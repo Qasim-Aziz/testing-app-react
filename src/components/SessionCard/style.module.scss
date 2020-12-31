@@ -1,0 +1,81 @@
+@import 'assets/styles/mixins.scss';
+
+.sessionCard {
+  max-width: 100%;
+  border: 1px solid #e4e9f0;
+  border-radius: 5px;
+  margin-bottom: 2px;
+  position: relative;
+  // border: '1px solid #E4E9F0';
+  box-shadow: '0px 0px 4px rgba(53, 53, 53, 0.1)';
+  padding: 10px;
+  display: 'flex';
+  align-items: 'center';
+  background-color: white;
+}
+
+.sessionCardAllocated {
+  max-width: 100%;
+  border: 1px solid #e4e9f0;
+  border-radius: 5px;
+  margin-bottom: 2px;
+  position: relative;
+  // border: '1px solid #E4E9F0';
+  box-shadow: '0px 0px 4px rgba(53, 53, 53, 0.1)';
+  padding: 10px;
+  display: 'flex';
+  align-items: 'center';
+  background-color: #ffcccc;
+}
+
+.sessionCardWrapper {
+  margin: 20px 5px 20px 20px;
+  display: flex;
+}
+
+.sessionCardImg {
+  width: 80px;
+  height: 64px;
+  border-radius: 10px;
+  margin-right: 12px;
+}
+
+.sessionHeading {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #000;
+}
+
+.language {
+  font-size: 16px;
+  margin-right: 15px;
+  color: #000;
+}
+
+.therepy {
+  font-size: 14px;
+  color: #d4237a;
+}
+.addSessionBtn {
+  background-color: #26e768;
+  border-radius: 0px;
+  border-bottom-right-radius: 5px;
+  border-top-left-radius: 5px;
+  width: 30px;
+  height: 27px;
+  margin-top: -15px;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  padding: 10;
+  color: '#fff'
+}
+
+.addSessionBtn span {
+  font-size: 20px;
+}

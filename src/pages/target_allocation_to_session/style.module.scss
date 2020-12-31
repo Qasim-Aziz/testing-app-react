@@ -1,0 +1,126 @@
+@import 'assets/styles/mixins.scss';
+
+.targetAllocation {
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: #e5e5e5;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: #6d6d6d;
+  }
+
+  .heading {
+    font-size: 24px;
+    font-weight: bold;
+    color: black;
+    margin-bottom: 4px;
+  }
+
+  .detailsButton {
+    background-color: rgb(249, 249, 249);
+    border: 1px solid rgb(228, 233, 240);
+    color: rgb(0, 0, 0);
+    height: 56px;
+    font-size: 16px;
+  }
+
+  .clearAllButton {
+    background-color: white;
+    border: 1px dashed $btn-primary-color;
+    color: $btn-primary-color;
+    height: 40px;
+    font-size: 16px;
+    margin-top: 10px;
+  }
+
+  .targetListHeding {
+    margin-bottom: 30px;
+    height: 40px;
+
+    .search {
+      span {
+        font-size: 25px;
+        color: black;
+      }
+    }
+  }
+}
+
+.card {
+  background-color: $white;
+  border-radius: 3px;
+  // box-shadow: 0 3px 5px rgba(22, 22, 53, 0.16);
+  margin-bottom: rem(15);
+  padding: rem(5);
+  min-height: rem(40);
+  cursor: move;
+}
+
+.content {
+  padding: rem(10);
+  position: relative;
+  //border: 1px solid #f4f6f8;
+}
+
+.flag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background-color: $gray;
+  width: 3px;
+  border-radius: 2px;
+}
+
+// dark theme
+:global(body.kit__dark) {
+  .card {
+    background: #f4f6fb;
+  }
+}
+
+.dynamicDeleteButton {
+  cursor: pointer;
+  position: relative;
+  top: 4px;
+  font-size: 24px;
+  color: #999;
+  transition: all 0.3s;
+}
+.dynamicDeleteButton:hover {
+  color: #777;
+}
+.dynamicDeleteButton[disabled] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.deleteButton {
+  height: 50px;
+  text-align: center;
+  border-radius: 6px;
+  justify-content: center;
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  border: 2px dashed #ff8080;
+  color: #ff8080;
+  font-size: 15px;
+  background-color: 'red';
+
+  :hover {
+    color: #ff8080;
+  }
+
+  div {
+    display: none;
+  }
+}

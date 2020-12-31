@@ -1,0 +1,23 @@
+.ant-form label {
+    font-size: 18px;
+    line-height: 18px;
+    margin-bottom: 11px;
+}
+  
+.ant-form-item-required::before {
+content: '';
+}
+
+.ant-form-item {
+    margin-bottom: 9px;
+}
+
+.ant-calendar-picker-input.ant-input,
+.ant-time-picker-input,
+.ant-input {
+    height: 38px;
+}
+
+// textarea.ant-input {
+//     height: 120px !important;
+// }

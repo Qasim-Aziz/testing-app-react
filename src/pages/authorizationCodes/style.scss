@@ -1,0 +1,50 @@
+.ant-table-thead > tr > th,
+.ant-table-tbody > tr > td {
+  padding-right: 0;
+  overflow-wrap: break-word;
+}
+
+.filter_sub_div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+.ant-form-item label {
+  font-size: 14px;
+}
+.ant-table-wrapper {
+  margin-left: 46px;
+}
+.ant-table {
+  font-size: 12px;
+}
+
+.ant-table-small > .ant-table-content > .ant-table-body > table > .ant-table-tbody > tr > td {
+  padding: 2px 15px;
+}
+
+.ant-table-small.ant-table-bordered .ant-table-content {
+  border-right: none;
+}
+
+.ant-table-small > .ant-table-content > .ant-table-body {
+  margin: 0 0;
+}
+.dynamic-delete-button {
+  cursor: pointer;
+  position: relative;
+  margin-left: 20px;
+  top: 4px;
+  font-size: 24px;
+  color: #999;
+  transition: all 0.3s;
+}
+.dynamic-delete-button:hover {
+  color: #777;
+}
+.dynamic-delete-button[disabled] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}

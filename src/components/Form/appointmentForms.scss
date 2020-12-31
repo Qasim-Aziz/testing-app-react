@@ -1,0 +1,24 @@
+.appointment-form {
+  margin-top: 0;
+
+  .ant-form-item {
+    margin-bottom: 5px;
+  }
+
+  .ant-form-item label {
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .ant-tag {
+    background-color: #dfdfdf;
+
+    &.ant-tag-checkable-checked {
+      background-color: #1890ff;
+    }
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}

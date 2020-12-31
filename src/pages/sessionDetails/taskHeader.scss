@@ -1,0 +1,17 @@
+.taskHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 17px;
+}
+
+.boxText {
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  box-sizing: border-box;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 18px;
+  padding: 10px;
+  min-width: 135px;
+  text-align: center;
+}

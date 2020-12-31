@@ -1,0 +1,13 @@
+// Import mixins
+@import 'assets/styles/mixins.scss';
+
+/////////////////////////////////////////////////////////////////////////////////////////
+/*  ANT DESIGN INPUT */
+
+.ant-input-disabled {
+  background: $gray-lighten-more-more;
+}
+.ant-upload.ant-upload-select-picture-card{
+  width: 100%;
+  height: 150px;
+}

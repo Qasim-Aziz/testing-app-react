@@ -1,0 +1,366 @@
+/* eslint-disable import/no-extraneous-dependencies */
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/jsx-indent */
+/* eslint-disable react/jsx-indent-props */
+/* eslint-disable react/jsx-closing-tag-location */
+/* eslint-disable react/destructuring-assignment */
+/* eslint-disable object-shorthand */
+import React from 'react'
+import {
+  Form,
+  Input,
+  Button,
+  Select,
+  DatePicker,
+  Divider,
+  Upload,
+  Tag,
+  Checkbox,
+  Icon,
+  message,
+} from 'antd'
+import moment from 'moment'
+import { connect } from 'react-redux'
+import axios from 'axios'
+
+const { TextArea } = Input
+const { Option } = Select
+const layout = {
+  labelCol: {
+    span: 5,
+  },
+  wrapperCol: {
+    span: 18,
+  },
+}
+const layout1 = {
+  labelCol: {
+    span: 5,
+  },
+  wrapperCol: {
+    span: 18,
+  },
+}
+const tailLayout = {
+  wrapperCol: {
+    offset: 5,
+    span: 18,
+  },
+}
+
+@connect(({ user, learners }) => ({ user, learners }))
+class EditBasicInformation extends React.Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {}
+  }
+
+  state = {
+    locationTag: null,
+    caseManagerTag: null,
+    categoryTag: null,
+    checked: true,
+    selectedFile: null,
+    userProfileID: null,
+  }
+
+  componentDidMount() {
+    const {
+      form,
+      learners: { UserProfile },
+    } = this.props
+
+    const selectedStaffList = []
+    UserProfile.authStaff.edges.map(item => selectedStaffList.push(item.node.id))
+
+    form.setFieldsValue({
+      clientId: UserProfile.clientId,
+      category: UserProfile.category?.id,
+      email: UserProfile.email,
+      gender: UserProfile.gender,
+      dob: moment(UserProfile.dob),
+      dateOfDiagnosis: UserProfile.dateOfDiagnosis ? moment(UserProfile.dateOfDiagnosis) : null,
+      clinicLocation: UserProfile.clinicLocation ? UserProfile.clinicLocation.id : null,
+      firstName: UserProfile.firstname,
+      lastName: UserProfile.lastname,
+      authStaff: selectedStaffList,
+      parentFirstName: UserProfile.parentName,
+      parentMobileNumber: UserProfile.parentMobile,
+      ssnCard: UserProfile.ssnAadhar,
+      mobileNo: UserProfile.mobileno,
+      address: UserProfile.currentAddress,
+      caseManager: UserProfile.caseManager?.id,
+      learnerLanguage: UserProfile.language?.id,
+      isActive: UserProfile.isActive
+        ? this.setState({ checked: UserProfile.isActive })
+        : this.setState({ checked: UserProfile.isActive }),
+    })
+
+    this.setState({
+      locationTag: UserProfile.clinicLocation
+        ? UserProfile.clinicLocation.location
+        : 'No Location Set',
+      caseManagerTag: UserProfile.caseManager
+        ? UserProfile.caseManager.name
+        : 'No Case Manager Set',
+      categoryTag: UserProfile.category?.category,
+      userProfileID: UserProfile.id,
+    })
+  }
+
+  onChange1 = e => {
+    this.setState({
+      checked: e.target.checked,
+    })
+  }
+
+  handleSubmit = e => {
+    const {
+      form,
+      dispatch,
+      learners: { UserProfile },
+    } = this.props
+    e.preventDefault()
+
+    let token = ''
+    if (!(localStorage.getItem('token') === null) && localStorage.getItem('token')) {
+      token = JSON.parse(localStorage.getItem('token'))
+    }
+    const headers = {
+      Accept: 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      database: 'india',
+      Authorization: token ? `JWT ${token}` : '',
+    }
+    const data = new FormData()
+    data.append('file', this.state.selectedFile)
+    data.append('pk', this.state.userProfileID)
+    form.validateFields((err, values) => {
+      if (!err) {
+        axios
+          .post('https://application.cogniable.us/apis/student-docs/', data, { headers: headers })
+          .then(res => {
+            // then print response status
+            console.log(res.statusText)
+            message.success('Upload Successfully.')
+            dispatch({
+              type: 'learners/EDIT_LEARNER',
+              payload: {
+                id: UserProfile.id,
+                values: values,
+              },
+            })
+          })
+          .catch(err1 => {
+            console.error({ err1 })
+            message.error('upload Failed.')
+            return false
+          })
+      }
+    })
+  }
+
+  onChangeHandler = event => {
+    this.setState({
+      selectedFile: event.target.files[0],
+    })
+  }
+
+  render() {
+    const itemStyle = { marginBottom: '5px', fontWeight: 'bold' }
+    const {
+      form,
+      learners: { clinicLocationList, categoryList, staffDropdownList, languageList },
+    } = this.props
+    const itemStyle1 = { textAlign: 'center', marginBottom: '5px', fontWeight: 'bold' }
+    return (
+      <Form {...layout} onSubmit={e => this.handleSubmit(e)}>
+        <Form.Item {...layout1} label="Profile" style={itemStyle1}>
+          <Tag>{this.state.locationTag}</Tag>
+          <Tag>{this.state.caseManagerTag}</Tag>
+          <Tag>{this.state.categoryTag}</Tag>
+        </Form.Item>
+
+        <Divider orientation="left">Contact Details</Divider>
+        <Form.Item label="Email" style={itemStyle}>
+          {form.getFieldDecorator('email', {
+            rules: [{ required: true, type: 'email', message: 'Please provide email!' }],
+          })(<Input size="medium" style={{ borderRadius: 0 }} />)}
+        </Form.Item>
+        <Form.Item label="First Name" style={itemStyle}>
+          {form.getFieldDecorator('firstName', {
+            rules: [{ required: true, message: 'Please provide firstName!' }],
+          })(<Input size="medium" style={{ borderRadius: 0 }} />)}
+        </Form.Item>
+        <Form.Item label="Last Name" style={itemStyle}>
+          {form.getFieldDecorator('lastName')(<Input size="medium" style={{ borderRadius: 0 }} />)}
+        </Form.Item>
+        <Form.Item label="Mobile no" style={itemStyle}>
+          {form.getFieldDecorator('mobileNo', {
+            rules: [{ message: 'Please provide Mobile No!' }],
+          })(<Input size="medium" style={{ borderRadius: 0 }} />)}
+        </Form.Item>
+        <Form.Item label="Address" style={itemStyle}>
+          {form.getFieldDecorator('address', { rules: [{ message: 'Please provide Address!' }] })(
+            <TextArea placeholder="Address" autoSize={{ minRows: 3 }} />,
+          )}
+        </Form.Item>
+        <Form.Item label="Street Address" style={itemStyle}>
+          {form.getFieldDecorator('street', { rules: [{ message: 'Please provide Street Name' }] })(
+            <Input placeholder="Street Address" size="medium" style={{ borderRadius: 0 }} />,
+          )}
+        </Form.Item>
+        <Form.Item label="State" style={itemStyle}>
+          {form.getFieldDecorator('state', { rules: [{ message: 'Please provide State' }] })(
+            <Input placeholder="State" size="medium" style={{ borderRadius: 0 }} />,
+          )}
+        </Form.Item>
+        <Form.Item label="City" style={itemStyle}>
+          {form.getFieldDecorator('city', { rules: [{ message: 'Please provide City' }] })(
+            <Input placeholder="City" size="medium" style={{ borderRadius: 0 }} />,
+          )}
+        </Form.Item>
+        <Form.Item label="Country" style={itemStyle}>
+          {form.getFieldDecorator('country', { rules: [{ message: 'Please provide Country' }] })(
+            <Input placeholder="Country" size="medium" style={{ borderRadius: 0 }} />,
+          )}
+        </Form.Item>
+        <Form.Item label="Pincode" style={itemStyle}>
+          {form.getFieldDecorator('pincode', { rules: [{ message: 'Please provide pincode' }] })(
+            <Input placeholder="Pincode" size="medium" style={{ borderRadius: 0 }} />,
+          )}
+        </Form.Item>
+
+        <Divider orientation="left">Personal Details</Divider>
+        <Form.Item label="Client Id" style={itemStyle}>
+          {form.getFieldDecorator('clientId', {
+            rules: [{ required: true, message: 'Please provide ClientId!' }],
+          })(<Input size="medium" style={{ borderRadius: 0 }} />)}
+        </Form.Item>
+        <Form.Item label="Parent Activation" style={itemStyle}>
+          {form.getFieldDecorator('isActive', {
+            rules: [{ required: false, message: 'Please Select parent activation if needed' }],
+          })(
+            <Checkbox checked={this.state.checked} onChange={this.onChange1} size="medium">
+              Yes
+            </Checkbox>,
+          )}
+        </Form.Item>
+        <Form.Item label="Gender" style={itemStyle}>
+          {form.getFieldDecorator('gender', {
+            rules: [{ required: true, message: 'Please provide Gender' }],
+          })(
+            <Select placeholder="Please provide Gender" allowClear size="medium">
+              <Option value="male">Male</Option>
+              <Option value="female">Female</Option>
+              <Option value="other">Other</Option>
+            </Select>,
+          )}
+        </Form.Item>
+        <Form.Item label="DOB" style={itemStyle}>
+          {form.getFieldDecorator('dob', {
+            rules: [{ required: true, message: 'Please provide Date of Birth!' }],
+          })(<DatePicker size="medium" style={{ borderRadius: 0 }} />)}
+        </Form.Item>
+        <Form.Item label="Parent/Guardian Name" style={itemStyle}>
+          {form.getFieldDecorator('parentFirstName', {
+            rules: [{ required: true, message: 'Please provide Parent Name!' }],
+          })(<Input size="medium" style={{ borderRadius: 0 }} />)}
+        </Form.Item>
+        <Form.Item label="Parent/Guardian Mobile no" style={itemStyle}>
+          {form.getFieldDecorator('parentMobileNumber', {
+            rules: [{ message: 'Please provide Mobile No!' }],
+          })(<Input size="medium" style={{ borderRadius: 0 }} />)}
+        </Form.Item>
+        <Form.Item label="SSN/Adhaar card" style={itemStyle}>
+          {form.getFieldDecorator('ssnCard', { rules: [{ message: 'Please provide Mobile No!' }] })(
+            <Input size="medium" style={{ borderRadius: 0 }} />,
+          )}
+        </Form.Item>
+
+        <Divider orientation="left">Misc details</Divider>
+        <Form.Item label="Authorized Staff" style={itemStyle}>
+          {form.getFieldDecorator('authStaff')(
+            <Select
+              mode="multiple"
+              placeholder="Select Therapist"
+              allowClear
+              maxTagCount="4"
+              size="medium"
+            >
+              {staffDropdownList.map(item => (
+                <Option value={item.node.id}>
+                  {item.node.name} {item.node.surname}
+                </Option>
+              ))}
+            </Select>,
+          )}
+        </Form.Item>
+        <Form.Item label="Case Manager" style={itemStyle}>
+          {form.getFieldDecorator('caseManager')(
+            <Select placeholder="Select Therapist" allowClear size="medium">
+              {staffDropdownList.map(item => (
+                <Option value={item.node.id}>
+                  {item.node.name} {item.node.surname}
+                </Option>
+              ))}
+            </Select>,
+          )}
+        </Form.Item>
+        <Form.Item label="Date of Diagnosis" style={itemStyle}>
+          {form.getFieldDecorator('dateOfDiagnosis')(<DatePicker />)}
+        </Form.Item>
+        <Form.Item label="Default Language" style={itemStyle}>
+          {form.getFieldDecorator('learnerLanguage', {
+            rules: [{ required: true, message: 'Please provide Default Language!' }],
+          })(
+            <Select placeholder="Select a default Language" allowClear size="medium">
+              {languageList.map(item => (
+                <Option value={item.id}>{item.name}</Option>
+              ))}
+            </Select>,
+          )}
+        </Form.Item>
+        <Form.Item label="Location Category" style={itemStyle}>
+          {form.getFieldDecorator('category', {
+            rules: [{ required: true, message: 'Please provide Mobile No!' }],
+          })(
+            <Select placeholder="Select category" allowClear size="medium">
+              {categoryList.map(item => (
+                <Option value={item.id}>{item.category}</Option>
+              ))}
+            </Select>,
+          )}
+        </Form.Item>
+        <Form.Item label="Upload Your Documents" style={itemStyle}>
+          <input type="file" name="file" onChange={this.onChangeHandler} />
+        </Form.Item>
+
+        <Divider orientation="left"> Default program </Divider>
+        <Form.Item label="Clinic Location" style={itemStyle}>
+          {form.getFieldDecorator('clinicLocation')(
+            <Select placeholder="Select a Clinic location" allowClear size="medium">
+              {clinicLocationList.map(item => (
+                <Option value={item.node.id}>{item.node.location}</Option>
+              ))}
+            </Select>,
+          )}
+        </Form.Item>
+
+        <Form.Item {...tailLayout}>
+          <Button style={{ width: '100%' }} type="primary" htmlType="submit">
+            Save
+          </Button>
+          {/* <Button htmlType="primary" onClick={this.onReset} className="ml-4">
+            cancel
+          </Button> */}
+        </Form.Item>
+      </Form>
+    )
+  }
+}
+
+const EditBasicInformationForm = Form.create()(EditBasicInformation)
+
+export default EditBasicInformationForm

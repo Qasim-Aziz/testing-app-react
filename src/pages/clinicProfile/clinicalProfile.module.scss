@@ -1,0 +1,89 @@
+@import 'assets/styles/mixins.scss';
+
+.mainProfile {
+  .menuButton {
+    width: 100%;
+    text-align: left;
+  }
+
+  .menuButton:focus,
+  .selected {
+    background-color: #e58425;
+    color: #fff !important;
+    border-color: unset;
+  }
+}
+
+.pageWrapper {
+  margin-top: 35px;
+
+  .pageTitle {
+    text-transform: uppercase;
+    font-size: rem(18);
+    color: #0e0b20;
+    margin: 12px 0;
+    margin-bottom: 17px;
+  }
+
+  label {
+    color: #63686e !important;
+    font-size: 16px !important;
+  }
+
+  input {
+    height: 48px !important;
+    border-radius: 4px !important;
+    font-size: 15px !important;
+  }
+
+  button {
+    background-color: $btn-primary-color;
+    color: #fff !important;
+    font-size: 17px !important;
+    font-weight: bold !important;
+    height: 35px !important;
+  }
+
+  button:focus,
+  button:hover {
+    background: #fff;
+    border: 1px solid $btn-primary-color;
+    color: $btn-primary-color !important;
+  }
+
+  ::placeholder {
+    color: #d5d5d5;
+  }
+
+  .logoWrapper {
+    width: 200px;
+    height: 250px;
+    border: 1px dashed $gray-border;
+    padding: 12px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .logo {
+    width: 100%;
+    //height: 100%;
+  }
+  .utils__content {
+    padding: 0rem 2.3rem;
+  }
+
+  .imageName {
+    width: 100px;
+    border-bottom: 1px solid $gray-border;
+    margin-right: 15px;
+
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 30px;
+  }
+}

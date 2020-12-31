@@ -1,0 +1,24 @@
+.summaryCardsBox {
+  margin-top: 22px !important;
+}
+
+.performenceCard {
+  height: 140px;
+  background: #fff;
+  border: 1px solid #e4e9f0;
+  box-sizing: border-box;
+  box-shadow: 0 0 4px rgba(53, 53, 53, 0.1);
+  border-radius: 10px;
+  padding: 20px 31px;
+  display: flex;
+  align-items: center;
+}
+
+.perCardMainContent {
+  margin-left: 51px;
+}
+
+.perCardIcon {
+  width: 100px;
+  height: 100px;
+}

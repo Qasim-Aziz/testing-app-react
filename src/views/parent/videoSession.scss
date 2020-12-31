@@ -1,0 +1,7 @@
+.targeVideo {
+  overflow: auto;
+  max-height: 1000px;
+}
+.targeVideo::-webkit-scrollbar {
+  display: none;
+}

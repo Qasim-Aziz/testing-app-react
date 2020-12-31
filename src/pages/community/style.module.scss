@@ -1,0 +1,244 @@
+@import 'assets/styles/mixins.scss';
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+main {
+  background-color: white !important;
+}
+
+.mainBody {
+  display: flex;
+  margin-top: 1%;
+  margin-left: 2%;
+}
+.itemImg {
+  width: 5%;
+}
+.itemImg img {
+  width: 100%;
+  height: 100%;
+  border-radius: 7px;
+}
+.blogs {
+  width: 55%;
+  margin-left: 3%;
+}
+.groups {
+  width: 40%;
+}
+.groupHeading p {
+  margin-left: 20%;
+  font-weight: bold;
+  font-size: 30px;
+  color: black;
+}
+.groupHeading {
+  margin-top: -2%;
+  display: flex;
+}
+.input_search {
+  height: 10%;
+}
+.subMainBody {
+  display: flex;
+  margin-top: 4%;
+  margin-left: 2%;
+}
+.commentCards {
+  width: 69%;
+}
+.gpCards {
+  width: 40%;
+  margin-left: 6%;
+  margin-top: -4%;
+  height: 75vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.gpCards::-webkit-scrollbar {
+  height: 10px;
+  width: 8px;
+}
+.gpCards::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: #a0a0a0;
+}
+.commentItem {
+  border: 1px solid #e4e9f0;
+  border-radius: 10px;
+  margin-top: 3%;
+}
+.gpItem {
+  border: 1px solid #e4e9f0;
+  border-radius: 4px;
+  margin-top: 6%;
+  margin-right: 1%;
+  margin-left: 1%;
+  cursor: pointer;
+}
+.gpItem:hover {
+  box-shadow: 0px 0px 8px 2px rgba(0, 0, 0, 0.2);
+  border: 1px solid darkorange;
+  border-radius: 10px;
+}
+.gpItem:active {
+  transition: transform 0.1s ease-out;
+  box-shadow: 0 5px #e4e9f0;
+  transform: translateY(5px);
+}
+
+.itemHeader {
+  display: flex;
+}
+.cardImg {
+  margin-top: 2%;
+  margin-left: 4%;
+  width: 13%;
+}
+.cardImg img {
+  width: 100%;
+  height: 100%;
+  border-radius: 7px;
+}
+.ItemName {
+  margin-top: 4%;
+  margin-left: 3%;
+}
+.ItemName h2 {
+  font-weight: bold;
+  font-size: 22px;
+}
+.ItemName p {
+  font-size: 20px;
+  color: #63686e;
+  // position:absolute;
+  // margin-top:3%;
+}
+.cardDes {
+  margin-top: 3%;
+  margin-left: 4%;
+  color: black;
+  font-size: 15px;
+  width: 95%;
+}
+.cardDes p {
+  word-wrap: break-word;
+}
+.actions {
+  display: flex;
+  margin-left: 5%;
+}
+.likes {
+  margin-top: 0.3%;
+  margin-left: 1%;
+  font-size: 15px;
+  color: darkorange;
+  font-size: 16px;
+}
+.comments {
+  position: absolute;
+  margin-left: 4.5%;
+  color: black;
+  font-size: 16px;
+}
+.gpHeading {
+  margin-left: 4%;
+  margin-top: 4%;
+  display: flex;
+}
+.gpIcon {
+  margin-top: 1%;
+  margin-left: 30%;
+}
+.gpLabel {
+  margin-left: 4%;
+}
+.gpDesc {
+  margin-left: 4%;
+  width: 85%;
+}
+
+.gpHeading p {
+  color: black;
+  font-size: 20px;
+  width: 95%;
+  font-weight: bold;
+}
+.gpLabel p {
+  color: darkorange;
+  font-weight: bold;
+  font-size: 18px;
+}
+.gpDesc p {
+  color: black;
+  font-size: 15px;
+  word-wrap: break-word;
+}
+.clickHandlerDiv {
+  width: 100%;
+}
+.msgIcon:active {
+  transition: transform 0.1s ease-out;
+  transform: translateY(5px);
+}
+.commentComp {
+  margin-left: 2%;
+}
+.commentBoxCover {
+  margin-top: 7%;
+}
+.commentBox {
+  display: flex;
+  margin-top: 3%;
+}
+.commentImageBox {
+  width: 13%;
+  height: 6em;
+}
+
+.commentImageBox img {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+.cmSubAct {
+  display: flex;
+}
+.cmtsubshell {
+  display: flex;
+}
+.commentDesc {
+  margin-left: 5%;
+  width: 70%;
+}
+.cmDesc {
+  width: 70%;
+}
+.cmDesc p {
+  word-wrap: space;
+}
+
+.communityActions {
+  margin-top: 3%;
+  margin-left: 20%;
+  font-weight: bold;
+}
+.notFoundImg {
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 31%;
+  margin: auto;
+}
+.notFoundImg img {
+  width: 100%;
+  height: 100%;
+}

@@ -1,0 +1,21 @@
+.CreateOrUpdate {
+  .ant-form-item {
+    margin-bottom: 5px;
+  }
+
+  .ant-form-item label {
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .ant-calendar-picker,
+  .ant-time-picker {
+    width: 100%;
+  }
+
+  .taskCompletionCount {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 0 10px;
+  }
+}

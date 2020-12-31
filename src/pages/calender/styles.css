@@ -1,0 +1,113 @@
+.calendar {
+  box-sizing: border-box;
+  font-size: 1rem;
+  /* max-width: 400px; */
+}
+
+.calendar .header {
+  background-color: #40a9ff;
+  text-align: center;
+  min-height: 3rem;
+  line-height: 3rem;
+  color: #FFF;
+  font-size: 25px;
+  /* font-family: var(--font-book); */
+  font-weight: 700;
+  display: flex;
+}
+
+.calendar .day-names {
+  display: flex;
+  flex-wrap: wrap;
+  /* max-width: 1000px; */
+  margin: 0 auto;
+  font-size: 20px;
+  align-items: center;
+}
+
+.calendar .body {
+  border: 1px solid var(--light-blue);
+}
+
+.calendar .header .previous {
+  flex: 1;
+  text-align: left;
+  margin-left: 1rem;
+  cursor: pointer;
+}
+
+.calendar .header .next {
+  flex: 1;
+  text-align: right;
+  margin-right: 1rem;
+  cursor: pointer;
+}
+
+.calendar .week {
+  background-color: white;
+  width: calc(100% / 7);
+  height: 60px;
+  line-height: 44px;
+  text-align: right;
+  text-transform: uppercase;
+  color: var(--black);
+  font-weight: 700;
+}
+.calendar .week div {
+  width: 100%;
+}
+
+.calendar .day {
+  position: relative;
+  width: calc(100% / 7);
+  height: 150px;
+  display: inline-block;
+  background-color: white;
+  padding: 5px;
+  margin: 0;
+  box-sizing: border-box;
+  z-index: 1;
+  text-align: right;
+  border-top: 0.5px solid;
+  font-size: 18px;
+  /* border-left: 0.5px solid; */
+}
+
+.calendar .day div {
+  /* width: 54px; */
+  /* height: 44px; */
+  position: relative;
+  color: var(--black);
+  z-index: 100;
+  line-height: 44px;
+}
+
+.calendar .day div.before {
+  color: var(--grey);
+}
+
+.calendar .day div.selected {
+  background-color: #c8e6ff;
+  /* color: var(--white); */
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.calendar .day div.today {
+  background-color: var(--grey);
+}
+.cal-event-item{
+  line-height: 1.5;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
+  text-overflow: ellipsis;
+  font-size: 14px;
+}
+.cal-event-div{
+  flex-direction: column; 
+  align-items: flex-start;
+  justify-content: flex-start;
+  height: 80px;
+  overflow-y: hidden;
+}

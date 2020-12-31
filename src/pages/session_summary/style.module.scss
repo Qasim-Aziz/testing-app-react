@@ -1,0 +1,251 @@
+@import 'assets/styles/mixins.scss';
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+main {
+  background-color: white;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-around;
+  min-height: 1vh;
+  border-bottom: 1px solid #e4e9f0;
+}
+
+.brand {
+  color: black;
+  font-size: 25px;
+  margin-right: 50%;
+  font-weight: bold;
+  margin-top: -9px;
+}
+
+.navbarLinks {
+  display: flex;
+  justify-content: space-around;
+  width: 30%;
+}
+
+.navbarLinks li {
+  list-style: none;
+}
+
+.navbarLinks a {
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.sessions {
+  display: flex;
+  justify-content: space-around;
+  width: 30%;
+}
+
+.sessions li {
+  list-style: none;
+  text-decoration: none;
+}
+
+.sessions p {
+  color: black;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.sessions p:focus {
+  color: #0b35b3;
+}
+
+.sessions p:hover {
+  color: #0b35b3;
+}
+
+.upload {
+  color: black;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: -4px;
+}
+
+.wrapper {
+  display: grid;
+  grid-template-columns: 70% 30%;
+  grid-column-gap: 1em;
+  justify-content: space-around;
+  min-height: 1vh;
+  margin-top: 1%;
+}
+
+.videoHeading {
+  margin-left: 17%;
+}
+
+.graphcol {
+  display: grid;
+  grid-template-columns: 70% 30%;
+  grid-column-gap: 3em;
+  justify-content: space-around;
+  min-height: 35vh;
+  margin-top: -1%;
+}
+.graphrow {
+  border: 1px solid #e4e9f0;
+  border-radius: 5px;
+  background-color: gray;
+}
+.videobox {
+  border: 1px solid #e4e9f0;
+  border-radius: 5px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.uploadImg {
+  width: 40%;
+  height: 190px;
+  margin: 10px;
+  padding: 5px;
+}
+
+.uploadImg img {
+  width: 100%;
+  height: 100%;
+  margin-top: -55px;
+}
+
+.btncls {
+  background-color: #0b35b3 !important;
+  margin-left: 20%;
+  color: white;
+}
+
+.dataup {
+  color: darkblue;
+  float: left;
+}
+
+.lists {
+  display: grid;
+  grid-template-columns: 70% 30%;
+  grid-column-gap: 3em;
+  justify-content: space-around;
+  min-height: 10vh;
+  margin-top: 2%;
+}
+
+.cards {
+  display: grid;
+  grid-gap: 1rem;
+  grid-template-columns: auto auto auto auto;
+  grid-column-gap: 3em;
+}
+.card {
+  border: 1px solid #e4e9f0;
+  border-radius: 5px;
+}
+.cardData {
+  display: flex;
+  margin-top: 10px;
+}
+
+.cardData p {
+  color: black;
+  font-size: 15px;
+  font-weight: bold;
+  margin-left: 9%;
+  margin-top: 8px;
+}
+.cardData h1 {
+  color: #e58425;
+  margin-left: 4%;
+}
+.postCardData p {
+  color: #e4e9f0;
+  font-size: 15px;
+  font-weight: bold;
+  margin-left: 17%;
+}
+
+.feedback {
+  border: 1px solid #e4e9f0;
+  border-radius: 5px;
+  position: relative;
+  margin-left: 71.3%;
+  margin-top: -11%;
+  height: 35vh;
+  width: 24vw;
+}
+
+.feedHeading p {
+  font-size: 20px;
+  font-weight: bold;
+  color: black;
+}
+
+.feedback p {
+  font-size: 15px;
+  font-weight: bold;
+  margin-left: 40px;
+  color: black;
+  margin-top: 19px;
+}
+
+.txtbx {
+  height: 30%;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.sessionq {
+  margin-top: -0%;
+}
+
+.circle {
+  border: 1px solid black;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  justify-content: space-between;
+  margin-left: 8px;
+  margin-top: 10px;
+}
+.rating {
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 5%;
+}
+.circle:hover {
+  background-color: darkblue;
+  color: white;
+}
+.btnSub {
+  margin-top: 6%;
+  width: 80%;
+  margin-left: 40px;
+  background-color: #0b35b3 !important;
+  font-size: large;
+}
+
+.btnSub :hover {
+  background-color: darkblue !important;
+}
+
+.uploadImg p {
+  font-size: large;
+  color: darkblue;
+  margin-top: 25px;
+  float: left;
+}

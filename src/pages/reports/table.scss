@@ -1,0 +1,18 @@
+/* table */
+.ant-table {
+  font-size: 11px;
+}
+/* row data */
+.ant-table-tbody > tr > td {
+  height: 5px;
+  padding: 4px;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.ant-table-thead > tr > th {
+  height: 5px;
+  padding: 4px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.87);
+  font-weight: bold;
+}

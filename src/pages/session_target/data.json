@@ -1,0 +1,113 @@
+{
+  "partitions": [{
+    "name": "Today's Kunal Morning Session",
+    "cover": "resources/images/photos/2.jpeg",
+    "videos": [{
+      "cover": "resources/images/photos/1.jpeg",
+      "name": "Stay in Malibu",
+      "author": "Samuel Lewin",
+      "views": "682,079"
+    }, {
+      "cover": "resources/images/photos/2.jpeg",
+      "name": "The climb into the mountains",
+      "author": "Kayla Mercer",
+      "views": "24,921"
+    }, {
+      "cover": "resources/images/photos/3.jpeg",
+      "name": "The art of macro photography",
+      "author": "Jennifer Neal",
+      "views": "322,234"
+    },
+    {
+      "cover": "resources/images/photos/1.jpeg",
+      "name": "Stay in Malibu",
+      "author": "Samuel Lewin",
+      "views": "682,079"
+    }, {
+      "cover": "resources/images/photos/2.jpeg",
+      "name": "The climb into the mountains",
+      "author": "Kayla Mercer",
+      "views": "24,921"
+    }, {
+      "cover": "resources/images/photos/3.jpeg",
+      "name": "The art of macro photography",
+      "author": "Jennifer Neal",
+      "views": "322,234"
+    },
+    {
+      "cover": "resources/images/photos/1.jpeg",
+      "name": "Stay in Malibu",
+      "author": "Samuel Lewin",
+      "views": "682,079"
+    }, {
+      "cover": "resources/images/photos/2.jpeg",
+      "name": "The climb into the mountains",
+      "author": "Kayla Mercer",
+      "views": "24,921"
+    }, {
+      "cover": "resources/images/photos/3.jpeg",
+      "name": "The art of macro photography",
+      "author": "Jennifer Neal",
+      "views": "322,234"
+    },
+    {
+      "cover": "resources/images/photos/1.jpeg",
+      "name": "Stay in Malibu",
+      "author": "Samuel Lewin",
+      "views": "682,079"
+    }, {
+      "cover": "resources/images/photos/2.jpeg",
+      "name": "The climb into the mountains",
+      "author": "Kayla Mercer",
+      "views": "24,921"
+    }, {
+      "cover": "resources/images/photos/3.jpeg",
+      "name": "The art of macro photography",
+      "author": "Jennifer Neal",
+      "views": "322,234"
+    }]
+  }, {
+    "name": "Today's Kunal Afternoon Session",
+    "cover": "resources/images/photos/2.jpeg",
+    "videos": [{
+      "cover": "resources/images/photos/1.jpeg",
+      "name": "Stay in Malibu",
+      "author": "Samuel Lewin",
+      "views": "682,079"
+    }, {
+      "cover": "resources/images/photos/2.jpeg",
+      "name": "The climb into the mountains",
+      "author": "Kayla Mercer",
+      "views": "24,921"
+    }, {
+      "cover": "resources/images/photos/3.jpeg",
+      "name": "The art of macro photography",
+      "author": "Jennifer Neal",
+      "views": "322,234"
+    }]
+  }, {
+    "name": "Today's Kunal Evening Session",
+    "cover": "resources/images/photos/3.jpeg",
+    "videos": [{
+      "cover": "resources/images/photos/1.jpeg",
+      "name": "Stay in Malibu",
+      "author": "Samuel Lewin",
+      "views": "682,079"
+    }, {
+      "cover": "resources/images/photos/2.jpeg",
+      "name": "The climb into the mountains",
+      "author": "Kayla Mercer",
+      "views": "24,921"
+    }, {
+      "cover": "resources/images/photos/3.jpeg",
+      "name": "The art of macro photography",
+      "author": "Jennifer Neal",
+      "views": "322,234"
+    }, {
+      "cover": "resources/images/photos/4.jpeg",
+      "name": "Downhill",
+      "author": "Kevin Addington",
+      "views": "864,092"
+    }]
+  }]
+}

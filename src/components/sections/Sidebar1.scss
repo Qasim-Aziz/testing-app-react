@@ -1,0 +1,23 @@
+.ant-list-split {
+  .ant-list-header {
+    border-bottom: none;
+    text-transform: uppercase;
+    margin: 30px 10px 0 10px;
+    div {
+      font-weight: 500;
+      margin-bottom: 10px;
+      margin-right: 20px;
+    }
+  }
+}
+
+.listItem {
+  padding: 10px 20px;
+  background-color: #fff;
+  margin: 0 10px;
+  margin-bottom: 10px;
+  padding-bottom: 15px;
+  padding-top: 15px;
+  font-size: 15px;
+  border: 1px solid opacity($color: #585555);
+}

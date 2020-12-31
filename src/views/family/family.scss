@@ -1,0 +1,95 @@
+@import 'assets/styles/mixins.scss';
+
+.btnActive:focus {
+  background-color: #e58425;
+  color: #fff !important;
+  border-color: unset;
+}
+
+.btnActive:focus div span,
+.btnActive:focus div h4 {
+  color: #fff;
+}
+
+.name-card {
+  padding: 24px;
+
+  .relationship {
+    font-size: 36px;
+    font-weight: bold;
+    color: #000;
+  }
+
+  .siblings {
+    margin-bottom: 15px;
+
+    .tag {
+      font-size: 18px;
+      color: #000;
+      margin-right: 20px;
+      margin-bottom: 10px;
+      height: 45px;
+      padding: 10px 20px 10px 20px;
+      //background-color: #F9F9F9;
+      border: 1px solid #e4e9f0;
+    }
+    .anticon-close-circle {
+      margin-left: 10px;
+    }
+  }
+
+  .member-image {
+    border-radius: 10px;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.time-card {
+  margin: 15px 0;
+  padding: 2px 14px;
+  height: 40px;
+  border-radius: 2px;
+  background-color: #f9f9f9;
+  border: 1px solid #e4e9f0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.time-spend {
+  font-size: 24px;
+  font-weight: 500;
+  color: #000;
+}
+
+.how-much-time {
+  color: #e5e5e5;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.save-btn {
+  float: right;
+  width: 200px;
+  height: 40px;
+  background-color: #0b35b3;
+  color: #fff;
+}
+
+.form-item {
+  width: 100%;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+
+  .ant-form-item-control {
+    line-height: 35px;
+  }
+}
+
+.relation-select {
+  width: 100%;
+  height: 40px;
+}
+.relation-select .ant-select-selection--single {
+  height: 40px;
+}

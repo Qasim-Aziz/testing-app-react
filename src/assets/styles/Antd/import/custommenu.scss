@@ -1,0 +1,15 @@
+@import 'assets/styles/mixins.scss';
+
+.ant-menu {
+  color: rgb(0, 0, 0);
+}
+
+.ant-menu-horizontal > .ant-menu-item > a {
+  color: rgb(0, 0, 0);
+}
+
+.ant-menu-horizontal > .ant-menu-item,
+.ant-menu-horizontal > .ant-menu-submenu {
+  border-left: 0.5px solid #f2f4f8;
+  border-right: 0.5px solid #f2f4f8;
+}

@@ -1,0 +1,19 @@
+.ant-table-thead > tr > th,
+.ant-table-tbody > tr > td {
+  padding-right: 0;
+  overflow-wrap: break-word;
+}
+
+.filter_sub_div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+.ant-form-item label {
+  font-size: 14px;
+}
+.utils__content {
+  padding: 0px;
+}

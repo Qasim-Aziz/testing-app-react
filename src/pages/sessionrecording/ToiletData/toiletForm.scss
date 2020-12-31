@@ -1,0 +1,25 @@
+.radioGroup {
+  display: flex;
+  justify-content: space-between;
+}
+
+.radioButton {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 45%;
+  font-size: 22px;
+  font-weight: 600;
+  border-radius: 6px !important;
+}
+
+.ant-form-item label {
+  font-size: 18px;
+}
+
+.ant-input-number {
+  height: 45px;
+  display: flex;
+  align-items: center;
+}
