@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import React, { useState, useEffect } from 'react'
 import { useQuery, useMutation } from 'react-apollo'
 import { Tabs, Button, notification } from 'antd'

@@ -1,4 +1,5 @@
 /* eslint-disable no-else-return */
+/* eslint-disable prefer-template */
 import moment from 'moment'
 
 function arrayNotNull(array) {

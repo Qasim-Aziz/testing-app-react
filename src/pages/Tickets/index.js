@@ -391,10 +391,10 @@ const AllTicketsData = () => {
                 onClose={() => setVisible(false)}
                 visible={visible}
             >
-                {/*<TicketsForm />*/}
+                {/* <TicketsForm /> */}
                 <Form {...layout} name='control-ref' onSubmit={e => updateTicketDetails(e)}>
                     <Form.Item label='Subject' style={{ marginBottom: '5px' }} size='small'>
-                        <Input size='small' style={{ borderRadius: 0 }} value={TicketSubject} onChange={(e) => { setTicketSubject(e.target.value)} } />
+                        <Input size='small' style={{ borderRadius: 0 }} value={TicketSubject} onChange={(e) => { setTicketSubject(e.target.value)}} />
                     </Form.Item>
                     <Form.Item label='Description' style={{ marginBottom: '5px' }} size='small'>
                         <Input size='small' style={{ borderRadius: 0 }} value={TicketDescription} onChange={(e) => setTicketDescription(e.target.value)} />

@@ -177,11 +177,11 @@ const routes = [
     component: loadable(() => import('components/UserProfile/EditProfile')),
     exact: true,
   },
-  {
-    path: '/targets/program_pdf',
-    component: loadable(() => import('pages/program_pdf')),
-    exact: true,
-  },
+  // {
+  //   path: '/targets/program_pdf',
+  //   component: loadable(() => import('pages/program_pdf')),
+  //   exact: true,
+  // },
   {
     path: '/targets/appointment',
     component: loadable(() => import('pages/appointment')),

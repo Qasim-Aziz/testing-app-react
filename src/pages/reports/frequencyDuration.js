@@ -1,4 +1,5 @@
 /* eslint-disable no-plusplus */
+/* eslint-disable import/no-extraneous-dependencies */
 
 import groupObj from '@hunters/group-object'
 import { Button, Empty, Modal, Table } from 'antd'
