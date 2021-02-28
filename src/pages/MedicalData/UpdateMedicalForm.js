@@ -92,7 +92,7 @@ const remainderReducer = (state, action) => {
   }
 }
 
-const UpdateMedicalForm = ({ style, setOpen, form, id, closeDrawer }) => {
+const UpdateMedicalForm = ({ style, setOpen, form, id, closeDrawer, setMedDataUpdated }) => {
   const [reminder, setReminder] = useState(true)
   const [preseptionDrugCount, setPreseptionDrugCount] = useState(0)
   const [remainderCount, setRemainderCount] = useState(0)
@@ -194,6 +194,8 @@ const UpdateMedicalForm = ({ style, setOpen, form, id, closeDrawer }) => {
       setRemainderCount(0)
       remainderDispatch({ type: 'RESET' })
       setOpen(null)
+      setMedDataUpdated(true)
+      closeDrawer()
     }
 
     if (error) {
@@ -347,7 +349,7 @@ const UpdateMedicalForm = ({ style, setOpen, form, id, closeDrawer }) => {
                 closeDrawer()
               }}
             >
-              Cancle
+              Cancel
             </Button>
           </Form.Item>
         </div>

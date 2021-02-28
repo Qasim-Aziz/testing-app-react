@@ -583,7 +583,7 @@ const UpdateABCForm = ({ style, form, updateAbc, setUpdateAbc, closeDrawer }) =>
               closeDrawer()
             }}
           >
-            Cancle
+            Cancel
           </Button>
         </div>
       </Form.Item>

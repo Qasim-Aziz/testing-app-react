@@ -63,7 +63,7 @@ class TargetResponseGraph extends Component {
         StimulusActiveId,
         StepActiveIndex,
         StepActiveId,
-
+        SelectedPeakStimulusIndex,
       },
     } = this.props
 
@@ -71,22 +71,22 @@ class TargetResponseGraph extends Component {
     let activeStimulusId = ''
     let activeStepId = ''
 
-    if (MasterSession.targets.edges[TargetActiveIndex].node.targetAllcatedDetails.targetType.id === peakId) {
+    if (
+      MasterSession.targets.edges[TargetActiveIndex].node.targetAllcatedDetails.targetType.id ===
+      peakId
+    ) {
       console.log('Peak Found')
       activeTargetId = TargetActiveId
-    }
-    else if (MasterSession.targets.edges[TargetActiveIndex].node.sd.edges.length > 0) {
+      activeStimulusId = MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[SelectedPeakStimulusIndex]?.node.id
+    } else if (MasterSession.targets.edges[TargetActiveIndex].node.sd.edges.length > 0) {
       console.log('found stimulus')
       activeTargetId = TargetActiveId
       activeStimulusId = StimulusActiveId
-    }
-    else if (MasterSession.targets.edges[TargetActiveIndex].node.steps.edges.length > 0) {
+    } else if (MasterSession.targets.edges[TargetActiveIndex].node.steps.edges.length > 0) {
       console.log('found Step')
       activeTargetId = TargetActiveId
       activeStepId = StepActiveId
-
-    }
-    else {
+    } else {
       console.log('Found Target')
       activeTargetId = TargetActiveId
     }
@@ -95,11 +95,7 @@ class TargetResponseGraph extends Component {
       .query({
         query: gql`
           query GetTargetPercentage($target: ID!, $sd: ID, $step: ID) {
-            get5dayPercentage2(
-              target: $target
-              sd: $sd
-              step: $step
-            ){
+            get5dayPercentage2(target: $target, sd: $sd, step: $step) {
               date
               correctPercent
               errorPercent
@@ -115,7 +111,6 @@ class TargetResponseGraph extends Component {
         fetchPolicy: 'network-only',
       })
       .then(result => {
-
         const correctData = []
         const incorrectData = []
         const promptData = []
@@ -133,6 +128,8 @@ class TargetResponseGraph extends Component {
             { id: 'Correct', data: correctData },
           ],
         })
+
+        
       })
       .catch(error => {
         error.graphQLErrors.map(item => {
@@ -146,6 +143,8 @@ class TargetResponseGraph extends Component {
 
   render() {
     const { loading, data, GraphData } = this.state
+
+    console.log("GraphData- " ,GraphData)
     if (loading) {
       return 'Loading...'
     }
@@ -163,7 +162,6 @@ class TargetResponseGraph extends Component {
         StimulusActiveId,
         StepActiveIndex,
         StepActiveId,
-
       },
     } = this.props
 
@@ -242,15 +240,14 @@ class TargetResponseGraph extends Component {
     //   ]
     // }
 
-
     return (
       <div style={{ height: '250px' }}>
         <ResponsiveLine
           data={GraphData}
           margin={{ top: 30, right: 50, bottom: 30, left: 60 }}
           xScale={{ type: 'point' }}
-          yScale={{ type: 'linear', min: 0, max: 100, stacked: true, reverse: false }}
-          curve="natural"
+          yScale={{ type: 'linear', min: 0, max: 100, stacked: false, reverse: false }}
+          curve="linear"
           axisTop={null}
           axisRight={null}
           // axisBottom={{
@@ -269,7 +266,7 @@ class TargetResponseGraph extends Component {
             tickRotation: 0,
             legend: 'Response (%)',
             legendOffset: -40,
-            legendPosition: 'middle'
+            legendPosition: 'middle',
           }}
           colors={{ scheme: 'category10' }}
           lineWidth={3}
@@ -300,11 +297,11 @@ class TargetResponseGraph extends Component {
                   on: 'hover',
                   style: {
                     itemBackground: 'rgba(0, 0, 0, .03)',
-                    itemOpacity: 1
-                  }
-                }
-              ]
-            }
+                    itemOpacity: 1,
+                  },
+                },
+              ],
+            },
           ]}
         />
       </div>

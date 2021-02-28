@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Drawer } from 'antd'
-import { useQuery } from 'react-apollo'
+import { useQuery, useLazyQuery } from 'react-apollo'
 import UpdateTargetForm from './UpdateTargetForm'
 import TargetAreaCard from './TargetAreaCard'
 import TargetCard from './TargetCard'
@@ -14,11 +14,17 @@ const TargetAreaContent = ({ targetArea, domainId, programArea }) => {
   const [selectName, setName] = useState()
   const [selectInstr, setInstr] = useState()
 
-  const { data, loading, error } = useQuery(TARGET_QUERY, {
-    variables: {
-      id: targetArea?.node.id,
-    },
-  })
+  const [fetchData, { data, loading, error }] = useLazyQuery(TARGET_QUERY)
+
+  useEffect(() => {
+    if (targetArea?.node) {
+      fetchData({
+        variables: {
+          id: targetArea.node.id,
+        },
+      })
+    }
+  }, [targetArea])
 
   useEffect(() => {
     if (selectName) {

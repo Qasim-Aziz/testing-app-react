@@ -28,20 +28,16 @@ const { Content } = Layout
 const { Title, Text } = Typography
 
 const MAND_DATA = gql`
-  query mandPage($studentId: ID!, $date: Date!) {
-    getClickData(student: $studentId, date: $date) {
+  query getMandData($studentId: ID!, $dateGte: Date!, $dateLte: Date!) {
+    getMandData(dailyClick_Student: $studentId, dateGte: $dateGte, dateLte: $dateLte) {
       edges {
         node {
           id
-          measurments
-          dailyClickDataSet {
-            edges {
-              node {
-                id
-                data
-                date
-              }
-            }
+          data
+          date
+          dailyClick {
+            id
+            measurments
           }
         }
       }
@@ -93,8 +89,15 @@ const MandDataPage = props => {
   const { openRightdrawer, closeDrawer, handleFilterToggle, filter, TabCheck } = props
 
   const [activeMand, setActiveMand] = useState('')
+  const [searchVal, setSearchVal] = useState('')
+  const [mandData, setMandData] = useState(null)
 
-  const [date, setDate] = useState(moment().format('YYYY-MM-DD'))
+  const [date, setDate] = useState({
+    gte: moment()
+      .subtract(4, 'weeks')
+      .format('YYYY-MM-DD'),
+    lte: moment().format('YYYY-MM-DD'),
+  })
   const [newMandCreated, setNewMandCreated] = useState(false)
   const [mandTitle, setMandTitle] = useState('')
   const studentId = localStorage.getItem('studentId')
@@ -110,7 +113,8 @@ const MandDataPage = props => {
     fetchPolicy: 'network-only',
     variables: {
       studentId,
-      date,
+      dateGte: date.gte,
+      dateLte: date.lte,
     },
   })
 
@@ -168,7 +172,15 @@ const MandDataPage = props => {
   }, [mandNewDataError])
 
   const handleSelectDate = (newDate, value) => {
-    setDate(moment(value).format('YYYY-MM-DD'))
+    setDate({
+      gte: moment(value[0]).format('YYYY-MM-DD'),
+      lte: moment(value[1]).format('YYYY-MM-DD'),
+    })
+  }
+
+  const searchValHandler = e => {
+    console.log(e.target.value)
+    setSearchVal(e.target.value)
   }
 
   const SubmitForm = e => {
@@ -194,6 +206,20 @@ const MandDataPage = props => {
   useEffect(() => {
     updateDrawerForm(openRightdrawer)
   }, [openRightdrawer])
+
+  useEffect(() => {
+    if (data && searchVal) {
+      const filteredData = data?.getMandData.edges.filter(item =>
+        item.node.dailyClick.measurments.toLowerCase().includes(searchVal),
+      )
+      console.log(filteredData)
+      setMandData({
+        getMandData: {
+          edges: filteredData,
+        },
+      })
+    } else setMandData(data)
+  }, [data, searchVal])
 
   // const [
   //   getSelectedMand,
@@ -239,7 +265,16 @@ const MandDataPage = props => {
         >
           <Row gutter={[46, 0]}>
             <Col span={24}>
-              {filter && <FilterComp onChange={handleSelectDate} />}
+              {filter && (
+                <FilterComp
+                  handleSelectDate={handleSelectDate}
+                  searchVal={searchVal}
+                  searchValHandler={searchValHandler}
+                  startDate={date.gte}
+                  endDate={date.lte}
+                  rangePicker
+                />
+              )}
               <div>
                 <div
                   style={{
@@ -255,12 +290,10 @@ const MandDataPage = props => {
                   ) : (
                     <>
                       {error && <pre>{JSON.stringify(error, null, 2)}</pre>}
-                      {data &&
-                        data.getClickData.edges.map(({ node }, index) => {
+                      {mandData &&
+                        mandData.getMandData.edges.map(({ node }, index) => {
                           // eslint-disable-next-line no-shadow
-                          const dailyClickData = node.dailyClickDataSet.edges[0]
-                            ? parseInt(node.dailyClickDataSet.edges[0].node.data, 10)
-                            : 0
+                          const dailyClickData = node.data
                           return (
                             <div
                               id={node.id}
@@ -289,7 +322,7 @@ const MandDataPage = props => {
                                   }}
                                 >
                                   {studnetInfo && studnetInfo.student.firstname}&apos;s requests for{' '}
-                                  {node.measurments}
+                                  {node.dailyClick.measurments}
                                 </div>
 
                                 <Button
@@ -298,12 +331,12 @@ const MandDataPage = props => {
                                     let newDailyClickData = dailyClickData
                                     if (dailyClickData > 0) {
                                       newDailyClickData -= 1
-                                      console.log(newDailyClickData)
+                                      console.log(node)
                                       recodeMandData({
                                         variables: {
-                                          id: node.id,
+                                          id: node.dailyClick.id,
                                           data: newDailyClickData,
-                                          date,
+                                          date: node.date,
                                         },
                                       })
                                     }
@@ -324,10 +357,11 @@ const MandDataPage = props => {
                                 </Text>
                                 <Button
                                   onClick={() => {
+                                    console.log(node)
                                     recodeMandData({
                                       variables: {
-                                        id: node.id,
-                                        date,
+                                        id: node.dailyClick.id,
+                                        date: node.date,
                                         data: dailyClickData + 1,
                                       },
                                     })
@@ -465,7 +499,12 @@ const MandDataPage = props => {
                 paddingTop: 0,
               }}
             >
-              <GraphComponent key={activeMand} mandId={activeMand} studentId={studentId} date={date} />
+              <GraphComponent
+                key={activeMand}
+                mandId={activeMand}
+                studentId={studentId}
+                date={date}
+              />
             </div>
           </Drawer>
         </Content>

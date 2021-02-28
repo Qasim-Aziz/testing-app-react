@@ -15,5 +15,15 @@
   font-size: 14px;
 }
 .utils__content {
-  padding: 0rem;
+  padding: 0;
+}
+
+.filter_div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: -28px;
+  margin-top: 8px;
+  width: fit-content;
+  height: 36px;
 }

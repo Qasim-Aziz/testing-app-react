@@ -7,10 +7,11 @@ import React, { useEffect, useState, useReducer } from 'react'
 import { Form, Select, Input, Typography, Button, notification, DatePicker } from 'antd'
 import { useMutation, useQuery } from 'react-apollo'
 import moment from 'moment'
-import InvoiceItemsTable from './InvoiceProductsTable'
+import { InvoiceProductsTable } from './InvoiceProductsTable'
 import './invoiceForm.scss'
 import { ALL_STUDENT, INVOICE_STATUS, CREATE_INVOICE, GET_STUDENT_EMAIL } from './query'
 import { ProductContext } from './context'
+import productReducer from './reducer'
 
 const { Option } = Select
 const { Text, Title } = Typography
@@ -28,31 +29,6 @@ const calculatDateAdd = (form, dayNum) => {
   return moment(form.getFieldValue('issueDate'))
     .add(dayNum, 'day')
     .format('YYYY-MM-DD')
-}
-
-const productReducer = (products, action) => {
-  let newProductsArray
-  switch (action.type) {
-    case 'INIT':
-      return []
-    case 'ADD_PRODUCT':
-      return [...products, action.payload]
-    case 'REMOVE_PRODUCT':
-      newProductsArray = products.filter(({ key }) => action.payload.key !== key)
-      return newProductsArray.map((product, index) => {
-        product.key = index + 1
-        return product
-      })
-    case 'EDIT_PRODUCT':
-      return products.map(product => {
-        if (product.key === action.payload.key) {
-          product = action.payload
-        }
-        return product
-      })
-    default:
-      return products
-  }
 }
 
 function getTotal(subTotal, discount = 0, taxableSubtotal = 0) {
@@ -274,7 +250,7 @@ const InvoiceForm = ({ form, setNewInvDrawer, refetchInvoices }) => {
         </div>
 
         <ProductContext.Provider value={productsDispatch}>
-          <InvoiceItemsTable
+          <InvoiceProductsTable
             style={{ marginTop: 25 }}
             totalAmount={subTotal}
             products={productsState}
@@ -403,7 +379,7 @@ const InvoiceForm = ({ form, setNewInvDrawer, refetchInvoices }) => {
               productsDispatch({ type: 'INIT' })
             }}
           >
-            Cancle
+            Cancel
           </Button>
 
           <Button

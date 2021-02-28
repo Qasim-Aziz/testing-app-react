@@ -1,0 +1,15 @@
+.filter-parent {
+  display: flex;
+  background-color: 'red';
+  width: 100%;
+  justify-content: space-between;
+}
+.filter-parent > span {
+  margin: 10px 5px;
+}
+
+@media screen and (max-width: 1000px) {
+  .filter-parent {
+    flex-wrap: wrap;
+  }
+}

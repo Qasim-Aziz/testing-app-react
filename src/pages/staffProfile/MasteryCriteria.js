@@ -216,7 +216,12 @@ const MasteryCriteria = () => {
       },
     ]
     return (
-      <Table columns={columns} dataSource={record.statuscriteriaSet.edges} pagination={false} />
+      <Table
+        columns={columns}
+        rowKey={record => record.node.id}
+        dataSource={record.statuscriteriaSet.edges}
+        pagination={false}
+      />
     )
   }
 
@@ -235,6 +240,7 @@ const MasteryCriteria = () => {
             <Table
               dataSource={tableData}
               columns={columns}
+              rowKey={record => record.id}
               bordered
               expandedRowRender={expandedRowRender}
             />

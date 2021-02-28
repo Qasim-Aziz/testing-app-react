@@ -3,15 +3,18 @@
 .menu {
   :global(.ant-menu-item-divider) {
     height: 36px !important;
-    margin-top: 0px !important;
+    margin-top: 0 !important;
     width: 1px !important;
     float: left;
-    height: 48px !important
+  }
+
+  :global(.ant-dropdown-menu-item) {
+    padding: 0.8rem 0.8rem 0;
   }
 
   :global(.ant-menu-dark) {
     :global(.ant-menu-item-divider) {
-      background: $text-darken-more !important;
+      background-color: $text-darken-more !important;
     }
 
     .icon {
@@ -81,4 +84,10 @@
 :global(.settings__menuTop .ant-menu-light) {
   border-bottom: none;
   box-shadow: inset 0 -1px 0 #e8e8e8;
+}
+
+.temp {
+  :global(.ant-comment-inner) {
+    padding: 0 !important;
+  }
 }

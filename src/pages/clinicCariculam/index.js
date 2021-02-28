@@ -26,7 +26,6 @@ import TabContent from './TabContent'
 import EquivalenceContent from './EquivalenceContent'
 import { DISABLE_PROGRAM_AREA, UPDATE_TARGET_AREA, TARGET_AREA_NAME } from './query'
 
-
 const { Content } = Layout
 const { TabPane } = Tabs
 const { confirm } = Modal
@@ -123,7 +122,6 @@ export default () => {
       )
     },
   })
-
   const [CopyMutate, copyAreaData] = useMutation(COPY_PROGRAM_AREA, {
     update(cache, { data }) {
       const cacheData = cache.readQuery({
@@ -390,12 +388,14 @@ export default () => {
       <Menu.Divider />
       <Menu.Item onClick={() => handelCopyProgramAreaModel(selectProgramArea)}>Copy</Menu.Item>
       <Menu.Divider />
-      <Menu.Item onClick={SyncProgram}>
-        <Tooltip placement="topRight" title="Update your Whole Program">
-          <SyncOutlined style={{ fontSize: 18, color: '#000' }} />
-          Sync Program
-        </Tooltip>
-      </Menu.Item>
+      {userRole === 'school_admin' ? (
+        <Menu.Item onClick={SyncProgram}>
+          <Tooltip placement="topRight" title="Update your Whole Program">
+            <SyncOutlined style={{ fontSize: 18, color: '#000' }} />
+            Sync Program
+          </Tooltip>
+        </Menu.Item>
+      ) : null}
     </Menu>
   )
 
@@ -408,7 +408,7 @@ export default () => {
               <PlusOutlined style={{ fontSize: 18 }} />
             </Button>
           </Tooltip>
-          <Dropdown overlay={menu}>
+          <Dropdown placement="bottomRight" overlay={menu}>
             <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
               <Icon type="setting" /> <Icon type="caret-down" />
             </a>
@@ -456,9 +456,6 @@ export default () => {
                       <EquivalenceContent />
                     </TabPane>
                   )}
-
-
-
                 </Tabs>
               </Col>
             </Row>

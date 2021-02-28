@@ -309,7 +309,7 @@ const UpdateCommentForm = Form.create()(({ form, content, setEditMode, id }) => 
           Save
         </Button>
         <Button type="danger" style={{ marginLeft: 5 }} onClick={() => setEditMode(null)}>
-          Cancle
+          Cancel
         </Button>
       </Form.Item>
     </Form>

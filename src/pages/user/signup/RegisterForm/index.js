@@ -2,12 +2,15 @@
 import React from 'react'
 import { Form, Input, Icon, Button, Select, message, InputNumber, notification } from 'antd'
 import { Link, Redirect } from 'react-router-dom'
+import './style.scss'
 import client from '../../../../config'
 // import { GraphQLClient } from 'graphql-request'
 
 const FormItem = Form.Item
 const API_URL = process.env.REACT_APP_API_URL
 const { Option } = Select
+const blue = '#260fb6'
+const orange = '#f17c00'
 
 class RegisterFormComponent extends React.Component {
   state = {
@@ -16,18 +19,6 @@ class RegisterFormComponent extends React.Component {
     LoginRedirect: false,
     loading:false
   }
-
-  // componentDidMount() {
-  //   fetch(`${API_URL}/school/country_list`, { headers: { "Accept": "application/json", "Content-Type": "application/json", "database": "india" } })
-  //     .then(res => res.json())
-  //     .then(
-  //       (result) => {
-  //         this.setState({
-  //           CountryList: result
-  //         });
-  //       }
-  //     )
-  // }
 
   componentDidMount() {
     const query = `query {
@@ -177,6 +168,7 @@ class RegisterFormComponent extends React.Component {
           })(
             <Select
               size="large"
+              type="select"
               id="user-country"
               showSearch
               style={{ width: '100%' }}
@@ -193,7 +185,8 @@ class RegisterFormComponent extends React.Component {
           {form.getFieldDecorator('no_learner', {
             rules: [{ required: true, message: 'Please input your number of learner!' }],
           })(
-            <InputNumber
+            <Input
+              type="number"
               size="large"
               min={1}
               style={{ width: '100%' }}
@@ -241,16 +234,27 @@ class RegisterFormComponent extends React.Component {
           )}
         </FormItem>
         <Form.Item>
-          <Button type="primary" htmlType="submit" size="large" loading={loading} block>
+          <Button 
+            htmlType="submit"
+            size="large"
+            loading={loading}
+            style={{
+              backgroundColor: orange,
+              borderColor: orange,
+              marginTop: '15px'
+            }}
+            onFocus={console.log('focus')}
+            block
+          >
             Sign Up
             {/* <ArrowRightOutlined className="site-form-item-icon" /> */}
           </Button>
-          <p style={{ marginTop: '10px' }}>
+          {/* <p style={{ marginTop: '10px' }}>
             <Link to="/user/login" className="utils__link--blue">
               {' '}
               Back to login
             </Link>
-          </p>
+          </p> */}
         </Form.Item>
         {/* <div className="form-actions">
           <span className="ml-3 pull-right">

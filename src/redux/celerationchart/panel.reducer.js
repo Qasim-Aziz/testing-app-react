@@ -1,3 +1,4 @@
+import moment from 'moment'
 import * as actions from './panel.action-type'
 
 const initialize = {
@@ -9,7 +10,8 @@ const initialize = {
       title: '',
       category: { id: '', name: '' },
       notes: '',
-      yAxisLabel: 'COUNT PER MINUTE',
+      labelX: 'SUCCESSIVE CALENDAR DAYS',
+      labelY: 'COUNT PER MINUTE',
       points: [],
       pointsTypeLables: {
         type1: 'Correct',
@@ -25,11 +27,13 @@ const initialize = {
 
   celerationChartIndex: -1,
   celerationChart: {
-    date: '',
+    date: moment().format('YYYY-MM-DD'),
     title: '',
     category: { name: '' },
     notes: '',
-    yAxisLabel: 'COUNT PER MINUTE',
+    labelX: 'SUCCESSIVE CALENDAR DAYS',
+    labelY: 'COUNT PER MINUTE',
+
     points: [],
     pointsTypeLables: {
       type1: 'Correct',
@@ -70,10 +74,11 @@ const celerationChartReducer = (state = initialize, action) => {
         ...state,
         drawer: true,
         celerationChart: {
-          date: '',
+          date: moment().format('YYYY-MM-DD'),
           title: '',
           category: { name: '' },
-          yAxisLabel: 'COUNT PER MINUTE',
+          labelX: 'SUCCESSIVE CALENDAR DAYS',
+          labelY: 'COUNT PER MINUTE',
           notes: '',
           points: [],
           pointsTypeLables: {
@@ -122,7 +127,12 @@ const celerationChartReducer = (state = initialize, action) => {
           },
         },
       }
-    case actions.onAddCelerationChart:
+    case actions.onAddCelerationChart: {
+      const pointsTypeLables = {}
+      action.chart.labels.edges.forEach(({ node }, index) => {
+        pointsTypeLables[`type${index + 1}`] = node.name
+      })
+
       return {
         ...state,
         drawer: true,
@@ -130,16 +140,12 @@ const celerationChartReducer = (state = initialize, action) => {
           ...state.celerationCharts,
           {
             ...action.chart,
-            yAxisLabel: 'COUNT PER MINUTE',
             points: [],
-            pointsTypeLables: {
-              type1: 'Correct',
-              type2: 'Incorrect',
-              type3: 'Prompted',
-            },
+            pointsTypeLables,
           },
         ],
       }
+    }
     case actions.resetCelerationChart:
       return {
         ...state,
@@ -150,7 +156,8 @@ const celerationChartReducer = (state = initialize, action) => {
           title: '',
           category: { name: '' },
           notes: '',
-          yAxisLabel: '',
+          labelX: 'SUCCESSIVE CALENDAR DAYS',
+          labelY: 'COUNT PER MINUTE',
           points: [],
           pointsTypeLables: {
             type1: '',
@@ -203,18 +210,21 @@ const celerationChartReducer = (state = initialize, action) => {
           points: [...state.celerationChart.points, action.point],
         },
       }
-    case actions.updatePoint:
+    case actions.updatePoint: {
+      const updatedPointIndex = state.celerationChart.points.findIndex(x => x.id === action.id)
+
       return {
         ...state,
         celerationChart: {
           ...state.celerationChart,
           points: [
-            ...state.celerationChart.points.slice(0, action.pointIndex),
-            action.newPoint,
-            ...state.celerationChart.points.slice(action.pointIndex + 1),
+            ...state.celerationChart.points.slice(0, updatedPointIndex),
+            action.updatedPoint,
+            ...state.celerationChart.points.slice(updatedPointIndex + 1),
           ],
         },
       }
+    }
     case actions.onBehaviorTypesChange:
       return {
         ...state,

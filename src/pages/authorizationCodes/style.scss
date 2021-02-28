@@ -1,37 +1,3 @@
-.ant-table-thead > tr > th,
-.ant-table-tbody > tr > td {
-  padding-right: 0;
-  overflow-wrap: break-word;
-}
-
-.filter_sub_div {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 10px;
-}
-.ant-form-item label {
-  font-size: 14px;
-}
-.ant-table-wrapper {
-  margin-left: 46px;
-}
-.ant-table {
-  font-size: 12px;
-}
-
-.ant-table-small > .ant-table-content > .ant-table-body > table > .ant-table-tbody > tr > td {
-  padding: 2px 15px;
-}
-
-.ant-table-small.ant-table-bordered .ant-table-content {
-  border-right: none;
-}
-
-.ant-table-small > .ant-table-content > .ant-table-body {
-  margin: 0 0;
-}
 .dynamic-delete-button {
   cursor: pointer;
   position: relative;
@@ -47,4 +13,132 @@
 .dynamic-delete-button[disabled] {
   cursor: not-allowed;
   opacity: 0.5;
+}
+
+.authorizeCodeTable {
+  .ant-table-small > .ant-table-content > .ant-table-body {
+    margin: 0 !important;
+  }
+
+  .ant-table-tbody > th > td {
+    padding: 10px 5px !important;
+  }
+
+  .ant-table-tbody > tr > td {
+    padding: 6px 6px !important;
+  }
+
+  th {
+    font-weight: bold !important;
+    background-color: rgba(0, 0, 0, 0.04) !important;
+  }
+
+  .ant-pagination {
+    background: rgba(0, 0, 0, 0.04);
+    padding: 10px 3px;
+  }
+
+  .header {
+    .pageTitle {
+      font-size: 18px;
+      color: #000;
+      font-weight: bold;
+      margin-right: 40px;
+    }
+
+    .filterTitle {
+      font-weight: bold;
+      margin-right: 5px;
+      margin-left: 12px;
+    }
+
+    .right-align {
+      float: right;
+      margin-top: -8px;
+    }
+  }
+}
+
+.addEditCode {
+  .ant-form-item {
+    margin-bottom: 5px;
+  }
+
+  .ant-form-item label {
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .useCodeSwitch {
+    .ant-switch {
+      background-color: #1890ff !important;
+    }
+  }
+}
+
+.addEditFeeScheduleRate {
+  .ant-form-item {
+    margin-bottom: 5px;
+  }
+
+  .ant-form-item label {
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .ant-input-number {
+    width: 100% !important;
+  }
+}
+
+.feeRatesTable {
+  .ant-table-small > .ant-table-content > .ant-table-body {
+    margin: 0 !important;
+  }
+
+  .ant-table-tbody > th > td {
+    padding: 10px 5px !important;
+  }
+
+  .ant-table-tbody > tr > td {
+    padding: 6px 6px !important;
+  }
+
+  th {
+    font-weight: bold !important;
+    background-color: rgba(0, 0, 0, 0.04) !important;
+  }
+
+  .ant-pagination {
+    background: rgba(0, 0, 0, 0.04);
+    padding: 10px 3px;
+  }
+
+  .ant-table-small tr.ant-table-expanded-row td > .ant-table-wrapper {
+    margin: 0;
+  }
+
+  .ant-table .ant-table .ant-table-tbody > tr {
+    background: #fff;
+  }
+
+  .header {
+    .pageTitle {
+      font-size: 18px;
+      color: #000;
+      font-weight: bold;
+      margin-right: 40px;
+    }
+
+    .filterTitle {
+      font-weight: bold;
+      margin-right: 5px;
+      margin-left: 12px;
+    }
+
+    .right-align {
+      float: right;
+      margin-top: -8px;
+    }
+  }
 }

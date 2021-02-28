@@ -104,7 +104,6 @@ class ProductsList extends React.Component {
   }
 
   showDrawer = () => {
-    alert('fdgdfg')
     this.setState({
       drawervisible: true,
     })

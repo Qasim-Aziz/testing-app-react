@@ -1,5 +1,5 @@
 /* eslint-disable no-unneeded-ternary */
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Form,
   Input,
@@ -60,6 +60,13 @@ const UpdateAppointmentForm = ({
     EDIT_APPOINTMENT,
   )
 
+  const [isParent, setIsParent] = useState(false)
+
+  useEffect(() => {
+    const item = localStorage.getItem('role')
+    setIsParent(item === '"parents"' ? true : false)
+  }, [])
+
   useEffect(() => {
     if (editAppointmentData) {
       notification.success({
@@ -82,6 +89,36 @@ const UpdateAppointmentForm = ({
     }
   }, [editAppointmentError])
 
+  function getDisabledStartHours() {
+    const startDate = new Date(form.getFieldValue('startDate')).toISOString().split('T')[0]
+    const today = new Date().toISOString().split('T')[0]
+    const now = startDate === today ? new Date().getHours() : 6
+    const result = []
+    for (let i = 0; i < 24; i += 1) {
+      if (i < 6 || i > 20 || i < now) {
+        console.log('in if if')
+        result.push(i)
+      }
+    }
+    return result
+  }
+
+  function getDisabledEndHours() {
+    const startHour = new Date(form.getFieldValue('startTime')).getHours()
+    const result = []
+    for (let i = 0; i < 24; i += 1) {
+      if (i < startHour || i > 21) {
+        result.push(i)
+      }
+    }
+    return result
+  }
+
+  function disabledDate(current) {
+    // Can not select days before today
+    return current && current < moment().startOf('day')
+  }
+
   const handleSubmit = e => {
     e.preventDefault()
     form.validateFields((error, values) => {
@@ -100,6 +137,10 @@ const UpdateAppointmentForm = ({
             start: combineDateAndTime(values.date, values.startTime),
             end: combineDateAndTime(values.date, values.endTime),
             appointmentStatus: values.appointmentStatus,
+          },
+          errorPolicy: 'all',
+          onError(err) {
+            console.log(err)
           },
         })
       }
@@ -132,7 +173,7 @@ const UpdateAppointmentForm = ({
             {form.getFieldDecorator('title', {
               initialValue: getAppointmentData.appointment.title,
               rules: [{ required: true, message: 'Please give a title' }],
-            })(<Input placeholder="Title" />)}
+            })(<Input readOnly={isParent} placeholder="Title" />)}
           </Form.Item>
         </Col>
       </Row>
@@ -241,7 +282,7 @@ const UpdateAppointmentForm = ({
             wrapperCol={{ sm: 12 }}
             rules={[{ required: true, message: 'Please select a start time!' }]}
           >
-            {form.getFieldDecorator('date', {
+            {form.getFieldDecorator('startDate', {
               initialValue: moment(getAppointmentData.appointment.start),
               rules: [
                 {
@@ -254,6 +295,7 @@ const UpdateAppointmentForm = ({
                 style={{
                   width: '100%',
                 }}
+                disabledDate={disabledDate}
                 placeholder="Date"
                 format="YYYY-MM-DD"
                 picker="date"
@@ -283,6 +325,8 @@ const UpdateAppointmentForm = ({
                 style={{
                   width: '100%',
                 }}
+                disabledHours={getDisabledStartHours}
+                minuteStep={15}
                 placeholder="Start Time"
                 format="HH:mm"
                 picker="time"
@@ -311,6 +355,8 @@ const UpdateAppointmentForm = ({
                 style={{
                   width: '100%',
                 }}
+                disabledHours={getDisabledEndHours}
+                minuteStep={15}
                 placeholder="End Time"
                 format="HH:mm"
                 picker="time"
@@ -388,7 +434,7 @@ const UpdateAppointmentForm = ({
                   message: 'Please give the Appointment Purpose',
                 },
               ],
-            })(<Input placeholder="Appointment Purpose" />)}
+            })(<Input readOnly={isParent} placeholder="Appointment Purpose" />)}
           </Form.Item>
         </Col>
       </Row>
@@ -402,6 +448,7 @@ const UpdateAppointmentForm = ({
             })(
               <TextArea
                 placeholder="Take a note"
+                readOnly={isParent}
                 style={{
                   height: 150,
                   resize: 'none',
@@ -415,21 +462,23 @@ const UpdateAppointmentForm = ({
       {/* Submit-Reset buttons */}
       <Row>
         <Col sm={24} md={24} lg={24}>
-          <Form.Item wrapperCol={{ offset: 5, sm: 18 }}>
-            <Button htmlType="submit" type="primary">
-              Update
-            </Button>
-            <Button
-              type="danger"
-              style={{ marginLeft: '10px' }}
-              onClick={() => {
-                form.resetFields()
-                closeUpdateAppointment()
-              }}
-            >
-              Cancel
-            </Button>
-          </Form.Item>
+          {!isParent ? (
+            <Form.Item wrapperCol={{ offset: 5, sm: 18 }}>
+              <Button htmlType="submit" type="primary">
+                Update
+              </Button>
+              <Button
+                type="danger"
+                style={{ marginLeft: '10px' }}
+                onClick={() => {
+                  form.resetFields()
+                  closeUpdateAppointment()
+                }}
+              >
+                Cancel
+              </Button>
+            </Form.Item>
+          ) : null}
         </Col>
       </Row>
     </Form>

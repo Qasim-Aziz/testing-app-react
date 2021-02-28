@@ -1,0 +1,216 @@
+@import 'assets/styles/mixins.scss';
+
+.cardBody {
+  padding: 0;
+}
+
+input {
+  font-size: 15px !important;
+  color: #000 !important;
+}
+
+textarea {
+  font-size: 15px !important;
+  color: #000 !important;
+}
+
+.cardHeader {
+  padding: 0;
+  margin-top: 0;
+}
+
+.feed {
+  max-width: rem(1300);
+  margin: 0 auto;
+}
+
+.selectPatient {
+  //width: 244px !important;
+  height: 60px !important;
+  border: 0;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.patentSelectOption {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.optionImage {
+  margin-right: 10px;
+  width: 60px;
+  height: 60px;
+}
+
+.partition {
+  padding-bottom: rem(10);
+  margin-bottom: rem(30);
+  // border-bottom: 1px solid $gray-border;
+}
+
+.leftPanel {
+  position: relative;
+}
+
+.longTermGoalWrapper {
+  //min-height: 300px;
+  max-height: 600px;
+  overflow-y: scroll;
+  // margin-bottom: 45px;
+  padding: 20px;
+  border: 2px solid #f9f9f9;
+  border-radius: 10px;
+}
+
+.longTermGoalWrapper::-webkit-scrollbar {
+  width: 5px;
+}
+
+.longTermGoalWrapper::-webkit-scrollbar-track {
+  background-color: #e5e5e5;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+}
+
+.longTermGoalWrapper::-webkit-scrollbar-thumb {
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  background: #6d6d6d;
+}
+
+.behaviour {
+  width: 100%;
+  margin-right: 12px;
+  margin-bottom: 30px;
+  position: relative;
+  border-radius: 10px;
+  border: '1px solid #E4E9F0';
+
+  .longTermGoalEditBn {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 15px;
+  }
+}
+
+.behaviourHeading {
+  font-size: 20px;
+  font-weight: 700;
+  color: #000;
+  margin: 10px 0;
+
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.goalCardWrapper {
+  //max-height: 210px;
+  //overflow-y: scroll;
+  padding-right: 5px;
+}
+
+.behaviourDate {
+  font-size: 18px;
+  color: #000;
+  margin: 10px 0;
+}
+
+.sessionBtns {
+  text-align: left;
+  margin-bottom: 30px;
+}
+
+.targetWrapper {
+  max-height: 500px;
+  overflow-y: scroll;
+  padding-right: 10px;
+}
+
+.targetWrapper::-webkit-scrollbar {
+  width: 5px;
+}
+
+.targetWrapper::-webkit-scrollbar-track {
+  background-color: #e5e5e5;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+}
+
+.targetWrapper::-webkit-scrollbar-thumb {
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  background: #6d6d6d;
+}
+
+.allocatedGoal {
+  border-radius: 10px;
+  border: 2px solid #f9f9f9;
+
+  .allocatedGoalHeading {
+    font-size: 24px;
+    font-weight: bold;
+    color: #000;
+    margin: 30px 0 40px 0;
+  }
+
+  .availableTargetWrapper {
+    max-height: 500px;
+    overflow-y: scroll;
+    //margin-bottom: 45px;
+    padding-right: 10px;
+  }
+
+  .availableTargetWrapper::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  .availableTargetWrapper::-webkit-scrollbar-track {
+    background-color: #e5e5e5;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+  }
+
+  .availableTargetWrapper::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: #6d6d6d;
+  }
+}
+
+.shortGoalBtn {
+  margin-top: 12px;
+  text-align: right;
+}
+
+.longtGoalBtn {
+  margin-bottom: 10px;
+  text-align: center;
+  margin-right: 30px;
+}
+
+.targetTabs {
+  border: 1px solid #dfdfdf;
+
+  .ant-tabs-tabpane {
+    padding: 5px;
+  }
+
+  .ant-form-item {
+    margin-bottom: 5px;
+  }
+
+  .ant-form-item label {
+    font-size: 14px;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.65);
+    line-height: 32px;
+  }
+}

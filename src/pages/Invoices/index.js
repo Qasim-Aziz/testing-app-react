@@ -86,7 +86,7 @@ const dateFormate = 'YYYY-MM-DD'
 
 export default () => {
   const classes = useStyles()
-  const [newInvDrawer, setNewInvDrawer] = useState(true)
+  const [newInvDrawer, setNewInvDrawer] = useState(false)
   const [data, setData] = useState()
 
   // invoice filer
@@ -242,7 +242,6 @@ export default () => {
                           <MoreOutlined style={{ fontSize: 24, marginTop: 4 }} />
                         </Button>
                       </Popover>
-                      ,
                     </div>
                   )
                 }}

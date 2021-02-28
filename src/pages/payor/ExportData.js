@@ -94,8 +94,8 @@ const ExportData = ({ data }) => {
   return (
     <>
       <Dropdown overlay={menu} trigger={['click']}>
-        <Button style={{ marginRight: '10px' }} type="link" size="large">
-          <CloudDownloadOutlined />{' '}
+        <Button style={{ marginRight: '10px' }} type="link" size="small">
+          <CloudDownloadOutlined />
         </Button>
       </Dropdown>
     </>

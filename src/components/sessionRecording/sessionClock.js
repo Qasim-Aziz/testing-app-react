@@ -139,7 +139,7 @@ class SessionClock extends React.Component {
   render() {
     const {
       sessionrecording: { SessionStatus, ChildSession },
-      user: {role}
+      user: { role },
     } = this.props
 
     return (
@@ -174,7 +174,6 @@ class SessionClock extends React.Component {
               </h6>
               <br />
               <div style={{ textAlign: 'center' }}>
-                  
                 {SessionStatus === 'Pending' ? (
                   <Button
                     onClick={() => {
@@ -229,25 +228,26 @@ class SessionClock extends React.Component {
                 {SessionStatus === 'Completed' ? (
                   <>
                     <p>Session Completed!!</p>
-                    <a href="/#/sessionsummary"><Button>Session Summary</Button></a>
+                    <a href="/#/sessionsummary">
+                      <Button>Session Summary</Button>
+                    </a>
                     <br />
-                    {role !== 'parents' ? 
-                      <span style={{marginTop: '5px'}}>
-                        Edit Data: 
+                    {role !== 'parents' ? (
+                      <div style={{ marginTop: '8px' }}>
+                        <b>Edit Data: </b>&nbsp;&nbsp;
                         <Switch
                           checkedChildren={<Icon type="check" />}
                           unCheckedChildren={<Icon type="close" />}
                           onChange={checked => this.editToggle(checked)}
                         />
-                      </span>
-                    :
+                      </div>
+                    ) : (
                       ''
-                    }
+                    )}
                   </>
                 ) : (
                   ''
                 )}
-                
               </div>
             </React.Fragment>
           )}

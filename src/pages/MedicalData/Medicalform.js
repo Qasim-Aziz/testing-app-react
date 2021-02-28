@@ -177,9 +177,9 @@ const MedicalForm = ({ style, handleNewMediDate, setNewMediCreated, form }) => {
       if (!error) {
         mutate({
           variables: {
-            date: moment(values.timeFream[0]).format('YYYY-MM-DD'),
-            startDate: moment(values.timeFream[0]).format('YYYY-MM-DD'),
-            endDate: moment(values.timeFream[1]).format('YYYY-MM-DD'),
+            date: moment(values.timeFrame[0]).format('YYYY-MM-DD'),
+            startDate: moment(values.timeFrame[0]).format('YYYY-MM-DD'),
+            endDate: moment(values.timeFrame[1]).format('YYYY-MM-DD'),
             condition: values.condition,
             severity: values.severity,
             note: values.note,
@@ -216,6 +216,16 @@ const MedicalForm = ({ style, handleNewMediDate, setNewMediCreated, form }) => {
     }
   }, [error])
 
+  // set default form-field values
+  useEffect(() => {
+    console.log(form.getFieldValue('timeFrame'))
+    const defaultTimeFrame = [moment(), moment().add(7, 'days')]
+    form.setFieldsValue({
+      timeFrame: defaultTimeFrame,
+      severity: severityType?.getSeverity[1].id,
+    })
+  }, [severityType])
+
   if (error) {
     return <pre>{JSON.stringify(error, null, 2)}</pre>
   }
@@ -249,7 +259,7 @@ const MedicalForm = ({ style, handleNewMediDate, setNewMediCreated, form }) => {
       </Form.Item>
 
       <Form.Item label={<span style={{ fontSize: '16px' }}>Start & End Date</span>}>
-        {form.getFieldDecorator('timeFream', {
+        {form.getFieldDecorator('timeFrame', {
           rules: [{ required: true, message: 'Please select start and end date!' }],
         })(<RangePicker size="large" style={{ width: '100%' }} />)}
       </Form.Item>

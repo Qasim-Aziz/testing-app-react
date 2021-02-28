@@ -1,5 +1,5 @@
 /* eslint-disable no-shadow */
-import React, { useState, useEffect, useReducer } from 'react'
+import React, { useState, useEffect, useReducer, useCallback } from 'react'
 import {
   Form,
   Input,
@@ -172,6 +172,37 @@ const MealForm = ({ style, handleNewMealDate, setNewMeal, form, closeDrawer }) =
     }
   }, [error])
 
+  // update mealType based on selected time
+  useEffect(() => {
+    const timeHH = form.getFieldValue('mealTime')?.format('HH')
+    if (timeHH) {
+      let mealType = ''
+      if (timeHH >= 2 && timeHH < 12) {
+        mealType = 'Breakfast'
+      } else if (timeHH >= 12 && timeHH < 17) {
+        mealType = 'Lunch'
+      } else {
+        mealType = 'Dinner'
+      }
+      form.setFieldsValue({
+        mealType,
+      })
+    }
+  }, [form.getFieldValue('mealTime')])
+
+  // Default values for forms
+  useEffect(() => {
+    form.setFieldsValue({
+      mealDate: date,
+      mealTime,
+      waterIntake: 100,
+    })
+  }, [])
+
+  useEffect(() => {
+    form.setFieldsValue({ foodType: foodTypeQuery?.data?.getFoodType[1].id })
+  }, [foodTypeQuery])
+
   if (error) {
     return <pre>{JSON.stringify(error, null, 2)}</pre>
   }
@@ -203,13 +234,11 @@ const MealForm = ({ style, handleNewMealDate, setNewMeal, form, closeDrawer }) =
       <div>
         <Form.Item label={<span style={{ fontSize: '16px' }}>Meal Date</span>} rule={[]}>
           {form.getFieldDecorator('mealDate', {
-            initialValue: date,
             rules: [{ required: true, message: 'Please Select Date!' }],
           })(<DatePicker style={{ width: '100%' }} />)}
         </Form.Item>
         <Form.Item label={<span style={{ fontSize: '16px' }}>Meal Time</span>}>
           {form.getFieldDecorator('mealTime', {
-            initialValue: mealTime,
             rules: [{ required: true, message: 'Please Select a time!' }],
           })(<TimePicker use12Hours format="h:mm a" style={{ width: '100%' }} />)}
         </Form.Item>
@@ -273,8 +302,6 @@ const MealForm = ({ style, handleNewMealDate, setNewMeal, form, closeDrawer }) =
           <TextArea
             placeholder="Meal Details"
             name="note"
-            onChange={e => setNote(e.target.value)}
-            value={note}
             autoSize={{ minRows: 3 }}
             style={{
               color: '#000',
@@ -290,7 +317,7 @@ const MealForm = ({ style, handleNewMealDate, setNewMeal, form, closeDrawer }) =
           }}
         />
       </Form.Item>
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Add Remainder</span>}>
+      <Form.Item label={<span style={{ fontSize: '16px' }}>Add Reminder</span>}>
         {remainderState &&
           times(n => {
             return (

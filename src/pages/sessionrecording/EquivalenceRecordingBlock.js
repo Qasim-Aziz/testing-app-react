@@ -20,14 +20,13 @@
 /* eslint-disable no-useless-concat */
 /* eslint-disable consistent-return */
 
-
 import React, { Component } from 'react'
 import { Card, Tabs, Typography, Button, Icon, notification, Radio, Collapse } from 'antd'
 import { connect } from 'react-redux'
 
 const { Title, Text } = Typography
-const { TabPane } = Tabs;
-const { Panel } = Collapse;
+const { TabPane } = Tabs
+const { Panel } = Collapse
 const recordingButtonStyle = {
   padding: '8px auto',
   width: '70px',
@@ -51,16 +50,15 @@ class RecordingBlock extends Component {
   componentDidMount() {
     const {
       dispatch,
-      sessionrecording: {
-        MasterSession,
-        TargetActiveIndex
-      },
+      sessionrecording: { MasterSession, TargetActiveIndex },
     } = this.props
 
     dispatch({
       type: 'sessionrecording/GET_SD_COMBINATIONS',
       payload: {
-        code: MasterSession.targets.edges[TargetActiveIndex].node.eqCode ? MasterSession.targets.edges[TargetActiveIndex].node.eqCode : '1A',
+        code: MasterSession.targets.edges[TargetActiveIndex].node.eqCode
+          ? MasterSession.targets.edges[TargetActiveIndex].node.eqCode
+          : '1A',
       },
     })
 
@@ -68,13 +66,10 @@ class RecordingBlock extends Component {
       type: 'sessionrecording/SET_STATE',
       payload: {
         SelectedOperation: 'Train',
-        SelectedClassId: MasterSession.targets.edges[TargetActiveIndex].node.classes.edges[0]?.node.id
-      }
+        SelectedClassId:
+          MasterSession.targets.edges[TargetActiveIndex].node.classes.edges[0]?.node.id,
+      },
     })
-
-
-
-
   }
 
   updateSessionClockTime = () => {
@@ -86,12 +81,6 @@ class RecordingBlock extends Component {
     // updatig trial start time to store
     document.getElementById('updateStartTrialTimeInStore').click()
   }
-
-
-
-
-
-
 
   resetZero = () => {
     const getButton0 = document.getElementById('peakResponseButtonZero')
@@ -142,14 +131,24 @@ class RecordingBlock extends Component {
 
     const {
       dispatch,
-      sessionrecording: { ActiveCombination, TargetActiveId, TargetResponse, EquiTrialCount, SelectedClassId, SelectedOperation },
+      sessionrecording: {
+        ActiveCombination,
+        TargetActiveId,
+        TargetResponse,
+        EquiTrialCount,
+        SelectedClassId,
+        SelectedOperation,
+      },
     } = this.props
 
     let text = 'train'
     if (SelectedOperation === 'Test') text = 'test'
-    
+
     if (EquiTrialCount < 10) {
-      if (EquiTrialCount <= TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId].length) {
+      if (
+        EquiTrialCount <=
+        TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId].length
+      ) {
         this.updateStartTrialClockTime()
         dispatch({
           type: 'sessionrecording/SET_STATE',
@@ -158,24 +157,42 @@ class RecordingBlock extends Component {
           },
         })
 
-
         // setting button color
-        if (TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][EquiTrialCount]?.score === 0) {
+        if (
+          TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][
+            EquiTrialCount
+          ]?.score === 0
+        ) {
           document.getElementById('peakResponseButtonZero').style.backgroundColor = '#FF8080'
         }
-        if (TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][EquiTrialCount]?.score === 2) {
+        if (
+          TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][
+            EquiTrialCount
+          ]?.score === 2
+        ) {
           document.getElementById('peakResponseButtonTwo').style.backgroundColor = '#FF9C52'
         }
-        if (TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][EquiTrialCount]?.score === 4) {
+        if (
+          TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][
+            EquiTrialCount
+          ]?.score === 4
+        ) {
           document.getElementById('peakResponseButtonFour').style.backgroundColor = '#FF9C52'
         }
-        if (TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][EquiTrialCount]?.score === 8) {
+        if (
+          TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][
+            EquiTrialCount
+          ]?.score === 8
+        ) {
           document.getElementById('peakResponseButtonEight').style.backgroundColor = '#FF9C52'
         }
-        if (TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][EquiTrialCount]?.score === 10) {
+        if (
+          TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][
+            EquiTrialCount
+          ]?.score === 10
+        ) {
           document.getElementById('peakResponseButtonTen').style.backgroundColor = '#4BAEA0'
         }
-
       } else {
         notification.warning({
           message: 'Warning!!',
@@ -186,14 +203,19 @@ class RecordingBlock extends Component {
   }
 
   goToPreviousTrial = () => {
-
     const {
       dispatch,
-      sessionrecording: { ActiveCombination, TargetActiveId, TargetResponse, EquiTrialCount, SelectedClassId, SelectedOperation },
+      sessionrecording: {
+        ActiveCombination,
+        TargetActiveId,
+        TargetResponse,
+        EquiTrialCount,
+        SelectedClassId,
+        SelectedOperation,
+      },
     } = this.props
 
     if (EquiTrialCount > 1) {
-
       this.resetZero()
       this.resetTwo()
       this.resetFour()
@@ -201,7 +223,6 @@ class RecordingBlock extends Component {
       this.resetTen()
 
       this.updateStartTrialClockTime()
-
 
       dispatch({
         type: 'sessionrecording/SET_STATE',
@@ -214,29 +235,43 @@ class RecordingBlock extends Component {
       if (SelectedOperation === 'Test') text = 'test'
 
       // setting button color
-      if (TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][EquiTrialCount - 2]?.score === 0) {
+      if (
+        TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][
+          EquiTrialCount - 2
+        ]?.score === 0
+      ) {
         document.getElementById('peakResponseButtonZero').style.backgroundColor = '#FF8080'
       }
-      if (TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][EquiTrialCount - 2]?.score === 2) {
+      if (
+        TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][
+          EquiTrialCount - 2
+        ]?.score === 2
+      ) {
         document.getElementById('peakResponseButtonTwo').style.backgroundColor = '#FF9C52'
       }
-      if (TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][EquiTrialCount - 2]?.score === 4) {
+      if (
+        TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][
+          EquiTrialCount - 2
+        ]?.score === 4
+      ) {
         document.getElementById('peakResponseButtonFour').style.backgroundColor = '#FF9C52'
       }
-      if (TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][EquiTrialCount - 2]?.score === 8) {
+      if (
+        TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][
+          EquiTrialCount - 2
+        ]?.score === 8
+      ) {
         document.getElementById('peakResponseButtonEight').style.backgroundColor = '#FF9C52'
       }
-      if (TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][EquiTrialCount - 2]?.score === 10) {
+      if (
+        TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][
+          EquiTrialCount - 2
+        ]?.score === 10
+      ) {
         document.getElementById('peakResponseButtonTen').style.backgroundColor = '#4BAEA0'
       }
-
-
     }
   }
-
-
-
-
 
   responseZero = combId => {
     this.resetZero()
@@ -245,13 +280,25 @@ class RecordingBlock extends Component {
     this.resetEight()
     this.resetTen()
 
-    const { dispatch, sessionrecording: { SelectedClassId, SelectedOperation, TargetResponse, TargetActiveId, EquiTrialCount } } = this.props
+    const {
+      dispatch,
+      sessionrecording: {
+        SelectedClassId,
+        SelectedOperation,
+        TargetResponse,
+        TargetActiveId,
+        EquiTrialCount,
+      },
+    } = this.props
     this.updateSessionClockTime()
     document.getElementById('peakResponseButtonZero').style.backgroundColor = '#FF8080'
     let text = 'train'
     if (SelectedOperation === 'Test') text = 'test'
 
-    if (TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId].length < EquiTrialCount) {
+    if (
+      TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId].length <
+      EquiTrialCount
+    ) {
       dispatch({
         type: 'sessionrecording/EQUIVALENCE_RESPONSE',
         payload: {
@@ -259,11 +306,10 @@ class RecordingBlock extends Component {
           classId: SelectedClassId,
           combinationTest: SelectedOperation === 'Test' ? combId : '',
           combinationTrain: SelectedOperation === 'Train' ? combId : '',
-          response: 0
-        }
+          response: 0,
+        },
       })
-    }
-    else {
+    } else {
       console.log('Update')
       dispatch({
         type: 'sessionrecording/EQUIVALENCE_RESPONSE_UPDATE',
@@ -273,11 +319,13 @@ class RecordingBlock extends Component {
           combinationTest: SelectedOperation === 'Test' ? combId : '',
           combinationTrain: SelectedOperation === 'Train' ? combId : '',
           response: 0,
-          trialRecordedId: TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId][EquiTrialCount-1]?.id
-        }
+          trialRecordedId:
+            TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId][
+              EquiTrialCount - 1
+            ]?.id,
+        },
       })
     }
-
   }
 
   responseTwo = combId => {
@@ -287,14 +335,26 @@ class RecordingBlock extends Component {
     this.resetEight()
     this.resetTen()
 
-    const { dispatch, sessionrecording: { SelectedClassId, SelectedOperation, TargetResponse, TargetActiveId, EquiTrialCount } } = this.props
+    const {
+      dispatch,
+      sessionrecording: {
+        SelectedClassId,
+        SelectedOperation,
+        TargetResponse,
+        TargetActiveId,
+        EquiTrialCount,
+      },
+    } = this.props
     this.updateSessionClockTime()
     document.getElementById('peakResponseButtonTwo').style.backgroundColor = '#FF9C52'
 
     let text = 'train'
     if (SelectedOperation === 'Test') text = 'test'
 
-    if (TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId].length < EquiTrialCount) {
+    if (
+      TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId].length <
+      EquiTrialCount
+    ) {
       dispatch({
         type: 'sessionrecording/EQUIVALENCE_RESPONSE',
         payload: {
@@ -302,11 +362,10 @@ class RecordingBlock extends Component {
           classId: SelectedClassId,
           combinationTest: SelectedOperation === 'Test' ? combId : '',
           combinationTrain: SelectedOperation === 'Train' ? combId : '',
-          response: 2
-        }
+          response: 2,
+        },
       })
-    }
-    else {
+    } else {
       console.log('Update')
       dispatch({
         type: 'sessionrecording/EQUIVALENCE_RESPONSE_UPDATE',
@@ -316,11 +375,13 @@ class RecordingBlock extends Component {
           combinationTest: SelectedOperation === 'Test' ? combId : '',
           combinationTrain: SelectedOperation === 'Train' ? combId : '',
           response: 2,
-          trialRecordedId: TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId][EquiTrialCount-1]?.id
-        }
+          trialRecordedId:
+            TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId][
+              EquiTrialCount - 1
+            ]?.id,
+        },
       })
     }
-
   }
 
   responseFour = combId => {
@@ -330,13 +391,25 @@ class RecordingBlock extends Component {
     this.resetEight()
     this.resetTen()
 
-    const { dispatch, sessionrecording: { SelectedClassId, SelectedOperation, TargetResponse, TargetActiveId, EquiTrialCount } } = this.props
+    const {
+      dispatch,
+      sessionrecording: {
+        SelectedClassId,
+        SelectedOperation,
+        TargetResponse,
+        TargetActiveId,
+        EquiTrialCount,
+      },
+    } = this.props
     this.updateSessionClockTime()
     document.getElementById('peakResponseButtonFour').style.backgroundColor = '#FF9C52'
     let text = 'train'
     if (SelectedOperation === 'Test') text = 'test'
 
-    if (TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId].length < EquiTrialCount) {
+    if (
+      TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId].length <
+      EquiTrialCount
+    ) {
       dispatch({
         type: 'sessionrecording/EQUIVALENCE_RESPONSE',
         payload: {
@@ -344,11 +417,10 @@ class RecordingBlock extends Component {
           classId: SelectedClassId,
           combinationTest: SelectedOperation === 'Test' ? combId : '',
           combinationTrain: SelectedOperation === 'Train' ? combId : '',
-          response: 4
-        }
+          response: 4,
+        },
       })
-    }
-    else {
+    } else {
       console.log('Update')
       dispatch({
         type: 'sessionrecording/EQUIVALENCE_RESPONSE_UPDATE',
@@ -358,11 +430,13 @@ class RecordingBlock extends Component {
           combinationTest: SelectedOperation === 'Test' ? combId : '',
           combinationTrain: SelectedOperation === 'Train' ? combId : '',
           response: 4,
-          trialRecordedId: TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId][EquiTrialCount-1]?.id
-        }
+          trialRecordedId:
+            TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId][
+              EquiTrialCount - 1
+            ]?.id,
+        },
       })
     }
-
   }
 
   responseEight = combId => {
@@ -372,13 +446,25 @@ class RecordingBlock extends Component {
     this.resetEight()
     this.resetTen()
 
-    const { dispatch, sessionrecording: { SelectedClassId, SelectedOperation, TargetResponse, TargetActiveId, EquiTrialCount } } = this.props
+    const {
+      dispatch,
+      sessionrecording: {
+        SelectedClassId,
+        SelectedOperation,
+        TargetResponse,
+        TargetActiveId,
+        EquiTrialCount,
+      },
+    } = this.props
     this.updateSessionClockTime()
     document.getElementById('peakResponseButtonEight').style.backgroundColor = '#FF9C52'
     let text = 'train'
     if (SelectedOperation === 'Test') text = 'test'
 
-    if (TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId].length < EquiTrialCount) {
+    if (
+      TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId].length <
+      EquiTrialCount
+    ) {
       dispatch({
         type: 'sessionrecording/EQUIVALENCE_RESPONSE',
         payload: {
@@ -386,11 +472,10 @@ class RecordingBlock extends Component {
           classId: SelectedClassId,
           combinationTest: SelectedOperation === 'Test' ? combId : '',
           combinationTrain: SelectedOperation === 'Train' ? combId : '',
-          response: 8
-        }
+          response: 8,
+        },
       })
-    }
-    else {
+    } else {
       console.log('Update')
       dispatch({
         type: 'sessionrecording/EQUIVALENCE_RESPONSE_UPDATE',
@@ -400,11 +485,13 @@ class RecordingBlock extends Component {
           combinationTest: SelectedOperation === 'Test' ? combId : '',
           combinationTrain: SelectedOperation === 'Train' ? combId : '',
           response: 8,
-          trialRecordedId: TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId][EquiTrialCount-1]?.id
-        }
+          trialRecordedId:
+            TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId][
+              EquiTrialCount - 1
+            ]?.id,
+        },
       })
     }
-
   }
 
   responseTen = combId => {
@@ -414,14 +501,26 @@ class RecordingBlock extends Component {
     this.resetEight()
     this.resetTen()
 
-    const { dispatch, sessionrecording: { SelectedClassId, SelectedOperation, TargetResponse, TargetActiveId, EquiTrialCount } } = this.props
+    const {
+      dispatch,
+      sessionrecording: {
+        SelectedClassId,
+        SelectedOperation,
+        TargetResponse,
+        TargetActiveId,
+        EquiTrialCount,
+      },
+    } = this.props
     this.updateSessionClockTime()
     document.getElementById('peakResponseButtonTen').style.backgroundColor = '#4BAEA0'
 
     let text = 'train'
     if (SelectedOperation === 'Test') text = 'test'
 
-    if (TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId].length < EquiTrialCount) {
+    if (
+      TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId].length <
+      EquiTrialCount
+    ) {
       dispatch({
         type: 'sessionrecording/EQUIVALENCE_RESPONSE',
         payload: {
@@ -429,11 +528,10 @@ class RecordingBlock extends Component {
           classId: SelectedClassId,
           combinationTest: SelectedOperation === 'Test' ? combId : '',
           combinationTrain: SelectedOperation === 'Train' ? combId : '',
-          response: 10
-        }
+          response: 10,
+        },
       })
-    }
-    else {
+    } else {
       console.log('Update')
       dispatch({
         type: 'sessionrecording/EQUIVALENCE_RESPONSE_UPDATE',
@@ -443,19 +541,27 @@ class RecordingBlock extends Component {
           combinationTest: SelectedOperation === 'Test' ? combId : '',
           combinationTrain: SelectedOperation === 'Train' ? combId : '',
           response: 10,
-          trialRecordedId: TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId][EquiTrialCount-1]?.id
-        }
+          trialRecordedId:
+            TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId][
+              EquiTrialCount - 1
+            ]?.id,
+        },
       })
     }
-
   }
 
-
-
-
-
-  callback = (e) => {
-    const { dispatch, sessionrecording: { SelectedClassId, SelectedOperation, TargetResponse, TargetActiveId, EquiTrialCount, ActiveCombination } } = this.props
+  callback = e => {
+    const {
+      dispatch,
+      sessionrecording: {
+        SelectedClassId,
+        SelectedOperation,
+        TargetResponse,
+        TargetActiveId,
+        EquiTrialCount,
+        ActiveCombination,
+      },
+    } = this.props
 
     this.resetZero()
     this.resetTwo()
@@ -467,56 +573,79 @@ class RecordingBlock extends Component {
     let text = 'train'
     if (SelectedOperation === 'Test') text = 'test'
 
-    const trialsLength = TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][e].length
+    const trialsLength =
+      TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][e].length
     if (trialsLength < 10) {
       dispatch({
         type: 'sessionrecording/SET_STATE',
         payload: {
           SelectedClassId: e,
-          EquiTrialCount: trialsLength + 1
-        }
+          EquiTrialCount: trialsLength + 1,
+        },
       })
-    }
-    else {
+    } else {
       dispatch({
         type: 'sessionrecording/SET_STATE',
         payload: {
           SelectedClassId: e,
-          EquiTrialCount: 10
-        }
+          EquiTrialCount: 10,
+        },
       })
 
       // setting button color
-      if (TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][9]?.score === 0) {
+      if (
+        TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][9]
+          ?.score === 0
+      ) {
         document.getElementById('peakResponseButtonZero').style.backgroundColor = '#FF8080'
       }
-      if (TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][9]?.score === 2) {
+      if (
+        TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][9]
+          ?.score === 2
+      ) {
         document.getElementById('peakResponseButtonTwo').style.backgroundColor = '#FF9C52'
       }
-      if (TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][9]?.score === 4) {
+      if (
+        TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][9]
+          ?.score === 4
+      ) {
         document.getElementById('peakResponseButtonFour').style.backgroundColor = '#FF9C52'
       }
-      if (TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][9]?.score === 8) {
+      if (
+        TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][9]
+          ?.score === 8
+      ) {
         document.getElementById('peakResponseButtonEight').style.backgroundColor = '#FF9C52'
       }
-      if (TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][9]?.score === 10) {
+      if (
+        TargetResponse[TargetActiveId].equivalence[text][ActiveCombination][SelectedClassId][9]
+          ?.score === 10
+      ) {
         document.getElementById('peakResponseButtonTen').style.backgroundColor = '#4BAEA0'
       }
-
     }
-
   }
 
   chnageOperation = type => {
-    const { dispatch, sessionrecording: { SelectedClassId, SelectedOperation, TargetResponse, TargetActiveId, EquiTrialCount, ActiveCombination, SdCombinations } } = this.props
+    const {
+      dispatch,
+      sessionrecording: {
+        SelectedClassId,
+        SelectedOperation,
+        TargetResponse,
+        TargetActiveId,
+        EquiTrialCount,
+        ActiveCombination,
+        SdCombinations,
+      },
+    } = this.props
 
     let text = 'train'
     let comId = ''
     if (type === 'Test') {
       text = 'test'
       comId = SdCombinations.test.edges[0]?.node.id
-    }
-    else {
+    } else {
       comId = SdCombinations.train.edges[0]?.node.id
     }
 
@@ -527,55 +656,82 @@ class RecordingBlock extends Component {
     this.resetTen()
     this.updateStartTrialClockTime()
 
-    const trialsLength = TargetResponse[TargetActiveId].equivalence[text][comId][SelectedClassId].length
+    console.log(
+      TargetResponse[TargetActiveId].equivalence[text][comId][SelectedClassId],
+      'length parent',
+    )
+    const trialsLength =
+      TargetResponse[TargetActiveId].equivalence[text][comId][SelectedClassId]?.length
     if (trialsLength < 10) {
       dispatch({
         type: 'sessionrecording/SET_STATE',
         payload: {
           SelectedOperation: type,
           EquiTrialCount: trialsLength + 1,
-          ActiveCombination: comId
-        }
+          ActiveCombination: comId,
+        },
       })
-    }
-    else {
+    } else {
       dispatch({
         type: 'sessionrecording/SET_STATE',
         payload: {
           SelectedOperation: type,
           EquiTrialCount: 10,
-          ActiveCombination: comId
-        }
+          ActiveCombination: comId,
+        },
       })
 
       // setting button color
-      if (TargetResponse[TargetActiveId].equivalence[text][comId][SelectedClassId][9]?.score === 0) {
+      if (
+        TargetResponse[TargetActiveId].equivalence[text][comId][SelectedClassId] &&
+        TargetResponse[TargetActiveId].equivalence[text][comId][SelectedClassId][9]?.score === 0
+      ) {
         document.getElementById('peakResponseButtonZero').style.backgroundColor = '#FF8080'
       }
-      if (TargetResponse[TargetActiveId].equivalence[text][comId][SelectedClassId][9]?.score === 2) {
+      if (
+        TargetResponse[TargetActiveId].equivalence[text][comId][SelectedClassId] &&
+        TargetResponse[TargetActiveId].equivalence[text][comId][SelectedClassId][9]?.score === 2
+      ) {
         document.getElementById('peakResponseButtonTwo').style.backgroundColor = '#FF9C52'
       }
-      if (TargetResponse[TargetActiveId].equivalence[text][comId][SelectedClassId][9]?.score === 4) {
+      if (
+        TargetResponse[TargetActiveId].equivalence[text][comId][SelectedClassId] &&
+        TargetResponse[TargetActiveId].equivalence[text][comId][SelectedClassId][9]?.score === 4
+      ) {
         document.getElementById('peakResponseButtonFour').style.backgroundColor = '#FF9C52'
       }
-      if (TargetResponse[TargetActiveId].equivalence[text][comId][SelectedClassId][9]?.score === 8) {
+      if (
+        TargetResponse[TargetActiveId].equivalence[text][comId][SelectedClassId] &&
+        TargetResponse[TargetActiveId].equivalence[text][comId][SelectedClassId][9]?.score === 8
+      ) {
         document.getElementById('peakResponseButtonEight').style.backgroundColor = '#FF9C52'
       }
-      if (TargetResponse[TargetActiveId].equivalence[text][comId][SelectedClassId][9]?.score === 10) {
+      if (
+        TargetResponse[TargetActiveId].equivalence[text][comId][SelectedClassId] &&
+        TargetResponse[TargetActiveId].equivalence[text][comId][SelectedClassId][9]?.score === 10
+      ) {
         document.getElementById('peakResponseButtonTen').style.backgroundColor = '#4BAEA0'
       }
-
     }
-
   }
 
   changeCombination = combId => {
-
-    const { dispatch, sessionrecording: { SelectedClassId, SelectedOperation, TargetResponse, TargetActiveId, EquiTrialCount, ActiveCombination, SdCombinations } } = this.props
+    const {
+      dispatch,
+      sessionrecording: {
+        SelectedClassId,
+        SelectedOperation,
+        TargetResponse,
+        TargetActiveId,
+        EquiTrialCount,
+        ActiveCombination,
+        SdCombinations,
+      },
+    } = this.props
 
     let text = 'train'
     if (SelectedOperation === 'Test') {
-      text = 'test' 
+      text = 'test'
     }
 
     this.resetZero()
@@ -587,42 +743,51 @@ class RecordingBlock extends Component {
 
     console.log(SelectedClassId, SelectedOperation, TargetResponse, TargetActiveId, combId)
 
-    const trialsLength = TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId].length
+    const trialsLength =
+      TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId].length
     if (trialsLength < 10) {
       dispatch({
         type: 'sessionrecording/SET_STATE',
         payload: {
           EquiTrialCount: trialsLength + 1,
-          ActiveCombination: combId
-        }
+          ActiveCombination: combId,
+        },
       })
-    }
-    else {
+    } else {
       dispatch({
         type: 'sessionrecording/SET_STATE',
         payload: {
           EquiTrialCount: 10,
-          ActiveCombination: combId
-        }
+          ActiveCombination: combId,
+        },
       })
 
       // setting button color
-      if (TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId][9]?.score === 0) {
+      if (
+        TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId][9]?.score === 0
+      ) {
         document.getElementById('peakResponseButtonZero').style.backgroundColor = '#FF8080'
       }
-      if (TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId][9]?.score === 2) {
+      if (
+        TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId][9]?.score === 2
+      ) {
         document.getElementById('peakResponseButtonTwo').style.backgroundColor = '#FF9C52'
       }
-      if (TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId][9]?.score === 4) {
+      if (
+        TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId][9]?.score === 4
+      ) {
         document.getElementById('peakResponseButtonFour').style.backgroundColor = '#FF9C52'
       }
-      if (TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId][9]?.score === 8) {
+      if (
+        TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId][9]?.score === 8
+      ) {
         document.getElementById('peakResponseButtonEight').style.backgroundColor = '#FF9C52'
       }
-      if (TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId][9]?.score === 10) {
+      if (
+        TargetResponse[TargetActiveId].equivalence[text][combId][SelectedClassId][9]?.score === 10
+      ) {
         document.getElementById('peakResponseButtonTen').style.backgroundColor = '#4BAEA0'
       }
-
     }
   }
 
@@ -636,29 +801,45 @@ class RecordingBlock extends Component {
     return finalText
   }
 
-  getDescriptions = (nodeItem) => {
-
-    const { sessionrecording: { SdCombinations, PeakTrialCount, SelectedOperation, EquiTrialCount } } = this.props
+  getDescriptions = nodeItem => {
+    const {
+      sessionrecording: { SdCombinations, PeakTrialCount, SelectedOperation, EquiTrialCount },
+    } = this.props
 
     if (SelectedOperation === 'Train') {
       const combinations = []
       SdCombinations?.train.edges.map((combinationNode, combinationIndex) => {
-        combinations.push(
-          {
-            id: combinationNode.node.id,
-            relation: `${combinationNode.node.stimulus1} ` + `${combinationNode.node.sign12} ` + `${combinationNode.node.stimulus2} ` + `${combinationNode.node.sign23 ? combinationNode.node.sign23 : ''} ` + `${combinationNode.node.stimulus3 ? combinationNode.node.stimulus3 : ''} `,
-            description: `${this.getFullName(nodeItem, combinationNode.node.stimulus1)} ` + `${combinationNode.node.sign12} ` + `${this.getFullName(nodeItem, combinationNode.node.stimulus2)} ` + `${combinationNode.node.sign23 ? combinationNode.node.sign23 : ''} ` + `${combinationNode.node.stimulus3 ? this.getFullName(nodeItem, combinationNode.node.stimulus3) : ''} `
-          }
-        )
+        combinations.push({
+          id: combinationNode.node.id,
+          relation:
+            `${combinationNode.node.stimulus1} ` +
+            `${combinationNode.node.sign12} ` +
+            `${combinationNode.node.stimulus2} ` +
+            `${combinationNode.node.sign23 ? combinationNode.node.sign23 : ''} ` +
+            `${combinationNode.node.stimulus3 ? combinationNode.node.stimulus3 : ''} `,
+          description:
+            `${this.getFullName(nodeItem, combinationNode.node.stimulus1)} ` +
+            `${combinationNode.node.sign12} ` +
+            `${this.getFullName(nodeItem, combinationNode.node.stimulus2)} ` +
+            `${combinationNode.node.sign23 ? combinationNode.node.sign23 : ''} ` +
+            `${
+              combinationNode.node.stimulus3
+                ? this.getFullName(nodeItem, combinationNode.node.stimulus3)
+                : ''
+            } `,
+        })
       })
 
       if (combinations.length > 0) {
         return (
           <div style={{ textAlign: 'center' }}>
-            <Collapse accordion destroyInactivePanel={true} onChange={(e) => this.changeCombination(e)}>
+            <Collapse
+              accordion
+              destroyInactivePanel={true}
+              onChange={e => this.changeCombination(e)}
+            >
               {combinations.map(item => (
                 <Panel header={item.description} key={item.id} extra={item.relation}>
-
                   <div style={{ textAlign: 'center' }}>
                     <Button onClick={this.goToPreviousTrial}>
                       <Icon type="left" />
@@ -675,67 +856,77 @@ class RecordingBlock extends Component {
                     onClick={() => this.responseZero(item.id)}
                   >
                     0
-                </Button>
+                  </Button>
                   <Button
                     id="peakResponseButtonTwo"
                     style={recordingButtonStyle}
                     onClick={() => this.responseTwo(item.id)}
                   >
                     2
-                </Button>
+                  </Button>
                   <Button
                     id="peakResponseButtonFour"
                     style={recordingButtonStyle}
                     onClick={() => this.responseFour(item.id)}
                   >
                     4
-                </Button>
+                  </Button>
                   <Button
                     id="peakResponseButtonEight"
                     style={recordingButtonStyle}
                     onClick={() => this.responseEight(item.id)}
                   >
                     8
-                </Button>
+                  </Button>
                   <Button
                     id="peakResponseButtonTen"
                     style={recordingButtonStyle}
                     onClick={() => this.responseTen(item.id)}
                   >
                     10
-                </Button>
-
+                  </Button>
                 </Panel>
-
               ))}
             </Collapse>
           </div>
-
         )
       }
-
     }
-
 
     if (SelectedOperation === 'Test') {
       const combinations = []
       SdCombinations?.test.edges.map((combinationNode, combinationIndex) => {
-        combinations.push(
-          {
-            id: combinationNode.node.id,
-            relation: `${combinationNode.node.stimulus1} ` + `${combinationNode.node.sign12} ` + `${combinationNode.node.stimulus2} ` + `${combinationNode.node.sign23 ? combinationNode.node.sign23 : ''} ` + `${combinationNode.node.stimulus3 ? combinationNode.node.stimulus3 : ''} `,
-            description: `${this.getFullName(nodeItem, combinationNode.node.stimulus1)} ` + `${combinationNode.node.sign12} ` + `${this.getFullName(nodeItem, combinationNode.node.stimulus2)} ` + `${combinationNode.node.sign23 ? combinationNode.node.sign23 : ''} ` + `${combinationNode.node.stimulus3 ? this.getFullName(nodeItem, combinationNode.node.stimulus3) : ''} `
-          }
-        )
+        combinations.push({
+          id: combinationNode.node.id,
+          relation:
+            `${combinationNode.node.stimulus1} ` +
+            `${combinationNode.node.sign12} ` +
+            `${combinationNode.node.stimulus2} ` +
+            `${combinationNode.node.sign23 ? combinationNode.node.sign23 : ''} ` +
+            `${combinationNode.node.stimulus3 ? combinationNode.node.stimulus3 : ''} `,
+          description:
+            `${this.getFullName(nodeItem, combinationNode.node.stimulus1)} ` +
+            `${combinationNode.node.sign12} ` +
+            `${this.getFullName(nodeItem, combinationNode.node.stimulus2)} ` +
+            `${combinationNode.node.sign23 ? combinationNode.node.sign23 : ''} ` +
+            `${
+              combinationNode.node.stimulus3
+                ? this.getFullName(nodeItem, combinationNode.node.stimulus3)
+                : ''
+            } `,
+        })
       })
 
       if (combinations.length > 0) {
         return (
           <div style={{ textAlign: 'center' }}>
-            <Collapse accordion destroyInactivePanel={true} onChange={(e) => this.changeCombination(e)}>
+            <Collapse
+              accordion
+              destroyInactivePanel={true}
+              onChange={e => this.changeCombination(e)}
+            >
               {combinations.map(item => (
                 <Panel header={item.description} key={item.id} extra={item.relation}>
-
                   <div style={{ textAlign: 'center' }}>
                     <Button onClick={this.goToPreviousTrial}>
                       <Icon type="left" />
@@ -752,50 +943,43 @@ class RecordingBlock extends Component {
                     onClick={() => this.responseZero(item.id)}
                   >
                     0
-                </Button>
+                  </Button>
                   <Button
                     id="peakResponseButtonTwo"
                     style={recordingButtonStyle}
                     onClick={() => this.responseTwo(item.id)}
                   >
                     2
-                </Button>
+                  </Button>
                   <Button
                     id="peakResponseButtonFour"
                     style={recordingButtonStyle}
                     onClick={() => this.responseFour(item.id)}
                   >
                     4
-                </Button>
+                  </Button>
                   <Button
                     id="peakResponseButtonEight"
                     style={recordingButtonStyle}
                     onClick={() => this.responseEight(item.id)}
                   >
                     8
-                </Button>
+                  </Button>
                   <Button
                     id="peakResponseButtonTen"
                     style={recordingButtonStyle}
                     onClick={() => this.responseTen(item.id)}
                   >
                     10
-                </Button>
-
+                  </Button>
                 </Panel>
-
               ))}
             </Collapse>
           </div>
-
         )
       }
-
     }
-
   }
-
-
 
   render() {
     const {
@@ -816,34 +1000,37 @@ class RecordingBlock extends Component {
       <>
         <div style={{ padding: '10px' }}>
           <div style={{ display: 'block', marginBottom: '5px' }}>
-            <span style={{ float: 'right' }}>Code : {MasterSession.targets.edges[TargetActiveIndex].node.eqCode ? MasterSession.targets.edges[TargetActiveIndex].node.eqCode : 'N/A'}</span>
+            <span style={{ float: 'right' }}>
+              Code :{' '}
+              {MasterSession.targets.edges[TargetActiveIndex].node.eqCode
+                ? MasterSession.targets.edges[TargetActiveIndex].node.eqCode
+                : 'N/A'}
+            </span>
 
-            <Radio.Group value={SelectedOperation} onChange={(e) => this.chnageOperation(e.target.value)} buttonStyle="solid" style={{ float: 'left' }}>
+            <Radio.Group
+              value={SelectedOperation}
+              onChange={e => this.chnageOperation(e.target.value)}
+              buttonStyle="solid"
+              style={{ float: 'left' }}
+            >
               <Radio.Button value="Train">Train</Radio.Button>
               <Radio.Button value="Test">Test</Radio.Button>
             </Radio.Group>
-
-
           </div>
           <br />
           <div style={{ display: 'block', marginTop: '10px' }}>
-            <Tabs destroyInactiveTabPane={true} onChange={(e) => this.callback(e)}>
-
-              {MasterSession.targets.edges[TargetActiveIndex].node.classes.edges.map((nodeItem, nodeIndex) => (
-                <TabPane tab={nodeItem.node.name} key={nodeItem.node.id}>
-                  {this.getDescriptions(nodeItem)}
-                </TabPane>
-              ))}
-
-
+            <Tabs destroyInactiveTabPane={true} onChange={e => this.callback(e)}>
+              {MasterSession.targets.edges[TargetActiveIndex].node.classes.edges.map(
+                (nodeItem, nodeIndex) => (
+                  <TabPane tab={nodeItem.node.name} key={nodeItem.node.id}>
+                    {this.getDescriptions(nodeItem)}
+                  </TabPane>
+                ),
+              )}
             </Tabs>
           </div>
 
-
-
           <br />
-
-
         </div>
       </>
     )

@@ -82,8 +82,8 @@ export const UPDATE_ABC = gql`
 `
 
 export const ABC = gql`
-  query getABC($studentId: ID!, $date: Date!) {
-    getABC(studentId: $studentId, date: $date) {
+  query getABC($studentId: ID!, $dateGte: Date!, $dateLte: Date) {
+    getABC(studentId: $studentId, date_Gte: $dateGte, date_Lte: $dateLte) {
       edges {
         node {
           id

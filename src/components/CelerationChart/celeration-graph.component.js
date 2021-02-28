@@ -1,50 +1,26 @@
-import React, { Component } from 'react'
-
-import { Line } from 'react-chartjs-2'
-
-import { Row, Col, Button, Drawer, Modal, Table, DatePicker, Select } from 'antd'
-import { LeftOutlined, ExportOutlined } from '@ant-design/icons'
-
-import Moment from 'moment'
+import { ExportOutlined, LeftOutlined } from '@ant-design/icons'
+import { Badge, Button, Col, DatePicker, Modal, Row, Select, Table, Icon, notification } from 'antd'
 import domtoimage from 'dom-to-image'
 import { jsPDF } from 'jspdf'
+import moment from 'moment'
+import React, { Component } from 'react'
+import { Line } from 'react-chartjs-2'
+import _ from 'lodash'
 import { chartPointType, chartSessionPointsFields } from 'redux/celerationchart/chart.constant'
-
 import AddUpdatePoint from './add-update-point.component'
-
 import GraphConfig from './graph.config'
 
 const { RangePicker } = DatePicker
-
-const filterCardStyle = {
-  background: '#F9F9F9',
-  borderRadius: 10,
-  padding: '10px',
-  margin: '0 0 9px 10px',
-  height: 50,
-  overflow: 'hidden',
-}
-
-const cardStyle = {
-  background: '#F9F9F9',
-  height: 500,
-  overflow: 'auto',
-}
-
-const antcol1 = {
-  display: 'block',
-  width: '6%',
-}
+const { Option } = Select
 
 class CelerationGraph extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      point: {},
-      pointIndex: 0,
-      open: false,
-      pointsDrawer: false,
+      pointToAdd: {},
+      pointToEdit: {},
+      isAddOrEditModalOpen: false,
       behaviorTypes: [],
     }
   }
@@ -73,17 +49,17 @@ class CelerationGraph extends Component {
   }
 
   render() {
-    const { Option } = Select
-
-    const { point, pointIndex, open, pointsDrawer, behaviorTypes } = this.state
-    const { chart, behaviorTypesSelected } = this.props
+    const { pointToAdd, pointToEdit, isAddOrEditModalOpen, behaviorTypes } = this.state
     const {
+      chart,
+      behaviorTypesSelected,
       addPoint,
       updatePoint,
       onCelerationChartChange,
       onBehaviorTypesChange,
       resetCelerationChartAction,
     } = this.props
+    const categoryName = chart.category.name
 
     /**
      * Filters the input array based on the chart point type.
@@ -103,12 +79,12 @@ class CelerationGraph extends Component {
       switch (chartSelected.category.name) {
         case 'Session': {
           type = chartSessionPointsFields[pointType]
-          list = chartSelected.points.filter(p => p[type] > 0)
+          list = groupDataForSessionType(chartSelected.points).filter(p => p[type] > 0)
 
           return sortedPoints(
             list.map(p => {
-              const startDate = Moment(chartSelected.startDate)
-              const latestDate = Moment(p.date)
+              const startDate = moment(chartSelected.startDate)
+              const latestDate = moment(p.date)
               const diff = startDate.diff(latestDate, 'days')
               return {
                 x: diff,
@@ -119,7 +95,7 @@ class CelerationGraph extends Component {
         }
 
         case 'Behaviour':
-          list = chartSelected.points.filter(p => p.frequency > 0)
+          list = groupDataForBehaviourType(chartSelected.points).filter(p => p.frequency > 0)
 
           if (behaviorTypesSelected.length > pointType) {
             list = list.filter(p => p.behaviour === behaviorTypesSelected[pointType])
@@ -138,91 +114,150 @@ class CelerationGraph extends Component {
 
         default:
           return sortedPoints(
-            chartSelected.points
+            groupDataForOtherType(chartSelected.points)
               .filter(p => p.dataType === pointType)
               .map(p => {
                 return {
                   x: p.day,
-                  y: onlyTime ? 1 / p.time : p.count / p.time,
+                  y: (onlyTime ? 1 / p.time : p.count / p.time).toFixed(2),
                 }
               }),
           )
       }
     }
 
-    const pointTypeInternalToExternal = value => {
+    const renderPointTypeBadge = value => {
       switch (value) {
         case 0:
-          return 'Correct'
+          return <Badge count={chart.pointsTypeLables.type1} style={{ background: '#52c41a' }} />
         case 1:
-          return 'Incorrect'
+          return <Badge count={chart.pointsTypeLables.type2} />
         case 2:
-          return 'Prompt'
+          return <Badge count={chart.pointsTypeLables.type3} style={{ background: '#faad14' }} />
         default:
           return ''
       }
     }
 
-    const dataColumnsOthers = [
-      {
-        title: 'Day',
-        dataIndex: 'day',
-        key: 'day',
-      },
-      {
-        title: 'Count',
-        dataIndex: 'count',
-        key: 'count',
-      },
-      {
-        title: 'Type',
-        dataIndex: 'dataType',
-        key: 'dataType',
-        render: value => pointTypeInternalToExternal(value),
-      },
-    ]
-    const dataColumnsSession = [
-      {
-        title: 'Correct',
-        dataIndex: 'correct',
-        key: 'correct',
-      },
-      {
-        title: 'Incorrect',
-        dataIndex: 'error',
-        key: 'error',
-      },
-      {
-        title: 'Prompt',
-        dataIndex: 'prompt',
-        key: 'prompt',
-      },
-      {
-        title: 'Date',
-        dataIndex: 'date',
-        key: 'date',
-      },
-    ]
-    const dataColumnsBehavior = [
-      {
-        title: 'Day',
-        dataIndex: 'day',
-        key: 'day',
-      },
-      {
-        title: 'Count',
-        dataIndex: 'frequency',
-        key: 'frequency',
-      },
-      {
-        title: 'Type',
-        dataIndex: 'behaviour',
-        key: 'behaviour',
-      },
-    ]
+    const groupDataForBehaviourType = flatData => {
+      let records = []
+      let index = 0
+      if (flatData) {
+        flatData.forEach(item => {
+          let existingRecord = records.find(x => x.day === item.day && x.dataType === item.dataType)
+
+          // If not exist then create Main Record
+          if (!existingRecord) {
+            existingRecord = {
+              id: index++, // eslint-disable-line no-plusplus
+              date: item.date,
+              day: item.day,
+              frequency: 0,
+              time: 0,
+              behaviour: item.behaviour,
+              child: [],
+            }
+            records.push(existingRecord)
+          }
+
+          // Update Main Record
+          existingRecord.frequency += item.frequency
+          existingRecord.time += item.time
+
+          // Create Child Record
+          existingRecord.child.push({
+            id: item.id,
+            date: item.date,
+            day: item.day,
+            frequency: item.frequency,
+            time: item.time ?? 0,
+            behaviour: item.behaviour,
+            countPerMinute: item.count / item.time ?? 0,
+          })
+        })
+      }
+
+      records = _.orderBy(records, ['date', 'behaviour'])
+
+      return records
+    }
+
+    const groupDataForOtherType = flatData => {
+      let records = []
+      let index = 0
+      if (flatData) {
+        flatData.forEach(item => {
+          let existingRecord = records.find(x => x.day === item.day && x.dataType === item.dataType)
+
+          // If not exist then create Main Record
+          if (!existingRecord) {
+            existingRecord = {
+              id: index++, // eslint-disable-line no-plusplus
+              day: item.day,
+              count: 0,
+              time: 0,
+              dataType: item.dataType,
+              child: [],
+            }
+            records.push(existingRecord)
+          }
+
+          // Update Main Record
+          existingRecord.count += item.count
+          existingRecord.time += item.time
+
+          // Create Child Record
+          existingRecord.child.push({
+            id: item.id,
+            day: item.day,
+            count: item.count,
+            time: item.time,
+            dataType: item.dataType,
+            countPerMinute: item.count / item.time,
+          })
+        })
+      }
+
+      records = _.orderBy(records, ['day', 'dataType'])
+
+      return records
+    }
+
+    const groupDataForSessionType = flatData => {
+      const allData = []
+
+      flatData.forEach(row => {
+        let existingRecord = allData.find(x => x.date === row.date)
+        if (!existingRecord) {
+          existingRecord = {
+            id: allData.length + 1,
+            date: row.date,
+            correct: 0,
+            error: 0,
+            prompt: 0,
+            child: [],
+          }
+
+          allData.push(existingRecord)
+        }
+
+        existingRecord.correct += row.correct
+        existingRecord.error += row.error
+        existingRecord.prompt += row.prompt
+
+        existingRecord.child.push({
+          attempt: existingRecord.child.length + 1,
+          correct: row.correct,
+          error: row.error,
+          prompt: row.prompt,
+        })
+      })
+
+      return allData
+    }
 
     // define data of the chart component used from react-chartjs-2
-    const data = {
+    const chartData = {
       labels: ['line'],
       datasets: [
         {
@@ -273,17 +308,6 @@ class CelerationGraph extends Component {
       ],
     }
 
-    const storePoint = (pointFoundInSameColumn, newX, newY) => {
-      this.setState({
-        point: {
-          ...pointFoundInSameColumn,
-          day: newX,
-          count: Math.round(10 ** (newY / 142.86 - 4) * 10) / 10,
-        },
-      })
-      this.setState({ pointIndex: chart.points.findIndex(p => p === pointFoundInSameColumn) })
-    }
-
     /**
      * Sort given points according to the x-value (days)
      * @param {*} points
@@ -297,17 +321,39 @@ class CelerationGraph extends Component {
       })
     }
 
+    const getDatesForChart = () => {
+      let startDate = moment().startOf('week')
+      let endDate = moment().endOf('week')
+
+      if (chart.range) [startDate, endDate] = chart.range
+      if (categoryName === 'Others')
+        endDate = moment()
+          .startOf('week')
+          .add(49, 'days')
+
+      const totalDays = moment.duration(endDate.diff(startDate)).asDays()
+
+      console.log({
+        startDate: moment(startDate).format('YYYY-MM-DD'),
+        endDate: moment(endDate).format('YYYY-MM-DD'),
+        totalDays,
+        totalWeeks: totalDays / 7,
+      })
+
+      return {
+        startDate: moment(startDate).format('YYYY-MM-DD'),
+        endDate: moment(endDate).format('YYYY-MM-DD'),
+        totalDays,
+        totalWeeks: totalDays / 7,
+      }
+    }
+
     const options = {
-      // onClick action on the graph
       onClick(event, element) {
-        if (viewMode) {
-          return
-        }
+        // Allow editing for Other type only
+        if (viewMode) return
 
-        /*
-         * 1. calculate x and y of clicked point
-         */
-
+        // calculate x and y of clicked point
         const yTop = this.chart.chartArea.top
         const yBottom = this.chart.chartArea.bottom
 
@@ -338,19 +384,19 @@ class CelerationGraph extends Component {
         // y-axis represents rounded to 1 decimal point
         newY = Math.round(newY * 10) / 10
 
-        /*
-         * 2. check all points that have the same x-axis value as the clicked point (same column on graph).
-         * If found, the point found need to be updated because there can't be more than one point in the same column.
-         */
-        const pointFoundInSameColumn = chart.points.find(p => p.day === newX)
+        const warningMsg =
+          'Mutiple points were present for that date. ' +
+          'For editing individual point open edit window from below grid.'
 
-        // y-axis is logarithmic, but the value is read as linear so we need to apply the following equation to map it
-        storePoint(pointFoundInSameColumn, newX, newY)
-
-        /*
-         * 3. open dialog for the user to add/update point
-         */
-        handleClickOpen()
+        // Find nodes for that day
+        const nodesOnThatPoint = chart.points.filter(p => p.day === newX)
+        if (nodesOnThatPoint.length === 0)
+          openAddPointModal({
+            day: newX,
+            count: Math.round(10 ** (newY / 142.86 - 4) * 10) / 10,
+          })
+        else if (nodesOnThatPoint.length === 1) openEditPointModal(nodesOnThatPoint[0])
+        else notification.warning({ message: warningMsg })
       },
       scales: {
         xAxes: [
@@ -364,20 +410,18 @@ class CelerationGraph extends Component {
             },
             scaleLabel: {
               display: true,
-              labelString: 'SUCCESSIVE CALENDAR DAYS',
+              labelString: chart.labelX ? chart.labelX : 'SUCCESSIVE CALENDAR DAYS',
             },
             ticks: {
               min: 0,
-              max: 140,
-              stepSize: 7,
-              callback(value, index, values) {
+              max: getDatesForChart().totalDays,
+              stepSize: 1,
+              callback(value) {
                 if (value === 0) {
-                  return `${Moment(chart.date).format('YYYY-MM-DD')} / ${value}`
+                  return `${getDatesForChart().startDate} / ${value}`
                 }
-                if (value === 140) {
-                  const date = new Date(chart.date)
-                  date.setDate(date.getDate() + 140)
-                  return `${Moment(date).format('YYYY-MM-DD')} / ${value}`
+                if (value === getDatesForChart().totalDays) {
+                  return `${getDatesForChart().endDate} / ${Math.ceil(value)}`
                 }
                 return value
               },
@@ -398,12 +442,12 @@ class CelerationGraph extends Component {
             },
             ticks: {
               min: 0,
-              max: 20,
-              stepSize: 4,
-              callback(value, index, values) {
-                const date = new Date(chart.date)
+              max: getDatesForChart().totalWeeks,
+              stepSize: 1,
+              callback(value) {
+                const date = new Date(getDatesForChart().startDate)
                 date.setDate(date.getDate() + value * 7)
-                return `${value} / ${Moment(date).format('YYYY-MM-DD')}`
+                return `${Math.ceil(value)} / ${moment(date).format('YYYY-MM-DD')}`
               },
             },
           },
@@ -419,12 +463,12 @@ class CelerationGraph extends Component {
             },
             scaleLabel: {
               display: true,
-              labelString: chart.yAxisLabel ? chart.yAxisLabel : 'COUNT PER MINUTE',
+              labelString: chart.labelY ? chart.labelY : 'COUNT PER MINUTE',
             },
             ticks: {
               min: 0.0001,
               max: 1000,
-              callback(value, index, values) {
+              callback(value) {
                 return Number(value.toString())
               },
             },
@@ -446,7 +490,7 @@ class CelerationGraph extends Component {
               reverse: true,
               min: 0.001,
               max: 10000,
-              callback(value, index, values) {
+              callback(value) {
                 return Number(value.toString())
               },
             },
@@ -456,23 +500,23 @@ class CelerationGraph extends Component {
       },
     }
 
-    const handleClickOpen = () => {
-      this.setState({ open: true })
+    const openAddPointModal = pointDetails => {
+      this.setState({
+        pointToAdd: pointDetails ?? {},
+        pointToEdit: null,
+        isAddOrEditModalOpen: true,
+      })
     }
 
-    const handleClose = () => {
-      this.setState({ open: false })
+    const openEditPointModal = row => {
+      this.setState({ pointToAdd: null, pointToEdit: row, isAddOrEditModalOpen: true })
     }
 
-    const pointDrawerOpen = () => {
-      this.setState({ pointsDrawer: true })
+    const closeAddOrEditPointModal = () => {
+      this.setState({ pointToAdd: null, pointToEdit: null, isAddOrEditModalOpen: false })
     }
 
-    const pointDrawerClose = () => {
-      this.setState({ pointsDrawer: false })
-    }
-
-    const exportChartPDF = e => {
+    const exportChartPDF = () => {
       const input = window.document.getElementById('celeration-chart-parent')
 
       /* eslint new-cap: [0, {capIsNewExceptions: ["S"]}] */
@@ -485,156 +529,339 @@ class CelerationGraph extends Component {
       }
     }
 
+    const getGridColumns = isForNestedGrid => {
+      const columnsForSessionType = [
+        {
+          title: 'Date',
+          dataIndex: 'date',
+          key: 'date',
+        },
+        {
+          title: 'Correct',
+          dataIndex: 'correct',
+          key: 'correct',
+          align: 'right',
+        },
+        {
+          title: 'Incorrect',
+          dataIndex: 'error',
+          key: 'error',
+          align: 'right',
+        },
+        {
+          title: 'Prompt',
+          dataIndex: 'prompt',
+          key: 'prompt',
+          align: 'right',
+        },
+      ]
+
+      const columnsForBehaviorType = [
+        {
+          title: 'Date',
+          dataIndex: 'date',
+          key: 'date',
+        },
+        {
+          title: 'Count',
+          dataIndex: 'frequency',
+          key: 'frequency',
+        },
+        {
+          title: 'Time',
+          dataIndex: 'time',
+          key: 'time',
+        },
+        {
+          title: 'Behavior Name',
+          dataIndex: 'behaviour',
+          key: 'behaviour',
+        },
+      ]
+
+      const columnsForOtherType = [
+        {
+          title: 'Day',
+          dataIndex: 'day',
+          key: 'day',
+        },
+        {
+          title: 'Count',
+          dataIndex: 'count',
+          key: 'count',
+          align: 'right',
+          render: value => value.toFixed(2),
+        },
+        {
+          title: 'Time',
+          dataIndex: 'time',
+          key: 'time',
+          align: 'right',
+        },
+        {
+          title: 'Type',
+          dataIndex: 'dataType',
+          key: 'dataType',
+          render: value => renderPointTypeBadge(value),
+        },
+      ]
+
+      const columnsForNestedSessionType = [
+        {
+          title: 'Attempt',
+          dataIndex: 'attempt',
+          key: 'attempt',
+        },
+        {
+          title: 'Correct',
+          dataIndex: 'correct',
+          key: 'correct',
+          align: 'right',
+        },
+        {
+          title: 'Incorrect',
+          dataIndex: 'error',
+          key: 'error',
+          align: 'right',
+        },
+        {
+          title: 'Prompt',
+          dataIndex: 'prompt',
+          key: 'prompt',
+          align: 'right',
+        },
+      ]
+
+      const columnsForNestedOtherType = [
+        {
+          title: 'Day',
+          dataIndex: 'day',
+          key: 'day',
+        },
+        {
+          title: 'Count',
+          dataIndex: 'count',
+          key: 'count',
+          align: 'right',
+          render: value => value.toFixed(2),
+        },
+        {
+          title: 'Time',
+          dataIndex: 'time',
+          key: 'time',
+          align: 'right',
+        },
+        {
+          title: 'Count/Minute',
+          dataIndex: 'countPerMinute',
+          key: 'countPerMinute',
+          align: 'right',
+          render: value => value.toFixed(2),
+        },
+        {
+          title: 'Type',
+          dataIndex: 'dataType',
+          key: 'dataType',
+          render: value => renderPointTypeBadge(value),
+        },
+        {
+          title: 'Action',
+          key: 'operation',
+          render: row => (
+            <Button type="link" icon="edit" onClick={() => openEditPointModal(row)}>
+              Edit
+            </Button>
+          ),
+          align: 'center',
+        },
+      ]
+
+      const columnsForNestedBehaviorType = [
+        {
+          title: 'Date',
+          dataIndex: 'date',
+          key: 'date',
+        },
+        {
+          title: 'Day',
+          dataIndex: 'day',
+          key: 'day',
+        },
+        {
+          title: 'Count',
+          dataIndex: 'frequency',
+          key: 'frequency',
+        },
+        {
+          title: 'Time',
+          dataIndex: 'time',
+          key: 'time',
+        },
+        {
+          title: 'Behavior Name',
+          dataIndex: 'behaviour',
+          key: 'behaviour',
+        },
+      ]
+
+      if (isForNestedGrid) {
+        if (categoryName === 'Others') return columnsForNestedOtherType
+        if (categoryName === 'Session') return columnsForNestedSessionType
+        if (categoryName === 'Behaviour') return columnsForNestedBehaviorType
+      }
+
+      if (categoryName === 'Others') return columnsForOtherType
+      if (categoryName === 'Session') return columnsForSessionType
+      if (categoryName === 'Behaviour') return columnsForBehaviorType
+      return []
+    }
+
+    const getGridDataSource = () => {
+      if (categoryName === 'Session') return groupDataForSessionType(chart.points)
+      if (categoryName === 'Others') return groupDataForOtherType(chart.points)
+      if (categoryName === 'Behaviour') return groupDataForBehaviourType(chart.points)
+      return []
+    }
+
     // whether to render component in view mode
-    const viewMode = chart.category.name !== 'Others'
+    const viewMode = categoryName !== 'Others'
+
+    // Generate list of columns based on type of grid
+
+    const expandedRowRender = row => (
+      <Table
+        rowKey="id"
+        dataSource={row.child}
+        columns={getGridColumns(true)}
+        bordered
+        showHeader
+        pagination={false}
+        size="small"
+      />
+    )
 
     return (
-      <div>
-        <br />
+      <>
+        <Row className="filterCard">
+          {/* Back button */}
+          <Col span={2}>
+            <Button type="primary" htmlType="button" onClick={resetCelerationChartAction}>
+              <LeftOutlined />
+              Back
+            </Button>
+          </Col>
 
-        <Row>
-          <Col sm={24}>
-            <Row>
-              <Col span={26}>
-                <div style={filterCardStyle}>
-                  <div style={cardStyle}>
-                    <Row>
-                      <Col span={2}>
-                        <Button
-                          type="primary"
-                          htmlType="button"
-                          onClick={resetCelerationChartAction}
-                        >
-                          <LeftOutlined />
-                          Back
-                        </Button>
-                      </Col>
-                      {chart.category.name !== 'Others' && (
-                        <>
-                          <Col span={1} style={antcol1}>
-                            <span style={{ fontSize: '15px', color: '#000' }}>Date :</span>
-                          </Col>
-                          <Col span={4} style={{ width: 265 }}>
-                            <RangePicker
-                              value={chart.range}
-                              onChange={e => onCelerationChartChange(e, 'range')}
-                              size="default"
-                              style={{
-                                marginLeft: 'auto',
-                                width: 250,
-                                marginRight: 31,
-                              }}
-                            />
-                          </Col>
-                        </>
-                      )}
-                      <Col span={1} style={antcol1}>
-                        {chart.category.name === 'Behaviour' ? (
-                          <span style={{ fontSize: '15px', color: '#000' }}>Behaviour:</span>
-                        ) : null}
-                      </Col>
-                      <Col span={8} style={{ marginRight: 10 }}>
-                        {chart.category.name === 'Behaviour' ? (
-                          <Col span={12}>
-                            <Select
-                              mode="multiple"
-                              id="behaviorTypes"
-                              placeholder="Behavior Types"
-                              optionFilterProp="children"
-                              size="small"
-                              style={{
-                                width: 180,
-                                borderRadius: 4,
-                                height: 35,
-                                overflow: 'auto',
-                              }}
-                              value={behaviorTypesSelected}
-                              onChange={value => {
-                                onBehaviorTypesChange(value)
-                              }}
-                            >
-                              {behaviorTypes.map(type => {
-                                return (
-                                  <Option key={type} value={type}>
-                                    {type}
-                                  </Option>
-                                )
-                              })}
-                            </Select>
-                          </Col>
-                        ) : null}
-                      </Col>
-                      <Col span={4}>
-                        <Button type="primary" htmlType="button" onClick={() => exportChartPDF()}>
-                          <ExportOutlined />
-                          Export to PDF
-                        </Button>
-                      </Col>
-                    </Row>
-                  </div>
-                </div>
+          {/* Date - Date picker */}
+          {categoryName !== 'Others' && (
+            <>
+              <Col span={1} offset={1}>
+                <span className="label">Date:</span>
               </Col>
-            </Row>
+              <Col span={7}>
+                <RangePicker
+                  value={chart.range}
+                  onChange={e => onCelerationChartChange(e, 'range')}
+                  size="default"
+                  className="datePaicker"
+                />
+              </Col>
+            </>
+          )}
+
+          {/* Behaviour - Picker */}
+          {categoryName === 'Behaviour' && (
+            <>
+              <Col span={2}>
+                <span className="label">Behaviour:</span>
+              </Col>
+              <Col span={4}>
+                <Select
+                  mode="multiple"
+                  placeholder="Behavior Types"
+                  optionFilterProp="children"
+                  style={{
+                    width: 180,
+                    borderRadius: 4,
+                    overflow: 'auto',
+                  }}
+                  value={behaviorTypesSelected}
+                  onChange={value => onBehaviorTypesChange(value)}
+                >
+                  {behaviorTypes.map(type => {
+                    return (
+                      <Option key={type} value={type}>
+                        {type}
+                      </Option>
+                    )
+                  })}
+                </Select>
+              </Col>
+            </>
+          )}
+
+          {/* Export to PDF */}
+          <Col span={4} style={{ float: 'right' }}>
+            <Button
+              type="primary"
+              htmlType="button"
+              onClick={exportChartPDF}
+              style={{ float: 'right' }}
+            >
+              <ExportOutlined />
+              Export to PDF
+            </Button>
           </Col>
         </Row>
 
-        <br />
         <div id="celeration-chart-parent">
-          <h2>{chart.title}</h2>
-          <Line data={data} options={options} />
+          <h2 style={{ textAlign: 'center', margin: '10px' }}>{chart.title}</h2>
+          <div style={{ margin: '10px', boxShadow: '0px 0px 1px rgba(0, 0, 0, 0.5)' }}>
+            <Line data={chartData} options={options} />
+          </div>
         </div>
 
-        {viewMode ? null : (
-          <>
-            <Modal
-              title="Create A New Point"
-              visible={open}
-              onCancel={handleClose}
-              footer={false}
-              closable={false}
-              afterClose={handleClose}
-              destroyOnClose
-            >
-              <AddUpdatePoint
-                chart={chart}
-                addPoint={addPoint}
-                updatePoint={updatePoint}
-                handleClose={handleClose}
-                pointInput={point}
-                pointIndex={pointIndex}
-              />
-            </Modal>
-
-            <Button type="primary" htmlType="button" onClick={pointDrawerOpen}>
-              Add a New Point
-            </Button>
-          </>
+        {!viewMode && (
+          <Row>
+            <Col span={4} offset={20}>
+              <div style={{ margin: '10px', float: 'right' }}>
+                <Button type="primary" htmlType="button" onClick={openAddPointModal}>
+                  Add a New Point
+                </Button>
+              </div>
+            </Col>
+          </Row>
         )}
 
-        {chart.category.name === 'Others' ? (
-          <Table dataSource={chart.points} columns={dataColumnsOthers} />
-        ) : null}
-        {chart.category.name === 'Session' ? (
-          <Table dataSource={chart.points} columns={dataColumnsSession} />
-        ) : null}
-        {chart.category.name === 'Behaviour' ? (
-          <Table dataSource={chart.points} columns={dataColumnsBehavior} />
-        ) : null}
+        <Table
+          dataSource={getGridDataSource()}
+          columns={getGridColumns()}
+          expandedRowRender={expandedRowRender}
+          expandRowByClick
+          rowKey="id"
+          bordered
+          size="small"
+          style={{ margin: '10px' }}
+        />
 
-        <Drawer
-          placement="right"
-          width="40%"
+        {/* Add/Update Model */}
+        <Modal
+          title={pointToEdit ? 'Update Point' : ' Create A New Point'}
+          visible={isAddOrEditModalOpen}
+          onCancel={closeAddOrEditPointModal}
+          footer={false}
           closable
-          onClose={pointDrawerClose}
-          visible={pointsDrawer}
           destroyOnClose
         >
-          <div>
-            <h2>Add a New Point</h2>
-            <AddUpdatePoint chart={chart} addPoint={addPoint} />
-          </div>
-        </Drawer>
-      </div>
+          <AddUpdatePoint
+            chart={chart}
+            addPointAction={addPoint}
+            updatePointAction={updatePoint}
+            pointToEdit={pointToEdit}
+            pointToAdd={pointToAdd}
+            onClose={closeAddOrEditPointModal}
+          />
+        </Modal>
+      </>
     )
   }
 }

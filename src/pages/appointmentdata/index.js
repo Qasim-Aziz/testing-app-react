@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet'
-import { Drawer, Button } from 'antd'
+import { Drawer, Button, notification } from 'antd'
 import moment from 'moment'
-import { useQuery } from 'react-apollo'
+import { useQuery, useMutation } from 'react-apollo'
 import { useSelector, useDispatch } from 'react-redux'
 import CreateAppointmentForm from 'components/Form/CreateAppointmentForm'
 import UpdateAppointmentForm from 'components/Form/UpdateAppointmentForm'
 import { PlusOutlined } from '@ant-design/icons'
 import SessionFeedbackForm from '../sessionFeedback'
-import { APPOINTMENTS_FOR_RANGE } from './query'
+import { APPOINTMENTS_FOR_RANGE, UPDATE_APPOINTMENT } from './query'
 import AppointmentCalender from '../../components/AppointmentCalender/index'
 import { dateTimeToDate } from '../../utilities'
 
@@ -20,8 +20,10 @@ export default () => {
   const [updatingAppointmentId, setUpdatingAppointmentId] = useState()
   const [selectedStartDate, setSelectedStartDate] = useState()
   const [selectedEndDate, setSelectedEndDate] = useState()
+  const [selectedTherapist, setSelectedTherapist] = useState()
 
   const [loadedAppointments, setLoadedAppointments] = useState([])
+  const [eventResources, setEventResources] = useState([])
   const [renderedStartDate, setRenderedStartDate] = useState(moment())
   const [renderedEndDate, setRenderedEndDate] = useState(moment())
   const { data, loading, error, refetch } = useQuery(APPOINTMENTS_FOR_RANGE, {
@@ -31,24 +33,51 @@ export default () => {
     },
   })
 
+  const [
+    dragAndDropAppointment,
+    {
+      data: dragAndDropAppointmentData,
+      error: dragAndDropAppointmentError,
+      loading: isDragAndDropAppointmentLoading,
+    },
+  ] = useMutation(UPDATE_APPOINTMENT)
+
+  useEffect(() => {
+    if (isDragAndDropAppointmentLoading)
+      notification.info({ message: 'Please wait while updating Appointment.', duration: 2 })
+  }, [isDragAndDropAppointmentLoading])
+
+  useEffect(() => {
+    if (dragAndDropAppointmentError)
+      notification.error({ message: 'An error occurred to update Appointment.' })
+  }, [dragAndDropAppointmentError])
+
+  useEffect(() => {
+    if (dragAndDropAppointmentData)
+      notification.success({ message: 'Appointment details updated successfully.' })
+  }, [dragAndDropAppointmentData])
+
   useEffect(() => {
     let appointmentsData = []
+
     if (data) {
-      console.log(data)
       appointmentsData = data.appointments.edges.map(({ node }) => ({
         id: node.id,
         start: node.start,
         end: node.end,
         title: node.title,
         classNames: 'event_item',
+        resourceId: node.therapist ? node.therapist.id : null,
         extendedProps: {
           location: node.location,
           student: node.student,
+          therapist: node.therapist,
         },
       }))
+
+      setLoadedAppointments(appointmentsData) // Save in state for reusing if render same range
     }
 
-    setLoadedAppointments(appointmentsData) // Save in state for reusing if render same range
     if (loadAppointmentCallback) {
       loadAppointmentCallback(appointmentsData)
       loadAppointmentCallback = undefined
@@ -70,6 +99,9 @@ export default () => {
       endDate = moment(selection.end).subtract(1, 'days')
     }
 
+    if (selection.resource && selection.resource.id) setSelectedTherapist(selection.resource.id)
+    else setSelectedTherapist(undefined)
+
     setSelectedStartDate(selection.start)
     setSelectedEndDate(endDate)
   }
@@ -88,6 +120,7 @@ export default () => {
   }
 
   const createAppointment = () => {
+    console.log('createAppointment is called')
     setUpdatingAppointmentId(null)
     setVisibleDraw(true)
   }
@@ -104,13 +137,13 @@ export default () => {
 
   const userRole = useSelector(state => state.user.role)
 
-  const [visible, setVisible] = useState(false)
+  const [feedbackDrawer, setFeedbackDrawer] = useState(false)
   const [visibleDraw, setVisibleDraw] = useState(false)
   const [selectedAppointmentId, setSelectedAppointmentId] = useState('')
   const dispatch = useDispatch()
 
   const showFeedback = id => {
-    setVisible(true)
+    setFeedbackDrawer(true)
 
     setSelectedAppointmentId(id)
     dispatch({
@@ -128,8 +161,8 @@ export default () => {
         placement="right"
         width="500px"
         closable
-        onClose={() => setVisible(false)}
-        visible={visible}
+        onClose={() => setFeedbackDrawer(false)}
+        visible={feedbackDrawer}
       >
         <SessionFeedbackForm appointmentId={selectedAppointmentId} key={selectedAppointmentId} />
       </Drawer>
@@ -152,6 +185,7 @@ export default () => {
             setNeedToReloadData={setNeedToReloadData}
             startDate={selectedStartDate}
             endDate={selectedEndDate}
+            therapistId={selectedTherapist}
           />
         )}
       </Drawer>
@@ -184,8 +218,12 @@ export default () => {
           <AppointmentCalender
             isLoading={loading}
             loadData={loadAppointments}
+            eventResources={eventResources}
             onDateSelect={handleSelectDates}
             onAppointmentClick={clickInfo => updateAppointment(clickInfo.event.id)}
+            feedbackClick={showFeedback}
+            createAppointment={createAppointment}
+            dragAndDropAppointment={dragAndDropAppointment}
           />
         </div>
       </div>

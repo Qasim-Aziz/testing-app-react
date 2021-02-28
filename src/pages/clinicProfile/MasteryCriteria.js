@@ -3,6 +3,7 @@
 /* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable no-unneeded-ternary */
 import React, { useState, useEffect } from 'react'
 import { Table, Drawer, Tag, Button, Input, Form, notification } from 'antd'
 import { useQuery, useMutation } from '@apollo/react-hooks'
@@ -12,6 +13,7 @@ import { PlusOutlined } from '@ant-design/icons'
 import MasteryCriteriaForm from './Mastery/CreateChildForm'
 import UpdateMasterChildForm from './Mastery/UpdateMasterChildForm'
 import LoadingComponent from '../staffProfile/LoadingComponent'
+import './masteryCriteria.scss'
 
 const MASTER_TARGET = gql`
   query {
@@ -184,18 +186,21 @@ const MasteryCriteria = () => {
         title: 'To Status',
         dataIndex: 'node.toStatus.statusName',
         key: 'toStatus',
+        width: '160px',
       },
       {
         title: 'Response Percentage',
         dataIndex: 'node.responsePercentage',
         key: 'responsePercentage',
+        width: '160px',
       },
       {
         title: 'Consecutive Days',
         dataIndex: 'node.consecutiveDays',
         key: 'consecutiveDays',
+        width: '160px',
       },
-      { title: 'Mininum Trials', dataIndex: 'node.minTrial', key: 'minTrial' },
+      { title: 'Mininum Trials', dataIndex: 'node.minTrial', key: 'minTrial', width: '160px' },
       {
         title: 'Actions',
         render(obj) {
@@ -203,8 +208,15 @@ const MasteryCriteria = () => {
             <Tag
               style={{ cursor: 'pointer' }}
               onClick={() => {
-                setUpdatechildId(obj.node.id)
-                setUpdateChildFormDrawer(true)
+                // if (obj.node && obj.node.id && obj.node.fromStatus && obj.node.toStatus) {
+                if (obj.node && obj.node.id) {
+                  setUpdatechildId(obj.node.id)
+                  setUpdateChildFormDrawer(true)
+                } else {
+                  notification.error({
+                    message: 'Sorry, Item does not exist',
+                  })
+                }
               }}
             >
               Edit
@@ -214,10 +226,20 @@ const MasteryCriteria = () => {
       },
     ]
     return (
-      <Table columns={columns} dataSource={record.statuscriteriaSet.edges} pagination={false} />
+      <Table
+        width="100%"
+        columns={columns}
+        dataSource={record.statuscriteriaSet.edges}
+        bordered
+        rowKey={record => record.node.id}
+        showHeader
+        size="small"
+        pagination={false}
+      />
     )
   }
 
+  console.log(visible, newMasterDrawer, updateChildFormDrawer, updateMaster, 'visible')
   return (
     <div>
       <div
@@ -246,13 +268,15 @@ const MasteryCriteria = () => {
           </Button>
         </div>
       </div>
-      <div>
+      <div className="mastery-criteria-table">
         {tableData && (
           <Table
             bordered
             dataSource={tableData}
             columns={columns}
+            rowKey={record => record.id}
             expandedRowRender={expandedRowRender}
+            expandRowByClick
           />
         )}
       </div>
@@ -313,7 +337,7 @@ const MasteryCriteria = () => {
         width={400}
         closable={false}
         onClose={() => setUpdateMaster(null)}
-        visible={updateMaster}
+        visible={updateMaster ? true : false}
       >
         <div
           style={{

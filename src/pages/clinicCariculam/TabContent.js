@@ -19,10 +19,6 @@ const TabContent = ({ programArea }) => {
     }
   }, [data, selectDomain])
 
-  useEffect(() => {
-    console.log(data)
-  }, [data])
-
   const handleSelectDomain = domain => () => {
     setSelectDomain(domain)
   }

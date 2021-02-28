@@ -44,6 +44,10 @@ export function* LOGIN({ payload }) {
           'studentId',
           JSON.stringify(response.tokenAuth.user.studentsSet.edges[0].node.id),
         )
+        localStorage.setItem(
+          'userId',
+          JSON.stringify(response.tokenAuth.user.studentsSet.edges[0].node.id),
+        )
         yield put({
           type: 'user/SET_STATE',
           payload: {
@@ -54,6 +58,7 @@ export function* LOGIN({ payload }) {
       }
 
       if (response.tokenAuth.user.groups.edges[0].node.name === 'therapist') {
+        localStorage.setItem('userId', JSON.stringify(response.tokenAuth.user.id))
         yield put({
           type: 'user/SET_STATE',
           payload: {
@@ -65,7 +70,7 @@ export function* LOGIN({ payload }) {
 
       if (response.tokenAuth.user.groups.edges[0].node.name === 'school_admin') {
         const result4 = yield call(clinicDetails)
-
+        localStorage.setItem('userId', JSON.stringify(response.tokenAuth.user.id))
         if (result4) {
           yield put({
             type: 'user/SET_STATE',
@@ -187,6 +192,7 @@ export function* LOGOUT() {
     },
   })
   yield call(logout)
+  window.location.reload()
   localStorage.clear()
 }
 

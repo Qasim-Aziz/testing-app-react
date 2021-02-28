@@ -7,12 +7,11 @@ import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons'
 import { history } from 'index'
 import { Spinner } from 'reactstrap'
 import { SUMMERY, GET_CODE_DETAILS, SEND_RESPONSE, QUIT } from './query'
-import cardImg from './assignmentImg.jpg'
 
-const { Title, Text } = Typography
+const { Text } = Typography
 
 export default ({ selectedQ, data, setSelectedQ, learner }) => {
-  console.log(selectedQ, '.........................................');
+  console.log(selectedQ, '.........................................')
   const peakId = localStorage.getItem('peakId')
   const [allreadyAnswere, setAllReadyAnswer] = useState(null)
 
@@ -97,14 +96,14 @@ export default ({ selectedQ, data, setSelectedQ, learner }) => {
     if (summeryData && data && !selectedQ) {
       if (summeryData?.peakDataSummary?.lastRecord) {
         let selectFullData
-        const s = data?.peakGetCodes?.edges.forEach(({ node }, index) => {
-          if (node.id === summeryData.peakDataSummary.lastRecord.id) {
-            selectFullData = {
-              id: data?.peakGetCodes?.edges[index + 1]?.node.id,
-              index: index + 1,
-            }
-          }
-        })
+        // const s = data?.peakGetCodes?.edges.forEach(({ node }, index) => {
+        //   if (node.id === summeryData.peakDataSummary.lastRecord.id) {
+        //     selectFullData = {
+        //       id: data?.peakGetCodes?.edges[index + 1]?.node.id,
+        //       index: index + 1,
+        //     }
+        //   }
+        // })
         if (selectFullData?.id) {
           setSelectedQ(selectFullData)
         } else {
@@ -215,10 +214,12 @@ export default ({ selectedQ, data, setSelectedQ, learner }) => {
                       marginBottom: '20px',
                       lineHeight: '27px',
                       marginTop: '10px',
-                      minHeight: '140px'
+                      minHeight: '140px',
                     }}
                   >
-                    <Text style={{ marginTop: 0, fontSize: 15, fontWeight: 700, lineHeight: '20px' }}>
+                    <Text
+                      style={{ marginTop: 0, fontSize: 15, fontWeight: 700, lineHeight: '20px' }}
+                    >
                       Question {quartionData.peakCodeDetails.code}:{' '}
                       {quartionData.peakCodeDetails.instructions}
                     </Text>
@@ -269,7 +270,8 @@ export default ({ selectedQ, data, setSelectedQ, learner }) => {
                     margin: 0,
                   }}
                 >
-                  &nbsp;&nbsp;{learner}{"  "}gives an Expected Response &nbsp;&nbsp;
+                  &nbsp;&nbsp;{learner}
+                  {'  '}gives an Expected Response &nbsp;&nbsp;
                 </Text>
               </Button>
               <br />
@@ -291,7 +293,8 @@ export default ({ selectedQ, data, setSelectedQ, learner }) => {
                     margin: 0,
                   }}
                 >
-                  {`${learner}`}{"  "}gives an Unexpected Response
+                  {`${learner}`}
+                  {'  '}gives an Unexpected Response
                 </Text>
               </Button>
             </div>

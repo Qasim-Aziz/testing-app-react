@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { Component } from 'react'
-import { Form, Input, Select, Button } from 'antd'
+import { Form, Input, Select, Button, Carousel } from 'antd'
 import { Helmet } from 'react-helmet'
 import { Link, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
@@ -13,10 +13,14 @@ import {
   SecurityScanOutlined,
 } from '@ant-design/icons'
 import client from '../../../config'
+import './carouselCustomStyle.scss'
 import styles from './style.module.scss'
 
 const { Option } = Select
 // const API_URL = process.env.REACT_APP_API_URL;
+
+const blue = '#006DEE'
+const orange = '#EE7200'
 
 @Form.create()
 @connect(({ user }) => ({ user }))
@@ -24,9 +28,7 @@ class Login extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      countryLoad: false,
-      CountryList: [],
-      loading:false,
+      loading: false,
       // UserContryName: '',
       // timezone: null,
       signupredirect: false,
@@ -35,42 +37,14 @@ class Login extends Component {
   }
 
   componentDidMount() {
-    const query = `query {
-      country {
-        edges {
-          node {
-            id
-            name
-          }
-      }
-    }
-    }`
-
-    client.request(query).then(data => {
-      this.setState({
-        CountryList: data.country.edges,
-        countryLoad: true,
+    fetch('https://extreme-ip-lookup.com/json/')
+      .then(res => res.json())
+      .then(response => {
+        console.log('Country: ', response)
       })
-    })
-    // fetch(`${API_URL}/school/country_list`, {headers:{ "Accept": "application/json", "Content-Type": "application/json", "database":"india" }})
-    //   .then(res => res.json())
-    //   .then(
-    //     (result) => {
-    //       this.setState({
-    //         CountryList: result,
-    //         countryLoad: true
-    //       });
-    //     }
-    //   )
-
-    // fetch('http://ip-api.com/json')
-    //   .then(res => res.json())
-    //   .then(result => {
-    //     this.setState({
-    //       UserContryName: result.country,
-    //       timezone: result.timezone,
-    //     })
-    //   })
+      .catch((data, status) => {
+        console.log('Request failed')
+      })
   }
 
   SignupRedirct = e => {
@@ -87,7 +61,7 @@ class Login extends Component {
     form.validateFields((error, values) => {
       if (!error) {
         this.setState({
-          loading:true
+          loading: true,
         })
         // values.timezone = timezone
         dispatch({
@@ -95,16 +69,16 @@ class Login extends Component {
           payload: values,
         })
         this.setState({
-          loading:false
+          loading: false,
         })
       }
     })
   }
 
   render() {
-    const { form } = this.props;
+    const { form } = this.props
 
-    const { loginredirect, signupredirect, CountryList, countryLoad, UserContryName, loading } = this.state
+    const { loginredirect, signupredirect, loading } = this.state
 
     if (loginredirect) {
       return <Redirect to="/master_target" />
@@ -114,82 +88,130 @@ class Login extends Component {
       return <Redirect to="/user/signup" />
     }
 
+    const customH3 = { padding: '10px', fontSize: 18 }
+
     return (
       <>
         <div>
           <Helmet title="Login" />
           <div className={styles.block}>
-            <div className="row">
-              <div className="col-xl-12">
+            <div className={styles.flexCenter}>
+              <div
+                className="col-xl-7"
+                style={{
+                  border: '1px solid white',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: '100%',
+                  height: '60%',
+                }}
+              >
                 <div className={styles.inner}>
                   <div className={styles.form}>
-                    <h4 className="text-uppercase" align="center">
-                      <strong>Sign In</strong>
-                    </h4>
-                    <p align="center">
-                      Don&apos;t have an account?
-                      contact at <b>info@cogniable.tech</b>
-                    </p>
                     <div align="center" className={styles.customLayout}>
                       <img
-                        src="resources/images/login.png"
+                        src="resources/images/HeaderLogo.png"
                         alt="HeaderLogo"
                         style={{
-                          height: '200px',
-                          borderRadius: '20px',
+                          borderRadius: '2px',
+                          marginBottom: '28px',
+                          marginTop: '50px',
+                          maxWidth: '310px',
                         }}
                       />
                     </div>
                     <br />
-                    <Form layout="vertical" hideRequiredMark onSubmit={this.onSubmit}>
-                      <Form.Item>
-                        {form.getFieldDecorator('username', {
-                          rules: [{ required: true, message: 'Please input your Email' }],
-                        })(
-                          <Input
+                    <Form layout="horizontal" hideRequiredMark onSubmit={this.onSubmit}>
+                      <div className={styles.inputFieldsContainer}>
+                        <Form.Item>
+                          {form.getFieldDecorator('username', {
+                            rules: [{ required: true, message: 'Please input your Email' }],
+                          })(
+                            <Input
+                              size="large"
+                              placeholder="Email"
+                              prefix={<UserOutlined className="site-form-item-icon" />}
+                              className={styles.inputStyles}
+                            />,
+                          )}
+                        </Form.Item>
+                        <Form.Item>
+                          {form.getFieldDecorator('password', {
+                            rules: [{ required: true, message: 'Please input your password' }],
+                          })(
+                            <Input.Password
+                              size="large"
+                              type="password"
+                              prefix={<KeyOutlined className="site-form-item-icon" />}
+                              className={styles.inputStyles}
+                              placeholder="Password"
+                            />,
+                          )}
+                        </Form.Item>
+                      </div>
+
+                      <div className={styles.flexCenter}>
+                        <Form.Item>
+                          <Button
+                            htmlType="submit"
                             size="large"
-                            placeholder="Email"
-                            prefix={<UserOutlined className="site-form-item-icon" />}
-                          />,
-                        )}
-                      </Form.Item>
-                      <Form.Item>
-                        {form.getFieldDecorator('password', {
-                          rules: [{ required: true, message: 'Please input your password' }],
-                        })(
-                          <Input.Password
-                            size="large"
-                            type="password"
-                            prefix={<KeyOutlined className="site-form-item-icon" />}
-                            placeholder="Password"
-                          />,
-                        )}
-                      </Form.Item>
+                            loading={loading}
+                            style={{
+                              backgroundColor: orange,
+                              borderColor: orange,
+                              margin: '15px auto auto auto',
+                              maxWidth: '208px',
+                              color: 'white',
+                              fontWeight: 700,
+                              fontSize: '14px',
+                            }}
+                            onFocus={console.log('focus')}
+                            block
+                          >
+                            SIGN IN
+                            <ArrowRightOutlined className="site-form-item-icon" />
+                          </Button>
+                          <p align="center" className="mt-2" style={{ color: 'goldenrod' }}>
+                            <SecurityScanOutlined
+                              style={{ fontSize: '14px', color: 'goldenrod' }}
+                              className="site-form-item-icon"
+                            />{' '}
+                            Your Information is safe with us
+                          </p>
+                        </Form.Item>
+                      </div>
                       <p align="center">
-                        <Link to="/user/forgot" className="utils__link--blue">
+                        <Link
+                          to="/user/forgot"
+                          style={{ color: blue }}
+                          className="utils__link--blue"
+                        >
                           {' '}
                           Forgot Password ?
                         </Link>
                       </p>
-                      <Form.Item>
-                        <Button type="primary" htmlType="submit" size="large" loading={loading} block>
-                          SIGN IN
-                          <ArrowRightOutlined className="site-form-item-icon" />
-                        </Button>
-                        <p align="center" className="mt-2">
-                          <SecurityScanOutlined
-                            style={{ fontSize: '14px' }}
-                            className="site-form-item-icon"
-                          />{' '}
-                          Your Information is safe with us
-                        </p>
-                        {/* <p align="center">
-                          <Link to="/user/signUp" className="utils__link--blue">
-                            {' '}
-                            Sign Up
-                          </Link>
-                        </p> */}
-                      </Form.Item>
+
+                      <p align="center">
+                        <Link
+                          to="/user/signUp"
+                          className="utils__link--blue"
+                          style={{
+                            width: '100%',
+                            borderRadius: '5px',
+                            display: 'inline-block',
+                            padding: 6,
+                            backgroundColor: blue,
+                            color: '#fff',
+                            maxWidth: '208px',
+                            fontSize: '14px',
+                          }}
+                        >
+                          {' '}
+                          SIGN UP
+                        </Link>
+                      </p>
                       {/* <div className="form-group">
                         <div>
                           <Link to="/user/phone">
@@ -204,16 +226,62 @@ class Login extends Component {
                           </Button>
                         </div>
                       </div> */}
-
-                      <p align="center">
-                        Need help?
-                        {/* <text className="utils__link--blue"> Contact Us support@cogniable.us  </text> */}
-                        <text> Contact Us at info@cogniable.tech </text>
-                      </p>
                     </Form>
+                  </div>
+                  <div style={{ zIndex: 2 }}>
+                    <p align="center" style={{ marginBottom: '0.5rem' }}>
+                      <a href="https://drive.google.com/drive/folders/1_0z9kzGquaXi-odJKw2DKOIAWACeoGnk">
+                        Clinic Manual
+                      </a>
+                    </p>
+
+                    <div align="center">
+                      Need help?
+                      {/* <text className="utils__link--blue"> Contact Us support@cogniable.us  </text> */}
+                      <p>
+                        Contact Us at <a href="mailto:info@cogniable.tech">info@cogniable.tech</a>
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
+              {/* <div className="col-xl-8" style={{ border: '1px solid white' }}>
+                <div style={{ padding: '10px' }}>
+                  <Carousel autoplay>
+                    <div>
+                      <div
+                        className={styles.img1}
+                      >
+                        &nbsp;
+                      </div>
+                    </div>
+                    <div>
+                      <h3 style={{color: '#260fb6'}}>Awards</h3>
+                      <h3 style={customH3}>
+                        <a href="https://analyticsindiamag.com/startups-that-won-indias-ai-solution-challenge-at-raise-2020/" target="blank">1. Announced number 1 company in the Education sector using Artificial Intelligence technologies by honourable Prime Minister Modi.</a>
+                      </h3>
+                      <h3 style={customH3}>
+                        <a href=" https://us.nttdata.com/en/blog/2021/january/partnering-with-startups" target="blank">2. The Regional  Round winners of NTT DATA OPEN INNOVATION CONTEST 2020 for International POC in Canada, with financing of $10000 </a>
+                      </h3>
+                      <h3 style={customH3}>
+                        <a href="https://yourstory.com/2020/10/techsparks-yourstory-tech30-2020" target="blank">3. One of the 3 selected from India for the Extreme Tech Challenge (XTC) at YourStory’s TECHSPARKS 2020 TECH 30</a>
+                      </h3>
+                      <h3 style={customH3}>
+                        <a href="https://www.aimcongress.com/roadshow/Countries/Details?countryName=India" target="blank">4. Selected as the top innovating company by the Ministry of commerce to represent India in AIM Congress awards</a>
+                      </h3>
+                      <h3 style={customH3}>
+                        <a href="https://www.researchstash.com/2019/07/18/india-innovation-growth-programme-grants-winners-2019/" target="blank">5. Selected in top 16 companies of India by FICCI , TAta-Trusts and Lockheed Martin and awarded prestigious IIGP award and grant.</a>
+                      </h3>
+                      <h3 style={customH3}>
+                        <a href="" target="blank">6. Selected as top company by Western Digital in Data Innovation bazar competition organized by Startup India </a>
+                      </h3>
+                      <h3 style={customH3}>
+                        <a href="https://www.ncpedp.org/The_NCPEDP-Mphasis_Universal_Design_Awards" target="blank">7. Awarded prestigious The NCPEDP - Mphasis Universal Design Awards</a>
+                      </h3>
+                    </div>
+                  </Carousel>
+                </div>
+              </div> */}
             </div>
           </div>
         </div>

@@ -196,7 +196,7 @@ const MasteryForm = ({ form, setOpen, id }) => {
           style={{ display: 'inline-block', width: 'calc(50% - 8px)' }}
         >
           {form.getFieldDecorator('fromStatus', {
-            initialValue: childData.masCriChild.fromStatus.id,
+            initialValue: childData.masCriChild.fromStatus?.id,
             rules: [{ required: true, message: 'Please enter From Status' }],
           })(
             <Select placeholder="From Status" allowClear size="large" loading={targetStatusLoading}>
@@ -214,7 +214,7 @@ const MasteryForm = ({ form, setOpen, id }) => {
           }}
         >
           {form.getFieldDecorator('toStatus', {
-            initialValue: childData.masCriChild.toStatus.id,
+            initialValue: childData.masCriChild.toStatus?.id,
             rules: [{ required: true, message: 'Please enter To Status' }],
           })(
             <Select placeholder="To Status" allowClear size="large" loading={targetStatusLoading}>

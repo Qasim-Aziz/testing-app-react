@@ -22,49 +22,21 @@
 
 import React from 'react'
 import { Helmet } from 'react-helmet'
-import {
-  Layout,
-  Row,
-  Col,
-  Card,
-  Button,
-  Typography,
-  Tabs,
-  Icon,
-  Affix,
-  Drawer,
-  Form,
-  DatePicker,
-  Collapse,
-  Input,
-  Steps,
-  Table,
-  Tooltip,
-  Select,
-  Dropdown,
-  Menu,
-} from 'antd'
+import { Row, Col, Button, Typography, Form, DatePicker, Select, Dropdown, Menu } from 'antd'
 import html2canvas from 'html2canvas'
-import { FilterOutlined, PlusOutlined, CloudDownloadOutlined } from '@ant-design/icons'
+import { FaDownload } from 'react-icons/fa'
 import JsPDF from 'jspdf'
-import { Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { gql } from 'apollo-boost'
 import Moment from 'moment'
-
 import client from '../../apollo/config'
 import PieChart from './PieChart'
 import BarChart from './BarChart'
 import Report from './Report'
 
 const { Title, Text } = Typography
-const { Content } = Layout
 const { RangePicker } = DatePicker
-const { TabPane } = Tabs
-const { Panel } = Collapse
-const { Step } = Steps
 const { Option } = Select
-
 
 const parentCardStyle = {
   background: '#F9F9F9',
@@ -84,47 +56,24 @@ const parentTableCardStyle = {
   overflow: 'hidden',
 }
 
-const dailyResponseParentCardStyle = {
-  background: '#F9F9F9',
-  borderRadius: 10,
-  padding: '10px',
-  margin: '7px 0 0 10px',
-  height: 900,
-  overflow: 'auto',
-}
-const dailyResponseCardStyle = {
-  background: '#F9F9F9',
-  height: 800,
-  overflow: 'auto',
-}
 const filterCardStyle = {
   background: '#F1F1F1',
-  padding: 10,
+  display: 'flex',
+  flexWrap: 'wrap',
+  padding: '5px 10px',
   margin: 0,
-  height: 50,
+  height: 'fit-content',
   overflow: 'hidden',
   backgroundColor: 'rgb(241, 241, 241)',
 }
+
+const parentDiv = { display: 'flex', margin: '5px 30px 5px 0' }
+const parentLabel = { fontSize: '15px', color: '#000', margin: 'auto 8px auto' }
 
 const cardStyle = {
   background: '#F9F9F9',
   height: 400,
   overflow: 'auto',
-}
-
-const antcol1 = {
-  display: 'block',
-  width: '6%',
-}
-
-const antcol2 = {
-  display: 'block',
-  width: '11%',
-}
-
-const antcol3 = {
-  display: 'block',
-  width: '23%',
 }
 
 @connect(({ user, student, learnersprogram }) => ({ user, student, learnersprogram }))
@@ -170,6 +119,7 @@ class ProgressOverview extends React.Component {
         `,
       })
       .then(result => {
+        console.log(result, 'status result')
         this.setState({
           targetStatus: result.data.targetStatus,
           selectTargetArea: result.data.targetStatus[0].id,
@@ -307,7 +257,7 @@ class ProgressOverview extends React.Component {
       barKey,
       visibleFilter,
     } = this.state
-    
+
     const pxToMm = px => {
       return Math.floor(px / document.getElementById('pieChart').offsetHeight)
     }
@@ -337,11 +287,6 @@ class ProgressOverview extends React.Component {
 
     const menu = (
       <Menu>
-        {/* <Menu.Item key="0">
-          <Button onClick={() => exportPDF()} type="link" size="small">
-            PDF
-          </Button>
-        </Menu.Item> */}
         <Menu.Item key="1">
           <Button onClick={() => exportToCSV()} type="link" size="small">
             CSV/Excel
@@ -354,116 +299,95 @@ class ProgressOverview extends React.Component {
       <>
         <Row>
           <Col sm={24} style={{ padding: 0 }}>
-
-
             <div style={filterCardStyle}>
-
-              <Row>
-                <Col span={1} style={antcol1}>
-                  <span style={{ fontSize: '15px', color: '#000' }}>Status :</span>
-                </Col>
-                <Col span={3} style={{ marginRight: 10 }}>
-                  {targetStatus.length > 0 && (
-                    <Tooltip placement="topRight" title="Click here to select status">
-                      <Select
-                        placeholder="Status"
-                        onChange={this.StatusCallback}
-                        style={{
-                          width: 120,
-                          borderRadius: 4,
-                          marginRight: 20,
-                        }}
-                        allowClear
-                        size="default"
-                        defaultValue={statusselected}
-                        showSearch
-                        optionFilterProp="name"
-                      >
-                        {targetStatus &&
-                          targetStatus.map(node => {
-                            return (
-                              <Option key={node.id} value={node.id} name={node.statusName}>
-                                {node.statusName}
-                              </Option>
-                            )
-                          })}
-                      </Select>
-                    </Tooltip>
-                  )}
-                </Col>
-                <Col span={1} style={antcol2}>
-                  <span style={{ fontSize: '15px', color: '#000' }}>Program Area :</span>
-                </Col>
-                <Col span={3} style={{ marginRight: 10 }}>
-                  {programArea.length > 0 && (
-                    <Select
-                      placeholder="From Status"
-                      onChange={this.ProgramSelected}
-                      size="default"
-                      defaultValue={defaultprogram}
-                      style={{
-                        width: 120,
-                        borderRadius: 4,
-                      }}
-                    >
-                      {programArea &&
-                        programArea.map(dom => (
-                          <Option value={dom.node.id}>{dom.node.name}</Option>
-                        ))}
-                    </Select>
-                  )}
-                </Col>
-                <Col span={2}>
-                  <span style={{ fontSize: '15px', color: '#000' }}>Domain :</span>
-                </Col>
-                <Col span={3} style={{ marginRight: 10 }}>
-                  {domainObj.length > 0 && (
-                    <Select
-                      style={{
-                        width: 120,
-                        borderRadius: 4,
-                      }}
-                      placeholder="ALL"
-                      onChange={this.DomainChange}
-                      allowClear
-                      size="default"
-                    >
-                      {domainObj &&
-                        domainObj.map(dom => (
-                          <Option value={dom.node.domain}>{dom.node.domain}</Option>
-                        ))}
-                    </Select>
-                  )}
-                </Col>
-                <Col span={1} style={antcol1}>
-                  <span style={{ fontSize: '15px', color: '#000' }}>Date :</span>
-                </Col>
-                <Col span={5} style={antcol3}>
-                  <RangePicker
+              <div style={parentDiv}>
+                <span style={parentLabel}>Date :</span>
+                <RangePicker
+                  style={{
+                    marginLeft: 'auto',
+                    width: 250,
+                  }}
+                  defaultValue={[
+                    Moment(graphstartdate, 'YYYY-MM-DD'),
+                    Moment(graphenddate, 'YYYY-MM-DD'),
+                  ]}
+                  format="YYYY-MM-DD"
+                  onChange={this.DateChange}
+                />
+              </div>
+              <div style={parentDiv}>
+                <span style={parentLabel}>Status :</span>
+                {targetStatus.length > 0 && (
+                  <Select
+                    placeholder="Status"
+                    onChange={this.StatusCallback}
                     style={{
-                      marginLeft: 'auto',
-                      width: 250,
-                      marginRight: 31,
+                      width: 120,
+                      borderRadius: 4,
                     }}
-                    defaultValue={[
-                      Moment(graphstartdate, 'YYYY-MM-DD'),
-                      Moment(graphenddate, 'YYYY-MM-DD'),
-                    ]}
-                    format="YYYY-MM-DD"
-                    onChange={this.DateChange}
-                  />
-                </Col>
-                <Col span={1}>
-                  <Dropdown overlay={menu} trigger={['click']}>
-                    <Button style={{ marginRight: '10px' }} type="link" size="large">
-                      <CloudDownloadOutlined />{' '}
-                    </Button>
-                  </Dropdown>
-                </Col>
-              </Row>
-
+                    allowClear
+                    size="default"
+                    defaultValue={statusselected}
+                    showSearch
+                    optionFilterProp="name"
+                  >
+                    {targetStatus &&
+                      targetStatus.map(node => {
+                        return (
+                          <Option key={node.id} value={node.id} name={node.statusName}>
+                            {node.statusName}
+                          </Option>
+                        )
+                      })}
+                  </Select>
+                )}
+              </div>
+              <div style={parentDiv}>
+                <span style={parentLabel}>Program Area :</span>
+                {programArea.length > 0 && (
+                  <Select
+                    placeholder="From Status"
+                    onChange={this.ProgramSelected}
+                    size="default"
+                    defaultValue={defaultprogram}
+                    style={{
+                      width: 120,
+                      borderRadius: 4,
+                    }}
+                  >
+                    {programArea &&
+                      programArea.map(dom => <Option value={dom.node.id}>{dom.node.name}</Option>)}
+                  </Select>
+                )}
+              </div>
+              <div style={{ ...parentDiv, marginRight: 0 }}>
+                <span style={parentLabel}>Domain :</span>
+                {domainObj.length > 0 && (
+                  <Select
+                    style={{
+                      width: 120,
+                      borderRadius: 4,
+                    }}
+                    placeholder="ALL"
+                    onChange={this.DomainChange}
+                    allowClear
+                    size="default"
+                  >
+                    {domainObj &&
+                      domainObj.map(dom => (
+                        <Option value={dom.node.domain}>{dom.node.domain}</Option>
+                      ))}
+                  </Select>
+                )}
+              </div>
+              <div style={{ marginLeft: 'auto' }}>
+                <Dropdown overlay={menu} style={{ padding: 0 }} trigger={['hover']}>
+                  <Button type="link" size="large" style={{ padding: '0 8px' }}>
+                    <FaDownload fontSize="22px" />
+                  </Button>
+                </Dropdown>
+              </div>
             </div>
-
 
             <Col span={12}>
               <div style={parentCardStyle}>
@@ -499,32 +423,23 @@ class ProgressOverview extends React.Component {
                 </div>
               </div>
             </Col>
-
-
-            <Col span={24}>
-              <div style={parentTableCardStyle}>
-                <div style={cardStyle}>
-                  {selectedprogram && statusselected && (
-                    <p>
-                      <Report
-                        ref={instance => {
-                          this.report = instance
-                        }}
-                        start_date={graphstartdate}
-                        end_date={graphenddate}
-                        selectedprogram={selectedprogram}
-                        statusselected={statusselected}
-                        domainSelected={domainSelected}
-                        studentIdSelected={selectedStudentId}
-                      />
-                    </p>
-                  )}
-                </div>
-              </div>
-            </Col>
-
           </Col>
         </Row>
+        <div style={{ margin: '20px 0 20px 10px' }}>
+          {selectedprogram && statusselected && (
+            <Report
+              ref={instance => {
+                this.report = instance
+              }}
+              start_date={graphstartdate}
+              end_date={graphenddate}
+              selectedprogram={selectedprogram}
+              statusselected={statusselected}
+              domainSelected={domainSelected}
+              studentIdSelected={selectedStudentId}
+            />
+          )}
+        </div>
       </>
     )
   }

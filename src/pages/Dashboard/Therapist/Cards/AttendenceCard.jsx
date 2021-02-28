@@ -20,7 +20,7 @@ const ATTENDENCE_QUERY = gql`
 const SingleRecord = ({ date, hours }) => (
   <a
     className="hover_me_item"
-    href="#/viewTask"
+    // href="#/viewTask"
     style={{
       display: 'flex',
       flexDirection: 'row',
@@ -65,7 +65,7 @@ const AttendenceCard = () => {
         ))}
       {data && data.attendanceReport && data.attendanceReport.length > 5 && (
         <div className="more-row">
-          <a href="#/viewTask">
+          <a href="#">
             <span style={{ fontWeight: 'bold', fontSize: 12 }}>More...</span>
           </a>
         </div>

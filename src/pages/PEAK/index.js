@@ -3,18 +3,44 @@
 /* eslint-disable react/jsx-indent */
 /* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable react/jsx-closing-bracket-location */
-import React, { useEffect, useState } from 'react'
+/* eslint-disable array-callback-return */
+/* eslint-disable no-unused-expressions */
+import {
+  CheckSquareFilled,
+  DeleteOutlined,
+  PauseOutlined,
+  PlayCircleOutlined,
+  PlusOutlined,
+  FilterOutlined,
+} from '@ant-design/icons'
+import {
+  Badge,
+  Button,
+  Drawer,
+  Dropdown,
+  Icon,
+  Input,
+  Layout,
+  Menu,
+  notification,
+  Popconfirm,
+  Radio,
+  Table,
+  Tabs,
+  Tooltip,
+  Typography,
+} from 'antd'
 import gql from 'graphql-tag'
-import { useQuery } from 'react-apollo'
-import { useDispatch } from 'react-redux'
-import { Table, Layout, Typography, Button, Drawer, Tabs, Tooltip, Dropdown, Icon, Menu, Popconfirm, Input, Select } from 'antd'
-import DataTable from 'react-data-table-component'
-import { CheckSquareFilled, ExclamationCircleFilled, PauseOutlined, PlayCircleOutlined, PlusOutlined, DeleteOutlined, CloseCircleOutlined } from '@ant-design/icons'
+import React, { useEffect, useState } from 'react'
+import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
+import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
+import LearnerSelect from 'components/LearnerSelect'
 import CreateAssignmentForm from './CreateAssignmentForm'
-import { STUDNET_INFO } from './query'
-import PeakTargets from './PeakTargets'
 import EquivalenceTargets from './EquivalenceTarget'
+import './index.scss'
+import PeakTargets from './PeakTargets'
+import { STUDNET_INFO } from './query'
 
 const { TabPane } = Tabs
 
@@ -41,417 +67,430 @@ const PEAK_PROGRAMS = gql`
     }
   }
 `
-const customStyles = {
-  title: {
-    style: {
-      fontSize: '15px'
-    }
-  },
-  header: {
-    style: {
-      minHeight: '30px'
-    }
-  },
-  headRow: {
-    style: {
-      borderTopStyle: 'solid',
-      borderTopWidth: '1px',
-      borderTopColor: '#ddd',
-      backgroundColor: '#f5f5f5',
-      minHeight: '30px'
-    }
-  },
-  rows: {
-    style: {
-      minHeight: '30px' // override the row height
-    }
-  },
-  headCells: {
-    style: {
-      '&:not(:last-of-type)': {
-        borderRightStyle: 'solid',
-        borderRightWidth: '1px',
-        borderRightColor: '#ddd',
-        minHeight: '30px'
-      },
-      fontWeight: 'bold'
-    }
-  },
-  cells: {
-    style: {
-      '&:not(:last-of-type)': {
-        borderRightStyle: 'solid',
-        borderRightWidth: '1px',
-        borderRightColor: '#ddd',
-        minHeight: '30px'
-      },
-      '.ebCczK:not(:last-of-type)': {
-        minHeight: '30px'
-      },
-      fontSize: '11px'
-    }
-  },
-  pagination: {
-    style: {
-      position: 'absolute',
-      top: '41px',
-      right: '5px',
-      borderTopStyle: 'none',
-      minHeight: '35px'
-    }
-  },
-  table: {
-    style: {
-      paddingBottom: '40px',
-      marginTop: '30px'
+
+const DISABLE_PEAK_PROGRAMS = gql`
+  mutation($id: ID!) {
+    updatePeakProgram(input: { program: $id, isActive: false }) {
+      details {
+        id
+        date
+        isActive
+      }
     }
   }
-}
+`
 
 export default () => {
   const [open, setOpen] = useState(false)
   const [suggestTarget, setSuggestTarget] = useState()
+  const [selectedTarget, setSelectedTarget] = useState()
   const [suggestEquiTarget, setSuggestEquiTarget] = useState()
   const studentId = localStorage.getItem('studentId')
-  const [updateModel, setUpdateModel] = useState(false)
   const [originalData, setOriginalData] = useState([])
-  const [pdata, setPdata] = useState([])
-  const [cdata, setCdata] = useState([])
+  const [tableData, setTableData] = useState([])
   const history = useHistory()
   const dispatch = useDispatch()
-  const [filterTitle, setFilterTitle] = useState('');
-  const [filterCategory, setFilterCategory] = useState('');
+  const [filterNote, setFilterNote] = useState('')
+  const [filterTitle, setFilterTitle] = useState('')
+  const [filterCategory, setFilterCategory] = useState('')
+  const [filterStatus, setFilterStatus] = useState('')
+  const [visibleFilter, setVisibleFilter] = useState(false)
 
-  const { data: studnetInfo } = useQuery(STUDNET_INFO, {
+  const [selectedIdForDelete, setSelectedIdForDelete] = useState(null)
+
+  const [loadStudentData, { data: studnetInfo }] = useLazyQuery(STUDNET_INFO, {
     variables: {
-      studentId
-    }
+      studentId,
+    },
   })
 
-  const { data, error, loading } = useQuery(PEAK_PROGRAMS, {
+  const [loadPeakPrograms, { data, error, loading, refetch }] = useLazyQuery(PEAK_PROGRAMS, {
     fetchPolicy: 'network-only',
     variables: {
-      studentId
-    }
+      studentId,
+    },
   })
+
+  const [
+    finishAssignment,
+    { data: deleteRes, error: deleteError, loading: deleteLoading },
+  ] = useMutation(DISABLE_PEAK_PROGRAMS, {
+    variables: {
+      id: selectedIdForDelete,
+    },
+  })
+
+  const user = useSelector(state => state.user)
+  const student = useSelector(state => state.student)
+
+  useEffect(() => {
+    console.log(studnetInfo)
+  }, [studnetInfo])
+
+  useEffect(() => {
+    if (studentId) {
+      loadPeakPrograms()
+    }
+  }, [student])
+
+  useEffect(() => {
+    if (studentId) {
+      loadStudentData()
+      loadPeakPrograms()
+    }
+  }, [studentId])
+
+  useEffect(() => {
+    dispatch({
+      type: 'learnersprogram/LOAD_DATA',
+    })
+  }, [])
+
+  useEffect(() => {
+    if (selectedIdForDelete) {
+      finishAssignment()
+    }
+  }, [selectedIdForDelete])
+
+  useEffect(() => {
+    if (deleteRes) {
+      notification.success({
+        message: 'Assessment Deleted Successfully',
+      })
+    }
+  }, [deleteRes])
 
   useEffect(() => {
     if (data) {
+      console.log(data?.peakPrograms?.edges, 'peak programs data')
       setOriginalData(data?.peakPrograms?.edges)
-      const p = []
-      const c = []
-      console.log(data, '..............')
-      const d = data?.peakPrograms?.edges?.forEach(element => {
-        if (element?.node?.status === 'PROGRESS'
-          && element.node.title.toLowerCase().includes(filterTitle)
-          // &&  element.node.category === filterCategory
-        ) {
-          p.push(element)
-        }
-        if (element?.node?.status === 'COMPLETED'
-          && element.node.title.toLowerCase().includes(filterTitle)
-          // && element.node.category === filterCategory 
-        ) {
-          c.push(element)
-        }
-      })
-      setPdata(p)
-      setCdata(c)
+      setTableData(data?.peakPrograms?.edges)
     }
-  }, [data, filterTitle, filterCategory])
+  }, [data])
 
-  const menu = (
-    <Menu style={{ zIndex: 1001 }}>
-      <Menu.Item>
-        <Tooltip placement='topRight' title='Edit'>
-          Activate
-        </Tooltip>
-      </Menu.Item>
-      <Menu.Divider />
-      <Menu.Item>Deactivate</Menu.Item>
-    </Menu>
-  )
+  useEffect(() => {
+    let tempList = originalData
+    if (filterTitle) {
+      tempList =
+        tempList &&
+        tempList.filter(
+          item => item.node.title && item.node.title.toLowerCase().includes(filterTitle),
+        )
+    }
+    if (filterNote) {
+      tempList =
+        tempList &&
+        tempList.filter(
+          item => item.node.notes && item.node.notes.toLowerCase().includes(filterNote),
+        )
+    }
+    if (filterCategory) {
+      tempList =
+        tempList &&
+        tempList.filter(
+          item => item.node.category && item.node.category.toLowerCase().includes(filterCategory),
+        )
+    }
+    if (filterStatus) {
+      tempList =
+        tempList &&
+        tempList.filter(
+          item => item.node.status && item.node.status.toLowerCase().includes(filterStatus),
+        )
+    }
+    setTableData(tempList)
+  }, [filterTitle, filterNote, filterCategory, filterStatus])
 
   const startPeakEquivalence = node => {
     dispatch({
       type: 'peakequivalence/SET_STATE',
       payload: {
-        ProgramId: node.id
-      }
+        ProgramId: node.id,
+      },
     })
     window.location.href = '/#/peakEqvi'
-    // console.log(node)
   }
 
   const makeInactive = id => {
-    console.log(id)
-    const c = []
-    const p = []
-    const newData = originalData?.filter(item => item.node.id !== id)
-    newData.forEach(element => {
-      if (element?.node?.status === 'PROGRESS') {
-        p.push(element)
-      }
-      if (element?.node?.status === 'COMPLETED') {
-        c.push(element)
-      }
-    })
-    setPdata(p)
-    setCdata(c)
-    setOriginalData(newData)
+    console.log('selected id ======> ', id)
+    const newData = tableData?.filter(item => item.node.id !== id)
+    setTableData(newData)
+
+    // write make assessment inActive code below
+    setSelectedIdForDelete(id)
   }
 
   if (error) {
     return <pre>{JSON.stringify(error, null, 2)}</pre>
   }
 
+  const handleMenuActions = (e, obj) => {
+    switch (e.key) {
+      case 'seeAssesment': {
+        localStorage.setItem('peakId', obj.node.id)
+        localStorage.setItem('peakType', obj.node.category)
+        history.push('/peakReport')
+        break
+      }
+
+      case 'seeReport': {
+        localStorage.setItem('peakId', obj.node.id)
+        localStorage.setItem('reportDate', obj.node.date)
+        localStorage.setItem('peakType', obj.node.category)
+        if (obj.node.category === 'EQUIVALANCE' || obj.node.category === 'EQUIVALENCE') {
+          history.push('/peakEquivalenceReport')
+        } else {
+          history.push('/peakReport')
+        }
+        break
+      }
+
+      case 'suggestTarget': {
+        if (obj.node.category === 'EQUIVALANCE' || obj.node.category === 'EQUIVALENCE') {
+          setSuggestEquiTarget(obj.node.id)
+        } else {
+          setSuggestTarget(obj.node.id)
+        }
+        setSelectedTarget(obj.node)
+        break
+      }
+
+      case 'resumeAssesment': {
+        localStorage.setItem('peakId', obj.node.id)
+        localStorage.setItem('peakType', obj.node.category)
+        if (obj.node.category === 'TRANSFORMATION') {
+          history.push('/classPage')
+        } else if (obj.node.category === 'EQUIVALANCE' || obj.node.category === 'EQUIVALENCE') {
+          startPeakEquivalence(obj.node)
+        } else {
+          history.push('/peakAssign')
+        }
+        break
+      }
+
+      case 'startAssesment': {
+        localStorage.setItem('peakId', obj.node.id)
+        localStorage.setItem('peakType', obj.node.category)
+        if (obj.node.category === 'TRANSFORMATION') {
+          history.push('/classPage')
+        } else if (obj.node.category === 'EQUIVALANCE' || obj.node.category === 'EQUIVALENCE') {
+          startPeakEquivalence(obj.node)
+        } else {
+          history.push('/peakAssign')
+        }
+        break
+      }
+
+      default: {
+        console.log(`Unknown menuitem - ${e.key}`)
+      }
+    }
+  }
+
   const columns = [
     {
-      name: 'Date',
-      selector: 'node.date'
+      title: 'Date',
+      dataIndex: 'node.date',
     },
     {
-      name: 'Category',
-      selector: 'node.category',
+      title: 'Category',
+      dataIndex: 'node.category',
       minWidth: '170px',
-      maxWidth: '170px'
+      maxWidth: '170px',
     },
     {
-      name: 'Title',
-      selector: 'node.title'
+      title: 'Title',
+      dataIndex: 'node.title',
     },
     {
-      name: 'Note',
-      selector: 'node.notes'
+      title: 'Note',
+      dataIndex: 'node.notes',
     },
     {
-      name: 'Response',
-      cell: obj => (
+      title: 'Response',
+      align: 'right',
+      render: (text, obj) => (
         <>
           {obj.node.submitpeakresponsesSet.totalAttended > 0
             ? Number(
-              (obj.node.submitpeakresponsesSet.totalAttended / obj.node.submitpeakresponsesSet.total) *
-              100
-            ).toFixed(2)
-            : 0}%
+                (obj.node.submitpeakresponsesSet.totalAttended /
+                  obj.node.submitpeakresponsesSet.total) *
+                  100,
+              ).toFixed(2)
+            : 0}
+          &nbsp;%
         </>
-      )
+      ),
     },
     {
-      name: 'Status',
-      width: '140px',
-      cell: obj => (
-        <span style={{ color: obj.node.status === 'PROGRESS' ? '#f5222d' : 'green' }}>
-          {obj.node.status === 'PROGRESS' ? 'IN-PROGRESS' : obj.node.status} &nbsp;
-        </span>
-      )
+      title: 'Status',
+      align: 'center',
+      render: (text, obj) => (
+        <Badge
+          count={obj.node.status.charAt(0).toUpperCase() + obj.node.status.slice(1).toLowerCase()}
+          style={{ background: obj.node.status === 'PROGRESS' ? '#52c41a' : '#faad14' }}
+        />
+      ),
     },
     {
-      name: 'Action',
-      width: '300px',
-      cell: obj => {
+      title: 'Action',
+      align: 'center',
+      minWidth: '100px',
+      maxWidth: '100px',
+      render: (text, obj) => {
         if (obj.node.category === 'TRANSFORMATION') {
           return <p>Under development</p>
         } else {
+          const seeAssesmentMenu = (
+            <Menu.Item key="seeAssesment">
+              <CheckSquareFilled /> See Assesment
+            </Menu.Item>
+          )
+
+          const seeReportMenu = (
+            <Menu.Item key="seeReport">
+              <Icon type="snippets" /> See Report
+            </Menu.Item>
+          )
+
+          const suggestTargetMenu = (
+            <Menu.Item key="suggestTarget">
+              <Icon type="diff" /> Suggest Target
+            </Menu.Item>
+          )
+
+          const resumeAssesmentMenu = (
+            <Menu.Item key="resumeAssesment">
+              <PauseOutlined /> Resume Assesment
+            </Menu.Item>
+          )
+
+          const startAssesmentMenu = (
+            <Menu.Item key="startAssesment">
+              <PlayCircleOutlined /> Start Assesment
+            </Menu.Item>
+          )
+
+          const menuItems = []
+
+          if (obj.node.status === 'COMPLETED') {
+            menuItems.push(seeAssesmentMenu)
+            menuItems.push(seeReportMenu)
+            menuItems.push(<Menu.Divider />)
+            menuItems.push(suggestTargetMenu)
+          } else if (obj.node.submitpeakresponsesSet.totalAttended > 0) {
+            menuItems.push(resumeAssesmentMenu)
+            menuItems.push(seeReportMenu)
+            menuItems.push(<Menu.Divider />)
+            menuItems.push(suggestTargetMenu)
+          } else {
+            menuItems.push(startAssesmentMenu)
+            menuItems.push(<Menu.Divider />)
+            menuItems.push(suggestTargetMenu)
+          }
+
+          const menu = <Menu onClick={e => handleMenuActions(e, obj)}>{menuItems}</Menu>
+
           return (
             <>
-              {obj.node.status === 'COMPLETED'
-                ? <>
-
-                  <Tooltip placement='topRight' title='See Assessment'>
-                    <Button
-                      style={{ borderRight: '1px solid #ddd', borderRadius: 0 }}
-                      onClick={() => {
-                        localStorage.setItem('peakId', obj.node.id)
-                        localStorage.setItem('peakType', obj.node.category)
-                        history.push('/peakReport')
-                      }}
-                      type='link'
-                    >
-                      <CheckSquareFilled />
-                    </Button>
-                  </Tooltip>
-                  <Tooltip placement='topRight' title='See Report'>
-                    <Button
-                      style={{ borderRight: '1px solid #ddd', borderRadius: 0 }}
-                      onClick={() => {
-                        localStorage.setItem('peakId', obj.node.id)
-                        localStorage.setItem('reportDate', obj.node.date)
-                        localStorage.setItem('peakType', obj.node.category)
-                        if (obj.node.category === 'EQUIVALANCE') {
-                          history.push('/peakEquivalenceReport')
-                        } else {
-                          history.push('/peakReport')
-                        }
-                        // history.push('/peakReport')
-                      }}
-                      type='link'
-                    >
-                      <Icon type='snippets' />
-                    </Button>
-                  </Tooltip>
-                  <Button
-                    style={{ borderRight: '1px solid #ddd', borderRadius: 0 }}
-                    type='link'
-                    onClick={() => {
-                      setSuggestTarget(obj.node.id)
-                    }}
-                  >
-                    Suggest Target
+              <Tooltip placement="topRight" title="Delete Assessment">
+                <Popconfirm
+                  title="Are you sure you don't want this assessment?"
+                  onConfirm={() => makeInactive(obj.node.id)}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <Button type="link" style={{ color: 'red' }}>
+                    <DeleteOutlined /> Delete
                   </Button>
-
-                </>
-                : <>
-                  {obj.node.submitpeakresponsesSet.totalAttended > 0
-                    ? <>
-                      <Tooltip placement='topRight' title='Resume Assessment'>
-                        <Button
-                          style={{ borderRight: '1px solid #ddd', borderRadius: 0 }}
-                          onClick={() => {
-                            localStorage.setItem('peakId', obj.node.id)
-                            localStorage.setItem('peakType', obj.node.category)
-                            if (obj.node.category === 'TRANSFORMATION') {
-                              history.push('/classPage')
-                            } else if (obj.node.category === 'EQUIVALANCE') {
-                              startPeakEquivalence(obj.node)
-                            } else {
-                              history.push('/peakAssign')
-                            }
-                          }}
-                          type='link'
-                        >
-                          <PauseOutlined />
-                        </Button>
-                      </Tooltip>
-                      <Tooltip placement='topRight' title='Report'>
-                        <Button
-                          style={{ borderRight: '1px solid #ddd', borderRadius: 0 }}
-                          onClick={() => {
-                            localStorage.setItem('peakId', obj.node.id)
-                            localStorage.setItem('reportDate', obj.node.date)
-                            localStorage.setItem('peakType', obj.node.category)
-                            if (obj.node.category === 'EQUIVALANCE') {
-                              history.push('/peakEquivalenceReport')
-                            } else {
-                              history.push('/peakReport')
-                            }
-                            // history.push('/peakReport')
-                          }}
-                          type='link'
-                        >
-                          <Icon type='snippets' />
-                        </Button>
-                      </Tooltip>
-
-                      <Button
-                        type='link'
-                        style={{ borderRight: '1px solid #ddd', borderRadius: 0 }}
-                        onClick={() => {
-                          setSuggestTarget(obj.node.id)
-                        }}
-                      >
-                        Suggest Target
-                      </Button>
-                    </>
-                    : <>
-                      <Tooltip placement='topRight' title='Start Assessment'>
-                        <Button
-                          style={{ borderRight: '1px solid #ddd', borderRadius: 0 }}
-                          onClick={() => {
-                            localStorage.setItem('peakId', obj.node.id)
-                            localStorage.setItem('peakType', obj.node.category)
-                            if (obj.node.category === 'TRANSFORMATION') {
-                              history.push('/classPage')
-                            } else if (obj.node.category === 'EQUIVALANCE') {
-                              startPeakEquivalence(obj.node)
-                            } else {
-                              history.push('/peakAssign')
-                            }
-                          }}
-                          type='link'
-                        >
-                          <PlayCircleOutlined />
-
-                        </Button>
-                      </Tooltip>
-                      {obj.node.category === 'EQUIVALANCE' && (
-                        <Button
-                          type='link'
-                          style={{ borderRight: '1px solid #ddd', borderRadius: 0 }}
-                          onClick={() => {
-                            setSuggestEquiTarget(obj.node.id)
-                          }}
-                        >
-                          Suggest Target
-                      </Button>
-                      )}
-
-
-                    </>}
-                </>}
-
-              <div style={{ right: 15, position: 'absolute' }}>
-                <Tooltip placement='topRight' title='Delete Assessment'>
-                  <Popconfirm
-                    // style={{marginBottom: '10px'}}
-                    title="Are you sure you don't want this assessment?"
-                    onConfirm={() => makeInactive(obj.node.id)}
-                    // onCancel={cancel}
-                    okText='Yes'
-                    cancelText='No'
-                  >
-                    <Button type='link' style={{ color: 'red' }}>
-                      <DeleteOutlined />
-                    </Button>
-                  </Popconfirm>
-                </Tooltip>
-              </div>
+                </Popconfirm>
+              </Tooltip>
+              <span style={{ borderRight: '1px solid #ccc', margin: '0 8px' }} />
+              <Dropdown overlay={menu}>
+                <a
+                  role="presentation"
+                  className="ant-dropdown-link"
+                  onClick={e => e.preventDefault()}
+                  style={{ color: '#1890ff' }}
+                >
+                  More <Icon type="down" />
+                </a>
+              </Dropdown>
             </>
-
           )
         }
-      }
-    }
+      },
+    },
   ]
 
-  const filters = <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
-    {filterTitle ||
-      filterCategory ? (
-        <Button
-          type="link"
-          style={{ marginLeft: '10px', color: '#FEBB27' }}
-          onClick={() => {
-            setFilterTitle('')
-            setFilterCategory('')
-          }
-          }
-          size="small"
-        >
-          Clear Filters
-          <CloseCircleOutlined />
-        </Button>
-      ) : null}
-    <Input
-      size="small"
-      placeholder="Search Title"
-      value={filterTitle}
-      onChange={e => setFilterTitle(e.target.value)}
-      style={{ width: 188, marginRight: 8, display: 'block' }}
-    />
-    <Select
-      size="small"
-      value={filterCategory}
-      onSelect={value => setFilterCategory(value)}
-      style={{ width: 188 }}
+  const filterHeader = (
+    <div
+      style={{
+        minHeight: '45px',
+        height: 'fit-content',
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+      }}
     >
-      <Select.Option value="">Select Category</Select.Option>
-      <Select.Option value="DIRECT">DIRECT</Select.Option>
-      <Select.Option value="GENERALIZATION">GENERALIZATION</Select.Option>
-      <Select.Option value="TRANSFORMATION">TRANSFORMATION</Select.Option>
-      <Select.Option value="EQUIVALANCE">EQUIVALANCE</Select.Option>
-    </Select>
-  </div>;
+      <div style={{ margin: 'auto' }}>
+        <span style={{ marginRight: '6px' }}>Category: </span>
+        <Radio.Group
+          size="small"
+          value={filterCategory}
+          onChange={e => setFilterCategory(e.target.value)}
+          buttonStyle="solid"
+        >
+          <Radio.Button value="">All</Radio.Button>
+          <Radio.Button value="direct">DIR</Radio.Button>
+          <Radio.Button value="generalization">GEN</Radio.Button>
+          <Radio.Button value="equivalence">EQUI</Radio.Button>
+          <Radio.Button value="transformation">TRANS</Radio.Button>
+        </Radio.Group>
+      </div>
+      <div style={{ margin: 'auto', display: 'flex' }}>
+        <span style={{ marginRight: '6px', marginTop: '2px' }}>Title: </span>
+        <Input
+          size="small"
+          placeholder="Search Title"
+          value={filterTitle}
+          onChange={e => setFilterTitle(e.target.value)}
+          style={{ width: 140, marginRight: 8, display: 'block' }}
+        />
+      </div>
+      <div style={{ margin: 'auto', display: 'flex' }}>
+        <span style={{ marginRight: '6px', marginTop: '2px' }}>Note: </span>
+        <Input
+          size="small"
+          placeholder="Search Note"
+          value={filterNote}
+          onChange={e => setFilterNote(e.target.value)}
+          style={{ width: 140, marginRight: 8, display: 'block' }}
+        />
+      </div>
+      <div style={{ margin: 'auto' }}>
+        <span style={{ marginRight: '6px' }}>Status: </span>
+        <Radio.Group
+          size="small"
+          value={filterStatus}
+          onChange={e => setFilterStatus(e.target.value)}
+          buttonStyle="solid"
+        >
+          <Radio.Button value="">All</Radio.Button>
+          <Radio.Button value="progress">In Progress</Radio.Button>
+          <Radio.Button value="completed">Completed</Radio.Button>
+        </Radio.Group>
+      </div>
+    </div>
+  )
 
+  const showDrawerFilter = () => {
+    setVisibleFilter(true)
+  }
+
+  const onCloseFilter = () => {
+    setVisibleFilter(false)
+  }
 
   return (
     <Layout style={{ padding: '0px' }}>
@@ -460,14 +499,14 @@ export default () => {
           padding: '0px 20px',
           maxWidth: '86%',
           width: '100%',
-          margin: '0px auto'
+          margin: '0px auto',
         }}
       >
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
-            alignItems: 'center'
+            alignItems: 'center',
           }}
         >
           <Text
@@ -476,47 +515,51 @@ export default () => {
               fontSize: 24,
               marginTop: 15,
               marginLeft: 5,
-              color: '#000'
+              color: '#000',
             }}
           >
             {`${studnetInfo?.student.firstname || ''}`} - PEAK Assessment
           </Text>
-          <Button type='primary' size='large' onClick={() => setOpen(true)}>
-            <PlusOutlined />
-            Create New Assessment
-          </Button>
-        </div>
+          <div style={{ display: 'flex', gap: '16px' }}>
+            {user?.role !== 'parents' && (
+              <Button onClick={showDrawerFilter} size="large">
+                <FilterOutlined />
+              </Button>
+            )}
 
-        <Tabs type='card' tabBarExtraContent={filters}>
-          <TabPane tab='In Progress' key='1'>
-            {/* <DataTable status="PROGRESS" /> */}
-            {pdata.length > 0 && <DataTable
-              // title="DIRECT TRAINING MODULE"
-              columns={columns}
-              theme='default'
-              dense={true}
-              pagination={true}
-              data={pdata}
-              customStyles={customStyles}
-              noHeader={true}
-              paginationRowsPerPageOptions={[10, 50, 100, 200, 500, 1000]}
-            />}
-          </TabPane>
-          <TabPane tab='Completed' key='2'>
-            {cdata.length > 0 && <DataTable
-              // title="DIRECT TRAINING MODULE"
-              columns={columns}
-              theme='default'
-              dense={true}
-              pagination={true}
-              data={cdata}
-              customStyles={customStyles}
-              noHeader={true}
-              paginationRowsPerPageOptions={[10, 50, 100, 200, 500, 1000]}
-            />}
-            {/* <DataTable status="COMPLETED" /> */}
-          </TabPane>
-        </Tabs>
+            <Drawer
+              visible={visibleFilter}
+              onClose={onCloseFilter}
+              width={350}
+              title="Select Learner"
+              placement="right"
+            >
+              <LearnerSelect />
+            </Drawer>
+            <Button type="primary" size="large" onClick={() => setOpen(true)}>
+              <PlusOutlined />
+              Create New Assessment
+            </Button>
+          </div>
+        </div>
+        <div className="modify-peak-22-table">
+          <Table
+            columns={columns}
+            size="small"
+            dataSource={tableData}
+            bordered
+            title={() => {
+              return filterHeader
+            }}
+            pagination={{
+              defaultPageSize: 10,
+              showSizeChanger: true,
+              pageSizeOptions: ['10', '20', '30', '50'],
+              position: 'top',
+            }}
+            loading={loading}
+          />
+        </div>
       </Content>
       <Drawer
         visible={open}
@@ -524,11 +567,11 @@ export default () => {
           setOpen(false)
         }}
         width={400}
-        title='Create New Assessment'
+        title="Create New Assessment"
       >
         <div
           style={{
-            padding: '0px 30px'
+            padding: '0px 30px',
           }}
         >
           <CreateAssignmentForm setOpen={setOpen} PEAK_PROGRAMS={PEAK_PROGRAMS} />
@@ -538,24 +581,29 @@ export default () => {
         visible={suggestTarget}
         onClose={() => {
           setSuggestTarget(null)
-          
         }}
         width={600}
-        title='Target Allocation from PEAK Assessment'
+        title="Target Allocation from PEAK Assessment"
       >
-        {suggestTarget && <PeakTargets suggestTarget={suggestTarget} setOpen={setSuggestTarget} />}
-        
+        {suggestTarget && (
+          <PeakTargets
+            suggestTarget={suggestTarget}
+            setOpen={setSuggestTarget}
+            selectedTargetCategory={selectedTarget.category}
+          />
+        )}
       </Drawer>
       <Drawer
         visible={suggestEquiTarget}
         onClose={() => {
           setSuggestEquiTarget(null)
         }}
-        width={600}
-        title='Target Allocation from PEAK Equivalence Assessment'
+        width={900}
+        title="Target Allocation from PEAK Equivalence Assessment"
       >
-        
-        {suggestEquiTarget && <EquivalenceTargets suggestTarget={suggestEquiTarget} setOpen={setSuggestEquiTarget} />}
+        {suggestEquiTarget && (
+          <EquivalenceTargets suggestTarget={suggestEquiTarget} setOpen={setSuggestEquiTarget} />
+        )}
       </Drawer>
     </Layout>
   )

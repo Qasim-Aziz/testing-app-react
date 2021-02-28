@@ -1,6 +1,6 @@
 import React from 'react'
-
-import { Form, Input, Select } from 'antd'
+import { Form, Input, Select, DatePicker, Divider } from 'antd'
+import moment from 'moment'
 
 const { Option } = Select
 
@@ -10,118 +10,96 @@ const InputCelerationChart = props => {
 
   return (
     <>
-      <Form.Item label="Date">
-        <Input
-          id="date"
+      <Divider orientation="left">Basic Details</Divider>
+
+      <Form.Item label="Date" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+        <DatePicker
+          format="YYYY-MM-DD"
           placeholder="Date"
-          size="large"
-          type="date"
-          onChange={e => {
-            onCelerationChartChange(e, 'date')
-          }}
-          value={chart.date}
+          onChange={e => onCelerationChartChange(e, 'date')}
+          value={chart.date ? moment(chart.date) : null}
         />
       </Form.Item>
 
       <Form.Item
-        id="title"
         label="Title"
-        name="username"
-        rules={[{ required: true, message: 'Please input your username!' }]}
+        labelCol={{ span: 6 }}
+        wrapperCol={{ span: 18 }}
+        rules={[{ required: true, message: 'Please Title!' }]}
       >
         <Input
           placeholder="Title"
-          size="large"
-          onChange={e => {
-            onCelerationChartChange(e, 'title')
-          }}
+          onChange={e => onCelerationChartChange(e, 'title')}
           value={chart.title}
         />
       </Form.Item>
 
-      <Form.Item label="Category">
+      <Form.Item label="Category" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
         <Select
-          id="category"
           placeholder="Category"
           optionFilterProp="children"
           value={chart.category.id}
-          onChange={e => {
-            onCelerationChartChange(e, 'category')
-          }}
+          onChange={e => onCelerationChartChange(e, 'category')}
         >
-          {celerationCategories.map(category => {
-            return (
-              <Option key={category.id} value={category.id}>
-                {category.name}
-              </Option>
-            )
-          })}
+          {celerationCategories.map(category => (
+            <Option key={category.id} value={category.id}>
+              {category.name}
+            </Option>
+          ))}
         </Select>
       </Form.Item>
 
-      <Form.Item label="Notes">
+      <Form.Item label="Notes" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
         <Input
-          id="notes"
           placeholder="Notes"
-          size="large"
-          onChange={e => {
-            onCelerationChartChange(e, 'notes')
-          }}
+          onChange={e => onCelerationChartChange(e, 'notes')}
           value={chart.notes}
         />
       </Form.Item>
-      <Form.Item label="Y-Axis Label">
+      {/* <Form.Item label="X-Axis Label" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
         <Input
-          id="yAxisLabel"
+          placeholder="X-Axis Label"
+          onChange={e => onCelerationChartChange(e, 'labelX')}
+          value={chart.labelX}
+        />
+      </Form.Item> */}
+
+      <Form.Item label="Y-Axis Label" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+        <Input
           placeholder="Y-Axis Label"
-          size="large"
-          onChange={e => {
-            onCelerationChartChange(e, 'yAxisLabel')
-          }}
-          value={chart.yAxisLabel}
+          onChange={e => onCelerationChartChange(e, 'labelY')}
+          value={chart.labelY}
         />
       </Form.Item>
 
-      <Form.Item label="Recording Parameters">
+      <Divider orientation="left">Recording Parameters</Divider>
+      <Form.Item label="Correct" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
         <Input
           type="text"
           className="form-control"
-          id="correct"
-          onChange={e => {
-            onRecordingParametersChange(e, 'type1')
-          }}
+          onChange={e => onRecordingParametersChange(e, 'type1')}
           value={chart.pointsTypeLables.type1}
           placeholder="Correct"
-          validators={['required']}
-          errorMessages={['This field is required.']}
         />
       </Form.Item>
-      <Form.Item required component="fieldset">
+
+      <Form.Item label="Incorrect" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
         <Input
           type="text"
           className="form-control"
-          id="incorrect"
-          onChange={e => {
-            onRecordingParametersChange(e, 'type2')
-          }}
+          onChange={e => onRecordingParametersChange(e, 'type2')}
           value={chart.pointsTypeLables.type2}
           placeholder="Incorrect"
-          validators={['required']}
-          errorMessages={['This field is required.']}
         />
       </Form.Item>
-      <Form.Item required component="fieldset">
+
+      <Form.Item label="Prompted" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
         <Input
           type="text"
           className="form-control"
-          id="prompted"
-          onChange={e => {
-            onRecordingParametersChange(e, 'type3')
-          }}
+          onChange={e => onRecordingParametersChange(e, 'type3')}
           value={chart.pointsTypeLables.type3}
           placeholder="prompted"
-          validators={['required']}
-          errorMessages={['This field is required.']}
         />
       </Form.Item>
     </>

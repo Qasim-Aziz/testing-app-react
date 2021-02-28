@@ -9,8 +9,10 @@
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable prefer-const */
 /* eslint-disable object-shorthand */
+/* eslint-disable react/no-access-state-in-setstate */
 /* eslint-disable react/jsx-boolean-value */
-import React from 'react'
+/* eslint-disable react/no-did-update-set-state */
+import React, { useRef } from 'react'
 import { Helmet } from 'react-helmet'
 import Highlighter from 'react-highlight-words'
 import {
@@ -28,6 +30,7 @@ import {
   Switch,
   Dropdown,
   Menu,
+  Radio,
 } from 'antd'
 import DataTable from 'react-data-table-component'
 import JsPDF from 'jspdf'
@@ -45,12 +48,13 @@ import {
   DownOutlined,
   CloudDownloadOutlined,
 } from '@ant-design/icons'
+import moment from 'moment'
 import { connect } from 'react-redux'
 import { gql } from 'apollo-boost'
+import { FilterCard } from '../../../components/FilterCard/FilterTable'
 import EditBasicInformation from './EditBasicInformation'
 import CreateLearner from '../createLearner'
 import client from '../../../apollo/config'
-
 import './style.scss'
 
 const { Panel } = Collapse
@@ -58,63 +62,80 @@ const { Meta } = Card
 const { Search } = Input
 const { RangePicker } = DatePicker
 
-const GET_LEARNERS = gql`
-  query getLearners(
-    $isActive: Boolean
-    $first: Int
-  ){
-    students(isActive: $isActive, first: $first) {
-      pageInfo{
-        startCursor
-        endCursor
-      }
-      clinicTotal
-      edges {
-        node {
-          id
-          firstname
-          email
-          dob
-          mobileno
-          lastname
-          gender
-          currentAddress
-          clientId
-          ssnAadhar
-          parentMobile
-          parentName
-          dateOfDiagnosis
-          category {
-            id
-            category
-          }
-          clinicLocation {
-            id
-            location
-          }
-          caseManager {
-            id
-            name
-          }
-          language {
-            id
-            name
-          }
-          authStaff {
-            edges {
-              node {
-                id
-                name
-                surname
-              }
-            }
-          }
-          isActive
-        }
-      }
-    }
-  }
-`
+const customStyles = {
+  header: {
+    style: {
+      maxHeight: '50px',
+    },
+  },
+  headRow: {
+    style: {
+      borderTopStyle: 'solid',
+      borderTopWidth: '1px',
+      borderTopColor: '#ddd',
+      backgroundColor: '#f5f5f5',
+    },
+  },
+  headCells: {
+    style: {
+      '&:not(:last-of-type)': {
+        borderRightStyle: 'solid',
+        borderRightWidth: '1px',
+        borderRightColor: '#ddd',
+      },
+      height: '40px',
+      padding: '12px 8px 12px',
+      fontWeight: 'bold',
+    },
+  },
+  cells: {
+    style: {
+      '&:not(:last-of-type)': {
+        borderRightStyle: 'solid',
+        borderRightWidth: '1px',
+        borderRightColor: '#ddd',
+      },
+      padding: '6px 8px',
+      fontSize: '12px',
+    },
+  },
+  pagination: {
+    style: {
+      position: 'absolute',
+      top: '-4px',
+      right: '5px',
+      borderTopStyle: 'none',
+      minHeight: '35px',
+    },
+  },
+  table: {
+    style: {
+      paddingBottom: '16px',
+      top: '16px',
+    },
+  },
+}
+
+const customSpanStyle = {
+  backgroundColor: '#52c41a',
+  color: 'white',
+  borderRadius: '3px',
+  padding: '1px 5px',
+}
+const inActiveSpanStyle = {
+  backgroundColor: 'red',
+  color: 'white',
+  borderRadius: '3px',
+  padding: '1px 5px',
+}
+const inputCustom = { width: '180px', marginBottom: '8px', display: 'block' }
+const tableFilterStyles = { margin: '0px 32px 0 8px' }
+const customLabel = {
+  fontSize: '17px',
+  color: '#000',
+  marginRight: '12px',
+  marginBottom: '12px',
+}
 
 @connect(({ user, learners }) => ({ user, learners }))
 class LearnerTable extends React.Component {
@@ -124,20 +145,32 @@ class LearnerTable extends React.Component {
     isLoaded: true,
     UserProfile: null,
     realLearnerList: [],
+    tableData: [],
+    mainData: [],
+    isFilterActive: false,
     searchText: '',
     searchedColumn: '',
     filteredInfo: null,
+    filterCategory: '',
     // for create learner drawer
     visible: false,
     visibleEdit: false,
     visibleFilter: false,
-    filterName: '',
-    filterCaseManager: '',
-    filterGender: '',
-    filterCategory: '',
-    filterLocation: '',
-    filterStatus: 'all',
+    filterStatus: 'active',
     noOfRows: 10,
+    filterName: '',
+    filterEmail: '',
+  }
+
+  filterRef = React.createRef()
+
+  filterSet = {
+    name: true,
+    email: true,
+    mobile: true,
+    gender: true,
+    caseMngr: true,
+    address: true,
   }
 
   componentDidMount() {
@@ -149,6 +182,21 @@ class LearnerTable extends React.Component {
     dispatch({
       type: 'learners/GET_LEARNERS_DROPDOWNS',
     })
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps?.learners !== this.props?.learners) {
+      this.setState({
+        mainData: this.props.learners.LearnersList,
+        tableData: this.props.learners.LearnersList,
+      })
+
+      if (this.props.learners.LearnerCreated === 'Created') {
+        this.setState({
+          visible: false,
+        })
+      }
+    }
   }
 
   handleChange = (pagination, filters, sorter) => {
@@ -201,7 +249,10 @@ class LearnerTable extends React.Component {
   }
 
   selectActiveStatus = value => {
-    const {dispatch, learners: {ItemPerPage}} = this.props
+    const {
+      dispatch,
+      learners: { ItemPerPage },
+    } = this.props
     let isActive = null
 
     if (value === 'all') isActive = null
@@ -211,8 +262,8 @@ class LearnerTable extends React.Component {
     dispatch({
       type: 'learners/SET_STATE',
       payload: {
-        CurrentStatus: value
-      }
+        CurrentStatus: value,
+      },
     })
 
     dispatch({
@@ -221,11 +272,9 @@ class LearnerTable extends React.Component {
         isActive,
         first: ItemPerPage,
         after: null,
-        before: null
-      }
+        before: null,
+      },
     })
-
-
   }
 
   selectDateRange = value => {
@@ -242,73 +291,6 @@ class LearnerTable extends React.Component {
           realLearnerList: [],
         })
       })
-  }
-
-  getColumnSearchProps = dataIndex => ({
-    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-      <div style={{ padding: 8 }}>
-        <Input
-          ref={node => {
-            this.searchInput = node
-          }}
-          placeholder={`Search ${dataIndex}`}
-          value={selectedKeys[0]}
-          onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-          onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
-          style={{ width: 188, marginBottom: 8, display: 'block' }}
-        />
-        <Button
-          type="primary"
-          onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
-          icon="search"
-          size="small"
-          style={{ width: 90, marginRight: 8 }}
-        >
-          Search
-        </Button>
-        <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
-          Reset
-        </Button>
-      </div>
-    ),
-    filterIcon: filtered => (
-      <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
-    ),
-    onFilter: (value, record) =>
-      record[dataIndex]
-        .toString()
-        .toLowerCase()
-        .includes(value.toLowerCase()),
-
-    onFilterDropdownVisibleChange: visible => {
-      if (visible) {
-        setTimeout(() => this.searchInput.select())
-      }
-    },
-    render: text =>
-      this.state.searchedColumn === dataIndex ? (
-        <Highlighter
-          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-          searchWords={[this.state.searchText]}
-          autoEscape
-          textToHighlight={text.toString()}
-        />
-      ) : (
-          text
-        ),
-  })
-
-  handleSearch = (selectedKeys, confirm, dataIndex) => {
-    confirm()
-    this.setState({
-      searchText: selectedKeys[0],
-      searchedColumn: dataIndex,
-    })
-  }
-
-  handleReset = clearFilters => {
-    clearFilters()
-    this.setState({ searchText: '' })
   }
 
   learnerActiveInactive = checked => {
@@ -387,26 +369,98 @@ class LearnerTable extends React.Component {
   pageChanged = (page, rows) => {
     console.log(page, rows)
 
-    const {dispatch, learners: {ItemPerPage, CurrentStatus}} = this.props
+    const {
+      dispatch,
+      learners: { ItemPerPage, CurrentStatus },
+    } = this.props
     dispatch({
       type: 'learners/PAGE_CHANGED',
       payload: {
         page,
-        rows
-      }
+        rows,
+      },
     })
   }
 
   rowsChanged = (currentRowsPerPage, currentPage) => {
-    console.log(currentRowsPerPage, currentPage)
-    const {dispatch, learners: {ItemPerPage, CurrentStatus}} = this.props
+    console.log(currentRowsPerPage, currentPage, 'rowChange')
+    const {
+      dispatch,
+      learners: { ItemPerPage, CurrentStatus },
+    } = this.props
     dispatch({
       type: 'learners/ROWS_CHANGED',
       payload: {
         currentRowsPerPage,
-        currentPage
-      }
+        currentPage,
+      },
     })
+  }
+
+  filterHandler = ({ name, email, mobile, gender, caseMngr, address }) => {
+    let filteredList = this.state.mainData
+    let tempFilterActive = false
+    console.log(name, email, 'clinic filter')
+    if (!name && !email && !mobile && !gender && !caseMngr && !address) {
+      tempFilterActive = false
+    }
+    if (name) {
+      tempFilterActive = true
+      filteredList =
+        filteredList &&
+        filteredList.filter(
+          item =>
+            item.firstname?.toLowerCase().includes(name.toLowerCase()) ||
+            item.lastname?.toLowerCase().includes(name.toLowerCase()),
+        )
+    }
+    if (email) {
+      tempFilterActive = true
+      filteredList =
+        filteredList &&
+        filteredList.filter(
+          item => item.email && item.email.toLowerCase().includes(email.toLowerCase()),
+        )
+    }
+    if (caseMngr) {
+      tempFilterActive = true
+      filteredList =
+        filteredList &&
+        filteredList.filter(
+          item =>
+            item.caseManager &&
+            item.caseManager?.name.toLowerCase().includes(caseMngr.toLowerCase()),
+        )
+    }
+    if (mobile) {
+      tempFilterActive = true
+      filteredList =
+        filteredList &&
+        filteredList.filter(item => item.mobileno?.toLowerCase().includes(mobile.toLowerCase()))
+    }
+    if (address) {
+      tempFilterActive = true
+      filteredList =
+        filteredList &&
+        filteredList.filter(item => item.currentAddress?.toLowerCase().includes(name.toLowerCase()))
+    }
+    if (gender) {
+      tempFilterActive = true
+      filteredList =
+        filteredList &&
+        filteredList.filter(
+          item => item.gender && item.gender.toLowerCase() === gender.toLowerCase(),
+        )
+    }
+    this.setState({
+      tableData: filteredList,
+      isFilterActive: tempFilterActive,
+    })
+  }
+
+  clearFilter = () => {
+    this.filterHandler({ name: '', email: '', mobile: '', gender: '', caseMngr: '', address: '' })
+    this.selectActiveStatus('all')
   }
 
   filterToggle(toggle) {
@@ -426,38 +480,18 @@ class LearnerTable extends React.Component {
 
     filteredInfo = filteredInfo || {}
     const {
-      learners: { loading, LearnersList, isUserProfile, UserProfile, TotalLearners, loadingLearners },
+      learners: {
+        loading,
+        LearnersList,
+        isUserProfile,
+        UserProfile,
+        TotalLearners,
+        loadingLearners,
+      },
     } = this.props
 
-    let filteredList = LearnersList
+    let filteredList = this.state.tableData
 
-    filteredList =
-      filteredList &&
-      filteredList.filter(
-        item =>
-          item.firstname &&
-          item.firstname.toLowerCase().includes(this.state.filterName.toLowerCase()),
-      )
-
-    if (this.state.filterCaseManager) {
-      filteredList =
-        filteredList &&
-        filteredList.filter(
-          item =>
-            item.caseManager &&
-            item.caseManager.name
-              .toLowerCase()
-              .includes(this.state.filterCaseManager.toLowerCase()),
-        )
-    }
-    if (this.state.filterGender) {
-      filteredList =
-        filteredList &&
-        filteredList.filter(
-          item =>
-            item.gender && item.gender.toLowerCase() === this.state.filterGender.toLowerCase(),
-        )
-    }
     if (this.state.filterCategory) {
       filteredList =
         filteredList &&
@@ -467,33 +501,22 @@ class LearnerTable extends React.Component {
             item.category.category.toLowerCase().includes(this.state.filterCategory.toLowerCase()),
         )
     }
-    if (this.state.filterLocation) {
-      filteredList =
-        filteredList &&
-        filteredList.filter(
-          item =>
-            item.clinicLocation &&
-            item.clinicLocation.location
-              .toLowerCase()
-              .includes(this.state.filterLocation.toLowerCase()),
-        )
-    }
 
-    let categories = LearnersList.reduce(function (sum, current) {
+    let categories = LearnersList.reduce(function(sum, current) {
       return sum.concat(current.category ? current.category : [])
     }, [])
 
-    let categoriesGrouped = categories.reduce(function (groups, item) {
+    let categoriesGrouped = categories.reduce(function(groups, item) {
       const val = item.category
       groups.includes(val) ? null : groups.push(val)
       return groups
     }, [])
 
-    let locations = LearnersList.reduce(function (sum, current) {
+    let locations = LearnersList.reduce(function(sum, current) {
       return sum.concat(current.clinicLocation ? current.clinicLocation : [])
     }, [])
 
-    let locationsGrouped = locations.reduce(function (groups, item) {
+    let locationsGrouped = locations.reduce(function(groups, item) {
       const val = item.location
       groups.includes(val) ? null : groups.push(val)
       return groups
@@ -503,64 +526,12 @@ class LearnerTable extends React.Component {
       return <div>Loading...</div>
     }
 
-    const customStyles = {
-      header: {
-        style: {
-          maxHeight: '50px',
-        },
-      },
-      headRow: {
-        style: {
-          borderTopStyle: 'solid',
-          borderTopWidth: '1px',
-          borderTopColor: '#ddd',
-          backgroundColor: '#f5f5f5',
-        },
-      },
-      headCells: {
-        style: {
-          '&:not(:last-of-type)': {
-            borderRightStyle: 'solid',
-            borderRightWidth: '1px',
-            borderRightColor: '#ddd',
-          },
-          fontWeight: 'bold',
-        },
-      },
-      cells: {
-        style: {
-          '&:not(:last-of-type)': {
-            borderRightStyle: 'solid',
-            borderRightWidth: '1px',
-            borderRightColor: '#ddd',
-          },
-          fontSize: '11px',
-        },
-      },
-      pagination: {
-        style: {
-          position: 'absolute',
-          top: '5px',
-          right: '5px',
-          borderTopStyle: 'none',
-          minHeight: '35px',
-        },
-      },
-      table: {
-        style: {
-          paddingBottom: '40px',
-          top: '40px',
-        },
-      },
-    }
-
     const columns = [
       {
         name: 'Name',
         selector: 'firstname',
         sortable: true,
-        minWidth: '120px',
-        maxWidth: '120px',
+        width: '150px',
         cell: row => (
           <Button
             onClick={() => this.info(row)}
@@ -572,11 +543,87 @@ class LearnerTable extends React.Component {
         ),
       },
       {
+        name: 'Email',
+        selector: 'email',
+        sortable: true,
+        maxWidth: '180px',
+        minWidth: '180px',
+        cell: row => <span>{row.email ? row.email : ''}</span>,
+      },
+
+      {
+        name: 'Contact No',
+        selector: 'mobileno',
+        maxWidth: '110px',
+      },
+
+      {
+        name: 'Date of Birth',
+        selector: 'dob',
+        sortable: true,
+        width: '110px',
+        cell: row => <span>{row.dob ? row.dob : ''}</span>,
+      },
+      {
+        name: 'Language',
+        selector: 'language',
+        cell: row => <span>{row.language ? row.language.name : ''}</span>,
+        maxWidth: '90px',
+        minWidth: '90px',
+      },
+      {
+        name: 'Case Manager',
+        selector: 'caseManager',
+        cell: row => <span>{row.caseManager ? row.caseManager.name : ''}</span>,
+        maxWidth: '120px',
+      },
+      {
+        name: 'Client Id',
+        selector: 'clientId',
+        maxWidth: '90px',
+        minWidth: '90px',
+      },
+      {
+        name: 'Gender',
+        selector: 'gender',
+        maxWidth: '90px',
+        minWidth: '90px',
+        cell: row => <span style={{ textTransform: 'capitalize' }}>{row.gender}</span>,
+      },
+      {
+        name: 'Category',
+        selector: 'category',
+        maxWidth: '80px',
+        cell: row => <span>{row.category?.category}</span>,
+      },
+      {
+        name: 'Address',
+        selector: 'currentAddress',
+        maxWidth: '100px',
+      },
+      {
+        name: 'Clinic Location',
+        selector: 'clinicLocation',
+        cell: row => <span>{row.clinicLocation ? row.clinicLocation.location : ''}</span>,
+        width: '140px',
+      },
+      {
+        name: 'Last Login',
+        selector: 'parent',
+        width: '100px',
+        cell: row => (
+          <span>
+            {row.parent && row.parent.lastLogin
+              ? moment(row.parent.lastLogin).format('YYYY-MM-DD')
+              : ''}
+          </span>
+        ),
+      },
+      {
         name: 'Assessments',
         ignoreRowClick: true,
         button: true,
-        maxWidth: '80px',
-        minWidth: '80px',
+        width: '100px',
         cell: obj => (
           <span>
             <Button
@@ -592,8 +639,7 @@ class LearnerTable extends React.Component {
         name: 'Program',
         ignoreRowClick: true,
         button: true,
-        maxWidth: '80px',
-        minWidth: '80px',
+        width: '80px',
         cell: obj => (
           <span>
             <Button
@@ -609,8 +655,6 @@ class LearnerTable extends React.Component {
         name: 'Session',
         ignoreRowClick: true,
         button: true,
-        maxWidth: '80px',
-        minWidth: '80px',
         cell: obj => (
           <span>
             <Button
@@ -622,73 +666,6 @@ class LearnerTable extends React.Component {
           </span>
         ),
       },
-
-      {
-        name: 'Date of Birth',
-        selector: 'dob',
-        sortable: true,
-        maxWidth: '100px',
-      },
-      {
-        name: 'Email',
-        selector: 'email',
-        sortable: true,
-        maxWidth: '140px',
-        minWidth: '140px',
-      },
-
-      {
-        name: 'Contact No',
-        selector: 'mobileno',
-        maxWidth: '100px',
-        cell: row => (
-          <Button style={{ padding: '0px', color: '#0190fe', border: 'none', fontSize: '11px' }}>
-            {row.mobileno}
-          </Button>
-        ),
-      },
-      {
-        name: 'Language',
-        selector: 'language',
-        cell: row => <span>{row.language ? row.language.name : ''}</span>,
-        maxWidth: '80px',
-        minWidth: '80px',
-      },
-      {
-        name: 'Case Manager',
-        selector: 'caseManager',
-        cell: row => <span>{row.caseManager ? row.caseManager.name : ''}</span>,
-        maxWidth: '100px',
-      },
-      {
-        name: 'Client Id',
-        selector: 'clientId',
-        maxWidth: '80px',
-        minWidth: '80px',
-      },
-      {
-        name: 'Gender',
-        selector: 'gender',
-        maxWidth: '80px',
-        minWidth: '80px',
-      },
-      {
-        name: 'Category',
-        selector: 'category',
-        maxWidth: '100px',
-        cell: row => <span>{row.category?.category}</span>,
-      },
-      {
-        name: 'Address',
-        selector: 'currentAddress',
-        maxWidth: '100px',
-      },
-      {
-        name: 'Clinic Location',
-        selector: 'clinicLocation',
-        cell: row => <span>{row.clinicLocation ? row.clinicLocation.location : ''}</span>,
-        maxWidth: '100px',
-      },
     ]
 
     const fileType =
@@ -697,7 +674,7 @@ class LearnerTable extends React.Component {
 
     const exportToCSV = () => {
       const filename = 'learners_excel'
-      let formattedData = filteredList.map(function (e) {
+      let formattedData = filteredList.map(function(e) {
         return {
           Name: e.firstname,
           Surname: e.lastname,
@@ -724,28 +701,6 @@ class LearnerTable extends React.Component {
     const { divShow, filterShow } = this.state
     const divClass = divShow ? 'col-sm-12' : 'col-sm-12'
     const detailsDiv = divShow ? { display: 'block', paddingLeft: '0' } : { display: 'none' }
-    const filterDiv = filterShow
-      ? {
-        display: 'block',
-        padding: '0',
-        marginBottom: '0',
-        backgroundColor: 'inherit',
-      }
-      : { display: 'none' }
-
-    const filterOptionStyle = { display: 'inline-block', marginRight: '10px' }
-    const customSpanStyle = {
-      backgroundColor: '#52c41a',
-      color: 'white',
-      borderRadius: '3px',
-      padding: '1px 5px',
-    }
-    const inActiveSpanStyle = {
-      backgroundColor: 'red',
-      color: 'white',
-      borderRadius: '3px',
-      padding: '1px 5px',
-    }
 
     const exportPDF = () => {
       const unit = 'pt'
@@ -820,89 +775,49 @@ class LearnerTable extends React.Component {
         <Helmet title="Partner" />
         <Drawer
           title="Filters"
-          placement="left"
+          placement="right"
           closable={true}
           onClose={this.onCloseFilter}
           visible={visibleFilter}
-          width={300}
+          width={380}
         >
+          <FilterCard
+            filterHandler={this.filterHandler}
+            filterSet={this.filterSet}
+            ref={this.filterRef}
+          />
           <div>
             <div className="filter_sub_div">
-              <span style={{ fontSize: '15px', color: '#000' }}>Name :</span>
-              <Input
-                size="small"
-                placeholder="Search Name"
-                value={this.state.filterName}
-                onChange={e => this.setState({ filterName: e.target.value })}
-                style={{ width: 188, marginBottom: 8, display: 'block' }}
-              />
-            </div>
-            <div className="filter_sub_div">
-              <span style={{ fontSize: '15px', color: '#000' }}>Case Manager :</span>
-              <Input
-                size="small"
-                placeholder="Search Case Manager"
-                value={this.state.filterCaseManager}
-                onChange={e => this.setState({ filterCaseManager: e.target.value })}
-                style={{ width: 188, marginBottom: 8, display: 'block' }}
-              />
-            </div>
-            <div className="filter_sub_div">
-              <span style={{ fontSize: '15px', color: '#000' }}>Gender :</span>
-              <Select
-                size="small"
-                value={this.state.filterGender}
-                onSelect={value => this.setState({ filterGender: value })}
-                style={{ width: 188 }}
-              >
-                <Select.Option value="">Select Gender</Select.Option>
-                <Select.Option value="male">Male</Select.Option>
-                <Select.Option value="female">Female</Select.Option>
-              </Select>
-            </div>
-
-            <div className="filter_sub_div">
-              <span style={{ fontSize: '15px', color: '#000' }}>Category :</span>
+              <span style={customLabel}>Category :</span>
 
               <Select
-                size="small"
+                size="default"
                 value={this.state.filterCategory}
-                onSelect={value => this.setState({ filterCategory: value })}
-                style={{ width: 188 }}
+                onSelect={value => this.setState({ filterCategory: value, isFilterActive: true })}
+                style={inputCustom}
+                placeholder="Select Category"
               >
-                <Select.Option value="">Select Category</Select.Option>
+                <Select.Option value="">All</Select.Option>
                 {categoriesGrouped.map((i, index) => {
-                  return <Select.Option value={i}>{i}</Select.Option>
+                  return (
+                    <Select.Option key={i} value={i}>
+                      {i}
+                    </Select.Option>
+                  )
                 })}
               </Select>
             </div>
 
             <div className="filter_sub_div">
-              <span style={{ fontSize: '15px', color: '#000' }}>Location :</span>
-
+              <span style={customLabel}>Status :</span>
               <Select
-                size="small"
-                value={this.state.filterLocation}
-                onSelect={value => this.setState({ filterLocation: value })}
-                style={{ width: 188 }}
-              >
-                <Select.Option value="">Select Location</Select.Option>
-                {locationsGrouped.map((i, index) => {
-                  return <Select.Option value={i}>{i}</Select.Option>
-                })}
-              </Select>
-            </div>
-
-            <div className="filter_sub_div">
-              <span style={{ fontSize: '15px', color: '#000' }}>Status :</span>
-              <Select
-                size="small"
+                size="default"
                 value={this.state.filterStatus}
                 onSelect={value => {
                   this.selectActiveStatus(value)
-                  this.setState({ filterStatus: value })
+                  this.setState({ filterStatus: value, isFilterActive: true })
                 }}
-                style={{ width: 188 }}
+                style={inputCustom}
               >
                 <Select.Option value="all">All</Select.Option>
                 <Select.Option value="active">Active</Select.Option>
@@ -986,16 +901,13 @@ class LearnerTable extends React.Component {
                                 onChange={this.learnerActiveInactive}
                               />
                             ) : (
-                                <Switch
-                                  checkedChildren={<Icon type="check" />}
-                                  unCheckedChildren={<Icon type="close" />}
-                                  onChange={this.learnerActiveInactive}
-                                />
-                              )}
+                              <Switch
+                                checkedChildren={<Icon type="check" />}
+                                unCheckedChildren={<Icon type="close" />}
+                                onChange={this.learnerActiveInactive}
+                              />
+                            )}
                           </span>
-                          {/* <span style={{float: 'right', fontSize: '12px', padding: '5px',}}>
-                            <a style={{ color: '#0190fe' }}>Edit</a>
-                          </span> */}
                         </h5>
                       }
                       description={
@@ -1005,44 +917,20 @@ class LearnerTable extends React.Component {
                             {UserProfile.isActive ? (
                               <span style={customSpanStyle}>Active</span>
                             ) : (
-                                <span style={inActiveSpanStyle}>In-Active</span>
-                              )}
+                              <span style={inActiveSpanStyle}>In-Active</span>
+                            )}
                           </p>
-                          {/* <p style={{ fontSize: '13px', marginBottom: '4px' }}>
-                              Intake Form Status <span style={customSpanStyle}>Active</span>
-                            </p>
-                            <p style={{ fontSize: '13px', marginBottom: '0' }}>
-                              Date of Start 01/01/2020
-                            </p> */}
                         </div>
                       }
                     />
                   </Card>
-                  {isUserProfile ? (
-                    <EditBasicInformation key={UserProfile.id} />
-                  ) : (
-                      // <Collapse defaultActiveKey="1" accordion bordered={false}>
-                      //   <Panel header="Basic Details" key="1">
-                      //     <EditBasicInformation key={UserProfile.id} />
-                      //   </Panel>
-                      //   <Panel header="Insurance Details" key="2">
-                      //     <EditInsuranceForm />
-                      //   </Panel>
-                      //   <Panel header="Health Details" key="3">
-                      //     <EditHealthForm />
-                      //   </Panel>
-                      //   <Panel header="Intake Form" key="4">
-                      //     <EditIntakeForm />
-                      //   </Panel>
-                      // </Collapse>
-                      ''
-                    )}
+                  {isUserProfile ? <EditBasicInformation key={UserProfile.id} /> : null}
                 </div>
               </div>
             </div>
           ) : (
-              ''
-            )}
+            ''
+          )}
         </Drawer>
 
         <div
@@ -1052,6 +940,7 @@ class LearnerTable extends React.Component {
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '0px 10px',
+            marginTop: '20px',
             backgroundColor: '#FFF',
             boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
           }}
@@ -1061,36 +950,33 @@ class LearnerTable extends React.Component {
               <FilterOutlined />
             </Button>
 
-            {this.state.filterName ||
-              this.state.filterCaseManager ||
-              this.state.filterGender ||
-              this.state.filterCategory ||
-              this.state.filterLocation ? (
-                <Button
-                  type="link"
-                  style={{ marginLeft: '10px', color: '#FEBB27' }}
-                  onClick={() =>
-                    this.setState({
-                      filterName: '',
-                      filterCaseManager: '',
-                      filterGender: '',
-                      filterCategory: '',
-                      filterLocation: '',
-                    })
-                  }
-                  size="small"
-                >
-                  Clear Filters
+            {this.state.isFilterActive ? (
+              <Button
+                type="link"
+                onClick={() => {
+                  this.filterRef.current ? this.filterRef.current.clearFilter() : this.clearFilter()
+                  this.setState({
+                    isFilterActive: false,
+                    filterStatus: 'all',
+                    filterCategory: '',
+                    filterName: '',
+                    filterEmail: '',
+                  })
+                }}
+                style={{ marginLeft: '10px', color: '#FEBB27' }}
+                size="small"
+              >
+                Clear Filters
                 <CloseCircleOutlined />
-                </Button>
-              ) : null}
+              </Button>
+            ) : null}
           </div>
           <div>
             <span style={{ fontSize: '25px', color: '#000' }}>Learners List</span>
           </div>
           <div style={{ padding: '5px 0px' }}>
             <Dropdown overlay={menu} trigger={['click']}>
-              <Button style={{ marginRight: '10px' }} type="link" size="large">
+              <Button style={{ marginRight: '10px' }} type="link">
                 <CloudDownloadOutlined />{' '}
               </Button>
             </Dropdown>
@@ -1101,131 +987,220 @@ class LearnerTable extends React.Component {
           </div>
         </div>
 
-        <div className="row">
-          <div className={divClass}>
-            <div style={{ margin: '5px', marginBottom: '50px' }}>
+        <div className={divClass}>
+          <div style={{ marginTop: '24px', marginBottom: '50px' }}>
+            {/* Filters */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                position: 'relative',
+                whiteSpace: 'nowrap',
+                zIndex: 2,
+                width: 'fit-content',
+                paddingTop: '4px',
+              }}
+            >
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <span>Name :</span>
+                <Input
+                  size="small"
+                  name="name"
+                  placeholder="Search Name"
+                  value={this.state.filterName}
+                  onChange={e => {
+                    this.setState({
+                      filterName: e.target.value,
+                      isFilterActive: e.target.value && true,
+                    })
+                    this.filterHandler({ name: e.target.value })
+                  }}
+                  style={{ ...tableFilterStyles, width: '112px' }}
+                />
+              </span>
+
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <span>Email :</span>
+                <Input
+                  size="small"
+                  name="name"
+                  placeholder="Search Email"
+                  value={this.state.filterEmail}
+                  onChange={e => {
+                    this.setState({
+                      filterEmail: e.target.value,
+                      isFilterActive: e.target.value && true,
+                    })
+                    this.filterHandler({ email: e.target.value })
+                  }}
+                  style={{ ...tableFilterStyles, width: '148px' }}
+                />
+              </span>
+
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                {/* <span>Status :</span> */}
+                <Radio.Group
+                  size="small"
+                  buttonStyle="solid"
+                  value={this.state.filterStatus}
+                  onChange={e => {
+                    this.selectActiveStatus(e.target.value)
+                    this.setState({ filterStatus: e.target.value, isFilterActive: true })
+                  }}
+                  style={tableFilterStyles}
+                >
+                  <Radio.Button value="all">All</Radio.Button>
+                  <Radio.Button value="active">Active</Radio.Button>
+                  <Radio.Button value="in-active">In-Active</Radio.Button>
+                </Radio.Group>
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <span>Category :</span>
+                <Radio.Group
+                  size="small"
+                  buttonStyle="solid"
+                  value={this.state.filterCategory}
+                  onChange={e =>
+                    this.setState({ filterCategory: e.target.value, isFilterActive: true })
+                  }
+                  style={tableFilterStyles}
+                >
+                  <Radio.Button value="">All</Radio.Button>
+                  {categoriesGrouped.map((i, index) => {
+                    return (
+                      <Radio.Button key={i} value={i}>
+                        {i}
+                      </Radio.Button>
+                    )
+                  })}
+                </Radio.Group>
+              </span>
+            </div>
+            <div className="modify-data-table">
               <DataTable
                 title="Learners List"
                 columns={columns}
                 theme="default"
                 dense={true}
+                key="id"
+                keyField="id"
                 pagination={true}
                 data={filteredList}
                 customStyles={customStyles}
                 noHeader={true}
-                
                 progressPending={loadingLearners}
                 paginationServer={true}
                 paginationTotalRows={TotalLearners}
                 onChangePage={(page, rows) => this.pageChanged(page, rows)}
                 paginationServerOptions={{
-                  persistSelectedOnPageChange:false, 
-                  persistSelectedOnSort: false 
+                  persistSelectedOnPageChange: false,
+                  persistSelectedOnSort: false,
                 }}
-                onChangeRowsPerPage={(currentRowsPerPage, currentPage) => this.rowsChanged(currentRowsPerPage, currentPage)}
-                paginationRowsPerPageOptions={[10, 20, 50, 80, 100, 200, 500]}
+                onChangeRowsPerPage={(currentRowsPerPage, currentPage) =>
+                  this.rowsChanged(currentRowsPerPage, currentPage)
+                }
+                paginationRowsPerPageOptions={
+                  TotalLearners > 100 ? [10, 20, 50, 80, 100, TotalLearners] : [10, 20, 50, 80, 100]
+                }
                 // currentPage={2}
-
               />
             </div>
           </div>
+        </div>
 
-          <div className="col-sm-4" style={detailsDiv}>
-            {UserProfile ? (
-              <Scrollbars key={UserProfile.id} style={{ height: 650 }}>
-                <div
-                  className="card"
-                  style={{ marginTop: '5px', minHeight: '600px', border: '1px solid #f4f6f8' }}
-                >
-                  <div className="card-body">
-                    <div className="table-operations" style={{ marginBottom: '16px' }}>
-                      <Button
-                        style={{
-                          marginRight: '-12px',
-                          float: 'right',
-                          border: 'none',
-                          padding: 'none',
-                        }}
-                        onClick={() => this.setState({ divShow: false })}
-                      >
-                        X
-                      </Button>
-                    </div>
-                    <div>
-                      <Card style={{ marginTop: '26px', border: 'none' }}>
-                        <Meta
-                          avatar={
-                            <Avatar
-                              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+        <div className="col-sm-4" style={detailsDiv}>
+          {UserProfile ? (
+            <Scrollbars key={UserProfile.id} style={{ height: 650 }}>
+              <div
+                className="card"
+                style={{ marginTop: '5px', minHeight: '600px', border: '1px solid #f4f6f8' }}
+              >
+                <div className="card-body">
+                  <div className="table-operations" style={{ marginBottom: '16px' }}>
+                    <Button
+                      style={{
+                        marginRight: '-12px',
+                        float: 'right',
+                        border: 'none',
+                        padding: 'none',
+                      }}
+                      onClick={() => this.setState({ divShow: false })}
+                    >
+                      X
+                    </Button>
+                  </div>
+                  <div>
+                    <Card style={{ marginTop: '26px', border: 'none' }}>
+                      <Meta
+                        avatar={
+                          <Avatar
+                            src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                            style={{
+                              width: '100px',
+                              height: '100px',
+                              border: '1px solid #f6f7fb',
+                            }}
+                          />
+                        }
+                        title={
+                          <h5 style={{ marginTop: '20px' }}>
+                            {UserProfile ? UserProfile.firstname : ''}
+                            <span
                               style={{
-                                width: '100px',
-                                height: '100px',
-                                border: '1px solid #f6f7fb',
+                                float: 'right',
+                                fontSize: '12px',
+                                padding: '5px',
+                                color: '#0190fe',
                               }}
-                            />
-                          }
-                          title={
-                            <h5 style={{ marginTop: '20px' }}>
-                              {UserProfile ? UserProfile.firstname : ''}
-                              <span
-                                style={{
-                                  float: 'right',
-                                  fontSize: '12px',
-                                  padding: '5px',
-                                  color: '#0190fe',
-                                }}
-                              >
-                                {UserProfile.isActive === true ? (
-                                  <Switch
-                                    checkedChildren={<Icon type="check" />}
-                                    unCheckedChildren={<Icon type="close" />}
-                                    defaultChecked
-                                    onChange={this.learnerActiveInactive}
-                                  />
-                                ) : (
-                                    <Switch
-                                      checkedChildren={<Icon type="check" />}
-                                      unCheckedChildren={<Icon type="close" />}
-                                      onChange={this.learnerActiveInactive}
-                                    />
-                                  )}
-                              </span>
-                              {/* <span style={{float: 'right', fontSize: '12px', padding: '5px',}}>
+                            >
+                              {UserProfile.isActive === true ? (
+                                <Switch
+                                  checkedChildren={<Icon type="check" />}
+                                  unCheckedChildren={<Icon type="close" />}
+                                  defaultChecked
+                                  onChange={this.learnerActiveInactive}
+                                />
+                              ) : (
+                                <Switch
+                                  checkedChildren={<Icon type="check" />}
+                                  unCheckedChildren={<Icon type="close" />}
+                                  onChange={this.learnerActiveInactive}
+                                />
+                              )}
+                            </span>
+                            {/* <span style={{float: 'right', fontSize: '12px', padding: '5px',}}>
                               <a style={{ color: '#0190fe' }}>Edit</a>
                             </span> */}
-                            </h5>
-                          }
-                          description={
-                            <div>
-                              <p style={{ fontSize: '13px', marginBottom: '4px' }}>
-                                Enrollment Status &nbsp;{' '}
-                                {UserProfile.isActive ? (
-                                  <span style={customSpanStyle}>Active</span>
-                                ) : (
-                                    <span style={inActiveSpanStyle}>In-Active</span>
-                                  )}
-                              </p>
-                              {/* <p style={{ fontSize: '13px', marginBottom: '4px' }}>
+                          </h5>
+                        }
+                        description={
+                          <div>
+                            <p style={{ fontSize: '13px', marginBottom: '4px' }}>
+                              Enrollment Status &nbsp;{' '}
+                              {UserProfile.isActive ? (
+                                <span style={customSpanStyle}>Active</span>
+                              ) : (
+                                <span style={inActiveSpanStyle}>In-Active</span>
+                              )}
+                            </p>
+                            {/* <p style={{ fontSize: '13px', marginBottom: '4px' }}>
                                 Intake Form Status <span style={customSpanStyle}>Active</span>
                               </p>
                               <p style={{ fontSize: '13px', marginBottom: '0' }}>
                                 Date of Start 01/01/2020
                               </p> */}
-                            </div>
-                          }
-                        />
-                      </Card>
-                      {isUserProfile && (
-                        <EditBasicInformation key={UserProfile.id} />
-                      )}
-                    </div>
+                          </div>
+                        }
+                      />
+                    </Card>
+                    {isUserProfile && <EditBasicInformation key={UserProfile.id} />}
                   </div>
                 </div>
-              </Scrollbars>
-            ) : (
-                ''
-              )}
-          </div>
+              </div>
+            </Scrollbars>
+          ) : (
+            ''
+          )}
         </div>
       </Authorize>
     )

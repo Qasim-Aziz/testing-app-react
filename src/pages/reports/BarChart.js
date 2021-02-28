@@ -1,53 +1,26 @@
 /* eslint-disable react/no-unused-state */
-/* eslint-disable no-nested-ternary */
 /* eslint-disable react/destructuring-assignment */
+/* eslint-disable react/jsx-no-bind */
 /* eslint-disable react/jsx-indent */
-/* eslint-disable react/jsx-indent-props */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/no-access-state-in-setstate */
-/* eslint-disable no-underscore-dangle */
 /* eslint-disable eqeqeq */
 /* eslint-disable react/jsx-boolean-value */
-/* eslint-disable no-plusplus */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable no-useless-concat */
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable react/jsx-closing-tag-location */
-/* eslint-disable no-var */
-/* eslint-disable react/no-unknown-property */
 /* eslint-disable no-unused-expressions */
-/* eslint-disable import/newline-after-import */
-/* eslint-disable react/jsx-closing-bracket-location */
 /* eslint-disable camelcase */
 /* eslint-disable prefer-const */
 /* eslint-disable no-var */
 /* eslint-disable radix */
-/* eslint-disable react/self-closing-comp */
-/* eslint-disable react/jsx-props-no-multi-spaces */
-/* eslint-disable react/jsx-tag-spacing */
-/* eslint-disable prefer-const */
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable guard-for-in */
-/* eslint-disable vars-on-top */
-/* eslint-disable block-scoped-var */
-/* eslint-disable no-empty */
-/* eslint-disable no-redeclare */
-/* eslint-disable dot-notation */
-/* eslint-disable prefer-destructuring */
-/* eslint-disable vars-on-top */
+/* eslint-disable no-plusplus */
+/* eslint-disable prefer-template */
 
 import React from 'react'
-import { Row, Col, Card, Button, Typography, Affix } from 'antd'
-import { connect } from 'react-redux'
+import { notification, Typography, Affix } from 'antd'
 import { ResponsiveBar } from '@nivo/bar'
 import { gql } from 'apollo-boost'
 import groupObj from '@hunters/group-object'
+import moment from 'moment'
 import client from '../../apollo/config'
-
-// var groupObj = require('@hunters/group-object')
-var moment = require('moment')
-const { Title, Text } = Typography
 
 class BarChart extends React.Component {
   constructor(props) {
@@ -99,18 +72,24 @@ class BarChart extends React.Component {
     client
       .query({
         query: gql`{
-          domainMastered(studentId: ${studentId}, dateGte:"${start_date}", dateLte:"${end_date}", programArea:"${selectedprogram}", targetStatus:"${statusselected}"){
+          domainMastered(studentId: ${studentId},
+              dateGte:"${start_date}",
+              dateLte:"${end_date}",
+              programArea:"${selectedprogram}",
+              targetStatus:"${statusselected}"){
             totalCount
             target {
               id
               domainName
               targetId {
+                id
                 domain {
                   id
                   domain
                 }
               }
               targetAllcatedDetails {
+                id
                 targetName
                 dateBaseline
               }
@@ -123,11 +102,6 @@ class BarChart extends React.Component {
         fetchPolicy: 'network-only',
       })
       .then(result => {
-        var data = []
-        var graphData = {}
-
-        let targets = result.data.domainMastered.target
-
         console.log('result.data bar ===> ', result.data)
         const baseline = 'U3RhdHVzVHlwZTox'
         const intherapy = 'U3RhdHVzVHlwZToz'
@@ -136,16 +110,6 @@ class BarChart extends React.Component {
         const onhold = 'U3RhdHVzVHlwZTo2'
         const deleted = 'U3RhdHVzVHlwZTo3'
 
-        // let domains = []
-        // if (targets.length > 0) {
-        //   for (let i = 0; i < targets.length; i++) {
-        //     if (targets[i].domainName) {
-        //       if (!domains.includes(targets[i].domainName)) {
-        //         domains.push(targets[i].domainName)
-        //       }
-        //     }
-        //   }
-        // }
         const domainData = []
         result.data.domainMastered.target.map(item => {
           return domainData.push({
@@ -164,12 +128,10 @@ class BarChart extends React.Component {
           domains = []
           domains.push(domainSelected)
         }
-        console.log('Grouped data1 ===>', groupedData)
         let gData = []
 
         // Graph for Baseline targets
         if (statusselected === baseline) {
-          console.log(statusselected, 'baseline', baseline)
           for (let i = 0; i < domains.length; i++) {
             let domainStr = domains[i]
             let count = 0
@@ -191,8 +153,6 @@ class BarChart extends React.Component {
         }
         // Graph for Intherapy Targets
         if (statusselected === intherapy) {
-          console.log(statusselected, 'intherapy', intherapy)
-          console.log('Intherapy====>', domains)
           for (let i = 0; i < domains.length; i++) {
             let domainStr = domains[i]
             let count = 0
@@ -219,8 +179,6 @@ class BarChart extends React.Component {
         }
         // Graph for inmaintainence Targets
         if (statusselected === inmaintainence) {
-          console.log('Inmaintainence====>')
-          console.log(statusselected, 'inmaintainence', inmaintainence)
           for (let i = 0; i < domains.length; i++) {
             let domainStr = domains[i]
             let count = 0
@@ -247,8 +205,6 @@ class BarChart extends React.Component {
         }
         // Graph for Mastered Targets
         if (statusselected === mastered) {
-          console.log(statusselected, 'mastered', mastered)
-          console.log('Mastered====>')
           for (let i = 0; i < domains.length; i++) {
             let domainStr = domains[i]
             let count = 0
@@ -274,14 +230,17 @@ class BarChart extends React.Component {
           })
         }
       })
+      .catch(error => {
+        error.graphQLErrors.map(item => {
+          return notification.error({
+            message: 'Somthing went wrong',
+            description: item.message,
+          })
+        })
+      })
   }
 
   render() {
-    const textStyle = {
-      fontSize: '16px',
-      lineHeight: '19px',
-    }
-
     const { GraphData } = this.state
 
     return (
@@ -301,7 +260,7 @@ class BarChart extends React.Component {
               data={GraphData}
               keys={['Master Time']}
               indexBy="domain"
-              margin={{ top: 50, right: 20, bottom: 20, left: 60 }}
+              margin={{ top: 30, right: 20, bottom: 60, left: 60 }}
               padding={0.15}
               colors={{ scheme: 'paired' }}
               defs={[
@@ -344,7 +303,7 @@ class BarChart extends React.Component {
               axisBottom={{
                 tickSize: 5,
                 tickPadding: 5,
-                tickRotation: 0,
+                tickRotation: -19,
                 legend: '',
                 legendPosition: 'middle',
                 legendOffset: 32,
@@ -360,30 +319,6 @@ class BarChart extends React.Component {
               labelSkipWidth={12}
               labelSkipHeight={12}
               labelTextColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
-              // legends={[
-              //   {
-              //     dataFrom: 'keys',
-              //     anchor: 'bottom-right',
-              //     direction: 'column',
-              //     justify: false,
-              //     translateX: 120,
-              //     translateY: 0,
-              //     itemsSpacing: 2,
-              //     itemWidth: 100,
-              //     itemHeight: 20,
-              //     itemDirection: 'left-to-right',
-              //     itemOpacity: 0.85,
-              //     symbolSize: 20,
-              //     effects: [
-              //       {
-              //         on: 'hover',
-              //         style: {
-              //           itemOpacity: 1,
-              //         },
-              //       },
-              //     ],
-              //   },
-              // ]}
               animate={true}
               motionStiffness={90}
               motionDamping={15}

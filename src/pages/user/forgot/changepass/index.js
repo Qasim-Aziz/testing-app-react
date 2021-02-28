@@ -19,24 +19,24 @@ import styles from '../style.module.scss'
 import client from '../../../../config'
 
 let token = null;
+const blue = '#260fb6'
+const orange = '#f17c00'
 
 @Form.create()
 class Forgot extends Component {
   state = {
-    token:null,
+    token: null,
     LoginRedirect: false,
-    loading:false
+    loading: false
   }
 
   componentDidMount() {
-    if(this.props.location.search.split("=")[0] = '?token')
-    {
+    if (this.props.location.search.split("=")[0] = '?token') {
       token = this.props.location.search.split("=")[1];
     }
-    else
-    {
+    else {
       this.setState({
-        LoginRedirect:true
+        LoginRedirect: true
       })
     }
   }
@@ -46,12 +46,12 @@ class Forgot extends Component {
     const { form } = this.props
     form.validateFields((error, values) => {
       if (!error) {
-       
+
         this.setState({
-          loading:true
+          loading: true
         })
 
-          const signUpQuery = `mutation {
+        const signUpQuery = `mutation {
               changePassword(input:{token:"${token}", password:"${values.password}"})
                  {
                      user
@@ -61,28 +61,28 @@ class Forgot extends Component {
                  }
           }`
 
-          return client
-            .request(signUpQuery)
-            .then(data => {
-                notification.success({
-                  message: "Your Password is Successfully Changed",
-                  description: "Please login To continue",
-                })
-                this.setState({
-                  loading:false,
-                  LoginRedirect:true
-                })
+        return client
+          .request(signUpQuery)
+          .then(data => {
+            notification.success({
+              message: "Your Password is Successfully Changed",
+              description: "Please login To continue",
+            })
+            this.setState({
+              loading: false,
+              LoginRedirect: true
+            })
 
+          })
+          .catch(err => {
+            notification.error({
+              message: err.response.errors[0].message,
+              description: err.response.errors[0].message,
             })
-            .catch(err => {
-              notification.error({
-                message: err.response.errors[0].message,
-                description: err.response.errors[0].message,
-              })
-              this.setState({
-                loading:false
-              })
+            this.setState({
+              loading: false
             })
+          })
 
       }
     })
@@ -120,43 +120,66 @@ class Forgot extends Component {
             <div className="col-xl-12">
               <div className={styles.inner}>
                 <div className={styles.form}>
+                  <div align="center" className={styles.customLayout}>
+                    <img
+                      src="resources/images/HeaderLogo.png"
+                      alt="HeaderLogo"
+                      style={{
+                        height: '70px',
+                        borderRadius: '2px',
+                        marginBottom: '60px',
+                        marginTop: '50px'
+                      }}
+                    />
+                  </div>
                   <h4 className="text-uppercase" align="center">
-                    <strong>Forget Password</strong>
+                    <strong>Change Password</strong>
                   </h4>
                   <br />
                   <Form layout="vertical" hideRequiredMark onSubmit={this.handleSubmit}>
-                      <Form.Item>
-                        {form.getFieldDecorator('password', {
-                          initialValue: '',
-                          rules: [{ required: true, message: 'Please password' },
-                          {
-                            validator: this.validateToNextPassword,
-                          }],
-                        })(
-                          <Input
-                            size="large"
-                            placeholder="New Password"
-                            prefix={<KeyOutlined className="site-form-item-icon" />}
-                          />,
-                        )}
-                      </Form.Item>
-                      <Form.Item>
-                        {form.getFieldDecorator('re-password', {
-                          initialValue: '',
-                          rules: [{ required: true, message: 'Please re-type your password' },
-                          {
-                            validator: this.compareToFirstPassword,
-                          }],
-                        })(
-                          <Input
-                            size="large"
-                            placeholder="Retype Password"
-                            prefix={<KeyOutlined className="site-form-item-icon" />}
-                          />,
-                        )}
-                      </Form.Item>
+                    <Form.Item>
+                      {form.getFieldDecorator('password', {
+                        initialValue: '',
+                        rules: [{ required: true, message: 'Please password' },
+                        {
+                          validator: this.validateToNextPassword,
+                        }],
+                      })(
+                        <Input
+                          size="large"
+                          placeholder="New Password"
+                          prefix={<KeyOutlined className="site-form-item-icon" />}
+                        />,
+                      )}
+                    </Form.Item>
+                    <Form.Item>
+                      {form.getFieldDecorator('re-password', {
+                        initialValue: '',
+                        rules: [{ required: true, message: 'Please re-type your password' },
+                        {
+                          validator: this.compareToFirstPassword,
+                        }],
+                      })(
+                        <Input
+                          size="large"
+                          placeholder="Retype Password"
+                          prefix={<KeyOutlined className="site-form-item-icon" />}
+                        />,
+                      )}
+                    </Form.Item>
                     <div>
-                      <Button type="primary" size="large" block htmlType="submit" loading={loading}>
+                      <Button
+                        htmlType="submit"
+                        size="large"
+                        loading={loading}
+                        style={{
+                          backgroundColor: orange,
+                          borderColor: orange,
+                          marginTop: '15px'
+                        }}
+                        onFocus={console.log('focus')}
+                        block
+                      >
                         CONTINUE
                         <ArrowRightOutlined className="site-form-item-icon" />
                       </Button>

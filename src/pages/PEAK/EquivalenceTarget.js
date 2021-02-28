@@ -1,17 +1,14 @@
 /* eslint-disable no-lone-blocks */
 /* eslint-disable no-shadow */
 /* eslint-disable react/jsx-boolean-value */
-import React, { useEffect, useState } from 'react'
-import { useMutation } from 'react-apollo'
-import { Button, Drawer } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
-import TargetAllocate from './TargetAllocation'
+import { Button, Col, Drawer, Radio, Row } from 'antd'
+import React, { useEffect, useState } from 'react'
+import { useMutation, useQuery } from 'react-apollo'
 import TargetAllocationNew from '../../components/TargetAllocationAssessments/TargetAllocation'
-import { GET_EQUI_TARGET } from './query'
-import CardImg from './targetCard.jpg'
+import { GET_EQUI_CATTEGORY, GET_EQUI_TARGET } from './query'
 
 export default ({ suggestTarget }) => {
-
   let stdId = ''
   if (!(localStorage.getItem('studentId') === null) && localStorage.getItem('studentId')) {
     stdId = JSON.parse(localStorage.getItem('studentId'))
@@ -22,59 +19,54 @@ export default ({ suggestTarget }) => {
   const [targetName, setTargetName] = useState('')
   const [targetVideo, setTargetVideo] = useState()
   const [targetInstr, setTargetInstr] = useState()
+  const [selectedCategory, setSelectedCategory] = useState('')
   const [equivalenceObject, setEquivalenceObject] = useState(null)
 
-  const [getTargets, { data, error, loading }] = useMutation(GET_EQUI_TARGET, {
+  const [
+    getTargets,
+    { data: targetsData, error: targetsError, loading: targetsLoading },
+  ] = useMutation(GET_EQUI_TARGET, {
     variables: {
       id: suggestTarget,
+      category: [selectedCategory],
     },
   })
 
+  const { data: categoryData, loading: categoryLoading, error: categoryError } = useQuery(
+    GET_EQUI_CATTEGORY,
+  )
+
   useEffect(() => {
-    if (!data && !error && !loading) {
+    if (selectedCategory !== '') {
       getTargets()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, error, loading])
+  }, [selectedCategory])
 
-  if (loading) return <h3>Loading...</h3>
-  if (error) return <h4 style={{ color: 'red' }}>Opps therir are something wrong</h4>
+  // if (loading) return <h3>Loading...</h3>
+  if (targetsError) return <h4 style={{ color: 'red' }}>Opps therir are something wrong</h4>
 
-  const Targets = data?.suggestPeakTargetsForEquivalence.codes?.map(node => {
-      return (
-        <div
-          key={node.id}
-          style={{
-            maxWidth: '100%',
-            border: '1px solid #e4e9f0',
-            borderRadius: 10,
-            marginBottom: 12,
-            position: 'relative',
-            background: '#fff',
-            padding: '20px 5px 20px 20px',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              fontSize: 18,
-            }}
-          >
-            {node.target.targetMain.targetName}
-          </div>
+  const selectCategory = text => {
+    setSelectedCategory(text)
+    console.log(text)
+  }
+
+  const Targets = targetsData?.suggestPeakTargetsForEquivalence.codes?.map(node => {
+    return (
+      <Row
+        style={{
+          border: '1px solid #e4e9f0',
+          borderRadius: 10,
+          background: '#fff',
+          padding: '10px 20px 10px 10px',
+          margin: '8px 0px',
+          fontSize: '18px',
+        }}
+      >
+        <Col span="22">{node.target.targetMain.targetName}</Col>
+        <Col span="2">
           <Button
-            type="link"
-            style={{
-              background: '#26e768',
-              width: '35px',
-              height: '33px',
-              borderBottomRightRadius: 10,
-              position: 'absolute',
-              bottom: 0,
-              right: 0,
-              display: 'flex',
-              justifyContent: 'center',
-            }}
+            type="primary"
             onClick={() => {
               setTargetName(node.target.targetMain.targetName)
               setSelectTarget(node.target.id)
@@ -83,52 +75,65 @@ export default ({ suggestTarget }) => {
               setEquivalenceObject(node)
             }}
           >
-            <PlusOutlined style={{ fontSize: 24, color: '#fff', marginTop: 8 }} />
+            <PlusOutlined style={{ fontSize: 20, color: '#fff', marginTop: 5 }} />
           </Button>
-        </div>
-      )
-    
+        </Col>
+      </Row>
+    )
   })
 
-  if (!Targets) {
-    return <h3 style={{ marginTop: 30, textAlign: 'center' }}>Their is no suggest target</h3>
-  }
+  // if (!Targets) {
+  //   return <h3 style={{ marginTop: 30, textAlign: 'center' }}>Their is no suggest target</h3>
+  // }
 
   return (
-    <div
-      style={{
-        height: 'calc(100vh - 110px)',
-        overflowY: 'scroll',
-        padding: 15,
-        backgroundColor: 'rgb(249, 249, 249)',
-        borderRadius: 10,
-      }}
-    >
-      {Targets}
-      <Drawer
-        visible={selectTarget}
-        onClose={() => setSelectTarget(null)}
-        title="Target Allocation"
-        width={750}
+    <>
+      {categoryData && (
+        <Radio.Group onChange={e => selectCategory(e.target.value)}>
+          {categoryData?.peakEquDomains?.map(item => (
+            <Radio.Button value={item.id}>{item.name}</Radio.Button>
+          ))}
+        </Radio.Group>
+      )}
+      <div
+        style={{
+          marginTop: '10px',
+          height: 'calc(100vh - 110px)',
+          overflowY: 'scroll',
+          padding: 15,
+          backgroundColor: 'rgb(249, 249, 249)',
+          borderRadius: 10,
+        }}
       >
-        <div
-          style={{
-            padding: '0px 23px',
-          }}
+        {selectCategory === '' && <p>Select Category</p>}
+        {targetsLoading && <p>Loading Targets..</p>}
+        {!Targets ? 'No Targets' : Targets}
+
+        <Drawer
+          visible={selectTarget}
+          onClose={() => setSelectTarget(null)}
+          title="Target Allocation"
+          width={950}
         >
-          <TargetAllocationNew
-            key={Math.random()}
-            studentId={selectedStudent}
-            selectedTargetId={selectTarget}
-            targetName={targetName}
-            targetVideo={targetVideo}
-            targetInstr={targetInstr}
-            peakEnable={true}
-            equivalenceEnable={true}
-            equivalenceObject={equivalenceObject}
-          />
-        </div>
-      </Drawer>
-    </div>
+          <div
+            style={{
+              padding: '0px 23px',
+            }}
+          >
+            <TargetAllocationNew
+              key={Math.random()}
+              studentId={selectedStudent}
+              selectedTargetId={selectTarget}
+              targetName={targetName}
+              targetVideo={targetVideo}
+              targetInstr={targetInstr}
+              peakEnable={true}
+              equivalenceEnable={true}
+              equivalenceObject={equivalenceObject}
+            />
+          </div>
+        </Drawer>
+      </div>
+    </>
   )
 }

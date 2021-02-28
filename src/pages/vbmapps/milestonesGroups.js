@@ -120,7 +120,7 @@ class MilestonesGroups extends Component {
     this.setState({
       loadingQuestion: true,
     })
-    const student = localStorage.getItem('studentId')
+    const student = JSON.parse(localStorage.getItem('studentId'))
     const areaID = localStorage.getItem('vbMappAreaId')
     const masterID = localStorage.getItem('vbMappMasterId')
     const { selected } = this.state
@@ -188,7 +188,7 @@ class MilestonesGroups extends Component {
     this.setState({
       loadingQuestion: true,
     })
-    const student = localStorage.getItem('studentId')
+    const student = JSON.parse(localStorage.getItem('studentId'))
     const areaID = localStorage.getItem('vbMappAreaId')
     const masterID = localStorage.getItem('vbMappMasterId')
     const { selected } = this.state
@@ -255,7 +255,7 @@ class MilestonesGroups extends Component {
     this.setState({
       loadingQuestion: true,
     })
-    const student = localStorage.getItem('studentId')
+    const student = JSON.parse(localStorage.getItem('studentId'))
     const areaID = localStorage.getItem('vbMappAreaId')
     const masterID = localStorage.getItem('vbMappMasterId')
     const { selected } = this.state
@@ -319,7 +319,7 @@ class MilestonesGroups extends Component {
   }
 
   getQuestion = selected => {
-    const student = localStorage.getItem('studentId')
+    const student = JSON.parse(localStorage.getItem('studentId'))
     const areaID = localStorage.getItem('vbMappAreaId')
     const masterID = localStorage.getItem('vbMappMasterId')
     const test = parseInt(localStorage.getItem('vbMappsTestId'), 10)

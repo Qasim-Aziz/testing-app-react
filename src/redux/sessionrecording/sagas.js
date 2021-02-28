@@ -25,25 +25,22 @@ import {
   updateTargetTrial,
   recordTargetStimulusTrial,
   recordTargetStepTrial,
-
   // peak queries
   createTargetBlock,
   updateTargetBlock,
   recordBlockTrial,
   updateBlockTrial,
   createNewTargetPeakAutomaticInstance,
-
   // peak Equivalence
   getCombinationsByCode,
   recordEquivalenceTarget,
   recordEquivalenceTargetUpdate,
-
 } from 'services/sessionrecording'
 import actions from './actions'
 
 const debug = true
 const peakId = 'VGFyZ2V0RGV0YWlsVHlwZTo4'
-const equivalence = 'EQUIVALANCE'
+const equivalence = 'EQUIVALENCE'
 
 // shuffle peak stimulus block
 function shuffle(array) {
@@ -60,7 +57,6 @@ function shuffle(array) {
     array[currentIndex] = array[randomIndex]
     array[randomIndex] = temporaryValue
   }
-
   return array
 }
 
@@ -96,16 +92,116 @@ function getVideoUrl(url) {
   if (splitList.length > 3) {
     if (url.split('/')[2] === 'www.youtube.com') {
       finalUrl = url
-    }
-    else {
+    } else {
       videoId = url.split('/')[3]
       finalUrl = `https://player.vimeo.com/video/${videoId}/`
     }
-
   }
   if (debug) console.log(videoId)
   // return videoId
   return finalUrl
+}
+
+function resetCorrectIncorrectButtons() {
+  var element = document.getElementById('correctResponseButton')
+
+  // If it isn't "undefined" and it isn't "null", then it exists.
+  if (typeof element !== 'undefined' && element !== null) {
+    document.getElementById('correctResponseButton').style.color = 'gray'
+    document.getElementById('correctResponseButton').style.borderColor = '#e4e9f0'
+    document.getElementById('incorrectResponseButton').style.color = 'gray'
+    document.getElementById('incorrectResponseButton').style.borderColor = '#e4e9f0'
+  } else {
+    console.log('Buttons does not not exits')
+  }
+}
+
+function resetStartTime() {
+  document.getElementById('updateStartTrialTimeInStore').click()
+}
+
+function updateSessionClockTime() {
+  // updatig current clock time to store
+  document.getElementById('updateSessionCurrentTimeInStore').click()
+}
+
+function resetPeakButtons() {
+  const getButton0 = document.getElementById('peakResponseButtonZero')
+  const getButton2 = document.getElementById('peakResponseButtonTwo')
+  const getButton4 = document.getElementById('peakResponseButtonFour')
+  const getButton8 = document.getElementById('peakResponseButtonEight')
+  const getButton10 = document.getElementById('peakResponseButtonTen')
+
+
+  if (typeof getButton0 !== 'undefined' && getButton0 !== null) {
+    document.getElementById('peakResponseButtonZero').style.backgroundColor = '#e4e9f0'
+  }
+  if (typeof getButton2 !== 'undefined' && getButton2 !== null) {
+    document.getElementById('peakResponseButtonTwo').style.backgroundColor = '#e4e9f0'
+  }
+  if (typeof getButton4 !== 'undefined' && getButton4 !== null) {
+    document.getElementById('peakResponseButtonFour').style.backgroundColor = '#e4e9f0'
+  }
+  if (typeof getButton8 !== 'undefined' && getButton8 !== null) {
+    document.getElementById('peakResponseButtonEight').style.backgroundColor = '#e4e9f0'
+  }
+  if (typeof getButton10 !== 'undefined' && getButton10 !== null) {
+    document.getElementById('peakResponseButtonTen').style.backgroundColor = '#e4e9f0'
+  }
+
+}
+
+export function* MOVE_TO_NEXT_TARGET() {
+  const MasterSession = yield select(state => state.sessionrecording.MasterSession)
+  const TargetActiveId = yield select(state => state.sessionrecording.TargetActiveId)
+  const TargetActiveIndex = yield select(state => state.sessionrecording.TargetActiveIndex)
+
+  document.getElementById(MasterSession.targets.edges[TargetActiveIndex + 1].node.id).click()
+  document.getElementsByClassName('targetElements')[TargetActiveIndex + 1].style.border =
+    '2px solid #bae7ff'
+  document.getElementsByClassName('targetElements')[TargetActiveIndex].style.border = 'none'
+
+  // updating start trial time
+  resetStartTime()
+  // updatig current clock time to store
+  updateSessionClockTime()
+  resetCorrectIncorrectButtons()
+  // updating previous target end time
+  yield put({
+    type: 'sessionrecording/TARGET_UPDATE',
+    payload: {
+      targetId: TargetActiveId,
+    },
+  })
+
+  // Updating target index and target id to store
+  yield put({
+    type: 'sessionrecording/SET_STATE',
+    payload: {
+      TargetActiveIndex: TargetActiveIndex + 1,
+      TargetActiveId: MasterSession.targets.edges[TargetActiveIndex + 1].node.id,
+      PeakTrialCount: 1,
+      PeakBlockIndex: 0,
+      StepActiveIndex: 0,
+      StimulusActiveIndex: 0,
+      EquiTrialCount: 1
+    },
+  })
+
+  // reset peak button style
+  resetPeakButtons()
+
+  // creating new target skills model instance
+  yield put({
+    type: 'sessionrecording/CREATE_NEW_TARGET_INSTANCE',
+    payload: {
+      targetId: MasterSession.targets.edges[TargetActiveIndex + 1].node.id,
+      targetIndex: TargetActiveIndex + 1,
+    },
+  })
+
+  // load video
+  // this.getVideoUrl(TargetActiveIndex + 1)
 }
 
 export function* UpdateDuration() {
@@ -150,6 +246,7 @@ export function* GET_DATA({ payload }) {
   let videoUrl = ''
 
   if (response && response.data) {
+    console.log('received response ===>')
     const targetResponse = {}
     let targetId = ''
     let stimulusId = ''
@@ -204,9 +301,11 @@ export function* GET_DATA({ payload }) {
           if (debug) console.log('found peak')
 
           if (targets.edges[i].node.peakType === equivalence) {
-            targetResponse[targets.edges[i].node.id]['equivalence'] = { "train": {}, "test": {} }
+            targetResponse[targets.edges[i].node.id]['equivalence'] = { train: {}, test: {} }
 
-            const combinationResponse = yield call(getCombinationsByCode, { "code": targets.edges[i].node.eqCode ? targets.edges[i].node.eqCode : '1A' })
+            const combinationResponse = yield call(getCombinationsByCode, {
+              code: targets.edges[i].node.eqCode ? targets.edges[i].node.eqCode : '1A',
+            })
 
             if (combinationResponse && combinationResponse.data) {
               if (debug) console.log('cobinationResponse', combinationResponse)
@@ -215,10 +314,14 @@ export function* GET_DATA({ payload }) {
               if (combTrain) {
                 if (debug) console.log('cobinationResponse ==> Train')
                 for (let o = 0; o < combTrain.edges.length; o++) {
-                  targetResponse[targets.edges[i].node.id]['equivalence']['train'][combTrain.edges[o].node.id] = {}
+                  targetResponse[targets.edges[i].node.id]['equivalence']['train'][
+                    combTrain.edges[o].node.id
+                  ] = {}
 
                   for (let p = 0; p < targets.edges[i].node.classes.edges.length; p++) {
-                    targetResponse[targets.edges[i].node.id]['equivalence']['train'][combTrain.edges[o].node.id][targets.edges[i].node.classes.edges[p].node.id] = []
+                    targetResponse[targets.edges[i].node.id]['equivalence']['train'][
+                      combTrain.edges[o].node.id
+                    ][targets.edges[i].node.classes.edges[p].node.id] = []
                   }
                 }
               }
@@ -226,20 +329,19 @@ export function* GET_DATA({ payload }) {
               if (combTest) {
                 if (debug) console.log('cobinationResponse ==> Test')
                 for (let o = 0; o < combTest.edges.length; o++) {
-                  targetResponse[targets.edges[i].node.id]['equivalence']['test'][combTest.edges[o].node.id] = {}
+                  targetResponse[targets.edges[i].node.id]['equivalence']['test'][
+                    combTest.edges[o].node.id
+                  ] = {}
 
                   for (let p = 0; p < targets.edges[i].node.classes.edges.length; p++) {
-                    targetResponse[targets.edges[i].node.id]['equivalence']['test'][combTest.edges[o].node.id][targets.edges[i].node.classes.edges[p].node.id] = []
+                    targetResponse[targets.edges[i].node.id]['equivalence']['test'][
+                      combTest.edges[o].node.id
+                    ][targets.edges[i].node.classes.edges[p].node.id] = []
                   }
                 }
               }
-
             }
-
-
-          }
-          else if (targets.edges[i].node.sd) {
-
+          } else if (targets.edges[i].node.sd) {
             targetResponse[targets.edges[i].node.id]['peak'] = {}
             const peakBlocksCount = targets.edges[i].node.peakBlocks
             for (let j = 0; j < peakBlocksCount; j++) {
@@ -276,6 +378,7 @@ export function* GET_DATA({ payload }) {
     // if child session exist
     if (response.data.getChildSession && response.data.getChildSession.edges.length > 0) {
       let sessionStatus = 'Paused'
+
       if (response.data.getChildSession.edges[0].node.status === 'COMPLETED') {
         sessionStatus = 'Completed'
         sessionEditAble = false
@@ -303,6 +406,7 @@ export function* GET_DATA({ payload }) {
       if (childResponse && childResponse.data) {
         if (debug) {
           console.log('====> found child session recording')
+          console.log(childResponse, targetResponse)
         }
         // updating targets response in store
         childResponse.data.getSessionRecordings.edges.map(item => {
@@ -313,25 +417,31 @@ export function* GET_DATA({ payload }) {
             endTime: item.node.durationEnd,
           }
 
-          // check for equivalence recording 
+          // check for equivalence recording
           if (item.node.isPeakEquivalance) {
             item.node.peakEquivalance.edges.map((equiNode, index) => {
-
               if (equiNode.node.recType === 'TRAIN') {
                 // console.log(targetResponse[item.node.targets.id].equivalence.train[equiNode.node.relationTrain.id], equiNode.node.relationTrain.id, equiNode.node.codeClass.id)
-                targetResponse[item.node.targets.id].equivalence.train[equiNode.node.relationTrain.id][equiNode.node.codeClass.id] = [
-                  ...targetResponse[item.node.targets.id].equivalence.train[equiNode.node.relationTrain.id][equiNode.node.codeClass.id],
-                  equiNode.node,
-                ]
+                targetResponse[item.node.targets.id].equivalence.train[
+                  equiNode.node.relationTrain.id
+                ][equiNode.node.codeClass.id] = [
+                    ...targetResponse[item.node.targets.id].equivalence.train[
+                    equiNode.node.relationTrain.id
+                    ][equiNode.node.codeClass.id],
+                    equiNode.node,
+                  ]
               }
 
               if (equiNode.node.recType === 'TEST') {
-                targetResponse[item.node.targets.id].equivalence.test[equiNode.node.relationTest.id][equiNode.node.codeClass.id] = [
-                  ...targetResponse[item.node.targets.id].equivalence.test[equiNode.node.relationTest.id][equiNode.node.codeClass.id],
-                  equiNode.node,
-                ]
+                targetResponse[item.node.targets.id].equivalence.test[
+                  equiNode.node.relationTest.id
+                ][equiNode.node.codeClass.id] = [
+                    ...targetResponse[item.node.targets.id].equivalence.test[
+                    equiNode.node.relationTest.id
+                    ][equiNode.node.codeClass.id],
+                    equiNode.node,
+                  ]
               }
-
             })
           }
 
@@ -351,7 +461,7 @@ export function* GET_DATA({ payload }) {
                     ...targetResponse[item.node.targets.id].peak[index].block[trialIndex],
                     recordedData: true,
                     response: trialObject.node,
-                    marksRecorded: trialObject.node.marks ? true : false
+                    marksRecorded: trialObject.node.marks ? true : false,
                   }
                 })
               }
@@ -478,45 +588,63 @@ export function* GET_DATA({ payload }) {
           if (stimulusId !== '') {
             console.log(targetId)
             if (targetResponse[targetId].sd[stimulusId].length > 0) {
-              currentCount = targetResponse[targetId].sd[stimulusId].length + 1
+              // check target daily trials here and compare with trials recorded and if recorded trials equal to daily
+              // currentCount = targetResponse[targetId].sd[stimulusId].length + 1
+              const recordedTrials = targetResponse[targetId].sd[stimulusId].length
+              const dT = response.data.getsession.targets.edges[targetIndex].node.targetAllcatedDetails.DailyTrials
+              if (recordedTrials >= dT) currentCount = recordedTrials
+              else currentCount = recordedTrials + 1
+
               targetResponse[targetId].sd[stimulusId].map(recordingItem => {
                 if (recordingItem.trial === 'CORRECT') {
                   currentCorrectCount += 1
                 }
-                if (recordingItem.trial === 'ERROR') {
-                  currentIncorrectCount += 1
-                }
-                if (recordingItem.trial === 'PROMPT') {
+                if (
+                  recordingItem.trial === 'ERROR' ||
+                  recordingItem.trial === 'PROMPT' ||
+                  recordingItem.trial === 'INCORRECT'
+                ) {
                   currentIncorrectCount += 1
                 }
               })
             }
           } else if (!(stepId === '')) {
             if (targetResponse[targetId].step[stepId].length > 0) {
-              currentCount = targetResponse[targetId].step[stepId].length + 1
+              // currentCount = targetResponse[targetId].step[stepId].length + 1
+              const recordedTrials = targetResponse[targetId].step[stepId].length
+              const dT = response.data.getsession.targets.edges[targetIndex].node.targetAllcatedDetails.DailyTrials
+              if (recordedTrials >= dT) currentCount = recordedTrials
+              else currentCount = recordedTrials + 1
+              // response.data.getsession.targets.edges[targetIndex].node
               targetResponse[targetId].step[stepId].map(recordingItem => {
                 if (recordingItem.trial === 'CORRECT') {
                   currentCorrectCount += 1
                 }
-                if (recordingItem.trial === 'ERROR') {
-                  currentIncorrectCount += 1
-                }
-                if (recordingItem.trial === 'PROMPT') {
+                if (
+                  recordingItem.trial === 'ERROR' ||
+                  recordingItem.trial === 'PROMPT' ||
+                  recordingItem.trial === 'INCORRECT'
+                ) {
                   currentIncorrectCount += 1
                 }
               })
             }
           } else {
             if (targetResponse[targetId].target.length > 0) {
-              currentCount = targetResponse[targetId].target.length + 1
+              // currentCount = targetResponse[targetId].target.length + 1
+              const recordedTrials = targetResponse[targetId].target.length
+              const dT = response.data.getsession.targets.edges[targetIndex].node.targetAllcatedDetails.DailyTrials
+              if (recordedTrials >= dT) currentCount = recordedTrials
+              else currentCount = recordedTrials + 1
               targetResponse[targetId].target.map(recordingItem => {
                 if (recordingItem.trial === 'CORRECT') {
                   currentCorrectCount += 1
                 }
-                if (recordingItem.trial === 'ERROR') {
-                  currentIncorrectCount += 1
-                }
-                if (recordingItem.trial === 'PROMPT') {
+                if (
+                  recordingItem.trial === 'ERROR' ||
+                  recordingItem.trial === 'PROMPT' ||
+                  recordingItem.trial === 'INCORRECT'
+                ) {
                   currentIncorrectCount += 1
                 }
               })
@@ -609,8 +737,11 @@ export function* START_SESSION({ payload }) {
     const targetResponse = yield select(state => state.sessionrecording.TargetResponse)
 
     if (masterSession.targets.edgeCount > 0) {
-
-      if (masterSession.targets.edges[0].node.targetAllcatedDetails.targetType.id === peakId && peakAutomatic && masterSession.targets.edges[0].node.peakType !== equivalence) {
+      if (
+        masterSession.targets.edges[0].node.targetAllcatedDetails.targetType.id === peakId &&
+        peakAutomatic &&
+        masterSession.targets.edges[0].node.peakType !== equivalence
+      ) {
         const targetId = masterSession.targets.edges[0]?.node.id
         const responseTarget = yield call(createNewTargetPeakAutomaticInstance, {
           childId: response.data.startSession.details.id,
@@ -638,17 +769,14 @@ export function* START_SESSION({ payload }) {
               // updating automatic created peak block trials to store
               if (nodeItem.node.trial.edges.length > 0) {
                 nodeItem.node.trial.edges.map((trailNode, trialIndex) => {
-
                   targetResponse[targetId].peak[index].block[trialIndex] = {
                     ...targetResponse[targetId].peak[index].block[trialIndex],
                     recordedData: true,
                     response: trailNode.node,
                     sd: trailNode.node.sd,
                   }
-
                 })
               }
-
             })
           }
 
@@ -661,10 +789,7 @@ export function* START_SESSION({ payload }) {
             },
           })
         }
-
-      }
-      else {
-
+      } else {
         // create first target instance in system
         const result = yield call(createFirstTragetAndTrialInstance, {
           childId: response.data.startSession.details.id,
@@ -695,7 +820,10 @@ export function* START_SESSION({ payload }) {
           })
 
           // if target type peak then create block Object
-          if (masterSession.targets.edges[0].node.targetAllcatedDetails.targetType.id === peakId && masterSession.targets.edges[0].node.peakType !== equivalence) {
+          if (
+            masterSession.targets.edges[0].node.targetAllcatedDetails.targetType.id === peakId &&
+            masterSession.targets.edges[0].node.peakType !== equivalence
+          ) {
             const blockResponse = yield call(createTargetBlock, {
               skillsId: result.data.sessionRecording.details.id,
               startTime: result.data.sessionRecording.details.durationStart,
@@ -778,6 +906,12 @@ export function* END_SESSION({ payload }) {
 }
 
 export function* TARGET_CORRECT({ payload }) {
+  yield put({
+    type: 'sessionrecording/SET_STATE',
+    payload: {
+      ResponseLoading: true,
+    },
+  })
   // selecting child session id for creating child session
   const childSessionId = yield select(state => state.sessionrecording.ChildSession.id)
   const targetActiveId = yield select(state => state.sessionrecording.TargetActiveId)
@@ -785,6 +919,7 @@ export function* TARGET_CORRECT({ payload }) {
   const currentSessionTime = yield select(state => state.sessionrecording.CurrentSessionTime)
   const masterSession = yield select(state => state.sessionrecording.MasterSession)
   const targetActiveIndex = yield select(state => state.sessionrecording.TargetActiveIndex)
+  const count = yield select(state => state.sessionrecording.Count)
   // selecting status id of the target
   const sessionStatusId = masterSession.targets.edges[targetActiveIndex].node.targetStatus.id
   // updating session duration
@@ -811,9 +946,33 @@ export function* TARGET_CORRECT({ payload }) {
         TargetResponse: targetResponse,
       },
     })
+
+    if (count < masterSession.targets.edges[targetActiveIndex].node.targetAllcatedDetails.DailyTrials) {
+      yield put({
+        type: 'sessionrecording/SET_STATE',
+        payload: {
+          Count: count + 1,
+        },
+      })
+      resetStartTime()
+      resetCorrectIncorrectButtons()
+    }
+    else if (count >= masterSession.targets.edges[targetActiveIndex].node.targetAllcatedDetails.DailyTrials && (targetActiveIndex + 1 < masterSession.targets.edges.length)) {
+      yield put({
+        type: 'sessionrecording/MOVE_TO_NEXT_TARGET',
+      })
+    }
+
     // update session duration
     yield put({
       type: 'sessionrecording/UPDATE_DURATION',
+    })
+
+    yield put({
+      type: 'sessionrecording/SET_STATE',
+      payload: {
+        ResponseLoading: false,
+      },
     })
   }
 }
@@ -901,13 +1060,19 @@ export function* CREATE_NEW_TARGET_INSTANCE({ payload }) {
     yield put({
       type: 'sessionrecording/SET_STATE',
       payload: {
-        SelectedClassId: masterSession.targets.edges[payload.targetIndex].node.classes.edges[0]?.node.id
-      }
+        SelectedClassId:
+          masterSession.targets.edges[payload.targetIndex].node.classes.edges[0]?.node.id,
+      },
     })
   }
 
   if (!targetResponse[payload.targetId].skillsId) {
-    if (masterSession.targets.edges[payload.targetIndex].node.targetAllcatedDetails.targetType.id === peakId && peakAutomatic && masterSession.targets.edges[payload.targetIndex].node.peakType !== equivalence) {
+    if (
+      masterSession.targets.edges[payload.targetIndex].node.targetAllcatedDetails.targetType.id ===
+      peakId &&
+      peakAutomatic &&
+      masterSession.targets.edges[payload.targetIndex].node.peakType !== equivalence
+    ) {
       const response = yield call(createNewTargetPeakAutomaticInstance, {
         childId: childSessionId,
         statusId: sessionStatusId,
@@ -934,21 +1099,17 @@ export function* CREATE_NEW_TARGET_INSTANCE({ payload }) {
             // updating automatic created peak block trials to store
             if (nodeItem.node.trial.edges.length > 0) {
               nodeItem.node.trial.edges.map((trailNode, trialIndex) => {
-
                 targetResponse[payload.targetId].peak[index].block[trialIndex] = {
                   ...targetResponse[payload.targetId].peak[index].block[trialIndex],
                   recordedData: true,
                   response: trailNode.node,
                   sd: trailNode.node.sd,
-                  marksRecorded: false
+                  marksRecorded: false,
                 }
-
               })
             }
-
           })
         }
-
 
         yield put({
           type: 'sessionrecording/SET_STATE',
@@ -963,13 +1124,8 @@ export function* CREATE_NEW_TARGET_INSTANCE({ payload }) {
             StimulusActiveId: stimulusId,
           },
         })
-
       }
-
-
-
-    }
-    else {
+    } else {
       const response = yield call(createNewTargetInstance, {
         childId: childSessionId,
         statusId: sessionStatusId,
@@ -1001,7 +1157,8 @@ export function* CREATE_NEW_TARGET_INSTANCE({ payload }) {
         // if target type peak then create block Object
         if (
           masterSession.targets.edges[payload.targetIndex].node.targetAllcatedDetails.targetType
-            .id === peakId && masterSession.targets.edges[payload.targetIndex].node.peakType !== equivalence
+            .id === peakId &&
+          masterSession.targets.edges[payload.targetIndex].node.peakType !== equivalence
         ) {
           const blockResponse = yield call(createTargetBlock, {
             skillsId: response.data.sessionRecording.details.id,
@@ -1054,7 +1211,8 @@ export function* CREATE_NEW_TARGET_INSTANCE({ payload }) {
 
     if (
       masterSession.targets.edges[payload.targetIndex].node.targetAllcatedDetails.targetType.id ===
-      peakId && masterSession.targets.edges[payload.targetIndex].node.peakType !== equivalence
+      peakId &&
+      masterSession.targets.edges[payload.targetIndex].node.peakType !== equivalence
     ) {
       // if peak first block instance not present then create one
       if (!targetResponse[payload.targetId].peak[0].blockId) {
@@ -1093,50 +1251,88 @@ export function* CREATE_NEW_TARGET_INSTANCE({ payload }) {
     }
 
     if (targetResponse[payload.targetId].sd) {
-      if (targetResponse[payload.targetId].sd[targetObject.sd.edges[payload.index ? payload.index : 0].node.id].length > 0) {
-        currentCount =
-          targetResponse[payload.targetId].sd[targetObject.sd.edges[payload.index ? payload.index : 0].node.id].length + 1
-        targetResponse[payload.targetId].sd[targetObject.sd.edges[payload.index ? payload.index : 0].node.id].map(recordingItem => {
+      if (
+        targetResponse[payload.targetId].sd[
+          targetObject.sd.edges[payload.index ? payload.index : 0].node.id
+        ].length > 0
+      ) {
+        // currentCount =
+        //   targetResponse[payload.targetId].sd[
+        //     targetObject.sd.edges[payload.index ? payload.index : 0].node.id
+        //   ].length + 1
+        const recordedTrials = targetResponse[payload.targetId].sd[
+          targetObject.sd.edges[payload.index ? payload.index : 0].node.id
+        ].length
+        const dT = masterSession.targets.edges[payload.targetIndex].node.targetAllcatedDetails.DailyTrials
+        if (recordedTrials >= dT) currentCount = recordedTrials
+        else currentCount = recordedTrials + 1
+
+
+
+        targetResponse[payload.targetId].sd[
+          targetObject.sd.edges[payload.index ? payload.index : 0].node.id
+        ].map(recordingItem => {
           if (recordingItem.trial === 'CORRECT') {
             currentCorrectCount += 1
           }
-          if (recordingItem.trial === 'ERROR') {
-            currentIncorrectCount += 1
-          }
-          if (recordingItem.trial === 'PROMPT') {
+          if (
+            recordingItem.trial === 'ERROR' ||
+            recordingItem.trial === 'PROMPT' ||
+            recordingItem.trial === 'INCORRECT'
+          ) {
             currentIncorrectCount += 1
           }
         })
       }
     } else if (targetResponse[payload.targetId].step) {
-      if (targetResponse[payload.targetId].step[targetObject.steps.edges[payload.index ? payload.index : 0].node.id].length > 0) {
-        currentCount =
-          targetResponse[payload.targetId].step[targetObject.steps.edges[payload.index ? payload.index : 0].node.id].length + 1
-        targetResponse[payload.targetId].step[targetObject.steps.edges[payload.index ? payload.index : 0].node.id].map(
-          recordingItem => {
-            if (recordingItem.trial === 'CORRECT') {
-              currentCorrectCount += 1
-            }
-            if (recordingItem.trial === 'ERROR') {
-              currentIncorrectCount += 1
-            }
-            if (recordingItem.trial === 'PROMPT') {
-              currentIncorrectCount += 1
-            }
-          },
-        )
+      if (
+        targetResponse[payload.targetId].step[
+          targetObject.steps.edges[payload.index ? payload.index : 0].node.id
+        ].length > 0
+      ) {
+        // currentCount =
+        //   targetResponse[payload.targetId].step[
+        //     targetObject.steps.edges[payload.index ? payload.index : 0].node.id
+        //   ].length + 1
+
+        const recordedTrials = targetResponse[payload.targetId].step[
+          targetObject.steps.edges[payload.index ? payload.index : 0].node.id
+        ].length
+        const dT = masterSession.targets.edges[payload.targetIndex].node.targetAllcatedDetails.DailyTrials
+        if (recordedTrials >= dT) currentCount = recordedTrials
+        else currentCount = recordedTrials + 1
+
+        targetResponse[payload.targetId].step[
+          targetObject.steps.edges[payload.index ? payload.index : 0].node.id
+        ].map(recordingItem => {
+          if (recordingItem.trial === 'CORRECT') {
+            currentCorrectCount += 1
+          }
+          if (
+            recordingItem.trial === 'ERROR' ||
+            recordingItem.trial === 'PROMPT' ||
+            recordingItem.trial === 'INCORRECT'
+          ) {
+            currentIncorrectCount += 1
+          }
+        })
       }
     } else {
       if (targetResponse[payload.targetId].target.length > 0) {
-        currentCount = targetResponse[payload.targetId].target.length + 1
+        // currentCount = targetResponse[payload.targetId].target.length + 1
+        const recordedTrials = targetResponse[payload.targetId].target.length
+        const dT = masterSession.targets.edges[payload.targetIndex].node.targetAllcatedDetails.DailyTrials
+        if (recordedTrials >= dT) currentCount = recordedTrials
+        else currentCount = recordedTrials + 1
         targetResponse[payload.targetId].target.map(recordingItem => {
           if (recordingItem.trial === 'CORRECT') {
             currentCorrectCount += 1
           }
-          if (recordingItem.trial === 'ERROR') {
-            currentIncorrectCount += 1
-          }
-          if (recordingItem.trial === 'PROMPT') {
+          if (
+            recordingItem.trial === 'ERROR' ||
+            recordingItem.trial === 'PROMPT' ||
+            recordingItem.trial === 'INCORRECT'
+          ) {
             currentIncorrectCount += 1
           }
         })
@@ -1165,6 +1361,12 @@ export function* CREATE_NEW_TARGET_INSTANCE({ payload }) {
 }
 
 export function* UPDATE_TARGET_TRIAL({ payload }) {
+  yield put({
+    type: 'sessionrecording/SET_STATE',
+    payload: {
+      ResponseLoading: true,
+    },
+  })
   // selecting target response object from store
   const targetResponse = yield select(state => state.sessionrecording.TargetResponse)
   const targetActiveId = yield select(state => state.sessionrecording.TargetActiveId)
@@ -1195,6 +1397,12 @@ export function* UPDATE_TARGET_TRIAL({ payload }) {
   // update session duration
   yield put({
     type: 'sessionrecording/UPDATE_DURATION',
+  })
+  yield put({
+    type: 'sessionrecording/SET_STATE',
+    payload: {
+      ResponseLoading: false,
+    },
   })
 }
 
@@ -1301,10 +1509,11 @@ export function* CHANGE_STIMULUS({ payload }) {
       if (recordingItem.trial === 'CORRECT') {
         currentCorrectCount += 1
       }
-      if (recordingItem.trial === 'ERROR') {
-        currentIncorrectCount += 1
-      }
-      if (recordingItem.trial === 'PROMPT') {
+      if (
+        recordingItem.trial === 'ERROR' ||
+        recordingItem.trial === 'PROMPT' ||
+        recordingItem.trial === 'INCORRECT'
+      ) {
         currentIncorrectCount += 1
       }
     })
@@ -1323,6 +1532,12 @@ export function* CHANGE_STIMULUS({ payload }) {
 }
 
 export function* TARGET_SD_CORRECT({ payload }) {
+  yield put({
+    type: 'sessionrecording/SET_STATE',
+    payload: {
+      ResponseLoading: true,
+    },
+  })
   // selecting child session id for creating child session
   const childSessionId = yield select(state => state.sessionrecording.ChildSession.id)
   const targetActiveId = yield select(state => state.sessionrecording.TargetActiveId)
@@ -1330,6 +1545,8 @@ export function* TARGET_SD_CORRECT({ payload }) {
   const currentSessionTime = yield select(state => state.sessionrecording.CurrentSessionTime)
   const masterSession = yield select(state => state.sessionrecording.MasterSession)
   const targetActiveIndex = yield select(state => state.sessionrecording.TargetActiveIndex)
+  const count = yield select(state => state.sessionrecording.Count)
+  const stimulusActiveIndex = yield select(state => state.sessionrecording.StimulusActiveIndex)
   // selecting status id of the target
   const sessionStatusId = masterSession.targets.edges[targetActiveIndex].node.targetStatus.id
   // updating session duration
@@ -1362,14 +1579,69 @@ export function* TARGET_SD_CORRECT({ payload }) {
         TargetResponse: targetResponse,
       },
     })
+
+    if (
+      count < masterSession.targets.edges[targetActiveIndex].node.targetAllcatedDetails.DailyTrials
+    ) {
+      yield put({
+        type: 'sessionrecording/SET_STATE',
+        payload: {
+          Count: count + 1,
+        },
+      })
+      resetStartTime()
+      resetCorrectIncorrectButtons()
+    } else if (
+      count ===
+      masterSession.targets.edges[targetActiveIndex].node.targetAllcatedDetails.DailyTrials
+    ) {
+      console.log('inside else if')
+      if (
+        stimulusActiveIndex <
+        masterSession.targets.edges[targetActiveIndex].node.sd.edges.length - 1
+      ) {
+        console.log('inside else if if')
+
+        resetStartTime()
+        resetCorrectIncorrectButtons()
+
+        yield put({
+          type: 'sessionrecording/CHANGE_STIMULUS',
+          payload: {
+            stimulusId:
+              masterSession.targets.edges[targetActiveIndex].node.sd.edges[stimulusActiveIndex + 1]
+                .node.id,
+            stimulusIndex: stimulusActiveIndex + 1,
+            targetId: targetActiveId,
+          },
+        })
+      }
+      else if (targetActiveIndex + 1 < masterSession.targets.edges.length) {
+        yield put({
+          type: 'sessionrecording/MOVE_TO_NEXT_TARGET',
+        })
+      }
+    }
   }
   // update session duration
   yield put({
     type: 'sessionrecording/UPDATE_DURATION',
   })
+  yield put({
+    type: 'sessionrecording/SET_STATE',
+    payload: {
+      ResponseLoading: false,
+    },
+  })
 }
 
 export function* UPDATE_TARGET_SD_TRIAL({ payload }) {
+  yield put({
+    type: 'sessionrecording/SET_STATE',
+    payload: {
+      ResponseLoading: true,
+    },
+  })
   // selecting target response object from store
   const targetResponse = yield select(state => state.sessionrecording.TargetResponse)
   const targetActiveId = yield select(state => state.sessionrecording.TargetActiveId)
@@ -1403,6 +1675,12 @@ export function* UPDATE_TARGET_SD_TRIAL({ payload }) {
   yield put({
     type: 'sessionrecording/UPDATE_DURATION',
   })
+  yield put({
+    type: 'sessionrecording/SET_STATE',
+    payload: {
+      ResponseLoading: false,
+    },
+  })
 }
 
 export function* CHANGE_STEP({ payload }) {
@@ -1421,10 +1699,11 @@ export function* CHANGE_STEP({ payload }) {
       if (recordingItem.trial === 'CORRECT') {
         currentCorrectCount += 1
       }
-      if (recordingItem.trial === 'ERROR') {
-        currentIncorrectCount += 1
-      }
-      if (recordingItem.trial === 'PROMPT') {
+      if (
+        recordingItem.trial === 'ERROR' ||
+        recordingItem.trial === 'PROMPT' ||
+        recordingItem.trial === 'INCORRECT'
+      ) {
         currentIncorrectCount += 1
       }
     })
@@ -1443,6 +1722,12 @@ export function* CHANGE_STEP({ payload }) {
 }
 
 export function* TARGET_STEP_CORRECT({ payload }) {
+  yield put({
+    type: 'sessionrecording/SET_STATE',
+    payload: {
+      ResponseLoading: true,
+    },
+  })
   // selecting child session id for creating child session
   const childSessionId = yield select(state => state.sessionrecording.ChildSession.id)
   const targetActiveId = yield select(state => state.sessionrecording.TargetActiveId)
@@ -1450,6 +1735,8 @@ export function* TARGET_STEP_CORRECT({ payload }) {
   const currentSessionTime = yield select(state => state.sessionrecording.CurrentSessionTime)
   const masterSession = yield select(state => state.sessionrecording.MasterSession)
   const targetActiveIndex = yield select(state => state.sessionrecording.TargetActiveIndex)
+  const count = yield select(state => state.sessionrecording.Count)
+  const stepActiveIndex = yield select(state => state.sessionrecording.StepActiveIndex)
   // selecting status id of the target
   const sessionStatusId = masterSession.targets.edges[targetActiveIndex].node.targetStatus.id
   // updating session duration
@@ -1482,15 +1769,70 @@ export function* TARGET_STEP_CORRECT({ payload }) {
         TargetResponse: targetResponse,
       },
     })
+
+    if (
+      count < masterSession.targets.edges[targetActiveIndex].node.targetAllcatedDetails.DailyTrials
+    ) {
+      yield put({
+        type: 'sessionrecording/SET_STATE',
+        payload: {
+          Count: count + 1,
+        },
+      })
+      resetStartTime()
+      resetCorrectIncorrectButtons()
+    } else if (
+      count ===
+      masterSession.targets.edges[targetActiveIndex].node.targetAllcatedDetails.DailyTrials
+    ) {
+      console.log('inside else if')
+      if (
+        stepActiveIndex <
+        masterSession.targets.edges[targetActiveIndex].node.steps.edges.length - 1
+      ) {
+        console.log('inside else if if')
+
+        resetStartTime()
+        resetCorrectIncorrectButtons()
+
+        yield put({
+          type: 'sessionrecording/CHANGE_STEP',
+          payload: {
+            stepId:
+              masterSession.targets.edges[targetActiveIndex].node.steps.edges[stepActiveIndex + 1]
+                .node.id,
+            stepIndex: stepActiveIndex + 1,
+            targetId: targetActiveId,
+          },
+        })
+      }
+      else if (targetActiveIndex + 1 < masterSession.targets.edges.length) {
+        yield put({
+          type: 'sessionrecording/MOVE_TO_NEXT_TARGET',
+        })
+      }
+    }
   }
 
   // update session duration
   yield put({
     type: 'sessionrecording/UPDATE_DURATION',
   })
+  yield put({
+    type: 'sessionrecording/SET_STATE',
+    payload: {
+      ResponseLoading: false,
+    },
+  })
 }
 
 export function* UPDATE_TARGET_STEP_TRIAL({ payload }) {
+  yield put({
+    type: 'sessionrecording/SET_STATE',
+    payload: {
+      ResponseLoading: true,
+    },
+  })
   // selecting target response object from store
   const targetResponse = yield select(state => state.sessionrecording.TargetResponse)
   const targetActiveId = yield select(state => state.sessionrecording.TargetActiveId)
@@ -1523,6 +1865,12 @@ export function* UPDATE_TARGET_STEP_TRIAL({ payload }) {
   // update session duration
   yield put({
     type: 'sessionrecording/UPDATE_DURATION',
+  })
+  yield put({
+    type: 'sessionrecording/SET_STATE',
+    payload: {
+      ResponseLoading: false,
+    },
   })
 }
 
@@ -1629,6 +1977,12 @@ export function* CREATE_NEW_BLOCK({ payload }) {
 }
 
 export function* RECORD_BLOCK_TRIAL({ payload }) {
+  yield put({
+    type: 'sessionrecording/SET_STATE',
+    payload: {
+      ResponseLoading: true,
+    },
+  })
   // selecting child session id for creating child session
   const currentSessionTime = yield select(state => state.sessionrecording.CurrentSessionTime)
   const startTime = yield select(state => state.sessionrecording.TrialStartTime)
@@ -1636,6 +1990,8 @@ export function* RECORD_BLOCK_TRIAL({ payload }) {
   const targetId = yield select(state => state.sessionrecording.TargetActiveId)
   const currentBlockIndex = yield select(state => state.sessionrecording.PeakBlockIndex)
   const trialCount = yield select(state => state.sessionrecording.PeakTrialCount)
+  const targetActiveIndex = yield select(state => state.sessionrecording.TargetActiveIndex)
+  const masterSession = yield select(state => state.sessionrecording.MasterSession)
 
   const blockId = targetResponse[targetId].peak[currentBlockIndex].blockId
 
@@ -1664,6 +2020,89 @@ export function* RECORD_BLOCK_TRIAL({ payload }) {
           TargetResponse: targetResponse,
         },
       })
+
+      // move to next trial
+
+      if (trialCount < 10) {
+        if (
+          targetResponse[targetId].peak[currentBlockIndex].block[trialCount - 1].recordedData ===
+          true
+        ) {
+          resetStartTime()
+
+          yield put({
+            type: 'sessionrecording/SET_STATE',
+            payload: {
+              PeakTrialCount: trialCount + 1,
+            },
+          })
+
+          if (
+            targetResponse[targetId].peak[currentBlockIndex].block[trialCount].response?.marks === 0
+          ) {
+            document.getElementById('peakResponseButtonZero').style.backgroundColor = '#FF8080'
+          }
+          if (
+            targetResponse[targetId].peak[currentBlockIndex].block[trialCount].response?.marks === 2
+          ) {
+            document.getElementById('peakResponseButtonTwo').style.backgroundColor = '#FF9C52'
+          }
+          if (
+            targetResponse[targetId].peak[currentBlockIndex].block[trialCount].response?.marks === 4
+          ) {
+            document.getElementById('peakResponseButtonFour').style.backgroundColor = '#FF9C52'
+          }
+          if (
+            targetResponse[targetId].peak[currentBlockIndex].block[trialCount].response?.marks === 8
+          ) {
+            document.getElementById('peakResponseButtonEight').style.backgroundColor = '#FF9C52'
+          }
+          if (
+            targetResponse[targetId].peak[currentBlockIndex].block[trialCount].response?.marks ===
+            10
+          ) {
+            document.getElementById('peakResponseButtonTen').style.backgroundColor = '#4BAEA0'
+          }
+
+          // if (!PeakAutomatic) {
+          //   this.peakSelectedStimulusIndexReset(trialCount + 1)
+          // }
+        }
+      } else if (trialCount === 10) {
+        if (
+          currentBlockIndex <
+          masterSession.targets.edges[targetActiveIndex].node.peakBlocks - 1
+        ) {
+          updateSessionClockTime()
+          yield put({
+            type: 'sessionrecording/UPDATE_BLOCK_ENDTIME',
+            payload: {
+              blockIndex: currentBlockIndex,
+              targetId: targetId,
+            },
+          })
+
+          yield put({
+            type: 'sessionrecording/SET_STATE',
+            payload: {
+              PeakBlockIndex: currentBlockIndex + 1,
+            },
+          })
+
+          yield put({
+            type: 'sessionrecording/CREATE_NEW_BLOCK',
+            payload: {
+              blockIndex: currentBlockIndex + 1,
+              targetId: targetId,
+            },
+          })
+        }
+        else if (targetActiveIndex + 1 < masterSession.targets.edges.length) {
+          yield put({
+            type: 'sessionrecording/MOVE_TO_NEXT_TARGET',
+          })
+        }
+      }
     }
   }
   // end of check
@@ -1671,14 +2110,28 @@ export function* RECORD_BLOCK_TRIAL({ payload }) {
   yield put({
     type: 'sessionrecording/UPDATE_DURATION',
   })
+  yield put({
+    type: 'sessionrecording/SET_STATE',
+    payload: {
+      ResponseLoading: false,
+    },
+  })
 }
 
 export function* UPDATE_BLOCK_TRIAL({ payload }) {
+  yield put({
+    type: 'sessionrecording/SET_STATE',
+    payload: {
+      ResponseLoading: true,
+    },
+  })
   // selecting child session id for creating child session
   const targetResponse = yield select(state => state.sessionrecording.TargetResponse)
   const targetId = yield select(state => state.sessionrecording.TargetActiveId)
   const currentBlockIndex = yield select(state => state.sessionrecording.PeakBlockIndex)
   const trialCount = yield select(state => state.sessionrecording.PeakTrialCount)
+  const targetActiveIndex = yield select(state => state.sessionrecording.TargetActiveIndex)
+  const masterSession = yield select(state => state.sessionrecording.MasterSession)
 
   const blockId = targetResponse[targetId].peak[currentBlockIndex].blockId
 
@@ -1706,6 +2159,89 @@ export function* UPDATE_BLOCK_TRIAL({ payload }) {
           TargetResponse: targetResponse,
         },
       })
+
+      // move to next trial
+
+      if (trialCount < 10) {
+        if (
+          targetResponse[targetId].peak[currentBlockIndex].block[trialCount - 1].recordedData ===
+          true
+        ) {
+          resetStartTime()
+
+          yield put({
+            type: 'sessionrecording/SET_STATE',
+            payload: {
+              PeakTrialCount: trialCount + 1,
+            },
+          })
+
+          if (
+            targetResponse[targetId].peak[currentBlockIndex].block[trialCount].response?.marks === 0
+          ) {
+            document.getElementById('peakResponseButtonZero').style.backgroundColor = '#FF8080'
+          }
+          if (
+            targetResponse[targetId].peak[currentBlockIndex].block[trialCount].response?.marks === 2
+          ) {
+            document.getElementById('peakResponseButtonTwo').style.backgroundColor = '#FF9C52'
+          }
+          if (
+            targetResponse[targetId].peak[currentBlockIndex].block[trialCount].response?.marks === 4
+          ) {
+            document.getElementById('peakResponseButtonFour').style.backgroundColor = '#FF9C52'
+          }
+          if (
+            targetResponse[targetId].peak[currentBlockIndex].block[trialCount].response?.marks === 8
+          ) {
+            document.getElementById('peakResponseButtonEight').style.backgroundColor = '#FF9C52'
+          }
+          if (
+            targetResponse[targetId].peak[currentBlockIndex].block[trialCount].response?.marks ===
+            10
+          ) {
+            document.getElementById('peakResponseButtonTen').style.backgroundColor = '#4BAEA0'
+          }
+
+          // if (!PeakAutomatic) {
+          //   this.peakSelectedStimulusIndexReset(trialCount + 1)
+          // }
+        }
+      } else if (trialCount === 10) {
+        if (
+          currentBlockIndex <
+          masterSession.targets.edges[targetActiveIndex].node.peakBlocks - 1
+        ) {
+          updateSessionClockTime()
+          yield put({
+            type: 'sessionrecording/UPDATE_BLOCK_ENDTIME',
+            payload: {
+              blockIndex: currentBlockIndex,
+              targetId: targetId,
+            },
+          })
+
+          yield put({
+            type: 'sessionrecording/SET_STATE',
+            payload: {
+              PeakBlockIndex: currentBlockIndex + 1,
+            },
+          })
+
+          yield put({
+            type: 'sessionrecording/CREATE_NEW_BLOCK',
+            payload: {
+              blockIndex: currentBlockIndex + 1,
+              targetId: targetId,
+            },
+          })
+        }
+        else if (targetActiveIndex + 1 < masterSession.targets.edges.length) {
+          yield put({
+            type: 'sessionrecording/MOVE_TO_NEXT_TARGET',
+          })
+        }
+      }
     }
   }
   // end of check
@@ -1713,23 +2249,34 @@ export function* UPDATE_BLOCK_TRIAL({ payload }) {
   yield put({
     type: 'sessionrecording/UPDATE_DURATION',
   })
+  yield put({
+    type: 'sessionrecording/SET_STATE',
+    payload: {
+      ResponseLoading: false,
+    },
+  })
 }
 
 export function* GET_SD_COMBINATIONS({ payload }) {
   const response = yield call(getCombinationsByCode, payload)
   if (response && response.data) {
-
     yield put({
       type: 'sessionrecording/SET_STATE',
       payload: {
         SdCombinations: response.data.getPeakEquCodes.edges[0]?.node,
-        ActiveCombination: response.data.getPeakEquCodes.edges[0]?.node.train.edges[0]?.node.id
+        ActiveCombination: response.data.getPeakEquCodes.edges[0]?.node.train.edges[0]?.node.id,
       },
     })
   }
 }
 
 export function* EQUIVALENCE_RESPONSE({ payload }) {
+  yield put({
+    type: 'sessionrecording/SET_STATE',
+    payload: {
+      ResponseLoading: true,
+    },
+  })
   // selecting child session id for creating child session
   const childSessionId = yield select(state => state.sessionrecording.ChildSession.id)
   const targetActiveId = yield select(state => state.sessionrecording.TargetActiveId)
@@ -1756,6 +2303,9 @@ export function* EQUIVALENCE_RESPONSE({ payload }) {
   const selectedOperation = yield select(state => state.sessionrecording.SelectedOperation)
   const activeCombination = yield select(state => state.sessionrecording.ActiveCombination)
   const selectedClassId = yield select(state => state.sessionrecording.SelectedClassId)
+  const equiTrialCount = yield select(state => state.sessionrecording.EquiTrialCount)
+  const sdCombinations = yield select(state => state.sessionrecording.SdCombinations)
+
   // const targetActiveIndex = yield select(state => state.sessionrecording.TargetActiveIndex)
 
   if (response && response.data && response.data.sessionRecording) {
@@ -1765,8 +2315,10 @@ export function* EQUIVALENCE_RESPONSE({ payload }) {
       let operation = 'train'
       if (selectedOperation === 'Test') operation = 'test'
       targetResponse[targetActiveId].equivalence[operation][activeCombination][selectedClassId] = [
-        ...targetResponse[targetActiveId].equivalence[operation][activeCombination][selectedClassId],
-        item.node
+        ...targetResponse[targetActiveId].equivalence[operation][activeCombination][
+        selectedClassId
+        ],
+        item.node,
       ]
     })
 
@@ -1780,10 +2332,211 @@ export function* EQUIVALENCE_RESPONSE({ payload }) {
     yield put({
       type: 'sessionrecording/UPDATE_DURATION',
     })
+
+    // automatic trial, combination, class, test/train and target move code
+    if (equiTrialCount < 10) {
+      
+      resetPeakButtons()
+      resetStartTime()
+      yield put({
+        type: 'sessionrecording/SET_STATE',
+        payload: {
+          EquiTrialCount: equiTrialCount + 1,
+        },
+      })
+    }
+    else {
+      if (selectedOperation === 'Train') {
+        let previousCombIndex = 0
+
+        sdCombinations.train.edges.map((nodeItem, index) => {
+          if (nodeItem.node.id === activeCombination) {
+            previousCombIndex = index
+          }
+        })
+
+        if (previousCombIndex + 1 < sdCombinations.train.edges.length) {
+          // change active combination
+          const newCombId = sdCombinations.train.edges[previousCombIndex + 1]?.node.id
+          const trialsLength = targetResponse[targetActiveId].equivalence.train[newCombId][selectedClassId].length
+          if (trialsLength < 10) {
+            yield put({
+              type: 'sessionrecording/SET_STATE',
+              payload: {
+                EquiTrialCount: trialsLength + 1,
+                ActiveCombination: newCombId,
+              },
+            })
+          } else {
+            yield put({
+              type: 'sessionrecording/SET_STATE',
+              payload: {
+                EquiTrialCount: 10,
+                ActiveCombination: newCombId,
+              },
+            })
+          }
+        }
+        else {
+          // check for change class
+          let previosClassIndex = 0
+          masterSession.targets.edges[targetActiveIndex].node.classes.edges.map((classNode, classIndex) => {
+            if (classNode.node.id === selectedClassId) {
+              previosClassIndex = classIndex
+            }
+          })
+
+          if (previosClassIndex + 1 < masterSession.targets.edges[targetActiveIndex].node.classes.edges.length) {
+            // chnage class
+            const newClassId = masterSession.targets.edges[targetActiveIndex].node.classes.edges[previosClassIndex + 1]?.node.id
+            const trialsLengthCheck = targetResponse[targetActiveId].equivalence.train[activeCombination][newClassId].length
+            if (trialsLengthCheck < 10) {
+              yield put({
+                type: 'sessionrecording/SET_STATE',
+                payload: {
+                  SelectedClassId: newClassId,
+                  EquiTrialCount: trialsLengthCheck + 1,
+                },
+              })
+            } else {
+              yield put({
+                type: 'sessionrecording/SET_STATE',
+                payload: {
+                  SelectedClassId: newClassId,
+                  EquiTrialCount: 10,
+                },
+              })
+
+            }
+          }
+          else {
+            // check for change test/train
+            const comId = sdCombinations.test.edges[0]?.node.id
+            const firstClassId = masterSession.targets.edges[targetActiveIndex].node.classes.edges[0]?.node.id
+            const trialsLengthOper = targetResponse[targetActiveId].equivalence.test[comId][selectedClassId]?.length
+            if (trialsLengthOper < 10) {
+              yield put({
+                type: 'sessionrecording/SET_STATE',
+                payload: {
+                  SelectedOperation: 'Test',
+                  EquiTrialCount: trialsLengthOper + 1,
+                  ActiveCombination: comId,
+                  SelectedClassId: firstClassId,
+                },
+              })
+            } else {
+              yield put({
+                type: 'sessionrecording/SET_STATE',
+                payload: {
+                  SelectedOperation: 'Test',
+                  EquiTrialCount: 10,
+                  ActiveCombination: comId,
+                  SelectedClassId: firstClassId,
+                },
+              })
+            }
+
+          }
+
+
+
+
+        }
+      }
+      else if(selectedOperation === 'Test'){
+        let previousCombIndex = 0
+
+        sdCombinations.test.edges.map((nodeItem, index) => {
+          if (nodeItem.node.id === activeCombination) {
+            previousCombIndex = index
+          }
+        })
+
+        if (previousCombIndex + 1 < sdCombinations.test.edges.length) {
+          // change active combination
+          const newCombId = sdCombinations.test.edges[previousCombIndex + 1]?.node.id
+          const trialsLength = targetResponse[targetActiveId].equivalence.test[newCombId][selectedClassId].length
+          if (trialsLength < 10) {
+            yield put({
+              type: 'sessionrecording/SET_STATE',
+              payload: {
+                EquiTrialCount: trialsLength + 1,
+                ActiveCombination: newCombId,
+              },
+            })
+          } else {
+            yield put({
+              type: 'sessionrecording/SET_STATE',
+              payload: {
+                EquiTrialCount: 10,
+                ActiveCombination: newCombId,
+              },
+            })
+          }
+        }
+        else {
+          // check for change class
+          let previosClassIndex = 0
+          masterSession.targets.edges[targetActiveIndex].node.classes.edges.map((classNode, classIndex) => {
+            if (classNode.node.id === selectedClassId) {
+              previosClassIndex = classIndex
+            }
+          })
+
+          if (previosClassIndex + 1 < masterSession.targets.edges[targetActiveIndex].node.classes.edges.length) {
+            // chnage class
+            const newClassId = masterSession.targets.edges[targetActiveIndex].node.classes.edges[previosClassIndex + 1]?.node.id
+            const trialsLengthCheck = targetResponse[targetActiveId].equivalence.test[activeCombination][newClassId].length
+            if (trialsLengthCheck < 10) {
+              yield put({
+                type: 'sessionrecording/SET_STATE',
+                payload: {
+                  SelectedClassId: newClassId,
+                  EquiTrialCount: trialsLengthCheck + 1,
+                },
+              })
+            } else {
+              yield put({
+                type: 'sessionrecording/SET_STATE',
+                payload: {
+                  SelectedClassId: newClassId,
+                  EquiTrialCount: 10,
+                },
+              })
+
+            }
+          }
+          // move to next target
+          else if (targetActiveIndex + 1 < masterSession.targets.edges.length) {
+            yield put({
+              type: 'sessionrecording/MOVE_TO_NEXT_TARGET',
+            })
+          }
+
+
+
+
+        }
+      }
+    }
+
+
   }
+  yield put({
+    type: 'sessionrecording/SET_STATE',
+    payload: {
+      ResponseLoading: false,
+    },
+  })
 }
 
 export function* EQUIVALENCE_RESPONSE_UPDATE({ payload }) {
+  yield put({
+    type: 'sessionrecording/SET_STATE',
+    payload: {
+      ResponseLoading: true,
+    },
+  })
   // selecting child session id for creating child session
   const childSessionId = yield select(state => state.sessionrecording.ChildSession.id)
   const targetActiveId = yield select(state => state.sessionrecording.TargetActiveId)
@@ -1812,8 +2565,9 @@ export function* EQUIVALENCE_RESPONSE_UPDATE({ payload }) {
     let operation = 'train'
     if (selectedOperation === 'Test') operation = 'test'
 
-    targetResponse[targetActiveId].equivalence[operation][activeCombination][selectedClassId][equiTrialCount - 1] = updatedObject
-
+    targetResponse[targetActiveId].equivalence[operation][activeCombination][selectedClassId][
+      equiTrialCount - 1
+    ] = updatedObject
 
     yield put({
       type: 'sessionrecording/SET_STATE',
@@ -1826,6 +2580,12 @@ export function* EQUIVALENCE_RESPONSE_UPDATE({ payload }) {
       type: 'sessionrecording/UPDATE_DURATION',
     })
   }
+  yield put({
+    type: 'sessionrecording/SET_STATE',
+    payload: {
+      ResponseLoading: false,
+    },
+  })
 }
 
 export default function* rootSaga() {
@@ -1858,5 +2618,7 @@ export default function* rootSaga() {
     takeEvery(actions.EQUIVALENCE_RESPONSE, EQUIVALENCE_RESPONSE),
     takeEvery(actions.EQUIVALENCE_RESPONSE_UPDATE, EQUIVALENCE_RESPONSE_UPDATE),
 
+    // automatic target move
+    takeEvery(actions.MOVE_TO_NEXT_TARGET, MOVE_TO_NEXT_TARGET),
   ])
 }

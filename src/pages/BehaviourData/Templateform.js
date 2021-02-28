@@ -1,31 +1,25 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useReducer, useState } from 'react'
-import { Form, Input, Button, Select, notification, Modal, Switch, Typography } from 'antd'
-import {
-  PlusCircleOutlined,
-  MinusCircleOutlined,
-  PlusSquareOutlined,
-  MinusSquareOutlined,
-  MinusOutlined,
-  CloseOutlined,
-} from '@ant-design/icons'
-import { useMutation, useQuery } from 'react-apollo'
-import moment from 'moment'
-import { times, remove, update } from 'ramda'
-import './templateform.scss'
+/* eslint-disable array-callback-return */
+/* eslint-disable react-hooks/exhaustive-deps */
+import { PlusCircleOutlined } from '@ant-design/icons'
+import { Button, Form, Input, Modal, notification, Select, Switch } from 'antd'
 import ReminderForm from 'components/Behavior/ReminderForm'
+import moment from 'moment'
+import { remove, times, update } from 'ramda'
+import React, { useEffect, useReducer, useState } from 'react'
+import { useMutation, useQuery } from 'react-apollo'
 import {
+  BEHAVIORS,
   CREATE_BEHAVIOR,
   CREATE_ENVIRONMENT,
-  DANCLE_STATUS,
+  CREATE_TAMPLET,
   DANCLE_ENVS,
   DANCLE_MEASURMENTS,
-  CREATE_TAMPLET,
-  BEHAVIORS,
+  DANCLE_STATUS,
 } from './query'
+import './templateform.scss'
 
 const { Option } = Select
-const { Text, Title } = Typography
 const { TextArea } = Input
 
 const remainderReducer = (state, action) => {
@@ -53,9 +47,15 @@ const remainderReducer = (state, action) => {
   }
 }
 
-const BehaviorForm = ({ style, setNewTamplate, setNewTampletFromOpen, form }) => {
+const CreateTemplateForm = ({
+  style,
+  onCreatingTemplate,
+  isBehaviorAlreadyExist,
+  cancel,
+  form,
+}) => {
   const studentId = localStorage.getItem('studentId')
-  const durationMesId = 'RGVjZWxCZWhhdmlvck1lYXN1cmluZ3NUeXBlOjQ='
+  const [defaultMeasurement, setDefaultMeasurement] = useState([])
   const [addBehNameModal, setAddBehNameModal] = useState(false)
   const [addEnvNameModal, setAddEnvNameModal] = useState(false)
   const [newBehName, setNewBahName] = useState('')
@@ -66,6 +66,7 @@ const BehaviorForm = ({ style, setNewTamplate, setNewTampletFromOpen, form }) =>
   const [envList, setEnvList] = useState()
   const [reminder, setReminder] = useState(true)
   const [remainderCount, setRemainderCount] = useState(1)
+  const [behaviourExists, setBehaviourExists] = useState(false)
 
   const [remainderState, remainderDispatch] = useReducer(remainderReducer, [
     { time: moment(), frequency: moment().format('dddd') },
@@ -100,25 +101,13 @@ const BehaviorForm = ({ style, setNewTamplate, setNewTampletFromOpen, form }) =>
     },
   })
 
+  // set default form values
   useEffect(() => {
-    if (newTempleteData) {
-      notification.success({
-        message: 'Behavior Data',
-        description: 'New Behavior Templete Added Successfully',
-      })
-      setNewTamplate({ node: newTempleteData.createTemplate.details })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newTempleteData])
-
-  useEffect(() => {
-    if (newTempletError) {
-      notification.error({
-        message: 'Somthing want wrong',
-        description: newTempletError.message,
-      })
-    }
-  }, [newTempletError])
+    form.setFieldsValue({
+      status: dancleStatusData?.getDecelStatus[0].id,
+      envs: dancleEnvData?.getEnvironment[1].id,
+    })
+  }, [dancleStatusData, dancleEnvData])
 
   useEffect(() => {
     if (behaviorData) {
@@ -131,6 +120,15 @@ const BehaviorForm = ({ style, setNewTamplate, setNewTampletFromOpen, form }) =>
       setEnvList(dancleEnvData.getEnvironment)
     }
   }, [dancleEnvData])
+
+  useEffect(() => {
+    if (dancleMeasurementData) {
+      const defaultIds = dancleMeasurementData.getBehaviourMeasurings.map(
+        measurement => measurement.id,
+      )
+      setDefaultMeasurement(defaultIds)
+    }
+  }, [dancleMeasurementData])
 
   useEffect(() => {
     if (createBehData?.createBehaviour) {
@@ -199,7 +197,7 @@ const BehaviorForm = ({ style, setNewTamplate, setNewTampletFromOpen, form }) =>
         },
         errorPolicy: 'all',
         onError(err) {
-          console.log(err);
+          console.log(err)
         },
       })
     }
@@ -214,7 +212,7 @@ const BehaviorForm = ({ style, setNewTamplate, setNewTampletFromOpen, form }) =>
         },
         errorPolicy: 'all',
         onError(err) {
-          console.log(err);
+          console.log(err)
         },
       })
     }
@@ -234,20 +232,36 @@ const BehaviorForm = ({ style, setNewTamplate, setNewTampletFromOpen, form }) =>
     })
 
     form.validateFields((error, value) => {
-      if (!error) {
+      console.log(error, value, 'eror, val')
+      if (!error && !behaviourExists) {
         createTemplate({
           variables: {
             studentId,
             behaviorId: value.name,
             status: value.status,
             description: value.description,
-            measurments: value.measurements,
+            measurments: defaultMeasurement,
             envs: value.envs,
             procedures: value.procedure,
             manipulations: value.manipulation,
             remainders: reminder ? modefiRemainderState : null,
           },
         })
+          .then(res => {
+            console.log(res)
+            notification.success({
+              message: 'Behavior Data',
+              description: 'New Behavior Templete Added Successfully',
+            })
+            onCreatingTemplate()
+          })
+          .catch(err => {
+            console.log(err, 'ereroero')
+            notification.error({
+              message: 'Something went wrong',
+              description: err.message,
+            })
+          })
       }
     })
   }
@@ -267,30 +281,16 @@ const BehaviorForm = ({ style, setNewTamplate, setNewTampletFromOpen, form }) =>
 
   return (
     <Form
+      className="templateForm"
       colon={false}
       {...formItemLayout}
       onSubmit={SubmitForm}
       name="control-ref"
       style={{ marginLeft: 0, position: 'relative', ...style }}
     >
-      <Button
-        type="link"
-        onClick={() => {
-          setNewTampletFromOpen(false)
-        }}
-        style={{
-          position: 'absolute',
-          right: -12,
-          top: 0,
-          zIndex: 10,
-        }}
-      >
-        <CloseOutlined style={{ fontSize: 20, color: '#D81E06' }} />
-      </Button>
       <div
         style={{
           position: 'relative',
-          paddingTop: 50,
         }}
       >
         <PlusCircleOutlined
@@ -298,13 +298,17 @@ const BehaviorForm = ({ style, setNewTamplate, setNewTampletFromOpen, form }) =>
           style={{
             position: 'absolute',
             right: '0px',
-            top: '60px',
+            top: '8px',
             zIndex: '100',
             fontSize: '20px',
           }}
         />
 
-        <Form.Item label={<span style={{ fontSize: '16px' }}>Behavior Name</span>}>
+        <Form.Item
+          label={<span style={{ fontSize: '16px' }}>Behavior Name</span>}
+          validateStatus={behaviourExists ? 'error' : 'success'}
+          help={behaviourExists ? 'Behaviour already exists' : ''}
+        >
           {form.getFieldDecorator('name', {
             rules: [{ required: true, message: 'Please select the behavior name!' }],
           })(
@@ -316,6 +320,9 @@ const BehaviorForm = ({ style, setNewTamplate, setNewTampletFromOpen, form }) =>
               optionFilterProp="name"
               style={{
                 color: '#000',
+              }}
+              onChange={e => {
+                setBehaviourExists(isBehaviorAlreadyExist(e))
               }}
             >
               {behNameList?.map(({ node }) => {
@@ -377,54 +384,21 @@ const BehaviorForm = ({ style, setNewTamplate, setNewTampletFromOpen, form }) =>
         </Form.Item>
       </div>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Measurements</span>}>
-        {form.getFieldDecorator('measurements', {
-          initialValue: dancleMeasurementData && [durationMesId],
-          rules: [{ required: true, message: 'Please select a Environments' }],
-        })(
-          <Select
-            mode="multiple"
-            style={{ width: '100%' }}
-            placeholder="Please select"
-            size="large"
-            loading={dancleMeasurementLoading}
-          >
-            {dancleMeasurementData &&
-              dancleMeasurementData.getBehaviourMeasurings.map(measurement => (
-                <Option
-                  key={measurement.id}
-                  value={measurement.id}
-                  disabled={measurement.id === durationMesId}
-                >
-                  {measurement.measuringType}
-                </Option>
-              ))}
-          </Select>,
-        )}
-      </Form.Item>
-
       <Form.Item label={<span style={{ fontSize: '16px' }}>Behavior description</span>}>
         {form.getFieldDecorator('description', { initialValue: '' })(
-          <TextArea
-            placeholder="Describe the behavior"
-            style={{
-              height: 174,
-              resize: 'none',
-              color: '#000',
-            }}
-          />,
+          <TextArea className="small-textarea" placeholder="Describe the behavior" />,
         )}
       </Form.Item>
 
       <Form.Item label={<span style={{ fontSize: '16px' }}>Reactive Procedure</span>}>
         {form.getFieldDecorator('procedure', { initialValue: '' })(
-          <Input size="large" placeholder="Give reactive procedure" />,
+          <TextArea className="small-textarea" placeholder="Give reactive procedure" />,
         )}
       </Form.Item>
 
       <Form.Item label={<span style={{ fontSize: '16px' }}>Antecedent Manipulation</span>}>
         {form.getFieldDecorator('manipulation', { initialValue: '' })(
-          <Input size="large" placeholder="Give antecedent manipulation" />,
+          <TextArea className="small-textarea" placeholder="Give antecedent manipulation" />,
         )}
       </Form.Item>
       <Form.Item label={<span style={{ fontSize: '16px' }}>Behavior Reminders</span>}>
@@ -436,7 +410,7 @@ const BehaviorForm = ({ style, setNewTamplate, setNewTampletFromOpen, form }) =>
           size="large"
         />
       </Form.Item>
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Add Remainder</span>}>
+      <Form.Item label={<span style={{ fontSize: '16px' }}>Add Reminder</span>}>
         {remainderState &&
           times(n => {
             return (
@@ -452,21 +426,38 @@ const BehaviorForm = ({ style, setNewTamplate, setNewTampletFromOpen, form }) =>
           }, remainderCount)}
       </Form.Item>
 
-      <Form.Item {...formTailLayout}>
-        <Button
-          type="primary"
-          htmlType="submit"
-          style={{
-            width: '100%',
-            height: 40,
-            marginTop: 10,
-          }}
-          loading={newTempleteLoading}
-        >
-          Save Template
-        </Button>
-      </Form.Item>
+      <div style={{ display: 'flex', width: '90%', margin: 'auto', justifyContent: 'center' }}>
+        <Form.Item>
+          <Button
+            type="primary"
+            htmlType="submit"
+            style={{
+              width: 140,
+              height: 40,
+              marginTop: 10,
+              marginRight: 10,
+            }}
+            loading={newTempleteLoading}
+          >
+            Save Template
+          </Button>
+        </Form.Item>
 
+        <Form.Item>
+          <Button
+            type="danger"
+            onClick={() => cancel(false)}
+            style={{
+              width: 140,
+              height: 40,
+              marginTop: 10,
+              marginLeft: 10,
+            }}
+          >
+            Cancel
+          </Button>
+        </Form.Item>
+      </div>
       <Modal
         visible={addBehNameModal}
         title="Add New Behavior Name"
@@ -534,4 +525,4 @@ const BehaviorForm = ({ style, setNewTamplate, setNewTampletFromOpen, form }) =>
   )
 }
 
-export default Form.create()(BehaviorForm)
+export default Form.create()(CreateTemplateForm)

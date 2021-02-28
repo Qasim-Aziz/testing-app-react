@@ -3,6 +3,7 @@ import actions from './actions'
 
 const initialState = {
   loading: true,
+  ResponseLoading: false,
   MasterSession: null,
   ChildSession: null,
   TargetResponse: {},
@@ -48,7 +49,8 @@ const initialState = {
   SelectedOperation: 'Train',
   SelectedClassId: '',
   EquiTrialCount: 1,
-  ActiveCombination: ''
+  ActiveCombination: '',
+  
 
 }
 

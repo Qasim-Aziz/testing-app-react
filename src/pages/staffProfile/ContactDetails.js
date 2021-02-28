@@ -88,14 +88,14 @@ const ContactDetails = ({ form }) => {
         <div className="profileForm">
           <Form.Item label="Email">
             {form.getFieldDecorator('email', {
-              initialValue: schoolData.staffs.edges[0].node.email,
+              initialValue: schoolData.staffs.edges[0]?.node.email,
               rules: [{ required: true, message: 'Please give the clinic email!' }],
             })(<Input style={{ width: '300px' }} placeholder="Type clinic email" />)}
           </Form.Item>
 
           <Form.Item label="Phone Number">
             {form.getFieldDecorator('phone', {
-              initialValue: schoolData.staffs.edges[0].node.contactNo,
+              initialValue: schoolData.staffs.edges[0]?.node.contactNo,
               rules: [{ required: true, message: 'Please give phone number!' }],
             })(<Input style={{ width: '300px' }} placeholder="Type clinic phone number" />)}
           </Form.Item>

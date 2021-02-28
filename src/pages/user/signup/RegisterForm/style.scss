@@ -1,0 +1,10 @@
+@import 'assets/styles/mixins.scss';
+
+.ant-select-selection {
+    border: none;
+    border-bottom: 2px solid #f17c00;
+    padding-top: 0px;
+    padding-bottom: 35px;
+    color: black;
+    margin-top: 8px
+  }

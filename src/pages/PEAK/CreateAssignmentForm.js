@@ -78,6 +78,13 @@ const CreateAssignmentForm = ({ form, setOpen, PEAK_PROGRAMS }) => {
     }
   }, [data, error])
 
+  useEffect(() => {
+    form.setFieldsValue({
+      date: moment(),
+      category: 'Direct',
+    })
+  }, [])
+
   const handleSubmit = e => {
     e.preventDefault()
     form.validateFields((formError, values) => {
@@ -134,8 +141,8 @@ const CreateAssignmentForm = ({ form, setOpen, PEAK_PROGRAMS }) => {
             <Option key="3" value="Transformation">
               Transformation
             </Option>
-            <Option key="4" value="Equivalance">
-              Equivalance
+            <Option key="4" value="Equivalence">
+              Equivalence
             </Option>
           </Select>,
         )}

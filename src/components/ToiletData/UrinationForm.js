@@ -12,11 +12,11 @@ export default ({ index, setUrinationCount, dispatch, state, onRemove }) => {
     <div
       style={{
         display: 'flex',
-        justifyContent: 'space-between',
         marginBottom: '10px',
+        width: '100%',
       }}
     >
-      <Form.Item style={{ marginBottom: 0 }}>
+      <Form.Item style={{ marginBottom: 0, marginRight: '12px' }}>
         <TimePicker
           value={state[index].time}
           onChange={value => {
@@ -29,15 +29,12 @@ export default ({ index, setUrinationCount, dispatch, state, onRemove }) => {
         />
       </Form.Item>
 
-      <Form.Item style={{ marginBottom: 0 }}>
+      <Form.Item style={{ width: '80%', maxWidth: 250, marginRight: '12px', marginBottom: 0 }}>
         <Select
           placeholder="Response"
           value={state[index].status}
           onChange={value => {
             dispatch({ type: 'UPDATE_STATUS', index, status: value })
-          }}
-          style={{
-            width: 310,
           }}
           size="large"
         >
@@ -47,22 +44,13 @@ export default ({ index, setUrinationCount, dispatch, state, onRemove }) => {
       </Form.Item>
       {index !== 0 && (
         <MinusCircleOutlined
-          style={{ fontSize: 24, marginTop: 2 }}
+          style={{ fontSize: 22, marginTop: 6, marginLeft: 'auto' }}
           onClick={() => {
             setUrinationCount(state => state - 1)
             if (onRemove) {
               onRemove()
             }
             dispatch({ type: 'REMOVE_URINATION', index })
-          }}
-        />
-      )}
-      {index === 0 && (
-        <PlusCircleOutlined
-          style={{ fontSize: 24, marginTop: 2 }}
-          onClick={() => {
-            setUrinationCount(state => state + 1)
-            dispatch({ type: 'ADD_URINATION' })
           }}
         />
       )}

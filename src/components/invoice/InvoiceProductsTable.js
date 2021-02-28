@@ -86,7 +86,6 @@ const InvoiceProductsTable = ({ products, dispatch, totalAmount }) => {
     {
       title: 'Amount',
       render: (text, record) => {
-        console.log(record)
         return parseFloat(record.qty) * parseFloat(record.rate)
       },
     },
@@ -139,12 +138,14 @@ const InvoiceProductsTable = ({ products, dispatch, totalAmount }) => {
     }
   })
 
+  console.log(products, 'tableData')
+
   return (
     <div>
       <Table
         components={components}
         columns={columns}
-        dataSource={!productLoading && products}
+        dataSource={products}
         bordered
         rowClassName={() => 'editable-row'}
         pagination={false}
@@ -195,16 +196,19 @@ const InvoiceProductsTable = ({ products, dispatch, totalAmount }) => {
   )
 }
 
-const CreateProductForm = Form.create()(({ form, setOpen, refetch }) => {
+const CreateProductForm = ({ setOpen, refetch }) => {
   const [createProduct, { data, error, loading }] = useMutation(CREATE_PRODUCT)
-
+  const [title, seTtitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [borderClassActive, setBorderClassActive] = useState(false)
   useEffect(() => {
     if (data) {
       notification.success({
         message: 'New product created sucessfully',
       })
       refetch()
-      form.resetFields()
+      seTtitle('')
+      setDescription('')
       setOpen(false)
     }
 
@@ -218,30 +222,49 @@ const CreateProductForm = Form.create()(({ form, setOpen, refetch }) => {
 
   const handleSubmit = e => {
     e.preventDefault()
-    form.validateFields((err, values) => {
-      if (!err) {
-        createProduct({
-          variables: {
-            name: values.name,
-            description: values.description,
-          },
-        })
-      }
-    })
+    if (title.length !== 0 && description.length !== 0) {
+      createProduct({
+        variables: {
+          name: title,
+          description,
+        },
+      })
+    } else {
+      setBorderClassActive(true)
+    }
   }
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <Form.Item label="Name">
-        {form.getFieldDecorator('name', {
-          rules: [{ required: true, message: 'Name is required' }],
-        })(<Input size="large" placeholder="Give the product name" />)}
-      </Form.Item>
-      <Form.Item label="Description">
-        {form.getFieldDecorator('description', {
-          rules: [{ required: true, message: 'Product description is required' }],
-        })(<TextArea placeholder="Tell more about the product" />)}
-      </Form.Item>
+    <div style={{ fontSize: '18px' }}>
+      <div>
+        <span>Title</span>
+        <Input
+          size="default"
+          name="name"
+          style={{
+            borderColor: `${borderClassActive && title.length === 0 ? 'red' : 'rgb(217,217,217)'}`,
+          }}
+          required
+          placeholder="Give product title"
+          value={title}
+          onChange={e => seTtitle(e.target.value)}
+        />
+      </div>
+      <div style={{ marginTop: '10px' }}>
+        <span>Description </span>
+        <TextArea
+          value={description}
+          onChange={e => setDescription(e.target.value)}
+          rows={3}
+          required
+          style={{
+            borderColor: `${
+              borderClassActive && description.length === 0 ? 'red' : 'rgb(217,217,217)'
+            }`,
+          }}
+          placeholder="Tell more about the product"
+        />
+      </div>
       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <Button
           type="primary"
@@ -249,15 +272,17 @@ const CreateProductForm = Form.create()(({ form, setOpen, refetch }) => {
           style={{
             width: 150,
             height: 40,
+            marginTop: '10px',
             fontSize: '1.3rem',
           }}
+          onClick={handleSubmit}
           loading={loading}
         >
           Create
         </Button>
       </div>
-    </Form>
+    </div>
   )
-})
+}
 
-export default InvoiceProductsTable
+export { InvoiceProductsTable, CreateProductForm }

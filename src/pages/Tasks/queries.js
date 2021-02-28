@@ -9,8 +9,8 @@ export const CREATE_TASK_DATA = gql`
     $status: ID!
     $startDate: Date!
     $dueDate: Date!
-    $assignWork: [ID]
-    $students: [ID]
+    $therapists: [ID]
+    $learners: [ID]
     $remainders: [RemainderInput]
   ) {
     createTask(
@@ -23,8 +23,8 @@ export const CREATE_TASK_DATA = gql`
           status: $status
           startDate: $startDate
           dueDate: $dueDate
-          assignWork: $assignWork
-          students: $students
+          assignWork: $therapists
+          students: $learners
           remainders: $remainders
         }
       }
@@ -63,6 +63,15 @@ export const CREATE_TASK_DATA = gql`
             }
           }
         }
+        taskcounterSet {
+          edges {
+            node {
+              id
+              count
+              date
+            }
+          }
+        }
       }
     }
   }
@@ -78,8 +87,8 @@ export const UPDATE_TASK_DATA = gql`
     $status: ID!
     $startDate: Date!
     $dueDate: Date!
-    $assignWork: [ID]
-    $students: [ID]
+    $therapists: [ID]
+    $learners: [ID]
     $remainders: [RemainderInput]
   ) {
     updateTask(
@@ -93,8 +102,8 @@ export const UPDATE_TASK_DATA = gql`
           status: $status
           startDate: $startDate
           dueDate: $dueDate
-          assignWork: $assignWork
-          students: $students
+          assignWork: $therapists
+          students: $learners
           remainders: $remainders
         }
       }
@@ -103,6 +112,45 @@ export const UPDATE_TASK_DATA = gql`
         id
         taskName
         description
+        startDate
+        dueDate
+        status {
+          id
+          taskStatus
+        }
+        priority {
+          id
+          name
+        }
+        taskType {
+          id
+          taskType
+        }
+        assignWork {
+          edges {
+            node {
+              id
+              name
+            }
+          }
+        }
+        students {
+          edges {
+            node {
+              id
+              firstname
+            }
+          }
+        }
+        taskcounterSet {
+          edges {
+            node {
+              id
+              count
+              date
+            }
+          }
+        }
       }
     }
   }

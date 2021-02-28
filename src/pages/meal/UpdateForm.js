@@ -452,7 +452,7 @@ const MealForm = ({
                 size="large"
               />
             </Form.Item>
-            <Form.Item label={<span style={{ fontSize: '16px' }}>Add Remainder</span>}>
+            <Form.Item label={<span style={{ fontSize: '16px' }}>Add Reminder</span>}>
               {remainderState &&
                 times(n => {
                   return (

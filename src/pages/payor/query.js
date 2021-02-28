@@ -18,34 +18,25 @@ export const GET_PAYORS = gql`
           homePhone
           workPhone
           primaryLocation
+          responsibility
           contactType {
             id
             name
           }
-        }
-      }
-    }
-  }
-`
-export const GET_ACTIVE_INACTIVE_PAYORS = gql`
-  query($isActive: Boolean) {
-    getPayors(isActive: $isActive) {
-      edges {
-        node {
-          id
-          isActive
-          firstname
-          lastname
-          email
-          description
-          city
-          state
-          homePhone
-          workPhone
-          primaryLocation
-          contactType {
+          docs {
+            edges {
+              node {
+                file
+              }
+            }
+          }
+          plan {
             id
-            name
+            plan
+            company {
+              id
+              name
+            }
           }
         }
       }
@@ -58,6 +49,23 @@ export const GET_CONTACT_TYPES = gql`
     getPayorContactType {
       id
       name
+    }
+  }
+`
+
+export const GET_PAYOR_PLANS = gql`
+  query {
+    payorPlan {
+      edges {
+        node {
+          id
+          plan
+          company {
+            id
+            name
+          }
+        }
+      }
     }
   }
 `

@@ -37,16 +37,8 @@
 /* eslint-disable prefer-destructuring */
 /* eslint-disable vars-on-top */
 
-
 import React from 'react'
-import {
-  Row,
-  Col,
-  Card,
-  Button,
-  Typography,
-  Affix,
-} from 'antd'
+import { Row, Col, Card, Button, Typography, Affix } from 'antd'
 import { connect } from 'react-redux'
 import { ResponsiveBar } from '@nivo/bar'
 import { gql } from 'apollo-boost'
@@ -54,7 +46,7 @@ import groupObj from '@hunters/group-object'
 import client from '../../apollo/config'
 
 // var groupObj = require('@hunters/group-object')
-var moment = require('moment');
+var moment = require('moment')
 const { Title, Text } = Typography
 
 class BarChart extends React.Component {
@@ -62,16 +54,15 @@ class BarChart extends React.Component {
     super(props)
 
     this.state = {
-      GraphData: []
+      GraphData: [],
     }
   }
 
   componentDidMount() {
+    let { start_date, end_date, selectedprogram, domainSelected, statusselected } = this.props
 
-    let { start_date, end_date, selectedprogram, domainSelected, statusselected } = this.props;
-
-    start_date = moment(start_date).format('YYYY-MM-DD');
-    end_date = moment(end_date).format('YYYY-MM-DD');
+    start_date = moment(start_date).format('YYYY-MM-DD')
+    end_date = moment(end_date).format('YYYY-MM-DD')
     const studentId = localStorage.getItem('studentId')
 
     client
@@ -83,12 +74,14 @@ class BarChart extends React.Component {
               id
               domainName
               targetId {
+                id
                 domain {
                   id
                   domain
                 }
               }
               targetAllcatedDetails {
+                id
                 targetName
                 dateBaseline
               }
@@ -98,7 +91,7 @@ class BarChart extends React.Component {
             }
           }
         }`,
-        fetchPolicy:'no-cache'
+        fetchPolicy: 'no-cache',
       })
       .then(result => {
         var data = []
@@ -115,10 +108,10 @@ class BarChart extends React.Component {
         const deleted = 'U3RhdHVzVHlwZTo3'
 
         let domains = []
-        if (targets.length > 0){
-          for (let i=0;i<targets.length; i++){
-            if (targets[i].domainName){
-              if (!domains.includes(targets[i].domainName)){
+        if (targets.length > 0) {
+          for (let i = 0; i < targets.length; i++) {
+            if (targets[i].domainName) {
+              if (!domains.includes(targets[i].domainName)) {
                 domains.push(targets[i].domainName)
               }
             }
@@ -130,106 +123,101 @@ class BarChart extends React.Component {
         let gData = []
 
         // Graph for Baseline targets
-        if (statusselected === baseline){
-          for (let i=0; i< domains.length; i++ ){
+        if (statusselected === baseline) {
+          for (let i = 0; i < domains.length; i++) {
             let domain = domains[i]
             let count = 0
             let length = 0
-            for (let j=0; j<groupedData[domains[i]].length; j++){
-              let dateBaseline = moment(groupedData[domains[i]][j].targetAllcatedDetails.dateBaseline)
+            for (let j = 0; j < groupedData[domains[i]].length; j++) {
+              let dateBaseline = moment(
+                groupedData[domains[i]][j].targetAllcatedDetails.dateBaseline,
+              )
               let currentDate = moment()
               let diff = parseInt((currentDate - dateBaseline) / (1000 * 3600 * 24))
-              count+= diff
-              length += 1                          
+              count += diff
+              length += 1
             }
-            gData.push({'domain': domain, 'Master Time': parseInt((count/length).toFixed())})          
+            gData.push({ domain, 'Master Time': parseInt((count / length).toFixed()) })
           }
           this.setState({
-            GraphData: gData
+            GraphData: gData,
           })
-          
         }
         // Graph for Intherapy Targets
-        if (statusselected === intherapy){
+        if (statusselected === intherapy) {
           console.log('Intherapy====>')
-          for (let i=0; i< domains.length; i++ ){
+          for (let i = 0; i < domains.length; i++) {
             let domain = domains[i]
             let count = 0
             let length = 0
-            for (let j=0; j<groupedData[domains[i]].length; j++){
+            for (let j = 0; j < groupedData[domains[i]].length; j++) {
               let desiredDate = groupedData[domains[i]][j].intherapyDate
-              if (desiredDate){
+              if (desiredDate) {
                 desiredDate = moment(desiredDate)
-              }
-              else{
+              } else {
                 desiredDate = moment(groupedData[domains[i]][j].targetAllcatedDetails.dateBaseline)
               }
               let currentDate = moment()
               let diff = parseInt((currentDate - desiredDate) / (1000 * 3600 * 24))
-              count+= diff
-              length += 1                          
+              count += diff
+              length += 1
             }
-            gData.push({'domain': domain, 'Master Time': parseInt((count/length).toFixed())})          
+            gData.push({ domain, 'Master Time': parseInt((count / length).toFixed()) })
           }
           this.setState({
-            GraphData: gData
+            GraphData: gData,
           })
         }
         // Graph for inmaintainence Targets
-        if (statusselected === inmaintainence){
+        if (statusselected === inmaintainence) {
           console.log('Inmaintainence====>')
-          for (let i=0; i< domains.length; i++ ){
+          for (let i = 0; i < domains.length; i++) {
             let domain = domains[i]
             let count = 0
             let length = 0
-            for (let j=0; j<groupedData[domains[i]].length; j++){
+            for (let j = 0; j < groupedData[domains[i]].length; j++) {
               let desiredDate = groupedData[domains[i]][j].inmaintainence
-              if (desiredDate){
+              if (desiredDate) {
                 desiredDate = moment(desiredDate)
-              }
-              else{
+              } else {
                 desiredDate = moment(groupedData[domains[i]][j].targetAllcatedDetails.dateBaseline)
               }
               let currentDate = moment()
               let diff = parseInt((currentDate - desiredDate) / (1000 * 3600 * 24))
-              count+= diff
-              length += 1                          
+              count += diff
+              length += 1
             }
-            gData.push({'domain': domain, 'Master Time': parseInt((count/length).toFixed())})          
+            gData.push({ domain, 'Master Time': parseInt((count / length).toFixed()) })
           }
           this.setState({
-            GraphData: gData
+            GraphData: gData,
           })
         }
         // Graph for Mastered Targets
-        if (statusselected === mastered){
+        if (statusselected === mastered) {
           console.log('Mastered====>')
-          for (let i=0; i< domains.length; i++ ){
+          for (let i = 0; i < domains.length; i++) {
             let domain = domains[i]
             let count = 0
             let length = 0
-            for (let j=0; j<groupedData[domains[i]].length; j++){
+            for (let j = 0; j < groupedData[domains[i]].length; j++) {
               let desiredDate = groupedData[domains[i]][j].intherapyDate
-              if (desiredDate){
+              if (desiredDate) {
                 desiredDate = moment(desiredDate)
-              }
-              else{
+              } else {
                 desiredDate = moment(groupedData[domains[i]][j].targetAllcatedDetails.dateBaseline)
               }
               let masteredDate = moment(groupedData[domains[i]][j].masterDate)
               let diff = parseInt((masteredDate - desiredDate) / (1000 * 3600 * 24))
-              count+= diff
-              length += 1                          
+              count += diff
+              length += 1
             }
-            gData.push({'domain': domain, 'Master Time': parseInt((count/length).toFixed())})          
+            gData.push({ domain, 'Master Time': parseInt((count / length).toFixed()) })
           }
           this.setState({
-            GraphData: gData
+            GraphData: gData,
           })
-
         }
-        
-
 
         // console.log(gData)
 
@@ -276,11 +264,8 @@ class BarChart extends React.Component {
         // this.setState({
         //   GraphData: finalGraphData
         // })
-
       })
   }
-
-
 
   render() {
     const textStyle = {
@@ -288,10 +273,8 @@ class BarChart extends React.Component {
       lineHeight: '19px',
     }
 
+    const { GraphData } = this.state
 
-
-    const { GraphData } = this.state;
-    
     return (
       <>
         <div
@@ -304,7 +287,7 @@ class BarChart extends React.Component {
             height: '450px',
           }}
         >
-          {GraphData &&
+          {GraphData && (
             <ResponsiveBar
               data={GraphData}
               keys={['Master Time']}
@@ -320,16 +303,16 @@ class BarChart extends React.Component {
                   color: '#eed312',
                   rotation: -45,
                   lineWidth: 6,
-                  spacing: 10
-                }
+                  spacing: 10,
+                },
               ]}
               fill={[
                 {
                   match: {
-                    id: 'Master Time'
+                    id: 'Master Time',
                   },
-                  id: 'lines'
-                }
+                  id: 'lines',
+                },
               ]}
               borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
               axisTop={null}
@@ -340,7 +323,7 @@ class BarChart extends React.Component {
                 tickRotation: 0,
                 legend: 'Domain',
                 legendPosition: 'middle',
-                legendOffset: 32
+                legendOffset: 32,
               }}
               axisLeft={{
                 tickSize: 5,
@@ -348,7 +331,7 @@ class BarChart extends React.Component {
                 tickRotation: 0,
                 legend: 'master Time',
                 legendPosition: 'middle',
-                legendOffset: -40
+                legendOffset: -40,
               }}
               labelSkipWidth={12}
               labelSkipHeight={12}
@@ -381,7 +364,7 @@ class BarChart extends React.Component {
               motionStiffness={90}
               motionDamping={15}
             />
-          }
+          )}
         </div>
       </>
     )

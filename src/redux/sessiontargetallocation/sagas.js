@@ -28,12 +28,14 @@ export function* GET_DATA({ payload }) {
     let morning = null
     let afternoon = null
     let evening = null
+    let defaultSession = null
     // selecting morning session id from store
     const mSessionId = yield select(state => state.sessiontargetallocation.MorningSessionId)
     // selecting afternoon session id from store
     const aSessionId = yield select(state => state.sessiontargetallocation.AfternoonSessionId)
     // selecting evening session id from store
     const eSessionId = yield select(state => state.sessiontargetallocation.EveningSessionId)
+    const dSessionId = yield select(state => state.sessiontargetallocation.DefaultSessionId)
     if (response.data.GetStudentSession && response.data.GetStudentSession.edges.length > 0) {
       response.data.GetStudentSession.edges.map(item => {
         // selecting morning session into the response list
@@ -48,6 +50,10 @@ export function* GET_DATA({ payload }) {
         if (item.node.sessionName.id === eSessionId) {
           evening = item.node
         }
+        // selecting default session into the response list
+        if (item.node.sessionName.id === dSessionId) {
+          defaultSession = item.node
+        }
       })
     }
 
@@ -61,6 +67,7 @@ export function* GET_DATA({ payload }) {
         MorningSession: morning,
         AfternoonSession: afternoon,
         EveningSession: evening,
+        DefaultSession: defaultSession,
         FamilyMemberList: response.data.student.family,
         AuthStaffList: response.data.student.authStaff,
         TargetStatusList: response.data.targetStatus,
@@ -111,6 +118,15 @@ export function* UPDATE_SESSION({ payload }) {
         },
       })
     }
+    if (payload.session === 'Default') {
+      yield put({
+        type: 'sessiontargetallocation/SET_STATE',
+        payload: {
+          DefaultSession: response.data.updateSessionTargets.session,
+          DefaultSessionRandomKey: Math.random(),
+        },
+      })
+    }
   }
 }
 
@@ -128,6 +144,10 @@ export function* UPDATE_SESSION_DETAILS({ payload }) {
   if (currentSession === 'Evening') {
     // selecting morning session id from store
     sessionObject = yield select(state => state.sessiontargetallocation.EveningSession)
+  }
+  if (currentSession === 'Default') {
+    // selecting morning session id from store
+    sessionObject = yield select(state => state.sessiontargetallocation.DefaultSession)
   }
 
   // console.log(payload)
@@ -168,6 +188,15 @@ export function* UPDATE_SESSION_DETAILS({ payload }) {
         type: 'sessiontargetallocation/SET_STATE',
         payload: {
           EveningSession: response.data.updateMasterSession.details,
+        },
+      })
+    }
+    if (currentSession === 'Default') {
+      // Updating morning session store value
+      yield put({
+        type: 'sessiontargetallocation/SET_STATE',
+        payload: {
+          DefaultSession: response.data.updateMasterSession.details,
         },
       })
     }
@@ -223,6 +252,9 @@ export function* DELETE_TARGET({ payload }) {
   else if(payload.session === 'Evening'){
     session = yield select(state => state.sessiontargetallocation.EveningSession)
   }
+  else if(payload.session === 'Default'){
+    session = yield select(state => state.sessiontargetallocation.DefaultSession)
+  }
 
   if (session !== ''){
     sessionId = session.id
@@ -261,6 +293,15 @@ export function* DELETE_TARGET({ payload }) {
         payload: {
           EveningSession: response.data.updateSessionTargets.session,
           EveningSessionRandomKey: Math.random(),
+        },
+      })
+    }
+    if (payload.session === 'Default') {
+      yield put({
+        type: 'sessiontargetallocation/SET_STATE',
+        payload: {
+          DefaultSession: response.data.updateSessionTargets.session,
+          DefaultSessionRandomKey: Math.random(),
         },
       })
     }

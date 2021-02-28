@@ -14,3 +14,57 @@
 .ant-form-item label {
   font-size: 14px;
 }
+
+.payorTable {
+  .ant-table-small > .ant-table-content > .ant-table-body {
+    margin: 0 !important;
+  }
+
+  .ant-table-tbody > th > td {
+    padding: 10px 5px !important;
+  }
+
+  .ant-table-tbody > tr > td {
+    padding: 6px 6px !important;
+  }
+
+  th {
+    font-weight: bold !important;
+    background-color: rgba(0, 0, 0, 0.04) !important;
+  }
+
+  .ant-pagination {
+    background: rgba(0, 0, 0, 0.04);
+    padding: 10px 3px;
+  }
+
+  .header {
+    .pageTitle {
+      font-size: 18px;
+      color: #000;
+      font-weight: bold;
+      margin-right: 40px;
+    }
+
+    .filterTitle {
+      font-weight: bold;
+      margin-right: 5px;
+      margin-left: 12px;
+    }
+
+    .right-align {
+      float: right;
+    }
+  }
+}
+
+.addOrEditPayor {
+  .ant-form-item {
+    margin-bottom: 5px;
+  }
+
+  .ant-form-item label {
+    font-size: 14px;
+    font-weight: bold;
+  }
+}

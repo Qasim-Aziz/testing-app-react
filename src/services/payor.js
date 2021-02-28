@@ -1,6 +1,9 @@
+import reqwest from 'reqwest'
 import { notification } from 'antd'
 import { gql } from 'apollo-boost'
 import apolloClient from '../apollo/config'
+
+const API_URL = process.env.REACT_APP_API_URL
 
 export async function createPayor(payload) {
   return apolloClient
@@ -17,6 +20,8 @@ export async function createPayor(payload) {
           $homePhone: String
           $workPhone: String
           $primaryLocation: String
+          $responsibility: String
+          $payorPlan: ID!
         ) {
           createPayor(
             input: {
@@ -30,6 +35,8 @@ export async function createPayor(payload) {
               homePhone: $homePhone
               workPhone: $workPhone
               primaryLocation: $primaryLocation
+              responsibility: $responsibility
+              payorPlan: $payorPlan
             }
           ) {
             details {
@@ -43,9 +50,18 @@ export async function createPayor(payload) {
               homePhone
               workPhone
               primaryLocation
+              responsibility
               contactType {
                 id
                 name
+              }
+              plan {
+                id
+                plan
+                company {
+                  id
+                  name
+                }
               }
             }
           }
@@ -62,6 +78,8 @@ export async function createPayor(payload) {
         homePhone: payload.values.homePhone,
         workPhone: payload.values.workPhone,
         primaryLocation: payload.values.primaryLocation,
+        responsibility: payload.values.responsibility,
+        payorPlan: payload.values.payorPlan,
       },
     })
     .then(result => result)
@@ -93,6 +111,8 @@ export async function updatePayor(payload) {
           $homePhone: String
           $workPhone: String
           $primaryLocation: String
+          $responsibility: String
+          $payorPlan: ID!
         ) {
           updatePayor(
             input: {
@@ -107,6 +127,8 @@ export async function updatePayor(payload) {
               homePhone: $homePhone
               workPhone: $workPhone
               primaryLocation: $primaryLocation
+              responsibility: $responsibility
+              payorPlan: $payorPlan
             }
           ) {
             details {
@@ -120,9 +142,18 @@ export async function updatePayor(payload) {
               homePhone
               workPhone
               primaryLocation
+              responsibility
               contactType {
                 id
                 name
+              }
+              plan {
+                id
+                plan
+                company {
+                  id
+                  name
+                }
               }
             }
           }
@@ -140,6 +171,8 @@ export async function updatePayor(payload) {
         homePhone: payload.values.homePhone,
         workPhone: payload.values.workPhone,
         primaryLocation: payload.values.primaryLocation,
+        responsibility: payload.values.responsibility,
+        payorPlan: payload.values.payorPlan,
       },
     })
     .then(result => result)
@@ -181,6 +214,29 @@ export async function activeInactivePayor(payload) {
           message: 'Something went wrong while changing state of Payor',
           description: item.message,
         })
+      })
+    })
+}
+
+export async function uploadPayorDocument(payload) {
+  const { payorId, fileList } = payload
+  const formData = new FormData()
+  formData.append('pk', payorId)
+  fileList.forEach(file => {
+    formData.append('file', file)
+  })
+
+  return reqwest({
+    url: `${API_URL}/authorization-docs/`,
+    method: 'post',
+    processData: false,
+    data: formData,
+  })
+    .then(result => result)
+    .catch(error => {
+      return notification.error({
+        message: 'An error occurred to upload Document.',
+        description: error.toString(),
       })
     })
 }

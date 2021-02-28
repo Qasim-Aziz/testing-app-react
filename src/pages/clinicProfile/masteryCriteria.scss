@@ -1,0 +1,15 @@
+.mastery-criteria-table {
+  .ant-table-thead > tr > th {
+    font-size: 12px !important;
+    background-color: rgba(0, 0, 0, 0.04) !important;
+    font-weight: bold;
+  }
+
+  .ant-table-body {
+    margin: 0 !important;
+  }
+
+  .ant-table-tbody > tr > td {
+    font-size: 12px !important;
+  }
+}

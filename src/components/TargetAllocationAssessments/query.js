@@ -57,8 +57,8 @@ export const TARGET_ALLOCATIONS_OPTIONS = gql`
     domain {
       edges {
         node {
-          domain
           id
+          domain
         }
       }
     }
@@ -127,11 +127,31 @@ export const SETTING = gql`
 
 export const SHORT_TERM_GOALS = gql`
   query($studentId: ID!) {
-    shortTerm(longTerm_Student: $studentId) {
+    shortTerm(longTerm_Student: $studentId, isDefault: false) {
       edges {
         node {
           id
           goalName
+        }
+      }
+    }
+  }
+`
+
+export const DEFAULT_SHORT_TERM_GOALS = gql`
+  query($studentId: ID!) {
+    shortTerm(longTerm_Student: $studentId, isDefault: true) {
+      edges {
+        node {
+          id
+          goalName
+          longTerm {
+            id
+            program {
+              id
+              name
+            }
+          }
         }
       }
     }
@@ -190,101 +210,103 @@ export const CREATE_TARGET = gql`
         classes: $classes
       }
     ) {
-      targetName,
+      targetName
       target {
-        id, 
-        date, 
-        targetInstr, 
-        peakBlocks,
-        peakType,
-        targetStatus{
-          id, statusName
+        id
+        date
+        targetInstr
+        peakBlocks
+        peakType
+        targetStatus {
+          id
+          statusName
         }
         eqCode
-        sessionSet{
-          edges{
-            node{
+        sessionSet {
+          edges {
+            node {
               id
             }
           }
         }
-        masteryCriteria{
-          id,
+        masteryCriteria {
+          id
           name
         }
-        targetId{
-          id,
+        targetId {
+          id
           maxSd
-          domain{
-            id,
+          domain {
+            id
             domain
           }
         }
-        targetAllcatedDetails{
-          id,
-          targetName,
-          dateBaseline,
-          DailyTrials,
-          consecutiveDays,
-          targetType{
-            id,
+        targetAllcatedDetails {
+          id
+          targetName
+          dateBaseline
+          DailyTrials
+          consecutiveDays
+          targetType {
+            id
             typeTar
           }
-        },
-        videos{
-          edges{
-            node{
-              id,
+        }
+        videos {
+          edges {
+            node {
+              id
               url
             }
           }
-        },
-        sd{
-          edges{
-            node{
-              id,
+        }
+        sd {
+          edges {
+            node {
+              id
               sd
             }
           }
-        },
-        steps{
-          edges{
-            node{
-              id,
+        }
+        steps {
+          edges {
+            node {
+              id
               step
             }
           }
-        },
-        mastery{
-          edges{
-            node{
-              sd{
+        }
+        mastery {
+          edges {
+            node {
+              sd {
                 id
                 sd
               }
-              step{
+              step {
                 id
                 step
               }
-              mastery{
+              mastery {
                 id
                 name
               }
-              status{
+              status {
                 id
                 statusName
               }
             }
           }
         }
-        classes{
-          edges{
-            node{
+        classes {
+          edges {
+            node {
               id
               name
-              stimuluses{
-                edges{
-                  node{
+              stimuluses {
+                edges {
+                  node {
+                    id
                     option
                     stimulusName
                   }
@@ -293,151 +315,150 @@ export const CREATE_TARGET = gql`
             }
           }
         }
-
       }
     }
   }
 `
 
-
 export const UPDATE_TARGET = gql`
   mutation UpdateShortTerm(
-          $targetAllocatedId: ID!
-          $targetStatus: ID!
-          $targetInstr: String!
-          $masteryCriteria: ID!
-          $targetName: String!
-          $dailyTrials: Int!
-          $consecutiveDays: Int!
-          $targetType: ID!
-          $sd: [SdMasteryInput]
-          $steps: [StepMasteryInput]
-          $video: [String]
-          $peakBlocks: Int
-          $peakType: String
-          $classes: [ClassesInput]
-        ) {
-          updateTargetAllocate2(
-            input: {
-              pk: $targetAllocatedId
-              targetData: {
-                targetStatus: $targetStatus
-                targetInstr: $targetInstr
-                goodPractices: "<p></p>"
-                precaution: "<p></p>"
-                gernalizationCriteria: "<p></p>"
-                masteryCriteria: $masteryCriteria
-                targetName: $targetName
-                DailyTrials: $dailyTrials
-                consecutiveDays: $consecutiveDays
-                targetType: $targetType
-                promptCodes: []
-                sd: $sd
-                steps: $steps
-                videos: $video
-                peakBlocks: $peakBlocks
-                peakType: $peakType
-              }
-              classes: $classes
-            }
-          ) {
-            targetName
-            target {
+    $targetAllocatedId: ID!
+    $targetStatus: ID!
+    $targetInstr: String!
+    $masteryCriteria: ID!
+    $targetName: String!
+    $dailyTrials: Int!
+    $consecutiveDays: Int!
+    $targetType: ID!
+    $sd: [SdMasteryInput]
+    $steps: [StepMasteryInput]
+    $video: [String]
+    $peakBlocks: Int
+    $peakType: String
+    $classes: [ClassesInput]
+  ) {
+    updateTargetAllocate2(
+      input: {
+        pk: $targetAllocatedId
+        targetData: {
+          targetStatus: $targetStatus
+          targetInstr: $targetInstr
+          goodPractices: "<p></p>"
+          precaution: "<p></p>"
+          gernalizationCriteria: "<p></p>"
+          masteryCriteria: $masteryCriteria
+          targetName: $targetName
+          DailyTrials: $dailyTrials
+          consecutiveDays: $consecutiveDays
+          targetType: $targetType
+          promptCodes: []
+          sd: $sd
+          steps: $steps
+          videos: $video
+          peakBlocks: $peakBlocks
+          peakType: $peakType
+        }
+        classes: $classes
+      }
+    ) {
+      targetName
+      target {
+        id
+        date
+        targetInstr
+        peakBlocks
+        peakType
+        targetStatus {
+          id
+          statusName
+        }
+        targetId {
+          id
+          maxSd
+          domain {
+            id
+            domain
+          }
+        }
+        masteryCriteria {
+          id
+          name
+        }
+        targetAllcatedDetails {
+          id
+          targetName
+          dateBaseline
+          DailyTrials
+          consecutiveDays
+          targetType {
+            id
+            typeTar
+          }
+        }
+        videos {
+          edges {
+            node {
               id
-              date
-              targetInstr
-              peakBlocks
-              peakType
-              targetStatus {
+              url
+            }
+          }
+        }
+        sd {
+          edges {
+            node {
+              id
+              sd
+            }
+          }
+        }
+        steps {
+          edges {
+            node {
+              id
+              step
+            }
+          }
+        }
+        mastery {
+          edges {
+            node {
+              sd {
                 id
-                statusName
+                sd
               }
-              targetId {
+              step {
                 id
-                maxSd
-                domain {
-                  id
-                  domain
-                }
+                step
               }
-              masteryCriteria {
+              mastery {
                 id
                 name
               }
-              targetAllcatedDetails {
+              status {
                 id
-                targetName
-                dateBaseline
-                DailyTrials
-                consecutiveDays
-                targetType {
-                  id
-                  typeTar
-                }
+                statusName
               }
-              videos {
+            }
+          }
+        }
+        classes {
+          edges {
+            node {
+              id
+              name
+              stimuluses {
                 edges {
                   node {
                     id
-                    url
-                  }
-                }
-              }
-              sd {
-                edges {
-                  node {
-                    id
-                    sd
-                  }
-                }
-              }
-              steps {
-                edges {
-                  node {
-                    id
-                    step
-                  }
-                }
-              }
-              mastery{
-                edges{
-                  node{
-                    sd{
-                      id
-                      sd
-                    }
-                    step{
-                      id
-                      step
-                    }
-                    mastery{
-                      id
-                      name
-                    }
-                    status{
-                      id
-                      statusName
-                    }
-                  }
-                }
-              }
-              classes{
-                edges{
-                  node{
-                    id
-                    name
-                    stimuluses{
-                      edges{
-                        node{
-                          option
-                          stimulusName
-                        }
-                      }
-                    }
+                    option
+                    stimulusName
                   }
                 }
               }
             }
           }
         }
-      `
+      }
+    }
+  }
+`

@@ -33,6 +33,24 @@ export async function getLeftMenuData() {
       key: 'dashboardAlpha',
       url: '/dashboard/alpha',
       icon: 'icmn icmn-home',
+      children: [
+        {
+          title: 'Documentation',
+          key: 'documentation2',
+          url: 'https://docs.cleanuitemplate.com',
+          target: '_blank',
+          icon: 'icmn icmn-books',
+          children: [
+            {
+              title: 'Documentation',
+              key: 'documentation3',
+              url: 'https://docs.cleanuitemplate.com',
+              target: '_blank',
+              icon: 'icmn icmn-books',
+            },
+          ],
+        },
+      ],
     },
   ]
 }
@@ -40,32 +58,42 @@ export async function getLeftMenuData() {
 export async function getTopMenuData(role) {
   return client
     .query({
-      query: gql`
-      query{
-       menu(group_Name:"${role}")
-       {
-           edges {
-                node {
-                    MenuName
+      query: gql`query{
+        menu(group_Name:"${role}"){
+          edges {
+            node {
+              id
+              MenuName
+              key
+              icon
+              url
+              menuLevel2Set {
+                edges {
+                  node {
+                    id
                     key
-                    icon
                     url
-                    menuLevel2Set
-                    {
-                        edges {
-                        node {
-                            id
-                            key
-                            url
-                            MenuName
-                            }
+                    MenuName
+                    menuLevel3Set{
+                      edges{
+                        node{
+                          id
+                          MenuName
+                          url
+                          isActive
+                          key
+                          order
                         }
+                      }
                     }
+                  }
                 }
-           }
-       }
-    }
-      `,
+              }
+            }
+          }
+        }
+      }
+    `,
     })
     .then(result => {
       var temp_data = []
@@ -78,22 +106,36 @@ export async function getTopMenuData(role) {
           url: menuobj[i].node.url,
         }
 
-        console.log(menuobj[i].node.menuLevel2Set.edges.length)
+        // console.log(menuobj[i].node.menuLevel2Set.edges.length)
         if (menuobj[i].node.menuLevel2Set.edges.length > 0) {
           var tempdata3 = []
           for (var x in menuobj[i].node.menuLevel2Set.edges) {
-            tempdata3.push({
+            var tempdata4 = {
               title: menuobj[i].node.menuLevel2Set.edges[x].node.MenuName,
               key: menuobj[i].node.menuLevel2Set.edges[x].node.key,
               icon: menuobj[i].node.menuLevel2Set.edges[x].node.icon,
               url: menuobj[i].node.menuLevel2Set.edges[x].node.url,
-            })
+            }
+
+            if (menuobj[i].node.menuLevel2Set.edges[x].node.menuLevel3Set.edges.length > 0) {
+              var tempdata5 = []
+              for (var z in menuobj[i].node.menuLevel2Set.edges[x].node.menuLevel3Set.edges) {
+                tempdata5.push({
+                  title: menuobj[i].node.menuLevel2Set.edges[x].node.menuLevel3Set.edges[z].node.MenuName,
+                  key: menuobj[i].node.menuLevel2Set.edges[x].node.menuLevel3Set.edges[z].node.key,
+                  icon: menuobj[i].node.menuLevel2Set.edges[x].node.menuLevel3Set.edges[z].node.icon,
+                  url: menuobj[i].node.menuLevel2Set.edges[x].node.menuLevel3Set.edges[z].node.url,
+                })
+              }
+              tempdata4['children'] = tempdata5
+            }
+            tempdata3.push(tempdata4)
           }
           tempdata2['children'] = tempdata3
         }
         temp_data.push(tempdata2)
       }
-      console.log(temp_data)
+      // console.log(temp_data)
       return temp_data
     })
 }

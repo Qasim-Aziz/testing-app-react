@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet'
@@ -7,105 +6,31 @@ import DataTable from 'react-data-table-component'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import JsPDF from 'jspdf'
-import html2canvas from 'html2canvas'
-import 'jspdf-autotable'
 import {
   PlusOutlined,
   CloudDownloadOutlined,
   CloseCircleOutlined,
   FilePdfOutlined,
 } from '@ant-design/icons'
-import { createUseStyles } from 'react-jss'
-import gql from 'graphql-tag'
 import { useQuery, useMutation } from 'react-apollo'
 import moment from 'moment'
 import InvoiceForm from 'components/invoice/InvoiceForm'
+import EditInvoice from 'components/invoice/EditInvoice'
 import LoadingComponent from '../../staffProfile/LoadingComponent'
-
-import './template.scss'
-
-const GET_INVOICES = gql`
-  query getInvoices($from: Date, $to: Date, $status: ID) {
-    getInvoices(date_Gte: $from, date_Lte: $to, status: $status) {
-      edges {
-        node {
-          id
-          invoiceNo
-          email
-          issueDate
-          dueDate
-          amount
-          address
-          taxableSubtotal
-          discount
-          total
-          clinic {
-            id
-            schoolName
-          }
-          status {
-            id
-            statusName
-          }
-          customer {
-            parent {
-              username
-            }
-          }
-          invoiceFee {
-            edges {
-              node {
-                id
-                quantity
-                rate
-                amount
-                tax
-                schoolServices {
-                  id
-                  name
-                  description
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`
-
-const DELETE_INVOICE = gql`
-  mutation deleteInvoice($id: ID!) {
-    deleteInvoice(input: { pk: $id }) {
-      status
-      message
-    }
-  }
-`
-
-const useStyles = createUseStyles(() => ({
-  headIconBut: {
-    width: 50,
-    height: 50,
-    marginLeft: 20,
-    margin: 10,
-  },
-
-  headIcon: {
-    fontSize: 24,
-    marginTop: 5,
-  },
-}))
+import PreviewInvoice from '../../../components/invoice/PreviewInvoice'
+import { GET_INVOICES, DELETE_INVOICE } from './Queries'
 
 const dateFormate = 'YYYY-MM-DD'
 
 export default () => {
-  const classNamees = useStyles()
-  const [newInvDrawer, setNewInvDrawer] = useState(false)
-  const [invPreview, setInvPreview] = useState(false)
-  const [selectedInvoice, setSelectedInvoice] = useState()
+  const [isCreateInvoice, setCreateInvoice] = useState(false)
+  const [isPreviewInvoice, setPreviewInvoice] = useState(false)
+  const [isEditInvoice, setEditInvoice] = useState(false)
+
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState()
   const [data, setData] = useState()
   const [deleteInvoiceId, setDeleteInvoiceId] = useState()
+  const [editInvoiceId, setEditInvoiceId] = useState()
 
   // invoice filer
   const [from, setFrom] = useState()
@@ -229,14 +154,7 @@ export default () => {
       selector: 'invoiceNo',
       maxWidth: '100px',
       cell: row => {
-        return (
-          <Button
-            // onClick={() => setUpdateTicket(row.key)}
-            type="link"
-          >
-            {row.invoiceNo}
-          </Button>
-        )
+        return <Button type="link">{row.invoiceNo}</Button>
       },
     },
     {
@@ -263,15 +181,16 @@ export default () => {
     },
     {
       name: 'Action',
-      minWidth: '150px',
-      maxWidth: '180px',
+      minWidth: '200px',
+      maxWidth: '220px',
       cell: row => {
+        console.log(row, 'in row')
         return (
           <div>
             <Button
               onClick={() => {
-                setSelectedInvoice(row)
-                setInvPreview(true)
+                setSelectedInvoiceId(row.key)
+                setPreviewInvoice(true)
               }}
               type="link"
             >
@@ -279,17 +198,28 @@ export default () => {
             </Button>
 
             {row.status !== 'Paid' && (
-              <Button
-                type="link"
-                style={{ color: 'red', marginLeft: 10 }}
-                onClick={() => {
-                  deleteInvoice({ variables: { id: row.key } })
-                  setDeleteInvoiceId(row.key)
-                }}
-                loading={deleteInvoiceLoading}
-              >
-                Delete
-              </Button>
+              <>
+                <Button
+                  type="link"
+                  onClick={() => {
+                    setEditInvoice(true)
+                    setEditInvoiceId(row.key)
+                  }}
+                >
+                  Edit
+                </Button>
+                <Button
+                  type="link"
+                  style={{ color: 'red' }}
+                  onClick={() => {
+                    deleteInvoice({ variables: { id: row.key } })
+                    setDeleteInvoiceId(row.key)
+                  }}
+                  loading={deleteInvoiceLoading}
+                >
+                  Delete
+                </Button>
+              </>
             )}
           </div>
         )
@@ -388,6 +318,8 @@ export default () => {
     </Menu>
   )
 
+  console.log(filteredList, 'filteredLIst')
+  console.log(editInvoiceId, 'selected')
   return (
     <div>
       <Helmet title="Dashboard Alpha" />
@@ -417,7 +349,7 @@ export default () => {
             <Button
               type="primary"
               style={{ marginBottom: 10 }}
-              onClick={() => setNewInvDrawer(true)}
+              onClick={() => setCreateInvoice(true)}
             >
               ADD INVOICE
               <PlusOutlined />
@@ -449,7 +381,6 @@ export default () => {
             ) : null}
             <div>
               <Select
-                size="large"
                 value={filterStatus}
                 onSelect={value => setFilterStatus(value)}
                 style={{ width: 188, marginRight: 20 }}
@@ -462,7 +393,6 @@ export default () => {
             </div>
             <div>
               <Input
-                size="small"
                 placeholder="Search Customer"
                 value={filterCustomer}
                 onChange={e => setFilterCustomer(e.target.value)}
@@ -470,18 +400,12 @@ export default () => {
               />
             </div>
             <DatePicker
-              size="small"
               placeholder="Form Date"
               value={from}
               onChange={newDate => setFrom(newDate)}
               style={{ marginRight: 20 }}
             />
-            <DatePicker
-              placeholder="To Date"
-              size="small"
-              value={to}
-              onChange={newDate => setTo(newDate)}
-            />
+            <DatePicker placeholder="To Date" value={to} onChange={newDate => setTo(newDate)} />
           </div>
         </div>
       </div>
@@ -492,7 +416,7 @@ export default () => {
           <DataTable
             columns={columns}
             theme="default"
-            pagination="true"
+            pagination
             data={filteredList}
             customStyles={customStyles}
             highlightOnHover
@@ -503,103 +427,21 @@ export default () => {
         )}
       </div>
 
-      <Drawer visible={invPreview} width="60%" onClose={() => setInvPreview(false)}>
-        <Template invoice={selectedInvoice} />
+      <Drawer visible={isPreviewInvoice} width="60%" onClose={() => setPreviewInvoice(false)}>
+        <PreviewInvoice invoiceId={selectedInvoiceId} />
       </Drawer>
 
-      <Drawer visible={newInvDrawer} width="100vw" onClose={() => setNewInvDrawer(false)}>
-        <InvoiceForm setNewInvDrawer={setNewInvDrawer} refetchInvoices={refetch} />
+      <Drawer visible={isEditInvoice} width="80vw" onClose={() => setEditInvoice(false)}>
+        <EditInvoice
+          invoiceId={editInvoiceId}
+          closeDrawer={setEditInvoice}
+          refetchInvoices={refetch}
+        />
       </Drawer>
 
-      <Drawer visible={newInvDrawer} width="100vw" onClose={() => setNewInvDrawer(false)}>
-        <InvoiceForm setNewInvDrawer={setNewInvDrawer} refetchInvoices={refetch} />
+      <Drawer visible={isCreateInvoice} width="80vw" onClose={() => setCreateInvoice(false)}>
+        <InvoiceForm setNewInvDrawer={setCreateInvoice} refetchInvoices={refetch} />
       </Drawer>
-    </div>
-  )
-}
-
-const Template = ({ invoice }) => {
-  const exportPdf = () => {
-    html2canvas(document.querySelector('#capture')).then(canvas => {
-      const imgData = canvas.toDataURL('image/png')
-      const pdf = new JsPDF()
-      pdf.addImage(imgData, 'PNG', 10, 0)
-      pdf.save('invoice.pdf')
-    })
-  }
-
-  return (
-    <div>
-      <Button type="link" onClick={() => exportPdf()}>
-        Download <FilePdfOutlined />
-      </Button>
-      <div id="capture">
-        <div className="clearfix" id="header">
-          <div id="logo">
-            <img src="logo.png" alt="logo" />
-          </div>
-          <div id="company">
-            <h2 className="name">Company Name</h2>
-            <div>455 Foggy Heights, AZ 85004, US</div>
-            <div>(602) 519-0450</div>
-            <div>
-              <a href="mailto:company@example.com">company@example.com</a>
-            </div>
-          </div>
-        </div>
-
-        <div id="details" className="clearfix">
-          <div id="client">
-            <div className="to">INVOICE TO:</div>
-            <h2 className="name">NAME</h2>
-            <div className="address">ADDRESS</div>
-            <div className="email">
-              <a href="#">{invoice.client}</a>
-            </div>
-          </div>
-          <div id="invoice">
-            <h1>INVOICE {invoice.invoiceNo}</h1>
-            <div className="date">Date of Invoice: {invoice.date}</div>
-            <div className="date">Due Date: {invoice.date}</div>
-          </div>
-        </div>
-        <table id="invoiceTable" border="0" cellSpacing="0" cellPadding="0">
-          <thead>
-            <tr>
-              <th className="no">#</th>
-              <th className="desc">DESCRIPTION</th>
-              <th className="total">TOTAL</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td className="no">01</td>
-              <td className="desc">
-                <h3>Item Title</h3>Sub Title
-              </td>
-              <td className="total">0.00</td>
-            </tr>
-          </tbody>
-          <tfoot>
-            <tr>
-              <td cellSpan="2"> </td>
-              <td cellSpan="2">SUBTOTAL</td>
-              <td>{invoice.amount}.00</td>
-            </tr>
-            {/* <tr>
-              <td cellSpan="2"> </td>
-              <td cellSpan="2">TAX 25%</td>
-              <td>0.00</td>
-            </tr> */}
-            <tr>
-              <td cellSpan="2"> </td>
-              <td cellSpan="2">GRAND TOTAL</td>
-              <td>{invoice.amount}.00</td>
-            </tr>
-          </tfoot>
-        </table>
-        <div id="thanks">Thank you!</div>
-      </div>
     </div>
   )
 }

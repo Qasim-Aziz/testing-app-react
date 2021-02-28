@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+/* eslint-disable prefer-destructuring */
 import React, { useEffect, useState } from 'react'
 import { Typography, Card, Button } from 'antd'
 import { HeartOutlined, HeartFilled } from '@ant-design/icons'
@@ -18,7 +19,7 @@ const LIKE = gql`
   }
 `
 
-const TaskCard = ({ style, id, domainName, targetName, like, userLiked }) => {
+const TaskCard = ({ style, id, domainName, targetName, like, userLiked, videoUrl }) => {
   const [mutate, { data, error }] = useMutation(LIKE, {
     variables: {
       targetId: id,
@@ -26,6 +27,33 @@ const TaskCard = ({ style, id, domainName, targetName, like, userLiked }) => {
   })
   const [targetLike, setTargetLike] = useState(like)
   const [userLike, setUserLike] = useState(userLiked)
+  // const [finalVideoUrl, setFinalVideoUrl] = useState(null)
+
+  // useEffect(() => {
+  //   if (videoUrl) {
+  //     let finalUrl = ''
+  //     let splitList = []
+  //     let videoId = ''
+  //     splitList = videoUrl.split('/')
+  //     if (splitList.length > 3) {
+  //       if (videoUrl.split('/')[2] === 'www.youtube.com') {
+  //         finalUrl = videoUrl
+  //       }
+  //       else {
+  //         videoId = videoUrl.split('/')[3]
+  //         finalUrl = `https://player.vimeo.com/video/${videoId}/`
+  //       }
+
+  //       setFinalVideoUrl(finalUrl)
+
+  //     }
+  //     else {
+  //       setFinalVideoUrl(null)
+  //     }
+
+  //   }
+  // }, [videoUrl])
+
 
   useEffect(() => {
     if (data) {
@@ -45,10 +73,10 @@ const TaskCard = ({ style, id, domainName, targetName, like, userLiked }) => {
         borderRadius: 10,
         maxWidth: 400,
         overflow: 'hidden',
-        height: 250,
+        height: 120,
         ...style,
       }}
-      cover={<img alt="example" src={taskCardHeroImg} />}
+      // cover={<img alt="example" src={taskCardHeroImg} />}
     >
       <Text
         type="danger"

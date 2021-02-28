@@ -112,78 +112,99 @@ class BasicInformationForm extends React.Component {
           <Tag>Category</Tag>
         </Form.Item>
 
-        <Divider orientation="left">Contact Details</Divider>
-        <Form.Item label="Email" style={itemStyle}>
-          {form.getFieldDecorator('email', {
-            rules: [{ required: true, type: 'email', message: 'Please provide email!' }],
-          })(<Input size="medium" style={{ borderRadius: 0 }} />)}
+        <Divider orientation="left">Mandatory Fields</Divider>
+
+        <Form.Item label="Client Id" style={itemStyle}>
+          {form.getFieldDecorator('clientId', {
+            rules: [{ required: true, message: 'Please provide ClientId!' }],
+          })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="First Name" style={itemStyle}>
           {form.getFieldDecorator('firstName', {
             rules: [{ required: true, message: 'Please provide firstName!' }],
-          })(<Input size="medium" style={{ borderRadius: 0 }} />)}
+          })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="Last Name" style={itemStyle}>
           {form.getFieldDecorator('lastName', {
             rules: [{ required: true, message: 'Please provide lastName!' }],
-          })(<Input size="medium" style={{ borderRadius: 0 }} />)}
+          })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
+        <Form.Item label="Email" style={itemStyle}>
+          {form.getFieldDecorator('email', {
+            rules: [{ required: true, type: 'email', message: 'Please provide email!' }],
+          })(<Input style={{ borderRadius: 0 }} />)}
+        </Form.Item>
+
         <Form.Item label="Mobile no" style={itemStyle}>
           {form.getFieldDecorator('mobileNo', {
             rules: [{ required: true, message: 'Please provide Mobile No!' }],
-          })(<Input size="medium" style={{ borderRadius: 0 }} />)}
+          })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
 
-        <Form.Item label="Address" style={itemStyle}>
+        <Form.Item label="Gender" style={itemStyle}>
+          {form.getFieldDecorator('gender', {
+            rules: [{ required: true, message: 'Please select Gender' }],
+          })(
+            <Select placeholder="Please select gender" allowClear>
+              <Option value="male">Male</Option>
+              <Option value="female">Female</Option>
+              <Option value="other">Other</Option>
+            </Select>,
+          )}
+        </Form.Item>
+
+        <Form.Item label="D.O.B" style={itemStyle}>
+          {form.getFieldDecorator('dob', {
+            rules: [{ required: true, message: 'Please provide Date of Birth!' }],
+          })(<DatePicker style={{ borderRadius: 0 }} />)}
+        </Form.Item>
+
+        <Form.Item label="Clinic Location" style={itemStyle}>
+          {form.getFieldDecorator('clinicLocation', {
+            rules: [{ required: true, message: 'Please provide Clinic Location!' }],
+          })(
+            <Select placeholder="Select a Clinic location" allowClear>
+              {clinicLocationList.map(item => (
+                <Option key={item.node.id} value={item.node.id}>
+                  {item.node.location}
+                </Option>
+              ))}
+            </Select>,
+          )}
+        </Form.Item>
+
+        <Form.Item label="Location Category" style={itemStyle}>
+          {form.getFieldDecorator('category', {
+            rules: [{ required: true, message: 'Please provide Location!' }],
+          })(
+            <Select placeholder="Select category" allowClear>
+              {categoryList.map(item => (
+                <Option key={item.id} value={item.id}>
+                  {item.category}
+                </Option>
+              ))}
+            </Select>,
+          )}
+        </Form.Item>
+
+        {/* <Form.Item label="Address" style={itemStyle}>
           {form.getFieldDecorator('address', {
             rules: [{ required: true, message: 'Please provide Address!' }],
           })(
             <TextArea
               placeholder="Address"
               autoSize={{ minRows: 3 }}
-              size="medium"
+              
               style={{ borderRadius: 0 }}
             />,
           )}
-        </Form.Item>
-        <Form.Item label="Street Address" style={itemStyle}>
-          {form.getFieldDecorator('street', { rules: [{ message: 'Please provide Street Name' }] })(
-            <Input placeholder="Street Address" size="medium" style={{ borderRadius: 0 }} />,
-          )}
-        </Form.Item>
-
-        <Form.Item label="State" style={itemStyle}>
-          {form.getFieldDecorator('state', { rules: [{ message: 'Please provide State' }] })(
-            <Input placeholder="State" size="medium" style={{ borderRadius: 0 }} />,
-          )}
-        </Form.Item>
-
-        <Form.Item label="City" style={itemStyle}>
-          {form.getFieldDecorator('city', { rules: [{ message: 'Please provide City' }] })(
-            <Input placeholder="City" size="medium" style={{ borderRadius: 0 }} />,
-          )}
-        </Form.Item>
-
-        <Form.Item label="Country" style={itemStyle}>
-          {form.getFieldDecorator('country', { rules: [{ message: 'Please provide Country' }] })(
-            <Input placeholder="Country" size="medium" style={{ borderRadius: 0 }} />,
-          )}
-        </Form.Item>
-        <Form.Item label="Pincode" style={itemStyle}>
-          {form.getFieldDecorator('pincode', { rules: [{ message: 'Please provide pincode' }] })(
-            <Input placeholder="Pincode" size="medium" style={{ borderRadius: 0 }} />,
-          )}
-        </Form.Item>
+        </Form.Item> */}
 
         <Divider orientation="left">Personal Details</Divider>
-        <Form.Item label="Client Id" style={itemStyle}>
-          {form.getFieldDecorator('clientId', {
-            rules: [{ required: true, message: 'Please provide ClientId!' }],
-          })(<Input size="medium" style={{ borderRadius: 0 }} />)}
-        </Form.Item>
+
         <Form.Item label="Program" style={itemStyle}>
           {form.getFieldDecorator('program')(
-            <Select placeholder="Program" allowClear size="medium">
+            <Select placeholder="Program" allowClear>
               <Option value="Basic">Basic</Option>
               <Option value="Intermediate">Intermediate</Option>
               <Option value="Advanced">Advanced</Option>
@@ -193,55 +214,67 @@ class BasicInformationForm extends React.Component {
         <Form.Item label="Parent Activation" style={itemStyle}>
           {form.getFieldDecorator('parentactivation', {
             rules: [{ required: false, message: 'Please Select parent activation if needed' }],
-          })(<Checkbox size="medium">Yes</Checkbox>)}
+          })(<Checkbox>Yes</Checkbox>)}
         </Form.Item>
-        <Form.Item label="Gender" style={itemStyle}>
-          {form.getFieldDecorator('gender', {
-            rules: [{ required: true, message: 'Please select Gender' }],
-          })(
-            <Select placeholder="Please select gender" allowClear size="medium">
-              <Option value="male">Male</Option>
-              <Option value="female">Female</Option>
-              <Option value="other">Other</Option>
-            </Select>,
-          )}
-        </Form.Item>
-        <Form.Item label="DOB" style={itemStyle}>
-          {form.getFieldDecorator('dob')(<DatePicker size="medium" style={{ borderRadius: 0 }} />)}
-        </Form.Item>
+
         <Form.Item label="Parent/Guardian Name" style={itemStyle}>
-          {form.getFieldDecorator('parentFirstName', {
-            rules: [{ required: true, message: 'Please provide Parent Name!' }],
-          })(<Input size="medium" style={{ borderRadius: 0 }} />)}
+          {form.getFieldDecorator('parentFirstName')(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="Parent/Guardian Mobile" style={itemStyle}>
-          {form.getFieldDecorator('parentMobileNumber', {
-            rules: [{ required: true, message: 'Please provide Mobile No!' }],
-          })(<Input size="medium" style={{ borderRadius: 0 }} />)}
+          {form.getFieldDecorator('parentMobileNumber')(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="SSN/Adhaar card" style={itemStyle}>
           {form.getFieldDecorator('ssnCard', { rules: [{ message: 'Please provide Mobile No!' }] })(
-            <Input size="medium" style={{ borderRadius: 0 }} />,
+            <Input style={{ borderRadius: 0 }} />,
+          )}
+        </Form.Item>
+
+        <Form.Item label="Street Address" style={itemStyle}>
+          {form.getFieldDecorator('street', { rules: [{ message: 'Please provide Street Name' }] })(
+            <Input placeholder="Street Address" style={{ borderRadius: 0 }} />,
+          )}
+        </Form.Item>
+
+        <Form.Item label="State" style={itemStyle}>
+          {form.getFieldDecorator('state', { rules: [{ message: 'Please provide State' }] })(
+            <Input placeholder="State" style={{ borderRadius: 0 }} />,
+          )}
+        </Form.Item>
+
+        <Form.Item label="City" style={itemStyle}>
+          {form.getFieldDecorator('city', { rules: [{ message: 'Please provide City' }] })(
+            <Input placeholder="City" style={{ borderRadius: 0 }} />,
+          )}
+        </Form.Item>
+
+        <Form.Item label="Country" style={itemStyle}>
+          {form.getFieldDecorator('country', { rules: [{ message: 'Please provide Country' }] })(
+            <Input placeholder="Country" style={{ borderRadius: 0 }} />,
+          )}
+        </Form.Item>
+        <Form.Item label="Pincode" style={itemStyle}>
+          {form.getFieldDecorator('pincode', { rules: [{ message: 'Please provide pincode' }] })(
+            <Input placeholder="Pincode" style={{ borderRadius: 0 }} />,
           )}
         </Form.Item>
 
         <Divider orientation="left">Misc details</Divider>
         <Form.Item label="Authorized Staff" style={itemStyle}>
-          {form.getFieldDecorator('authStaff', {
-            rules: [{ required: true, message: 'Please Select Authorized Staff!' }],
-          })(
-            <Select mode="multiple" placeholder="Select Therapist" allowClear size="medium">
+          {form.getFieldDecorator('authStaff')(
+            <Select mode="multiple" placeholder="Select Therapist" allowClear>
               {staffDropdownList.map(item => (
-                <Option value={item.node.id}>{item.node.name}</Option>
+                <Option key={item.node.id} value={item.node.id}>
+                  {item.node.name}
+                </Option>
               ))}
             </Select>,
           )}
         </Form.Item>
         <Form.Item label="Case Manager" style={itemStyle}>
           {form.getFieldDecorator('caseManager')(
-            <Select placeholder="Select Therapist" allowClear size="medium">
+            <Select placeholder="Select Therapist" allowClear>
               {staffDropdownList.map(item => (
-                <Option value={item.node.id}>
+                <Option key={item.node.id} value={item.node.id}>
                   {item.node.name} {item.node.surname}
                 </Option>
               ))}
@@ -249,74 +282,48 @@ class BasicInformationForm extends React.Component {
           )}
         </Form.Item>
         <Form.Item label="Date of Diagnosis" style={itemStyle}>
-          {form.getFieldDecorator('dateOfDiagnosis')(
-            <DatePicker size="medium" style={{ borderRadius: 0 }} />,
-          )}
+          {form.getFieldDecorator('dateOfDiagnosis')(<DatePicker style={{ borderRadius: 0 }} />)}
         </Form.Item>
-        <Form.Item label="Type of Diagnosis" style={itemStyle}>
-          {form.getFieldDecorator('caseManager', {
-            rules: [{ required: true, message: 'Please Select Case Manager!' }],
+
+        <Form.Item label="Default Language" style={itemStyle}>
+          {form.getFieldDecorator('learnerLanguage', {
+            rules: [{ message: 'Please provide Default Language!' }],
           })(
-            <Select placeholder="Select Type of Diagnosis" allowClear size="medium">
-              {staffDropdownList.map(item => (
-                <Option value={item.node.id}>
-                  {item.node.name} {item.node.surname}
+            <Select placeholder="Select a default Language" allowClear>
+              {languageList.map(item => (
+                <Option key={item.id} value={item.id}>
+                  {item.name}
                 </Option>
               ))}
             </Select>,
           )}
         </Form.Item>
-        <Form.Item label="Default Language" style={itemStyle}>
-          {form.getFieldDecorator('learnerLanguage', {
-            rules: [{ message: 'Please provide Default Language!' }],
-          })(
-            <Select placeholder="Select a default Language" allowClear size="medium">
-              {languageList.map(item => (
-                <Option value={item.id}>{item.name}</Option>
-              ))}
-            </Select>,
-          )}
-        </Form.Item>
-        <Form.Item label="Location Category" style={itemStyle}>
-          {form.getFieldDecorator('category', {
-            rules: [{ required: true, message: 'Please provide Mobile No!' }],
-          })(
-            <Select placeholder="Select category" allowClear size="medium">
-              {categoryList.map(item => (
-                <Option value={item.id}>{item.category}</Option>
-              ))}
-            </Select>,
-          )}
-        </Form.Item>
+
         <Form.Item label="Upload Your Documents" style={itemStyle}>
           <input type="file" name="file1" onChange={this.onChangeHandler} />
         </Form.Item>
+        <Form.Item label="Research Participant" name="researchParticipant" style={itemStyle}>
+          {form.getFieldDecorator('researchParticipant', {
+            initialValue: false,
+            valuePropName: 'checked',
+            rules: [{ required: false }],
+          })(<Checkbox />)}
+        </Form.Item>
 
         <Divider orientation="left"> Default program </Divider>
-        <Form.Item label="Clinic Location" style={itemStyle}>
-          {form.getFieldDecorator('clinicLocation', {
-            rules: [{ message: 'Please provide Clinic Location!' }],
-          })(
-            <Select placeholder="Select a Clinic location" allowClear size="medium">
-              {clinicLocationList.map(item => (
-                <Option value={item.node.id}>{item.node.location}</Option>
-              ))}
-            </Select>,
-          )}
-        </Form.Item>
 
         <Form.Item label="Default Program" style={itemStyle}>
           {form.getFieldDecorator('defaultProgram', {
             rules: [{ required: false, message: 'Please provide Default Program!' }],
-          })(<Checkbox size="medium">Check to import Default Program</Checkbox>)}
+          })(<Checkbox>Check to import Default Program</Checkbox>)}
         </Form.Item>
 
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" size="medium" className="mt-4">
+          <Button type="primary" htmlType="submit" className="mt-4">
             Submit
           </Button>
 
-          <Button htmlType="primary" onClick={this.onReset} className="ml-4">
+          <Button type="primary" onClick={this.onReset} className="ml-4">
             Reset
           </Button>
         </Form.Item>

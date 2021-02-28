@@ -12,6 +12,7 @@ const APPIONTMENTS = gql`
     upcoming_appointment: appointments {
       edges {
         node {
+          id
           start
           end
           title

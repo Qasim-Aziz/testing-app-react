@@ -3,8 +3,8 @@
 import gql from 'graphql-tag'
 
 export const TOILET_DATA = gql`
-  query getToiletData($date: Date!, $student: ID!) {
-    getToiletData(student: $student, date: $date, success: true) {
+  query getToiletData($dateGte: Date!, $dateLte: Date!, $student: ID!) {
+    getToiletData(student: $student, date_Gte: $dateGte, date_Lte: $dateLte, success: true) {
       edges {
         node {
           id

@@ -54,10 +54,26 @@ const CREATE_MASTER = gql`
 const GET_MASTER = gql`
   query {
     masteryCriteria {
-      responsePercentage
-      consecutiveDays
-      minTrial
+      id
       isDefault
+      statuscriteriaSet {
+        edges {
+          node {
+            id
+            responsePercentage
+            consecutiveDays
+            minTrial
+            fromStatus {
+              id
+              statusName
+            }
+            toStatus {
+              id
+              statusName
+            }
+          }
+        }
+      }
     }
   }
 `
@@ -66,7 +82,9 @@ export default () => {
   const [addMasterDrawer, setAddMasterDrawer] = useState(false)
   const [dataSource, setDataSource] = useState()
 
-  const { data: masterData, loading: masterLoading, error: masterError } = useQuery(GET_MASTER)
+  const { data: masterData, loading: masterLoading, error: masterError } = useQuery(GET_MASTER, {
+    fetchPolicy: 'network-only',
+  })
 
   useEffect(() => {
     if (masterError) {
@@ -77,19 +95,21 @@ export default () => {
   })
 
   useEffect(() => {
+    console.log(masterData, 'masterDaa')
     if (masterData) {
       const newData = []
-      masterData.masteryCriteria.map(
-        ({ responsePercentage, consecutiveDays, minTrial, isDefault }) => {
+      masterData.masteryCriteria.map(item1 => {
+        item1.statuscriteriaSet.edges.map(item2 => {
+          console.log(item2, 'sdsd')
           newData.push({
             name: 'Criteria 1',
-            response: responsePercentage,
-            days: consecutiveDays,
-            minTrials: minTrial,
-            defaultMastery: isDefault,
+            response: item2.node.responsePercentage,
+            days: item2.node.consecutiveDays,
+            minTrials: item2.node.minTrial,
+            defaultMastery: item1.isDefault,
           })
-        },
-      )
+        })
+      })
       setDataSource(newData)
     }
   }, [masterData])
@@ -314,7 +334,7 @@ const CreateMasterCriteriaForm = Form.create()(({ form, setOpen }) => {
             setOpen(false)
           }}
         >
-          Cancle
+          Cancel
         </Button>
       </div>
     </Form>

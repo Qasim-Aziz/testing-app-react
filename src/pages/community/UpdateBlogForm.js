@@ -99,7 +99,7 @@ const UpdateBlogForm = ({ form, setOpen, node }) => {
             setOpen(false)
           }}
         >
-          Cancle
+          Cancel
         </Button>
       </div>
     </Form>

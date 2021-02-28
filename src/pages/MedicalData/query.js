@@ -2,8 +2,8 @@ import gql from 'graphql-tag'
 
 /* eslint-disable import/prefer-default-export */
 export const MEDICAL_DATA = gql`
-  query getMedication($date: Date!, $student: ID!) {
-    getMedication(student: $student, date: $date) {
+  query getMedication($dateGte: Date!, $dateLte: Date!, $student: ID!) {
+    getMedication(student: $student, date_Gte: $dateGte, date_Lte: $dateLte) {
       edges {
         node {
           id
@@ -13,6 +13,7 @@ export const MEDICAL_DATA = gql`
           note
           duration
           severity {
+            id
             name
           }
         }

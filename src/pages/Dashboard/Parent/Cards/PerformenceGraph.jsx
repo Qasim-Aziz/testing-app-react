@@ -17,14 +17,12 @@ import client from '../../../../apollo/config'
 
 import './PerformenceGraph.scss'
 
-
-
 class PerformenceGraph extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
       mastertarget: [],
-      loading: false,
+      loading: true,
       data: [],
     }
     this.MasterGraph = this.MasterGraph.bind(this)
@@ -43,7 +41,8 @@ class PerformenceGraph extends React.Component {
           masterTargetGraph(studentId:${studentId}, targetStatus:"U3RhdHVzVHlwZTo0", dateGte:"${gtedate}") {
               date
               tarCount
-          }
+          },
+          
       }`,
       })
       .then(result => {
@@ -61,23 +60,21 @@ class PerformenceGraph extends React.Component {
         this.setState({
           mastertarget: res_list,
           loading: false,
-          data: res_list.length > 0 ? [
-            {
-              id: 'Master Traget',
-              color: 'hsl(49, 70%, 50%)',
-              data: res_list,
-            },
-          ] : [],
+          data:
+            res_list.length > 0
+              ? [
+                  {
+                    id: 'Master Traget',
+                    color: 'hsl(49, 70%, 50%)',
+                    data: res_list,
+                  },
+                ]
+              : [],
         })
-
       })
   }
 
   componentDidMount() {
-    this.state = {
-      loading: true,
-    }
-
     this.MasterGraph('365')
   }
 

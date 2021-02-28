@@ -180,7 +180,9 @@ const MasteryForm = ({ form, criteriaid, setOpen }) => {
             <Select placeholder="From Status" allowClear size="large" loading={targetStatusLoading}>
               {formStatus &&
                 formStatus.map(question => (
-                  <Option value={question.id}>{question.statusName}</Option>
+                  <Option key={question.id} value={question.id}>
+                    {question.statusName}
+                  </Option>
                 ))}
             </Select>,
           )}
@@ -199,7 +201,9 @@ const MasteryForm = ({ form, criteriaid, setOpen }) => {
             <Select placeholder="To Status" allowClear size="large" loading={targetStatusLoading}>
               {formStatus &&
                 formStatus.map(question => (
-                  <Option value={question.id}>{question.statusName}</Option>
+                  <Option key={question.id} value={question.id}>
+                    {question.statusName}
+                  </Option>
                 ))}
             </Select>,
           )}

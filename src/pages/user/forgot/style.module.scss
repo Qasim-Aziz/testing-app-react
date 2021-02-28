@@ -34,7 +34,7 @@
   min-width: rem(300);
   max-width: rem(450);
   margin: 0 auto;
-  padding: rem(150) rem(40) rem(20);
+  padding: rem(60) rem(40) rem(20);
   border-radius: 10px;
   overflow: hidden;
   background-color: $white;
@@ -48,4 +48,12 @@
 .form {
   position: relative;
   z-index: 2;
+
+  input[type=text], input[type=password] {
+    border: none;
+    border-bottom: 2px solid #f17c00;
+    padding-top: 25px;
+    padding-bottom: 25px;
+    color: black;
+  }
 }

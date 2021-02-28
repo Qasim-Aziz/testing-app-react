@@ -22,25 +22,36 @@
 
 import React from 'react'
 import { Helmet } from 'react-helmet'
-import { Button, Drawer, Input, Select, Checkbox, Affix, Tabs } from 'antd'
+import { Button, Drawer, Input, Empty, Select, Checkbox, Affix, Tabs } from 'antd'
 import Sortable from 'react-sortablejs'
 import { connect } from 'react-redux'
-import { PlusOutlined } from '@ant-design/icons'
+import { PlusOutlined, FilterOutlined } from '@ant-design/icons'
+import LearnerSelect from 'components/LearnerSelect'
 import style from './style.module.scss'
 import Authorize from '../../components/LayoutComponents/Authorize'
 import SessionDetails from './sessiondetails'
 import TargetCard from './TargetCard'
 import DeleteACard from './DeleteACard'
+import EditTarget from './editTarget'
 
-const { TabPane } = Tabs;
-const { Search } = Input;
+const { TabPane } = Tabs
+const { Search } = Input
 
-@connect(({ user, sessiontargetallocation }) => ({ user, sessiontargetallocation }))
+@connect(({ user, sessiontargetallocation, student }) => ({
+  user,
+  sessiontargetallocation,
+  student,
+}))
 class TargetAllocationToSession extends React.Component {
   state = {
     visible: false,
+    visibleEditTarget: false,
     searchTargetText: '',
-    top: 10
+    studentID: '',
+    studentName: '',
+    top: 10,
+    visibleFilter: false,
+    selectedTarget: ''
   }
 
   componentWillMount() {
@@ -57,14 +68,54 @@ class TargetAllocationToSession extends React.Component {
           studentId: JSON.parse(localStorage.getItem('studentId')),
         },
       })
-    } else {
-      window.location.href = '/'
+    }
+  }
+
+  componentDidMount() {
+    if (localStorage.getItem('studentId')) {
+      const studentID = JSON.parse(localStorage.getItem('studentId'))
+      this.setState({ studentID, studentName: this.props.student.StudentName })
+    }
+    const { dispatch } = this.props
+    dispatch({
+      type: 'learnersprogram/LOAD_DATA',
+    })
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const studentID = JSON.parse(localStorage.getItem('studentId'))
+    if (this.props.student.StudentName !== prevState.studentName) {
+      console.log('student changed', this.props.student.StudentName, studentID)
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({ studentName: this.props.student.StudentName, studentID })
+      const { dispatch } = this.props
+
+      dispatch({
+        type: 'user/GET_STUDENT_NAME',
+      })
+      dispatch({
+        type: 'sessiontargetallocation/GET_ALLOCATED_TARGETS',
+        payload: {
+          studentId: JSON.parse(localStorage.getItem('studentId')),
+        },
+      })
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({ visibleFilter: false })
     }
   }
 
   clearAll = session => {
     // console.log('session==>', session)
   }
+
+  showDrawerFilter = () => {
+    this.setState({ visibleFilter: true })
+  }
+
+  onCloseFilter = () => {
+    this.setState({ visibleFilter: false })
+  }
+  
 
   showDrawer = session => {
     const { dispatch } = this.props
@@ -86,6 +137,20 @@ class TargetAllocationToSession extends React.Component {
     })
   }
 
+  onCloseEditTarget = () => {
+    this.setState({
+      visibleEditTarget: false,
+    })
+  }
+
+  showEditTargetDrawer = node => {
+    console.log(node)
+    this.setState({
+      visibleEditTarget: true,
+      selectedTarget: node
+    })
+  }
+
   saveSessionTargets = session => {
     const {
       dispatch,
@@ -93,10 +158,12 @@ class TargetAllocationToSession extends React.Component {
         MorningSession,
         AfternoonSession,
         EveningSession,
+        DefaultSession,
         CurrentSession,
         MorningSessionId,
         AfternoonSessionId,
         EveningSessionId,
+        DefaultSessionId,
       },
     } = this.props
     let id = null
@@ -112,6 +179,10 @@ class TargetAllocationToSession extends React.Component {
     if (session === 'Evening') {
       rawString = localStorage.getItem('Evening').split('|')
       id = EveningSession.id
+    }
+    if (session === 'Default') {
+      rawString = localStorage.getItem('Default').split('|')
+      id = DefaultSession.id
     }
 
     dispatch({
@@ -192,18 +263,31 @@ class TargetAllocationToSession extends React.Component {
           EveningSessionRandomKey: Math.random(),
         },
       })
+    } else if (sessionName === 'Default') {
+      dispatch({
+        type: 'sessiontargetallocation/SET_STATE',
+        payload: {
+          DefaultSortTargetTrue: isChecked,
+          DefaultSessionRandomKey: Math.random(),
+        },
+      })
     }
   }
 
   searchTarget = text => {
     let searchedTarget = []
-    const {dispatch, sessiontargetallocation : {AllocatedTargetListClone}} = this.props;
-    searchedTarget = AllocatedTargetListClone.filter(item => item.node.targetAllcatedDetails.targetName.includes(text))
+    const {
+      dispatch,
+      sessiontargetallocation: { AllocatedTargetListClone },
+    } = this.props
+    searchedTarget = AllocatedTargetListClone.filter(item =>
+      item.node.targetAllcatedDetails.targetName.includes(text),
+    )
     dispatch({
       type: 'sessiontargetallocation/SET_STATE',
       payload: {
         AllocatedTargetsList: searchedTarget,
-        randomKey: Math.random()
+        randomKey: Math.random(),
       },
     })
   }
@@ -216,27 +300,57 @@ class TargetAllocationToSession extends React.Component {
         MorningSession,
         AfternoonSession,
         EveningSession,
+        DefaultSession,
         CurrentSession,
         TargetStatusList,
         randomKey,
         MorningSessionRandomKey,
         AfternoonSessionRandomKey,
         EveningSessionRandomKey,
+        DefaultSessionRandomKey,
         MorningSortTargetTrue,
         AfternoonSortTargetTrue,
         EveningSortTargetTrue,
+        DefaultSortTargetTrue,
       },
-      user: { studentName },
+      user: { studentName, role },
     } = this.props
 
-    if (loading) {
-      return 'loading targets...'
+    if (!this.state.studentID) {
+      return (
+        <>
+          <div className="col-lg-12 col-md-6" style={{ position: 'relative' }}>
+            <Empty description="Please select a learner" />
+            <div style={{ position: 'absolute', top: '5px', right: '5px' }}>
+              {role !== 'parents' && (
+                <Button onClick={this.showDrawerFilter} size="large">
+                  <FilterOutlined />
+                </Button>
+              )}
+
+              <Drawer
+                visible={this.state.visibleFilter}
+                onClose={this.onCloseFilter}
+                width={350}
+                title="Select Learner"
+                placement="right"
+              >
+                <LearnerSelect />
+              </Drawer>
+            </div>
+          </div>
+        </>
+      )
     }
 
+    if (loading) {
+      return 'loading...'
+    }
     const allocatedTargetsListDivs = []
     const morningSessionDiv = []
     const afternoonSessionDiv = []
     const eveningSessionDiv = []
+    const defaultSessionDiv = []
 
     AllocatedTargetsList.map(item => {
       allocatedTargetsListDivs.push(
@@ -246,6 +360,7 @@ class TargetAllocationToSession extends React.Component {
           node={item.node}
           text={item.node.targetAllcatedDetails.targetName}
           showAllocation={true}
+          onEditTarget={() => this.showEditTargetDrawer(item.node)}
         />,
       )
     })
@@ -344,6 +459,37 @@ class TargetAllocationToSession extends React.Component {
       }
     }
 
+    if (DefaultSession && DefaultSession.targets.edges.length > 0) {
+      if (DefaultSortTargetTrue) {
+        const sortedList = this.sortTargetInDesiredFormat(DefaultSession.targets.edges)
+        sortedList.map((item, index) => {
+          defaultSessionDiv.push(
+            <TargetCard
+              showDelete
+              sessionId="Default"
+              srNo={index + 1}
+              key={item.node.id}
+              id={item.node.id}
+              node={item.node}
+              text={item.node.targetAllcatedDetails.targetName}
+            />,
+          )
+        })
+      } else {
+        DefaultSession.targets.edges.map((item, index) => {
+          defaultSessionDiv.push(
+            <TargetCard
+              key={item.node.id}
+              id={item.node.id}
+              node={item.node}
+              srNo={index + 1}
+              text={item.node.targetAllcatedDetails.targetName}
+            />,
+          )
+        })
+      }
+    }
+
     const targetSortableStyle = { height: 640, overflow: 'auto' }
     const sessionsSortableStyle = { height: 500, overflow: 'auto', marginTop: '10px' }
 
@@ -353,7 +499,7 @@ class TargetAllocationToSession extends React.Component {
           <Helmet title="Target Allocation To Sessions" />
 
           <div className="row">
-            <div className="col-lg-3 col-md-6">
+            <div className="col-lg-4 col-md-6">
               <div className={style.heading}>
                 <span>{studentName}&apos;s Target List</span>
               </div>
@@ -385,7 +531,7 @@ class TargetAllocationToSession extends React.Component {
                       pull: 'clone',
                       // put: false, // Do not allow items to be put into this list
                       // forceFallback: true,
-                      put: function (to, el, node) {
+                      put: function(to, el, node) {
                         var check = true
                         for (var key in to.el.children) {
                           if (to.el.children.hasOwnProperty(key)) {
@@ -399,7 +545,7 @@ class TargetAllocationToSession extends React.Component {
                         return check
                         // return to.el.children.some(item => item.id === node.item.id)
                       },
-                      add: function (/* *Event */ evt) {
+                      add: function(/* *Event */ evt) {
                         console.log('trigger==>', evt)
                       },
                     },
@@ -411,7 +557,24 @@ class TargetAllocationToSession extends React.Component {
                 </Sortable>
               </div>
             </div>
-            <div className="col-lg-9 col-md-9">
+            <div className="col-lg-8 col-md-6" style={{ position: 'relative' }}>
+              <div style={{ position: 'absolute', top: '0px', right: '16px', zIndex: 2 }}>
+                {role !== 'parents' && (
+                  <Button onClick={this.showDrawerFilter} size="large">
+                    <FilterOutlined />
+                  </Button>
+                )}
+
+                <Drawer
+                  visible={this.state.visibleFilter}
+                  onClose={this.onCloseFilter}
+                  width={350}
+                  title="Select Learner"
+                  placement="right"
+                >
+                  <LearnerSelect />
+                </Drawer>
+              </div>
               <Tabs defaultActiveKey="1">
                 <TabPane tab="Morning" key="1">
                   {MorningSession ? (
@@ -445,7 +608,6 @@ class TargetAllocationToSession extends React.Component {
                             </Checkbox>
                           </div>
                         </div>
-
                       </div>
                       <div className="card py-3 px-2" style={{ border: '2px solid #f4f6f8' }}>
                         <Sortable
@@ -453,7 +615,7 @@ class TargetAllocationToSession extends React.Component {
                           options={{
                             group: {
                               name: 'shared',
-                              put: function (to, el, node) {
+                              put: function(to, el, node) {
                                 var check = true
                                 for (var key in to.el.children) {
                                   if (to.el.children.hasOwnProperty(key)) {
@@ -467,7 +629,7 @@ class TargetAllocationToSession extends React.Component {
                               },
                             },
                             store: {
-                              get: function (sortable) {
+                              get: function(sortable) {
                                 let i = 0
                                 const list = []
                                 for (i = 0; i < sortable.el.childNodes.length; i++) {
@@ -477,7 +639,7 @@ class TargetAllocationToSession extends React.Component {
                               },
                               // Save the order of elements.
                               // @param {Sortable}  sortable
-                              set: function (sortable) {
+                              set: function(sortable) {
                                 let i = 0
                                 const list = []
                                 for (i = 0; i < sortable.el.childNodes.length; i++) {
@@ -494,10 +656,9 @@ class TargetAllocationToSession extends React.Component {
                         </Sortable>
                       </div>
                     </>
-
                   ) : (
-                      ''
-                    )}
+                    ''
+                  )}
                 </TabPane>
                 <TabPane tab="Afternoon" key="2">
                   {AfternoonSession ? (
@@ -526,7 +687,9 @@ class TargetAllocationToSession extends React.Component {
                             >
                               Save
                             </Button>
-                            <Checkbox onChange={e => this.sortSession('Afternoon', e.target.checked)}>
+                            <Checkbox
+                              onChange={e => this.sortSession('Afternoon', e.target.checked)}
+                            >
                               Sort
                             </Checkbox>
                           </div>
@@ -538,7 +701,7 @@ class TargetAllocationToSession extends React.Component {
                           options={{
                             group: {
                               name: 'shared',
-                              put: function (to, el, node) {
+                              put: function(to, el, node) {
                                 var check = true
                                 for (var key in to.el.children) {
                                   if (to.el.children.hasOwnProperty(key)) {
@@ -554,7 +717,7 @@ class TargetAllocationToSession extends React.Component {
                               // Get the order of elements. Called once during initialization.
                               // @param   {Sortable}  sortable
                               // @returns {Array}
-                              get: function (sortable) {
+                              get: function(sortable) {
                                 console.log(sortable.el.childNodes)
                                 let i = 0
                                 const list = []
@@ -565,7 +728,7 @@ class TargetAllocationToSession extends React.Component {
                               },
                               // Save the order of elements.
                               // @param {Sortable}  sortable
-                              set: function (sortable) {
+                              set: function(sortable) {
                                 let i = 0
                                 const list = []
                                 for (i = 0; i < sortable.el.childNodes.length; i++) {
@@ -583,8 +746,8 @@ class TargetAllocationToSession extends React.Component {
                       </div>
                     </>
                   ) : (
-                      ''
-                    )}
+                    ''
+                  )}
                 </TabPane>
                 <TabPane tab="Evening" key="3">
                   {EveningSession ? (
@@ -625,7 +788,7 @@ class TargetAllocationToSession extends React.Component {
                           options={{
                             group: {
                               name: 'shared',
-                              put: function (to, el, node) {
+                              put: function(to, el, node) {
                                 var check = true
                                 for (var key in to.el.children) {
                                   if (to.el.children.hasOwnProperty(key)) {
@@ -657,7 +820,7 @@ class TargetAllocationToSession extends React.Component {
                               // Get the order of elements. Called once during initialization.
                               // @param   {Sortable}  sortable
                               // @returns {Array}
-                              get: function (sortable) {
+                              get: function(sortable) {
                                 console.log(sortable.el.childNodes)
                                 let i = 0
                                 const list = []
@@ -668,7 +831,7 @@ class TargetAllocationToSession extends React.Component {
                               },
                               // Save the order of elements.
                               // @param {Sortable}  sortable
-                              set: function (sortable) {
+                              set: function(sortable) {
                                 let i = 0
                                 const list = []
                                 for (i = 0; i < sortable.el.childNodes.length; i++) {
@@ -700,25 +863,153 @@ class TargetAllocationToSession extends React.Component {
                       </div>
                     </>
                   ) : (
-                      ''
-                    )}
+                    ''
+                  )}
+                </TabPane>
+                <TabPane tab="Default" key="4">
+                  {DefaultSession ? (
+                    <>
+                      <div className={style.targetListHeding}>
+                        <div className="row">
+                          <div className="col-sm-3">
+                            <Button
+                              type="dashed"
+                              className={style.detailsButton}
+                              onClick={() => this.showDrawer('Default')}
+                              block
+                            >
+                              {' '}
+                              <PlusOutlined /> Add Details
+                            </Button>
+                          </div>
+                          <div className="col-sm-7">
+                            {DefaultSortTargetTrue ? '' : <DeleteACard />}
+                          </div>
+                          <div className="col-sm-2">
+                            <Button
+                              disabled={DefaultSortTargetTrue}
+                              onClick={() => this.saveSessionTargets('Default')}
+                              type="link"
+                            >
+                              Save
+                            </Button>
+                            <Checkbox onChange={e => this.sortSession('Default', e.target.checked)}>
+                              Sort
+                            </Checkbox>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="card py-3 px-2" style={{ border: '2px solid #f4f6f8' }}>
+                        <Sortable
+                          key={DefaultSessionRandomKey}
+                          options={{
+                            group: {
+                              name: 'shared',
+                              put: function(to, el, node) {
+                                var check = true
+                                for (var key in to.el.children) {
+                                  if (to.el.children.hasOwnProperty(key)) {
+                                    if (to.el.children[key].id === node.id) {
+                                      check = false
+                                    }
+                                  }
+                                }
+                                return check
+                              },
+                            },
+                            // onRemove: (node) => {
+                            //     console.log(node.type)
+                            //     console.log(node.item.id)
+                            //     console.log(node.item.innerText)
+                            //     console.log(node)
+
+                            //     const newItems = this.state.defaultSession.filter(item => item.key !== node.item.id);
+                            //     this.setState({ defaultSession: newItems })
+                            // },
+                            // onAdd: (node) => {
+                            //     console.log(node.type)
+                            //     console.log(node.item.id)
+                            //     console.log(node.item.innerText)
+                            //     console.log(node)
+                            //     this.setState({ defaultSession: [...this.state.defaultSession, { key: node.item.id, text: node.item.innerText }] });
+                            // },
+                            store: {
+                              // Get the order of elements. Called once during initialization.
+                              // @param   {Sortable}  sortable
+                              // @returns {Array}
+                              get: function(sortable) {
+                                console.log(sortable.el.childNodes)
+                                let i = 0
+                                const list = []
+                                for (i = 0; i < sortable.el.childNodes.length; i++) {
+                                  list.push(`"${sortable.el.childNodes[i].id}"`)
+                                }
+                                localStorage.setItem('Default', list.join('|'))
+                              },
+                              // Save the order of elements.
+                              // @param {Sortable}  sortable
+                              set: function(sortable) {
+                                let i = 0
+                                const list = []
+                                for (i = 0; i < sortable.el.childNodes.length; i++) {
+                                  list.push(`"${sortable.el.childNodes[i].id}"`)
+                                }
+                                // this.printDetails()
+                                localStorage.setItem('Default', list.join('|'))
+                                // var order = sortable.toArray();
+                                // localStorage.setItem(sortable.options.group.name, order.join('|'));
+                              },
+                            },
+                          }}
+                          tag="div"
+                          style={sessionsSortableStyle}
+                        >
+                          {defaultSessionDiv}
+                        </Sortable>
+
+                        {/* <div>
+                    <Button
+                      type="dashed"
+                      className={style.clearAllButton}
+                      onClick={() => this.clearAll('Default')}
+                      block
+                    >
+                      Clear All
+                    </Button>
+                  </div> */}
+                      </div>
+                    </>
+                  ) : (
+                    ''
+                  )}
                 </TabPane>
               </Tabs>
             </div>
-
-
-
-
           </div>
           <Drawer
             title={`${CurrentSession} Session`}
             placement="right"
-            width="400px"
+            width="600px"
             closable={false}
             onClose={this.onClose}
             visible={this.state.visible}
           >
             <SessionDetails key={CurrentSession} />
+          </Drawer>
+
+          <Drawer
+            title="Edit Target"
+            placement="right"
+            width="70%"
+            closable={true}
+            onClose={this.onCloseEditTarget}
+            visible={this.state.visibleEditTarget}
+          >
+            <EditTarget
+              key={this.state.selectedTarget?.id}
+              selectedTarget={this.state.selectedTarget}
+              onSuccessEditTarget={this.onCloseEditTarget}
+            />
           </Drawer>
         </div>
       </Authorize>

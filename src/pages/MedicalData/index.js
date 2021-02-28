@@ -1,19 +1,35 @@
 import React, { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet'
-import { Row, Col, Layout, Typography, Drawer, Tooltip, Button } from 'antd'
-import { PlusOutlined } from '@ant-design/icons'
+import {
+  Row,
+  Col,
+  Layout,
+  Typography,
+  Drawer,
+  Tooltip,
+  Button,
+  Popconfirm,
+  notification,
+  Form,
+  Input,
+  Table,
+} from 'antd'
+import { EditTwoTone, DeleteTwoTone } from '@ant-design/icons'
+import Highlighter from 'react-highlight-words'
 import moment from 'moment'
-import { useQuery } from 'react-apollo'
+import { useQuery, useMutation } from 'react-apollo'
 import gql from 'graphql-tag'
 import Calendar from 'components/Calander'
 import MedicalCard from './MedicalCard'
 import MedicalForm from './Medicalform'
-import { MEDICAL_DATA } from './query'
+import { MEDICAL_DATA, DELETE_MEDICAL } from './query'
 import UpdateMedicalForm from './UpdateMedicalForm'
 import FilterComp from '../../components/FilterCard/FilterComp'
+import './styles.scss'
 
 const { Content } = Layout
 const { Title } = Typography
+const { Search } = Input
 
 const STUDNET_INFO = gql`
   query student($studentId: ID!) {
@@ -24,18 +40,27 @@ const STUDNET_INFO = gql`
 `
 
 const MedicalDataPage = props => {
-  const [date, setDate] = useState(moment().format('YYYY-MM-DD'))
+  const [date, setDate] = useState({
+    gte: moment()
+      .subtract(4, 'weeks')
+      .format('YYYY-MM-DD'),
+    lte: moment().format('YYYY-MM-DD'),
+  })
+  const [medTableData, setMedTableData] = useState([])
   const [newMediDate, setNewMediDate] = useState(date)
   const [newMediCreated, setNewMediCreated] = useState(false)
   const studentId = localStorage.getItem('studentId')
   const [updateMed, setUpdateMed] = useState()
+  const [medDataUpdated, setMedDataUpdated] = useState(false)
   const [showDrawerForm, updateDrawerForm] = useState(false)
+  const [searchText, setSearchText] = useState()
   const { openRightdrawer, closeDrawer, handleFilterToggle, filter, TabCheck, openDrawer } = props
 
   const { data, loading, error, refetch } = useQuery(MEDICAL_DATA, {
     variables: {
       student: studentId,
-      date,
+      dateGte: date.gte,
+      dateLte: date.lte,
     },
   })
 
@@ -45,15 +70,114 @@ const MedicalDataPage = props => {
     },
   })
 
+  const [deleteMedData, { data: deleteData, error: deleteError }] = useMutation(DELETE_MEDICAL)
+
   useEffect(() => {
-    if (newMediDate === date && newMediCreated) {
+    if (moment(newMediDate).isBetween(date.gte, date.lte, undefined, []) && newMediCreated) {
       refetch()
       setNewMediCreated(false)
+      setMedDataUpdated(false)
     }
-  }, [newMediDate, refetch, date, newMediCreated])
+  }, [newMediDate, date, newMediCreated])
+
+  useEffect(() => {
+    if (data) {
+      const medData = data.getMedication.edges.map(item => item.node)
+      setMedTableData(medData)
+    }
+  }, [data])
+
+  useEffect(() => {
+    console.log(deleteData)
+    if (deleteData) {
+      notification.success({
+        message: 'Medical Data',
+        description: 'Medical Data Deleted Successfully',
+      })
+      refetch()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deleteData])
+
+  useEffect(() => {
+    if (medDataUpdated) refetch()
+    setMedDataUpdated(false)
+  }, [medDataUpdated])
+
+  const MedColumns = [
+    {
+      title: 'Medical Condition',
+      dataIndex: 'condition',
+      render: (text, record) => (
+        <Highlighter
+          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text}
+        />
+      ),
+    },
+    {
+      title: 'Severity',
+      dataIndex: 'severity',
+      render: (text, record) => record.severity.name,
+    },
+    {
+      title: 'Start Date',
+      dataIndex: 'startDate',
+      width: 150,
+    },
+    {
+      title: 'End Date',
+      dataIndex: 'endDate',
+      width: 150,
+    },
+    {
+      title: 'Action(s)',
+      dataIndex: '',
+      align: 'center',
+      width: 100,
+      render: (text, record) => (
+        <>
+          <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+            <EditTwoTone
+              style={{ cursor: 'pointer' }}
+              onClick={() => handleUpdateMedData(record.id)}
+            />
+            <Popconfirm
+              placement="top"
+              title="Delete Medical data?"
+              onConfirm={() => confirmDelete(record.id)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <DeleteTwoTone />
+            </Popconfirm>
+          </div>
+        </>
+      ),
+    },
+  ]
+
+  const handleUpdateMedData = id => {
+    setUpdateMed(id)
+    openDrawer()
+  }
+
+  const confirmDelete = id => {
+    deleteMedData({
+      variables: {
+        id,
+      },
+    })
+  }
 
   const handleSelectDate = (newDate, value) => {
-    setDate(moment(value).format('YYYY-MM-DD'))
+    console.log(value)
+    setDate({
+      gte: moment(value[0]).format('YYYY-MM-DD'),
+      lte: moment(value[1]).format('YYYY-MM-DD'),
+    })
   }
 
   const showDrawer = () => {
@@ -63,21 +187,75 @@ const MedicalDataPage = props => {
   const onClickClose = () => {
     updateDrawerForm(false)
   }
+  const header = () => (
+    <Row>
+      <Col span={14}>
+        <Form layout="inline">
+          <Form.Item label="Medical Condition" style={{ fontSize: '14px' }}>
+            <Search
+              placeholder="Search by medical condition"
+              value={searchText}
+              onChange={searchMedData}
+            />
+          </Form.Item>
+        </Form>
+      </Col>
+    </Row>
+  )
+
+  const searchMedData = e => {
+    // Update Text
+    const text = e.target.value
+    setSearchText(text)
+
+    // Filter Medical Data
+    if (data) {
+      const filteredMedData = data.getMedication.edges.filter(x =>
+        x.node.condition.toLowerCase().includes(text.toLowerCase()),
+      )
+      const medData = filteredMedData.map(edge => edge.node)
+      setMedTableData(medData)
+    }
+  }
+
   useEffect(() => {
     updateDrawerForm(openRightdrawer)
   }, [openRightdrawer])
+
   return (
     <div>
       <Helmet title="Dashboard Alpha" />
       <Layout style={{ padding: '0px' }}>
         <Content style={{ padding: '0px 20px', maxWidth: 1300, width: '100%', margin: '0px auto' }}>
           <Row gutter={[46, 0]}>
-            <Col span={24}>
+            <Col className="medicalData">
               {/* <Calendar value={date} handleOnChange={handleSelectDate} /> */}
-              {filter && <FilterComp handleSelectDate={handleSelectDate} />}
+              {filter && (
+                <FilterComp
+                  handleSelectDate={handleSelectDate}
+                  startDate={date.gte}
+                  endDate={date.lte}
+                  rangePicker
+                />
+              )}
               <div>
                 <div style={{ marginTop: 17 }}>
-                  {loading && 'Loading...'}
+                  <Table
+                    loading={loading}
+                    className="mealTable"
+                    rowKey="id"
+                    columns={MedColumns}
+                    dataSource={medTableData}
+                    pagination={{
+                      position: 'bottom',
+                      showSizeChanger: true,
+                      pageSizeOptions: ['10', '25', '50', '100'],
+                    }}
+                    size="small"
+                    title={header}
+                    bordered
+                  />
+                  {/* {loading && 'Loading...'}
                   {error && <pre>{JSON.stringify(error, null, 2)}</pre>}
                   {data &&
                     data.getMedication.edges.map(({ node }, index) => (
@@ -95,7 +273,7 @@ const MedicalDataPage = props => {
                         severity={node.severity.name}
                         openDrawer={openDrawer}
                       />
-                    ))}
+                    ))} */}
                 </div>
               </div>
             </Col>
@@ -112,6 +290,7 @@ const MedicalDataPage = props => {
                   id={updateMed}
                   setOpen={setUpdateMed}
                   closeDrawer={closeDrawer}
+                  setMedDataUpdated={setMedDataUpdated}
                 />
               ) : (
                 <MedicalForm

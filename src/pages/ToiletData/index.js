@@ -24,7 +24,12 @@ const STUDNET_INFO = gql`
 `
 
 const ToiletDataPage = props => {
-  const [date, setDate] = useState(moment().format('YYYY-MM-DD'))
+  const [date, setDate] = useState({
+    gte: moment()
+      .subtract(4, 'weeks')
+      .format('YYYY-MM-DD'),
+    lte: moment().format('YYYY-MM-DD'),
+  })
   const [newToiletDate, setNewToiletDate] = useState(date)
   const [newToiletDataCreated, setNewToiletDataCreated] = useState(false)
   const [updateToilet, setUpdateToilet] = useState()
@@ -35,7 +40,8 @@ const ToiletDataPage = props => {
     fetchPolicy: 'network-only',
     variables: {
       student: studentId,
-      date,
+      dateGte: date.gte,
+      dateLte: date.lte,
     },
   })
 
@@ -53,7 +59,10 @@ const ToiletDataPage = props => {
   }, [newToiletDate, refetch, date, newToiletDataCreated])
 
   const handleSelectDate = (newDate, value) => {
-    setDate(moment(value).format('YYYY-MM-DD'))
+    setDate({
+      gte: moment(value[0]).format('YYYY-MM-DD'),
+      lte: moment(value[1]).format('YYYY-MM-DD'),
+    })
   }
 
   const showDrawer = () => {
@@ -82,7 +91,14 @@ const ToiletDataPage = props => {
           <Row gutter={[46, 0]}>
             <Col span={24}>
               {/* <Calendar value={date} handleOnChange={handleSelectDate} /> */}
-              {filter && <FilterComp handleSelectDate={handleSelectDate} />}
+              {filter && (
+                <FilterComp
+                  handleSelectDate={handleSelectDate}
+                  startDate={date.gte}
+                  endDate={date.lte}
+                  rangePicker
+                />
+              )}
               <div>
                 <div
                   style={{

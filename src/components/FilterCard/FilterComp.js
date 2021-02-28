@@ -1,8 +1,10 @@
 import React from 'react'
-import { DatePicker } from 'antd'
+import { DatePicker, Input } from 'antd'
+import moment from 'moment'
 
 const FilterComp = props => {
-  const { handleSelectDate } = props
+  const { handleSelectDate, rangePicker, searchVal, searchValHandler, startDate, endDate } = props
+
   const continer = {
     background: 'rgb(241 241 241)',
     border: '1px solid #E4E9F0',
@@ -11,7 +13,7 @@ const FilterComp = props => {
     padding: '10px 35px',
     position: 'relative',
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'space-evenly',
     marginTop: '10px',
     width: '1108px',
   }
@@ -20,14 +22,39 @@ const FilterComp = props => {
     paddingTop: '7px',
     marginRight: '10px',
   }
-  const CalanderWidth = {
+  const FieldWidth = {
     width: '300px',
   }
 
   return (
     <div style={continer}>
-      <span style={Headstyle}>Filter By Date</span>
-      <DatePicker style={CalanderWidth} onChange={handleSelectDate} />
+      <span>
+        <span style={Headstyle}>Filter By Date</span>
+        {rangePicker ? (
+          <>
+            <DatePicker.RangePicker
+              style={FieldWidth}
+              defaultValue={[moment(startDate), moment(endDate)]}
+              onChange={handleSelectDate}
+            />
+          </>
+        ) : (
+          <DatePicker style={FieldWidth} onChange={handleSelectDate} />
+        )}
+      </span>
+      {searchValHandler && (
+        <span>
+          <span style={Headstyle}>Search</span>
+          <Input.Search
+            size="small"
+            value={searchVal}
+            onChange={searchValHandler}
+            allowClear
+            style={FieldWidth}
+            placeholder="search..."
+          />
+        </span>
+      )}
     </div>
   )
 }

@@ -7,6 +7,7 @@ const initialState = {
   isStaffProfile: false,
   UserRole: [],
   clinicLocationList: [],
+  staffCreated: false,
 }
 
 export default function userReducer(state = initialState, action) {
@@ -17,6 +18,7 @@ export default function userReducer(state = initialState, action) {
       return {
         ...state,
         StaffList: [...state.StaffList, action.payload.staff],
+        staffCreated: 'Created',
       }
     case actions.UPDATE_STAFFS_LIST:
       return {

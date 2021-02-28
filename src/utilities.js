@@ -57,6 +57,17 @@ function combineDateAndTime(date, time) {
   return `${dateText}T${timeText}`
 }
 
+function calculateAge(birthday) { // birthday is a date
+  const a = moment();
+  const b = moment(birthday)
+  const years = a.diff(b, 'year');
+  b.add(years, 'years');
+  const months = a.diff(b, 'months');
+  b.add(months, 'months');
+  const days = a.diff(b, 'days');
+  return years + ' years ' + months + ' months'
+}
+
 export {
   arrayNotNull,
   notNull,
@@ -65,4 +76,5 @@ export {
   capitalize,
   dateTimeToDate,
   combineDateAndTime,
+  calculateAge,
 }

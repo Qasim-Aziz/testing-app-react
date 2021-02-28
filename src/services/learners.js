@@ -19,8 +19,14 @@ export async function getClinicLearners(payload) {
           $after: String
           $before: String
         ) {
-          students(isActive: $isActive, first: $first, last: $last, after: $after, before: $before) {
-            pageInfo{
+          students(
+            isActive: $isActive
+            first: $first
+            last: $last
+            after: $after
+            before: $before
+          ) {
+            pageInfo {
               startCursor
               endCursor
             }
@@ -31,6 +37,10 @@ export async function getClinicLearners(payload) {
                 firstname
                 email
                 dob
+                parent {
+                  id
+                  lastLogin
+                }
                 mobileno
                 lastname
                 gender
@@ -40,6 +50,7 @@ export async function getClinicLearners(payload) {
                 parentMobile
                 parentName
                 dateOfDiagnosis
+                researchParticipant
                 category {
                   id
                   category
@@ -73,18 +84,18 @@ export async function getClinicLearners(payload) {
       `,
       variables: {
         isActive: payload.isActive,
-        first: payload.first,
+        first: payload.first > 100 ? null : payload.first,
         after: payload.after,
         before: payload.before,
-        last: payload.last ? payload.last : null 
+        last: payload.last ? payload.last : null,
       },
-      fetchPolicy: 'network-only'
+      fetchPolicy: 'network-only',
     })
     .then(result => result)
     .catch(error => {
       error.graphQLErrors.map(item => {
         return notification.error({
-          message: 'Somthing want wrong',
+          message: 'Something went wrong',
           description: item.message,
         })
       })
@@ -128,7 +139,7 @@ export async function getLearnersDropdown() {
     .catch(error => {
       error.graphQLErrors.map(item => {
         return notification.error({
-          message: 'Somthing want wrong',
+          message: 'Something went wrong',
           description: item.message,
         })
       })
@@ -140,11 +151,6 @@ export async function updateLearner(payload) {
   if (payload.values.authStaff.length > 0) {
     payload.values.authStaff.map(item => authStaffList.push(`"${item}"`))
   }
-
-  // let date = ''
-  // if (payload.values.dateOfDiagnosis){
-  //   date = moment(payload.values.dateOfDiagnosis).format('YYYY-MM-DD')
-  // }
 
   return apolloClient
     .mutate({
@@ -161,7 +167,7 @@ export async function updateLearner(payload) {
           $firstName: String!
           $lastName: String
           $authStaffList: [ID]
-          $parentFirstName: String!
+          $parentFirstName: String
           $parentMobileNumber: String
           $ssnCard: String
           $mobileNo: String
@@ -169,6 +175,7 @@ export async function updateLearner(payload) {
           $caseManager: ID
           $learnerLanguage: ID
           $isActive: Boolean
+          $researchParticipant: Boolean
         ) {
           updateStudent(
             input: {
@@ -192,6 +199,7 @@ export async function updateLearner(payload) {
                 address: $address
                 language: $learnerLanguage
                 isActive: $isActive
+                researchParticipant: $researchParticipant
               }
             }
           ) {
@@ -234,6 +242,7 @@ export async function updateLearner(payload) {
                 }
               }
               isActive
+              researchParticipant
             }
           }
         }
@@ -260,13 +269,14 @@ export async function updateLearner(payload) {
         caseManager: payload.values.caseManager,
         learnerLanguage: payload.values.learnerLanguage,
         isActive: payload.values.isActive,
+        researchParticipant: payload.values.researchParticipant,
       },
     })
     .then(result => result)
     .catch(error => {
       error.graphQLErrors.map(item => {
         return notification.error({
-          message: 'Somthing want wrong',
+          message: 'Something went wrong',
           description: item.message,
         })
       })
@@ -278,7 +288,7 @@ export async function createLearner(payload) {
   // if (payload.values.authStaff.length > 0) {
   //   payload.values.authStaff.map(item => authStaffList.push(`"${item}"`))
   // }
-  console.log(payload.values)
+  console.log(payload.values, 'payload values are')
   console.log(payload.data)
   console.log(payload.data.get('file'))
   return apolloClient
@@ -295,7 +305,7 @@ export async function createLearner(payload) {
           $firstName: String!
           $lastName: String
           $authStaffList: [ID]
-          $parentFirstName: String!
+          $parentFirstName: String
           $parentMobileNumber: String
           $ssnCard: String
           $mobileNo: String
@@ -304,6 +314,7 @@ export async function createLearner(payload) {
           $isActive: Boolean
           $defaultProgram: Boolean
           $learnerLanguage: ID
+          $researchParticipant: Boolean
         ) {
           createStudent(
             input: {
@@ -327,6 +338,7 @@ export async function createLearner(payload) {
                 isActive: $isActive
                 defaultProgram: $defaultProgram
                 language: $learnerLanguage
+                researchParticipant: $researchParticipant
               }
             }
           ) {
@@ -369,6 +381,7 @@ export async function createLearner(payload) {
                 }
               }
               isActive
+              researchParticipant
             }
           }
         }
@@ -395,6 +408,7 @@ export async function createLearner(payload) {
         learnerLanguage: payload.values.learnerLanguage,
         isActive: payload.values.isActive,
         defaultProgram: payload.values.defaultProgram,
+        researchParticipant: payload.values.researchParticipant,
       },
     })
     .then(result => result)
@@ -459,7 +473,7 @@ export async function learnerActiveInactive(payload) {
     .catch(error => {
       error.graphQLErrors.map(item => {
         return notification.error({
-          message: 'Somthing want wrong',
+          message: 'Something went wrong',
           description: item.message,
         })
       })

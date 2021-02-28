@@ -43,15 +43,6 @@ class TargetStatusCard extends React.Component {
   }
 
   componentWillMount() {
-    this.state = {
-      graphstartdate: Moment(Date.now())
-        .format('YYYY-MM-DD')
-        .toString(),
-      graphenddate: Moment(Date.now())
-        .subtract(14, 'days')
-        .format('YYYY-MM-DD')
-        .toString(),
-    }
     this.CreateChart(
       'U3R1ZGVudFR5cGU6MTYz',
       Moment(Date.now())

@@ -20,11 +20,12 @@ export const GET_TARGET = gql`
         targets {
           edges {
             node {
+              id
               video
               targetInstr
-              id
               status
               targetMain {
+                id
                 targetName
               }
               targetArea {
@@ -40,41 +41,47 @@ export const GET_TARGET = gql`
 `
 
 export const GET_EQUI_TARGET = gql`
-  mutation suggestPeakEquiTargets($id: ID!) {
-    suggestPeakTargetsForEquivalence(input:{
-        program: $id
-    }){
-        codes{
+  mutation suggestPeakEquiTargets($id: ID!, $category: [ID]) {
+    suggestPeakTargetsForEquivalence(input: { program: $id, domains: $category }) {
+      codes {
+        id
+        code
+        target {
+          id
+          maxSd
+          targetInstr
+          targetMain {
             id
-            code
-            target{
-                id
-                maxSd
-                targetInstr
-                targetMain{
-                    id
-                    targetName
-                }
-            }
-            classes{
-                edges{
-                    node{
-                        id
-                        name
-                        stimuluses{
-                            edges{
-                                node{
-                                    id
-                                    option
-                                    stimulusName
-                                    
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            targetName
+          }
         }
+        classes {
+          edges {
+            node {
+              id
+              name
+              stimuluses {
+                edges {
+                  node {
+                    id
+                    option
+                    stimulusName
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+export const GET_EQUI_CATTEGORY = gql`
+  query {
+    peakEquDomains {
+      id
+      name
     }
   }
 `
@@ -100,8 +107,8 @@ export const TARGET_ALLOCATIONS_OPTIONS = gql`
     domain {
       edges {
         node {
-          domain
           id
+          domain
         }
       }
     }

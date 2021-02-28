@@ -6,17 +6,57 @@
 /* eslint-disable object-shorthand */
 /* eslint-disable react/destructuring-assignment */
 import React from 'react'
-import { Form, Input, Button, Select, DatePicker, notification } from 'antd'
+import {
+  Form,
+  Input,
+  Button,
+  Select,
+  DatePicker,
+  notification,
+  Divider,
+  Upload,
+  message,
+  Tag,
+} from 'antd'
+import { InboxOutlined } from '@ant-design/icons'
 import { connect } from 'react-redux'
 import { gql } from 'apollo-boost'
 import client from '../../apollo/config'
+import AntdTag from './antdTag'
+
+const { Dragger } = Upload
+
+const props1 = {
+  name: 'file',
+  multiple: true,
+  action: '#',
+  onChange(info) {
+    const { status } = info.file
+    if (status !== 'uploading') {
+      console.log(info.file, info.fileList)
+    }
+    if (status === 'done') {
+      message.success(`${info.file.name} file uploaded successfully.`)
+    } else if (status === 'error') {
+      message.error(`${info.file.name} file upload failed.`)
+    }
+  },
+}
 
 const layout = {
   labelCol: {
-    span: 8,
+    span: 5,
   },
   wrapperCol: {
-    span: 13,
+    span: 18,
+  },
+}
+const layout1 = {
+  labelCol: {
+    span: 5,
+  },
+  wrapperCol: {
+    span: 18,
   },
 }
 const tailLayout = {
@@ -33,6 +73,13 @@ class StaffBasicInfo extends React.Component {
     super(props)
 
     this.state = {}
+
+    this.tagArrayHandler = this.tagArrayHandler.bind(this)
+  }
+
+  state = {
+    selectedFile: null,
+    tagArray: [],
   }
 
   componentDidMount() {
@@ -45,17 +92,40 @@ class StaffBasicInfo extends React.Component {
   handleSubmit = e => {
     e.preventDefault()
     const { form, dispatch } = this.props
+    const data = new FormData()
+    data.append('resume', this.state.selectedFile)
+    data.append('tags', this.state.tagArray)
     form.validateFields((error, values) => {
+      console.log('data', data)
+      const newValues = {
+        ...values,
+        tags: this.state.tagArray,
+      }
+      console.log('values', newValues)
       if (!error) {
         dispatch({
           type: 'staffs/CREATE_STAFF',
           payload: {
-            values: values,
+            values: newValues,
+            data: data,
           },
         })
         this.props.CloseDrawer()
         form.resetFields()
       }
+    })
+  }
+
+  tagArrayHandler = tags => {
+    this.setState({
+      tagArray: tags,
+    })
+  }
+
+  onChangeHandler = event => {
+    console.log(event.target.files[0])
+    this.setState({
+      selectedFile: event.target.files[0],
     })
   }
 
@@ -69,62 +139,62 @@ class StaffBasicInfo extends React.Component {
       form,
       staffs: { UserRole, clinicLocationList },
     } = this.props
-    const itemStyle = { marginBottom: '5px' }
-
+    const itemStyle = { marginBottom: '5px', fontWeight: 'bold' }
+    const itemStyle1 = { textAlign: 'center', marginBottom: '5px', fontWeight: 'bold' }
     return (
       <Form {...layout} onSubmit={e => this.handleSubmit(e)}>
+        <Form.Item {...layout1} label="Profile" style={itemStyle1}>
+          <div>
+            <img
+              src="https://www.thewodge.com/wp-content/uploads/2019/11/avatar-icon.png"
+              alt="avatar"
+              className="avatarlogo"
+            />
+          </div>
+          <Tag>Role</Tag>
+          <Tag>Designation</Tag>
+          <Tag>Qualification</Tag>
+          <Tag>Location</Tag>
+        </Form.Item>
+        <Divider orientation="left">Mandatory Fields</Divider>
         <Form.Item label="Staff ID" style={itemStyle}>
           {form.getFieldDecorator('staffId', {
             rules: [{ required: true, message: 'Please provide your Staff Id!' }],
-          })(<Input size="small" />)}
+          })(<Input size="medium" />)}
         </Form.Item>
         <Form.Item label="Role" style={itemStyle}>
           {form.getFieldDecorator('role', {
             rules: [{ required: true, message: 'Please provide your Role' }],
           })(
-            <Select size="small">
+            <Select size="medium">
               {UserRole.map(item => (
                 <Select.Option value={item.id}>{item.name}</Select.Option>
               ))}
             </Select>,
           )}
         </Form.Item>
-        <Form.Item label="Date of Joining" style={itemStyle}>
-          {form.getFieldDecorator('dateOfJoining', {
-            rules: [{ required: true, message: 'Please provide your Date of Joining!' }],
-          })(<DatePicker size="small" />)}
-        </Form.Item>
 
-        <Form.Item label="Designation" style={itemStyle}>
-          {form.getFieldDecorator('designation', { initialValue: '' })(<Input size="small" />)}
-        </Form.Item>
-        <Form.Item label="Clinic Location" style={itemStyle}>
-          {form.getFieldDecorator('clinicLocation')(
-            <Select size="small">
-              {clinicLocationList.map(item => (
-                <Select.Option value={item.node.id}>{item.node.location}</Select.Option>
-              ))}
-            </Select>,
-          )}
-        </Form.Item>
         <Form.Item label="First Name" style={itemStyle}>
           {form.getFieldDecorator('firstname', {
             rules: [{ required: true, message: 'Please provide your name' }],
-          })(<Input size="small" />)}
+          })(<Input size="medium" />)}
         </Form.Item>
         <Form.Item label="Last Name" style={itemStyle}>
-          {form.getFieldDecorator('lastname', { initialValue: '' })(<Input size="small" />)}
+          {form.getFieldDecorator('lastname', {
+            rules: [{ required: true, message: 'Please provide your last name' }],
+            initialValue: '',
+          })(<Input size="medium" />)}
         </Form.Item>
         <Form.Item label="Email" style={itemStyle}>
           {form.getFieldDecorator('email', {
             rules: [{ required: true, type: 'email', message: 'Please provide your email' }],
-          })(<Input size="small" />)}
+          })(<Input size="medium" />)}
         </Form.Item>
         <Form.Item label="Gender" style={itemStyle}>
           {form.getFieldDecorator('gender', {
             rules: [{ required: true, message: 'Please select gender' }],
           })(
-            <Select size="small">
+            <Select size="medium">
               <Select.Option value="male">Male</Select.Option>
               <Select.Option value="female">Female</Select.Option>
               <Select.Option value="other">Other</Select.Option>
@@ -136,75 +206,131 @@ class StaffBasicInfo extends React.Component {
             rules: [{ required: true, message: 'Please provide Date of Birth' }],
           })(<DatePicker />)}
         </Form.Item>
-        <Form.Item label="Contact no." style={itemStyle}>
-          {form.getFieldDecorator('contactNumber', { initialValue: '' })(<Input size="small" />)}
+        <Form.Item label="Date of Joining" style={itemStyle}>
+          {form.getFieldDecorator('dateOfJoining', {
+            rules: [{ required: true, message: 'Please provide your Date of Joining!' }],
+          })(<DatePicker size="medium" />)}
         </Form.Item>
 
-        <Form.Item label="Address" style={itemStyle}>
-          {form.getFieldDecorator('address', { initialValue: '' })(
-            <TextArea placeholder="Address" autoSize={{ minRows: 3 }} size="small" />,
-          )}
-        </Form.Item>
+        <Divider orientation="left">Personal Details</Divider>
 
-        <Form.Item label="Street Address" style={itemStyle}>
-          {form.getFieldDecorator('street', { rules: [{ message: 'Please provide Street Name' }] })(
-            <Input placeholder="Street Address" size="small" />,
-          )}
+        <Form.Item label="Designation" style={itemStyle}>
+          {form.getFieldDecorator('designation', { initialValue: '' })(<Input size="medium" />)}
         </Form.Item>
-
-        <Form.Item label="State" style={itemStyle}>
-          {form.getFieldDecorator('state', { rules: [{ message: 'Please provide State' }] })(
-            <Input placeholder="State" size="small" />,
-          )}
-        </Form.Item>
-
-        <Form.Item label="City" style={itemStyle}>
-          {form.getFieldDecorator('city', { rules: [{ message: 'Please provide City' }] })(
-            <Input placeholder="City" size="small" />,
-          )}
-        </Form.Item>
-
-        <Form.Item label="Country" style={itemStyle}>
-          {form.getFieldDecorator('country', { rules: [{ message: 'Please provide Country' }] })(
-            <Input placeholder="Country" size="small" />,
-          )}
-        </Form.Item>
-        <Form.Item label="Pincode" style={itemStyle}>
-          {form.getFieldDecorator('pincode', { rules: [{ message: 'Please provide pincode' }] })(
-            <Input placeholder="Pincode" size="small" style={{ borderRadius: 0 }} />,
-          )}
-        </Form.Item>
-
         <Form.Item label="Marital Status" style={itemStyle}>
           {form.getFieldDecorator('meritalStatus', { initialValue: '' })(
-            <Select size="small">
+            <Select size="medium">
               <Select.Option value="Single">Single</Select.Option>
               <Select.Option value="Married">Married</Select.Option>
             </Select>,
           )}
         </Form.Item>
+
+        <Form.Item label="Qualification" style={itemStyle}>
+          {form.getFieldDecorator('qualification', {
+            rules: [{ required: false, message: 'Please provide Qualification' }],
+            initialValue: '',
+          })(<Input size="medium" />)}
+        </Form.Item>
+        <Form.Item label="Work Experience" style={itemStyle}>
+          {form.getFieldDecorator('workExprience', {
+            rules: [{ required: false, message: 'Please provide Work Experience' }],
+            initialValue: '',
+          })(<Input size="medium" />)}
+        </Form.Item>
+
+        <Divider orientation="left">Contact Details</Divider>
         <Form.Item label="Emergency Contact Name" style={itemStyle}>
-          {form.getFieldDecorator('emergencyName', { initialValue: '' })(<Input size="small" />)}
+          {form.getFieldDecorator('emergencyName', {
+            rules: [{ required: false, message: 'Please provide Emergency Contact Name' }],
+            initialValue: '',
+          })(<Input size="medium" />)}
         </Form.Item>
         <Form.Item label="Emergency Contact Relation" style={itemStyle}>
-          {form.getFieldDecorator('emergencyRelation', { initialValue: '' })(
-            <Input size="small" />,
-          )}
+          {form.getFieldDecorator('emergencyRelation', {
+            rules: [{ required: false, message: 'Please provide Emergency Contact Relation' }],
+            initialValue: '',
+          })(<Input size="medium" />)}
         </Form.Item>
         <Form.Item label="Emergency contact no." style={itemStyle}>
-          {form.getFieldDecorator('emergencyContactNumber', { initialValue: '' })(
-            <Input size="small" />,
+          {form.getFieldDecorator('emergencyContactNumber', {
+            rules: [{ required: false, message: 'Please provide Emergency Contact Relation' }],
+            initialValue: '',
+          })(<Input size="medium" />)}
+        </Form.Item>
+        <Form.Item label="Contact no." style={itemStyle}>
+          {form.getFieldDecorator('contactNumber', {
+            rules: [{ required: false, message: 'Please provide your Contact no.!' }],
+            initialValue: '',
+          })(<Input size="medium" />)}
+        </Form.Item>
+        {/* <Form.Item label="Address" style={itemStyle}>
+          {form.getFieldDecorator('address', {
+            required: false,
+            message: 'Please provide Address',
+            initialValue: '',
+          })(<TextArea placeholder="Address" autoSize={{ minRows: 3 }} size="medium" />)}
+        </Form.Item> */}
+
+        <Form.Item label="Street Address" style={itemStyle}>
+          {form.getFieldDecorator('street', { rules: [{ message: 'Please provide Street Name' }] })(
+            <Input placeholder="Street Address" size="medium" />,
           )}
         </Form.Item>
-        <Form.Item label="Qualification" style={itemStyle}>
-          {form.getFieldDecorator('qualification', { initialValue: '' })(<Input size="small" />)}
+
+        <Form.Item label="State" style={itemStyle}>
+          {form.getFieldDecorator('state', { rules: [{ message: 'Please provide State' }] })(
+            <Input placeholder="State" size="medium" />,
+          )}
         </Form.Item>
-        <Form.Item label="Work Exprience" style={itemStyle}>
-          {form.getFieldDecorator('workExprience', { initialValue: '' })(<Input size="small" />)}
+
+        <Form.Item label="City" style={itemStyle}>
+          {form.getFieldDecorator('city', { rules: [{ message: 'Please provide City' }] })(
+            <Input placeholder="City" size="medium" />,
+          )}
+        </Form.Item>
+        <Form.Item label="Country" style={itemStyle}>
+          {form.getFieldDecorator('country', { rules: [{ message: 'Please provide Country' }] })(
+            <Input placeholder="Country" size="medium" />,
+          )}
+        </Form.Item>
+        <Form.Item label="Pincode" style={itemStyle}>
+          {form.getFieldDecorator('pincode', { rules: [{ message: 'Please provide pincode' }] })(
+            <Input placeholder="Pincode" size="medium" style={{ borderRadius: 0 }} />,
+          )}
+        </Form.Item>
+
+        <Divider orientation="left">Misc details</Divider>
+
+        <Form.Item label="Tags" style={itemStyle}>
+          {console.log('TAG ARRAY', this.state.tagArray)}
+          {form.getFieldDecorator('tags')(
+            <AntdTag
+              style={itemStyle}
+              changeTagsHandler={this.tagArrayHandler}
+              tagArray={this.state.tagArray}
+              closeable="true"
+              defaultVal={[]}
+            />,
+          )}
+        </Form.Item>
+
+        <Form.Item label="Clinic Location" style={itemStyle}>
+          {form.getFieldDecorator('clinicLocation')(
+            <Select size="medium">
+              {clinicLocationList.map(item => (
+                <Select.Option value={item.node.id}>{item.node.location}</Select.Option>
+              ))}
+            </Select>,
+          )}
+        </Form.Item>
+
+        <Form.Item label="Upload Your Documents" style={itemStyle}>
+          <input type="file" name="file" onChange={this.onChangeHandler} />
         </Form.Item>
 
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" className="mt-4">
             Submit
           </Button>
 

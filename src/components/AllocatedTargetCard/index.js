@@ -3,19 +3,23 @@
 /* eslint-disable no-shadow */
 import React from 'react'
 import { Typography } from 'antd'
-import styles from './style.module.scss'
 
 const { Title } = Typography
 
-const AllocatedTargetCard = ({ heading = '', status = '', node, editAllocatedTarget, editAble }) => {
-
+const AllocatedTargetCard = ({
+  heading = '',
+  status = '',
+  node,
+  editAllocatedTarget,
+  editAble,
+}) => {
   const editTarget = () => {
     console.log('clicked', node.id)
   }
 
   return (
     <>
-      {editAble ?
+      {editAble ? (
         <a editAble onClick={() => editAllocatedTarget(node)}>
           <div
             style={{
@@ -23,15 +27,15 @@ const AllocatedTargetCard = ({ heading = '', status = '', node, editAllocatedTar
               border: '1px solid #E4E9F0',
               boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
               borderRadius: 2,
-              padding: 5,
+              padding: 10,
               display: 'flex',
               alignItems: 'center',
-              marginBottom: '2px'
+              margin: '5px 5px 5px 0px',
             }}
           >
             <div
               style={{
-                marginLeft: 22,
+                marginLeft: 5,
               }}
             >
               <Title
@@ -60,7 +64,7 @@ const AllocatedTargetCard = ({ heading = '', status = '', node, editAllocatedTar
             </div>
           </div>
         </a>
-        :
+      ) : (
         <div
           style={{
             background: '#FFFFFF',
@@ -70,7 +74,7 @@ const AllocatedTargetCard = ({ heading = '', status = '', node, editAllocatedTar
             padding: 5,
             display: 'flex',
             alignItems: 'center',
-            marginBottom: '2px'
+            marginBottom: '2px',
           }}
         >
           <div
@@ -102,9 +106,8 @@ const AllocatedTargetCard = ({ heading = '', status = '', node, editAllocatedTar
             </div>
           </div>
         </div>
-      }
+      )}
     </>
-
   )
 }
 

@@ -1,11 +1,17 @@
-.ant-form-item label {
-  font-size: 18px;
-}
+.templateForm {
+  .ant-form-item label {
+    font-size: 18px;
+  }
 
-.ant-form-item {
-  margin-bottom: 13px;
-}
+  .ant-form-item {
+    margin-bottom: 13px;
+  }
 
-.ant-select-selection-selected-value {
-  color: #000;
+  .ant-select-selection-selected-value {
+    color: #000;
+  }
+
+  .small-textarea {
+    height: 100px !important;
+  }
 }

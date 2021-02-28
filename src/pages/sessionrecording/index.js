@@ -21,48 +21,32 @@
 /* eslint-disable prefer-destructuring */
 /* eslint-disable import/extensions */
 
+import { Badge, Button, Card, Col, Drawer, Empty, notification, Row, Typography } from 'antd'
+import { gql } from 'apollo-boost'
+import Authorize from 'components/LayoutComponents/Authorize'
+import moment from 'moment'
 import React from 'react'
 import { Helmet } from 'react-helmet'
 import ReactPlayer from 'react-player'
-import {
-  Row,
-  Col,
-  Card,
-  Drawer,
-  Select,
-  Form,
-  Collapse,
-  Tree,
-  Icon,
-  DatePicker,
-  notification,
-  Empty,
-  Button,
-  Typography,
-} from 'antd'
-import { Redirect } from 'react-router-dom'
-import Authorize from 'components/LayoutComponents/Authorize'
 import { connect } from 'react-redux'
-import moment from 'moment'
-import { CheckOutlined, CloseOutlined } from '@ant-design/icons'
-import { gql } from 'apollo-boost'
+import { Redirect } from 'react-router-dom'
 import apolloClient from '../../apollo/config'
-import TargetListBlock from '../../components/sessionRecording/targetListBlock'
 import SessionClock from '../../components/sessionRecording/sessionClock'
+import TargetListBlock from '../../components/sessionRecording/targetListBlock'
 import TrialsList from '../../components/sessionRecording/trialsList'
 import DataRecordingBlock from './dataRecordingBlock'
-import PeakRecordingBlock from './peakRecordingBlock'
 import EquivalenceRecordingBlock from './EquivalenceRecordingBlock'
-import PeakTrialBoxes from './trialsBoxes'
 import EquivalenceScoreBoard from './EquivalenceScoreBoard'
-import SessionSummary from '../session_summary/index'
+import PeakRecordingBlock from './peakRecordingBlock'
 import RecordView from './RecordView'
 import TargetResponseGraph from './TargetResponseGraph'
+import PeakTrialBoxes from './trialsBoxes'
+import LoadingComponent from '../staffProfile/LoadingComponent'
 
 const { Title, Text } = Typography
 
 const peakId = 'VGFyZ2V0RGV0YWlsVHlwZTo4'
-const equivalence = 'EQUIVALANCE'
+const equivalence = 'EQUIVALENCE'
 
 @connect(({ sessionrecording, user }) => ({ sessionrecording, user }))
 class DataRecording extends React.Component {
@@ -88,27 +72,28 @@ class DataRecording extends React.Component {
     const {
       dispatch,
       sessionrecording: { SessionId, SessionDate },
-      user: { id }
+      user: { id },
     } = this.props
 
-    apolloClient.query({
-      query: gql`query GetUserSettings(
-        $id: ID!
-      ){
-        userSettings(user: $id){
-            edges{
-                node{
-                    id
-                    peakAutomaticBlocks
+    apolloClient
+      .query({
+        query: gql`
+          query GetUserSettings($id: ID!) {
+            userSettings(user: $id) {
+              edges {
+                node {
+                  id
+                  peakAutomaticBlocks
                 }
+              }
             }
-        }
-    }`,
-      variables: {
-        id
-      },
-      fetchPolicy: 'no-cache',
-    })
+          }
+        `,
+        variables: {
+          id,
+        },
+        fetchPolicy: 'network-only',
+      })
       .then(result => {
         if (result && result.data && result.data.userSettings.edges.length > 0) {
           dispatch({
@@ -149,7 +134,7 @@ class DataRecording extends React.Component {
     //   payload: {
     //     // masterSessionId: SessionId,
     //     date: SessionDate !== null ? SessionDate : moment().format('YYYY-MM-DD'),
-    //     masterSessionId: 'U2Vzc2lvblR5cGU6MzQ3MA==',
+    //     masterSessionId: 'U2Vzc2lvblR5cGU6Mzc0NQ==',
     //   },
     // })
   }
@@ -181,12 +166,10 @@ class DataRecording extends React.Component {
       if (splitList.length > 3) {
         if (targetVideoUrl.split('/')[2] === 'www.youtube.com') {
           finalUrl = targetVideoUrl
-        }
-        else {
+        } else {
           videoId = targetVideoUrl.split('/')[3]
           finalUrl = `https://player.vimeo.com/video/${videoId}/`
         }
-
       }
 
       // const videoId = targetVideoUrl.split('/')[3]
@@ -493,8 +476,8 @@ class DataRecording extends React.Component {
         VideoUrl,
         TargetActiveId,
         StimulusActiveId,
-        StepActiveId
-
+        StepActiveId,
+        SelectedPeakStimulusIndex,
       },
     } = this.props
 
@@ -502,23 +485,23 @@ class DataRecording extends React.Component {
 
     const style2 = Disabled
       ? {
-        border: '2px solid #f4f6f8',
-        overflow: 'hidden',
-        position: 'relative',
-        minHeight: '600px',
-        pointerEvents: 'none',
-        opacity: '0.4',
-      }
+          border: '2px solid #f4f6f8',
+          overflow: 'hidden',
+          position: 'relative',
+          minHeight: '730px',
+          pointerEvents: 'none',
+          opacity: '0.4',
+        }
       : {
-        border: '2px solid #f4f6f8',
-        overflow: 'hidden',
-        position: 'relative',
-        minHeight: '600px',
-      }
+          border: '2px solid #f4f6f8',
+          overflow: 'hidden',
+          position: 'relative',
+          minHeight: '730px',
+        }
 
     const style3 = {
       border: '2px solid #f4f6f8',
-      height: '600px',
+      height: '730px',
       backgroundColor: 'white',
       padding: '10px',
     }
@@ -532,7 +515,7 @@ class DataRecording extends React.Component {
     }
 
     if (loading) {
-      return 'Loading session data...'
+      return <LoadingComponent />
     }
 
     // if (!loading && ChildSession && ChildSession.id && ChildSession.status === 'COMPLETED') {
@@ -542,28 +525,44 @@ class DataRecording extends React.Component {
     return (
       <Authorize roles={['school_admin', 'therapist', 'parents']} redirect to="/dashboard/beta">
         <Helmet title="Session" />
-        <Row>
-          {/* Main target recording area */}
-          <Col xs={24} sm={18} md={18} lg={18} xl={18} style={style2}>
-            {/* Header block details */}
-            <Card bodyStyle={{ padding: '5px' }}>
-              {MasterSession?.targets.edges.length > 0 ? (
-                <>
-                  <Title level={3} style={{ display: 'inline-block', width: '85%' }}>
-                    Target :{' '}
-                    {
-                      MasterSession.targets.edges[TargetActiveIndex].node.targetAllcatedDetails
-                        .targetName
-                    }
-                  </Title>
-                  <span style={{ float: 'right', display: 'inline-block' }}>
-                    Target {TargetActiveIndex + 1} / {MasterSession.targets.edgeCount}
-                  </span>
-                  <Button style={{ marginTop: '15px' }} onClick={this.showTargetDrawer}>
-                    Target Instruction
-                  </Button>
+        {MasterSession && (
+          <Row>
+            {/* Main target recording area */}
+            <Col xs={24} sm={18} md={18} lg={18} xl={18} style={style2}>
+              {/* Header block details */}
+              <Card bodyStyle={{ padding: '5px' }}>
+                {MasterSession?.targets.edges.length > 0 ? (
+                  <>
+                    <div style={{ textAlign: 'center' }}>
+                      <Title level={3} style={{ display: 'inline-block' }}>
+                        Target :{' '}
+                        {
+                          MasterSession.targets.edges[TargetActiveIndex].node.targetAllcatedDetails
+                            .targetName
+                        }
+                      </Title>
+                      <Badge
+                        style={{
+                          marginLeft: '10px',
+                          marginBottom: '8px',
+                          background: '#1890ff',
+                        }}
+                        count={
+                          MasterSession?.targets.edges[TargetActiveIndex].node?.targetStatus
+                            ?.statusName
+                        }
+                      />
+                      <span style={{ float: 'right', display: 'inline-block' }}>
+                        Target {TargetActiveIndex + 1} / {MasterSession.targets.edgeCount}
+                      </span>
+                    </div>
 
-                  {/* <p
+                    <div>
+                      <Button style={{ marginTop: '15px' }} onClick={this.showTargetDrawer}>
+                        Target Instruction
+                      </Button>
+
+                      {/* <p
                     style={{
                       display: 'inline-block',
                       width: '30%',
@@ -573,32 +572,57 @@ class DataRecording extends React.Component {
                   >
                     {MasterSession.targets.edges[TargetActiveIndex].node?.targetId?.domain?.domain}
                   </p> */}
-                  <Button
-                    style={{ marginLeft: '10px', marginTop: '15px', }}
-                    onClick={this.toggleShowVideo}
-                  >
-                    {showVideo ? 'Show Graph' : 'Show Video'}
-                  </Button>
-                  <Button style={{ marginLeft: '10px', marginTop: '15px', border: 'none' }}>
-                    {MasterSession.targets.edges[TargetActiveIndex].node?.targetStatus?.statusName}
-                  </Button>
-                  <Button style={{ float: 'right', marginTop: '15px' }} onClick={this.showDrawer}>
-                    BR
-                  </Button>
-                </>
-              ) : (
+                      <Button
+                        style={{ marginLeft: '10px', marginTop: '15px' }}
+                        onClick={this.toggleShowVideo}
+                      >
+                        {showVideo ? 'Show Graph' : 'Show Video'}
+                      </Button>
+                      <Button
+                        style={{ float: 'right', marginTop: '15px' }}
+                        onClick={this.showDrawer}
+                      >
+                        BR
+                      </Button>
+
+                      <Badge
+                        style={{
+                          marginLeft: '10px',
+                          marginBottom: '8px',
+                          background: '#1890ff',
+                        }}
+                        count={
+                          MasterSession?.targets.edges[TargetActiveIndex]?.node
+                            .targetAllcatedDetails.targetType.typeTar
+                        }
+                      />
+                      {MasterSession?.targets.edges[TargetActiveIndex]?.node.targetAllcatedDetails
+                        .targetType.id === peakId && (
+                        <Badge
+                          style={{
+                            marginLeft: '10px',
+                            marginBottom: '8px',
+                            background: '#1890ff',
+                          }}
+                          count={MasterSession?.targets.edges[TargetActiveIndex]?.node.peakType}
+                        />
+                      )}
+                    </div>
+                  </>
+                ) : (
                   ''
                 )}
-            </Card>
-            {/* End of Header block details */}
-            <Row>
-              {/* Target video section */}
-              <Col xs={24} sm={24} md={12} lg={12} xl={12} style={borderOnePixel}>
-                {showVideo ? (
-                  <Card bodyStyle={{ padding: '5px', border: 'none' }} style={{ border: 'none' }}>
-                    {MasterSession.targets.edges[TargetActiveIndex].node.videos.edges.length > 0 ? (
-                      <>
-                        {/* <iframe
+              </Card>
+              {/* End of Header block details */}
+              <Row>
+                {/* Target video section */}
+                <Col xs={24} sm={24} md={12} lg={12} xl={12} style={borderOnePixel}>
+                  {showVideo ? (
+                    <Card bodyStyle={{ padding: '5px', border: 'none' }} style={{ border: 'none' }}>
+                      {MasterSession?.targets.edges[TargetActiveIndex].node.videos.edges.length >
+                      0 ? (
+                        <>
+                          {/* <iframe
                         width="100%"
                         height="250px"
                         title="0"
@@ -607,101 +631,102 @@ class DataRecording extends React.Component {
                         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
                         allowfullscreen
                       /> */}
-                        {VideoLoading === true ? (
-                          <p>Loading video...</p>
-                        ) : (
+                          {VideoLoading === true ? (
+                            <p>Loading video...</p>
+                          ) : (
                             <>
                               {VideoAvailable === true ? (
                                 <ReactPlayer url={VideoUrl} controls height="250px" width="100%" />
                               ) : (
-                                  <Empty />
-                                )}
+                                <Empty />
+                              )}
                             </>
                           )}
-                      </>
-                    ) : (
+                        </>
+                      ) : (
                         <Empty style={{ height: '250px' }} />
                       )}
-                  </Card>
-                ) : (
+                    </Card>
+                  ) : (
                     <Card
                       bodyStyle={{ padding: '5px', border: 'none', height: '250' }}
                       style={{ border: 'none' }}
                     >
                       <TargetResponseGraph
                         key={
-                          MasterSession.targets.edges[TargetActiveIndex].node.sd.edges.length > 0 ?
-                            StimulusActiveId :
-                            MasterSession.targets.edges[TargetActiveIndex].node.steps.edges.length > 0 ?
-                              StepActiveId : TargetActiveId
+                          MasterSession.targets.edges[TargetActiveIndex].node.sd.edges.length > 0
+                            ? StimulusActiveId + SelectedPeakStimulusIndex
+                            : MasterSession.targets.edges[TargetActiveIndex].node.steps.edges
+                                .length > 0
+                            ? StepActiveId
+                            : TargetActiveId
                         }
                         targetId={MasterSession.targets.edges[TargetActiveIndex].node.id}
                         sessionId={MasterSession?.id}
                       />
                     </Card>
                   )}
-              </Col>
-              {/* End of target video section */}
-              {/* Target recording section */}
-              <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                {MasterSession.targets.edges[TargetActiveIndex].node.targetAllcatedDetails
-                  .targetType.id === peakId ?
-                  <>
-                    {MasterSession.targets.edges[TargetActiveIndex].node.peakType === equivalence ? (
-                      <EquivalenceRecordingBlock key={TargetActiveIndex} />
-                    )
-                      :
-                      (
+                </Col>
+                {/* End of target video section */}
+                {/* Target recording section */}
+                <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+                  {MasterSession?.targets.edges[TargetActiveIndex].node.targetAllcatedDetails
+                    .targetType.id === peakId ? (
+                    <>
+                      {MasterSession?.targets.edges[TargetActiveIndex].node.peakType ===
+                      equivalence ? (
+                        <EquivalenceRecordingBlock key={TargetActiveIndex} />
+                      ) : (
                         <PeakRecordingBlock />
-                      )
-                    }
-                  </>
-                  : (
+                      )}
+                    </>
+                  ) : (
                     <DataRecordingBlock />
                   )}
-                {/* <EquivalenceRecordingBlock /> */}
-              </Col>
-              {/* End of Target recording section */}
-            </Row>
-            {/* Trials list section */}
-            <Card bodyStyle={{ padding: '5px', border: 'none' }} style={{ border: 'none' }}>
-              {MasterSession.targets.edges[TargetActiveIndex].node.targetAllcatedDetails.targetType
-                .id === peakId ? 
+                  {/* <EquivalenceRecordingBlock /> */}
+                </Col>
+                {/* End of Target recording section */}
+              </Row>
+              {/* Trials list section */}
+              <Card bodyStyle={{ padding: '5px', border: 'none' }} style={{ border: 'none' }}>
+                {MasterSession?.targets.edges[TargetActiveIndex].node.targetAllcatedDetails
+                  .targetType.id === peakId ? (
                   <>
-                    {MasterSession.targets.edges[TargetActiveIndex].node.peakType === equivalence ? (
+                    {MasterSession.targets.edges[TargetActiveIndex].node.peakType ===
+                    equivalence ? (
                       // <p>1</p>
                       <EquivalenceScoreBoard key={TargetActiveIndex} />
-                    )
-                      :
-                      (
-                        <PeakTrialBoxes trails={10} boxWidth="45px" boxHeight="20px" />
-                      )
-                    }
-                  </> 
-                  : (
+                    ) : (
+                      <PeakTrialBoxes trails={10} boxWidth="45px" boxHeight="20px" />
+                    )}
+                  </>
+                ) : (
                   <>
-                    {MasterSession.targets.edges[TargetActiveIndex].node.sd.edges.length > 0 ? (
+                    {MasterSession?.targets.edges[TargetActiveIndex].node.sd.edges.length > 0 ? (
                       <>
-                        {MasterSession.targets.edges[TargetActiveIndex].node.sd.edges.map(item2 => (
-                          <>
-                            <span>Stimulus : {item2.node.sd} </span>
-                            <br />
-                            <TrialsList
-                              key={MasterSession.targets.edges[TargetActiveIndex].node.id}
-                              id={MasterSession.targets.edges[TargetActiveIndex].node.id}
-                              sdKey={item2.node.id}
-                              stepKey=""
-                              dailyTrails={
-                                MasterSession.targets.edges[TargetActiveIndex].node
-                                  .targetAllcatedDetails.DailyTrials
-                              }
-                              boxWidth="35px"
-                            />
-                            <br />
-                          </>
-                        ))}
+                        {MasterSession?.targets.edges[TargetActiveIndex].node.sd.edges.map(
+                          item2 => (
+                            <>
+                              <span>Stimulus : {item2.node.sd} </span>
+                              <br />
+                              <TrialsList
+                                key={MasterSession.targets.edges[TargetActiveIndex].node.id}
+                                id={MasterSession.targets.edges[TargetActiveIndex].node.id}
+                                sdKey={item2.node.id}
+                                stepKey=""
+                                dailyTrails={
+                                  MasterSession.targets.edges[TargetActiveIndex].node
+                                    .targetAllcatedDetails.DailyTrials
+                                }
+                                boxWidth="35px"
+                              />
+                              <br />
+                            </>
+                          ),
+                        )}
                       </>
-                    ) : MasterSession.targets.edges[TargetActiveIndex].node.steps.edges.length > 0 ? (
+                    ) : MasterSession?.targets.edges[TargetActiveIndex].node.steps.edges.length >
+                      0 ? (
                       <>
                         {MasterSession.targets.edges[TargetActiveIndex].node.steps.edges.map(
                           item3 => (
@@ -725,76 +750,77 @@ class DataRecording extends React.Component {
                         )}
                       </>
                     ) : (
-                          <TrialsList
-                            key={MasterSession.targets.edges[TargetActiveIndex].node.id}
-                            id={MasterSession.targets.edges[TargetActiveIndex].node.id}
-                            sdKey=""
-                            stepKey=""
-                            dailyTrails={
-                              MasterSession.targets.edges[TargetActiveIndex].node.targetAllcatedDetails
-                                .DailyTrials
-                            }
-                            boxWidth="35px"
-                          />
-                        )}
+                      <TrialsList
+                        key={MasterSession?.targets.edges[TargetActiveIndex].node.id}
+                        id={MasterSession?.targets.edges[TargetActiveIndex].node.id}
+                        sdKey=""
+                        stepKey=""
+                        dailyTrails={
+                          MasterSession?.targets.edges[TargetActiveIndex].node.targetAllcatedDetails
+                            .DailyTrials
+                        }
+                        boxWidth="35px"
+                      />
+                    )}
                   </>
                 )}
 
-              <br />
-              {MasterSession?.targets.edgeCount > TargetActiveIndex + 1 ? (
-                <>
-                  <Button style={{ float: 'right' }} onClick={this.changeTarget}>
-                    Next
-                  </Button>
-                  &nbsp;
-                  {/* <Button onClick={this.saveData} type="primary">Save and Next</Button>  */}
-                </>
-              ) : (
+                <br />
+                {MasterSession?.targets.edgeCount > TargetActiveIndex + 1 ? (
+                  <>
+                    <Button style={{ float: 'right' }} onClick={this.changeTarget}>
+                      Next
+                    </Button>
+                    &nbsp;
+                    {/* <Button onClick={this.saveData} type="primary">Save and Next</Button>  */}
+                  </>
+                ) : (
                   <>
                     <Button style={{ float: 'right' }} disabled>
                       Next
-                  </Button>
+                    </Button>
                     &nbsp;
-                  {/* <Button onClick={this.saveData} type="primary">Save</Button> */}
+                    {/* <Button onClick={this.saveData} type="primary">Save</Button> */}
                   </>
                 )}
 
-              {TargetActiveIndex === 0 ? (
-                <>
-                  <Button style={{ float: 'right', marginRight: '10px' }} disabled>
-                    Prev
-                  </Button>
-                  &nbsp;
-                  {/* <Button onClick={this.saveData} type="primary">Save and Next</Button>  */}
-                </>
-              ) : (
+                {TargetActiveIndex === 0 ? (
+                  <>
+                    <Button style={{ float: 'right', marginRight: '10px' }} disabled>
+                      Prev
+                    </Button>
+                    &nbsp;
+                    {/* <Button onClick={this.saveData} type="primary">Save and Next</Button>  */}
+                  </>
+                ) : (
                   <>
                     <Button
                       style={{ float: 'right', marginRight: '10px' }}
                       onClick={this.moveToPreviousTarget}
                     >
                       Prev
-                  </Button>
+                    </Button>
                     &nbsp;
-                  {/* <Button onClick={this.saveData} type="primary">Save</Button> */}
+                    {/* <Button onClick={this.saveData} type="primary">Save</Button> */}
                   </>
                 )}
-            </Card>
-            {/* End of Trials list section */}
-            {this.state.visible && (
-              <Drawer
-                height="90%"
-                placement="bottom"
-                closable={false}
-                onClose={this.onClose}
-                visible={this.state.visible}
-                getContainer={false}
-                style={{ position: 'absolute' }}
-              >
-                <RecordView />
-              </Drawer>
-            )}
-            <Drawer
+              </Card>
+              {/* End of Trials list section */}
+              {this.state.visible && (
+                <Drawer
+                  height="90%"
+                  placement="bottom"
+                  closable={false}
+                  onClose={this.onClose}
+                  visible={this.state.visible}
+                  getContainer={false}
+                  style={{ position: 'absolute' }}
+                  className="br-drawer"
+                >
+                  <RecordView />
+                </Drawer>
+              )}
+              {/* <Drawer
               height="90%"
               placement="bottom"
               closable={false}
@@ -804,34 +830,37 @@ class DataRecording extends React.Component {
               style={{ position: 'absolute' }}
             >
               <RecordView />
-            </Drawer>
-            <Drawer
-              title="Target Instruction"
-              width="40%"
-              placement="left"
-              closable={false}
-              onClose={this.onTargetClose}
-              visible={this.state.targetVisible}
-              getContainer={false}
-              style={{ position: 'absolute' }}
-            >
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: MasterSession?.targets.edges[TargetActiveIndex].node.targetInstr,
-                }}
-              />
-            </Drawer>
-          </Col>
-          {/* End of Main target recording area */}
-          {/* clock and target list portion */}
-          <Col xs={0} sm={6} md={6} lg={6} xl={6} style={style3}>
-            <SessionClock />
-            <div style={targetBlockStyle}>
-              <TargetListBlock />
-            </div>
-          </Col>
-          {/* End of clock and target list portion */}
-        </Row>
+            </Drawer> */}
+              <Drawer
+                title="Target Instruction"
+                width="40%"
+                placement="left"
+                closable={false}
+                onClose={this.onTargetClose}
+                visible={this.state.targetVisible}
+                getContainer={false}
+                style={{ position: 'absolute' }}
+              >
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: MasterSession?.targets.edges[TargetActiveIndex].node.targetInstr,
+                  }}
+                />
+              </Drawer>
+            </Col>
+            {/* End of Main target recording area */}
+            {/* clock and target list portion */}
+            <Col xs={0} sm={6} md={6} lg={6} xl={6} style={style3}>
+              <div style={{ borderBottom: '1px solid #ccc' }}>
+                <SessionClock />
+              </div>
+              <div style={targetBlockStyle}>
+                <TargetListBlock />
+              </div>
+            </Col>
+            {/* End of clock and target list portion */}
+          </Row>
+        )}
       </Authorize>
     )
   }

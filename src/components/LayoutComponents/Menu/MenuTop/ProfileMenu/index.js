@@ -58,6 +58,12 @@ class ProfileMenu extends React.Component {
           </div>
         </Menu.Item>
         <Menu.Divider />
+        <Menu.Item>
+          <a href="/#/clinicSupportTicket">
+            <strong>Tickets</strong>
+          </a>
+        </Menu.Item>
+        {/* <Menu.Divider />
         {user.role === 'parents' ? (
           <Menu.Item>
             <a href="/#/profileSetting/">
@@ -87,7 +93,7 @@ class ProfileMenu extends React.Component {
           </Menu.Item>
         ) : (
           ''
-        )}
+        )} */}
         
         <Menu.Divider />
         <Menu.Item onClick={this.logout}>

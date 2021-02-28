@@ -148,7 +148,7 @@ export default () => {
         Their are no clinic tutorial module
         <br />
         You can create form{' '}
-        <Link to="/clinicProfile/" style={{ color: 'blue' }}>
+        <Link to="/clinicVideoTutorials" style={{ color: 'blue' }}>
           here
         </Link>
       </h3>

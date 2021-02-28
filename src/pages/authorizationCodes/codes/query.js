@@ -4,7 +4,7 @@ import gql from 'graphql-tag'
 
 export const GET_CODES = gql`
   query {
-    getAuthorizationCodes(school: "Q2xpbmljRGV0YWlsc1R5cGU6NDM3", payor: "UGF5b3JUeXBlOjE=") {
+    getAuthorizationCodes {
       edges {
         node {
           id
@@ -19,6 +19,7 @@ export const GET_CODES = gql`
           payor {
             id
             firstname
+            lastname
           }
           codeType {
             id

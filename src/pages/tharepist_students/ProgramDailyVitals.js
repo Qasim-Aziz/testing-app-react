@@ -5,46 +5,25 @@
 /* eslint-disable react/no-unused-state */
 /* eslint-disable react/jsx-boolean-value */
 /* eslint-disable react/jsx-indent-props */
+/* eslint-disable consistent-return */
+/* eslint-disable no-unneeded-ternary */
 import React, { PureComponent } from 'react'
-import { Layout, Row, Col, Input, Typography, Empty, Drawer, Tooltip, Button } from 'antd'
+import { Layout, Row, Col, Input, Empty, Drawer, Button } from 'antd'
 import { Helmet } from 'react-helmet'
 import Authorize from 'components/LayoutComponents/Authorize'
 import { gql } from 'apollo-boost'
 import { connect } from 'react-redux'
 import { FilterOutlined, PlusOutlined } from '@ant-design/icons'
 import { MdFilterList } from 'react-icons/md'
-import { useQuery } from 'react-apollo'
 import apolloClient from '../../apollo/config'
 import LearnerCard from './LearnerCard'
-import LearnerDetailsCard from './LearnerDetailsCard'
 import DailyVitalsCard from './DailyVitalsCard'
-import brainImg from '../../images/brain.png'
+
 import './ProgramDailyVitals.scss'
 
 const { Content } = Layout
-const { Title, Text } = Typography
 const { Search } = Input
-const cardStyle = {
-  background: '#F9F9F9',
-  height: 500,
-  overflow: 'auto',
-}
-const parentCardStyle = {
-  background: '#F9F9F9',
-  borderRadius: 10,
-  padding: '20px',
-  margin: '20px 10px 20px 10px',
-}
-const targetMappingStyle = {
-  background: '#FFFFFF',
-  border: '1px solid #E4E9F0',
-  boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
-  borderRadius: 10,
-  padding: '16px 12px',
-  // display: 'flex',
-  alignItems: 'center',
-  marginBottom: '10px',
-}
+
 @connect(({ student, user }) => ({ student, user }))
 class TharepistStudentsDailyVitals extends PureComponent {
   constructor(props) {
@@ -55,6 +34,8 @@ class TharepistStudentsDailyVitals extends PureComponent {
     this.openDrawer = this.openDrawer.bind(this)
     this.filterLearnerData = this.filterLearnerData.bind(this)
     this.onClose = this.onClose.bind(this)
+
+    const { activeTab } = this.props
 
     this.state = {
       // isClicked: false,
@@ -71,7 +52,8 @@ class TharepistStudentsDailyVitals extends PureComponent {
       openRightdrawer: false,
       filter: false,
       TabStage: 1,
-      TabCheck: 'Meal Data',
+      TabCheck: activeTab ? activeTab : 'Meal Data',
+      selectedStudent: '',
     }
   }
 
@@ -124,13 +106,19 @@ class TharepistStudentsDailyVitals extends PureComponent {
             isPresent: true,
             selectedNode: refinedArray[0].node,
             loading: false,
+            selectedStudent: result,
           })
         } else {
           this.setState({
             loading: false,
             students: qresult.data.students.edges,
             prevData: qresult.data.students.edges,
+            selectedStudent: qresult.data.students.edges[0]?.node?.id,
           })
+          localStorage.setItem(
+            'studentId',
+            JSON.stringify(qresult.data.students.edges[0]?.node?.id),
+          )
         }
       })
       .catch(error => {
@@ -139,8 +127,6 @@ class TharepistStudentsDailyVitals extends PureComponent {
   }
 
   setClickHandler = node => {
-    // console.log('===> cliked', node.id)
-    // setting student id to local storage for further operations
     localStorage.setItem('studentId', JSON.stringify(node.id))
     this.setState({
       isDrawer: false,
@@ -150,7 +136,7 @@ class TharepistStudentsDailyVitals extends PureComponent {
   }
 
   move = (data, storageData) => {
-    data.forEach(function (item, i) {
+    data.forEach(function(item, i) {
       if (item.node.id.toUpperCase() === storageData.toUpperCase()) {
         data.splice(i, 1)
         data.unshift(item)
@@ -160,7 +146,7 @@ class TharepistStudentsDailyVitals extends PureComponent {
   }
 
   filter = (data, name) => {
-    return data.filter(function (el) {
+    return data.filter(function(el) {
       return (
         el.node.firstname !== null && el.node.firstname.toUpperCase().includes(name.toUpperCase())
       )
@@ -170,26 +156,23 @@ class TharepistStudentsDailyVitals extends PureComponent {
   renderStudentCards = () => {
     const stateData = this.state
     const cards = []
-    console.log(stateData)
     if (stateData.students !== undefined) {
       for (let i = 0; i < stateData.students.length; i += 1) {
         cards.push(
-          <>
-            <div
-              role="presentation"
-              onClick={() => {
-                this.setClickHandler(stateData.students[i].node)
-              }}
-            >
-              <LearnerCard
-                key={stateData.students[i].node.id}
-                node={stateData.students[i].node}
-                name={stateData.students[i].node.firstname}
-                style={{ marginTop: 18 }}
-                leaveRequest={stateData.students[i].node.leaveRequest}
-              />
-            </div>
-          </>,
+          <div
+            key={stateData.students[i].node.id}
+            role="presentation"
+            onClick={() => {
+              this.setClickHandler(stateData.students[i].node)
+            }}
+          >
+            <LearnerCard
+              node={stateData.students[i].node}
+              name={stateData.students[i].node.firstname}
+              style={{ marginTop: 18 }}
+              leaveRequest={stateData.students[i].node.leaveRequest}
+            />
+          </div>,
         )
       }
     }
@@ -200,43 +183,8 @@ class TharepistStudentsDailyVitals extends PureComponent {
     this.setState({ TabCheck: val })
   }
 
-  renderBehaviorContent = () => {
-    return (
-      <div style={parentCardStyle}>
-        <div style={cardStyle}>
-          <Title style={{ fontSize: 20, lineHeight: '27px' }}>Behaviors</Title>
-          <a href="/#/decel/">
-            <div style={targetMappingStyle}>
-              <img
-                style={{
-                  marginRight: '10px',
-                  height: '40px',
-                }}
-                src={brainImg}
-                alt=""
-              />
-              <Text style={{ fontSize: 20, lineHeight: '27px' }}>Behavior Data</Text>
-            </div>
-          </a>
-          <a href="/#/abc/">
-            <div style={targetMappingStyle}>
-              <Title style={{ fontSize: '20px', lineHeight: '27px', display: 'block' }}>
-                ABC Data
-              </Title>
-
-              <p style={{ display: 'block', marginTop: '5px', marginBottom: '-5px' }}>
-                <i>Click here to record ABC data</i>
-              </p>
-            </div>
-          </a>
-        </div>
-      </div>
-    )
-  }
-
   renderDetail = () => {
     const data = this.state
-    console.log(data, 'checkData')
     if (data.students[0] !== undefined) {
       return (
         <>
@@ -251,46 +199,13 @@ class TharepistStudentsDailyVitals extends PureComponent {
                 data={data}
                 setTabCheck={this.setTabCheck}
                 openDrawer={this.openDrawer}
+                selectedStudent={data.selectedStudent}
               />
-            </Col>
-            <Col span={12} style={{ display: 'none' }}>
-              {this.renderBehaviorContent()}
             </Col>
           </Row>
         </>
       )
     }
-
-    if (!data.isDrawer) {
-      return (
-        <>
-          {localStorage.getItem('studentId') !== '' ? (
-            <>
-              <Row>
-                <Col span={24}>
-                  <DailyVitalsCard
-                    openRightdrawer={data.openRightdrawer}
-                    closeDrawer={this.closeDrawer}
-                    filterToggle={data.filter}
-                    handleFilterToggle={this.handleFilterToggle}
-                    TabCheck={data.TabCheck}
-                    data={data}
-                    setTabCheck={this.setTabCheck}
-                    openDrawer={this.openDrawer}
-                  />
-                </Col>
-                <Col span={12} style={{ display: 'none' }}>
-                  {this.renderBehaviorContent()}
-                </Col>
-              </Row>
-            </>
-          ) : (
-              ''
-            )}
-        </>
-      )
-    }
-    return null
   }
 
   filterLearnerData = e => {
@@ -336,11 +251,13 @@ class TharepistStudentsDailyVitals extends PureComponent {
     const stateData = this.state
     const checkStudnetOnLocalStorage = localStorage.getItem('studentId')
 
-    const { user: { role } } = this.props
+    const {
+      user: { role },
+    } = this.props
 
     return (
-      <Authorize roles={['therapist', 'school_admin', 'parents']} redirect to="/dashboard/beta">
-        <Helmet title="Dashboard Alpha" />
+      <Authorize roles={['therapist', 'school_admin', 'parents']} redirect to="/">
+        <Helmet title="Daily Vitals" />
         <Layout style={{ padding: '0px' }}>
           <div
             style={{
@@ -349,6 +266,7 @@ class TharepistStudentsDailyVitals extends PureComponent {
               justifyContent: 'space-between',
               alignItems: 'center',
               padding: '0px 10px',
+              margin: '10px 0',
               backgroundColor: '#FFF',
               boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
             }}
@@ -384,14 +302,14 @@ class TharepistStudentsDailyVitals extends PureComponent {
                       }}
                       style={{ width: '100%', marginBottom: '10px' }}
                     />
-                    <div style={{ height: '660px', overflow: 'auto' }}>
+                    <div>
                       {stateData.loading === true ? (
                         <>
-                          <p style={{ marginTop: '20px' }}>loading studnets...</p>
+                          <p style={{ marginTop: '20px' }}>loading students...</p>
                         </>
                       ) : (
-                          <>{this.renderStudentCards()}</>
-                        )}
+                        <>{this.renderStudentCards()}</>
+                      )}
                     </div>
                   </Drawer>
                 </div>
@@ -424,7 +342,13 @@ class TharepistStudentsDailyVitals extends PureComponent {
           </div>
 
           <Col style={{ paddingRight: 0 }}>
-            {checkStudnetOnLocalStorage ? this.renderDetail() : <Empty />}
+            {stateData.selectedStudent || checkStudnetOnLocalStorage ? (
+              this.renderDetail()
+            ) : (
+              <>
+                <Empty />
+              </>
+            )}
           </Col>
         </Layout>
       </Authorize>

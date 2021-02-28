@@ -111,7 +111,7 @@ button {
 
 .profile-details {
   .profile-title {
-    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.4);
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.4);
     background-color: #fff;
     text-align: center;
     padding: 9px;
@@ -235,5 +235,16 @@ button {
     font-size: 24px;
     margin-top: 5px;
     font-weight: 600;
+  }
+}
+
+.miscConfigTab {
+  .ant-form-item {
+    margin-bottom: 5px;
+  }
+
+  .ant-form-item label {
+    font-size: 14px;
+    font-weight: bold;
   }
 }

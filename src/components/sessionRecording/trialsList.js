@@ -46,6 +46,9 @@ class TrialsList extends Component {
         if (item.trial === 'ERROR') {
           colorList.push('#FF8080')
         }
+        if (item.trial === 'INCORRECT') {
+          colorList.push('#FF8080')
+        }
         if (item.trial === 'PROMPT') {
           colorList.push('#FF9C52')
         }

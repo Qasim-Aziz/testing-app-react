@@ -23,20 +23,20 @@ import React from 'react'
 import { Helmet } from 'react-helmet'
 import ReactPlayer from 'react-player'
 import {
-    Row,
-    Col,
-    Card,
-    Drawer,
-    Select,
-    Form,
-    Collapse,
-    Tree,
-    Icon,
-    DatePicker,
-    notification,
-    Empty,
-    Button,
-    Typography,
+  Row,
+  Col,
+  Card,
+  Drawer,
+  Select,
+  Form,
+  Collapse,
+  Tree,
+  Icon,
+  DatePicker,
+  notification,
+  Empty,
+  Button,
+  Typography,
 } from 'antd'
 import { Redirect } from 'react-router-dom'
 import Authorize from 'components/LayoutComponents/Authorize'
@@ -46,60 +46,57 @@ import ParentFeedback from './parentFeedback'
 import TherapistFeedback from './therapistFeedback'
 
 const { Title, Text } = Typography
-const { Panel } = Collapse;
+const { Panel } = Collapse
 
 const text = (
-    <p style={{ paddingLeft: 24 }}>
-      A dog is a type of domesticated animal. Known for its loyalty and faithfulness, it can be found
-      as a welcome guest in many households across the world.
-    </p>
-);
+  <p style={{ paddingLeft: 24 }}>
+    A dog is a type of domesticated animal. Known for its loyalty and faithfulness, it can be found
+    as a welcome guest in many households across the world.
+  </p>
+)
 
 @connect(({ user, feedback }) => ({ user, feedback }))
 class DataRecording extends React.Component {
-    constructor(props) {
-        super(props)
+  constructor(props) {
+    super(props)
 
-        this.state = {
-            loading: false,
-        }
+    this.state = {
+      loading: false,
+    }
+  }
+
+  componentDidMount() {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'feedback/GET_QUESTIONS',
+    })
+  }
+
+  render() {
+    const { loading } = this.state
+
+    if (loading) {
+      return 'Loading data...'
     }
 
-    componentDidMount() {
-        const {dispatch} = this.props
-        dispatch({
-            type: 'feedback/GET_QUESTIONS',
-        })
-    }
-
-
-    render() {
-        const { loading } = this.state
-
-        if (loading) {
-            return 'Loading data...'
-        }
-
-        return (
-            <Authorize roles={['school_admin', 'therapist', 'parents']} redirect to="/dashboard/beta">
-                <Helmet title="Session" />
-                <Row>
-
-                    <Col span={24}>
-                        <Collapse bordered={false} defaultActiveKey={['1']}>
-                            <Panel header="Parent Feedback" key="1">
-                                <ParentFeedback />
-                            </Panel>
-                            <Panel header="Therapist Feedback" key="2">
-                                <TherapistFeedback />
-                            </Panel>
-                        </Collapse>
-                    </Col>
-
-                </Row>
-            </Authorize>
-        )
-    }
+    return (
+      <Authorize roles={['school_admin', 'therapist', 'parents']} redirect to="/dashboard/beta">
+        <Helmet title="Session" />
+        <Row>
+          <Col span={24}>
+            <Collapse bordered={false} defaultActiveKey={['1']}>
+              <Panel header="Parent Feedback" key="1">
+                <ParentFeedback />
+              </Panel>
+              <Panel header="Therapist Feedback" key="2">
+                <TherapistFeedback />
+              </Panel>
+            </Collapse>
+          </Col>
+        </Row>
+      </Authorize>
+    )
+  }
 }
 
 export default DataRecording

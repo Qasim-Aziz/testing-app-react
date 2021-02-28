@@ -68,7 +68,7 @@ const DashboardTab = () => {
       title: 'Attendance',
       path: '#',
       color: 'orange',
-      enableAdd: true,
+      enableAdd: false,
       labelForAddButton: 'Add Attendance',
       style: { borderTop: '2px solid orange' },
       component: <AttendenceCard />,

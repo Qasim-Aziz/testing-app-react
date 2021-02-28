@@ -15,6 +15,8 @@ import peakReprotCom from './pages/PEAK/PeakReport'
 import Reportss from './pages/reports'
 import AppData from './pages/appointmentdata'
 import clinicDash from './pages/Dashboard/Clinic'
+import payorCom from './pages/payor'
+import PrintTableInvoice from './pages/allClinicData/printableInvoice'
 
 
 
@@ -394,8 +396,8 @@ const routes = [
   },
   {
     path: '/sessionrecording',
-    component: loadable(() => import('pages/sessionrecording')),
-    // component: sessionR,
+    // component: loadable(() => import('pages/sessionrecording')),
+    component: loadable(() => import('pages/SessionDataRecording')),
     exact: true,
   },
   {
@@ -427,6 +429,12 @@ const routes = [
     exact: true,
   },
 
+  {
+    path: '/printInvoice/',
+    component: PrintTableInvoice,
+    exact: true,
+  },
+
 
   // Therapist Urls 
   // Program
@@ -438,6 +446,57 @@ const routes = [
   {
     path: '/therapistStudent',
     component: loadable(() => import('pages/LearnersProgram')),
+    exact: true,
+  },
+
+  {
+    path: '/LearnerAssessments',
+    component: loadable(() => import('pages/LearnersProgram/urlAssessments')),
+    exact: true,
+  },
+  {
+    path: '/LearnerGoals',
+    component: loadable(() => import('pages/LearnersProgram/urlGoals')),
+    exact: true,
+  },
+  {
+    path: '/LearnerSessions',
+    component: loadable(() => import('pages/LearnersProgram/urlSessions')),
+    exact: true,
+  },
+  {
+    path: '/LearnerBuildSessions',
+    component: loadable(() => import('pages/LearnersProgram/urlBuildSessions')),
+    exact: true,
+  },
+  {
+    path: '/LearnerMand',
+    component: loadable(() => import('pages/tharepist_students/urlMand')),
+    exact: true,
+  },
+  {
+    path: '/LearnerMeal',
+    component: loadable(() => import('pages/tharepist_students/urlMeal')),
+    exact: true,
+  },
+  {
+    path: '/LearnerMedical',
+    component: loadable(() => import('pages/tharepist_students/urlMedical')),
+    exact: true,
+  },
+  {
+    path: '/LearnerBehavior',
+    component: loadable(() => import('pages/tharepist_students/urlBehavior')),
+    exact: true,
+  },
+  {
+    path: '/LearnerABC',
+    component: loadable(() => import('pages/tharepist_students/urlAbc')),
+    exact: true,
+  },
+  {
+    path: '/LearnerToilet',
+    component: loadable(() => import('pages/tharepist_students/urlToilet')),
     exact: true,
   },
   // Program Daily Vitals
@@ -512,7 +571,25 @@ const routes = [
     exact: true,
   },
   {
-    path: '/reports',
+    path: [
+      '/reports',
+      '/reports/progress_overview',
+      '/reports/daily_res_rate',
+      '/reports/behavior',
+      '/reports/mand',
+      '/reports/sessions',
+      '/reports/goals',
+      '/reports/celer_chart',
+      '/reports/appointment_report',
+      '/reports/staff_activity',
+      '/reports/attendance',
+      '/reports/timesheet',
+      '/reports/monthly_report',
+      '/reports/vbmapp',
+      '/reports/peak_block_report',
+      '/reports/target_res_report',
+      '/reports/network_graph',
+    ],
     // component: loadable(() => import('pages/reports/index')),
     component: Reportss,
     exact: true,
@@ -530,13 +607,29 @@ const routes = [
    // Payors
   {
     path: '/payors/view_payors',
-    component: loadable(() => import('pages/payor')),
+    // component: loadable(() => import('pages/payor')),
+    component: payorCom,
     exact: true,
   },
   // Service codes
   {
     path: '/authorization_codes/view_codes',
     component: loadable(() => import('pages/authorizationCodes')),
+    exact: true,
+  },
+  {
+    path: '/clinicSupportTicket',
+    component: loadable(() => import('pages/ClinicProfile/SupportTicketSett')),
+    exact: true,
+  },
+  {
+    path: '/clinicInvoice',
+    component: loadable(() => import('pages/ClinicProfile/Invoices')),
+    exact: true,
+  },
+  {
+    path: '/clinicVideoTutorials',
+    component: loadable(() => import('pages/ClinicProfile/VideoTutorial')),
     exact: true,
   },
 

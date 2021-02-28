@@ -1,36 +1,24 @@
-/* eslint-disable react/jsx-boolean-value */
-/* eslint-disable no-nested-ternary */
-
-import React, { useState, useEffect } from 'react'
-import { Button, Input, Drawer, Select } from 'antd'
-import { FilterOutlined, PlusOutlined, CloseCircleOutlined } from '@ant-design/icons'
-import DataTable from 'react-data-table-component'
+import { PlusOutlined } from '@ant-design/icons'
+import { Button, Drawer, Radio, Table } from 'antd'
+import { defaultColumnProps } from 'components/PayorsAndBilling/Common/utils'
+import React, { useEffect, useState } from 'react'
 import { useQuery } from 'react-apollo'
-import ExportData from './ExportData'
-
-import EditCode from './EditCode'
+import Highlighter from 'react-highlight-words'
 import AddCode from './AddCode'
+import EditCode from './EditCode'
+import ExportData from './ExportData'
 import {
-  GET_CODES,
-  GET_ACTIVE_INACTIVE_CODES,
-  GET_CODE_TYPES,
   GET_CALCULATION_TYPES,
+  GET_CODES,
+  GET_CODE_TYPES,
+  GET_DEFAULT_UNITS,
   GET_PAYORS,
   GET_USER_ROLE,
-  GET_DEFAULT_UNITS,
 } from './query'
 
 const CodesTable = () => {
   const [showRightDrawer, setShowRightDrawer] = useState(false)
-  const [showFilterDrawer, setShowFilterDrawer] = useState(false)
   const [showForm, setShowForm] = useState('')
-  const [selectStatus, setSelectStatus] = useState('all')
-  const [filterCode, setFilterCode] = useState('')
-  const [filterBillable, setFilterBillable] = useState(null)
-  const [filterPayor, setFilterPayor] = useState('')
-  const [filterCodeType, setFilterCodeType] = useState('')
-  const [filterCalculationType, setFilterCalculationType] = useState('')
-  const [filteredList, setFilteredList] = useState([])
   const [codeList, setCodeList] = useState([])
   const [codeTypeList, setCodeTypeList] = useState([])
   const [calculationTypeList, setCalculationTypeList] = useState([])
@@ -38,6 +26,16 @@ const CodesTable = () => {
   const [defaultUnitList, setDefaultUnitList] = useState([])
   const [roleList, setRoleList] = useState([])
   const [codeProfile, setCodeProfile] = useState(null)
+  const [appliedFilters, setFilters] = useState({
+    isActive: ['all'],
+    codePermission: ['all'],
+    billable: ['all'],
+  })
+  const [appliedSorting, setSorting] = useState({
+    order: 'descend',
+    columnKey: 'code',
+  })
+
   const { data: codes, loading, error, refetch: refetchCodes } = useQuery(GET_CODES, {
     fetchPolicy: 'network-only',
   })
@@ -46,134 +44,222 @@ const CodesTable = () => {
   const { data: payors } = useQuery(GET_PAYORS)
   const { data: roles } = useQuery(GET_USER_ROLE)
   const { data: defaultUnits } = useQuery(GET_DEFAULT_UNITS)
-  const { data: activeCodes, refetch: refetchActive } = useQuery(GET_ACTIVE_INACTIVE_CODES, {
-    variables: {
-      isActive: true,
-    },
-  })
-  const { data: inActiveCodes, refetch: refetchInactive } = useQuery(GET_ACTIVE_INACTIVE_CODES, {
-    variables: {
-      isActive: false,
-    },
-  })
 
-  const getPermissions = data => {
+  const getPermissionText = data => {
     const list = []
     if (data && data.edges.length > 0) {
-      const nodes = data.edges.map(({ node }) => {
+      data.edges.forEach(({ node }) => {
         list.push(node.name)
         return node
       })
     }
-    return list
+
+    return list.join(', ')
   }
 
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    // Handle custom filters using here
+    confirm()
+    setFilters({
+      ...appliedFilters,
+      [dataIndex]: selectedKeys[0],
+    })
+  }
+
+  const handleReset = (clearFilters, dataIndex) => {
+    clearFilters()
+    const existingFilters = appliedFilters
+    if (existingFilters[dataIndex]) delete existingFilters[dataIndex]
+    setFilters(existingFilters)
+  }
+
+  const handleFilterAndSorting = (pagination, filters, sorter) => {
+    setSorting(sorter)
+    if (filters) {
+      // Handle default filters from here
+      if (filters.isActive && filters.isActive.length === 1) {
+        updateFilterValues('isActive', filters.isActive[0])
+      }
+      if (filters.codePermission && filters.codePermission.length === 1) {
+        updateFilterValues('codePermission', filters.codePermission[0])
+      }
+      if (filters.billable && filters.billable.length === 1) {
+        updateFilterValues('billable', filters.billable[0])
+      }
+    }
+  }
+
+  const updateFilterValues = (columnKey, newValue) => {
+    const updatedFilters = appliedFilters
+    updatedFilters[columnKey] = [newValue]
+    console.log('updatedFilters', updatedFilters)
+    setFilters(updatedFilters)
+  }
+
+  const columnCommonProps = [appliedFilters, appliedSorting, handleSearch, handleReset]
   const columns = [
     {
-      name: 'Code',
-      selector: 'code',
-      sortable: true,
-      cell: row => (
+      ...defaultColumnProps('Code', 'code', 'code', ...columnCommonProps),
+      render: (text, row) => (
         <Button
-          onClick={() => info(row)}
+          onClick={() => openInEditMode(row)}
           type="link"
-          style={{ fontWeight: 'bold', fontSize: '11px' }}
+          style={{ padding: '0px', fontWeight: 'bold', fontSize: '13px' }}
         >
-          {row.code}
+          {appliedFilters.code ? (
+            <Highlighter
+              highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+              searchWords={[appliedFilters.code]}
+              autoEscape
+              textToHighlight={text}
+            />
+          ) : (
+            text
+          )}
         </Button>
       ),
     },
     {
-      name: 'Description',
-      selector: 'description',
+      ...defaultColumnProps('Description', 'description', 'description', ...columnCommonProps),
     },
     {
-      name: 'Code Type',
-      selector: 'codeType.name',
+      ...defaultColumnProps('Code Type', 'codeType.name', 'codeTypeName', ...columnCommonProps),
     },
     {
-      name: 'School',
-      selector: 'school.schoolName',
+      ...defaultColumnProps('School Name', 'school.schoolName', 'schoolName', ...columnCommonProps),
     },
     {
-      name: 'Payor',
-      selector: 'payor.firstname',
+      ...defaultColumnProps('Payor Name', 'payor.firstname', 'payorName', ...columnCommonProps),
+      render: (text, row) =>
+        appliedFilters.payorName ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+            searchWords={[appliedFilters.payorName]}
+            autoEscape
+            textToHighlight={`${row.payor.firstname} ${row.payor.lastname ?? ''}`}
+          />
+        ) : (
+          `${row.payor.firstname} ${row.payor.lastname ?? ''}`
+        ),
     },
     {
-      name: 'Calculation Type',
-      selector: 'calculationType.name',
-    },
-    {
-      name: 'Type',
-      selector: 'billable',
-      cell: row => <span>{row.billable ? 'Billable' : 'Non-billable'}</span>,
-    },
-    {
-      name: 'Default Units',
-      selector: 'defaultUnits.unit',
-    },
-    {
-      name: 'Permissions',
-      cell: row => (
-        <span style={{ fontWeight: 'bold', fontSize: '11px' }}>
-          {getPermissions(row.codePermission).length > 0
-            ? getPermissions(row.codePermission).join(', ')
-            : ''}
-        </span>
+      ...defaultColumnProps(
+        'Calculation Type',
+        'calculationType.name',
+        'calculationTypeName',
+        ...columnCommonProps,
       ),
     },
+    {
+      ...defaultColumnProps('Type', 'billable', 'billable', ...columnCommonProps, true),
+      filterMultiple: false,
+      filters: [
+        {
+          text: 'All',
+          value: 'all',
+        },
+        {
+          text: 'Billable',
+          value: 'billable',
+        },
+        {
+          text: 'Non-billable',
+          value: 'nonbillable',
+        },
+      ],
+      filteredValue: appliedFilters.billable || null,
+      onFilter: (value, record) => {
+        if (value === 'all') return true
+        if (value === 'billable') return record.billable
+        if (value === 'nonbillable') return !record.billable
+        return false
+      },
+      render: isBillable => {
+        const text = isBillable ? 'Billable' : 'Non-billable'
+        if (appliedFilters.billable && appliedFilters.billable[0] !== 'all') {
+          return (
+            <Highlighter
+              highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+              searchWords={[isBillable ? 'Billable' : 'Non-billable']}
+              autoEscape
+              textToHighlight={isBillable ? 'Billable' : 'Non-billable'}
+            />
+          )
+        }
+        return text
+      },
+    },
+    {
+      ...defaultColumnProps(
+        'Default Units',
+        'defaultUnits.unit',
+        'defaultUnit',
+        ...columnCommonProps,
+      ),
+      align: 'right',
+    },
+    {
+      ...defaultColumnProps(
+        'Permissions',
+        'codePermission',
+        'codePermission',
+        ...columnCommonProps,
+        true,
+      ),
+      filterMultiple: false,
+      filters: [
+        { text: 'All', value: 'all' },
+        ...roleList.map(role => ({
+          text: role.name,
+          value: role.name,
+        })),
+      ],
+      filteredValue: appliedFilters.codePermission || null,
+      onFilter: (value, record) => {
+        if (value === 'all') return true
+        return getPermissionText(record.codePermission)
+          .toUpperCase()
+          .includes(value.toUpperCase())
+      },
+      render: text =>
+        appliedFilters.codePermission ? (
+          <Highlighter
+            highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
+            searchWords={[appliedFilters.codePermission[0]]}
+            autoEscape
+            textToHighlight={getPermissionText(text)}
+          />
+        ) : (
+          getPermissionText(text)
+        ),
+    },
+    {
+      ...defaultColumnProps('Active/Inactive', 'isActive', 'isActive', ...columnCommonProps, true),
+      filterMultiple: false,
+      filters: [
+        {
+          text: 'All',
+          value: 'all',
+        },
+        {
+          text: 'Active',
+          value: 'active',
+        },
+        {
+          text: 'Inactive',
+          value: 'inactive',
+        },
+      ],
+      filteredValue: appliedFilters.isActive || null,
+      onFilter: (value, record) => {
+        if (value === 'all') return true
+        if (value === 'active') return record.isActive
+        if (value === 'inactive') return !record.isActive
+        return false
+      },
+      render: text => (text ? 'Active' : 'Inactive'),
+    },
   ]
-
-  const customStyles = {
-    header: {
-      style: {
-        maxHeight: '50px',
-      },
-    },
-    headRow: {
-      style: {
-        borderTopStyle: 'solid',
-        borderTopWidth: '1px',
-        borderTopColor: '#ddd',
-        backgroundColor: '#f5f5f5',
-      },
-    },
-    headCells: {
-      style: {
-        '&:not(:last-of-type)': {
-          borderRightStyle: 'solid',
-          borderRightWidth: '1px',
-          borderRightColor: '#ddd',
-        },
-        fontWeight: 'bold',
-      },
-    },
-    cells: {
-      style: {
-        '&:not(:last-of-type)': {
-          borderRightStyle: 'solid',
-          borderRightWidth: '1px',
-          borderRightColor: '#ddd',
-        },
-        fontSize: '11px',
-      },
-    },
-    pagination: {
-      style: {
-        position: 'absolute',
-        top: '5px',
-        right: '5px',
-        borderTopStyle: 'none',
-        minHeight: '35px',
-      },
-    },
-    table: {
-      style: {
-        paddingBottom: '40px',
-        top: '40px',
-      },
-    },
-  }
 
   useEffect(() => {
     if (codes) {
@@ -181,7 +267,6 @@ const CodesTable = () => {
         return node
       })
       setCodeList(nodes)
-      setFilteredList(nodes)
     }
     if (codeTypes) {
       const items = codeTypes.getAuthorizationCodeTypes.map(item => {
@@ -215,102 +300,104 @@ const CodesTable = () => {
     }
   }, [codes, codeTypes, calculationTypes, defaultUnits, payors, roles])
 
-  const info = e => {
+  const openInEditMode = e => {
     setCodeProfile(e)
     setShowForm('Edit')
     setShowRightDrawer(true)
   }
 
-  const getFilteredList = () => {
-    let filtered = filteredList
-    filtered =
-      filtered &&
-      filtered.filter(
-        item => item.code && item.code.toLowerCase().includes(filterCode.toLowerCase()),
-      )
-    if (filterBillable !== null) {
-      filtered = filtered && filtered.filter(item => item.billable === filterBillable)
-    }
-    if (filterCodeType) {
-      filtered =
-        filtered &&
-        filtered.filter(
-          item =>
-            item.codeType &&
-            item.codeType.name.toLowerCase().includes(filterCodeType.toLowerCase()),
-        )
-    }
-    if (filterCalculationType) {
-      filtered =
-        filtered &&
-        filtered.filter(
-          item =>
-            item.calculationType &&
-            item.calculationType.name.toLowerCase().includes(filterCalculationType.toLowerCase()),
-        )
-    }
-    if (filterPayor) {
-      filtered =
-        filtered &&
-        filtered.filter(
-          item =>
-            item.payor && item.payor.firstname.toLowerCase().includes(filterPayor.toLowerCase()),
-        )
-    }
-    return filtered
-  }
-
   const handleRightDrawerClose = () => {
     setShowRightDrawer(false)
-    setSelectStatus('all')
-    refetchActive()
-    refetchInactive()
     refetchCodes()
   }
 
-  const filterToggle = () => {
-    setShowFilterDrawer(!showFilterDrawer)
-  }
+  const header = currentPageData => (
+    <div className="header">
+      <span className="pageTitle">Service Codes</span>
 
-  const handleFilterChange = e => {
-    setFilterCode(e.target.value)
-  }
-  const selectCodesByStatus = value => {
-    setSelectStatus(value)
-    if (value === 'all') {
-      if (codes) {
-        const nodes = codes.getAuthorizationCodes.edges.map(({ node }) => {
-          return node
-        })
-        setFilteredList(nodes)
-      }
-    } else if (value === 'active') {
-      if (activeCodes) {
-        const nodes = activeCodes.getAuthorizationCodes.edges.map(({ node }) => {
-          return node
-        })
-        setFilteredList(nodes)
-      }
-    } else if (value === 'inActive') {
-      if (inActiveCodes) {
-        const nodes = inActiveCodes.getAuthorizationCodes.edges.map(({ node }) => {
-          return node
-        })
-        setFilteredList(nodes)
-      }
-    }
-  }
+      <span className="filterTitle">Status:</span>
+      <Radio.Group
+        defaultValue="all"
+        buttonStyle="solid"
+        size="small"
+        onChange={e => updateFilterValues('isActive', e.target.value)}
+        value={
+          appliedFilters.isActive && appliedFilters.isActive.length
+            ? appliedFilters.isActive[0]
+            : 'inactive'
+        }
+      >
+        {['all', 'active', 'inactive'].map(status => (
+          <Radio.Button key={status} value={status} style={{ textTransform: 'capitalize' }}>
+            {status}
+          </Radio.Button>
+        ))}
+      </Radio.Group>
+
+      <span className="filterTitle">Type:</span>
+      <Radio.Group
+        defaultValue="all"
+        buttonStyle="solid"
+        size="small"
+        onChange={e => updateFilterValues('billable', e.target.value)}
+        value={
+          appliedFilters.billable && appliedFilters.billable.length
+            ? appliedFilters.billable[0]
+            : 'nonbillable'
+        }
+      >
+        {['all', 'billable', 'nonbillable'].map(value => (
+          <Radio.Button key={value} value={value} style={{ textTransform: 'capitalize' }}>
+            {value}
+          </Radio.Button>
+        ))}
+      </Radio.Group>
+
+      <span className="filterTitle">Permission:</span>
+      <Radio.Group
+        defaultValue="all"
+        buttonStyle="solid"
+        size="small"
+        onChange={e => updateFilterValues('codePermission', e.target.value)}
+        value={
+          appliedFilters.codePermission && appliedFilters.codePermission.length
+            ? appliedFilters.codePermission[0]
+            : 'Technician'
+        }
+      >
+        {[{ name: 'all' }, ...roleList].map(role => (
+          <Radio.Button key={role.name} value={role.name} style={{ textTransform: 'capitalize' }}>
+            {role.name}
+          </Radio.Button>
+        ))}
+      </Radio.Group>
+
+      <div className="right-align">
+        <ExportData data={currentPageData} />
+        <Button
+          onClick={() => {
+            setShowForm('Add')
+            setShowRightDrawer(true)
+          }}
+          type="primary"
+          size="small"
+        >
+          <PlusOutlined /> ADD CODE
+        </Button>
+      </div>
+    </div>
+  )
 
   return (
     <>
       <Drawer
         title={showForm === 'Add' ? 'ADD CODE' : 'EDIT CODE'}
-        width="50%"
+        width="65%"
         placement="right"
         onClose={handleRightDrawerClose}
         visible={showRightDrawer}
       >
-        {showForm === 'Add' ? (
+        {showForm === 'Add' && (
           <AddCode
             closeDrawer={handleRightDrawerClose}
             codes={codeList}
@@ -320,7 +407,8 @@ const CodesTable = () => {
             userRole={roleList}
             payorList={payorList}
           />
-        ) : showForm === 'Edit' ? (
+        )}
+        {showForm === 'Edit' && (
           <EditCode
             closeDrawer={handleRightDrawerClose}
             key={codeProfile?.id}
@@ -332,176 +420,27 @@ const CodesTable = () => {
             userRole={roleList}
             payorList={payorList}
           />
-        ) : null}
+        )}
       </Drawer>
-
-      <Drawer
-        title="Filters"
-        placement="left"
-        onClose={() => setShowFilterDrawer(false)}
-        visible={showFilterDrawer}
-        width={300}
-      >
-        <div>
-          {filterCode ||
-          filterBillable != null ||
-          filterCalculationType ||
-          filterCodeType ||
-          filterPayor ? (
-            <Button
-              type="link"
-              style={{ marginLeft: '140px' }}
-              onClick={() => {
-                setFilterCode('')
-                setFilterPayor('')
-                setFilterBillable(null)
-                setFilterCalculationType('')
-                setFilterCodeType('')
-              }}
-              size="small"
-            >
-              Clear Filters
-              <CloseCircleOutlined />
-            </Button>
-          ) : null}
-          <div className="filter_sub_div">
-            <span style={{ fontSize: '15px', color: '#000' }}>Code :</span>
-            <Input
-              size="small"
-              placeholder="Search Code"
-              value={filterCode}
-              onChange={handleFilterChange}
-              style={{ width: 188, marginBottom: 8, display: 'block' }}
-            />
-          </div>
-          <div className="filter_sub_div">
-            <span style={{ fontSize: '15px', color: '#000' }}>Payor:</span>
-            <Select
-              size="small"
-              value={filterPayor === '' ? undefined : filterPayor}
-              placeholder="Select Payor"
-              onSelect={value => setFilterPayor(value)}
-              style={{ width: 188 }}
-            >
-              {payorList.map(item => (
-                <Select.Option key={item.id} value={item.firstname}>
-                  {item.firstname}
-                </Select.Option>
-              ))}
-            </Select>
-          </div>
-          <div className="filter_sub_div">
-            <span style={{ fontSize: '15px', color: '#000' }}>Billable :</span>
-            <Select
-              size="small"
-              placeholder="Select Billable Type"
-              value={filterBillable === null ? undefined : filterBillable}
-              onSelect={value => setFilterBillable(value)}
-              style={{ width: 188 }}
-            >
-              <Select.Option value={true}>Billable</Select.Option>
-              <Select.Option value={false}>Non-Billable</Select.Option>
-            </Select>
-          </div>
-          <div className="filter_sub_div">
-            <span style={{ fontSize: '15px', color: '#000' }}>Code Types:</span>
-            <Select
-              size="small"
-              placeholder="Select Code Type"
-              value={filterCodeType === '' ? undefined : filterCodeType}
-              onSelect={value => setFilterCodeType(value)}
-              style={{ width: 188 }}
-            >
-              {codeTypeList.map(item => (
-                <Select.Option key={item.id} value={item.name}>
-                  {item.name}
-                </Select.Option>
-              ))}
-            </Select>
-          </div>
-          <div className="filter_sub_div">
-            <span style={{ fontSize: '15px', color: '#000' }}>Calculation Types:</span>
-            <Select
-              size="small"
-              placeholder="Select Calculation Type"
-              value={filterCalculationType === '' ? undefined : filterCalculationType}
-              onSelect={value => setFilterCalculationType(value)}
-              style={{ width: 188 }}
-            >
-              {calculationTypeList.map(item => (
-                <Select.Option key={item.id} value={item.name}>
-                  {item.name}
-                </Select.Option>
-              ))}
-            </Select>
-          </div>
-        </div>
-      </Drawer>
-
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '0px 10px',
-          backgroundColor: '#FFF',
-          boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
-        }}
-      >
-        <div style={{ padding: '5px 0px' }}>
-          <Button onClick={() => filterToggle()} size="large">
-            <FilterOutlined />
-          </Button>
-        </div>
-        <Select
-          style={{ width: 140, position: 'absolute', marginLeft: '60px' }}
-          onChange={selectCodesByStatus}
-          value={selectStatus}
-        >
-          <Select.Option value="all">All Codes</Select.Option>
-          <Select.Option value="active">Active Codes</Select.Option>
-          <Select.Option value="inActive">Inactive Codes</Select.Option>
-        </Select>
-        <div>
-          <span style={{ fontSize: '25px', color: '#000' }}>Code List</span>
-        </div>
-        <div style={{ padding: '5px 0px' }}>
-          <ExportData data={filteredList} />
-          <Button
-            onClick={() => {
-              setShowForm('Add')
-              setShowRightDrawer(true)
-            }}
-            type="primary"
-          >
-            <PlusOutlined /> ADD CODE
-          </Button>
-        </div>
+      {error && <pre>{JSON.stringify(error, null, 2)}</pre>}
+      <div style={{ margin: '5px', marginBottom: '50px' }}>
+        <Table
+          loading={loading}
+          className="authorizeCodeTable"
+          rowKey="id"
+          columns={columns}
+          dataSource={codeList}
+          pagination={{
+            position: 'both',
+            showSizeChanger: true,
+            pageSizeOptions: ['3', '10', '25', '50', '100'],
+          }}
+          size="small"
+          bordered
+          onChange={handleFilterAndSorting}
+          title={header}
+        />
       </div>
-      {loading ? (
-        <div>Loading...</div>
-      ) : (
-        <>
-          {error && <pre>{JSON.stringify(error, null, 2)}</pre>}
-          <div className="row">
-            <div className="col-sm-12">
-              <div style={{ margin: '5px', marginBottom: '50px' }}>
-                <DataTable
-                  columns={columns}
-                  theme="default"
-                  dense={true}
-                  pagination={true}
-                  data={getFilteredList()}
-                  customStyles={customStyles}
-                  noHeader={true}
-                  paginationRowsPerPageOptions={[10, 50, 100, 200, 500, 1000]}
-                />
-              </div>
-            </div>
-          </div>
-        </>
-      )}
     </>
   )
 }

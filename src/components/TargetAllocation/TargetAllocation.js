@@ -1,53 +1,50 @@
-/* eslint-disable no-lonely-if */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-shadow */
-/* eslint-disable no-unneeded-ternary */
-/* eslint-disable array-callback-return */
 /* eslint-disable react/no-array-index-key */
-/* eslint-disable prefer-template */
-/* eslint-disable no-useless-concat */
-/* eslint-disable prefer-const */
 /* eslint-disable no-unused-expressions */
-import React, { useState, useEffect } from 'react'
-import { Avatar, Form, Input, Select, Checkbox, Button, Typography, notification, Spin, Icon, Row, Col, AutoComplete } from 'antd'
-import { useQuery, useMutation } from 'react-apollo'
-import CKEditor from 'react-ckeditor-component'
-import moment from 'moment'
-import {
-  TARGET_ALLOCATIONS_OPTIONS,
-  SETTING,
-  SHORT_TERM_GOALS,
-  CREATE_TARGET,
-  GET_TARGET_STEP,
-  GET_TARGET_SD,
-} from './query'
-import NumberCard from './NumberCard'
 
-let id = 0;
-let stepId = 0;
-let classId = 0;
-const AutoCompleteOption = AutoComplete.Option;
-const { Text } = Typography
+import { Button, Col, Divider, Form, Icon, Input, notification, Row, Select, Switch } from 'antd'
+import moment from 'moment'
+import React, { useEffect, useState } from 'react'
+import { useMutation, useQuery } from 'react-apollo'
+import CKEditor from 'react-ckeditor-component'
+import NumberCard from './NumberCard'
+import { CREATE_TARGET, SETTING, TARGET_ALLOCATIONS_OPTIONS, SHORT_TERM_GOALS } from './query'
+import './style.scss'
+
+let id = 0
+let stepId = 0
+let classId = 0
 const { Option } = Select
 
-const layout = {
-  labelCol: { span: 8 },
-  wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  wrapperCol: { offset: 8, span: 16 },
-};
-
+const searchableDropDownOption = {
+  showSearch: true,
+  optionFilterProp: 'children',
+  filterOption: (input, option) =>
+    option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0,
+}
 export default Form.create()(
-  ({ form, targetName, targetVideo, targetInstr, selectedTargetId, activeSessionDetails, setOpen, selectedShortTermGoal, onSuccessTargetAllocation, peakEnable = false, equivalenceEnable = false, equivalenceObject }) => {
+  ({
+    form,
+    targetName,
+    targetVideo,
+    targetInstr,
+    selectedTargetId,
+    onSuccessTargetAllocation,
+    peakEnable = false,
+    equivalenceEnable = false,
+    equivalenceObject,
+    isDirectGoal,
+    defaultShortTermGoalForSelectedProgram,
+    selectedShortTermGoal,
+  }) => {
     const [targetInstructions, setTargetInstructions] = useState(targetInstr)
     const [dailyTrials, setDailyTrials] = useState(0)
     const [sessionConsecutiveDays, setSessionConsecutiveDays] = useState(0)
-    const [makeDefault, setMakeDefault] = useState(false)
-    const [stepText, setStepText] = useState()
+    const [makeDefault, setMakeDefault] = useState(true)
     const studentId = localStorage.getItem('studentId')
     const [peakBlockCount, setPeakBlockCount] = useState(1)
-    const [sdText, setSdText] = useState('')
+    const [useDefaultGoal, setUseDefaultGoal] = useState(isDirectGoal)
 
     const onChangeNumber = (type, num) => {
       if (type === 'sdt') setDailyTrials(num)
@@ -57,23 +54,9 @@ export default Form.create()(
       }
     }
 
-
     const { data: settingData, error: settingError } = useQuery(SETTING, {
       variables: {
         studentId,
-      },
-    })
-
-    const { data: stepData, error: stepError, loading: stepLoading } = useQuery(GET_TARGET_STEP, {
-      variables: {
-        text: stepText,
-      },
-    })
-
-
-    const { data: sdData, error: sdError, loading: sdLoading } = useQuery(GET_TARGET_SD, {
-      variables: {
-        text: sdText,
       },
     })
 
@@ -88,111 +71,103 @@ export default Form.create()(
       { data: allocateTargetData, error: allocateTargetError, loading: allocateTargetLoading },
     ] = useMutation(CREATE_TARGET)
 
-    const stepsOptions = stepData?.targetStep.edges.map(node => (
-      <AutoCompleteOption key={node.node.id} value={node.node.step}>{node.node.step}</AutoCompleteOption>
-    ));
-
-    const sdsOptions = sdData?.targetSd.edges.map(node => (
-      <AutoCompleteOption key={node.node.id} value={node.node.sd}>{node.node.sd}</AutoCompleteOption>
-    ));
+    const { data: shortGoals, error: shortGoalsError, loading: shortGoalLoading } = useQuery(
+      SHORT_TERM_GOALS,
+      {
+        variables: {
+          studentId,
+        },
+      },
+    )
 
     const add = () => {
       // const { form } = this.props;
       // can use data-binding to get
-      const keys = form.getFieldValue('keys');
-      const nextKeys = keys.concat(id++);
+      const keys = form.getFieldValue('keys')
+      const nextKeys = keys.concat(id++)
       // can use data-binding to set
       // important! notify form to detect changes
       form.setFieldsValue({
         keys: nextKeys,
-      });
-    };
+      })
+    }
 
     const remove = k => {
       // const { form } = this.props;
       // can use data-binding to get
-      const keys = form.getFieldValue('keys');
+      const keys = form.getFieldValue('keys')
       // We need at least one passenger
       if (keys.length === 0) {
-        return;
+        return
       }
 
       // can use data-binding to set
       form.setFieldsValue({
         keys: keys.filter(key => key !== k),
-      });
-    };
+      })
+    }
 
     const addStep = () => {
       // const { form } = this.props;
       // can use data-binding to get
-      const stepKeys = form.getFieldValue('stepKeys');
-      const nextKeys = stepKeys.concat(stepId++);
+      const stepKeys = form.getFieldValue('stepKeys')
+      const nextKeys = stepKeys.concat(stepId++)
       // can use data-binding to set
       // important! notify form to detect changes
       form.setFieldsValue({
         stepKeys: nextKeys,
-      });
-    };
+      })
+    }
 
     const stepRemove = k => {
       // const { form } = this.props;
       // can use data-binding to get
-      const stepKeys = form.getFieldValue('stepKeys');
+      const stepKeys = form.getFieldValue('stepKeys')
       // We need at least one passenger
       if (stepKeys.length === 0) {
-        return;
+        return
       }
 
       // can use data-binding to set
       form.setFieldsValue({
         stepKeys: stepKeys.filter(key => key !== k),
-      });
-    };
+      })
+    }
 
     const classAdd = () => {
       // const { form } = this.props;
       // can use data-binding to get
-      const keys = form.getFieldValue('Classkeys');
-      const nextKeys = keys.concat(classId++);
+      const keys = form.getFieldValue('Classkeys')
+      const nextKeys = keys.concat(classId++)
       // can use data-binding to set
       // important! notify form to detect changes
       form.setFieldsValue({
         Classkeys: nextKeys,
-      });
-    };
+      })
+    }
 
     const classRemove = k => {
       // const { form } = this.props;
       // can use data-binding to get
-      const keys = form.getFieldValue('Classkeys');
+      const keys = form.getFieldValue('Classkeys')
       // We need at least one passenger
       if (keys.length === 0) {
-        return;
+        return
       }
 
       // can use data-binding to set
       form.setFieldsValue({
         Classkeys: keys.filter(key => key !== k),
-      });
-    };
+      })
+    }
 
     useEffect(() => {
-      if (stepError) {
+      if (shortGoalsError) {
         notification.error({
-          message: 'Failed to load step list',
+          message: 'Failed to Short term Goal list',
         })
       }
-    }, [stepError])
-
-    useEffect(() => {
-      if (sdError) {
-        notification.error({
-          message: 'Failed to load sd list',
-        })
-      }
-    }, [sdError])
-
+    }, [shortGoalsError])
 
     useEffect(() => {
       if (allocateTargetData?.createTargetAllocate2) {
@@ -201,25 +176,27 @@ export default Form.create()(
         })
         // setOpen(null)
         form.resetFields()
-        onSuccessTargetAllocation({ data: allocateTargetData })
+        onSuccessTargetAllocation({
+          data: allocateTargetData,
+          isCreateForDirectGoal: useDefaultGoal,
+        })
       }
+
       if (allocateTargetError) {
         notification.error({
           message: 'Target allocation failed',
           description: allocateTargetError.message,
         })
-
-
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [allocateTargetData, allocateTargetError])
 
     useEffect(() => {
       if (settingData && !sessionConsecutiveDays && !dailyTrials) {
-        setDailyTrials(
-          settingData.getAllocateTargetSettings.edges[0]?.node.dailyTrials || 0
+        setDailyTrials(settingData.getAllocateTargetSettings.edges[0]?.node.dailyTrials || 5)
+        setSessionConsecutiveDays(
+          settingData.getAllocateTargetSettings.edges[0]?.node.consecutiveDays || 25,
         )
-        setSessionConsecutiveDays(settingData.getAllocateTargetSettings.edges[0]?.node.consecutiveDays || 0)
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [settingData])
@@ -230,7 +207,7 @@ export default Form.create()(
     }
 
     const handleSubmit = e => {
-      const alphaList = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+      const alphaList = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K']
       let selectedAlpha = ['A', 'B']
 
       if (equivalenceObject?.target?.maxSd) {
@@ -242,70 +219,101 @@ export default Form.create()(
 
       e.preventDefault()
       form.validateFields((error, values) => {
-        const { keys, stimulus, stimulusMC, stimulusStatus, stepKeys, steps, stepStatus, stepMC, Classkeys } = values
+        const {
+          keys,
+          stimulus,
+          stimulusMC,
+          stimulusStatus,
+          stepKeys,
+          steps,
+          stepStatus,
+          stepMC,
+          Classkeys,
+        } = values
         // console.log(keys, stimulus, stimulusMC, stimulusStatus, stepKeys, steps, stepStatus, stepMC)
 
         const classes = []
-        Classkeys.map((key, index) => {
+        Classkeys.forEach((key, index) => {
           const sampleStimulus = []
-          selectedAlpha.map((alpha, alphaIndex) => {
+          selectedAlpha.forEach((alpha, alphaIndex) => {
             sampleStimulus.push({ option: alpha, stimulusName: values[`stimulus${key}${alpha}`] })
           })
           classes.push({ name: `Class ${index + 1}`, stimuluses: sampleStimulus })
         })
 
-        const sdResponse = []
-        const stepResponse = []
-        keys.map(id => {
-          sdResponse.push({ sd: stimulus[id], mastery: stimulusMC[id], status: stimulusStatus[id] })
-        })
-        stepKeys.map(id => {
-          stepResponse.push({ step: steps[id], mastery: stepMC[id], status: stepStatus[id] })
-        })
-        if (values.type === 'VGFyZ2V0RGV0YWlsVHlwZTo4' && values.category !== 'Equivalance' && sdResponse.length < 1) {
-          notification.info({
-            message: 'Sd required for type PEAK',
+        const stimulusResponse = []
+        keys.forEach(key => {
+          stimulusResponse.push({
+            sd: stimulus[key],
+            mastery: stimulusMC[key],
+            status: stimulusStatus[key],
           })
-        }
-        if (!targetInstructions) {
-          notification.info({
-            message: 'Target Instruction is mandatory',
-          })
-        }
-        else if (!error) {
-          try {
-            allocateTarget({
-              variables: {
-                studentId,
-                shortTerm: selectedShortTermGoal.node.id,
-                targetId: selectedTargetId,
-                targetStatus: values.status,
-                targetInstr: targetInstructions,
-                date: moment().format('YYYY-MM-DD'),
-                masteryCriteria: values.masteryCriteria,
-                targetName: values.name,
-                dailyTrials,
-                consecutiveDays: sessionConsecutiveDays,
-                targetType: values.type,
-                sd: sdResponse,
-                steps: stepResponse,
-                video: values.video,
-                default: makeDefault,
-                peakBlocks: peakBlockCount,
-                peakType: values.category ? values.category : null,
-                classes,
-                equiCode: values.equiCode ? values.equiCode : null
+        })
 
-              },
-              errorPolicy: 'all',
-              onError(err) {
-                console.log(err);
-              },
-            })
-          } catch (e) {
-            console.log(e)
+        const stepResponse = []
+        stepKeys.forEach(key => {
+          stepResponse.push({ step: steps[key], mastery: stepMC[key], status: stepStatus[key] })
+        })
+
+        if (!error) {
+          // Other custom validations
+          let validationMessage = null
+          if (
+            values.type === 'VGFyZ2V0RGV0YWlsVHlwZTo4' &&
+            values.category === 'Equivalence' &&
+            classes.length === 0
+          ) {
+            validationMessage = 'At least one classe required for type PEAK with Equivalence.'
+          } else if (
+            values.type === 'VGFyZ2V0RGV0YWlsVHlwZTo4' &&
+            stimulusResponse.length === 0 &&
+            (values.category === 'Generalization' || values.category === 'Direct')
+          ) {
+            validationMessage =
+              'At least one Stimulus required for type PEAK with Generalization/Direct.'
+          } else if (!targetInstructions) {
+            validationMessage = 'Target Instruction is mandatory'
+          } else if (!useDefaultGoal && !values.stg) {
+            validationMessage = 'Select short term Goal.'
           }
 
+          if (validationMessage) {
+            notification.info({ message: validationMessage })
+          } else {
+            try {
+              allocateTarget({
+                variables: {
+                  studentId,
+                  shortTerm: useDefaultGoal
+                    ? defaultShortTermGoalForSelectedProgram.node.id
+                    : values.stg,
+                  targetId: selectedTargetId,
+                  targetStatus: values.status,
+                  targetInstr: targetInstructions,
+                  date: moment().format('YYYY-MM-DD'),
+                  masteryCriteria: values.masteryCriteria,
+                  targetName: values.name,
+                  dailyTrials,
+                  consecutiveDays: sessionConsecutiveDays,
+                  targetType: values.type,
+                  sd: stimulusResponse,
+                  steps: stepResponse,
+                  video: values.video,
+                  default: makeDefault,
+                  peakBlocks: peakBlockCount,
+                  peakType: values.category ? values.category : null,
+                  classes,
+                  equiCode: values.equiCode ? values.equiCode : null,
+                },
+                errorPolicy: 'all',
+                onError(err) {
+                  console.log(err)
+                },
+              })
+            } catch (ex) {
+              console.log(ex)
+            }
+          }
         }
       })
     }
@@ -314,35 +322,14 @@ export default Form.create()(
       return <h4 style={{ color: 'red', marginTop: 40 }}>Opps therir are something wrong</h4>
     }
 
-    const { getFieldDecorator, getFieldValue } = form;
-    const formItemLayout = {
-      labelCol: {
-        xs: { span: 24 },
-        sm: { span: 8 },
-      },
-      wrapperCol: {
-        xs: { span: 24 },
-        sm: { span: 16 },
-      },
-    };
-    const formItemLayoutWithOutLabel = {
-      wrapperCol: {
-        xs: { span: 24, offset: 0 },
-        sm: { span: 16, offset: 8 },
-      },
-    };
+    const { getFieldDecorator, getFieldValue } = form
+    getFieldDecorator('keys', { initialValue: [] })
+    const keys = getFieldValue('keys')
 
-
-    getFieldDecorator('keys', { initialValue: [] });
-    const keys = getFieldValue('keys');
-    const formItems = keys.map((k, index) => (
-      <>
-        <Form.Item {...(index === 0 ? formItemLayout : formItemLayoutWithOutLabel)} label={index === 0 ? 'Stimulus' : ''} key={k} style={{ marginTop: 0, marginBottom: 0 }}>
-          <Form.Item
-            required={false}
-            key={'stimulus' + k}
-            style={{ display: 'inline-block', width: 'calc(40% - 12px)' }}
-          >
+    const formItemsForStimulus = keys.map((k, index) => (
+      <Row key={k}>
+        <Col span="11">
+          <Form.Item required={false} key={`stimulus-${k}`} wrapperCol={{ md: 22 }}>
             {getFieldDecorator(`stimulus[${k}]`, {
               validateTrigger: ['onChange', 'onBlur'],
               rules: [
@@ -352,22 +339,11 @@ export default Form.create()(
                   message: "Please input Stimulus's name or delete this field.",
                 },
               ],
-            })(
-              <AutoComplete
-                dataSource={sdsOptions}
-                onChange={(v) => setSdText(v)}
-              >
-                <Input
-                  placeholder="Stimulus name"
-                />
-              </AutoComplete>
-            )}
+            })(<Input placeholder="Stimulus name" style={{ width: '100%' }} />)}
           </Form.Item>
-          <Form.Item
-            required={false}
-            key={'sdStatus' + k}
-            style={{ display: 'inline-block', width: 'calc(28% - 12px)' }}
-          >
+        </Col>
+        <Col span="6">
+          <Form.Item required={false} key={`sdStatus-${k}`} wrapperCol={{ md: 22 }}>
             {getFieldDecorator(`stimulusStatus[${k}]`, {
               initialValue: form.getFieldValue('status'),
               validateTrigger: ['onChange', 'onBlur'],
@@ -375,27 +351,26 @@ export default Form.create()(
                 {
                   required: true,
                   whitespace: true,
-                  message: "Please Select Status or delete this field.",
+                  message: 'Please Select Status or delete this field.',
                 },
               ],
             })(
-              <Select loading={targetOptionsLoading}>
-                {targetOptions?.targetStatus.map(({ id, statusName }) => {
-                  return (
-                    <Select.Option key={id} value={id}>
-                      {statusName}
-                    </Select.Option>
-                  )
-                })}
-              </Select>
+              <Select
+                loading={targetOptionsLoading}
+                style={{ width: '100%' }}
+                {...searchableDropDownOption}
+              >
+                {targetOptions?.targetStatus.map(({ id, statusName }) => (
+                  <Select.Option key={id} value={id}>
+                    {statusName}
+                  </Select.Option>
+                ))}
+              </Select>,
             )}
           </Form.Item>
-
-          <Form.Item
-            style={{ display: 'inline-block', width: 'calc(32% - 12px)' }}
-            required={false}
-            key={'sdMC' + k}
-          >
+        </Col>
+        <Col span="6">
+          <Form.Item required={false} key={`sdMC-${k}`} wrapperCol={{ md: 22 }}>
             {getFieldDecorator(`stimulusMC[${k}]`, {
               initialValue: form.getFieldValue('masteryCriteria'),
               validateTrigger: ['onChange', 'onBlur'],
@@ -403,45 +378,44 @@ export default Form.create()(
                 {
                   required: true,
                   whitespace: true,
-                  message: "Please Select Criteria or delete this field.",
+                  message: 'Please Select Criteria or delete this field.',
                 },
               ],
             })(
-              <Select placeholder="select criteria" loading={targetOptionsLoading} style={{ width: '80%', marginRight: 8 }}>
-                {targetOptions?.masteryCriteria.map(({ id, name }) => {
-                  return (
-                    <Select.Option key={id} value={id}>
-                      {name}
-                    </Select.Option>
-                  )
-                })}
-              </Select>
+              <Select
+                placeholder="select criteria"
+                loading={targetOptionsLoading}
+                style={{ width: '100%' }}
+                {...searchableDropDownOption}
+              >
+                {targetOptions?.masteryCriteria.map(({ id, name }) => (
+                  <Select.Option key={id} value={id}>
+                    {name}
+                  </Select.Option>
+                ))}
+              </Select>,
             )}
-            {keys.length > 0 ? (
-              <Icon
-                className="dynamic-delete-button"
-                type="minus-circle-o"
-                onClick={() => remove(k)}
-              />
-            ) : null}
-
           </Form.Item>
-        </Form.Item>
+        </Col>
+        {keys.length > 0 && (
+          <Col span="1">
+            <Icon
+              className="dynamic-delete-button"
+              type="minus-circle-o"
+              onClick={() => remove(k)}
+              style={{ marginTop: '15px' }}
+            />
+          </Col>
+        )}
+      </Row>
+    ))
 
-
-      </>
-    ));
-
-    getFieldDecorator('stepKeys', { initialValue: [] });
-    const stepKeys = getFieldValue('stepKeys');
-    const formItemsSteps = stepKeys.map((k, index) => (
-      <>
-        <Form.Item {...(index === 0 ? formItemLayout : formItemLayoutWithOutLabel)} label={index === 0 ? 'Steps' : ''} key={index} style={{ marginTop: 0, marginBottom: 0 }}>
-          <Form.Item
-            style={{ display: 'inline-block', width: 'calc(40% - 12px)' }}
-            required={false}
-            key={'step' + k}
-          >
+    getFieldDecorator('stepKeys', { initialValue: [] })
+    const stepKeys = getFieldValue('stepKeys')
+    const formItemsForSteps = stepKeys.map((k, index) => (
+      <Row key={index}>
+        <Col span="11">
+          <Form.Item required={false} key={`step-${k}`} wrapperCol={{ md: 22 }}>
             {getFieldDecorator(`steps[${k}]`, {
               validateTrigger: ['onChange', 'onBlur'],
               rules: [
@@ -451,22 +425,11 @@ export default Form.create()(
                   message: "Please input Step's name or delete this field.",
                 },
               ],
-            })(
-              <AutoComplete
-                dataSource={stepsOptions}
-                onChange={(v) => setStepText(v)}
-              >
-                <Input
-                  placeholder="Step name"
-                />
-              </AutoComplete>
-            )}
+            })(<Input placeholder="Step name" style={{ width: '100%' }} />)}
           </Form.Item>
-          <Form.Item
-            required={false}
-            key={'stepStatus' + k}
-            style={{ display: 'inline-block', width: 'calc(28% - 12px)' }}
-          >
+        </Col>
+        <Col span="6">
+          <Form.Item required={false} key={`stepStatus-${k}`} wrapperCol={{ md: 22 }}>
             {getFieldDecorator(`stepStatus[${k}]`, {
               initialValue: form.getFieldValue('status'),
               validateTrigger: ['onChange', 'onBlur'],
@@ -474,27 +437,26 @@ export default Form.create()(
                 {
                   required: true,
                   whitespace: true,
-                  message: "Please Select Status or delete this field.",
+                  message: 'Please Select Status or delete this field.',
                 },
               ],
             })(
-              <Select loading={targetOptionsLoading}>
-                {targetOptions?.targetStatus.map(({ id, statusName }) => {
-                  return (
-                    <Select.Option key={id} value={id}>
-                      {statusName}
-                    </Select.Option>
-                  )
-                })}
-              </Select>
+              <Select
+                loading={targetOptionsLoading}
+                style={{ width: '100%' }}
+                {...searchableDropDownOption}
+              >
+                {targetOptions?.targetStatus.map(({ id, statusName }) => (
+                  <Select.Option key={id} value={id}>
+                    {statusName}
+                  </Select.Option>
+                ))}
+              </Select>,
             )}
           </Form.Item>
-
-          <Form.Item
-            style={{ display: 'inline-block', width: 'calc(32% - 12px)' }}
-            required={false}
-            key={'stepMC' + k}
-          >
+        </Col>
+        <Col span="6">
+          <Form.Item required={false} key={`stepMC-${k}`} wrapperCol={{ md: 22 }}>
             {getFieldDecorator(`stepMC[${k}]`, {
               initialValue: form.getFieldValue('masteryCriteria'),
               validateTrigger: ['onChange', 'onBlur'],
@@ -502,34 +464,37 @@ export default Form.create()(
                 {
                   required: true,
                   whitespace: true,
-                  message: "Please Select Criteria or delete this field.",
+                  message: 'Please Select Criteria or delete this field.',
                 },
               ],
             })(
-              <Select placeholder="select criteria" loading={targetOptionsLoading} style={{ width: '80%', marginRight: 8 }}>
-                {targetOptions?.masteryCriteria.map(({ id, name }) => {
-                  return (
-                    <Select.Option key={id} value={id}>
-                      {name}
-                    </Select.Option>
-                  )
-                })}
-              </Select>
+              <Select
+                placeholder="select criteria"
+                loading={targetOptionsLoading}
+                style={{ width: '100%' }}
+                {...searchableDropDownOption}
+              >
+                {targetOptions?.masteryCriteria.map(({ id, name }) => (
+                  <Select.Option key={id} value={id}>
+                    {name}
+                  </Select.Option>
+                ))}
+              </Select>,
             )}
-            {stepKeys.length > 0 ? (
-              <Icon
-                className="dynamic-delete-button"
-                type="minus-circle-o"
-                onClick={() => stepRemove(k)}
-              />
-            ) : null}
-
           </Form.Item>
-        </Form.Item>
-
-
-      </>
-    ));
+        </Col>
+        {stepKeys.length > 0 && (
+          <Col span="1">
+            <Icon
+              className="dynamic-delete-button"
+              type="minus-circle-o"
+              onClick={() => stepRemove(k)}
+              style={{ marginTop: '15px' }}
+            />
+          </Col>
+        )}
+      </Row>
+    ))
 
     // start of equivalence class code
 
@@ -541,7 +506,6 @@ export default Form.create()(
 
     console.log('Session Details --------->', equivalenceObject)
     // if(equivalenceObject) setEquivalenceCode(equivalenceObject?.code)
-    
 
     if (equivalenceObject?.target?.maxSd) {
       selectedAlpha = []
@@ -552,13 +516,13 @@ export default Form.create()(
 
     if (equivalenceObject?.classes?.edges.length > 0) {
       classId = equivalenceObject?.classes?.edges.length
-      equivalenceObject?.classes?.edges.map((item, index) => {
+      equivalenceObject?.classes?.edges.forEach((item, index) => {
         initialKeyValue.push(index)
       })
     }
 
-    getFieldDecorator('Classkeys', { initialValue: initialKeyValue });
-    const classKeys = getFieldValue('Classkeys');
+    getFieldDecorator('Classkeys', { initialValue: initialKeyValue })
+    const classKeys = getFieldValue('Classkeys')
     const classFormItems = classKeys.map((k, index) => (
       <>
         <Form.Item
@@ -583,11 +547,13 @@ export default Form.create()(
           {selectedAlpha.map((alpha, alphaIndex) => (
             <Form.Item
               required={false}
-              key={'stimulus' + k + alpha}
+              key={`stimulus-${k}-${alpha}`}
               style={{ display: 'inline-block', width: 'calc(100% - 12px)' }}
             >
               {getFieldDecorator(`stimulus${k}${alpha}`, {
-                initialValue: equivalenceObject?.classes?.edges[k]?.node.stimuluses.edges[alphaIndex]?.node.stimulusName,
+                initialValue:
+                  equivalenceObject?.classes?.edges[k]?.node.stimuluses.edges[alphaIndex]?.node
+                    .stimulusName,
                 validateTrigger: ['onChange', 'onBlur'],
                 rules: [
                   {
@@ -596,69 +562,74 @@ export default Form.create()(
                     message: "Please input Stimulus's name or delete this field.",
                   },
                 ],
-              })(
-                <Input placeholder={`Stimulus ` + `${alpha}`} />
-              )}
-
+              })(<Input placeholder={`Stimulus ${alpha}`} />)}
             </Form.Item>
-
           ))}
-
-
-          {/* {keys.length > 0 ? (
-                    <Icon
-                        style={{ marginRight: 10 }}
-                        className="dynamic-delete-button"
-                        type="minus-circle-o"
-                        onClick={() => this.remove(k)}
-                    />
-                ) : null} */}
-
         </Form.Item>
-
-
       </>
-    ));
-
-
+    ))
 
     // end of equivalence class code
 
     return (
-      <div>
-        <Form {...layout} name="basic" onSubmit={handleSubmit}>
+      <div className="targetAllocationFormForAddOrEdit">
+        <Form onSubmit={handleSubmit} labelCol={{ sm: 24, md: 6 }} wrapperCol={{ sm: 24, md: 18 }}>
+          <Divider orientation="left">Basic Details</Divider>
+          <Form.Item label="Allocate target directly">
+            <Switch
+              checkedChildren={<Icon type="check" />}
+              unCheckedChildren={<Icon type="close" />}
+              checked={useDefaultGoal}
+              onChange={setUseDefaultGoal}
+            />
+          </Form.Item>
+          <Form.Item label="Short Term Goal">
+            {form.getFieldDecorator('stg', {
+              initialValue: !isDirectGoal && selectedShortTermGoal.node.id,
+            })(
+              <Select
+                loading={shortGoalLoading}
+                disabled={useDefaultGoal}
+                {...searchableDropDownOption}
+              >
+                {shortGoals?.shortTerm.edges.map(({ node }) => {
+                  return (
+                    <Select.Option key={node.id} value={node.id}>
+                      {node.goalName}
+                    </Select.Option>
+                  )
+                })}
+              </Select>,
+            )}
+          </Form.Item>
           <Form.Item label="Target Name" name="Target Name">
             {form.getFieldDecorator('name', {
               initialValue: targetName,
               rules: [{ required: true, message: 'Please give a target name' }],
-            })(<Input name="targetName" size="large" />)}
+            })(<Input name="targetName" />)}
           </Form.Item>
-
-          {peakEnable ?
-
-            <Form.Item label="Target Type" name="Target Type" style={{ marginTop: 15 }}>
+          {peakEnable ? (
+            <Form.Item label="Target Type" name="Target Type">
               {form.getFieldDecorator('type', {
                 initialValue: 'VGFyZ2V0RGV0YWlsVHlwZTo4',
                 rules: [{ required: true, message: 'Please select a target type' }],
               })(
-                <Select size="large" name="targetType" disabled>
+                <Select name="targetType" disabled {...searchableDropDownOption}>
                   <Select.Option value="VGFyZ2V0RGV0YWlsVHlwZTo4" key="VGFyZ2V0RGV0YWlsVHlwZTo4">
                     Peak
                   </Select.Option>
                 </Select>,
               )}
             </Form.Item>
-
-            :
-
-            <Form.Item label="Target Type" name="Target Type" style={{ marginTop: 15 }}>
+          ) : (
+            <Form.Item label="Target Type" name="Target Type">
               {form.getFieldDecorator('type', {
                 initialValue:
-                  targetOptions &&
-                  settingData?.getAllocateTargetSettings.edges[0]?.node.targetType.id,
+                  settingData?.getAllocateTargetSettings.edges[0]?.node.targetType.id ||
+                  targetOptions?.types[5].id,
                 rules: [{ required: true, message: 'Please select a target type' }],
               })(
-                <Select size="large" name="targetType">
+                <Select name="targetType" {...searchableDropDownOption}>
                   {targetOptions?.types.map(({ id, typeTar }) => {
                     return (
                       <Select.Option key={id} value={id}>
@@ -669,16 +640,19 @@ export default Form.create()(
                 </Select>,
               )}
             </Form.Item>
-          }
-
-          <Form.Item label="Mastery Criteria" name="masteryCriteria" style={{ marginTop: 15 }}>
+          )}
+          <Form.Item label="Mastery Criteria" name="masteryCriteria">
             {form.getFieldDecorator('masteryCriteria', {
               initialValue:
-                targetOptions &&
-                settingData?.getAllocateTargetSettings.edges[0]?.node.masteryCriteria.id,
-              rules: [{ required: true, message: 'Please select a target type' }],
+                settingData?.getAllocateTargetSettings.edges[0]?.node.masteryCriteria.id ||
+                targetOptions?.masteryCriteria[0].id,
+              rules: [{ required: true, message: 'Please select a Mastery Criteria' }],
             })(
-              <Select size="large" name="masteryCriteria" loading={targetOptionsLoading}>
+              <Select
+                name="masteryCriteria"
+                loading={targetOptionsLoading}
+                {...searchableDropDownOption}
+              >
                 {targetOptions?.masteryCriteria.map(({ id, name }) => {
                   return (
                     <Select.Option key={id} value={id}>
@@ -689,75 +663,100 @@ export default Form.create()(
               </Select>,
             )}
           </Form.Item>
-
-          <Form.Item label={<><span style={{ color: 'red', fontSize: 10 }}>*</span><span>Daily Trials</span></>} style={{ marginTop: 0, marginBottom: 0 }}>
-
+          <Form.Item
+            label={
+              <>
+                <span style={{ color: 'red', fontSize: 10 }}>*</span>
+                <span>Daily Trials</span>
+              </>
+            }
+            style={{ marginTop: 0, marginBottom: 0 }}
+          >
             <NumberCard
               // title="Daily Trials"
               number={dailyTrials}
               form={form}
               maxValue={26}
               setNumber={num => onChangeNumber('sdt', num)}
-              style={{
-                marginLeft: 5,
-                marginTop: 10,
-              }}
+              style={{ float: 'left' }}
             />
           </Form.Item>
-          <Form.Item label={<><span style={{ color: 'red', fontSize: 10 }}>*</span><span>Consecutive Days</span></>} style={{ marginTop: 0, marginBottom: 0 }}>
+          <Form.Item
+            label={
+              <>
+                <span style={{ color: 'red', fontSize: 10 }}>*</span>
+                <span>Consecutive Days</span>
+              </>
+            }
+            style={{ marginTop: 0, marginBottom: 0 }}
+          >
             <NumberCard
               // title="Consecutive Days"
               number={sessionConsecutiveDays}
               form={form}
               setNumber={num => onChangeNumber('scd', num)}
-              style={{
-                marginLeft: 5,
-                marginTop: 10,
-              }}
+              style={{ float: 'left' }}
             />
           </Form.Item>
-
-
           <div
             style={
               form.getFieldValue('type') === 'VGFyZ2V0RGV0YWlsVHlwZTo4'
                 ? {
-                  display: 'block',
-                  // marginTop: 10,
-                  marginLeft: 5,
-                }
+                    display: 'block',
+                    // marginTop: 10,
+                    marginLeft: 5,
+                  }
                 : { display: 'none' }
             }
           >
-            <Form.Item label={<><span style={{ color: 'red', fontSize: 10 }}>*</span><span>Peak Blocks</span></>} style={{ marginTop: 0, marginBottom: 0 }}>
+            <Form.Item
+              label={
+                <>
+                  <span style={{ color: 'red', fontSize: 10 }}>*</span>
+                  <span>Peak Blocks</span>
+                </>
+              }
+              style={{ marginTop: 0, marginBottom: 0 }}
+            >
               <NumberCard
                 // title="Peak Blocks"
                 number={peakBlockCount}
                 maxValue={10}
                 setNumber={num => onChangeNumber('spbc', num)}
                 minValue={1}
+                style={{ float: 'left' }}
               />
             </Form.Item>
 
-            {equivalenceEnable ?
-
+            {equivalenceEnable ? (
               <Form.Item label="Category">
                 {form.getFieldDecorator('category', {
-                  initialValue: 'Equivalance',
+                  initialValue: 'Equivalence',
                   rules: [{ required: true, message: 'Please select a category' }],
                 })(
-                  <Select style={{ width: '100%' }} disabled placeholder="Select a category" size="large">
-                    <Option key="4" value="Equivalance">
-                      Equivalance
+                  <Select
+                    style={{ width: '100%' }}
+                    disabled
+                    placeholder="Select a category"
+                    {...searchableDropDownOption}
+                  >
+                    <Option key="4" value="Equivalence">
+                      Equivalence
                     </Option>
                   </Select>,
                 )}
               </Form.Item>
-
-              :
+            ) : (
               <Form.Item label="Category">
-                {form.getFieldDecorator('category')(
-                  <Select style={{ width: '100%' }} placeholder="Select a category" size="large">
+                {form.getFieldDecorator('category', {
+                  initialValue: 'Direct',
+                  rules: [{ required: true, message: 'Please select a category' }],
+                })(
+                  <Select
+                    style={{ width: '100%' }}
+                    placeholder="Select a category"
+                    {...searchableDropDownOption}
+                  >
                     <Option key="1" value="Direct">
                       Direct
                     </Option>
@@ -767,22 +766,22 @@ export default Form.create()(
                     <Option key="3" value="Transformation">
                       Transformation
                     </Option>
-                    <Option key="4" value="Equivalance">
-                      Equivalance
+                    <Option key="4" value="Equivalence">
+                      Equivalence
                     </Option>
                   </Select>,
                 )}
               </Form.Item>
-            }
-
+            )}
           </div>
-
-          <Form.Item label="Status" style={{ marginTop: 15 }}>
+          <Form.Item label="Status">
             {form.getFieldDecorator('status', {
-              initialValue: settingData?.getAllocateTargetSettings.edges[0]?.node.status.id,
+              initialValue:
+                settingData?.getAllocateTargetSettings.edges[0]?.node.status.id ||
+                targetOptions?.targetStatus[5].id,
               rules: [{ required: true, message: 'Please select a target status' }],
             })(
-              <Select size="large" loading={targetOptionsLoading}>
+              <Select loading={targetOptionsLoading} {...searchableDropDownOption}>
                 {targetOptions?.targetStatus.map(({ id, statusName }) => {
                   return (
                     <Select.Option key={id} value={id}>
@@ -793,8 +792,7 @@ export default Form.create()(
               </Select>,
             )}
           </Form.Item>
-
-          {equivalenceEnable || form.getFieldValue('category') === 'Equivalance' ?
+          {equivalenceEnable || form.getFieldValue('category') === 'Equivalence' ? (
             <>
               {classFormItems}
               <Form.Item label="Add Classes">
@@ -803,50 +801,65 @@ export default Form.create()(
                 </Button>
               </Form.Item>
 
-              <Form.Item label="Equivalence Code" style={{ marginTop: 15 }}>
+              <Form.Item label="Equivalence Code">
                 {form.getFieldDecorator('equiCode', {
                   initialValue: equivalenceObject?.code,
-                })(<Input disabled={equivalenceObject?.code ? true : false} size="large" />)}
+                })(<Input disabled={equivalenceObject?.code} />)}
               </Form.Item>
             </>
-            :
+          ) : (
             <>
-              {formItems}
-              {form.getFieldValue('stepKeys')?.length > 0 ?
-                <Form.Item label="Add Stimulus">
+              <Divider orientation="left">Stimulus</Divider>
+              {formItemsForStimulus}
+              {form.getFieldValue('stepKeys')?.length > 0 ? (
+                <Form.Item style={{ textAlign: 'center' }} wrapperCol={{ sm: 24, md: 24 }}>
                   <Button type="dashed" disabled style={{ width: '60%' }}>
                     <Icon type="plus" /> Add field
                   </Button>
                 </Form.Item>
-                :
-                <Form.Item label="Add Stimulus">
+              ) : (
+                <Form.Item style={{ textAlign: 'center' }} wrapperCol={{ sm: 24, md: 24 }}>
                   <Button type="dashed" onClick={add} style={{ width: '60%' }}>
                     <Icon type="plus" /> Add field
                   </Button>
                 </Form.Item>
-              }
+              )}
 
-              {formItemsSteps}
-              {form.getFieldValue('keys')?.length > 0 ?
-                <Form.Item label="Add Steps">
-                  <Button type="dashed" disabled style={{ width: '60%' }}>
-                    <Icon type="plus" /> Add field
-                  </Button>
-                </Form.Item>
-                :
-                <Form.Item label="Add Steps">
-                  <Button type="dashed" onClick={addStep} style={{ width: '60%' }}>
-                    <Icon type="plus" /> Add field
-                  </Button>
-                </Form.Item>
-              }
+              <div
+                style={
+                  form.getFieldValue('type') !== 'VGFyZ2V0RGV0YWlsVHlwZTo4'
+                    ? {
+                        display: 'block',
+                        // marginTop: 10,
+                        marginLeft: 5,
+                      }
+                    : { display: 'none' }
+                }
+              >
+                <Divider orientation="left">Steps</Divider>
+                {formItemsForSteps}
+                {form.getFieldValue('keys')?.length > 0 ? (
+                  <Form.Item style={{ textAlign: 'center' }} wrapperCol={{ sm: 24, md: 24 }}>
+                    <Button type="dashed" disabled style={{ width: '60%' }}>
+                      <Icon type="plus" /> Add field
+                    </Button>
+                  </Form.Item>
+                ) : (
+                  <Form.Item style={{ textAlign: 'center' }} wrapperCol={{ sm: 24, md: 24 }}>
+                    <Button type="dashed" onClick={addStep} style={{ width: '60%' }}>
+                      <Icon type="plus" /> Add field
+                    </Button>
+                  </Form.Item>
+                )}
+              </div>
             </>
-          }
-
+          )}
+          <Divider orientation="left">Misc</Divider>
           <Form.Item
             label="Target Instructions"
             name="Target Instructions"
-            style={{ marginTop: 15 }}
+            labelCol={{ sm: 24, md: 5 }}
+            wrapperCol={{ sm: 24, md: 19 }}
           >
             <CKEditor
               name="targetInstructions"
@@ -857,29 +870,29 @@ export default Form.create()(
               }}
             />
           </Form.Item>
-
-          <Form.Item label="Target Video Link" name="Target Video" style={{ marginTop: 15 }}>
+          <Form.Item
+            label="Target Video Link"
+            labelCol={{ sm: 24, md: 5 }}
+            wrapperCol={{ sm: 24, md: 19 }}
+          >
             {form.getFieldDecorator('video', {
               initialValue: targetVideo,
-            })(<Input placeholder="Give the video url" size="large" />)}
+            })(<Input placeholder="Give the video url" />)}
           </Form.Item>
-
-          <Form.Item {...tailLayout} style={{ marginTop: 15 }}>
-            <Checkbox value={makeDefault} onChange={() => setMakeDefault(state => !state)}>
-              Make values default
-            </Checkbox>
+          <Form.Item
+            label="Make values default"
+            labelCol={{ sm: 24, md: 5 }}
+            wrapperCol={{ sm: 24, md: 19 }}
+          >
+            <Switch
+              checkedChildren={<Icon type="check" />}
+              unCheckedChildren={<Icon type="close" />}
+              checked={makeDefault}
+              onChange={setMakeDefault}
+            />
           </Form.Item>
-
-          <Form.Item {...tailLayout} style={{ marginTop: 20 }}>
-            <Button
-              type="primary"
-              htmlType="submit"
-              size="large"
-              style={{
-                width: 150,
-              }}
-              loading={allocateTargetLoading}
-            >
+          <Form.Item style={{ textAlign: 'center' }}>
+            <Button type="primary" htmlType="submit" loading={allocateTargetLoading}>
               Save
             </Button>
           </Form.Item>

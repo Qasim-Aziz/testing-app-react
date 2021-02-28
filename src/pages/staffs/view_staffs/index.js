@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 /* eslint-disable react/no-unused-state */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/destructuring-assignment */
@@ -8,6 +9,9 @@
 /* eslint-disable react/jsx-indent */
 /* eslint-disable object-shorthand */
 /* eslint-disable react/jsx-boolean-value */
+/* eslint-disable react/no-access-state-in-setstate */
+/* eslint-disable react/jsx-boolean-value */
+/* eslint-disable react/no-did-update-set-state */
 
 import React from 'react'
 import { Helmet } from 'react-helmet'
@@ -26,6 +30,8 @@ import {
   Switch,
   Dropdown,
   Menu,
+  Radio,
+  Tag,
 } from 'antd'
 // import EditHrDetails from 'components/staff/EditHrDetails'
 // import EditCertificationDetails from 'components/staff/EditCertificationDetails'
@@ -43,6 +49,7 @@ import {
   CloseCircleOutlined,
   CloudDownloadOutlined,
 } from '@ant-design/icons'
+import moment from 'moment'
 import { gql } from 'apollo-boost'
 import { connect } from 'react-redux'
 import DataTable from 'react-data-table-component'
@@ -52,35 +59,112 @@ import JsPDF from 'jspdf'
 import 'jspdf-autotable'
 import Highlighter from 'react-highlight-words'
 import { Scrollbars } from 'react-custom-scrollbars'
+import { FilterCard } from '../../../components/FilterCard/FilterTable'
 import EditStaffBasicInfo from './EditStaffBasicInfo'
 import CreateStaff from '../createStaff'
 import Authorize from '../../../components/LayoutComponents/Authorize'
 import client from '../../../apollo/config'
-
 import './style.scss'
 
 const { Panel } = Collapse
 const { Meta } = Card
 const { RangePicker } = DatePicker
 
+const customStyles = {
+  header: {
+    style: {
+      maxHeight: '50px',
+    },
+  },
+  headRow: {
+    style: {
+      borderTopStyle: 'solid',
+      borderTopWidth: '1px',
+      borderTopColor: '#ddd',
+      backgroundColor: '#f5f5f5',
+    },
+  },
+  headCells: {
+    style: {
+      '&:not(:last-of-type)': {
+        borderRightStyle: 'solid',
+        borderRightWidth: '1px',
+        borderRightColor: '#ddd',
+      },
+      height: '40px',
+      padding: '12px 8px 7px',
+      fontWeight: 'bold',
+    },
+  },
+  cells: {
+    style: {
+      '&:not(:last-of-type)': {
+        borderRightStyle: 'solid',
+        borderRightWidth: '1px',
+        borderRightColor: '#ddd',
+      },
+      padding: '4px 8px',
+      fontSize: '11px',
+    },
+  },
+  pagination: {
+    style: {
+      position: 'absolute',
+      top: '12px',
+      right: '5px',
+      borderTopStyle: 'none',
+      minHeight: '35px',
+    },
+  },
+  table: {
+    style: {
+      paddingBottom: '64px',
+      top: '64px',
+    },
+  },
+}
+
+const inputCustom = { width: '180px', marginBottom: '8px', display: 'block' }
+const tableFilterStyles = { margin: '0px 32px 0 8px' }
+const customLabel = {
+  fontSize: '17px',
+  color: '#000',
+  marginRight: '12px',
+  marginBottom: '12px',
+}
 @connect(({ staffs, learners }) => ({ staffs, learners }))
 class StaffTable extends React.Component {
   state = {
     divShow: false,
     filterShow: false,
     staffdata: [],
+    tableData: [],
+    mainData: [],
     realStaffList: [],
+    isFilterActive: false,
     UserProfile: null,
     isLoaded: false,
     searchText: '',
     searchedColumn: '',
     filteredInfo: null,
-    filterName: '',
     filterRole: '',
-    filterDesignation: '',
-    filterLocation: '',
     // for create learner drawer
     visible: false,
+    visibleEdit: false,
+    filterName: '',
+    filterEmail: '',
+    filterDesignation: '',
+  }
+
+  filterRef = React.createRef()
+
+  filterSet = {
+    name: true,
+    email: true,
+    mobile: true,
+    gender: true,
+    designation: true,
+    address: true,
   }
 
   componentDidMount() {
@@ -94,7 +178,23 @@ class StaffTable extends React.Component {
     })
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.staffs.StaffList !== this.props.staffs.StaffList) {
+      this.setState({
+        tableData: this.props.staffs.StaffList,
+        mainData: this.props.staffs.StaffList,
+      })
+
+      if (this.props.staffs.staffCreated === 'Created') {
+        this.setState({
+          visible: false,
+        })
+      }
+    }
+  }
+
   info = e => {
+    console.log(e, 'ewewe')
     const { dispatch } = this.props
     dispatch({
       type: 'staffs/SET_STATE',
@@ -105,6 +205,19 @@ class StaffTable extends React.Component {
     })
     this.setState({
       divShow: true,
+    })
+    this.showEditDrawer()
+  }
+
+  showEditDrawer = () => {
+    this.setState({
+      visibleEdit: true,
+    })
+  }
+
+  onCloseEdit = () => {
+    this.setState({
+      visibleEdit: false,
     })
   }
 
@@ -118,73 +231,6 @@ class StaffTable extends React.Component {
     this.setState({
       visible: false,
     })
-  }
-
-  getColumnSearchProps = dataIndex => ({
-    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-      <div style={{ padding: 8 }}>
-        <Input
-          ref={node => {
-            this.searchInput = node
-          }}
-          placeholder={`Search ${dataIndex}`}
-          value={selectedKeys[0]}
-          onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-          onPressEnter={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
-          style={{ width: 188, marginBottom: 8, display: 'block' }}
-        />
-        <Button
-          type="primary"
-          onClick={() => this.handleSearch(selectedKeys, confirm, dataIndex)}
-          icon="search"
-          size="small"
-          style={{ width: 90, marginRight: 8 }}
-        >
-          Search
-        </Button>
-        <Button onClick={() => this.handleReset(clearFilters)} size="small" style={{ width: 90 }}>
-          Reset
-        </Button>
-      </div>
-    ),
-    filterIcon: filtered => (
-      <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
-    ),
-    onFilter: (value, record) =>
-      record[dataIndex]
-        .toString()
-        .toLowerCase()
-        .includes(value.toLowerCase()),
-
-    onFilterDropdownVisibleChange: visible => {
-      if (visible) {
-        setTimeout(() => this.searchInput.select())
-      }
-    },
-    render: text =>
-      this.state.searchedColumn === dataIndex ? (
-        <Highlighter
-          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-          searchWords={[this.state.searchText]}
-          autoEscape
-          textToHighlight={text.toString()}
-        />
-      ) : (
-        text
-      ),
-  })
-
-  handleSearch = (selectedKeys, confirm, dataIndex) => {
-    confirm()
-    this.setState({
-      searchText: selectedKeys[0],
-      searchedColumn: dataIndex,
-    })
-  }
-
-  handleReset = clearFilters => {
-    clearFilters()
-    this.setState({ searchText: '' })
   }
 
   handleChange = (pagination, filters, sorter) => {
@@ -319,6 +365,69 @@ class StaffTable extends React.Component {
       })
   }
 
+  filterHandler = ({ name, email, mobile, gender, designation, address }) => {
+    let filteredList = this.state.mainData
+    let tempFilterActive = false
+    if (name) {
+      tempFilterActive = true
+      filteredList =
+        filteredList &&
+        filteredList.filter(item => item.name?.toLowerCase().includes(name.toLowerCase()))
+    }
+    if (email) {
+      tempFilterActive = true
+      filteredList =
+        filteredList &&
+        filteredList.filter(
+          item => item.email && item.email.toLowerCase().includes(email.toLowerCase()),
+        )
+    }
+    if (designation) {
+      tempFilterActive = true
+      filteredList =
+        filteredList &&
+        filteredList.filter(
+          item =>
+            item.designation && item.designation?.toLowerCase().includes(designation.toLowerCase()),
+        )
+    }
+    if (mobile) {
+      tempFilterActive = true
+      filteredList =
+        filteredList &&
+        filteredList.filter(item => item.contactNo?.toLowerCase().includes(mobile.toLowerCase()))
+    }
+    if (address) {
+      tempFilterActive = true
+      filteredList =
+        filteredList &&
+        filteredList.filter(item => item.localAddress?.toLowerCase().includes(name.toLowerCase()))
+    }
+    if (gender) {
+      tempFilterActive = true
+      filteredList =
+        filteredList &&
+        filteredList.filter(
+          item => item.gender && item.gender?.toLowerCase() === gender.toLowerCase(),
+        )
+    }
+    this.setState({
+      tableData: filteredList,
+      isFilterActive: tempFilterActive,
+    })
+  }
+
+  clearFilter = () => {
+    this.filterHandler({
+      name: '',
+      email: '',
+      mobile: '',
+      gender: '',
+      designation: '',
+      address: '',
+    })
+  }
+
   filterToggle(toggle) {
     if (toggle) {
       this.setState({
@@ -335,64 +444,13 @@ class StaffTable extends React.Component {
     let { filteredInfo } = this.state
     filteredInfo = filteredInfo || {}
 
-    const customStyles = {
-      header: {
-        style: {
-          maxHeight: '50px',
-        },
-      },
-      headRow: {
-        style: {
-          borderTopStyle: 'solid',
-          borderTopWidth: '1px',
-          borderTopColor: '#ddd',
-          backgroundColor: '#f5f5f5',
-        },
-      },
-      headCells: {
-        style: {
-          '&:not(:last-of-type)': {
-            borderRightStyle: 'solid',
-            borderRightWidth: '1px',
-            borderRightColor: '#ddd',
-          },
-          fontWeight: 'bold',
-        },
-      },
-      cells: {
-        style: {
-          '&:not(:last-of-type)': {
-            borderRightStyle: 'solid',
-            borderRightWidth: '1px',
-            borderRightColor: '#ddd',
-          },
-          fontSize: '11px',
-        },
-      },
-      pagination: {
-        style: {
-          position: 'absolute',
-          top: '5px',
-          right: '5px',
-          borderTopStyle: 'none',
-          minHeight: '35px',
-        },
-      },
-      table: {
-        style: {
-          paddingBottom: '40px',
-          top: '40px',
-        },
-      },
-    }
-
     const columns = [
       {
         name: 'Name',
         selector: 'name',
         sortable: true,
-        minWidth: '120px',
-        maxWidth: '120px',
+        minWidth: '160px',
+        maxWidth: '160px',
         cell: row => (
           <Button
             onClick={() => this.info(row)}
@@ -404,25 +462,15 @@ class StaffTable extends React.Component {
         ),
       },
       {
-        name: 'Session',
-        ignoreRowClick: true,
-        button: true,
-        maxWidth: '80px',
-        minWidth: '80px',
-        cell: () => (
-          <span>
-            <Button
-              onClick={this.showSession}
-              style={{ padding: '0px', color: '#0190fe', border: 'none', fontSize: '11px' }}
-            >
-              Time
-            </Button>
-          </span>
-        ),
-      },
-      {
         name: 'Email',
         selector: 'email',
+        key: 'email',
+        maxWidth: '160px',
+        minWidth: '160px',
+      },
+      {
+        name: 'Contact No',
+        selector: 'contactNo',
         key: 'email',
         maxWidth: '160px',
         minWidth: '160px',
@@ -443,13 +491,13 @@ class StaffTable extends React.Component {
         name: 'Join Date',
         selector: 'dateOfJoining',
         key: 'joining',
-        maxWidth: '100px',
+        maxWidth: '120px',
       },
       {
         name: 'Date of Birth',
         selector: 'dob',
         key: 'dob',
-        maxWidth: '80px',
+        maxWidth: '120px',
       },
       {
         name: 'Designation',
@@ -460,6 +508,55 @@ class StaffTable extends React.Component {
         name: 'Qualification',
         selector: 'qualification',
         maxWidth: '120px',
+      },
+      {
+        name: 'Last Login',
+        selector: 'user',
+        width: '100px',
+        cell: row => (
+          <span>
+            {row.user && row.user.lastLogin ? moment(row.user.lastLogin).format('YYYY-MM-DD') : ''}
+          </span>
+        ),
+      },
+      {
+        name: 'Session',
+        ignoreRowClick: true,
+        button: true,
+        maxWidth: '80px',
+        minWidth: '80px',
+        cell: () => (
+          <span>
+            <Button
+              onClick={this.showSession}
+              style={{ padding: '0px', color: '#0190fe', border: 'none', fontSize: '11px' }}
+            >
+              Time
+            </Button>
+          </span>
+        ),
+      },
+      {
+        name: 'Tags',
+        selector: 'tags',
+        width: 60,
+        cell: row => {
+          if (row.tags.length > 0) {
+            return (
+              <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                {row.tags?.map(r => {
+                  return (
+                    <Tag color="blue" style={{ margin: '1px' }}>
+                      {r}
+                    </Tag>
+                  )
+                })}
+              </div>
+            )
+          }
+
+          return null
+        },
       },
       {
         name: 'Location',
@@ -473,34 +570,28 @@ class StaffTable extends React.Component {
       staffs: { StaffList, StaffProfile },
     } = this.props
 
-    console.log('staff----', StaffList)
+    console.log(StaffList, 'stafflist')
+    // let tagArrList = [
+    //   ...this.state.tableData.map(ele => {
+    //     if (typeof ele.tags === 'object') {
+    //       if ('__typename' in ele.tags) {
+    //         ele.tags = ''
+    //       } else if (ele.tags !== '') {
+    //         console.log('ELSE', ele.tags)
+    //         ele.tags.edges.node.tags
+    //       }
+    //     }
+    //     return ele
+    //   }),
+    // ]
 
     let filteredList = StaffList
-    filteredList = filteredList.filter(
-      item => item.name && item.name.toLowerCase().includes(this.state.filterName.toLowerCase()),
-    )
-
+    console.log('TABLE DATA', filteredList)
     if (this.state.filterRole) {
       filteredList = filteredList.filter(
         item =>
           item.userRole &&
           item.userRole.name.toLowerCase().includes(this.state.filterRole.toLowerCase()),
-      )
-    }
-    if (this.state.filterDesignation) {
-      filteredList = filteredList.filter(
-        item =>
-          item.designation &&
-          item.designation.toLowerCase().includes(this.state.filterDesignation.toLowerCase()),
-      )
-    }
-    if (this.state.filterLocation) {
-      filteredList = filteredList.filter(
-        item =>
-          item.clinicLocation &&
-          item.clinicLocation.location
-            .toLowerCase()
-            .includes(this.state.filterLocation.toLowerCase()),
       )
     }
 
@@ -515,28 +606,6 @@ class StaffTable extends React.Component {
         return group
       }
       return group
-    }, [])
-
-    let designations = StaffList.reduce(function(sum, current) {
-      return sum.concat(current.designation ? current.designation : [])
-    }, [])
-
-    let designationsGrouped = designations.reduce(function(groups, item) {
-      if (!groups.includes(item)) {
-        groups.push(item)
-      }
-      return groups
-    }, [])
-
-    let locations = StaffList.reduce(function(sum, current) {
-      return sum.concat(current.clinicLocation ? current.clinicLocation : [])
-    }, [])
-
-    let locationsGrouped = locations.reduce(function(groups, item) {
-      if (!groups.includes(item.location)) {
-        groups.push(item.location)
-      }
-      return groups
     }, [])
 
     const fileType =
@@ -569,12 +638,8 @@ class StaffTable extends React.Component {
     if (staffs.loading) {
       return <div>Loading...</div>
     }
-    const divClass = divShow ? 'col-sm-8' : 'col-sm-12'
+    const divClass = divShow ? 'col-sm-12' : 'col-sm-12'
     const detailsDiv = divShow ? { display: 'block', paddingLeft: '0' } : { display: 'none' }
-    const filterDiv = filterShow
-      ? { display: 'block', padding: '0', marginBottom: '0', backgroundColor: 'inherit' }
-      : { display: 'none' }
-    const filterOptionStyle = { display: 'inline-block', marginRight: '10px' }
 
     const exportPDF = () => {
       const unit = 'pt'
@@ -638,12 +703,13 @@ class StaffTable extends React.Component {
       </Menu>
     )
 
+    console.log(filteredList, 'filteredList')
     return (
       <Authorize roles={['school_admin']} redirect to="/dashboard/beta">
         <Helmet title="Partner" />
         <Drawer
           title="CREATE STAFF"
-          width="50%"
+          width="75%"
           placement="right"
           closable={true}
           onClose={this.onClose}
@@ -654,69 +720,144 @@ class StaffTable extends React.Component {
 
         <Drawer
           title="Filters"
-          placement="left"
+          placement="right"
           closable={true}
           onClose={() => this.setState({ filterShow: false })}
           visible={filterShow}
-          width={300}
+          width={380}
         >
+          <FilterCard
+            filterHandler={this.filterHandler}
+            filterSet={this.filterSet}
+            ref={this.filterRef}
+          />
           <div>
             <div className="filter_sub_div">
-              <span style={{ fontSize: '15px', color: '#000' }}>Name :</span>
-              <Input
-                size="small"
-                placeholder="Search Name"
-                value={this.state.filterName}
-                onChange={e => this.setState({ filterName: e.target.value })}
-                style={{ width: 188, marginBottom: 8, display: 'block' }}
-              />
-            </div>
-            <div className="filter_sub_div">
-              <span style={{ fontSize: '15px', color: '#000' }}>Role :</span>
+              <span style={customLabel}>Role :</span>
               <Select
-                size="small"
+                size="default"
                 value={this.state.filterRole}
-                onSelect={value => this.setState({ filterRole: value })}
-                style={{ width: 188, marginBottom: 8 }}
+                onSelect={value => this.setState({ filterRole: value, isFilterActive: true })}
+                style={inputCustom}
               >
                 <Select.Option value="">Select Role</Select.Option>
                 {rolesGrouped.map((i, index) => {
-                  return <Select.Option value={i}>{i}</Select.Option>
-                })}
-              </Select>
-            </div>
-
-            <div className="filter_sub_div">
-              <span style={{ fontSize: '15px', color: '#000' }}>Designation :</span>
-
-              <Select
-                size="small"
-                value={this.state.filterDesignation}
-                onSelect={value => this.setState({ filterDesignation: value })}
-                style={{ width: 188, marginBottom: 8 }}
-              >
-                <Select.Option value="">Select Designation</Select.Option>
-                {designationsGrouped.map((i, index) => {
-                  return <Select.Option value={i}>{i}</Select.Option>
-                })}
-              </Select>
-            </div>
-            <div className="filter_sub_div">
-              <span style={{ fontSize: '15px', color: '#000' }}>Location :</span>
-
-              <Select
-                size="small"
-                value={this.state.filterLocation}
-                onSelect={value => this.setState({ filterLocation: value })}
-                style={{ width: 188, marginBottom: 8 }}
-              >
-                <Select.Option value="">Select Location</Select.Option>
-                {locationsGrouped.map((i, index) => {
-                  return <Select.Option value={i}>{i}</Select.Option>
+                  return (
+                    <Select.Option key={i} value={i}>
+                      {i}
+                    </Select.Option>
+                  )
                 })}
               </Select>
             </div>
           </div>
+        </Drawer>
+
+        <Drawer
+          title="EDIT LEARNER"
+          width="75%"
+          placement="right"
+          closable={true}
+          onClose={this.onCloseEdit}
+          visible={this.state.visibleEdit}
+        >
+          {StaffProfile ? (
+            <div className="card" style={{ marginTop: '5px', border: 'none' }}>
+              <div className="card-body" style={{ paddingLeft: '5px', paddingRight: '5px' }}>
+                <div className="table-operations" style={{ marginBottom: '16px' }}>
+                  <Button
+                    style={{
+                      marginRight: '-12px',
+                      float: 'right',
+                      border: 'none',
+                      padding: 'none',
+                    }}
+                    onClick={() => this.onCloseEdit()}
+                  >
+                    X
+                  </Button>
+                </div>
+                <div>
+                  <Card
+                    style={{
+                      textAlign: 'center',
+                      border: 'none',
+                      display: 'flex',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Meta
+                      avatar={
+                        <Avatar
+                          src="https://www.thewodge.com/wp-content/uploads/2019/11/avatar-icon.png"
+                          style={{
+                            width: '100px',
+                            height: '100px',
+                            border: '1px solid #f6f7fb',
+                          }}
+                        />
+                      }
+                      title={
+                        <h5 style={{ marginTop: '20px' }}>
+                          {StaffProfile ? StaffProfile.name : ''}
+                          <span
+                            style={{
+                              float: 'right',
+                              fontSize: '12px',
+                              padding: '5px',
+                              color: '#0190fe',
+                            }}
+                          >
+                            {StaffProfile.isActive === true ? (
+                              <Switch
+                                checkedChildren={<Icon type="check" />}
+                                unCheckedChildren={<Icon type="close" />}
+                                defaultChecked
+                                onChange={this.staffActiveInactive}
+                              />
+                            ) : (
+                              <Switch
+                                checkedChildren={<Icon type="check" />}
+                                unCheckedChildren={<Icon type="close" />}
+                                onChange={this.staffActiveInactive}
+                              />
+                            )}
+                          </span>
+                          {/* <span style={{float:'right', fontSize:'12px', padding:'5px'}}>delete</span>
+                        <span style={{float:'right', fontSize:'12px', padding:'5px'}}>edit</span> */}
+                        </h5>
+                      }
+                      description={
+                        <div>
+                          <p style={{ fontSize: '13px', marginBottom: '4px' }}>
+                            {' '}
+                            Therapist{' '}
+                            <span
+                              style={{
+                                backgroundColor: '#52c41a',
+                                color: 'white',
+                                borderRadius: '3px',
+                                padding: '1px 5px',
+                              }}
+                            >
+                              Active
+                            </span>
+                          </p>
+                        </div>
+                      }
+                    />
+                  </Card>
+                  {StaffProfile ? (
+                    <EditStaffBasicInfo key={StaffProfile.id} userinfo={StaffProfile} />
+                  ) : (
+                    ''
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            ''
+          )}
         </Drawer>
 
         <div
@@ -725,6 +866,7 @@ class StaffTable extends React.Component {
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
+            marginTop: '20px',
             padding: '0px 10px',
             backgroundColor: '#FFF',
             boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
@@ -734,22 +876,21 @@ class StaffTable extends React.Component {
             <Button onClick={() => this.filterToggle(filterShow)} size="large">
               <FilterOutlined />
             </Button>
-            {this.state.filterName ||
-            this.state.filterRole ||
-            this.state.filterDesignation ||
-            this.state.filterLocation ? (
+            {this.state.isFilterActive ? (
               <Button
                 type="link"
                 style={{ marginLeft: '10px', color: '#FEBB27' }}
-                onClick={() =>
+                size="small"
+                onClick={() => {
+                  this.filterRef.current ? this.filterRef.current.clearFilter() : this.clearFilter()
                   this.setState({
-                    filterName: '',
+                    isFilterActive: false,
                     filterRole: '',
                     filterDesignation: '',
-                    filterLocation: '',
+                    filterName: '',
+                    filterEmail: '',
                   })
-                }
-                size="small"
+                }}
               >
                 Clear Filters
                 <CloseCircleOutlined />
@@ -760,14 +901,6 @@ class StaffTable extends React.Component {
             <span style={{ fontSize: '25px', color: '#000' }}>Staff List</span>
           </div>
           <div style={{ padding: '5px 0px' }}>
-            {/* <Button onClick={() => exportPDF()} type='primary'>
-              pdf <PlusOutlined />
-            </Button>
-
-            <Button onClick={(e) => exportToCSV(filteredList, 'Staff')} type='primary'>
-              <PlusOutlined />
-            </Button> */}
-
             <Dropdown overlay={menu} trigger={['click']}>
               <Button style={{ marginRight: '10px' }} type="link" size="large">
                 <CloudDownloadOutlined />{' '}
@@ -780,9 +913,95 @@ class StaffTable extends React.Component {
           </div>
         </div>
 
-        <div className="row">
-          <div className={divClass}>
-            <div style={{ margin: '5px', marginBottom: '50px' }}>
+        <div className={divClass}>
+          <div style={{ margin: '5px', marginBottom: '50px' }}>
+            {/* filters */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                position: 'absolute',
+                top: '20px',
+                whiteSpace: 'nowrap',
+                zIndex: 2,
+                width: 'fit-content',
+              }}
+            >
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <span>Name :</span>
+                <Input
+                  size="small"
+                  name="name"
+                  placeholder="Search Name"
+                  value={this.state.filterName}
+                  onChange={e => {
+                    this.setState({
+                      filterName: e.target.value,
+                      isFilterActive: e.target.value && true,
+                    })
+                    this.filterHandler({ name: e.target.value })
+                  }}
+                  style={{ ...tableFilterStyles, width: '112px' }}
+                />
+              </span>
+
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <span>Email :</span>
+                <Input
+                  size="small"
+                  name="email"
+                  placeholder="Search Email"
+                  value={this.state.filterEmail}
+                  onChange={e => {
+                    this.setState({
+                      filterEmail: e.target.value,
+                      isFilterActive: e.target.value && true,
+                    })
+                    this.filterHandler({ email: e.target.value })
+                  }}
+                  style={{ ...tableFilterStyles, width: '148px' }}
+                />
+              </span>
+
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <span>Designation :</span>
+                <Input
+                  size="small"
+                  name="designation"
+                  placeholder="Search Designation"
+                  value={this.state.filterDesignation}
+                  onChange={e => {
+                    this.setState({
+                      filterDesignation: e.target.value,
+                      isFilterActive: e.target.value && true,
+                    })
+                    this.filterHandler({ designation: e.target.value })
+                  }}
+                  style={{ ...tableFilterStyles, width: '148px' }}
+                />
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <Radio.Group
+                  size="small"
+                  buttonStyle="solid"
+                  value={this.state.filterRole}
+                  onChange={e => {
+                    this.setState({ filterRole: e.target.value, isFilterActive: true })
+                  }}
+                  style={tableFilterStyles}
+                >
+                  <Radio.Button value="">All</Radio.Button>
+                  {rolesGrouped.map((i, index) => {
+                    return (
+                      <Radio.Button key={i} value={i}>
+                        {i}
+                      </Radio.Button>
+                    )
+                  })}
+                </Radio.Group>
+              </span>
+            </div>
+            <div className="modify-data-table">
               <DataTable
                 columns={columns}
                 theme="default"
@@ -795,130 +1014,96 @@ class StaffTable extends React.Component {
               />
             </div>
           </div>
-          <div className="col-sm-4" style={detailsDiv}>
-            {StaffProfile ? (
-              <Scrollbars key={StaffProfile.id} style={{ height: 650 }}>
-                <div
-                  className="card"
-                  style={{ marginTop: '5px', minHeight: '600px', border: '1px solid #f4f6f8' }}
-                >
-                  <div className="card-body">
-                    <div className="table-operations" style={{ marginBottom: '16px' }}>
-                      <Button
-                        style={{
-                          marginRight: '-12px',
-                          float: 'right',
-                          border: 'none',
-                          padding: 'none',
-                        }}
-                        onClick={() => this.setState({ divShow: false })}
-                      >
-                        X
-                      </Button>
-                    </div>
-                    <div>
-                      {/* <p style={{ textAlign: 'center' }}>
-                        <span style={{ padding: '5px' }}>
-                          <ContactsOutlined /> Appointment
-                        </span>
-                        <span style={{ padding: '5px' }}>
-                          <FileDoneOutlined /> Task
-                        </span>
-                        <span style={{ padding: '5px' }}>
-                          <AuditOutlined /> Attendence
-                        </span>
-                        <span style={{ padding: '5px' }}>
-                          <UserOutlined /> Timesheet
-                        </span>
-                      </p> */}
-                      <Card style={{ marginTop: '26px', border: 'none' }}>
-                        <Meta
-                          avatar={
-                            <Avatar
-                              src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+        </div>
+        <div className="col-sm-4" style={detailsDiv}>
+          {StaffProfile ? (
+            <Scrollbars key={StaffProfile.id} style={{ height: 650 }}>
+              <div
+                className="card"
+                style={{ marginTop: '5px', minHeight: '600px', border: '1px solid #f4f6f8' }}
+              >
+                <div className="card-body">
+                  <div className="table-operations" style={{ marginBottom: '16px' }}>
+                    <Button
+                      style={{
+                        marginRight: '-12px',
+                        float: 'right',
+                        border: 'none',
+                        padding: 'none',
+                      }}
+                      onClick={() => this.setState({ divShow: false })}
+                    >
+                      X
+                    </Button>
+                  </div>
+                  <div>
+                    <Card style={{ marginTop: '26px', border: 'none' }}>
+                      <Meta
+                        avatar={
+                          <Avatar
+                            src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                            style={{
+                              width: '100px',
+                              height: '100px',
+                              border: '1px solid #f6f7fb',
+                            }}
+                          />
+                        }
+                        title={
+                          <h5 style={{ marginTop: '20px' }}>
+                            {StaffProfile ? StaffProfile.name : ''}
+                            <span
                               style={{
-                                width: '100px',
-                                height: '100px',
-                                border: '1px solid #f6f7fb',
+                                float: 'right',
+                                fontSize: '12px',
+                                padding: '5px',
+                                color: '#0190fe',
                               }}
-                            />
-                          }
-                          title={
-                            <h5 style={{ marginTop: '20px' }}>
-                              {StaffProfile ? StaffProfile.name : ''}
+                            >
+                              {StaffProfile.isActive === true ? (
+                                <Switch
+                                  checkedChildren={<Icon type="check" />}
+                                  unCheckedChildren={<Icon type="close" />}
+                                  defaultChecked
+                                  onChange={this.staffActiveInactive}
+                                />
+                              ) : (
+                                <Switch
+                                  checkedChildren={<Icon type="check" />}
+                                  unCheckedChildren={<Icon type="close" />}
+                                  onChange={this.staffActiveInactive}
+                                />
+                              )}
+                            </span>
+                          </h5>
+                        }
+                        description={
+                          <div>
+                            <p style={{ fontSize: '13px', marginBottom: '4px' }}>
+                              {' '}
+                              Therapist{' '}
                               <span
                                 style={{
-                                  float: 'right',
-                                  fontSize: '12px',
-                                  padding: '5px',
-                                  color: '#0190fe',
+                                  backgroundColor: '#52c41a',
+                                  color: 'white',
+                                  borderRadius: '3px',
+                                  padding: '1px 5px',
                                 }}
                               >
-                                {StaffProfile.isActive === true ? (
-                                  <Switch
-                                    checkedChildren={<Icon type="check" />}
-                                    unCheckedChildren={<Icon type="close" />}
-                                    defaultChecked
-                                    onChange={this.staffActiveInactive}
-                                  />
-                                ) : (
-                                  <Switch
-                                    checkedChildren={<Icon type="check" />}
-                                    unCheckedChildren={<Icon type="close" />}
-                                    onChange={this.staffActiveInactive}
-                                  />
-                                )}
+                                Active
                               </span>
-                              {/* <span style={{float:'right', fontSize:'12px', padding:'5px'}}>delete</span>
-                            <span style={{float:'right', fontSize:'12px', padding:'5px'}}>edit</span> */}
-                            </h5>
-                          }
-                          description={
-                            <div>
-                              <p style={{ fontSize: '13px', marginBottom: '4px' }}>
-                                {' '}
-                                Therapist{' '}
-                                <span
-                                  style={{
-                                    backgroundColor: '#52c41a',
-                                    color: 'white',
-                                    borderRadius: '3px',
-                                    padding: '1px 5px',
-                                  }}
-                                >
-                                  Active
-                                </span>
-                              </p>
-                            </div>
-                          }
-                        />
-                      </Card>
-                      {StaffProfile ? (
-                        <Collapse defaultActiveKey="1" accordion bordered={false}>
-                          <Panel header="Basic Details" key="1">
-                            <EditStaffBasicInfo key={StaffProfile.id} userinfo={StaffProfile} />
-                          </Panel>
-                          {/* <Panel header="HR Details" key="2">
-                            <EditHrDetails />
-                        </Panel>
-                        <Panel header="Health Details" key="3">
-                            <EditCertificationDetails />
-                        </Panel>
-                        <Panel header="Intake Form" key="4">
-                            <EditHealthForm />
-                        </Panel> */}
-                        </Collapse>
-                      ) : (
-                        ''
-                      )}
-                    </div>
+                            </p>
+                          </div>
+                        }
+                      />
+                    </Card>
                   </div>
                 </div>
-              </Scrollbars>
-            ) : (
-              ''
-            )}
-          </div>
+              </div>
+            </Scrollbars>
+          ) : (
+            ''
+          )}
         </div>
       </Authorize>
     )

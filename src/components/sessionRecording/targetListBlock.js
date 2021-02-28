@@ -16,15 +16,18 @@
 /* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable prefer-template */
+/* eslint-disable no-return-assign */
 
 import React, { Component } from 'react'
-import { Card, Progress, Typography } from 'antd'
+import {Badge, Card, Progress, Typography } from 'antd'
 import { connect } from 'react-redux'
 import Scroll from 'react-scroll'
 import TrialsList from './trialsList'
 
 const { Element, Link } = Scroll
 const peakId = 'VGFyZ2V0RGV0YWlsVHlwZTo4'
+const Equivalence = 'EQUIVALENCE'
+const { Title, Text } = Typography
 
 @connect(({ sessionrecording }) => ({ sessionrecording }))
 class Target extends Component {
@@ -35,8 +38,13 @@ class Target extends Component {
     } = this.props
     if (!loading) {
       document.getElementById(TargetActiveId).click()
-      document.getElementsByClassName('targetElements')[TargetActiveIndex].style.border =
-        '2px solid #bae7ff'
+
+      // Highlight selected target & scroll to that
+      const card = document.getElementsByClassName('targetElements')[TargetActiveIndex]
+      card.style.border = '2px solid #bae7ff'
+      card.setAttribute('tabindex', '-1')
+      card.focus()
+      card.removeAttribute('tabindex')
     }
   }
 
@@ -63,17 +71,14 @@ class Target extends Component {
       let splitList = []
       let videoId = ''
       splitList = targetVideoUrl.split('/')
-      if (splitList.length > 3){
-        if (targetVideoUrl.split('/')[2] === 'www.youtube.com'){
+      if (splitList.length > 3) {
+        if (targetVideoUrl.split('/')[2] === 'www.youtube.com') {
           finalUrl = targetVideoUrl
-        }
-        else{
+        } else {
           videoId = targetVideoUrl.split('/')[3]
           finalUrl = `https://player.vimeo.com/video/${videoId}/`
         }
-        
       }
-
 
       // const videoId = targetVideoUrl.split('/')[3]
       // return videoId
@@ -230,10 +235,7 @@ class Target extends Component {
 
       // load video
       this.getVideoUrl(index)
-
     }
-
-
   }
 
   changeTargetWithStimulusIndex = (index, stimulusOrStepIndex) => {
@@ -294,15 +296,70 @@ class Target extends Component {
 
       // load video
       this.getVideoUrl(index)
-
     }
-
-
   }
 
-  changeStimulus = (e) => {
+  changePeakTargetStimulus = (targetIndex, stimulusIndex) => {
+    const {
+      dispatch,
+      sessionrecording: { Disabled, TargetActiveIndex },
+    } = this.props
+
+    if (Disabled) {
+      alert('Please Start Session Clock first')
+    } else {
+      if (targetIndex !== TargetActiveIndex) {
+        this.changeTarget(targetIndex)
+      }
+
+      dispatch({
+        type: 'sessionrecording/SET_STATE',
+        payload: {
+          SelectedPeakStimulusIndex: stimulusIndex,
+        },
+      })
+    }
+  }
+
+  changeStimulus = e => {
     e.preventDefault()
     // alert('clicked')
+  }
+
+  getStimulusStatus = (item, item2) => {
+    let status = ''
+    item.node.mastery.edges.map(masteryItem =>
+      masteryItem.node.sd?.id === item2.node.id && (
+        status = masteryItem.node.status?.statusName
+      )
+    )
+
+    return <Badge
+      style={{
+        marginLeft: '10px',
+        marginBottom: '8px',
+        background: '#1890ff',
+      }}
+      count={status}
+    />
+  }
+
+  getStepStatus = (item, item3) => {
+    let status = ''
+    item.node.mastery.edges.map(masteryItem =>
+      masteryItem.node.step.id === item3.node.id && (
+        status = masteryItem.node.status?.statusName
+      )
+    )
+
+    return <Badge
+      style={{
+        marginLeft: '10px',
+        marginBottom: '8px',
+        background: '#1890ff',
+      }}
+      count={status}
+    />
   }
 
   render() {
@@ -326,7 +383,6 @@ class Target extends Component {
           style={{
             position: 'relative',
             height: '500px',
-            overflow: 'scroll',
             // marginBottom: '100px'
           }}
         >
@@ -338,205 +394,123 @@ class Target extends Component {
                   style={{ padding: '4px', borderRadius: '8px' }}
                   name={item.node.id}
                 >
-                  {item.node.sd.edges.length > 0 ?
+                  {item.node.sd.edges.length > 0 ? (
                     <>
-                      {item.node.targetAllcatedDetails.targetType.id === peakId ?
-                        <>
-                          <a onClick={() => this.changeTarget(index)}>
-                            <Card hoverable style={{ width: '100%', maxHeight: '350px' }}>
-                              <Meta title={`Target : `+ item.node.targetAllcatedDetails.targetName} />
-                            </Card>
-                          </a>
-                        </>
-                        :
-                        <>
-                          <Card hoverable style={{ width: '100%', maxHeight: '350px' }}>
-                            <a onClick={(e) => this.changeTarget(index)}><Meta title={`Target : `+ item.node.targetAllcatedDetails.targetName} /></a>
-                            <div style={trialsDivStyle}>
-                              <h6>Stimulus</h6>
-                              {item.node.sd.edges.length > 0 ? (
-                                <>
-                                  {item.node.sd.edges.map((item2, stimulusIndex) => (
-                                    <a onClick={(e) => this.changeTargetWithStimulusIndex(index, stimulusIndex)}>
-                                      <>
-                                        <span>{index+1} - {item2.node.sd} </span>
-                                        <span>{item.node.mastery.edges.map(masteryItem => {masteryItem.node.sd.id === item2.node.id ? masteryItem.node.status?.statusName : ''})}</span>
-                                        <br />
-                                        <TrialsList
-                                          key={item.node.id}
-                                          id={item.node.id}
-                                          sdKey={item2.node.id}
-                                          stepKey=""
-                                          dailyTrails={item.node.targetAllcatedDetails.DailyTrials}
-                                          boxWidth="20px"
-                                        />
-                                        <br />
-                                      </>
-                                    </a>
-                                  ))}
-                                </>
-                              ) : item.node.steps.edges.length > 0 ? (
-                                <>
-                                  {item.node.steps.edges.map((item3, stepIndex) => (
-                                    <a onClick={(e) => this.changeTargetWithStimulusIndex(index, stepIndex)}>
-                                      <>
-                                        <span>Step : {item3.node.step} </span>
-                                        <br />
-                                        <TrialsList
-                                          key={item.node.id}
-                                          id={item.node.id}
-                                          sdKey=""
-                                          stepKey={item3.node.id}
-                                          dailyTrails={item.node.targetAllcatedDetails.DailyTrials}
-                                          boxWidth="20px"
-                                        />
-                                        <br />
-                                      </>
-                                    </a>
-                                  ))}
-                                </>
-                              ) : (
-                                    <TrialsList
-                                      key={item.node.id}
-                                      id={item.node.id}
-                                      sdKey=""
-                                      stepKey=""
-                                      dailyTrails={item.node.targetAllcatedDetails.DailyTrials}
-                                      boxWidth="20px"
-                                    />
-                                  )}
-                            </div>
-                          </Card>
-
-                        </>
-
-                      }
-                    </>
-                    :
-                    <>
-                      {item.node.steps.edges.length > 0 ?
-                        <>
-                          {item.node.targetAllcatedDetails.targetType.id === peakId ?
-                            <>
-                              <a onClick={() => this.changeTarget(index)}>
-                                <Card hoverable style={{ width: '100%', maxHeight: '350px' }}>
-                                  <Meta title={`Target : `+ item.node.targetAllcatedDetails.targetName} />
-                                </Card>
-                              </a>
-                            </>
-                            :
-                            <>
-                              <Card hoverable style={{ width: '100%', maxHeight: '350px' }}>
-                                <a onClick={(e) => this.changeTarget(index)}><Meta title={`Target : `+ item.node.targetAllcatedDetails.targetName} /></a>
-                                <div style={trialsDivStyle}>
-                                  <h6>Steps</h6>
-                                  {item.node.sd.edges.length > 0 ? (
-                                    <>
-                                      {item.node.sd.edges.map((item2, stimulusIndex) => (
-                                        <a onClick={(e) => this.changeTargetWithStimulusIndex(index, stimulusIndex)}>
-                                          <>
-                                            <span>Stimulus : {item2.node.sd} </span>
-                                            <br />
-                                            <TrialsList
-                                              key={item.node.id}
-                                              id={item.node.id}
-                                              sdKey={item2.node.id}
-                                              stepKey=""
-                                              dailyTrails={item.node.targetAllcatedDetails.DailyTrials}
-                                              boxWidth="20px"
-                                            />
-                                            <br />
-                                          </>
-                                        </a>
-                                      ))}
-                                    </>
-                                  ) : item.node.steps.edges.length > 0 ? (
-                                    <>
-                                      {item.node.steps.edges.map((item3, stepIndex) => (
-                                        <a onClick={(e) => this.changeTargetWithStimulusIndex(index, stepIndex)}>
-                                          <>
-                                            <span>{index+1} - {item3.node.step} </span>
-                                            <span>{item.node.mastery.edges.map(masteryItem => {masteryItem.node.step.id === item3.node.id ? masteryItem.node.status?.statusName : ''})}</span>
-                                            <br />
-                                            <TrialsList
-                                              key={item.node.id}
-                                              id={item.node.id}
-                                              sdKey=""
-                                              stepKey={item3.node.id}
-                                              dailyTrails={item.node.targetAllcatedDetails.DailyTrials}
-                                              boxWidth="20px"
-                                            />
-                                            <br />
-                                          </>
-                                        </a>
-                                      ))}
-                                    </>
-                                  ) : (
-                                        <TrialsList
-                                          key={item.node.id}
-                                          id={item.node.id}
-                                          sdKey=""
-                                          stepKey=""
-                                          dailyTrails={item.node.targetAllcatedDetails.DailyTrials}
-                                          boxWidth="20px"
-                                        />
-                                      )}
-                                </div>
+                      {item.node.targetAllcatedDetails.targetType.id === peakId &&
+                        item.node.peakType === Equivalence ? (
+                          <>
+                            <a onClick={() => this.changeTarget(index)}>
+                              <Card hoverable style={{ width: '100%' }}>
+                                <Meta
+                                  title={`Target : ` + item.node.targetAllcatedDetails.targetName}
+                                />
                               </Card>
-
-                            </>
-
-                          }
-                        </>
-                        :
-                        <>
-                          <a onClick={() => this.changeTarget(index)}>
-                            <>
-                              {item.node.targetAllcatedDetails.targetType.id === peakId ?
-                                <>
-                                  <Card hoverable style={{ width: '100%', maxHeight: '350px' }}>
-                                    <Meta title={`Target : `+ item.node.targetAllcatedDetails.targetName} />
-                                  </Card>
-                                </>
-                                :
-                                <>
-                                  <Card hoverable style={{ width: '100%', maxHeight: '350px' }}>
-                                    <a onClick={(e) => this.changeStimulus(e)}><Meta title={`Target : `+ item.node.targetAllcatedDetails.targetName} /></a>
-                                    <div style={trialsDivStyle}>
-                                      {item.node.sd.edges.length > 0 ? (
-                                        <>
-                                          {item.node.sd.edges.map(item2 => (
+                            </a>
+                          </>
+                        ) : (
+                          <>
+                            {item.node.targetAllcatedDetails.targetType.id === peakId ? (
+                              <>
+                                <Card hoverable style={{ width: '100%' }}>
+                                  <a onClick={e => this.changeTarget(index)}>
+                                    <Meta
+                                      title={`Target : ` + item.node.targetAllcatedDetails.targetName}
+                                    />
+                                  </a>
+                                  <div style={trialsDivStyle}>
+                                    <h6>Stimulus</h6>
+                                    {item.node.sd.edges.length > 0 && (
+                                      <>
+                                        {item.node.sd.edges.map((item2, stimulusIndex) => (
+                                          <a
+                                            onClick={e =>
+                                              this.changePeakTargetStimulus(index, stimulusIndex)
+                                            }
+                                          >
                                             <>
-                                              <span>Stimulus : {item2.node.sd} </span>
-                                              <br />
-                                              <TrialsList
-                                                key={item.node.id}
-                                                id={item.node.id}
-                                                sdKey={item2.node.id}
-                                                stepKey=""
-                                                dailyTrails={item.node.targetAllcatedDetails.DailyTrials}
-                                                boxWidth="20px"
-                                              />
+                                              <Title level={4} style={{ display: 'inline-block', fontSize: '16px' }}>
+                                                - {item2.node.sd}{' '} {this.getStimulusStatus(item, item2)}
+                                              </Title>
+
                                               <br />
                                             </>
+                                          </a>
+                                        ))}
+                                      </>
+                                    )}
+                                  </div>
+                                </Card>
+                              </>
+                            ) : (
+                                <>
+                                  <Card hoverable style={{ width: '100%' }}>
+                                    <a onClick={e => this.changeTarget(index)}>
+                                      <Meta
+                                        title={`Target : ` + item.node.targetAllcatedDetails.targetName}
+                                      />
+                                    </a>
+                                    <div style={trialsDivStyle}>
+                                      <h6>Stimulus</h6>
+                                      {item.node.sd.edges.length > 0 ? (
+                                        <>
+                                          {item.node.sd.edges.map((item2, stimulusIndex) => (
+                                            <a
+                                              onClick={e =>
+                                                this.changeTargetWithStimulusIndex(index, stimulusIndex)
+                                              }
+                                            >
+                                              <>
+                                                <Title level={4} style={{ display: 'inline-block', fontSize: '16px' }}>
+
+                                                  - {item2.node.sd}{' '}
+
+                                                  {this.getStimulusStatus(item, item2)}
+
+                                                </Title>
+
+                                                <br />
+                                                <TrialsList
+                                                  key={item.node.id}
+                                                  id={item.node.id}
+                                                  sdKey={item2.node.id}
+                                                  stepKey=""
+                                                  dailyTrails={
+                                                    item.node.targetAllcatedDetails.DailyTrials
+                                                  }
+                                                  boxWidth="20px"
+                                                />
+                                                <br />
+                                              </>
+                                            </a>
                                           ))}
                                         </>
                                       ) : item.node.steps.edges.length > 0 ? (
                                         <>
-                                          {item.node.steps.edges.map(item3 => (
-                                            <>
-                                              <span>Step : {item3.node.step} </span>
-                                              <br />
-                                              <TrialsList
-                                                key={item.node.id}
-                                                id={item.node.id}
-                                                sdKey=""
-                                                stepKey={item3.node.id}
-                                                dailyTrails={item.node.targetAllcatedDetails.DailyTrials}
-                                                boxWidth="20px"
-                                              />
-                                              <br />
-                                            </>
+                                          {item.node.steps.edges.map((item3, stepIndex) => (
+                                            <a
+                                              onClick={e =>
+                                                this.changeTargetWithStimulusIndex(index, stepIndex)
+                                              }
+                                            >
+                                              <>
+                                                <Title level={4} style={{ display: 'inline-block', fontSize: '16px' }}>
+                                                  Step : {item3.node.step} {' '} {this.getStepStatus(item, item3)}
+                                                </Title>
+
+                                                <br />
+                                                <TrialsList
+                                                  key={item.node.id}
+                                                  id={item.node.id}
+                                                  sdKey=""
+                                                  stepKey={item3.node.id}
+                                                  dailyTrails={
+                                                    item.node.targetAllcatedDetails.DailyTrials
+                                                  }
+                                                  boxWidth="20px"
+                                                />
+                                                <br />
+                                              </>
+                                            </a>
                                           ))}
                                         </>
                                       ) : (
@@ -551,18 +525,198 @@ class Target extends Component {
                                           )}
                                     </div>
                                   </Card>
-
                                 </>
-
-                              }
-                            </>
-                          </a>
-                        </>
-                      }
+                              )}
+                          </>
+                        )}
                     </>
+                  ) : (
+                      <>
+                        {item.node.steps.edges.length > 0 ? (
+                          <>
+                            {item.node.targetAllcatedDetails.targetType.id === peakId ? (
+                              <>
+                                <a onClick={() => this.changeTarget(index)}>
+                                  <Card hoverable style={{ width: '100%' }}>
+                                    <Meta
+                                      title={`Target : ` + item.node.targetAllcatedDetails.targetName}
+                                    />
+                                  </Card>
+                                </a>
+                              </>
+                            ) : (
+                                <>
+                                  <Card hoverable style={{ width: '100%' }}>
+                                    <a onClick={e => this.changeTarget(index)}>
+                                      <Meta
+                                        title={`Target : ` + item.node.targetAllcatedDetails.targetName}
+                                      />
+                                    </a>
+                                    <div style={trialsDivStyle}>
+                                      <h6>Steps</h6>
+                                      {item.node.sd.edges.length > 0 ? (
+                                        <>
+                                          {item.node.sd.edges.map((item2, stimulusIndex) => (
+                                            <a
+                                              onClick={e =>
+                                                this.changeTargetWithStimulusIndex(index, stimulusIndex)
+                                              }
+                                            >
+                                              <>
+                                                <Title level={4} style={{ display: 'inline-block', fontSize: '16px' }}>
+                                                  Stimulus : {item2.node.sd} {' '} {this.getStimulusStatus(item, item2)}
+                                                </Title>
 
-                  }
+                                                <br />
+                                                <TrialsList
+                                                  key={item.node.id}
+                                                  id={item.node.id}
+                                                  sdKey={item2.node.id}
+                                                  stepKey=""
+                                                  dailyTrails={
+                                                    item.node.targetAllcatedDetails.DailyTrials
+                                                  }
+                                                  boxWidth="20px"
+                                                />
+                                                <br />
+                                              </>
+                                            </a>
+                                          ))}
+                                        </>
+                                      ) : item.node.steps.edges.length > 0 ? (
+                                        <>
+                                          {item.node.steps.edges.map((item3, stepIndex) => (
+                                            <a
+                                              onClick={e =>
+                                                this.changeTargetWithStimulusIndex(index, stepIndex)
+                                              }
+                                            >
+                                              <>
+                                                <Title level={4} style={{ display: 'inline-block', fontSize: '16px' }}>
+                                                  - {item3.node.step}{' '}
 
+                                                  {this.getStepStatus(item, item3)}
+                                                </Title>
+                                                <br />
+                                                <TrialsList
+                                                  key={item.node.id}
+                                                  id={item.node.id}
+                                                  sdKey=""
+                                                  stepKey={item3.node.id}
+                                                  dailyTrails={
+                                                    item.node.targetAllcatedDetails.DailyTrials
+                                                  }
+                                                  boxWidth="20px"
+                                                />
+                                                <br />
+                                              </>
+                                            </a>
+                                          ))}
+                                        </>
+                                      ) : (
+                                            <TrialsList
+                                              key={item.node.id}
+                                              id={item.node.id}
+                                              sdKey=""
+                                              stepKey=""
+                                              dailyTrails={item.node.targetAllcatedDetails.DailyTrials}
+                                              boxWidth="20px"
+                                            />
+                                          )}
+                                    </div>
+                                  </Card>
+                                </>
+                              )}
+                          </>
+                        ) : (
+                            <>
+                              <a onClick={() => this.changeTarget(index)}>
+                                <>
+                                  {item.node.targetAllcatedDetails.targetType.id === peakId ? (
+                                    <>
+                                      <Card hoverable style={{ width: '100%' }}>
+                                        <Meta
+                                          title={
+                                            `Target : ` + item.node.targetAllcatedDetails.targetName
+                                          }
+                                        />
+                                      </Card>
+                                    </>
+                                  ) : (
+                                      <>
+                                        <Card hoverable style={{ width: '100%' }}>
+                                          <a onClick={e => this.changeStimulus(e)}>
+                                            <Meta
+                                              title={
+                                                `Target : ` + item.node.targetAllcatedDetails.targetName
+                                              }
+                                            />
+                                          </a>
+                                          <div style={trialsDivStyle}>
+                                            {item.node.sd.edges.length > 0 ? (
+                                              <>
+                                                {item.node.sd.edges.map(item2 => (
+                                                  <>
+                                                    <Title level={4} style={{ display: 'inline-block', fontSize: '16px' }}>
+                                                      Stimulus : {item2.node.sd} {' '} {this.getStimulusStatus(item, item2)}
+                                                    </Title>
+                                                    <br />
+                                                    <TrialsList
+                                                      key={item.node.id}
+                                                      id={item.node.id}
+                                                      sdKey={item2.node.id}
+                                                      stepKey=""
+                                                      dailyTrails={
+                                                        item.node.targetAllcatedDetails.DailyTrials
+                                                      }
+                                                      boxWidth="20px"
+                                                    />
+                                                    <br />
+                                                  </>
+                                                ))}
+                                              </>
+                                            ) : item.node.steps.edges.length > 0 ? (
+                                              <>
+                                                {item.node.steps.edges.map(item3 => (
+                                                  <>
+                                                    <Title level={4} style={{ display: 'inline-block', fontSize: '16px' }}>
+                                                      Step : {item3.node.step} {' '} {this.getStepStatus(item, item3)}
+                                                    </Title>
+                                                    <br />
+                                                    <TrialsList
+                                                      key={item.node.id}
+                                                      id={item.node.id}
+                                                      sdKey=""
+                                                      stepKey={item3.node.id}
+                                                      dailyTrails={
+                                                        item.node.targetAllcatedDetails.DailyTrials
+                                                      }
+                                                      boxWidth="20px"
+                                                    />
+                                                    <br />
+                                                  </>
+                                                ))}
+                                              </>
+                                            ) : (
+                                                  <TrialsList
+                                                    key={item.node.id}
+                                                    id={item.node.id}
+                                                    sdKey=""
+                                                    stepKey=""
+                                                    dailyTrails={item.node.targetAllcatedDetails.DailyTrials}
+                                                    boxWidth="20px"
+                                                  />
+                                                )}
+                                          </div>
+                                        </Card>
+                                      </>
+                                    )}
+                                </>
+                              </a>
+                            </>
+                          )}
+                      </>
+                    )}
                 </Element>
                 <Link
                   activeClass="active"

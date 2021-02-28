@@ -146,8 +146,6 @@ const AttendenceGraph = () => {
       }
     }
 
-    console.log(data)
-    console.log(graphData)
     return (
       <div
         style={{

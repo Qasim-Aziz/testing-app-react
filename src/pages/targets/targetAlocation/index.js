@@ -1,36 +1,44 @@
-/* eslint-disable react/jsx-closing-tag-location */
-/* eslint-disable react/jsx-indent */
-/* eslint-disable react/jsx-boolean-value */
-/* eslint-disable no-else-return */
-/* eslint-disable array-callback-return */
-/* eslint-disable prefer-const */
+import { EditOutlined } from '@ant-design/icons'
+import {
+  Button,
+  Card,
+  Col,
+  Drawer,
+  Form,
+  Icon,
+  Input,
+  Radio,
+  Row,
+  Select,
+  Tabs,
+  Typography,
+} from 'antd'
+import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet'
-import { useSelector, useDispatch } from 'react-redux'
-import { Button, Checkbox, Select, Icon, Typography, Drawer, Input, Radio, Row, Col, Card } from 'antd'
-import moment from 'moment'
-import { EditOutlined } from '@ant-design/icons'
-import styles from './style.module.scss'
+import { useDispatch, useSelector } from 'react-redux'
 import GoalCard from '../../../components/GoalCard'
+import EditTargetAllocationNewDrawer from '../../../components/TargetAllocation/EditTargetAllocation'
+import TargetAllocationNewDrawer from '../../../components/TargetAllocation/TargetAllocation'
+import { arrayNotNull, capitalize, notNull } from '../../../utilities'
+import LoadingComponent from '../../staffProfile/LoadingComponent'
+import AddLongAndShortGoal from '../AddLongAndShortGoal'
+import AllocatedTarget from './AllocatedTarget'
+import EquivalenceDrawer from './EquivalenceTargetAllocationDrawer'
+import CogniAbleDrawer from './FromCogniable'
 import {
-  alreadyAlloctedTarget,
+  getDefaultGoals,
+  getGoalResponsibility,
+  getGoalStatus,
   getLongTermGoals,
   getPatients,
-  getGoalStatus,
-  getGoalResponsibility,
 } from './TargetAllocation.query'
-import { arrayNotNull, notNull, capitalize } from '../../../utilities'
-import AddLongAndShortGoal from '../AddLongAndShortGoal'
-
-import AllocatedTarget from './AllocatedTarget'
-import TargetsAvailable from './TargetsAvailable'
 import TargetAvailableDrawer from './TargetAllocationDrawer'
-import CogniAbleDrawer from './FromCogniable'
-import TargetAllocationNewDrawer from '../../../components/TargetAllocation/TargetAllocation'
-import EquivalenceDrawer from './EquivalenceTargetAllocationDrawer'
-import EditTargetAllocationNewDrawer from '../../../components/TargetAllocation/EditTargetAllocation'
+import './style.scss'
 
 const { Title, Text } = Typography
+const { TabPane } = Tabs
+
 const longGoalBtn = {
   color: '#fff',
   backgroundColor: '#0B35B3',
@@ -38,14 +46,12 @@ const longGoalBtn = {
 }
 
 const shortGoalBtn = {
-  // border: 0,
   color: '#111',
   backgroundColor: '#FFF',
 }
 
 const selectPatientStyle = {
   width: '200px',
-  // height: '60px',
   textDecoration: 'none',
   marginRight: '20px',
   border: 0,
@@ -70,6 +76,15 @@ const TargetAllocation = () => {
   const [longTermGoals, setLongTermGoals] = useState([])
   // for search in ltg and stg
   const [longTermGoalsClone, setLongTermGoalsClone] = useState([])
+
+  const [activeTabKey, setActiveTabKey] = useState('customGoalTab')
+  const [defaultShortTermGoals, setDefaultShortTermGoals] = useState([])
+  const [selectedDefaultShortTermGoal, setSelectedDefaultShortTermGoal] = useState()
+  const [selectedDefaultShortTermGoalKey, setSelectedDefaultShortTermGoalKey] = useState(
+    Math.random(),
+  )
+  const [selectedProgramInDefaultTab, setSelectedProgramInDefaultTab] = useState()
+
   const [activeLongTermGoal, setActiveLongTermGoal] = useState(null)
   const [activeShortTermGoal, setActiveShortTermGoal] = useState(null)
   const [isAddGoalVisible, setAddGoalVisible] = useState(false)
@@ -86,15 +101,18 @@ const TargetAllocation = () => {
 
   const [selectedShortTermGoalKey, setSelectedShortTermGoalKey] = useState(Math.random())
 
-
-
   useEffect(() => {
     if (allreadySelectedProgramId) setSelectedProgram(allreadySelectedProgramId)
     else if (programArea && programArea.length > 0) {
       setSelectedProgram(programArea[0].node.id)
     }
-  }, [programArea])
 
+    // Also select it for default tab
+    if (!selectedProgramInDefaultTab && programArea && programArea.length > 0) {
+      setSelectedProgramInDefaultTab(programArea[0].node.id)
+      setSelectedDefaultShortTermGoalKey(Math.random())
+    }
+  }, [programArea])
 
   const getLongTermGoalsQuery = async (studentId, program, status) => {
     setLoading(true)
@@ -104,6 +122,28 @@ const TargetAllocation = () => {
       setLongTermGoals(longTermGoalResp.data.longTerm.edges)
       setLongTermGoalsClone(longTermGoalResp.data.longTerm.edges)
       setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (selectedProgramInDefaultTab && defaultShortTermGoals)
+      setSelectedDefaultShortTermGoal(defaultShortTermGoals[selectedProgramInDefaultTab])
+  }, [selectedProgramInDefaultTab, defaultShortTermGoals])
+
+  useEffect(() => {
+    if (selectedProgramInDefaultTab && defaultShortTermGoals)
+      setSelectedDefaultShortTermGoal(defaultShortTermGoals[selectedProgramInDefaultTab])
+  }, [selectedProgramInDefaultTab, defaultShortTermGoals])
+
+  const getDefaultGoalsQuery = async studentId => {
+    const defaultGoalResponse = await getDefaultGoals(studentId)
+    if (notNull(defaultGoalResponse)) {
+      const allDefaultGoals = []
+      defaultGoalResponse.data.longTerm.edges.forEach(({ node: longTermGoal }) => {
+        // eslint-disable-next-line prefer-destructuring
+        allDefaultGoals[longTermGoal.program.id] = longTermGoal.shorttermgoalSet.edges[0]
+      })
+      setDefaultShortTermGoals(allDefaultGoals)
     }
   }
 
@@ -131,9 +171,16 @@ const TargetAllocation = () => {
     getProgramAreaQuery(selectedStudent)
     getGoalStatusQuery()
     getGoalResponsibilityQuery()
+    getDefaultGoalsQuery(selectedStudent)
     // alreadyAlloctedTargetQuery(selectedStudent, 'U3RhdHVzVHlwZToz', 'RG9tYWluVHlwZToxMQ==')
-    getLongTermGoalsQuery(selectedStudent, selectedProgram, selectedGoalsStatus)
+    // getLongTermGoalsQuery(selectedStudent, selectedProgram, selectedGoalsStatus)
   }, [])
+
+  useEffect(() => {
+    if (selectedProgram) {
+      getLongTermGoalsQuery(selectedStudent, selectedProgram, selectedGoalsStatus)
+    }
+  }, [selectedProgram])
 
   const addShortTermGoal = ltg => {
     setGoalType('short')
@@ -163,17 +210,21 @@ const TargetAllocation = () => {
     const endDate = moment(node.dateEnd)
     // const diff = moment(endDate) - moment(startDate)
 
-    const years = endDate.diff(startDate, 'year');
-    startDate.add(years, 'years');
+    const years = endDate.diff(startDate, 'year')
+    startDate.add(years, 'years')
 
-    const months = endDate.diff(startDate, 'months');
-    startDate.add(months, 'months');
+    const months = endDate.diff(startDate, 'months')
+    startDate.add(months, 'months')
 
-    const days = endDate.diff(startDate, 'days');
+    const days = endDate.diff(startDate, 'days')
 
     const date =
-      `${moment(node.dateInitialted).format('MMMM DD, YYYY')} - ${endDate.format('MMMM DD, YYYY')}` +
-      `, ${years > 0 ? `${years} Year`: ''} ${months > 0 ? `${months} Months`: ''} ${days > 0 ?`${days} Days`: ''}`
+      `${moment(node.dateInitialted).format('MMMM DD, YYYY')} - ${endDate.format(
+        'MMMM DD, YYYY',
+      )}` +
+      `, ${years > 0 ? `${years} Year` : ''} ${months > 0 ? `${months} Months` : ''} ${
+        days > 0 ? `${days} Days` : ''
+      }`
     return date
   }
 
@@ -278,7 +329,12 @@ const TargetAllocation = () => {
   const [isEquivalence, setIsEquivalence] = useState(false)
   const [equivalenceObject, setEquivalenceObject] = useState(null)
 
-  const allocateSessionToTarget = (session, peakEnable = false, equivalenceEnable = false, equivalenceNode = null) => {
+  const allocateSessionToTarget = (
+    session,
+    peakEnable = false,
+    equivalenceEnable = false,
+    equivalenceNode = null,
+  ) => {
     setShowTargetDetailsVisible(true)
     setIsPeak(peakEnable)
     setIsEquivalence(equivalenceEnable)
@@ -291,8 +347,6 @@ const TargetAllocation = () => {
     setSelectedShortTermGoal(stg)
     setSelectedShortTermGoalKey(Math.random())
   }
-
-  useEffect(() => { }, [selectedShortTermGoal])
 
   // Edit target
 
@@ -309,41 +363,97 @@ const TargetAllocation = () => {
     setActiveAllocatedTarget(node)
   }
 
-  const onSuccessEditTargetAllocation = resp => {
-    const cloneSelectedShortTermGoal = {
-      ...selectedShortTermGoal,
-      node: {
-        ...selectedShortTermGoal.node,
-        targetAllocateSet: {
-          ...selectedShortTermGoal.node.targetAllocateSet,
-          edges: [
-            ...selectedShortTermGoal.node.targetAllocateSet.edges.map(item => {
-              if (item.node.id === resp.data.updateTargetAllocate2.target.id) {
-                return {
-                  node: resp.data.updateTargetAllocate2.target,
-                }
-              } else {
-                return item
-              }
-            }),
-          ],
-        },
-      },
+  const onSuccessEditTargetAllocation = ({
+    data,
+    isDirectGoalOriginally,
+    isDirectGoalAfterUpdate,
+  }) => {
+    const updateResult = data.updateTargetAllocate2
+    const cloneSelectedShortTermGoal = { ...selectedShortTermGoal }
+    const cloneDefaultShortTermGoal = { ...selectedDefaultShortTermGoal }
+
+    // If short term goal is changed then remove exiting targetAllocation
+    // If Type was changed then remove existing one and add new at end
+    if (isDirectGoalOriginally !== isDirectGoalAfterUpdate) {
+      if (isDirectGoalOriginally && cloneDefaultShortTermGoal.node.targetAllocateSet) {
+        cloneDefaultShortTermGoal.node.targetAllocateSet.edges = [
+          ...cloneDefaultShortTermGoal.node.targetAllocateSet.edges.filter(
+            ({ node }) => node.id !== updateResult.target.id,
+          ),
+        ]
+      } else if (!isDirectGoalOriginally && cloneSelectedShortTermGoal.node.targetAllocateSet) {
+        cloneSelectedShortTermGoal.node.targetAllocateSet.edges = [
+          ...cloneSelectedShortTermGoal.node.targetAllocateSet.edges.filter(
+            ({ node }) => node.id !== updateResult.target.id,
+          ),
+        ]
+      }
+
+      // Add new/updated target allocation
+      if (isDirectGoalAfterUpdate) {
+        cloneDefaultShortTermGoal.node = {
+          ...cloneDefaultShortTermGoal.node,
+          targetAllocateSet: {
+            edges: [
+              ...cloneDefaultShortTermGoal.node.targetAllocateSet.edges,
+              { node: { ...updateResult.target } },
+            ],
+          },
+        }
+      } else if (cloneSelectedShortTermGoal?.node?.id === updateResult.target.shortTerm.id) {
+        cloneSelectedShortTermGoal.node = {
+          ...cloneSelectedShortTermGoal.node,
+          targetAllocateSet: {
+            edges: [
+              ...cloneSelectedShortTermGoal.node.targetAllocateSet.edges,
+              { node: { ...updateResult.target } },
+            ],
+          },
+        }
+      }
+    } else {
+      // If Type was not then just update the value only
+      // eslint-disable-next-line no-lonely-if
+      if (isDirectGoalOriginally) {
+        cloneDefaultShortTermGoal.node = {
+          ...cloneDefaultShortTermGoal.node,
+          targetAllocateSet: {
+            edges: [
+              ...cloneDefaultShortTermGoal.node.targetAllocateSet.edges.map(item =>
+                item.node.id === updateResult.target.id ? { node: updateResult.target } : item,
+              ),
+            ],
+          },
+        }
+      } else if (cloneSelectedShortTermGoal?.node?.id === updateResult.target.shortTerm.id) {
+        cloneSelectedShortTermGoal.node = {
+          ...cloneSelectedShortTermGoal.node,
+          targetAllocateSet: {
+            edges: [
+              ...cloneSelectedShortTermGoal.node.targetAllocateSet.edges.map(item =>
+                item.node.id === updateResult.target.id ? { node: updateResult.target } : item,
+              ),
+            ],
+          },
+        }
+      }
     }
-    // console.log(cloneSelectedShortTermGoal)
-    setSelectedShortTermGoal(cloneSelectedShortTermGoal)
-    setSelectedShortTermGoalKey(Math.random())
+
+    // Save Data for both type
+    if (Object.values(cloneSelectedShortTermGoal).length) {
+      setSelectedShortTermGoal(cloneSelectedShortTermGoal)
+      setSelectedShortTermGoalKey(Math.random())
+    }
+    if (Object.values(cloneDefaultShortTermGoal).length) {
+      setSelectedDefaultShortTermGoal(cloneDefaultShortTermGoal)
+      setSelectedDefaultShortTermGoalKey(Math.random())
+    }
+
     setEditAllocatedTargetVisible(false)
     setActiveAllocatedTarget(null)
   }
 
   // End of Edit allocated target
-
-  // for close sugegsted target area
-  const closeSuggestedTargetArea = () => {
-    setAddTargetMode('')
-    setSelectedShortTermGoal(null)
-  }
 
   const handleSelectTargetMode = mode => {
     setAddTargetMode(mode)
@@ -359,7 +469,6 @@ const TargetAllocation = () => {
     if (mode === 'equivalence') {
       setEquivalenceTargetDrawer(true)
     }
-
   }
 
   useEffect(() => {
@@ -369,29 +478,35 @@ const TargetAllocation = () => {
     }
   }, [addTargetMode])
 
-  const onSuccessTargetAllocation = resp => {
+  const onSuccessTargetAllocation = ({ data, isCreateForDirectGoal }) => {
     setShowTargetDetailsVisible(false)
     setActiveSessionDetails(null)
 
-    // getLongTermGoalsQuery(selectedStudent, selectedProgram)
-
-    const cloneSelectedShortTermGoal = { ...selectedShortTermGoal }
+    const existingGoal = isCreateForDirectGoal
+      ? selectedDefaultShortTermGoal
+      : selectedShortTermGoal
+    const cloneSelectedShortTermGoal = { ...existingGoal }
 
     if (cloneSelectedShortTermGoal.node.targetAllocateSet) {
       cloneSelectedShortTermGoal.node.targetAllocateSet.edges.unshift({
         node: {
-          ...resp.data.createTargetAllocate2.target,
+          ...data.createTargetAllocate2.target,
         },
       })
     } else {
       cloneSelectedShortTermGoal.node = {
         ...cloneSelectedShortTermGoal.node,
-        targetAllocateSet: { edges: [{ node: { ...resp.data.createTargetAllocate2.target } }] },
+        targetAllocateSet: { edges: [{ node: { ...data.createTargetAllocate2.target } }] },
       }
-      // console.log(cloneSelectedShortTermGoal)
     }
 
-    setSelectedShortTermGoal(cloneSelectedShortTermGoal)
+    if (!isCreateForDirectGoal) {
+      setSelectedShortTermGoal(cloneSelectedShortTermGoal)
+      setSelectedShortTermGoalKey(Math.random())
+    } else {
+      setSelectedDefaultShortTermGoal(cloneSelectedShortTermGoal)
+      setSelectedDefaultShortTermGoalKey(Math.random())
+    }
 
     if (addTargetMode === 'list') {
       setSuggestedTarget(item =>
@@ -408,15 +523,16 @@ const TargetAllocation = () => {
   const searchTarget = text => {
     const searchedGoals = []
     if (longTermGoalsClone.length > 0) {
-      longTermGoalsClone.map(item => {
+      longTermGoalsClone.forEach(item => {
         if (item.node.goalName.includes(text)) {
           searchedGoals.push(item)
-        }
-        else {
+        } else {
           let includeInShorTerm = false
-          const itemWithEmptyShortTermSet = { node: { ...item.node, shorttermgoalSet: { edges: [] } } }
+          const itemWithEmptyShortTermSet = {
+            node: { ...item.node, shorttermgoalSet: { edges: [] } },
+          }
           if (item.node.shorttermgoalSet.edges.length > 0) {
-            item.node.shorttermgoalSet.edges.map(shortItem => {
+            item.node.shorttermgoalSet.edges.forEach(shortItem => {
               if (shortItem.node.goalName.includes(text)) {
                 itemWithEmptyShortTermSet.node.shorttermgoalSet.edges.push(shortItem)
                 includeInShorTerm = true
@@ -431,9 +547,6 @@ const TargetAllocation = () => {
     }
     setLongTermGoals(searchedGoals)
   }
-
-
-
 
   const role = useSelector(state => state.user.role)
   let editAble = true
@@ -452,6 +565,254 @@ const TargetAllocation = () => {
 
   const studentName = useSelector(state => state.user.studentName)
 
+  const customGoalTab = (
+    <Row gutter={[10, 10]}>
+      <Col md={16} sm={24}>
+        <div>
+          <div style={{ paddingBottom: '10px' }}>
+            <Select
+              style={selectPatientStyle}
+              // size="large"
+              defaultValue="Select Program"
+              value={selectedProgram}
+              onSelect={handleSelectProgram}
+            >
+              {programArea &&
+                programArea.map(p => {
+                  return (
+                    <Select.Option value={p.node.id} key={p.node.id}>
+                      {p.node.name}
+                    </Select.Option>
+                  )
+                })}
+            </Select>
+            <Select
+              style={selectPatientStyle}
+              // size="large"
+              defaultValue="Select Status"
+              value={selectedGoalsStatus}
+              onSelect={handleSelectStatus}
+            >
+              <Select.Option value="" key="R">
+                All
+              </Select.Option>
+              {goalStatusList &&
+                goalStatusList.map(p => {
+                  return (
+                    <Select.Option value={p.id} key={p.id}>
+                      {p.status}
+                    </Select.Option>
+                  )
+                })}
+            </Select>
+            <Input
+              placeholder="Search LT &amp; ST Goals"
+              onChange={e => searchTarget(e.target.value)}
+              style={{ width: 280, marginRight: 16 }}
+            />
+            {editAble && (
+              <Button type="default" style={longGoalBtn} onClick={addLongTermGoal}>
+                <Icon type="plus" /> LT Goal
+              </Button>
+            )}
+          </div>
+        </div>
+        <div>
+          <div
+            style={{
+              border: '2px solid #ccc',
+              padding: '0px 5px',
+              height: 650,
+              overflow: 'auto',
+              background: '#f9f9f9',
+            }}
+          >
+            {longTermGoals &&
+              longTermGoals.length > 0 &&
+              longTermGoals.map(ltGoal => {
+                return (
+                  <div
+                    key={ltGoal.node.id}
+                    style={{
+                      background: '#fff',
+                      border: '1px solid #E4E9F0',
+                      // boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
+                      borderRadius: 5,
+                      // padding: '10px 10px',
+                      // display: 'flex',
+                      margin: 5,
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Card
+                      size="small"
+                      title={
+                        <>
+                          <Title
+                            style={{
+                              color: '#000',
+                              fontSize: 16,
+                              lineHeight: '25px',
+                              display: 'inline',
+                              margin: 0,
+                              fontWeight: '500',
+                            }}
+                          >
+                            {capitalize(ltGoal.node.goalName)}
+                          </Title>
+                          <div>
+                            <Text style={{ fontSize: 15, lineHeight: '27px' }}>
+                              {ltGoal.node.goalStatus.status}
+                            </Text>
+                            <Text
+                              style={{
+                                fontSize: 15,
+                                lineHeight: '27px',
+                                float: 'right',
+                                marginRight: 10,
+                              }}
+                            >
+                              {getDate(ltGoal.node)}
+                            </Text>
+                          </div>
+                        </>
+                      }
+                      extra={
+                        editAble && (
+                          <>
+                            <div>
+                              <Button style={shortGoalBtn} onClick={() => addShortTermGoal(ltGoal)}>
+                                <Icon type="plus" />
+                              </Button>
+                              &nbsp;
+                              <Button onClick={() => editLongTermGoal(ltGoal)}>
+                                <EditOutlined />
+                              </Button>
+                            </div>
+                          </>
+                        )
+                      }
+                      style={{ width: '100%' }}
+                    >
+                      {'shorttermgoalSet' in ltGoal.node &&
+                        arrayNotNull(ltGoal.node.shorttermgoalSet.edges) &&
+                        ltGoal.node.shorttermgoalSet.edges.map((sGoal, index) => {
+                          return (
+                            <GoalCard
+                              selected={
+                                selectedShortTermGoal !== null &&
+                                selectedShortTermGoal.node.id === sGoal.node.id
+                              }
+                              editAble={editAble}
+                              key={sGoal.node.id}
+                              heading={sGoal.node.goalName}
+                              status={sGoal.node.goalStatus.status}
+                              progess={50}
+                              onEdit={() => editShortTermGoal(ltGoal, sGoal)}
+                              selectShortTermGoal={() => selectShortTermGoal(sGoal)}
+                            />
+                          )
+                        })}
+                    </Card>
+                  </div>
+                )
+              })}
+          </div>
+        </div>
+      </Col>
+
+      {selectedShortTermGoal && (
+        <Col md={8} sm={24}>
+          {selectedShortTermGoal && editAble && (
+            <div
+              style={{
+                marginBottom: '11px',
+                fontWeight: 'bold',
+                textAlign: 'center',
+              }}
+            >
+              Target Allocation from &nbsp;
+              <Radio.Group
+                onChange={e => handleSelectTargetMode(e.target.value)}
+                value={addTargetMode}
+              >
+                <Radio.Button value="list">Library</Radio.Button>
+                <Radio.Button value="manually">Manually</Radio.Button>
+                <Radio.Button value="equivalence">Equivalence</Radio.Button>
+              </Radio.Group>
+            </div>
+          )}
+          <div
+            style={{
+              border: '2px solid #ccc',
+              padding: 10,
+              height: 650,
+              background: '#f9f9f9',
+              overflow: 'hidden',
+            }}
+          >
+            <AllocatedTarget
+              key={selectedShortTermGoalKey}
+              editAble={editAble}
+              editAllocatedTarget={editAllocatedTarget}
+              allocatedTarget={selectedShortTermGoal?.node?.targetAllocateSet?.edges}
+            />
+          </div>
+        </Col>
+      )}
+    </Row>
+  )
+
+  const defaultGoalTab = (
+    <div>
+      <Form layout="inline">
+        <Form.Item label="Select Program">
+          <Select
+            style={selectPatientStyle}
+            placeholder="Select Program"
+            value={selectedProgramInDefaultTab}
+            onSelect={setSelectedProgramInDefaultTab}
+          >
+            {programArea &&
+              programArea.map(p => (
+                <Select.Option value={p.node.id} key={p.node.id}>
+                  {p.node.name}
+                </Select.Option>
+              ))}
+          </Select>
+        </Form.Item>
+        {editAble && (
+          <Form.Item label="Target Allocation from" style={{ float: 'right', marginRight: 0 }}>
+            <Radio.Group
+              onChange={e => handleSelectTargetMode(e.target.value)}
+              value={addTargetMode}
+            >
+              <Radio.Button value="list">Library</Radio.Button>
+              <Radio.Button value="manually">Manually</Radio.Button>
+              <Radio.Button value="equivalence">Equivalence</Radio.Button>
+            </Radio.Group>
+          </Form.Item>
+        )}
+      </Form>
+      <div
+        style={{
+          border: '2px solid #ccc',
+          padding: 10,
+          height: 650,
+          background: '#f9f9f9',
+          overflow: 'hidden',
+        }}
+      >
+        <AllocatedTarget
+          key={selectedDefaultShortTermGoalKey}
+          editAble={editAble}
+          editAllocatedTarget={editAllocatedTarget}
+          allocatedTarget={selectedDefaultShortTermGoal?.node?.targetAllocateSet?.edges}
+        />
+      </div>
+    </div>
+  )
+
   return (
     <div>
       <Helmet title="Target allocation to goals" />
@@ -460,8 +821,8 @@ const TargetAllocation = () => {
       <Drawer
         title={addHeading}
         placement="right"
-        closable={true}
-        width={550}
+        closable
+        width="50%"
         onClose={handleCloseAddGoal}
         visible={isAddGoalVisible}
       >
@@ -482,7 +843,7 @@ const TargetAllocation = () => {
       <Drawer
         title="Target Allocation"
         placement="right"
-        closable={true}
+        closable
         width={850}
         style={{ zIndex: 1001 }}
         onClose={handleCloseTargetDetails}
@@ -490,12 +851,13 @@ const TargetAllocation = () => {
       >
         <TargetAllocationNewDrawer
           key={Math.random()}
+          isDirectGoal={activeTabKey !== 'customGoalTab'}
+          defaultShortTermGoalForSelectedProgram={selectedDefaultShortTermGoal}
           selectedShortTermGoal={selectedShortTermGoal}
           studentId={selectedStudent}
           activeSessionDetails={activeSessionDetails}
           addTargetMode={addTargetMode}
           onSuccessTargetAllocation={onSuccessTargetAllocation}
-
           selectedTargetId={activeSessionDetails ? activeSessionDetails.node.id : null}
           targetName={activeSessionDetails ? activeSessionDetails.node.targetMain.targetName : null}
           targetVideo={activeSessionDetails ? activeSessionDetails.node.video : null}
@@ -503,7 +865,7 @@ const TargetAllocation = () => {
           peakEnable={isPeak}
           equivalenceEnable={isEquivalence}
           equivalenceObject={equivalenceObject}
-        // setOpen={setSelectTarget}
+          // setOpen={setSelectTarget}
         />
       </Drawer>
 
@@ -511,7 +873,7 @@ const TargetAllocation = () => {
       <Drawer
         title="Target Allocation from library"
         placement="right"
-        closable={true}
+        closable
         width="80%"
         onClose={closeTargetAllocationDrawer}
         visible={targetAllocationDrawer}
@@ -529,7 +891,7 @@ const TargetAllocation = () => {
       <Drawer
         title="Equivalence Target Allocation"
         placement="right"
-        closable={true}
+        closable
         width="80%"
         onClose={closeTargetAllocationDrawer}
         visible={equivalenceTargetDrawer}
@@ -547,7 +909,7 @@ const TargetAllocation = () => {
       <Drawer
         title="Target Allocation from CogniAble Assessment"
         placement="right"
-        closable={true}
+        closable
         width="80%"
         onClose={closeTargetAllocationDrawer}
         visible={cogniableAssessmentDrawer}
@@ -565,13 +927,15 @@ const TargetAllocation = () => {
       <Drawer
         title="Edit Allocated Target Details"
         placement="right"
-        closable={true}
+        closable
         width={850}
         onClose={handleCloseEditTargetDetails}
         visible={isEditAllocatedTargetVisible}
       >
         <EditTargetAllocationNewDrawer
           key={Math.random()}
+          isDirectGoal={activeTabKey !== 'customGoalTab'}
+          defaultShortTermGoalForSelectedProgram={selectedDefaultShortTermGoal}
           selectedShortTermGoal={selectedShortTermGoal}
           studentId={selectedStudent}
           activeAllocatedTarget={activeAllocatedTarget}
@@ -580,262 +944,38 @@ const TargetAllocation = () => {
         />
       </Drawer>
 
-      <section className="card">
-        <div className="card-header" style={{ padding: 0 }}>
-          <div>
-            <Title
-              style={{
-                fontSize: 20,
-                lineHeight: '27px',
-                marginLeft: '40px',
-              }}
-            >
-              {studentName}&apos;s Goals
-            </Title>
-          </div>
-        </div>
-        <div className={`${styles.cardBody} card-body`}>
-          <div className={styles.feed}>
-            <div className="row">
-              <div className="col-lg-12 d-flex">
-                <div style={{ paddingBottom: '10px' }}>
-                  <Select
-                    style={selectPatientStyle}
-                    // size="large"
-                    defaultValue="Select Program"
-                    value={selectedProgram}
-                    onSelect={handleSelectProgram}
-                  >
-                    {programArea &&
-                      programArea.map(p => {
-                        return (
-                          <Select.Option value={p.node.id} key={p.node.id}>
-                            {p.node.name}
-                          </Select.Option>
-                        )
-                      })}
-                  </Select>
-                  <Select
-                    style={selectPatientStyle}
-                    // size="large"
-                    defaultValue="Select Status"
-                    value={selectedGoalsStatus}
-                    onSelect={handleSelectStatus}
-                  >
-                    <Select.Option value="" key="R">
-                      All
-                    </Select.Option>
-                    {goalStatusList &&
-                      goalStatusList.map(p => {
-                        return (
-                          <Select.Option value={p.id} key={p.id}>
-                            {p.status}
-                          </Select.Option>
-                        )
-                      })}
-                  </Select>
-
-                  <Input
-                    placeholder="Search LT & ST Goals"
-                    onChange={e => searchTarget(e.target.value)}
-                    style={{ width: 300, marginRight: 16 }}
-                  />
-
-                </div>
-                {editAble ? (
-                  <>
-                    <Button type="default" style={longGoalBtn} onClick={addLongTermGoal}>
-                      <Icon type="plus" /> LT Goal
-                    </Button>
-
-                    {/* {addTargetMode === 'list' ?
-                      <>
-
-                        <Button type="default" style={{ marginLeft: '466px' }} onClick={closeSuggestedTargetArea}>
-                          X
-                        </Button>
-
-                      </>
-                      :
-                      ''
-                    } */}
-                  </>
-                ) : (
-                    <></>
-                  )}
-                {/* </div>
-              <div className="col-lg-4"> */}
-                {selectedShortTermGoal && editAble ? (
-                  <>
-                    <span style={{ position: 'absolute', right: 0, top: 0 }}>Target Allocation from &nbsp;
-                      <Radio.Group onChange={(e) => handleSelectTargetMode(e.target.value)} value={addTargetMode}>
-                        <Radio.Button value="list">Library</Radio.Button>
-                        <Radio.Button value="manually">Manually</Radio.Button>
-                        <Radio.Button value="equivalence">Equivalence</Radio.Button>
-                      </Radio.Group>
-                    </span>
-
-                    {/* <Select
-                      style={{ width: 200, position: 'absolute', right: 0, top: 0 }}
-                      placeholder="Select Target selection"
-                      value={addTargetMode}
-                      onSelect={handleSelectTargetMode}
-                    >
-                      <Select.Option value="" hidden>
-                        Select Target selection
-                      </Select.Option>
-                      <Select.Option value="list">Choose from Library</Select.Option>
-                      <Select.Option value="CogniAble">From CogniAble Assessment</Select.Option>
-                      <Select.Option value="Peak">From Peak Assessment</Select.Option>
-                      <Select.Option value="VB-Mapp ">From VB-Mapp Assessment</Select.Option>
-                      <Select.Option value="manually">Add Manually</Select.Option>
-                    </Select> */}
-                  </>
-                ) : (
-                    <></>
-                  )}
-              </div>
-            </div>
-
-            <div className={styles.partition}>
-              {loading ? (
-                <>
-                  <p>Loading...</p>
-                </>
-              ) : (
-                  <>
-                    <Row gutter={[10, 10]}>
-                      <Col md={16} sm={24}>
-                        <div
-                          style={{
-                            border: '2px solid #f9f9f9',
-                            padding: 5,
-                            height: 650,
-                            overflow: 'auto',
-                            background: '#f9f9f9',
-                          }}
-                        >
-
-                          {longTermGoals &&
-                            longTermGoals.length > 0 &&
-                            longTermGoals.map(ltGoal => {
-                              return (
-                                <div
-                                  key={ltGoal.node.id}
-                                  style={{
-                                    background: '#fff',
-                                    border: '1px solid #E4E9F0',
-                                    // boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
-                                    borderRadius: 5,
-                                    // padding: '10px 10px',
-                                    // display: 'flex',
-                                    margin: 5,
-                                    alignItems: 'center',
-                                  }}
-                                >
-                                  <Card
-                                    size="small"
-                                    title={
-                                      <>
-                                        <Title
-                                          style={{
-                                            color: '#000',
-                                            fontSize: 16,
-                                            lineHeight: '25px',
-                                            display: 'inline',
-                                            margin: 0,
-                                            fontWeight: '500',
-                                          }}
-                                        >
-                                          {capitalize(ltGoal.node.goalName)}
-                                        </Title>
-                                        <div>
-                                          <Text style={{ fontSize: 15, lineHeight: '27px', }}>
-                                            {ltGoal.node.goalStatus.status}
-                                          </Text>
-                                          <Text style={{ fontSize: 15, lineHeight: '27px', float: 'right', marginRight: 10 }}>
-                                            {getDate(ltGoal.node)}
-                                          </Text>
-                                        </div>
-                                      </>
-                                    }
-                                    extra={editAble && (
-                                      <>
-                                        <div>
-                                          <Button
-                                            style={shortGoalBtn}
-                                            onClick={() => addShortTermGoal(ltGoal)}
-                                          >
-                                            <Icon type="plus" />
-                                          </Button>
-                                          &nbsp;
-                                          <Button onClick={() => editLongTermGoal(ltGoal)}>
-                                            <EditOutlined />
-                                          </Button>
-                                        </div>
-                                      </>
-                                    )}
-                                    style={{ width: '100%' }}
-                                  >
-                                    {'shorttermgoalSet' in ltGoal.node &&
-                                      arrayNotNull(ltGoal.node.shorttermgoalSet.edges) &&
-                                      ltGoal.node.shorttermgoalSet.edges.map((sGoal, index) => {
-                                        return (
-
-                                          <GoalCard
-                                            selected={
-                                              selectedShortTermGoal !== null &&
-                                              selectedShortTermGoal.node.id === sGoal.node.id
-                                            }
-                                            editAble={editAble}
-                                            key={sGoal.node.id}
-                                            heading={sGoal.node.goalName}
-                                            status={sGoal.node.goalStatus.status}
-                                            progess={50}
-                                            onEdit={() => editShortTermGoal(ltGoal, sGoal)}
-                                            selectShortTermGoal={() => selectShortTermGoal(sGoal)}
-                                          />
-
-                                        )
-                                      })}
-
-                                  </Card>
-
-                                </div>
-                              )
-                            })}
-                        </div>
-                      </Col>
-
-                      {selectedShortTermGoal && (
-                        <Col md={8} sm={24}>
-                          <div
-                            style={{
-                              border: '2px solid #f9f9f9',
-                              padding: 10,
-                              height: 650,
-                              overflow: 'auto',
-                              background: '#f9f9f9',
-                            }}
-                          >
-                            <AllocatedTarget
-                              key={selectedShortTermGoalKey}
-                              editAble={editAble}
-                              editAllocatedTarget={editAllocatedTarget}
-                              allocatedTarget={selectedShortTermGoal?.node?.targetAllocateSet?.edges}
-                            />
-                          </div>
-                        </Col>
-                      )}
-
-                    </Row>
-
-                  </>
-                )}
+      <div className="feed">
+        <section className="card">
+          <div className="card-header" style={{ padding: 0 }}>
+            <div>
+              {studentName && !loading && (
+                <Title
+                  style={{
+                    fontSize: 20,
+                    lineHeight: '27px',
+                    margin: '0px 0px 20px 0px',
+                  }}
+                >
+                  {studentName}&apos;s Targets
+                </Title>
+              )}
             </div>
           </div>
-        </div>
-      </section>
+
+          {loading ? (
+            <LoadingComponent />
+          ) : (
+            <Tabs type="card" className="targetTabs" onChange={setActiveTabKey}>
+              <TabPane tab="Goal(s)" key="customGoalTab">
+                {customGoalTab}
+              </TabPane>
+              <TabPane tab="Directly" key="defaultGoalTab">
+                {defaultGoalTab}
+              </TabPane>
+            </Tabs>
+          )}
+        </section>
+      </div>
     </div>
   )
 }

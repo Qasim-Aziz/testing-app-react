@@ -17,8 +17,9 @@
 /* eslint-disable object-shorthand */
 /* eslint-disable react/no-unknown-property */
 /* eslint-disable no-unused-expressions */
+/* eslint-disable import/order */
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Layout,
   Row,
@@ -27,18 +28,26 @@ import {
   Button,
   Typography,
   Tabs,
+  Badge,
   Form,
   DatePicker,
   Menu,
   Dropdown,
+  Table,
+  Tooltip,
 } from 'antd'
-import { FilterOutlined, CloudDownloadOutlined } from '@ant-design/icons'
+import { FaDownload } from 'react-icons/fa'
+import { BiDollar } from 'react-icons/bi'
+import { GoCheck, GoPrimitiveDot } from 'react-icons/go'
+import { LeftOutlined, RightOutlined } from '@ant-design/icons'
 import { gql } from 'apollo-boost'
 import moment from 'moment'
+import { useQuery, useLazyQuery } from 'react-apollo'
 import FrequencyDurationGraph from './frequencyDuration'
 import client from '../../apollo/config'
 // import AttendanceBar from './AttendanceBar'
 import DataTable from 'react-data-table-component'
+import LoadingComponent from 'components/VBMappReport/LoadingComponent'
 
 const { Title, Text } = Typography
 const { Content } = Layout
@@ -49,19 +58,26 @@ const parentCardStyle = {
   background: '#F9F9F9',
   borderRadius: 10,
   padding: '10px',
+  minWidth: '210px',
   margin: '7px 10px 0 10px',
-  height: 500,
-  overflow: 'hidden',
+  maxHeight: 600,
+  overflowY: 'scroll',
 }
 
 const filterCardStyle = {
   background: '#F1F1F1',
-  padding: 10,
+  display: 'flex',
+  flexWrap: 'wrap',
+  padding: '5px 10px',
   margin: 0,
-  height: 50,
+  height: 'fit-content',
   overflow: 'hidden',
   backgroundColor: 'rgb(241, 241, 241)',
 }
+
+const parentDiv = { display: 'flex', margin: '5px 40px 5px 36px' }
+const parentLabel = { fontSize: '15px', color: '#000', margin: 'auto 8px auto' }
+
 const antcol1 = {
   display: 'block',
   width: '6%',
@@ -72,388 +88,443 @@ const antcol3 = {
   width: '88%',
 }
 
-class Att extends React.Component {
-  constructor(props) {
-    super(props)
+const generalstyle = {
+  border: '1px solid #E4E9F0',
+  boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
+  borderRadius: 10,
+  padding: '5px',
+  alignItems: 'center',
+  display: 'block',
+  width: '100%',
+  marginBottom: '4px',
+  curser: 'pointer',
+}
 
-    this.state = {
-      therapistList: [],
-      loading: true,
-      selectedTherapist: '',
-      startDate: moment().subtract(21, 'days'),
-      endDate: moment(),
-      componentsKey: Math.random(),
-      visible: false,
-      tableData:[]
-    }
-  }
+const behaviorCardStyle = {
+  ...generalstyle,
+  background: '#FFFFFF',
+}
 
-  componentDidMount() {
-    client
-      .query({
-        query: gql`
-          query {
-              staffs {
-                  edges {
-                      node {
-                          id
-                          name
-                      }
-                  }
-              }
-          }
-        `
-      })
-      .then(result => {
-        console.log('result.data.getTemplate.edges', result.data.staffs.edges)
-        this.setState({
-          therapistList: result.data.staffs.edges,
-          loading: false,
-        })
-      })
-  }
-
-  componentDidUpdate(prevProps) {
-    const { selectedStudentId } = this.props
-    if (selectedStudentId != prevProps.selectedStudentId) {
-      client
-        .query({
-          query: gql`
-            query {
-              staffs {
-                  edges {
-                      node {
-                          id
-                          name
-                      }
-                  }
-              }
-          }
-          `
-        })
-        .then(result => {
-          // console.log('result.data.getTemplate.edges', result.data.staffs.edges)
-          this.setState({
-            therapistList: result.data.staffs.edges,
-            loading: false,
-          })
-        })
-    }
-  }
-
-  loadGraph = id => {
-    this.setState({
-      selectedTherapist: id,
-      componentsKey: Math.random(),
-    })
-    if (id) {
-      // alert(moment(this.state.startDate).format('YYYY-MM-DD'))
-      client
-        .query({
-          query: gql`
-            query($dateGte:Date!, $dateLte:Date!, $therapist:ID!){
-              timesheetReport(dateGte:$dateGte, dateLte:$dateLte, therapist:$therapist){
-                  date
-                  hours
-                  appList{
-                      id
-                      title
-                      start
-                      end
-                  }
-                  workList{
-                      id
-                      checkIn
-                      checkOut
-                  }
-              }
-          }
-          `,
-          variables:{
-            dateGte:moment(this.state.startDate).format('YYYY-MM-DD'),
-            dateLte:moment(this.state.endDate).format('YYYY-MM-DD'),
-            therapist:id
-          }
-        })
-        .then(result => {
-          this.setState({
-            tableData: result.data.timesheetReport,
-            loading: false,
-          })
-        })
-    }
-  }
-
-  dateChange = dateRange => {
-    // alert()
-    this.setState({
-      startDate: dateRange[0],
-      endDate: dateRange[1],
-      componentsKey: Math.random(),
-    })
-    if(dateRange){
-      client
-        .query({
-          query: gql`
-            query($dateGte:Date!, $dateLte:Date!, $therapist:ID!){
-              timesheetReport(dateGte:$dateGte, dateLte:$dateLte, therapist:$therapist){
-                  date
-                  hours
-                  appList{
-                      id
-                      title
-                      start
-                      end
-                  }
-                  workList{
-                      id
-                      checkIn
-                      checkOut
-                  }
-              }
-          }
-          `,
-          variables:{
-            dateGte:moment(dateRange[0]).format('YYYY-MM-DD'),
-            dateLte:moment(dateRange[1]).format('YYYY-MM-DD'),
-            therapist:this.state.selectedTherapist
-          }
-        })
-        .then(result => {
-          this.setState({
-            tableData: result.data.timesheetReport,
-            loading: false,
-          })
-        })
-    }
-  }
-
-  showDrawer = () => {
-    this.setState({
-      visible: true,
-    })
-  }
-
-  onClose = () => {
-    this.setState({
-      visible: false,
-    })
-  }
-
-  render() {
-    const behaviorCardStyle = {
-      background: '#FFFFFF',
-      border: '1px solid #E4E9F0',
-      boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
-      borderRadius: 10,
-      padding: '11px 0px 5px 9px',
-      alignItems: 'center',
-      display: 'block',
-      width: '100%',
-      marginBottom: '4px',
-      lineHeight: '27px',
-      curser: 'pointer',
-      // minHeight: '130px',
-    }
-
-    const selectedCardStyle = {
-      background: '#E58425',
-      border: '1px solid #E4E9F0',
-      color: '#fff',
-      boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
-      borderRadius: 10,
-      padding: '11px 0px 5px 9px',
-      alignItems: 'center',
-      display: 'block',
-      width: '100%',
-      marginBottom: '4px',
-      lineHeight: '27px',
-      // minHeight: '130px',
-    }
-    const customStyles = {
-      header: {
-        style: {
-          maxHeight: '50px',
-        },
-      },
-      headRow: {
-        style: {
-          borderTopStyle: 'solid',
-          borderTopWidth: '1px',
-          borderTopColor: '#ddd',
-          backgroundColor: '#f5f5f5',
-        },
-      },
-      headCells: {
-        style: {
-          '&:not(:last-of-type)': {
-            borderRightStyle: 'solid',
-            borderRightWidth: '1px',
-            borderRightColor: '#ddd',
-          },
-          fontWeight: 'bold',
-        },
-      },
-      cells: {
-        style: {
-          '&:not(:last-of-type)': {
-            borderRightStyle: 'solid',
-            borderRightWidth: '1px',
-            borderRightColor: '#ddd',
-          },
-          fontSize: '11px',
-        },
-      },
-      pagination: {
-        style: {
-          position: 'absolute',
-          top: '7px',
-          right: '0px',
-          borderTopStyle: 'none',
-          minHeight: '35px',
-        },
-      },
-      table: {
-        style: {
-          paddingBottom: '40px',
-          top: '40px',
-        },
-      },
-    }
-    const { form, studentName } = this.props
-    const {
-      therapistList,
-      loading,
-      selectedTherapist,
-      startDate,
-      endDate,
-      componentsKey,
-      tableData
-    } = this.state
-    // alert(startDate);
-    if (loading) {
-      return 'Loading...'
-    }
-
-    const exportToCSV = () => {
-      this.report.exportToCSV(studentName)
-    }
-
-  const columns = [
-    {
-      name: 'Date',
-      selector: 'date',
-      cell: row => <span>{row && row.date ? row.date : ''}</span>,
-      // maxWidth: '100px',
+const selectedCardStyle = {
+  ...generalstyle,
+  background: '#E58425',
+  color: '#fff',
+}
+const customStyles = {
+  header: {
+    style: {
+      maxHeight: '50px',
     },
-    {
-      name: 'Hours',
-      selector: 'hours',
-      cell: row => <span>{row && row.hours ? row.hours : '0'}</span>,
-      // maxWidth: '100px',
+  },
+  headRow: {
+    style: {
+      borderTopStyle: 'solid',
+      borderTopWidth: '1px',
+      borderTopColor: '#ddd',
+      backgroundColor: '#f5f5f5',
+    },
+  },
+  headCells: {
+    style: {
+      '&:not(:last-of-type)': {
+        borderRightStyle: 'solid',
+        borderRightWidth: '1px',
+        borderRightColor: '#ddd',
+      },
+      fontWeight: 'bold',
+    },
+  },
+  cells: {
+    style: {
+      '&:not(:last-of-type)': {
+        borderRightStyle: 'solid',
+        borderRightWidth: '1px',
+        borderRightColor: '#ddd',
+      },
+      fontSize: '11px',
+    },
+  },
+  pagination: {
+    style: {
+      position: 'absolute',
+      top: '7px',
+      right: '0px',
+      borderTopStyle: 'none',
+      minHeight: '35px',
+    },
+  },
+  table: {
+    style: {
+      paddingBottom: '40px',
+      top: '40px',
+    },
+  },
+}
+
+const TIMESHEETS = gql`
+  query($dateGte: Date!, $dateLte: Date!, $staffId: ID!) {
+    timesheets(dateGte: $dateGte, dateLte: $dateLte, staffId: $staffId) {
+      edges {
+        node {
+          id
+          title
+          start
+          end
+        }
+      }
     }
-  ]
-    const menu = (
-      <Menu>
-        {/* <Menu.Item key="0">
-          <Button onClick={() => exportPDF()} type="link" size="small">
-            PDF
-          </Button>
-        </Menu.Item> */}
-        <Menu.Item key="1">
-          <Button onClick={() => exportToCSV()} type="link" size="small">
-            CSV/Excel
-          </Button>
-        </Menu.Item>
-      </Menu>
-    )
-
-    return (
-      <>
-        <Row>
-          <Col sm={24}>
-            <Row>
-              <Col span={26}>
-                <div style={filterCardStyle}>
-                  <Row>
-                    <Col span={1} style={antcol1}>
-                      <span style={{ fontSize: '15px', color: '#000' }}>Date :</span>
-                    </Col>
-                    <Col span={4} style={antcol3}>
-                      <RangePicker
-                        style={{
-                          marginLeft: 'auto',
-                          width: 250,
-                          marginRight: 31,
-                        }}
-                        size="default"
-                        defaultValue={[
-                          moment(startDate, 'YYYY-MM-DD'),
-                          moment(endDate, 'YYYY-MM-DD'),
-                        ]}
-                        onChange={this.dateChange}
-                      />
-                    </Col>
-                    <Col span={1}>
-                      <Dropdown overlay={menu} trigger={['click']}>
-                        <Button style={{ marginRight: '10px' }} type="link" size="large">
-                          <CloudDownloadOutlined />{' '}
-                        </Button>
-                      </Dropdown>
-                    </Col>
-                  </Row>
-
-                </div>
-              </Col>
-            </Row>
-            <Row>
-              <Col span={5}>
-                <div style={parentCardStyle}>
-                  <div id="capture" style={behaviorCardStyle}>
-                    {therapistList.map(item => (
-                      <div key="1234"
-                        style={
-                          selectedTherapist === item.node.id ? selectedCardStyle : behaviorCardStyle
-                        }
-                        onClick={() => this.loadGraph(item.node.id)}
-                      >
-                        {/* <Text style={textStyle}>{item.node.behavior.behaviorName}</Text> */}
-                        <Title
-                          style={{
-                            fontSize: '14px',
-                            lineHeight: '5px',
-                            display: 'block',
-                            width: '100%',
-                          }}
-                        >
-                          {item.node.name}
-                        </Title>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </Col>
-
-              <Col span={19}>
-                  <div style={parentCardStyle}>
-                    <DataTable
-                      columns={columns}
-                      // loading={loading}
-                      noHeader="true"
-                      theme="default"
-                      data={tableData}
-                      customStyles={customStyles}
-                      width="100px"
-                    />
-                  </div>
-                </Col>
-
-            </Row>
-          </Col>
-        </Row>
-      </>
-    )
   }
+`
+
+const APPOINTMENTS = gql`
+  query($dateFrom: Date!, $dateTo: Date!, $therapist: ID!) {
+    appointments(dateFrom: $dateFrom, dateTo: $dateTo, therapist: $therapist) {
+      edges {
+        node {
+          id
+          title
+          start
+          end
+          isApproved
+          appointmentStatus {
+            id
+            appointmentStatus
+          }
+        }
+      }
+    }
+  }
+`
+
+const STAFF_LIST = gql`
+  query {
+    staffs {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+    }
+  }
+`
+
+const getDatesBetween = (startDate, endDate) => {
+  const now = startDate.clone()
+  const dates = []
+
+  while (now.isSameOrBefore(endDate)) {
+    dates.push(now.format('YYYY-MM-DD'))
+    now.add(1, 'days')
+  }
+  return dates
+}
+
+const dateFormat = 'YYYY-MM-DD'
+function Att({ form, studentName, selectedStaff }) {
+  const [therapistList, seTtherapistList] = useState([])
+  const [currentTherapistId, setCurrentTherapistId] = useState()
+  const [tableData, setTableData] = useState([])
+  const [columns, setColumns] = useState([])
+  const userRole = localStorage.getItem('role')
+  const [dateRR, setDateRR] = useState([
+    moment()
+      .startOf('week')
+      .add(1, 'day'),
+    moment().endOf('week'),
+  ])
+  const { data: staffData, loading: staffLoading, error: staffError, refetch } = useQuery(
+    STAFF_LIST,
+  )
+  const [getTimeSheetData, { data: timeSheetData, loading: timeSheetLoading }] = useLazyQuery(
+    TIMESHEETS,
+  )
+  const [getAppointmentData, { data: appointmentData, loading: appointmentLoading }] = useLazyQuery(
+    APPOINTMENTS,
+  )
+
+  useEffect(() => {
+    if (staffData) {
+      seTtherapistList(staffData.staffs.edges)
+      setCurrentTherapistId(
+        userRole === 'therapist'
+          ? localStorage.getItem('student_id')
+          : staffData.staffs.edges[0].node.id,
+      )
+    }
+  }, [staffData])
+
+  useEffect(() => {
+    if (timeSheetData && appointmentData && !appointmentLoading && !timeSheetLoading) {
+      filterTableData(timeSheetData.timesheets.edges, appointmentData.appointments.edges)
+    }
+  }, [timeSheetData, appointmentData])
+
+  useEffect(() => {
+    if (dateRR[0] && dateRR[1] && selectedStaff.id) {
+      let st
+      let end
+      if (dateRR[0].format(dateFormat) < dateRR[1].format(dateFormat)) {
+        st = dateRR[0].format(dateFormat)
+        end = dateRR[1].format(dateFormat)
+      } else {
+        st = dateRR[1].format(dateFormat)
+        end = dateRR[0].format(dateFormat)
+      }
+      getTimeSheetData({
+        variables: {
+          dateGte: moment(st).format('YYYY-MM-DD'),
+          dateLte: moment(end).format('YYYY-MM-DD'),
+          staffId: selectedStaff.id,
+          // therapist: currentTherapistId,
+        },
+      })
+      getAppointmentData({
+        variables: {
+          dateFrom: moment(st).format('YYYY-MM-DD'),
+          dateTo: moment(end).format('YYYY-MM-DD'),
+          therapist: selectedStaff.id,
+          // therapist: currentTherapistId,
+        },
+      })
+    }
+  }, [dateRR, currentTherapistId, selectedStaff])
+
+  const filterTableData = (timesheets, appointments) => {
+    const filteredData = []
+    const newColumns = [
+      {
+        title: <span style={{ fontWeight: 'bold', fontSize: '13px' }}>Title</span>,
+        dataIndex: 'title',
+        key: 'title',
+        fixed: 'left',
+        width: '300px',
+        render: (text, record) => (
+          <Badge color={record.isAppointment ? 'lightpink' : 'lightblue'} text={text} />
+        ),
+      },
+    ]
+
+    timesheets.forEach(item => {
+      const start = moment(item.node.start)
+      const end = moment(item.node.end)
+      const duration = moment.duration(end.diff(start)).minutes()
+
+      filteredData.push({
+        [moment(item.node.start).format('YYYY-MM-DD')]: duration,
+        title: item.node.title,
+        id: item.node.id,
+        duration,
+        badges: { approved: true, billable: false, overtime: false }, // ! Not Integrated
+        isWorkLog: true,
+      })
+    })
+
+    appointments.forEach(item => {
+      const start = moment(item.node.start)
+      const end = moment(item.node.end)
+      const duration = moment.duration(end.diff(start)).as('minutes')
+
+      filteredData.push({
+        [moment(item.node.start).format('YYYY-MM-DD')]: duration,
+        title: item.node.title,
+        id: item.node.id,
+        duration,
+        badges: {
+          approved: item.node.isApproved,
+          billable: false,
+          overtime: false,
+        },
+        isAppointment: true,
+      })
+    })
+
+    const dates = getDatesBetween(dateRR[0], dateRR[1])
+
+    dates.forEach((date, i) => {
+      newColumns.push({
+        title: (
+          <span style={{ fontWeight: 'bold', fontSize: '13px' }}>
+            {moment(date).format('dd, MMM DD')}
+          </span>
+        ),
+        dataIndex: date,
+        key: `${date}_${i}`,
+        align: 'center',
+        render: text => {
+          let hrs = 0
+          let min = 0
+          if (text > 0) {
+            hrs = Math.floor(text / 60)
+            min = Math.floor(text % 60)
+          }
+          return hrs > 0 ? `${hrs} Hrs ${min} Min` : `${min} Min`
+        },
+      })
+    })
+
+    newColumns.push({
+      title: <span style={{ fontWeight: 'bold', fontSize: '13px' }}>Status</span>,
+      dataIndex: 'badges',
+      key: 'badges',
+      fixed: 'right',
+      width: '150px',
+      align: 'center',
+      render: (text, record) => {
+        return (
+          <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+            <Tooltip placement="top" title="Approved">
+              <Badge
+                count={
+                  <GoCheck
+                    style={{
+                      fontSize: '18px',
+                      color: record.badges.approved ? 'limegreen' : 'darkgrey',
+                      cursor: 'pointer',
+                    }}
+                  />
+                }
+              />
+            </Tooltip>
+            <Tooltip placement="top" title="Billable">
+              <Badge
+                count={<BiDollar />}
+                style={{
+                  fontSize: '18px',
+                  color: record.badges.billable ? 'limegreen' : 'darkgrey',
+                  cursor: 'pointer',
+                }}
+              />
+            </Tooltip>
+            <Tooltip placement="top" title="">
+              <Badge
+                count={<GoPrimitiveDot />}
+                style={{
+                  fontSize: '18px',
+                  color: record.badges.overtime ? 'limegreen' : 'darkgrey',
+                  cursor: 'pointer',
+                }}
+              />
+            </Tooltip>
+          </div>
+        )
+      },
+    })
+    setColumns(newColumns)
+    setTableData(filteredData)
+  }
+
+  const setCurrentWeek = () => {
+    setDateRR([
+      moment()
+        .startOf('week')
+        .add(1, 'day'),
+      moment().endOf('week'),
+    ])
+  }
+  const setPreviousWeek = () => {
+    setDateRR([dateRR[0].subtract(7, 'days'), dateRR[1].subtract(7, 'days')])
+  }
+  const setNextWeek = () => {
+    setDateRR([dateRR[0].add(7, 'days'), dateRR[1].add(7, 'days')])
+  }
+
+  const exportToCSV = report => {
+    console.log(report, 'asa') // this.report.exportToCSV(studentName)
+  }
+
+  const menu = (
+    <Menu>
+      <Menu.Item key="1">
+        <Button onClick={() => exportToCSV()} type="link" size="small">
+          CSV/Excel
+        </Button>
+      </Menu.Item>
+    </Menu>
+  )
+
+  if (staffLoading) {
+    return <LoadingComponent />
+  }
+
+  console.log(currentTherapistId, 'therapist')
+
+  return (
+    <>
+      <Row>
+        <Col sm={24}>
+          <Row>
+            <Col span={26}>
+              <div style={filterCardStyle}>
+                <div style={parentDiv}>
+                  <Tooltip placement="top" title="Previous Week">
+                    <Button onClick={() => setPreviousWeek()}>
+                      <LeftOutlined />
+                    </Button>
+                  </Tooltip>
+                  <Button onClick={() => setCurrentWeek()}>This Week</Button>
+                  <Tooltip placement="top" title="Next Week">
+                    <Button onClick={() => setNextWeek()}>
+                      <RightOutlined />
+                    </Button>
+                  </Tooltip>
+                </div>
+                {/* <div style={{ marginLeft: 'auto' }}>
+                  <Dropdown overlay={menu} trigger={['hover']}>
+                    <Button type="link" size="large">
+                      <FaDownload />{' '}
+                    </Button>
+                  </Dropdown>
+                </div> */}
+              </div>
+            </Col>
+          </Row>
+          <div style={{ display: 'flex' }}>
+            {/* {userRole === '"school_admin"' ? (
+              <div style={parentCardStyle}>
+                <div id="capture" style={behaviorCardStyle}>
+                  {therapistList.map(item => (
+                    <Button
+                      key={item.node.id}
+                      style={
+                        currentTherapistId === item.node.id ? selectedCardStyle : behaviorCardStyle
+                      }
+                      onClick={() => setCurrentTherapistId(item.node.id)}
+                    >
+                      <span
+                        style={{
+                          fontSize: '14px',
+                          fontWeight: '600',
+                          display: 'block',
+                          width: '100%',
+                        }}
+                      >
+                        {item.node.name}
+                      </span>
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            ) : null} */}
+
+            <div style={{ width: '98%', margin: '20px auto' }}>
+              <div style={{ margin: 'auto', width: '95%' }}>
+                {/* {!timeSheetData && ( */}
+                <Table
+                  columns={columns}
+                  dataSource={tableData}
+                  bordered
+                  size="middle"
+                  loading={appointmentLoading && timeSheetLoading}
+                />
+                {/* )} */}
+              </div>
+            </div>
+          </div>
+        </Col>
+      </Row>
+    </>
+  )
 }
 
 export default Form.create()(Att)

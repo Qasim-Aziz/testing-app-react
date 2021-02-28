@@ -16,7 +16,7 @@ export default ({ reminder, index, setRemainderCount, dispatch, state }) => {
         marginBottom: '10px',
       }}
     >
-      <Form.Item style={{ marginBottom: 0 }}>
+      <Form.Item style={{ marginBottom: 0, marginRight: '20px' }}>
         <TimePicker
           disabled={!reminder}
           value={state[index].time}
@@ -30,7 +30,7 @@ export default ({ reminder, index, setRemainderCount, dispatch, state }) => {
         />
       </Form.Item>
 
-      <Form.Item style={{ marginBottom: 0 }}>
+      <Form.Item style={{ marginRight: 'auto', marginBottom: 0 }}>
         <Select
           disabled={!reminder}
           placeholder="Set Repeat"
@@ -39,7 +39,7 @@ export default ({ reminder, index, setRemainderCount, dispatch, state }) => {
             dispatch({ type: 'UPDATE_FREQUENCY', index, frequency: value })
           }}
           style={{
-            width: 310,
+            width: 250,
           }}
           size="large"
           mode="multiple"
@@ -72,19 +72,10 @@ export default ({ reminder, index, setRemainderCount, dispatch, state }) => {
       </Form.Item>
       {index !== 0 && (
         <MinusCircleOutlined
-          style={{ fontSize: 24, marginTop: 2 }}
+          style={{ fontSize: 24, marginTop: 6 }}
           onClick={() => {
             setRemainderCount(state => state - 1)
             dispatch({ type: 'REMOVE_REMAINDER', index })
-          }}
-        />
-      )}
-      {index === 0 && (
-        <PlusCircleOutlined
-          style={{ fontSize: 24, marginTop: 2 }}
-          onClick={() => {
-            setRemainderCount(state => state + 1)
-            dispatch({ type: 'ADD_REMAINDER' })
           }}
         />
       )}

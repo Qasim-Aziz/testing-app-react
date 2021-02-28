@@ -40,6 +40,8 @@ const actions = {
   GET_SD_COMBINATIONS: 'sessionrecording/GET_SD_COMBINATIONS',
   EQUIVALENCE_RESPONSE: 'sessionrecording/EQUIVALENCE_RESPONSE',
   EQUIVALENCE_RESPONSE_UPDATE: 'sessionrecording/EQUIVALENCE_RESPONSE_UPDATE',
+
+  MOVE_TO_NEXT_TARGET: 'sessionrecording/MOVE_TO_NEXT_TARGET',
 }
 
 export default actions

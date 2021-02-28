@@ -1,0 +1,28 @@
+const barriersQueTitles = {
+  1: 'Behavior Problems',
+  2: 'Instructional Control',
+  3: 'Impaired Mand',
+  4: 'Impaired Tact',
+  5: 'Impaired Imitation',
+  6: 'Impaired Echoic',
+  7: 'Impaired VP-MTS',
+  8: 'Impaired Listener',
+  9: 'Impaired Intraverbal',
+  10: 'Impaired Social Skills',
+  11: 'Prompt Dependent',
+  12: 'Scrolling',
+  13: 'Impaired Scanning',
+  14: 'Impaired Conditional Discrimination',
+  15: 'Failure to Generalize',
+  16: 'Weak Motivators',
+  17: 'Response Requirement Weakens MO',
+  18: 'Reinforcer Dependent',
+  19: 'Self-Stimulation',
+  20: 'Impaired Articulation',
+  21: 'Obsessive-Compulsive Behavior',
+  22: 'Hyperactive Behavior',
+  23: 'Failure to Make Eye Contact',
+  24: 'Sensory Defensiveness',
+}
+
+export default barriersQueTitles

@@ -9,14 +9,7 @@ const UpdateCelerationChart = props => {
   const { updateCelerationChart, onCelerationChartChange, onRecordingParametersChange } = props
 
   return (
-    <Form
-      name="basic"
-      style={{
-        marginTop: 0,
-      }}
-      size="large"
-      onSubmit={e => updateCelerationChart(e)}
-    >
+    <Form className="addOrEditFormCelerationChart" onSubmit={e => updateCelerationChart(e)}>
       <InputCelerationChart
         celerationCategories={celerationCategories}
         chart={chart}
@@ -24,9 +17,11 @@ const UpdateCelerationChart = props => {
         onRecordingParametersChange={onRecordingParametersChange}
       />
 
-      <Button type="primary" htmlType="submit" color="primary" variant="contained">
-        Save Chart
-      </Button>
+      <Form.Item style={{ textAlign: 'center' }}>
+        <Button type="primary" htmlType="submit" color="primary" variant="contained">
+          Save Chart
+        </Button>
+      </Form.Item>
     </Form>
   )
 }

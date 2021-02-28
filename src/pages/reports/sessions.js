@@ -1,6 +1,7 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable react/jsx-indent */
+/* eslint-disable-next-line react-hooks/exhaustive-deps */
 /* eslint-disable array-callback-return */
 import React, { useEffect, useState } from 'react'
 import { useQuery, useLazyQuery } from 'react-apollo'
@@ -8,243 +9,62 @@ import {
   Table,
   Button,
   notification,
-  Row,
-  Col,
   Form,
   Select,
   DatePicker,
   Drawer,
   Menu,
+  Radio,
   Dropdown,
+  Row,
 } from 'antd'
-import { useSelector } from 'react-redux'
 import { usePrevious } from 'react-delta'
-import { ResponsiveLine } from '@nivo/line'
-import { ResponsiveBar } from '@nivo/bar'
+import { ResponsivePie } from '@nivo/pie'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
-import { LineChartOutlined, FilterOutlined, CloudDownloadOutlined } from '@ant-design/icons'
+import { LineChartOutlined } from '@ant-design/icons'
+import { FaDownload } from 'react-icons/fa'
 import moment from 'moment'
-import DataTable from 'react-data-table-component'
-import filterIcon from 'icons/filter.png'
 import { SESSIONS_SUMMERY, FREQUENCY_DIS_TARGET } from './query'
 import './form.scss'
+import './table.scss'
 
 const { RangePicker } = DatePicker
 
-const parentCardStyle = {
-  background: '#F9F9F9',
-  borderRadius: 10,
-  padding: '10px',
-  margin: '7px 10px 0 10px',
-  height: 900,
-  overflow: 'auto',
-}
-
-const tableCardStyle = {
-  background: '#F9F9F9',
-  height: 800,
-  overflow: 'auto',
-}
-
-const antcol1 = {
-  display: 'block',
-  width: '6%',
-}
-
-
-
 const filterCardStyle = {
   background: '#F1F1F1',
-  padding: 10,
+  display: 'flex',
+  flexWrap: 'wrap',
+  padding: '5px 10px',
   margin: 0,
-  height: 50,
+  height: 'fit-content',
   overflow: 'hidden',
   backgroundColor: 'rgb(241, 241, 241)',
 }
 
+const parentDiv = { display: 'flex', margin: 'auto 30px auto 0' }
+const parentLabel = { fontSize: '15px', color: '#000', margin: 'auto 8px auto' }
+
 export default Form.create()(({ studentName, showDrawerFilter }) => {
   const [selectSession, setSelectSession] = useState()
-  const [filterDrawer, setFilterDrawer] = useState(false)
   const [range, setRange] = useState([moment(Date.now()).subtract(21, 'days'), moment(Date.now())])
   const [session, setSession] = useState('Morning')
   const studentId = localStorage.getItem('studentId')
   const prevSelectSession = usePrevious(selectSession)
   const [lineDrawer, setLineDrawer] = useState(false)
   const [tableData, setTableData] = useState([])
-  const { Option } = Select
-  const [graphData, setGraphData] = useState([
-    {
-      id: 'japan',
-      color: 'hsl(159, 70%, 50%)',
-      data: [],
-    },
-  ])
   const [barGraphData, setBarGraphData] = useState([])
-  const customStyles = {
-    header: {
-      style: {
-        maxHeight: '50px',
-      },
-    },
-    headRow: {
-      style: {
-        borderTopStyle: 'solid',
-        borderTopWidth: '1px',
-        borderTopColor: '#ddd',
-        backgroundColor: '#f5f5f5',
-      },
-    },
-    headCells: {
-      style: {
-        '&:not(:last-of-type)': {
-          borderRightStyle: 'solid',
-          borderRightWidth: '1px',
-          borderRightColor: '#ddd',
-        },
-        fontWeight: 'bold',
-      },
-    },
-    cells: {
-      style: {
-        '&:not(:last-of-type)': {
-          borderRightStyle: 'solid',
-          borderRightWidth: '1px',
-          borderRightColor: '#ddd',
-        },
-        fontSize: '11px',
-      },
-    },
-    pagination: {
-      style: {
-        position: 'absolute',
-        top: '7px',
-        right: '0px',
-        borderTopStyle: 'none',
-        minHeight: '35px',
-      },
-    },
-    table: {
-      style: {
-        paddingBottom: '40px',
-        top: '40px',
-      },
-    },
-  }
+  const [currentRow, setCurrentRow] = useState(null)
 
-  function formatDuration(ms) {
-    const duration = moment.duration(ms)
-    let returnVal = ''
-    if (duration.asHours() > 1) {
-      returnVal =
-        Math.floor(duration.asHours()) + moment.utc(duration.asMilliseconds()).format(':mm:ss')
-    } else {
-      returnVal = '00:'.concat(moment.utc(duration.asMilliseconds()).format('mm:ss'))
+  function compare(a, b) {
+    if (a.sessionDate < b.sessionDate) {
+      return -1
     }
-    return returnVal
+    if (a.sessionDate > b.sessionDate) {
+      return 1
+    }
+    return 0
   }
-
-  const columns = [
-    {
-      name: 'Date',
-      selector: 'sessionDate',
-      cell: row => <span>{row.sessionDate ? row.sessionDate : ''}</span>,
-      maxWidth: '100px',
-    },
-    {
-      name: 'Session',
-      selector: 'sessions',
-      cell: row => <span>{row.sessions.sessionName.name}</span>,
-      maxWidth: '100px',
-    },
-    {
-      name: 'Duration (HH:MM:SS)',
-      selector: 'duration',
-      cell: row => <span>{formatDuration(row.duration)}</span>,
-      maxWidth: '100px',
-    },
-    {
-      name: 'Percentage Correct',
-      selector: 'correctCount',
-      cell: row => (
-        <span>
-          {Number.isNaN(
-            (row.correctCount * 100) / (row.correctCount + row.errorCount + row.promptCount),
-          )
-            ? 0
-            : Math.round(
-              (row.correctCount * 100) / (row.correctCount + row.errorCount + row.promptCount),
-            )}
-        </span>
-      ),
-      maxWidth: '150px',
-    },
-    {
-      name: 'Percentage Incorrect',
-      selector: 'errorCount',
-      cell: row => (
-        <span>
-          {Number.isNaN(
-            (row.errorCount * 100) / (row.correctCount + row.errorCount + row.promptCount),
-          )
-            ? 0
-            : Math.round(
-              (row.errorCount * 100) / (row.correctCount + row.errorCount + row.promptCount),
-            )}
-        </span>
-      ),
-      maxWidth: '150px',
-    },
-    {
-      name: 'Percentage Prompt',
-      selector: 'promptCount',
-      cell: row => (
-        <span>
-          {Number.isNaN(
-            (row.promptCount * 100) / (row.correctCount + row.errorCount + row.promptCount),
-          )
-            ? 0
-            : Math.round(
-              (row.promptCount * 100) / (row.correctCount + row.errorCount + row.promptCount),
-            )}
-        </span>
-      ),
-      maxWidth: '150px',
-    },
-    {
-      name: 'Behavior count',
-      selector: 'behaviour',
-      cell: row => <span>{row.behaviour}</span>,
-      maxWidth: '150px',
-    },
-    {
-      name: 'Mand Count',
-      selector: 'mand',
-      cell: row => <span>{row.mand}</span>,
-      maxWidth: '150px',
-    },
-    {
-      name: 'Toilet Count',
-      selector: 'toilet',
-      cell: row => <span>{row.toilet}</span>,
-      maxWidth: '100px',
-    },
-    {
-      name: 'Actions',
-      cell: row => (
-        <span>
-          <Button
-            type="link"
-            onClick={() => setSelectSession(row.id)}
-            loading={freDisLoading && selectSession === row.id}
-          >
-            <LineChartOutlined style={{ fontSize: 30, color: 'rgb(229, 132, 37)' }} />
-          </Button>
-        </span>
-      ),
-      maxWidth: '50px',
-    },
-  ]
 
   const { data, error, loading } = useQuery(SESSIONS_SUMMERY, {
     variables: {
@@ -254,35 +74,82 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     },
   })
 
-  useEffect(() => {
-    if (data && data.sessionSummary) {
-      const filterData = data.sessionSummary.filter(
-        item => item.sessions.sessionName.name === session,
-      )
-      setTableData(filterData)
-    }
-  }, [data])
+  console.log(data, 'dt')
 
   const [
     getFreDisTarget,
     { data: freDisData, error: freDisError, loading: freDisLoading },
-  ] = useLazyQuery(FREQUENCY_DIS_TARGET, {
-    variables: {
-      session: selectSession,
-      student: studentId,
-    },
-  })
-
+  ] = useLazyQuery(FREQUENCY_DIS_TARGET)
   useEffect(() => {
-    if (session) {
-      if (data && data.sessionSummary) {
-        const filterData = data.sessionSummary.filter(
-          item => item.sessions.sessionName.name === session,
-        )
-        setTableData(filterData)
+    if (data && data.sessionSummary && session) {
+      let filterData = []
+
+      if (session === 'All') {
+        data.sessionSummary.map(item => {
+          let itemExist = false
+          let itemIdx = -1
+          for (let i = 0; i < filterData.length; i += 1) {
+            if (filterData[i].sessionDate === item.sessionDate) {
+              itemExist = true
+              itemIdx = i
+            }
+          }
+
+          if (itemExist) {
+            filterData[itemIdx] = {
+              ...filterData[itemIdx],
+              behCount: filterData[itemIdx].behCount + item.behCount,
+              behaviour:
+                filterData[itemIdx].behaviour === 'No behaviour performed!'
+                  ? item.behaviour
+                  : filterData[itemIdx].behaviour +
+                    (item.behaviour === 'No behaviour performed!' ? '' : item.behaviour),
+              correctCount: filterData[itemIdx].correctCount + item.correctCount,
+              duration: filterData[itemIdx].duration + item.duration,
+              errorCount: filterData[itemIdx].errorCount + item.errorCount,
+              mand:
+                filterData[itemIdx].mand === 'No mand performed!'
+                  ? item.mand
+                  : filterData[itemIdx].mand +
+                    (item.mand === 'No mand performed!' ? '' : item.mand),
+              peakCorrect: filterData[itemIdx].peakCorrect + item.peakCorrect,
+              peakError: filterData[itemIdx].peakError + item.peakError,
+              peakPrompt: filterData[itemIdx].peakPrompt + item.peakPrompt,
+              peakEquCorrect: filterData[itemIdx].peakEquCorrect + item.peakEquCorrect,
+              peakEquError: filterData[itemIdx].peakEquError + item.peakEquError,
+              peakEquPrompt: filterData[itemIdx].peakEquPrompt + item.peakEquPrompt,
+              promptCount: filterData[itemIdx].promptCount + item.promptCount,
+              toilet: item.toilet === 'No' ? 'No' : 'Yes',
+              toiletCount: filterData[itemIdx].toiletCount + item.toiletCount,
+            }
+          } else {
+            filterData.push({
+              ...item,
+              sessions: {
+                id: item.sessions.id,
+                key: item.sessions.id,
+                sessionName: {
+                  id: item.sessions.sessionName.id,
+                  key: item.sessions.sessionName.id,
+                  name: 'All',
+                },
+              },
+            })
+          }
+        })
+      } else {
+        filterData = data.sessionSummary.filter(item => item.sessions.sessionName.name === session)
+        filterData = filterData.map(item => {
+          return {
+            ...item,
+            key: item.id,
+          }
+        })
       }
+      filterData.sort(compare)
+      setTableData(filterData)
     }
-  }, [session])
+  }, [data, session])
 
   useEffect(() => {
     if (freDisData) {
@@ -293,37 +160,6 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
           y: tarCount,
         })
       })
-
-      const gData = []
-      const filterData = tableData.filter(item => item.id === selectSession)
-      filterData.map(item => {
-        gData.push({
-          domain: item.sessionDate,
-          'Percentage Correct': Number.isNaN(
-            (item.correctCount * 100) / (item.correctCount + item.errorCount + item.promptCount),
-          )
-            ? 0
-            : Math.round(
-              (item.correctCount * 100) /
-              (item.correctCount + item.errorCount + item.promptCount),
-            ),
-          'Percentage Incorrect': Number.isNaN(
-            (item.errorCount * 100) / (item.correctCount + item.errorCount + item.promptCount),
-          )
-            ? 0
-            : Math.round(
-              (item.errorCount * 100) / (item.correctCount + item.errorCount + item.promptCount),
-            ),
-          'Percentage Prompt': Number.isNaN(
-            (item.promptCount * 100) / (item.correctCount + item.errorCount + item.promptCount),
-          )
-            ? 0
-            : Math.round(
-              (item.promptCount * 100) / (item.correctCount + item.errorCount + item.promptCount),
-            ),
-        })
-      })
-      setBarGraphData(gData)
     }
   }, [freDisData])
 
@@ -345,46 +181,145 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
 
   useEffect(() => {
     if (selectSession && selectSession !== prevSelectSession) {
-      console.log(selectSession)
-      getFreDisTarget()
+      getFreDisTarget({
+        variables: {
+          session: selectSession?.id,
+          student: studentId,
+        },
+      })
       setLineDrawer(true)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectSession])
 
-  const reduxUser = useSelector(state => state.user)
-  console.log('selectSession', selectSession)
+  const generateGraphData = row => {
+    let total =
+      row.correctCount +
+      row.errorCount +
+      row.promptCount +
+      row.peakCorrect +
+      row.peakError +
+      row.peakPrompt +
+      row.peakEquCorrect +
+      row.peakEquPrompt +
+      row.peakEquError
+
+    total = total === 0 ? 1 : total
+
+    const gData = []
+    gData.push({
+      id: 'Correct',
+      key: Math.random(),
+      label: ' Correct',
+      value: Number.isNaN(row.correctCount) ? 0 : Math.round((row.correctCount * 100) / total),
+    })
+    gData.push({
+      id: 'Incorrect',
+      key: Math.random(),
+      label: ' Incorrect',
+      value: Number.isNaN(row.errorCount) ? 0 : Math.round((row.errorCount * 100) / total),
+    })
+    gData.push({
+      id: 'Prompt',
+      key: Math.random(),
+      label: ' Prompt',
+      value: Number.isNaN(row.promptCount) ? 0 : Math.round((row.promptCount * 100) / total),
+    })
+    gData.push({
+      id: 'Peak Correct',
+      key: Math.random(),
+      label: 'Peak  Correct',
+      value: Number.isNaN(row.peakCorrect) ? 0 : Math.round((row.peakCorrect * 100) / total),
+    })
+    gData.push({
+      id: 'Peak Incorrect',
+      key: Math.random(),
+      label: 'Peak  Incorrect',
+      value: Number.isNaN(row.peakError) ? 0 : Math.round((row.peakError * 100) / total),
+    })
+    gData.push({
+      id: 'Peak Prompt',
+      key: Math.random(),
+      label: 'Peak  Prompt',
+      value: Number.isNaN(row.peakPrompt) ? 0 : Math.round((row.peakPrompt * 100) / total),
+    })
+    gData.push({
+      id: 'Equ Correct',
+      key: Math.random(),
+      label: 'Peak Equ  Correct',
+      value: Number.isNaN(row.peakEquCorrect) ? 0 : Math.round((row.peakEquCorrect * 100) / total),
+    })
+    gData.push({
+      id: 'Equ Incorrect',
+      key: Math.random(),
+      label: 'Peak Equ Incorrect',
+      value: Number.isNaN(row.peakEquError) ? 0 : Math.round((row.peakEquError * 100) / total),
+    })
+    gData.push({
+      id: 'Equ Prompt',
+      key: Math.random(),
+      label: 'Peak Equ  Prompt',
+      value: Number.isNaN(row.peakEquPrompt) ? 0 : Math.round((row.peakEquPrompt * 100) / total),
+    })
+
+    setBarGraphData(gData)
+    setCurrentRow(row)
+    setLineDrawer(true)
+  }
+
+  function formatDuration(ms) {
+    const duration = moment.duration(ms)
+    let returnVal = ''
+    if (duration.asHours() > 1) {
+      returnVal =
+        Math.floor(duration.asHours()) + moment.utc(duration.asMilliseconds()).format(':mm:ss')
+    } else {
+      returnVal = '00:'.concat(moment.utc(duration.asMilliseconds()).format('mm:ss'))
+    }
+    return returnVal
+  }
 
   const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
   const fileExtension = '.xlsx'
   const exportToCSV = () => {
     const filename = '_sessions_excel'
-    const formattedData = tableData.map(function (e) {
+    const formattedData = tableData.map(function(e) {
       return {
         Date: e.sessionDate ? e.sessionDate : '',
         Session: e.sessions.sessionName.name,
         Duration_in_HH_MM_SS: formatDuration(e.duration),
-        Percentage_Correct: Number.isNaN(
-          (e.correctCount * 100) / (e.correctCount + e.errorCount + e.promptCount),
-        )
+        Total: getTotal(e),
+        Percentage_Correct: Number.isNaN((e.correctCount * 100) / getTotal(e))
           ? 0
-          : Math.round((e.correctCount * 100) / (e.correctCount + e.errorCount + e.promptCount)),
-        Percentage_Incorrect: Number.isNaN(
-          (e.errorCount * 100) / (e.correctCount + e.errorCount + e.promptCount),
-        )
+          : Math.round((e.correctCount * 100) / getTotal(e)),
+        Percentage_Incorrect: Number.isNaN((e.errorCount * 100) / getTotal(e))
           ? 0
-          : Math.round((e.errorCount * 100) / (e.correctCount + e.errorCount + e.promptCount)),
-        Percentage_Prompt: Number.isNaN(
-          (e.promptCount * 100) / (e.correctCount + e.errorCount + e.promptCount),
-        )
+          : Math.round((e.errorCount * 100) / getTotal(e)),
+        Percentage_Prompt: Number.isNaN((e.promptCount * 100) / getTotal(e))
           ? 0
-          : Math.round((e.promptCount * 100) / (e.correctCount + e.errorCount + e.promptCount)),
+          : Math.round((e.promptCount * 100) / getTotal(e)),
+        Percentage_Peak_Correct: Number.isNaN((e.peakCorrect * 100) / getTotal(e))
+          ? 0
+          : Math.round((e.peakCorrect * 100) / getTotal(e)),
+        Percentage_Peak_Incorrect: Number.isNaN((e.peakError * 100) / getTotal(e))
+          ? 0
+          : Math.round((e.peakError * 100) / getTotal(e)),
+        Percentage_Peak_Prompt: Number.isNaN((e.peakPrompt * 100) / getTotal(e))
+          ? 0
+          : Math.round((e.peakPrompt * 100) / getTotal(e)),
+        Percentage_Equ_Correct: Number.isNaN((e.peakEquCorrect * 100) / getTotal(e))
+          ? 0
+          : Math.round((e.peakEquCorrect * 100) / getTotal(e)),
+        Percentage_Equ_Incorrect: Number.isNaN((e.peakEquError * 100) / getTotal(e))
+          ? 0
+          : Math.round((e.peakEquError * 100) / getTotal(e)),
+        Percentage_Equ_Prompt: Number.isNaN((e.peakEquPrompt * 100) / getTotal(e))
+          ? 0
+          : Math.round((e.peakEquPrompt * 100) / getTotal(e)),
         Behavior_count: e.behaviour,
         Mand_Count: e.mand,
         Toilet_Count: e.toilet,
       }
     })
-
     const ws = XLSX.utils.json_to_sheet(formattedData)
     const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
     const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
@@ -392,13 +327,194 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     FileSaver.saveAs(excelData, studentName + filename + fileExtension)
   }
 
+  const getTotal = row => {
+    return (
+      row.correctCount +
+      row.errorCount +
+      row.promptCount +
+      row.peakCorrect +
+      row.peakPrompt +
+      row.peakError +
+      row.peakEquCorrect +
+      row.peakEquError +
+      row.peakEquPrompt
+    )
+  }
+  const columns = [
+    {
+      title: 'Date',
+      dataIndex: 'sessionDate',
+      width: '100px',
+      render: (text, row) => <span>{row.sessionDate ? row.sessionDate : ''}</span>,
+    },
+    {
+      title: 'Session',
+      dataIndex: 'sessions',
+      render: (text, row) => <span>{row.sessions.sessionName.name}</span>,
+      width: '100px',
+    },
+    {
+      title: 'Duration (HH:MM:SS)',
+      dataIndex: 'duration',
+      width: '100px',
+      render: (text, row) => <span>{formatDuration(row.duration)}</span>,
+    },
+    {
+      title: 'Total Trials',
+      width: '100px',
+      align: 'center',
+      render: (text, row) => <span>{getTotal(row)}</span>,
+    },
+    {
+      title: 'Correct',
+      dataIndex: 'correctCount',
+      render: (text, row) => (
+        <span>
+          {row.correctCount} Trials - &nbsp;
+          {Number.isNaN((row.correctCount * 100) / getTotal(row))
+            ? 0
+            : Math.round((row.correctCount * 100) / getTotal(row))}
+          %
+        </span>
+      ),
+    },
+    {
+      title: 'Incorrect',
+      dataIndex: 'errorCount',
+      render: (text, row) => (
+        <span>
+          {row.errorCount} Trials - &nbsp;
+          {Number.isNaN((row.errorCount * 100) / getTotal(row))
+            ? 0
+            : Math.round((row.errorCount * 100) / getTotal(row))}
+          %
+        </span>
+      ),
+    },
+    {
+      title: 'Prompt',
+      dataIndex: 'promptCount',
+      render: (text, row) => (
+        <span>
+          {row.promptCount} Trials - &nbsp;
+          {Number.isNaN((row.promptCount * 100) / getTotal(row))
+            ? 0
+            : Math.round((row.promptCount * 100) / getTotal(row))}
+          %
+        </span>
+      ),
+    },
+    {
+      title: 'Peak Correct',
+      dataIndex: 'correctCount',
+      render: (text, row) => (
+        <span>
+          {row.peakCorrect} Trials - &nbsp;
+          {Number.isNaN((row.peakCorrect * 100) / getTotal(row))
+            ? 0
+            : Math.round((row.peakCorrect * 100) / getTotal(row))}
+          %
+        </span>
+      ),
+    },
+    {
+      title: 'Peak Incorrect',
+      dataIndex: 'errorCount',
+      render: (text, row) => (
+        <span>
+          {row.peakError} Trials - &nbsp;
+          {Number.isNaN((row.peakError * 100) / getTotal(row))
+            ? 0
+            : Math.round((row.peakError * 100) / getTotal(row))}
+          %
+        </span>
+      ),
+    },
+    {
+      title: 'Peak Prompt',
+      dataIndex: 'promptCount',
+      render: (text, row) => (
+        <span>
+          {row.peakPrompt} Trials - &nbsp;
+          {Number.isNaN((row.peakPrompt * 100) / getTotal(row))
+            ? 0
+            : Math.round((row.peakPrompt * 100) / getTotal(row))}
+          %
+        </span>
+      ),
+    },
+    {
+      title: 'Peak Equ Correct',
+      dataIndex: 'correctCount',
+      render: (text, row) => (
+        <span>
+          {row.peakEquCorrect} Trials - &nbsp;
+          {Number.isNaN((row.peakEquCorrect * 100) / getTotal(row))
+            ? 0
+            : Math.round((row.peakEquCorrect * 100) / getTotal(row))}
+          %
+        </span>
+      ),
+    },
+    {
+      title: 'Peak Equ Incorrect',
+      dataIndex: 'errorCount',
+      render: (text, row) => (
+        <span>
+          {row.peakEquError} Trials - &nbsp;
+          {Number.isNaN((row.peakEquError * 100) / getTotal(row))
+            ? 0
+            : Math.round((row.peakEquError * 100) / getTotal(row))}
+          %
+        </span>
+      ),
+    },
+    {
+      title: 'Peak Equ Prompt',
+      dataIndex: 'promptCount',
+      render: (text, row) => (
+        <span>
+          {row.peakEquPrompt} Trials - &nbsp;
+          {Number.isNaN((row.peakEquPrompt * 100) / getTotal(row))
+            ? 0
+            : Math.round((row.peakEquPrompt * 100) / getTotal(row))}
+          %
+        </span>
+      ),
+    },
+    {
+      title: 'Behavior count',
+      dataIndex: 'behaviour',
+    },
+    {
+      title: 'Mand Count',
+      dataIndex: 'mand',
+    },
+    {
+      title: 'Toilet Count',
+      dataIndex: 'toilet',
+      render: (text, row) => <span>{row.toilet}</span>,
+      align: 'center',
+      width: '80px',
+    },
+    {
+      title: 'Actions',
+      render: (text, row) => (
+        <span>
+          <Button
+            type="link"
+            onClick={() => generateGraphData(row)}
+            loading={freDisLoading && selectSession.id === row.id}
+          >
+            <LineChartOutlined style={{ fontSize: 30, color: 'rgb(229, 132, 37)' }} />
+          </Button>
+        </span>
+      ),
+    },
+  ]
+
   const menu = (
     <Menu>
-      {/* <Menu.Item key="0">
-        <Button onClick={() => exportPDF()} type="link" size="small">
-          PDF
-        </Button>
-      </Menu.Item> */}
       <Menu.Item key="1">
         <Button onClick={() => exportToCSV()} type="link" size="small">
           CSV/Excel
@@ -409,191 +525,129 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
 
   return (
     <div>
+      <div style={filterCardStyle}>
+        <div style={parentDiv}>
+          <span style={parentLabel}>Date :</span>
+          <RangePicker
+            style={{
+              marginLeft: 'auto',
+              width: 250,
+            }}
+            size="default"
+            value={range}
+            onChange={v => setRange(v)}
+          />
+        </div>
+        <div style={parentDiv}>
+          <span style={parentLabel}>Session:</span>
+          <Radio.Group
+            size="small"
+            value={session}
+            onChange={v => setSession(v.target.value)}
+            style={{ margin: 'auto 0' }}
+            buttonStyle="solid"
+          >
+            <Radio.Button value="All">All</Radio.Button>
+            <Radio.Button value="Morning">Morning</Radio.Button>
+            <Radio.Button value="Afternoon">Afternoon</Radio.Button>
+            <Radio.Button value="Evening">Evening</Radio.Button>
+            <Radio.Button value="Default">Default</Radio.Button>
+          </Radio.Group>
+        </div>
+
+        <div style={{ marginLeft: 'auto' }}>
+          <Dropdown overlay={menu} trigger={['hover']}>
+            <Button type="link" size="large" style={{ padding: '0 8px' }}>
+              <FaDownload fontSize={22} />{' '}
+            </Button>
+          </Dropdown>
+        </div>
+      </div>
+      <div style={{ margin: '4px 0 8px 8px' }} className="session-table">
+        <Table
+          columns={columns}
+          dataSource={tableData}
+          loading={loading}
+          bordered
+          scroll={{ x: 1860 }}
+          pagination={{
+            defaultPageSize: 10,
+            showSizeChanger: true,
+            pageSizeOptions: ['10', '20', '30', '50'],
+            position: 'top',
+          }}
+        />
+      </div>
+
       <Drawer
         visible={lineDrawer}
         onClose={() => setLineDrawer(false)}
         width={900}
-        title="Session Graph"
+        title={`${currentRow?.sessionDate}: ${currentRow?.sessions.sessionName.name} Session - Response Percentage  Graph`}
       >
-        {selectSession && freDisData && (
-          <div style={{ height: 300, marginBottom: 30 }}>
-
-            <ResponsiveBar
-              data={barGraphData}
-              keys={['Percentage Correct', 'Percentage Incorrect', 'Percentage Prompt']}
-              indexBy="domain"
-              groupMode="grouped"
-              margin={{ top: 50, right: 20, bottom: 20, left: 60 }}
-              padding={0.15}
-              colors={{ scheme: 'paired' }}
-              defs={[
-                {
-                  id: 'dots',
-                  type: 'patternDots',
-                  background: 'inherit',
-                  color: '#38bcb2',
-                  size: 4,
-                  padding: 1,
-                  stagger: true,
-                },
-                {
-                  id: 'lines',
-                  type: 'patternLines',
-                  background: 'inherit',
-                  color: '#eed312',
-                  rotation: -45,
-                  lineWidth: 6,
-                  spacing: 10,
-                },
-              ]}
-              fill={[
-                {
-                  match: {
-                    id: 'fries',
+        <div style={{ height: 480, marginBottom: 0 }}>
+          <ResponsivePie
+            data={barGraphData}
+            margin={{ top: 40, right: 100, bottom: 80, left: 20 }}
+            innerRadius={0.5}
+            padAngle={0.9}
+            cornerRadius={3}
+            colors={{ scheme: 'nivo' }}
+            borderWidth={1}
+            borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
+            radialLabelsSkipAngle={3}
+            radialLabelsTextColor="#333333"
+            radialLabelsLinkColor={{ from: 'color' }}
+            sliceLabelsSkipAngle={2}
+            sliceLabelsTextColor="#333333"
+            defs={[
+              {
+                id: 'dots',
+                type: 'patternDots',
+                background: 'inherit',
+                color: 'rgba(255, 255, 255, 0.3)',
+                size: 4,
+                padding: 1,
+                stagger: true,
+              },
+              {
+                id: 'lines',
+                type: 'patternLines',
+                background: 'inherit',
+                color: 'rgba(255, 255, 255, 0.3)',
+                rotation: -45,
+                lineWidth: 6,
+                spacing: 10,
+              },
+            ]}
+            legends={[
+              {
+                anchor: 'right',
+                direction: 'column',
+                justify: false,
+                translateX: 70,
+                translateY: 56,
+                itemsSpacing: 7,
+                itemWidth: 100,
+                itemHeight: 18,
+                itemTextColor: '#999',
+                itemDirection: 'left-to-right',
+                itemOpacity: 1,
+                symbolSize: 18,
+                symbolShape: 'circle',
+                effects: [
+                  {
+                    on: 'hover',
+                    style: {
+                      itemTextColor: '#000',
+                    },
                   },
-                  id: 'dots',
-                },
-                {
-                  match: {
-                    id: 'sandwich',
-                  },
-                  id: 'lines',
-                },
-              ]}
-              borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
-              axisTop={null}
-              axisRight={null}
-              axisBottom={{
-                tickSize: 5,
-                tickPadding: 5,
-                tickRotation: 0,
-                legend: '',
-                legendPosition: 'middle',
-                legendOffset: 32,
-              }}
-              axisLeft={{
-                tickSize: 5,
-                tickPadding: 5,
-                tickRotation: 0,
-                legend: 'Percentage',
-                legendPosition: 'middle',
-                legendOffset: -40,
-              }}
-              labelSkipWidth={12}
-              labelSkipHeight={12}
-              labelTextColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
-              // legends={[
-              //   {
-              //     dataFrom: 'keys',
-              //     anchor: 'bottom-right',
-              //     direction: 'column',
-              //     justify: false,
-              //     translateX: 120,
-              //     translateY: 0,
-              //     itemsSpacing: 2,
-              //     itemWidth: 100,
-              //     itemHeight: 20,
-              //     itemDirection: 'left-to-right',
-              //     itemOpacity: 0.85,
-              //     symbolSize: 20,
-              //     effects: [
-              //       {
-              //         on: 'hover',
-              //         style: {
-              //           itemOpacity: 1,
-              //         },
-              //       },
-              //     ],
-              //   },
-              // ]}
-              animate="true"
-              motionStiffness={90}
-              motionDamping={15}
-            />
-          </div>
-        )}
+                ],
+              },
+            ]}
+          />
+        </div>
       </Drawer>
-
-      <Row gutter={[46, 0]}>
-        <Col span={24}>
-          <Row>
-            <Col span={26}>
-              <div style={filterCardStyle}>
-
-                <Row>
-                  <Col span={1} style={antcol1}>
-                    <span style={{ fontSize: '15px', color: '#000' }}>Date :</span>
-                  </Col>
-                  <Col span={4} style={{ width: 265 }}>
-                    <RangePicker
-                      style={{
-                        marginLeft: 'auto',
-                        width: 250,
-                      }}
-                      size="default"
-                      value={range}
-                      onChange={v => setRange(v)}
-                    />
-                  </Col>
-                  <Col span={1} style={antcol1}>
-                    <span style={{ fontSize: '15px', color: '#000' }}>Session:</span>
-                  </Col>
-                  <Col span={4} style={{ marginRight: 10 }}>
-                    <Select
-                      size="default"
-                      style={{
-                        width: 180,
-                        borderRadius: 4,
-                      }}
-                      placeholder="Filter by session"
-                      value={session}
-                      onChange={v => setSession(v)}
-                    >
-                      <Option key="1" value="Morning">
-                        Morning
-                        </Option>
-                      <Option key="2" value="Afternoon">
-                        Afternoon
-                        </Option>
-                      <Option key="3" value="Evining">
-                        Evening
-                        </Option>
-                    </Select>
-                  </Col>
-                  <Col span={1}>
-                    <Dropdown overlay={menu} trigger={['click']}>
-                      <Button style={{ marginRight: '10px' }} type="link" size="large">
-                        <CloudDownloadOutlined />{' '}
-                      </Button>
-                    </Dropdown>
-                  </Col>
-                </Row>
-
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={24}>
-              <div style={parentCardStyle}>
-                <div style={tableCardStyle}>
-                  <DataTable
-                    columns={columns}
-                    loading={loading}
-                    theme="default"
-                    dense="true"
-                    pagination="true"
-                    data={tableData}
-                    customStyles={customStyles}
-                    noHeader="true"
-                    width="100px"
-                    paginationRowsPerPageOptions={[10, 50, 100, 200, 500, 1000]}
-                  />
-                </div>
-              </div>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
     </div>
   )
 })

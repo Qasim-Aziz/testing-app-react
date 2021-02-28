@@ -479,18 +479,16 @@ class EESAGroups extends Component {
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                marginTop: 10,
-                marginBottom: 10,
-                borderTop: '1px solid #DDD',
-                paddingLeft: 20,
-                paddingRight: 20,
-                paddingTop: 20,
-                paddingBottom: 10,
+                marginTop: 5,
+                marginBottom: 5,
+                border: '1px solid #DDD',
+                padding: '5px 20px',
+                backgroundColor: 'white'
               }}
             >
-              <p style={{ fontSize: 18, color: '#777', flex: 1 }}>
+              <Text style={{ fontSize: 18, color: '#000' }}>
                 {ReactHtmlParser(questionss[x].text)}
-              </p>
+              </Text>
               {options}
             </div>,
           )
@@ -600,16 +598,17 @@ class EESAGroups extends Component {
               <Col sm={19}>
                 <div style={rightDivStyle}>
                   <PageHeader pageTitle="VB-MAPP Eesa Assessment" />
-                  <div
-                    style={{...defaultDivStyle, marginBottom: 10}}
+                  <h5
+                    style={{ paddingLeft: 20, paddingRight: 20, textAlign: 'right', display: 'flex' }}
                   >
-                    <h5
-                      style={{ paddingLeft: 20, paddingRight: 20, textAlign: 'right', display: 'flex' }}
-                    >
-                      Score: {totalScore}
-                    </h5>
+                    Score: {totalScore}
+                  </h5>
+                  <div
+                    style={{ ...defaultDivStyle, marginBottom: 10, padding: 15, backgroundColor: '#f9f9f9' }}
+                  >
+
                     {loadingQuestion && <p>Loading Question...</p>}
-                    <Scrollbars style={{ height: 'calc(100vh - 250px)' }}>
+                    <Scrollbars style={{ height: 'calc(100vh - 200px)' }}>
                       {loadingQuestion === false && questions.length > 0 && questions}
                     </Scrollbars>
                   </div>

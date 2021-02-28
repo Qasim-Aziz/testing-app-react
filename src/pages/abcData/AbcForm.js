@@ -195,6 +195,15 @@ const ABCForm = ({ style, form, refetchAbc }) => {
     })
   }
 
+  // set default form values
+  useEffect(() => {
+    form.setFieldsValue({
+      environment: environmentData?.getEnvironment[1].id,
+      intensity: 'Moderate',
+      response: 'Improv',
+    })
+  }, [environmentData])
+
   useEffect(() => {
     if (data) {
       notification.success({

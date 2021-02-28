@@ -1,0 +1,396 @@
+.vbmappReport {
+  .vbmappReportTabs {
+    margin: 10px;
+    border: 1px solid #dfdfdf;
+
+    .ant-tabs-tabpane {
+      padding: 5px;
+    }
+
+    .studentAndScoreDetails {
+      table {
+        min-width: 320px;
+        max-width: 400px;
+        margin: 0 auto;
+
+        td,
+        th {
+          padding: 5px;
+        }
+
+        th {
+          font-weight: bold;
+        }
+
+        .colorBlock {
+          height: 100%;
+          width: 100%;
+          display: block;
+          padding: 10px;
+        }
+      }
+    }
+
+    .milestoneTab {
+      .studentAndScoreDetails {
+        td,
+        th {
+          border: 2px solid #7d3bff;
+        }
+
+        th {
+          background-color: rgba(219, 201, 254, 0.85);
+        }
+      }
+
+      .milestoneChart {
+        display: flex;
+        margin: 20px;
+
+        .scaleAxis {
+          .axisLabel {
+            height: 100%;
+            width: 100%;
+            display: block;
+            padding: 10px;
+            font-weight: bold;
+            border: 1px solid transparent;
+            text-align: center;
+          }
+        }
+
+        .milestoneLevels {
+          .levelBlock {
+            border: 1px solid transparent;
+            margin-top: 47px;
+            height: 205px;
+          }
+
+          .levelText {
+            transform: rotate(270deg);
+            margin-top: 90px;
+            font-weight: bold;
+            font-size: 1.2rem;
+
+            &.level1 {
+              color: #fa9349;
+            }
+
+            &.level2 {
+              color: #4fc547;
+            }
+
+            &.level3 {
+              color: #31a8ec;
+            }
+          }
+        }
+
+        .milestoneDots {
+          .dot {
+            display: inline;
+            font-size: 1.2rem;
+            margin: 3px;
+          }
+        }
+
+        .milestoneItem {
+          min-width: 60px;
+          text-align: center;
+          margin-right: 10px;
+
+          .groupTitle {
+            font-weight: bold;
+            margin: 10px 0;
+            padding: 3px;
+          }
+
+          .level1 {
+            .groupTitle {
+              background-color: #ffd7ba;
+              border: 1px solid #fa9349;
+            }
+          }
+
+          .level2 {
+            .groupTitle {
+              background-color: #c9e7c7;
+              border: 1px solid #4fc547;
+            }
+          }
+
+          .level3 {
+            .groupTitle {
+              background-color: #aecfe2;
+              border: 1px solid #31a8ec;
+            }
+          }
+
+          .question {
+            height: 100%;
+            width: 100%;
+            display: block;
+            padding: 10px;
+            font-weight: bold;
+            border: 1px solid rgba(16, 17, 16, 0.3);
+          }
+        }
+      }
+    }
+
+    .barrierTab {
+      .studentAndScoreDetails {
+        td,
+        th {
+          border: 2px solid #eeb30c;
+        }
+
+        th {
+          background-color: rgba(254, 225, 201, 0.85);
+        }
+      }
+
+      .barriersChart {
+        display: flex;
+        margin: 20px;
+        flex-flow: wrap;
+
+        .barrierQuestion {
+          margin: 10px;
+
+          .queTitle {
+            padding: 5px;
+            border: 1px solid #000;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            background: rgb(246, 191, 145);
+            margin: 10px 0 10px 25px;
+            height: 52px;
+            width: 180px;
+            word-break: break-word;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .scoreGroup {
+            display: flex;
+          }
+
+          .score {
+            border: 1px solid rgba(16, 17, 16, 0.1);
+            width: 45px;
+            height: 32px;
+          }
+
+          .axisLine {
+            display: flex;
+            flex-direction: column;
+
+            .axisText {
+              width: 25px;
+              height: 32px;
+              text-align: center;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding-top: 5px;
+              font-weight: bold;
+            }
+          }
+
+          .bottomAxisLine {
+            display: flex;
+            flex-direction: row;
+            margin-left: 25px;
+
+            .axisText {
+              width: 45px;
+              height: 32px;
+              text-align: center;
+              font-weight: bold;
+              padding-top: 5px;
+            }
+          }
+        }
+      }
+    }
+
+    .taskTab {
+      .studentAndScoreDetails {
+        td,
+        th {
+          border: 2px solid #eeb30c;
+        }
+
+        th {
+          background-color: rgba(254, 225, 201, 0.85);
+        }
+      }
+
+      .taskChart {
+        display: flex;
+        margin: 20px;
+
+        .taskItem {
+          min-width: 60px;
+          text-align: center;
+          margin-right: 10px;
+
+          .groupTitle {
+            font-weight: bold;
+            margin: 10px 0;
+            padding: 3px;
+            background-color: #ffd7ba;
+            border: 1px solid #fa9349;
+          }
+
+          .question {
+            height: 100%;
+            width: 100%;
+            display: block;
+            font-weight: bold;
+          }
+
+          .queNo {
+            padding: 4px;
+            margin-top: 8px;
+            font-weight: bold;
+            border: 1px solid rgba(16, 17, 16, 0.1);
+          }
+
+          .selectedCode {
+            padding: 4px;
+            border: 1px solid rgba(16, 17, 16, 0.1);
+            font-weight: normal;
+          }
+
+          .notSelectedCode {
+            padding: 4px;
+            font-weight: normal;
+          }
+
+          .blankCode {
+            padding: 5px;
+          }
+
+          .level1 {
+            .notSelectedCode {
+              background-color: #ffd7ba;
+              border: 1px solid #fa9349;
+            }
+
+            .groupTitle {
+              background-color: #ffd7ba;
+              border: 1px solid #fa9349;
+            }
+          }
+
+          .level2 {
+            .notSelectedCode {
+              background-color: #c9e7c7;
+              border: 1px solid #4fc547;
+            }
+
+            .groupTitle {
+              background-color: #c9e7c7;
+              border: 1px solid #4fc547;
+            }
+          }
+
+          .level3 {
+            .notSelectedCode {
+              background-color: #aecfe2;
+              border: 1px solid #31a8ec;
+            }
+
+            .groupTitle {
+              background-color: #aecfe2;
+              border: 1px solid #31a8ec;
+            }
+          }
+        }
+      }
+    }
+
+    .transitionTab {
+      .studentAndScoreDetails {
+        td,
+        th {
+          border: 2px solid #33980a;
+        }
+
+        th {
+          background-color: rgba(176, 226, 180, 0.85);
+        }
+      }
+
+      .transitionChart {
+        display: flex;
+        margin: 20px;
+        flex-flow: wrap;
+
+        .transitionQuestion {
+          margin: 10px;
+
+          .queTitle {
+            padding: 5px;
+            border: 1px solid #000;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            background: rgb(176, 226, 180);
+            margin: 10px 0 10px 25px;
+            height: 52px;
+            width: 180px;
+            word-break: break-word;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .scoreGroup {
+            display: flex;
+          }
+
+          .score {
+            border: 1px solid rgba(16, 17, 16, 0.1);
+            width: 45px;
+            height: 32px;
+          }
+
+          .axisLine {
+            display: flex;
+            flex-direction: column;
+
+            .axisText {
+              width: 25px;
+              height: 32px;
+              text-align: center;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              padding-top: 5px;
+              font-weight: bold;
+            }
+          }
+
+          .bottomAxisLine {
+            display: flex;
+            flex-direction: row;
+            margin-left: 25px;
+
+            .axisText {
+              width: 45px;
+              height: 32px;
+              text-align: center;
+              font-weight: bold;
+              padding-top: 5px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

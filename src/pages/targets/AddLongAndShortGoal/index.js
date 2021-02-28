@@ -46,12 +46,12 @@ const AddLongAndShortGoalForm = props => {
 
   const resetForm = () => {
     form.setFieldsValue({
-      endDate: null,
-      dateIntiated: null,
+      endDate: moment().add(3, 'M'),
+      dateIntiated: moment(),
       description: null,
       goalName: null,
-      goalStatus: null,
-      responsible: null,
+      goalStatus: goalStatusList[0].id,
+      responsible: goalResponsibilityList[1].id,
     })
   }
   const [goalLoading, setGoalLoadig] = useState(false)
@@ -85,7 +85,7 @@ const AddLongAndShortGoalForm = props => {
             message: 'Long Term Created Successfully',
           })
           onSuccess(createLongTermGoalResp, type)
-          form.resetFields();
+          form.resetFields()
         }
       } else if (type === 'long-edit') {
         const updateLongTermGoalResp = await updateLongTermGoal(
@@ -105,7 +105,7 @@ const AddLongAndShortGoalForm = props => {
             message: 'Long Term Updated Successfully',
           })
           onSuccess(updateLongTermGoalResp, type)
-          form.resetFields();
+          form.resetFields()
         }
       } else if (type === 'short') {
         const createShortTermGoalResp = await createShortTermGoal(
@@ -124,7 +124,7 @@ const AddLongAndShortGoalForm = props => {
             message: 'Short Term Created Successfully',
           })
           onSuccess(createShortTermGoalResp, type)
-          form.resetFields();
+          form.resetFields()
         }
       } else if (type === 'short-edit') {
         const updateShortTermGoalResp = await updateShortTermGoal(
@@ -144,7 +144,7 @@ const AddLongAndShortGoalForm = props => {
             message: 'Short Term Updated Successfully',
           })
           onSuccess(updateShortTermGoalResp, type)
-          form.resetFields();
+          form.resetFields()
         }
       }
     }
@@ -152,9 +152,19 @@ const AddLongAndShortGoalForm = props => {
 
   const formRef = useRef(null)
 
+  const formItemLayout = {
+    labelCol: {
+      span: 5,
+    },
+    wrapperCol: {
+      span: 17,
+      offset: 1,
+    },
+  }
+
   return (
     <div className={style.form}>
-      <Form ref={formRef} name="basic">
+      <Form ref={formRef} name="basic" {...formItemLayout} layout="horizontal">
         <Form.Item
           label="Goal Name"
           name="goalName"
@@ -221,11 +231,7 @@ const AddLongAndShortGoalForm = props => {
           {form.getFieldDecorator('endDate', {
             rules: [{ required: true, message: 'Please Select end date!' }],
           })(
-            <DatePicker
-              className={style.datepicker}
-              format="YYYY-MM-DD"
-              placeholder="End Date"
-            />,
+            <DatePicker className={style.datepicker} format="YYYY-MM-DD" placeholder="End Date" />,
           )}
         </Form.Item>
 
@@ -280,7 +286,13 @@ const AddLongAndShortGoalForm = props => {
         </Form.Item>
 
         <Form.Item>
-          <Button onClick={addGoal} loading={goalLoading} className={style.searchBtn} type="primary" htmlType="submit">
+          <Button
+            onClick={addGoal}
+            loading={goalLoading}
+            className={style.searchBtn}
+            type="primary"
+            htmlType="submit"
+          >
             {type.includes('edit') ? 'Update' : 'Add'}
           </Button>
         </Form.Item>

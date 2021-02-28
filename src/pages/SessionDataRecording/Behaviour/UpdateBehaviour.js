@@ -8,7 +8,7 @@ import { MinusOutlined, PlusOutlined } from '@ant-design/icons'
 import gql from 'graphql-tag'
 import { useMutation } from 'react-apollo'
 import Timer from 'react-compound-timer/build'
-import moment from 'moment'
+import { useSelector } from 'react-redux'
 
 const { Text } = Typography
 const { Option } = Select
@@ -43,8 +43,8 @@ const useStyles = createUseStyles(() => ({
 }))
 
 const RECORD_DATA = gql`
-  mutation createDecel($templateId: ID!) {
-    createDecel(input: { template: $templateId }) {
+  mutation createDecel($templateId: ID!, $session: ID!) {
+    createDecel(input: { template: $templateId, session: $session }) {
       details {
         id
         date
@@ -143,16 +143,19 @@ const CreateFrom = ({
   form,
   setNewRecord,
   setSelectTamplate,
-  setNewRecordDrawer,
   setUpdateBehavior,
 }) => {
   const classes = useStyles()
   const [frequency, setFrequency] = useState(0)
   const [irt, setIrt] = useState(0)
   const timerRef = useRef()
+  const sessionId = useSelector(state => state.sessionrecording.ChildSession.id)
 
   const [createRecord, { data, loading, error }] = useMutation(RECORD_DATA, {
     fetchPolicy: 'no-cache',
+    variables: {
+      session: sessionId,
+    },
   })
 
   const [
@@ -169,13 +172,13 @@ const CreateFrom = ({
     if (updateRecordData) {
       const newData = updateRecordData.updateDecel.details
       newData.template.id = selectTamplate
-      setNewRecordDrawer(false)
       setSelectTamplate(null)
       setUpdateBehavior(newData)
     }
   }, [updateRecordData])
 
   useEffect(() => {
+    console.log('im in useeffect')
     createRecord({
       variables: {
         templateId: selectTamplate,
@@ -257,7 +260,7 @@ const CreateFrom = ({
               textAlign: 'center',
             }}
           >
-            <Timer id={selectTamplate} ref={timerRef}>
+            {/* <Timer id={selectTamplate} ref={timerRef}>
               {() => {
                 return (
                   <span>
@@ -266,34 +269,52 @@ const CreateFrom = ({
                   </span>
                 )
               }}
+            </Timer> */}
+            <Timer id={selectTamplate} ref={timerRef} startImmediately={false}>
+              {({ start, resume, pause, stop }) => (
+                <div className="timer">
+                  <div style={{ marginBottom: '20px' }}>
+                    <span className="timeText">
+                      <Timer.Minutes />
+                    </span>
+                    <span className="labelText">min&nbsp;:&nbsp;</span>
+                    <span className="timeText">
+                      <Timer.Seconds />
+                    </span>
+                    <span className="labelText"> sec</span>
+                  </div>
+                  <div>
+                    <Button icon="play-circle" onClick={start}>
+                      Start
+                    </Button>
+                    <Button icon="pause-circle" onClick={pause} style={{ marginLeft: '20px' }}>
+                      Pause
+                    </Button>
+                  </div>
+                </div>
+              )}
             </Timer>
           </span>
           <div className={classes.horizontalView}>
-            <Text className={classes.text}>Titile</Text>
+            <Text className={classes.text} style={{ fontWeight: 'bold' }}>
+              Titile:
+            </Text>
             <Text className={classes.text}>
               {data.createDecel.details.template.behavior.behaviorName}
             </Text>
           </div>
           <div className={classes.horizontalView}>
-            <Text className={classes.text}>Status</Text>
+            <Text className={classes.text} style={{ fontWeight: 'bold' }}>
+              Status:
+            </Text>
             <Text className={classes.text}>
               {data.createDecel.details.template.status.statusName}
             </Text>
           </div>
           <div className={classes.horizontalView}>
-            <Text className={classes.text}>Date</Text>
-            <Text className={classes.text} style={{ maxWidth: '60%', lineBreak: 'anywhere' }}>
-              {moment().format('YYYY-MM-DD')}
+            <Text className={classes.text} style={{ fontWeight: 'bold' }}>
+              Environments:
             </Text>
-          </div>
-          <div className={classes.horizontalView}>
-            <Text className={classes.text}>Time</Text>
-            <Text className={classes.text} style={{ maxWidth: '60%', lineBreak: 'anywhere' }}>
-              {moment().format('HH:mm a')}
-            </Text>
-          </div>
-          <div className={classes.horizontalView}>
-            <Text className={classes.text}>Environments</Text>
             <Text className={classes.text} style={{ maxWidth: '60%', lineBreak: 'anywhere' }}>
               <Form.Item>
                 {form.getFieldDecorator('env', {
@@ -322,8 +343,10 @@ const CreateFrom = ({
               switch (node.measuringType) {
                 case 'Intensity':
                   return (
-                    <div className={classes.horizontalView}>
-                      <Text className={classes.text}>Intensity</Text>
+                    <div className={classes.horizontalView} key={node.id}>
+                      <Text className={classes.text} style={{ fontWeight: 'bold' }}>
+                        Intensity:
+                      </Text>
                       <Form.Item>
                         {form.getFieldDecorator('intensity', {
                           rules: [
@@ -361,8 +384,11 @@ const CreateFrom = ({
                         alignItems: 'center',
                         fontSize: 16,
                       }}
+                      key={node.id}
                     >
-                      <Text className={classes.text}>IRT</Text>
+                      <Text className={classes.text} style={{ fontWeight: 'bold' }}>
+                        IRT:
+                      </Text>
                       <Button
                         style={{
                           marginLeft: 'auto',
@@ -398,8 +424,11 @@ const CreateFrom = ({
                         alignItems: 'center',
                         fontSize: 16,
                       }}
+                      key={node.id}
                     >
-                      <Text className={classes.text}>Frequency</Text>
+                      <Text className={classes.text} style={{ fontWeight: 'bold' }}>
+                        Frequency:
+                      </Text>
                       <Button
                         style={{
                           marginLeft: 'auto',
@@ -440,7 +469,19 @@ const CreateFrom = ({
             className={classes.submitButton}
             loading={updateRecordLoading}
           >
-            Submit
+            Click for Submit
+          </Button>
+
+          <Button
+            type="primary"
+            className={classes.submitButton}
+            style={{
+              background: 'red',
+              color: '#fff',
+            }}
+            onClick={() => setSelectTamplate(null)}
+          >
+            Cancel
           </Button>
         </>
       )}

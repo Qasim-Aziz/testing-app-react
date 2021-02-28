@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet'
 import Authorize from 'components/LayoutComponents/Authorize'
 import { Row, Col, Layout, Typography } from 'antd'
+import Scrollbars from 'react-custom-scrollbars'
 import moment from 'moment'
 import { useQuery } from 'react-apollo'
 import gql from 'graphql-tag'
@@ -74,34 +75,52 @@ export default () => {
       <Layout style={{ padding: '0px' }}>
         <Content
           style={{
-            padding: '0px 20px',
             maxWidth: 1300,
             width: '100%',
             margin: '0px auto',
           }}
         >
-          {studnetInfo && (
-            <Title
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div
               style={{
-                marginBottom: 30,
-                fontSize: 25,
+                width: '44%',
               }}
             >
-              {studnetInfo.student && studnetInfo.student.firstname}&apos;s Toilet Data
-            </Title>
-          )}
-          <Row gutter={[46, 0]}>
-            <Col span={14}>
-              <div
+              <Title
                 style={{
-                  marginTop: 41,
+                  marginTop: '15px',
+                  marginLeft: '15px',
+                  fontSize: '30px',
                 }}
               >
-                <div
-                  style={{
-                    marginTop: 17,
+                Record Toilet Data
+              </Title>
+              <div
+                style={{
+                  background: '#F9F9F9',
+                  borderRadius: 10,
+                  padding: '18px 24px',
+                  width: '100%',
+                }}
+              >
+                <ToiletForm
+                  handleNewToiletDate={newDate => {
+                    setNewToiletDate(newDate)
                   }}
-                >
+                  selectDate={date}
+                  setNewToiletCreated={setNewToiletDataCreated}
+                />
+              </div>
+            </div>
+
+            <div
+              style={{
+                marginTop: '20px',
+                width: '54%',
+              }}
+            >
+              <Scrollbars autoHide>
+                <div>
                   {loading ? (
                     'Loading...'
                   ) : (
@@ -124,35 +143,9 @@ export default () => {
                     </>
                   )}
                 </div>
-              </div>
-            </Col>
-            <Col span={10}>
-              <Title
-                style={{
-                  marginLeft: '30px',
-                  fontSize: '30px',
-                  lineHeight: '41px',
-                }}
-              >
-                Record Toilet Data
-              </Title>
-              <div
-                style={{
-                  background: '#F9F9F9',
-                  borderRadius: 10,
-                  padding: '30px',
-                }}
-              >
-                <ToiletForm
-                  handleNewToiletDate={newDate => {
-                    setNewToiletDate(newDate)
-                  }}
-                  selectDate={date}
-                  setNewToiletCreated={setNewToiletDataCreated}
-                />
-              </div>
-            </Col>
-          </Row>
+              </Scrollbars>
+            </div>
+          </div>
         </Content>
       </Layout>
     </Authorize>

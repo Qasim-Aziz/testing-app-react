@@ -3,7 +3,10 @@
 /* eslint-disable no-shadow */
 /* eslint-disable array-callback-return */
 /* eslint-disable react/jsx-boolean-value */
-import React, { useState, useEffect } from 'react'
+/* eslint-disable prefer-destructuring */
+/* eslint-disable no-nested-ternary */
+/* eslint-disable no-plusplus */
+import React, { useState, useEffect, useRef } from 'react'
 import {
   Input,
   Menu,
@@ -14,25 +17,30 @@ import {
   Button,
   Drawer,
   Form,
+  Radio,
   Select,
+  Badge,
   DatePicker,
   notification,
-  Tooltip,
   Dropdown,
-  Icon,
 } from 'antd'
-import { useQuery } from 'react-apollo'
-import { useSelector } from 'react-redux'
-import filterIcon from 'icons/filter.png'
-import { ResponsiveLine } from '@nivo/line'
+import { useQuery, useLazyQuery } from 'react-apollo'
 import groupObj from '@hunters/group-object'
+import { FaDownload } from 'react-icons/fa'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUser } from '@fortawesome/free-solid-svg-icons'
-import { LineChartOutlined, FilterOutlined, CloudDownloadOutlined } from '@ant-design/icons'
+import { LineChartOutlined } from '@ant-design/icons'
 import moment from 'moment'
-import { RESPONSE_RATE, RESPONSE_RATE_FILTER_OPT } from './query'
+import LoadingComponent from 'components/VBMappReport/LoadingComponent'
+import { ResponseRateEqui } from './dailyResponseRateEqui'
+import ResponseRateGraph from './dailyResponseRateGraph'
+import {
+  RESPONSE_RATE,
+  RESPONSE_RATE_EQUI,
+  RESPONSE_RATE_FILTER_OPT,
+  PEAK_BLOCKWISE,
+  PEAK_EQUIVALENCE,
+} from './query'
 import './form.scss'
 import './table.scss'
 
@@ -40,157 +48,77 @@ const { Option } = Select
 const { RangePicker } = DatePicker
 const { Panel } = Collapse
 
-const pstyle = { marginBottom: 0 }
-
-const parentCardStyle = {
-  background: '#F9F9F9',
-  borderRadius: 10,
-  padding: '10px',
-  margin: '7px 10px 0 10px',
-  height: 500,
-  overflow: 'auto',
-}
-
 const filterCardStyle = {
   background: '#F1F1F1',
-  padding: 10,
+  display: 'flex',
+  flexWrap: 'wrap',
+  padding: '5px 10px',
   margin: 0,
-  height: 50,
+  height: 'fit-content',
   overflow: 'hidden',
   backgroundColor: 'rgb(241, 241, 241)',
 }
 
 const tableFilterCardStyle = {
-  borderRadius: 10,
-  padding: '10px',
-  margin: '0 0 -2px 10px',
-  height: 35,
+  ...filterCardStyle,
+  backgroundColor: '#FFFFFF',
   overflow: 'hidden',
 }
 
-const learnerFilterCardStyle = {
-  background: '#FFFFFF',
-  border: '1px solid #E4E9F0',
-  boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
-  borderRadius: 10,
-  padding: '9px',
-  margin: '0px 0px 9px 10px',
+const statusColor = {
+  'In-Therapy': 'blue',
+  Deleted: 'red',
+  'In-Maintenance': 'orange',
+  BaseLine: 'green',
 }
 
-const learnerCardStyle = {
-  background: '#FFFFFF',
-  height: 20,
-}
-
-const cardStyle = {
-  background: '#F9F9F9',
-  height: 500,
-  overflow: 'auto',
-}
-
-const filterDataCardStyle = {
-  height: 500,
-  overflow: 'auto',
-}
-
-const tableCardStyle = {
-  background: '#F9F9F9',
-  height: 400,
-  overflow: 'auto',
-}
-
-const antcol1 = {
-  display: 'block',
-  width: '6%',
-}
-
-const antcol2 = {
-  display: 'block',
-  width: '11%',
-}
-
-const antcol3 = {
-  display: 'block',
-  width: '36%',
-}
+const dateFormat = 'YYYY-MM-DD'
+const parentDiv = { display: 'flex', margin: '5px 20px 5px 0' }
+const parentLabel = { fontSize: '15px', color: '#000', margin: 'auto 8px auto' }
 
 export default Form.create()(({ studentName, showDrawerFilter }) => {
   const [selectTarget, setSelectTarget] = useState()
   const studentId = localStorage.getItem('studentId')
-  const [mydata, setMydata] = useState()
   const [dateRange, setDateRange] = useState([
-    moment(Date.now()).subtract(21, 'days'),
+    moment(Date.now()).subtract(11, 'days'),
     moment(Date.now()),
   ])
-  const [filterDrawer, setFilterDrawer] = useState(false)
   const [lineDrawer, setLineDrawer] = useState(false)
-  const [learnerFilterDrawer, setLearnerFilterDrawer] = useState(false)
-  const [columns, setColumns] = useState([])
-  const [selectedYear, setSelectedYear] = useState(moment(dateRange[0]).format('YYYY'))
-  const [selectedMonth, setSelectedMonth] = useState(moment(dateRange[0]).format('MMM'))
-  const [status, setStatus] = useState(['In-Therapy'])
+  const [status, setStatus] = useState()
   const [type, setType] = useState()
-  const [graphData, setGraphData] = useState([
-    {
-      id: 'DailyResponseRate',
-      color: 'hsl(335, 70%, 50%)',
-      data: [],
-    },
-  ])
+  const [graphData, setGraphData] = useState([])
+  const [tableData, setTableData] = useState([])
+  const [peakType, setpeakType] = useState('dir/gen')
+  const [peakEquiFilData, setPeakEquiFilData] = useState(null)
+  const downloadCsvRef = useRef()
 
-  const [graphKey, setGraphKey] = useState(Math.random())
-
-  const { data, error, loading } = useQuery(RESPONSE_RATE, {
-    variables: {
-      studentId,
-      startDate: moment(dateRange[0]).format('YYYY-MM-DD'),
-      endDate: moment(dateRange[1]).format('YYYY-MM-DD'),
-    },
-  })
-
-  const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
-  const fileExtension = '.xlsx'
-  const exportToCSV = () => {
-    const filename = '_daily_response_rate_excel'
-    const formattedData = keyObjects.map(function (e) {
-      return {}
-    })
-
-    const ws = XLSX.utils.json_to_sheet(formattedData)
-    const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
-    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
-    const excelData = new Blob([excelBuffer], { type: fileType })
-    FileSaver.saveAs(excelData, studentName + filename + fileExtension)
-  }
-
-  const menu = (
-    <Menu>
-      {/* <Menu.Item key="0">
-        <Button onClick={() => exportPDF()} type="link" size="small">
-          PDF
-        </Button>
-      </Menu.Item> */}
-      <Menu.Item key="1">
-        <Button onClick={() => exportToCSV()} type="link" size="small">
-          CSV/Excel
-        </Button>
-      </Menu.Item>
-    </Menu>
+  const { data: filterOptions, error: filterOptErr, loading: filterOptLoading } = useQuery(
+    RESPONSE_RATE_FILTER_OPT,
   )
 
+  const [getResponseRate, { data, error, loading }] = useLazyQuery(RESPONSE_RATE)
+  const [getPeakBlockData, { data: peakBlockData, loading: peakBlockLoading }] = useLazyQuery(
+    PEAK_BLOCKWISE,
+  )
+  const [
+    getResponseRateEqui,
+    { data: equiData, error: equiError, loading: equiLoading },
+  ] = useLazyQuery(RESPONSE_RATE_EQUI)
+
+  const [
+    getPeakEquiData,
+    { data: peakEqui, error: peakEquiError, loading: peakEquiLoading },
+  ] = useLazyQuery(PEAK_EQUIVALENCE)
   const start = dateRange[0]
   const end = dateRange[1]
 
   const days = []
-  const [keyObjects, setKeyObjects] = useState([])
   let day = start
-
   while (day <= end) {
     days.push(day.toDate())
     day = day.clone().add(1, 'd')
   }
-  const monthsList = []
-  const yearList = []
+
   const daysList = []
   days.map(dateStr => {
     daysList.push({
@@ -203,578 +131,750 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
       day: moment(dateStr).format('dddd'),
       year: moment(dateStr).format('YYYY'),
     })
-    if (monthsList.indexOf(moment(dateStr).format('MMM')) === -1) {
-      monthsList.push(moment(dateStr).format('MMM'))
-    }
-    if (yearList.indexOf(moment(dateStr).format('YYYY')) === -1) {
-      yearList.push(moment(dateStr).format('YYYY'))
-    }
   })
 
-  const onMonthClick = val => {
-    setSelectedMonth(val)
-    filterData()
+  useEffect(() => {
+    getResponseRate({
+      variables: {
+        startDate: dateRange[0].format(dateFormat),
+        endDate: dateRange[1].format(dateFormat),
+        studentId,
+      },
+    })
+    getPeakBlockData({
+      variables: {
+        start: dateRange[0].format(dateFormat),
+        end: dateRange[1].format(dateFormat),
+        student: studentId,
+        sessionName: '',
+      },
+    })
+    getResponseRateEqui({
+      variables: {
+        startDate: dateRange[0].format(dateFormat),
+        endDate: dateRange[1].format(dateFormat),
+        studentId,
+        equivalence: true,
+      },
+    })
+    getPeakEquiData({
+      variables: {
+        start: dateRange[0].format(dateFormat),
+        end: dateRange[1].format(dateFormat),
+        student: studentId,
+        sessionName: '',
+        equivalence: true,
+      },
+    })
+  }, [])
+
+  useEffect(() => {
+    setTableData([])
+    if (dateRange[0] && dateRange[1]) {
+      let start
+      let end
+      if (dateRange[0].format(dateFormat) < dateRange[1].format(dateFormat)) {
+        start = dateRange[0].format(dateFormat)
+        end = dateRange[1].format(dateFormat)
+      } else {
+        start = dateRange[1].format(dateFormat)
+        end = dateRange[0].format(dateFormat)
+      }
+      getResponseRate({
+        variables: {
+          startDate: start,
+          endDate: end,
+          studentId,
+        },
+      })
+      getPeakBlockData({
+        variables: {
+          start,
+          end,
+          student: studentId,
+          sessionName: '',
+        },
+      })
+      getResponseRateEqui({
+        variables: {
+          startDate: start,
+          endDate: end,
+          studentId,
+          equivalence: true,
+        },
+      })
+      getPeakEquiData({
+        variables: {
+          start,
+          end,
+          student: studentId,
+          sessionName: '',
+          equivalence: true,
+        },
+      })
+    }
+  }, [dateRange, studentId])
+
+  useEffect(() => {
+    if (peakEqui) {
+      let tempData = []
+      const tempClassId = []
+      peakEqui.peakBlockWiseReport.map(item => {
+        tempData.push({
+          date: item.date,
+          equBlocks: item.equBlocks,
+          targetName: item.target?.targetAllcatedDetails.targetName,
+          targetId: item.target?.targetAllcatedDetails.id,
+          peakType: item.target?.peakType,
+        })
+      })
+
+      tempData = tempData.filter(item => {
+        if (item.targetName === undefined || item.targetName === null || item.equBlocks === null) {
+          return false
+        }
+
+        if (item.equBlocks.length === 0) {
+          return true
+        }
+        for (let i = 0; i < tempClassId.length; i++) {
+          if (item.equBlocks[0].id === tempClassId[i]) {
+            return false
+          }
+        }
+
+        tempClassId.push(item.equBlocks[0].id)
+        return true
+      })
+
+      setPeakEquiFilData(tempData)
+    } else if (peakEquiError) {
+      notification.error({
+        message: 'Something went wrong',
+        description: 'Unable to fetch equivalence targets details',
+      })
+    }
+  }, [peakEqui, peakEquiError])
+
+  useEffect(() => {
+    if (data && peakBlockData) {
+      loadData(data.responseRate)
+    }
+    if (error) {
+      error.graphQLErrors.map(item => {
+        return notification.error({
+          message: 'Somthing went wrong',
+          description: item.message,
+        })
+      })
+    }
+  }, [data, peakBlockData, error])
+
+  useEffect(() => {
+    if (data) {
+      filterData()
+    }
+  }, [type, status])
+
+  const loadData = data => {
+    let tempPeakStimulus = []
+    const tempBlockId = []
+
+    peakBlockData.peakBlockWiseReport.map(item => {
+      tempPeakStimulus.push({
+        date: item.date,
+        blocks: item.blocks,
+        target: item.target?.targetAllcatedDetails.targetName,
+        peakType: item.target?.peakType,
+      })
+    })
+
+    tempPeakStimulus = tempPeakStimulus.filter(item => item.peakType !== 'EQUIVALENCE')
+    tempPeakStimulus = tempPeakStimulus.filter(item => {
+      if (item.blocks?.length > 0) {
+        const tempBlock = item.blocks[0].id
+        for (let i = 0; i < tempBlockId.length; i += 1) {
+          if (tempBlockId[i] === tempBlock) {
+            return false
+          }
+        }
+        tempBlockId.push(tempBlock)
+      }
+      return true
+    })
+
+    if (data) {
+      const tempData = []
+      if (data.length > 0) {
+        const groupedData = groupObj.group(data, 'targetName')
+        const peakGroup = groupObj.group(tempPeakStimulus, 'target')
+        const keys = Object.keys(groupedData)
+        keys.map((target, index) => {
+          if (groupedData[target].length > 0) {
+            tempData.push({
+              target,
+              key: target,
+              parent: true,
+              children: [],
+            })
+            const lastIdx = tempData.length - 1
+            groupedData[target]?.map(data => {
+              // console.log(data, 'data')
+              tempData[lastIdx] = {
+                ...tempData[lastIdx],
+                targetStatusName: data.targetStatusName,
+                targetType: data.targetType,
+
+                [`${data.sessionDate}`]:
+                  data.targetType === 'Peak' ? data.perPeakCorrect : data.perTar,
+              }
+              if (data.targetType === 'Peak') {
+                target = target.trim()
+                const childrenObj = []
+
+                for (let k = 0; k < peakGroup[target]?.length; k += 1) {
+                  if (peakGroup[target][k].date === data.sessionDate) {
+                    peakGroup[target][k].blocks?.map(blockItem => {
+                      blockItem.trial?.edges.map(trialObj => {
+                        let stimulusIdx = -1
+                        let stimulusExist = false
+                        for (let w = 0; w < childrenObj.length; w += 1) {
+                          if (childrenObj[w].sd === trialObj?.node.sd.sd) {
+                            stimulusExist = true
+                            stimulusIdx = w
+                          }
+                        }
+                        if (stimulusExist) {
+                          childrenObj[stimulusIdx].trialCount += 1
+                          childrenObj[stimulusIdx].marks += trialObj?.node.marks === 10 ? 1 : 0
+                        } else {
+                          childrenObj.push({
+                            key: trialObj?.node.id,
+                            sd: trialObj?.node.sd.sd,
+                            targetStatusName:
+                              trialObj?.node.sd.sdstepsmasterySet?.edges[0].node.status.statusName,
+                            trialCount: 1,
+                            marks: trialObj?.node.marks === 10 ? 1 : 0,
+                          })
+                        }
+                      })
+                    })
+                  }
+                }
+                childrenObj.map(cc => {
+                  let childIndex = -1
+                  let childExist = false
+                  for (let bb = 0; bb < tempData[lastIdx].children.length; bb += 1) {
+                    if (cc.sd === tempData[lastIdx].children[bb].target) {
+                      childExist = true
+                      childIndex = bb
+                    }
+                  }
+                  if (childExist) {
+                    tempData[lastIdx].children[childIndex] = {
+                      ...tempData[lastIdx].children[childIndex],
+                      [`${data.sessionDate}`]: Number(
+                        Number((cc.marks / cc.trialCount) * 100).toFixed(0),
+                      ),
+                    }
+                  } else {
+                    tempData[lastIdx].children.push({
+                      key: cc.key,
+                      target: cc.sd,
+                      type: 'sd',
+                      targetStatusName: cc.targetStatusName,
+                      parentTarget: target,
+                      [`${data.sessionDate}`]: Number(
+                        Number((cc.marks / cc.trialCount) * 100).toFixed(0),
+                      ),
+                    })
+                  }
+                })
+              }
+              if (data.sessionRecord?.length > 0) {
+                const sessionRecord = data.sessionRecord
+                sessionRecord.map(sessionData => {
+                  let type = 'sd'
+                  if (sessionData.sd && sessionData.sd !== '') {
+                    type = 'sd'
+                  } else if (sessionData.step && sessionData.step !== '') {
+                    type = 'step'
+                  }
+                  let isExist = false
+                  let childIdx = -1
+
+                  for (let i = 0; i < tempData[lastIdx].children.length; i += 1) {
+                    if (tempData[lastIdx].children[i].target === sessionData[type]) {
+                      isExist = true
+                      childIdx = i
+                      break
+                    }
+                  }
+                  if (isExist) {
+                    tempData[lastIdx].children[childIdx] = {
+                      ...tempData[lastIdx].children[childIdx],
+                      [`${data.sessionDate}`]:
+                        type === 'sd' ? sessionData.perSd : sessionData.perStep,
+                    }
+                  } else {
+                    tempData[lastIdx].children.push({
+                      target: sessionData[type],
+                      key: Math.random(),
+                      targetStatusName: data.targetStatusName,
+                      type,
+                      parentTarget: target,
+                      [`${data.sessionDate}`]:
+                        type === 'sd' ? sessionData.perSd : sessionData.perStep,
+                    })
+                  }
+                })
+              }
+            })
+          }
+        })
+      }
+      tempData.map(item => {
+        if (item.children.length === 0) {
+          delete item.children
+        }
+      })
+      setTableData(tempData)
+    }
   }
 
-  const onYearClick = val => {
-    setSelectedYear(val)
-    filterData()
-  }
+  const columns = [
+    {
+      key: 'targetName',
+      title: 'Target',
+      fixed: 'left',
+      width: '350px',
+      dataIndex: 'target',
+      render: (text, row) => {
+        if (row.parent) {
+          if (row.children) {
+            return (
+              <div
+                style={{
+                  height: '26px',
+                  fontSize: '13px',
+                  display: 'flex',
+                  margin: 'auto 0',
+                  width: '100%',
+                  color: '#2874A6',
+                  fontWeight: '600',
+                }}
+              >
+                {text}
+              </div>
+            )
+          }
+          return (
+            <div
+              style={{
+                fontSize: '13px',
+                height: '26px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                width: '100%',
+                fontWeight: '600',
+                color: '#2874A6',
+              }}
+            >
+              <div style={{ margin: 'auto 0', padding: 0 }}>{text}</div>
+
+              <Button type="link" onClick={() => handleSelectTarget(row)}>
+                <LineChartOutlined
+                  style={{ margin: 'auto 0', fontSize: '26px', color: 'rgb(229, 132, 37)' }}
+                />
+              </Button>
+            </div>
+          )
+        }
+
+        return (
+          <div
+            style={{
+              display: 'flex',
+              height: '26px',
+              justifyContent: 'space-between',
+              width: '100%',
+              fontSize: '12px',
+              textAlign: 'center',
+              fontWeight: '600',
+              paddingLeft: '20px',
+              color: row.type === 'sd' ? '#F080B8' : '#F0B880',
+            }}
+          >
+            <div style={{ margin: 'auto 0', padding: 0 }}>{text}</div>
+            {row.parent ? null : (
+              <Button type="link" onClick={() => handleSelectTarget(row)}>
+                <LineChartOutlined
+                  style={{ fontSize: '26px', margin: 'auto 0', color: 'rgb(229, 132, 37)' }}
+                />
+              </Button>
+            )}
+          </div>
+        )
+      },
+    },
+    {
+      title: 'Target Status',
+      dataIndex: 'targetStatusName',
+      width: '120px',
+      render: text => <span style={{ fontWeight: 600 }}>{text}</span>,
+    },
+    {
+      title: 'Target Type',
+      dataIndex: 'targetType',
+      width: '150px',
+      render: text => <span style={{ fontWeight: 600 }}>{text}</span>,
+    },
+    ...daysList.map(item => {
+      return {
+        title: `${item.dayDate} ${item.month}`,
+        align: 'center',
+        children: [
+          {
+            title: item.day.substring(0, 3),
+            align: 'center',
+            dataIndex: item.date,
+            render: (text, row) => {
+              if (row.parent) {
+                return <span style={{ fontWeight: '600' }}>{text}</span>
+              }
+              return <span>{text}</span>
+            },
+          },
+        ],
+      }
+    }),
+  ]
 
   const filterData = () => {
     const typeFilterDataList = []
     const statusFilterDataList = []
     if ((type && type.length > 0) || (status && status.length > 0)) {
-      if (data) {
-        if (type && type.length > 0) {
-          type.map(targetTypeVal => {
-            const filterData = data.responseRate.filter(item => item.targetType === targetTypeVal)
-            typeFilterDataList.push(...filterData)
-          })
-          loadData(typeFilterDataList)
-        }
-        console.log(status)
-        if (status && status.length > 0) {
-          if (type && type.length > 0) {
-            status.map(statusVal => {
-              const filterData = typeFilterDataList.filter(
-                item => item.targetStatusName === statusVal,
-              )
-              statusFilterDataList.push(...filterData)
-            })
-          } else {
-            status.map(statusVal => {
-              const filterData = data.responseRate.filter(
-                item => item.targetStatusName === statusVal,
-              )
-              statusFilterDataList.push(...filterData)
-            })
-          }
-          loadData(statusFilterDataList)
-        }
-      }
-    } else if (data) {
-      loadData(data.responseRate)
-    }
-  }
-  const monthMenu = (
-    <Menu>
-      {monthsList.map(val => {
-        return <Menu.Item onClick={() => onMonthClick(val)}>{val}</Menu.Item>
-      })}
-    </Menu>
-  )
-  const yearMenu = (
-    <Menu>
-      {yearList.map(val => {
-        return <Menu.Item onClick={() => onYearClick(val)}>{val}</Menu.Item>
-      })}
-    </Menu>
-  )
-
-  useEffect(() => {
-    setSelectedYear(moment(dateRange[0]).format('YYYY'))
-    setSelectedMonth(moment(dateRange[0]).format('MMM'))
-    filterData()
-  }, [dateRange])
-
-  useEffect(() => {
-    filterData()
-  }, [type, status])
-
-  useEffect(() => {
-    if (data) {
-      console.log('data data -----', data)
-      loadData(data.responseRate)
-    }
-    if (error) {
-      notification.error({
-        message: 'Opps their are something wrong to load the data',
-      })
-    }
-  }, [data, error])
-
-  const loadData = data => {
-    if (data) {
-      console.log('daily response rate data', data)
-      if (data.length > 0) {
-        const groupedData = groupObj.group(data, 'targetName')
-        let keys = []
-        keys = Object.keys(groupedData)
-        const objects = []
-        keys.map((target, index) => {
-          const targetStimulus = []
-          if (groupedData[target]?.length > 0) {
-            groupedData[target].map(data => {
-              if (data.sessionRecord?.length > 0) {
-                data.sessionRecord.map(sr => {
-                  if (sr.sd !== '' && sr.step === '') {
-                    if (targetStimulus.indexOf(sr.sd) === -1) {
-                      targetStimulus.push(sr.sd)
-                    }
-                  } else if (sr.sd === '' && sr.step !== '') {
-                    if (targetStimulus.indexOf(sr.step) === -1) {
-                      targetStimulus.push(sr.step)
-                    }
-                  }
-                })
-              }
-            })
-          }
-          console.log('targetStimulus', targetStimulus)
-          let item = {
-            key: index,
-            targetName: target,
-            isStimulusStepsAvailable: false,
-            isStimulus: false,
-            displayGraph: false,
-          }
-          if (targetStimulus.length === 0) {
-            item = {
-              key: index,
-              targetName: target,
-              isStimulusStepsAvailable: false,
-              isStimulus: false,
-              displayGraph: true,
-            }
-            daysList.map(itemObj => {
-              let targetPer = 0
-              if (groupedData[target]?.length > 0) {
-                let present = false
-                groupedData[target].map(data => {
-                  if (data.sessionDate === itemObj.date) {
-                    console.log('item.date', itemObj.date)
-                    console.log('data.sessionDate', data.sessionDate)
-                    present = true
-                    targetPer = data.perTar ? data.perTar : 0
-                    item[itemObj.date] = targetPer
-                  }
-                })
-                if (!present) {
-                  item[itemObj.date] = 0
-                }
-              } else {
-                item[itemObj.date] = 0
-              }
-            })
-          } else {
-            daysList.map(itemObj => {
-              item[itemObj.date] = ''
-            })
-          }
-          objects.push(item)
-          if (targetStimulus && targetStimulus.length > 0) {
-            targetStimulus.map(sdStr => {
-              const sdItem = {
-                key: index,
-                targetName: sdStr,
-                isStimulusStepsAvailable: true,
-                displayGraph: true,
-              }
-              daysList.map(item => {
-                let targetSDPer = 0
-                let targetStepPer = 0
-                if (groupedData[target]?.length > 0) {
-                  let present = false
-                  groupedData[target].map(data => {
-                    if (data.sessionDate === item.date) {
-                      present = true
-                      if (data.sessionRecord?.length > 0) {
-                        data.sessionRecord.map(sr => {
-                          if (sr.sd !== '' && sr.step === '') {
-                            if (sr.sd === sdStr) {
-                              targetSDPer = sr.perSd ? sr.perSd : 0
-                              sdItem[item.date] = targetSDPer
-                              sdItem.isStimulus = true
-                            }
-                          } else if (sr.sd === '' && sr.step !== '') {
-                            if (sr.step === sdStr) {
-                              targetStepPer = sr.perStep ? sr.perStep : 0
-                              sdItem[item.date] = targetStepPer
-                              sdItem.isStimulus = false
-                            }
-                          }
-                        })
-                      }
-                    }
-                  })
-                  if (!present) {
-                    sdItem[item.date] = 0
-                  }
-                }
-              })
-              objects.push(sdItem)
-            })
-          }
+      if (type && type.length > 0) {
+        type.map(targetTypeVal => {
+          const filterData = data.responseRate.filter(item => item.targetType === targetTypeVal)
+          typeFilterDataList.push(...filterData)
         })
-        console.log('keyObjects', objects)
-        setKeyObjects(objects)
-        setMydata(groupedData)
-      } else {
-        const objects = []
-        setKeyObjects(objects)
-        setMydata({})
-        setSelectTarget(null)
+        loadData(typeFilterDataList)
+      }
+      if (status && status.length > 0) {
+        if (type && type.length > 0) {
+          status.map(statusVal => {
+            const filterData = typeFilterDataList.filter(
+              item => item.targetStatusName === statusVal,
+            )
+            statusFilterDataList.push(...filterData)
+          })
+        } else {
+          status.map(statusVal => {
+            const filterData = data.responseRate.filter(item => item.targetStatusName === statusVal)
+            statusFilterDataList.push(...filterData)
+          })
+        }
+        loadData(statusFilterDataList)
       }
     } else {
-      const objects = []
-      setKeyObjects(objects)
-      setMydata({})
-      setSelectTarget(null)
+      loadData(data.responseRate)
     }
   }
-  const { data: filterOptions, error: filterOptErr, loading: filterOptLoading } = useQuery(
-    RESPONSE_RATE_FILTER_OPT,
-  )
-
-  useEffect(() => {
-    console.log('use effect', mydata)
-    console.log('use effect dateRange', dateRange)
-    if (mydata) {
-      console.log('entired')
-      const myColumns = [
-        {
-          key: 'targetName',
-          title: 'Skills',
-          fixed: 'left',
-          width: '350px',
-          render(obj) {
-            return (
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  width: '100%',
-                  color: '#80b8f0',
-                }}
-              >
-                {obj.isStimulusStepsAvailable === false && obj.targetName}
-                {obj.isStimulusStepsAvailable === true && obj.isStimulus === true && (
-                  <div
-                    style={{
-                      color: '#f080b8',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      width: '100%',
-                    }}
-                  >
-                    {obj.targetName}
-                  </div>
-                )}
-                {obj.isStimulusStepsAvailable === true && obj.isStimulus === false && (
-                  <div
-                    style={{
-                      color: '#f0b880',
-                      display: 'flex',
-                      justifyContent: 'center',
-                      width: '100%',
-                    }}
-                  >
-                    {obj.targetName}
-                  </div>
-                )}
-                {obj.displayGraph === true && (
-                  <Button type="link" onClick={() => handleSelectTarget(obj)}>
-                    <LineChartOutlined style={{ fontSize: 30, color: 'rgb(229, 132, 37)' }} />
-                  </Button>
-                )}
-                {obj.displayGraph === false && (
-                  <Button type="link" onClick={() => handleSelectTarget(obj)}>
-                    <LineChartOutlined style={{ fontSize: 30, color: 'rgb(229, 132, 37)' }} />
-                  </Button>
-                )}
-              </div>
-            )
-          },
-        },
-      ]
-      const monthYear = selectedMonth.concat(selectedYear)
-      console.log('monthYear', monthYear)
-      console.log('daysList', daysList)
-      const daysListFiltered = daysList.filter(item => item.monthYear === monthYear)
-      console.log('daysListFiltered', daysListFiltered)
-      daysListFiltered.map(item => {
-        myColumns.push({
-          title: item.dayDate,
-          children: [
-            {
-              // key: dateStr,
-              title: item.day.substring(0, 3),
-              width: '50px',
-              height: '5px',
-              dataIndex: item.date,
-            },
-          ],
-        })
-      })
-      setColumns(myColumns)
-      console.log(myColumns)
-      if (selectTarget && mydata.length > 0) {
-        getGraphData(selectTarget)
-      }
-    }
-  }, [dateRange, mydata])
 
   const getGraphData = targetName => {
-    const monthYear = selectedMonth.concat(selectedYear)
-    const daysListFiltered = daysList.filter(item => item.monthYear === monthYear)
     const graphAxixData = []
-    console.log('keyObjects', keyObjects)
-    let filterKeyObjects = []
-    if (keyObjects) {
-      filterKeyObjects = keyObjects.filter(item => item.targetName === targetName)
-    }
-    if (filterKeyObjects) {
-      console.log('filterKeyObjects ===>',filterKeyObjects)
-      daysListFiltered.map(item => {
-        const targetPer = filterKeyObjects[0][item.date] ? filterKeyObjects[0][item.date] : 0
-        graphAxixData.push({
+    const groupedData = groupObj.group(daysList, 'monthYear')
+    let keys = []
+    keys = Object.keys(groupedData)
+
+    keys.map(monthYear => {
+      const tempData = [
+        {
+          month: groupedData[monthYear][0].month,
+          year: groupedData[monthYear][0].year,
+          key: `DailyResponseRate ${groupedData[monthYear][0].month} ${groupedData[monthYear][0].year}`,
+          color: 'hsl(335, 70%, 50%)',
+          data: [],
+        },
+      ]
+
+      groupedData[monthYear].map(item => {
+        const targetPer = targetName[item.date] ? targetName[item.date] : 0
+        tempData[0].data.push({
           x: item.dayDate,
           y: targetPer,
+          key: item.dayDate,
         })
       })
-    }
-    console.log('graphAxixData', graphAxixData)
-    console.log('targetName', targetName)
-    setGraphData(state => {
-      state[0].data = graphAxixData
-      return state
+      graphAxixData.push(tempData)
     })
-    console.log('graphData', graphData)
+
+    setGraphData(graphAxixData)
     setLineDrawer(true)
-    setGraphKey(Math.random())
   }
 
-  const handleSelectTarget = ({ targetName }) => {
+  const handleSelectTarget = targetName => {
     setSelectTarget(targetName)
     getGraphData(targetName)
   }
 
-  const reduxUser = useSelector(state => state.user)
+  const getFormattedObj = (data, parentTarget) => {
+    let tempObj = {
+      target: data.parent
+        ? data.target
+        : data.type === 'sd'
+        ? `${parentTarget}-Stimulus-${data.target}`
+        : `${parentTarget}-Step-${data.target}`,
+    }
+    daysList.map(item => {
+      if (data[item.date]) {
+        tempObj = {
+          ...tempObj,
+          [`${item.date}`]: data[item.date],
+        }
+      } else {
+        tempObj = {
+          ...tempObj,
+          [`${item.date}`]: null,
+        }
+      }
+    })
+
+    return tempObj
+  }
+
+  const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+  const fileExtension = '.xlsx'
+  const exportToCSV = () => {
+    const filename = '_daily_response_rate_excel'
+    const formattedData = []
+
+    for (let i = 0; i < tableData.length; i += 1) {
+      const obj = tableData[i]
+      const tempObj = getFormattedObj(obj)
+      formattedData.push(tempObj)
+      if (obj.children) {
+        obj.children.map(child => {
+          formattedData.push(getFormattedObj(child, obj.target))
+        })
+      }
+    }
+
+    // console.log(formattedData, 'fdff')
+    const ws = XLSX.utils.json_to_sheet(formattedData)
+    const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+    const excelData = new Blob([excelBuffer], { type: fileType })
+    FileSaver.saveAs(excelData, studentName + filename + fileExtension)
+  }
+
+  const menu = (
+    <Menu>
+      <Menu.Item key="1">
+        <Button
+          onClick={() => {
+            if (peakType === 'dir/gen') {
+              exportToCSV()
+            } else {
+              downloadCsvRef.current?.exportToCSV('Equivalence')
+            }
+          }}
+          type="link"
+          size="small"
+        >
+          CSV/Excel
+        </Button>
+      </Menu.Item>
+    </Menu>
+  )
+
   return (
     <div>
+      <div style={filterCardStyle}>
+        <div style={parentDiv}>
+          <span style={parentLabel}>Date:</span>
+          <RangePicker
+            style={{
+              marginLeft: 'auto',
+              width: 230,
+              marginRight: 10,
+            }}
+            value={dateRange}
+            onChange={v => setDateRange(v)}
+          />
+        </div>
+        <div style={parentDiv}>
+          <span style={parentLabel}>Report Type: </span>
+          <Radio.Group
+            size="small"
+            value={peakType}
+            style={{ margin: 'auto 0' }}
+            onChange={e => {
+              setpeakType(e.target.value)
+            }}
+            buttonStyle="solid"
+          >
+            <Radio.Button value="dir/gen">DIR/GEN</Radio.Button>
+            <Radio.Button value="equi">EQUI</Radio.Button>
+          </Radio.Group>
+        </div>
+        <div style={parentDiv}>
+          <span style={parentLabel}>Type:</span>
+          <Select
+            mode="multiple"
+            style={{
+              width: 170,
+              borderRadius: 4,
+              height: 35,
+              overflow: 'auto',
+            }}
+            disabled={loading || peakBlockLoading}
+            allowClear
+            onChange={v => {
+              setType(v)
+            }}
+            placeholder="ALL"
+          >
+            {filterOptions &&
+              filterOptions.types.map(({ id, typeTar }) => (
+                <Option key={id} value={typeTar}>
+                  {typeTar}
+                </Option>
+              ))}
+          </Select>
+        </div>
+        <div style={parentDiv}>
+          <span style={parentLabel}>Target Status:</span>
+
+          <Select
+            style={{
+              width: 170,
+              borderRadius: 4,
+              height: 35,
+              overflow: 'auto',
+            }}
+            value={status}
+            disabled={loading || peakBlockLoading}
+            onChange={v => setStatus(v)}
+            allowClear
+            mode="multiple"
+            placeholder="ALL"
+          >
+            {filterOptions &&
+              filterOptions.targetStatus.map(({ id, statusName }) => (
+                <Option key={id} value={statusName}>
+                  {statusName}
+                </Option>
+              ))}
+          </Select>
+        </div>
+
+        <div style={{ marginLeft: 'auto' }}>
+          <Dropdown overlay={menu} trigger={['click']}>
+            <Button style={{ padding: '0 8px' }} type="link" size="large">
+              <FaDownload fontSize="22" />{' '}
+            </Button>
+          </Dropdown>
+        </div>
+      </div>
+      <Row>
+        <div style={{ ...parentDiv, margin: '10px 5px 5px 10px' }}>
+          <span style={parentLabel}>Target</span>
+          <div
+            style={{
+              background: '#2874A6',
+              borderRadius: 10,
+              width: '20px',
+              margin: 'auto 0',
+              marginRight: '10px',
+              height: 20,
+            }}
+          />
+          <span style={parentLabel}>Stimulus</span>
+          <div
+            style={{
+              background: '#f080b8',
+              borderRadius: 10,
+              width: '20px',
+              margin: 'auto 0',
+              marginRight: '10px',
+              height: 20,
+            }}
+          />
+          <span style={parentLabel}>Steps</span>
+          <div
+            style={{
+              background: '#f0b880',
+              borderRadius: 10,
+              width: '20px',
+              margin: 'auto 0',
+              height: 20,
+            }}
+          />
+        </div>
+      </Row>
       <Drawer
+        title={`${studentName}'s  -  
+                ${
+                  selectTarget?.parent
+                    ? `Target: ${selectTarget?.target}`
+                    : `Target: ${selectTarget?.parentTarget} - ${
+                        selectTarget?.type === 'sd' ? 'Stimulus: ' : 'Step: '
+                      } ${selectTarget?.target}`
+                }`}
         visible={lineDrawer}
         onClose={() => setLineDrawer(false)}
         width={900}
-        title="Session Graph"
-        key={graphKey}
       >
-        {console.log(graphData)}
-        {graphData && (
-          <div style={{ height: 300, marginBottom: 30 }}>
-            <ResponsiveLine
-              key={graphKey}
-              data={graphData}
-              margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
-              xScale={{ type: 'point' }}
-              yScale={{ type: 'linear', min: 'auto', max: 'auto', stacked: true, reverse: false }}
-              yFormat=" >-.2f"
-              axisTop={null}
-              axisRight={null}
-              axisBottom={{
-                  orient: 'bottom',
-                  tickSize: 5,
-                  tickPadding: 5,
-                  tickRotation: 0,
-                  legend: 'Date',
-                  legendOffset: 36,
-                  legendPosition: 'middle'
-              }}
-              axisLeft={{
-                  orient: 'left',
-                  tickSize: 5,
-                  tickPadding: 5,
-                  tickRotation: 0,
-                  legend: 'count',
-                  legendOffset: -40,
-                  legendPosition: 'middle'
-              }}
-              pointSize={10}
-              pointColor={{ theme: 'background' }}
-              pointBorderWidth={2}
-              pointBorderColor={{ from: 'serieColor' }}
-              pointLabelYOffset={-12}
-              useMesh={true}
-            />
-          </div>
-        )}
+        <ResponseRateGraph graphData={graphData} />
       </Drawer>
+
       <Row>
-        <Col sm={24}>
-
-          <Row>
-            <Col span={26}>
-              <div style={filterCardStyle}>
-
-                <Row>
-                  <Col span={1} style={antcol1}>
-                    <span style={{ fontSize: '15px', color: '#000' }}>Type:</span>
-                  </Col>
-                  <Col span={4} style={{ marginRight: 10 }}>
-                    <Select
-                      size="small"
-                      mode="multiple"
-                      style={{
-                        width: 180,
-                        borderRadius: 4,
-                        height: 35,
-                        overflow: 'auto',
-                      }}
-                      allowClear
-                      onChange={v => {
-                        setType(v)
-                      }}
-                      placeholder="ALL"
-                    >
-                      {filterOptions &&
-                        filterOptions.types.map(({ id, typeTar }) => (
-                          <Option key={id} value={typeTar}>
-                            {typeTar}
-                          </Option>
-                        ))}
-                    </Select>
-                  </Col>
-                  <Col span={1} style={antcol2}>
-                    <span style={{ fontSize: '15px', color: '#000' }}>Target Status:</span>
-                  </Col>
-                  <Col span={4} style={{ marginRight: 10 }}>
-                    <Select
-                      size="small"
-                      style={{
-                        width: 180,
-                        borderRadius: 4,
-                        height: 35,
-                        overflow: 'auto',
-                      }}
-                      value={status}
-                      onChange={v => setStatus(v)}
-                      allowClear
-                      mode="multiple"
-                      placeholder="ALL"
-                    >
-                      {filterOptions &&
-                        filterOptions.targetStatus.map(({ id, statusName }) => (
-                          <Option key={id} value={statusName}>
-                            {statusName}
-                          </Option>
-                        ))}
-                    </Select>
-                  </Col>
-                  <Col span={1} style={antcol1}>
-                    <span style={{ fontSize: '15px', color: '#000' }}>Date:</span>
-                  </Col>
-                  <Col span={4} style={antcol3}>
-                    <RangePicker
-                      size="small"
-                      style={{
-                        marginLeft: 'auto',
-                        width: 250,
-                        marginRight: 31,
-                      }}
-                      value={dateRange}
-                      onChange={v => setDateRange(v)}
-                    />
-                  </Col>
-                  <Col span={1}>
-                    <Dropdown overlay={menu} trigger={['click']}>
-                      <Button style={{ marginRight: '10px' }} type="link" size="large">
-                        <CloudDownloadOutlined />{' '}
-                      </Button>
-                    </Dropdown>
-                  </Col>
-                </Row>
-
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <div style={tableFilterCardStyle}>
-
-              <Col span={1} style={{ display: 'block', width: '3%' }}>
-                {selectedMonth}
-              </Col>
-              <Col span={1} style={{ display: 'block', width: '3%' }}>
-                <div>
-                  <Dropdown overlay={monthMenu}>
-                    <a className="ant-dropdown-link">
-                      <Icon type="caret-down" />
-                    </a>
-                  </Dropdown>
-                </div>
-              </Col>
-              <Col span={1} style={{ display: 'block', width: '3%' }}>
-                {selectedYear}
-              </Col>
-              <Col span={1} style={{ display: 'block', width: '3%' }}>
-                <div>
-                  <Dropdown overlay={yearMenu}>
-                    <a className="ant-dropdown-link">
-                      <Icon type="caret-down" />
-                    </a>
-                  </Dropdown>
-                </div>
-              </Col>
-
-
-              <Col span={1} style={antcol1}>
-                <div
-                  style={{
-                    background: '#2874A6',
-                    borderRadius: 10,
-                    width: '100%',
-                    height: 18,
-                  }}
-                />
-              </Col>
-              <Col span={1} style={antcol1}>
-                <span style={{ fontSize: '15px', color: '#000' }}>Target</span>
-              </Col>
-              <Col span={1} style={antcol1}>
-                <div
-                  style={{
-                    background: '#f080b8',
-                    borderRadius: 10,
-                    width: '100%',
-                    height: 18,
-                  }}
-                />
-              </Col>
-              <Col span={3} style={{ display: 'block', width: '7%' }}>
-                <span style={{ fontSize: '15px', color: '#000' }}>Stimulus</span>
-              </Col>
-              <Col span={1} style={antcol1}>
-                <div
-                  style={{
-                    background: '#f0b880',
-                    borderRadius: 10,
-                    width: '100%',
-                    height: 18,
-                  }}
-                />
-              </Col>
-              <Col span={1} style={antcol1}>
-                <span style={{ fontSize: '15px', color: '#000' }}>Steps</span>
-              </Col>
-
-            </div>
-          </Row>
-          <Row>
-            <Col span={24}>
-              <div style={parentCardStyle}>
+        <Col span={24}>
+          {peakType === 'dir/gen' ? (
+            loading || peakBlockLoading || !tableData ? (
+              <LoadingComponent />
+            ) : tableData.length > 0 ? (
+              <div
+                key={Math.random()}
+                className="response-rate-table"
+                style={{ margin: '10px 0px 10px 10px' }}
+              >
                 <Table
                   columns={columns}
-                  dataSource={keyObjects}
+                  dataSource={tableData}
                   bordered
+                  expandIcon={record => {
+                    return null
+                  }}
+                  pagination={false}
+                  defaultExpandAllRows={true}
+                  size="middle"
                   loading={loading}
-                  scroll={{ x: 'max-content', y: 340 }}
-                  pagination={{ pageSize: 50 }}
-                  size="small"
+                  scroll={{ x: daysList.length * 100 + 300, y: '1000px' }}
                 />
-
               </div>
-            </Col>
-          </Row>
+            ) : (
+              <div style={{ margin: '20px auto', textAlign: 'center' }}>
+                No data found, try to remove filter or change date range
+              </div>
+            )
+          ) : (
+            <ResponseRateEqui
+              studentName={studentName}
+              peakEqui={peakEqui}
+              peakEquiFilData={peakEquiFilData}
+              equiData={equiData}
+              equiError={equiError}
+              peakEquiError={peakEquiError}
+              type={type}
+              status={status}
+              peakEquiLoading={peakEquiLoading}
+              daysList={daysList}
+              ref={downloadCsvRef}
+            />
+          )}
         </Col>
       </Row>
     </div>

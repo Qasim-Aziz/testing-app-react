@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { useState, useEffect, useReducer } from 'react'
 import {
   Form,
@@ -28,7 +29,7 @@ const { Text } = Typography
 const { TextArea } = Input
 const { Option } = Select
 
-const CreateOrUpdateTask = ({ tasks, form, task }) => {
+const CreateOrUpdateTask = ({ tasks, form, task, onClose, dispatch, user }) => {
   const { priority, taskStatus, taskType, learnersList, staffsList, createTaskLoading } = tasks
   const [reminder, setReminder] = useState(true)
   const [remainderCount, setRemainderCount] = useState(1)
@@ -66,6 +67,15 @@ const CreateOrUpdateTask = ({ tasks, form, task }) => {
         setReminder(remaindersList)
         setRemainderCount(remaindersList.length)
       }
+      const {
+        taskcounterSet: { edges },
+      } = task
+      const currentCount = edges.length
+        ? edges[edges.length - 1].node.date === moment().format('YYYY-MM-DD')
+          ? edges[edges.length - 1].node.count
+          : 0
+        : 0
+      setTaskCompletionCount(currentCount)
 
       form.setFieldsValue({
         taskType: task.taskType.id,
@@ -146,9 +156,15 @@ const CreateOrUpdateTask = ({ tasks, form, task }) => {
         message: 'Task Data',
         description: 'Task Data Updated Successfully',
       })
-      form.resetFields()
+      // form.resetFields()
       setRemainderCount(1)
       remainderDispatch({ type: 'RESET' })
+      dispatch({
+        type: 'tasks/UPDATE_TASKS_LIST',
+        payload: {
+          object: updateTaskData.updateTask.task,
+        },
+      })
       history.push('/viewTask/')
     }
   }, [updateTaskData])
@@ -163,9 +179,16 @@ const CreateOrUpdateTask = ({ tasks, form, task }) => {
       setRemainderCount(1)
       remainderDispatch({ type: 'RESET' })
       history.push('/viewTask/')
+
+      // update UI for newly created task
+      dispatch({
+        type: 'tasks/APPEND_TASKS_LIST',
+        payload: { task: createTaskData.createTask.task },
+      })
     }
   }, [createTaskData])
 
+  console.log(reminder, 'reminder')
   return (
     <Form name="manageTasks" onSubmit={SubmitForm} className="CreateOrUpdate">
       <Divider orientation="left">Basic Details</Divider>
@@ -229,7 +252,7 @@ const CreateOrUpdateTask = ({ tasks, form, task }) => {
       )}
 
       {/* Learners */}
-      {taskSelected !== 'Reminder' && (
+      {taskSelected !== 'Reminder' && user.role !== 'parents' && (
         <Row>
           <Col span={24}>
             <Form.Item label="Learners" labelCol={{ sm: 4 }} wrapperCol={{ sm: 20 }}>
@@ -395,10 +418,7 @@ const CreateOrUpdateTask = ({ tasks, form, task }) => {
         <Button type="primary" loading={createTaskLoading} htmlType="submit">
           Submit
         </Button>
-        <Button
-          // onClick={this.onReset}
-          className="ml-4"
-        >
+        <Button onClick={onClose} className="ml-4">
           Cancel
         </Button>
       </Form.Item>

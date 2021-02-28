@@ -5,10 +5,12 @@ import EmailNotiSett from 'pages/ClinicProfile/EmailNotiSett'
 import ContactDetails from 'pages/ClinicProfile/ContactDetails'
 import InvCurrency from 'pages/ClinicProfile/InvCurrency'
 import ChangePassword from 'components/changePassword/form'
-import MasterCriteria from 'pages/ClinicProfile/MasterCriteria'
+import MasterCriteria from 'pages/ClinicProfile/MasteryCriteria'
 import LocationSett from 'pages/ClinicProfile/LocationSett'
 import DisabledCurriculum from 'pages/ClinicProfile/DisabledCurriculum'
 import PeakAutomaticTab from '../PeakAutomaticTab'
+import AssessmentsTab from '../../../components/AssessmentsProfileTab'
+import SessionSettingTab from '../SessionSettingTab'
 
 const { TabPane } = Tabs
 
@@ -38,6 +40,16 @@ const ProfileTab = ({ activeProfileTab, onProfileTabChange }) => {
       key: 'peak-automatic',
       title: 'Peak Automatic',
       component: <PeakAutomaticTab />,
+    },
+    {
+      key: 'session-setting',
+      title: 'Session Settings',
+      component: <SessionSettingTab />,
+    },
+    {
+      key: 'assessments',
+      title: 'Assessments',
+      component: <AssessmentsTab />,
     },
     {
       key: 'master-criteria',

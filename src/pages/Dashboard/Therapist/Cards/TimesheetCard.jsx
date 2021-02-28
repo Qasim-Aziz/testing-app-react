@@ -20,7 +20,7 @@ const TIMESHEET_QUERY = gql`
 const SingleRecord = ({ date, hours }) => (
   <a
     className="hover_me_item"
-    href="#/viewTask"
+    href="#/workdone"
     style={{
       display: 'flex',
       flexDirection: 'row',
@@ -65,7 +65,7 @@ const TimesheetCard = () => {
         ))}
       {data && data.timesheetReport && data.timesheetReport.length > 5 && (
         <div className="more-row">
-          <a href="#/viewTask">
+          <a href="#/workdone">
             <span style={{ fontWeight: 'bold', fontSize: 12 }}>More...</span>
           </a>
         </div>

@@ -17,7 +17,12 @@ const { Content } = Layout
 const { Title } = Typography
 
 const AbcDataPage = props => {
-  const [date, setDate] = useState(moment().format('YYYY-MM-DD'))
+  const [date, setDate] = useState({
+    gte: moment()
+      .subtract(4, 'weeks')
+      .format('YYYY-MM-DD'),
+    lte: moment().format('YYYY-MM-DD'),
+  })
   const [updateAbc, setUpdateAbc] = useState()
   const [showDrawerForm, updateDrawerForm] = useState(false)
   const { openRightdrawer, closeDrawer, handleFilterToggle, filter, TabCheck, openDrawer } = props
@@ -27,9 +32,10 @@ const AbcDataPage = props => {
   const { data, loading, error, refetch } = useQuery(ABC, {
     variables: {
       studentId,
-      date,
+      dateGte: date.gte,
+      dateLte: date.lte,
     },
-    fetchPolicy: 'network-only'
+    fetchPolicy: 'network-only',
   })
 
   const { data: studnetInfo } = useQuery(STUDNET_INFO, {
@@ -39,7 +45,10 @@ const AbcDataPage = props => {
   })
 
   const handleSelectDate = (newDate, value) => {
-    setDate(moment(value).format('YYYY-MM-DD'))
+    setDate({
+      gte: moment(value[0]).format('YYYY-MM-DD'),
+      lte: moment(value[1]).format('YYYY-MM-DD'),
+    })
   }
 
   const showDrawer = () => {
@@ -67,7 +76,14 @@ const AbcDataPage = props => {
           <Row>
             <Col>
               {/* <Calendar value={date} handleOnChange={handleSelectDate} /> */}
-              {filter && <FilterComp handleSelectDate={handleSelectDate} />}
+              {filter && (
+                <FilterComp
+                  handleSelectDate={handleSelectDate}
+                  startDate={date.gte}
+                  endDate={date.lte}
+                  rangePicker
+                />
+              )}
               <div>
                 <div
                   style={{

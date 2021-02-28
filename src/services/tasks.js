@@ -13,7 +13,7 @@ export async function getTasks() {
     .query({
       query: gql`
         query {
-          tasks (status:"VGFza1N0YXR1c1R5cGU6MQ==", last:30){
+          tasks(last: 30) {
             edges {
               node {
                 id
@@ -32,7 +32,7 @@ export async function getTasks() {
                 taskType {
                   id
                   taskType
-                }  
+                }
                 assignWork {
                   edges {
                     node {
@@ -41,11 +41,28 @@ export async function getTasks() {
                     }
                   }
                 }
+                remainders {
+                  edges {
+                    node {
+                      id
+                      time
+                    }
+                  }
+                }
                 students {
                   edges {
                     node {
                       id
                       firstname
+                    }
+                  }
+                }
+                taskcounterSet {
+                  edges {
+                    node {
+                      id
+                      count
+                      date
                     }
                   }
                 }
@@ -71,7 +88,7 @@ export async function getClosedTasks() {
     .query({
       query: gql`
         query {
-          tasks (status:"VGFza1N0YXR1c1R5cGU6Mg==", last:30){
+          tasks(status: "VGFza1N0YXR1c1R5cGU6Mg==", last: 30) {
             edges {
               node {
                 id
@@ -90,7 +107,7 @@ export async function getClosedTasks() {
                 taskType {
                   id
                   taskType
-                }  
+                }
                 assignWork {
                   edges {
                     node {
@@ -104,6 +121,15 @@ export async function getClosedTasks() {
                     node {
                       id
                       firstname
+                    }
+                  }
+                }
+                taskcounterSet {
+                  edges {
+                    node {
+                      id
+                      count
+                      date
                     }
                   }
                 }
@@ -157,7 +183,6 @@ export async function getTasksDropdown() {
               }
             }
           }
-
         }
       `,
     })
@@ -172,36 +197,36 @@ export async function getTasksDropdown() {
     })
 }
 
-
 export async function createTask(payload) {
   console.log('task create API')
   console.log(payload)
 
   return apolloClient
     .mutate({
-      mutation: gql`mutation CreateTask (
-        $type: ID!,
-        $taskName: String!,
-        $description: String!,
-        $priority: ID!,
-        $status: ID!,
-        $startDate: Date!,
-        $endDate: Date!,
-        $therapist: [ID],
-        $learners: [ID]
-      ) {
+      mutation: gql`
+        mutation CreateTask(
+          $type: ID!
+          $taskName: String!
+          $description: String!
+          $priority: ID!
+          $status: ID!
+          $startDate: Date!
+          $endDate: Date!
+          $therapist: [ID]
+          $learners: [ID]
+        ) {
           createTask(
             input: {
               task: {
-                taskType: $type,
-                taskName: $taskName,
-                description: $description,
-                priority: $priority,
-                status: $status,
-                startDate: $startDate,
-                dueDate: $endDate,
-                assignWork: $therapist,
-                students: $learners,
+                taskType: $type
+                taskName: $taskName
+                description: $description
+                priority: $priority
+                status: $status
+                startDate: $startDate
+                dueDate: $endDate
+                assignWork: $therapist
+                students: $learners
               }
             }
           ) {
@@ -222,7 +247,7 @@ export async function createTask(payload) {
               taskType {
                 id
                 taskType
-              } 
+              }
               assignWork {
                 edges {
                   node {
@@ -239,6 +264,15 @@ export async function createTask(payload) {
                   }
                 }
               }
+              taskcounterSet {
+                edges {
+                  node {
+                    id
+                    count
+                    date
+                  }
+                }
+              }
             }
           }
         }
@@ -252,8 +286,8 @@ export async function createTask(payload) {
         startDate: moment(payload.values.startDate).format('YYYY-MM-DD'),
         endDate: moment(payload.values.dueDate).format('YYYY-MM-DD'),
         therapist: payload.values.therapists ? payload.values.therapists : [],
-        learners: payload.values.learners ? payload.values.learners : []
-      }
+        learners: payload.values.learners ? payload.values.learners : [],
+      },
     })
     .then(result => result)
     .catch(error => {
@@ -272,31 +306,35 @@ export async function editTask(payload) {
 
   return apolloClient
     .mutate({
-      mutation: gql`mutation UpdateTask (
-        $id: ID!,
-        $type: ID!,
-        $taskName: String!,
-        $description: String!,
-        $priority: ID!,
-        $status: ID!,
-        $startDate: Date!,
-        $endDate: Date!,
-        $therapist: [ID],
-        $learners: [ID]
-      ) {
-        updateTask(input:{
-          task:{
-            pk: $id, 
-            taskType: $type, 
-            taskName: $taskName, 
-            description: $description,
-            priority: $priority,
-            status: $status,
-            startDate: $startDate,
-            dueDate: $endDate,
-            assignWork: $therapist,
-            students: $learners,
-          }}) {
+      mutation: gql`
+        mutation UpdateTask(
+          $id: ID!
+          $type: ID!
+          $taskName: String!
+          $description: String!
+          $priority: ID!
+          $status: ID!
+          $startDate: Date!
+          $endDate: Date!
+          $therapist: [ID]
+          $learners: [ID]
+        ) {
+          updateTask(
+            input: {
+              task: {
+                pk: $id
+                taskType: $type
+                taskName: $taskName
+                description: $description
+                priority: $priority
+                status: $status
+                startDate: $startDate
+                dueDate: $endDate
+                assignWork: $therapist
+                students: $learners
+              }
+            }
+          ) {
             task {
               id
               taskName
@@ -314,7 +352,7 @@ export async function editTask(payload) {
               taskType {
                 id
                 taskType
-              } 
+              }
               assignWork {
                 edges {
                   node {
@@ -328,6 +366,15 @@ export async function editTask(payload) {
                   node {
                     id
                     firstname
+                  }
+                }
+              }
+              taskcounterSet {
+                edges {
+                  node {
+                    id
+                    count
+                    date
                   }
                 }
               }
@@ -345,8 +392,8 @@ export async function editTask(payload) {
         startDate: moment(payload.values.startDate).format('YYYY-MM-DD'),
         endDate: moment(payload.values.dueDate).format('YYYY-MM-DD'),
         therapist: payload.values.therapists ? payload.values.therapists : [],
-        learners: payload.values.learners ? payload.values.learners : []
-      }
+        learners: payload.values.learners ? payload.values.learners : [],
+      },
     })
     .then(result => result)
     .catch(error => {
@@ -360,18 +407,11 @@ export async function editTask(payload) {
 }
 
 export async function updateTaskStatus(payload) {
-
   return apolloClient
     .mutate({
-      mutation: gql`mutation UpdateTask (
-        $id: ID!,
-        $status: ID!,
-       ) {
-        updateTask(input:{
-          task:{
-            pk: $id,
-            status: $status,
-          }}) {
+      mutation: gql`
+        mutation UpdateTask($id: ID!, $status: ID!) {
+          updateTask(input: { task: { pk: $id, status: $status } }) {
             task {
               id
               taskName
@@ -389,7 +429,7 @@ export async function updateTaskStatus(payload) {
               taskType {
                 id
                 taskType
-              } 
+              }
               assignWork {
                 edges {
                   node {
@@ -406,6 +446,15 @@ export async function updateTaskStatus(payload) {
                   }
                 }
               }
+              taskcounterSet {
+                edges {
+                  node {
+                    id
+                    count
+                    date
+                  }
+                }
+              }
             }
           }
         }
@@ -413,7 +462,7 @@ export async function updateTaskStatus(payload) {
       variables: {
         id: payload.id,
         status: payload.status,
-      }
+      },
     })
     .then(result => result)
     .catch(error => {
@@ -426,3 +475,72 @@ export async function updateTaskStatus(payload) {
     })
 }
 
+export async function updateTaskCounter(payload) {
+  return apolloClient
+    .mutate({
+      mutation: gql`
+        mutation taskCounter($pk: ID!, $count: Int!) {
+          taskCounter(input: { pk: $pk, count: $count }) {
+            data
+            details {
+              id
+              taskName
+              description
+              startDate
+              dueDate
+              status {
+                id
+                taskStatus
+              }
+              priority {
+                id
+                name
+              }
+              taskType {
+                id
+                taskType
+              }
+              assignWork {
+                edges {
+                  node {
+                    id
+                    name
+                  }
+                }
+              }
+              students {
+                edges {
+                  node {
+                    id
+                    firstname
+                  }
+                }
+              }
+              taskcounterSet {
+                edges {
+                  node {
+                    id
+                    count
+                    date
+                  }
+                }
+              }
+            }
+          }
+        }
+      `,
+      variables: {
+        pk: payload.id,
+        count: payload.count,
+      },
+    })
+    .then(result => result)
+    .catch(error => {
+      error.graphQLErrors.map(item => {
+        return notification.error({
+          message: 'Something went wrong',
+          description: item.message,
+        })
+      })
+    })
+}

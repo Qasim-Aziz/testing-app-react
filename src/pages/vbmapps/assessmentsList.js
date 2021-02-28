@@ -7,20 +7,33 @@
 /* eslint-disable react/self-closing-comp */
 import React, { Component } from 'react'
 import { gql } from 'apollo-boost'
-import { Link, useHistory } from 'react-router-dom'
-import { Button, Drawer, Progress, Tabs, Icon, Layout, Row, Col, Typography, Popover } from 'antd'
+import { Link } from 'react-router-dom'
+import {
+  Button,
+  Drawer,
+  Progress,
+  Tabs,
+  Layout,
+  Row,
+  Col,
+  Popconfirm,
+  Tooltip,
+  notification,
+} from 'antd'
+import { connect } from 'react-redux'
+import { DeleteOutlined, FilterOutlined } from '@ant-design/icons'
 import Scrollbars from 'react-custom-scrollbars'
 import moment from 'moment'
+import LearnerSelect from 'components/LearnerSelect'
 import client from '../../apollo/config'
 import VbMappsTargets from './VbMappsTargets'
 import PageHeader from './PageHeader'
-import { leftDivStyle, rightDivStyle, assessmentCompletedBlockStyle, defaultDivStyle, leftListBoxStyle, recordResponseButtonStyle } from './customStyle'
+import { leftDivStyle, rightDivStyle } from './customStyle'
 
 const { Content } = Layout
-const { Title, Text } = Typography
 
 const { TabPane } = Tabs
-
+@connect(({ user, student, learnersprogram }) => ({ user, student, learnersprogram }))
 class AssessmentsList extends Component {
   constructor(props) {
     super(props)
@@ -30,19 +43,35 @@ class AssessmentsList extends Component {
       selected: 0,
       target: null,
       master: '',
-      // studentID: 'U3R1ZGVudFR5cGU6MTYz',
       studentID: JSON.parse(localStorage.getItem('studentId')),
+      deleteLoading: false,
     }
   }
 
   componentDidMount() {
     const { studentID } = this.state
+    const { dispatch } = this.props
+    dispatch({
+      type: 'learnersprogram/LOAD_DATA',
+    })
+    this.getVbmappData(studentID)
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const studentID = JSON.parse(localStorage.getItem('studentId'))
+    if (studentID !== prevState.studentID) {
+      this.getVbmappData(studentID)
+    }
+  }
+
+  getVbmappData(id) {
+    this.setState({ studentID: id })
     client
       .query({
         fetchPolicy: 'no-cache',
         query: gql`
         query{
-          vbmappGetAssessments(student:"${studentID}"){
+          vbmappGetAssessments(student:"${id}"){
               edges{
                   total
                   milestone
@@ -95,14 +124,39 @@ class AssessmentsList extends Component {
         `,
       })
       .then(result => {
-        console.log(result.data.vbmappAreas)
         this.setState({
           areas: result.data.vbmappAreas,
         })
       })
   }
 
-  handleKeyDown = () => { }
+  handleKeyDown = () => {}
+
+  deleteAssessment = id => {
+    this.setState({ deleteLoading: true })
+    console.log(`deleting assessment ${id}`)
+    client
+      .mutate({
+        mutation: gql`
+        mutation {
+          vbmappDeleteAssessment (input: {pk: "${id}"}) {
+            status
+            message
+          }
+        }
+                `,
+      })
+      .then(result => {
+        if (result?.data?.vbmappDeleteAssessment?.status === true) {
+          this.setState(state => ({
+            assessments: state.assessments.filter(item => item.node.id !== id),
+          }))
+          notification.success(result?.data?.vbmappDeleteAssessment?.message)
+        } else notification.error(result?.data?.vbmappDeleteAssessment?.message)
+      })
+
+    this.setState({ deleteLoading: false })
+  }
 
   assessmentCard = ({
     testNo,
@@ -135,10 +189,28 @@ class AssessmentsList extends Component {
           margin: '10px 10px 0px',
         }}
       >
-        <p style={{ fontSize: 18, fontWeight: '700', marginBottom: 0 }}>Assessment {testNo}</p>
-        <p>
-          <span>{outputDate}</span>
-        </p>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <p style={{ fontSize: 18, fontWeight: '700', marginBottom: 0 }}>Assessment {testNo}</p>
+            <p>
+              <span>{outputDate}</span>
+            </p>
+          </div>
+          <div onClick={() => console.log({ id, testNo })}>
+            <Tooltip placement="top" title="Delete Assessment">
+              <Popconfirm
+                title="Are you sure ?"
+                onConfirm={() => this.deleteAssessment(id)}
+                okText="Yes"
+                cancelText="No"
+              >
+                <Button type="link" style={{ color: textColor }} loading={this.state.deleteLoading}>
+                  <DeleteOutlined />
+                </Button>
+              </Popconfirm>
+            </Tooltip>
+          </div>
+        </div>
         <div
           style={{
             paddingBottom: 5,
@@ -361,14 +433,6 @@ class AssessmentsList extends Component {
               showInfo={false}
               style={{ padding: 10 }}
             />
-            {/* <div
-              style={{ marginRight: 10,marginLeft:'85%',height:30,border:'1px solid #3e7bfa',textAlign:'center',borderRadius:5,marginBottom:10,width:120 }}
-              role="button"
-              onKeyDown={this.handleKeyDown}
-              tabIndex="0"
-            >
-              <Link to="/target/allocation"> Suggest Target</Link>
-            </div> */}
           </div>
         </Link>
       </div>
@@ -428,8 +492,21 @@ class AssessmentsList extends Component {
     return areass
   }
 
+  onCloseFilter = () => {
+    this.setState({
+      visibleFilter: false,
+    })
+  }
+
+  showDrawerFilter = () => {
+    this.setState({
+      visibleFilter: true,
+    })
+  }
+
   render() {
     const { assessments, areas, studentID } = this.state
+    const { user } = this.props
     return (
       <Layout style={{ padding: '0px' }}>
         <Content
@@ -525,7 +602,7 @@ class AssessmentsList extends Component {
                       style={{
                         height: 'calc(100vh - 180px)',
                       }}
-                    // autoHide
+                      // autoHide
                     >
                       {assessments && assessments.length === 0 && (
                         <Link
@@ -579,12 +656,30 @@ class AssessmentsList extends Component {
                     </Scrollbars>
                   </TabPane>
                 </Tabs>
-
               </div>
             </Col>
             <Col sm={18}>
               <div style={rightDivStyle}>
-                <PageHeader pageTitle="VB-MAPP Assessment" style={{ marginTop: 20 }} />
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <PageHeader pageTitle="VB-MAPP Assessment" style={{ marginTop: 20 }} />
+                  <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                    {user?.role !== 'parents' && (
+                      <Button onClick={this.showDrawerFilter} size="large">
+                        <FilterOutlined />
+                      </Button>
+                    )}
+
+                    <Drawer
+                      visible={this.state.visibleFilter}
+                      onClose={this.onCloseFilter}
+                      width={350}
+                      title="Select Learner"
+                      placement="right"
+                    >
+                      <LearnerSelect />
+                    </Drawer>
+                  </div>
+                </div>
                 <div className="row" style={{ position: 'relative' }}>
                   {this.state.selected < 1 && (
                     <div

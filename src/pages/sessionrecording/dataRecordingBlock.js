@@ -15,11 +15,16 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable no-var */
+/* eslint-disable vars-on-top */
 
 import React from 'react'
-import { Button, Icon, Row, Col, notification, Popconfirm, Input } from 'antd'
+import { Button, Icon, Row, Col, notification, Popconfirm, Input, Typography } from 'antd'
 import { connect } from 'react-redux'
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons'
+
+const error = 'Error'
+const incorrect = 'Incorrect'
+const { Title, Text } = Typography
 
 @connect(({ sessionrecording }) => ({ sessionrecording }))
 class DataRecordingBlock extends React.Component {
@@ -28,7 +33,7 @@ class DataRecordingBlock extends React.Component {
 
     this.state = {
       showPromptOptions: true,
-      note: ''
+      note: '',
     }
   }
 
@@ -73,6 +78,20 @@ class DataRecordingBlock extends React.Component {
     document.getElementById('correctResponseButton').style.borderColor = '#e4e9f0'
     document.getElementById('incorrectResponseButton').style.color = '#FF8080'
     document.getElementById('incorrectResponseButton').style.borderColor = '#FF8080'
+  }
+
+  resetCorrectIncorrectButtonStyle = () => {
+    var element = document.getElementById('correctResponseButton')
+
+    // If it isn't "undefined" and it isn't "null", then it exists.
+    if (typeof element != 'undefined' && element != null) {
+      document.getElementById('correctResponseButton').style.color = 'gray'
+      document.getElementById('correctResponseButton').style.borderColor = '#e4e9f0'
+      document.getElementById('incorrectResponseButton').style.color = 'gray'
+      document.getElementById('incorrectResponseButton').style.borderColor = '#e4e9f0'
+    } else {
+      console.log('Buttons does not not exits')
+    }
   }
 
   addCorrectTrail = val => {
@@ -122,25 +141,36 @@ class DataRecordingBlock extends React.Component {
   }
 
   resetNote = () => {
-    // this.setState({
-    //   note: ''
-    // })
+    this.setState({
+      note: '',
+    })
     console.log('called')
   }
 
   setNoteText = object => {
     if (object.text) {
       this.setState({
-        note: object.text
+        note: object.text,
       })
-    }
-    else {
+    } else {
       this.setState({
-        note: ''
+        note: '',
       })
     }
   }
 
+  trialAutoMove = operation => {
+    console.log('auto trial move called')
+
+    const {
+      dispatch,
+      sessionrecording: { MasterSession, TargetActiveIndex, Count },
+    } = this.props
+
+    if (operation === 'sd') {
+      this.moveToNextSDTrail()
+    }
+  }
 
   addCount = val => {
     const { note } = this.state
@@ -166,7 +196,7 @@ class DataRecordingBlock extends React.Component {
             object: trialObject,
             response: 'Correct',
             promptId: '',
-            note
+            note,
           },
         })
 
@@ -190,7 +220,7 @@ class DataRecordingBlock extends React.Component {
           payload: {
             response: 'Correct',
             promptId: '',
-            note
+            note,
           },
         })
       }
@@ -200,7 +230,6 @@ class DataRecordingBlock extends React.Component {
   }
 
   promptCount = (val, promptObject) => {
-
     const { note } = this.state
     console.log('====> note <==== ', note)
 
@@ -227,7 +256,7 @@ class DataRecordingBlock extends React.Component {
             object: trialObject,
             response: 'Prompt',
             promptId: promptObject.id,
-            note
+            note,
           },
         })
 
@@ -249,7 +278,7 @@ class DataRecordingBlock extends React.Component {
           payload: {
             response: 'Prompt',
             promptId: promptObject.id,
-            note
+            note,
           },
         })
       }
@@ -257,7 +286,7 @@ class DataRecordingBlock extends React.Component {
     this.resetNote()
   }
 
-  removeCount = val => {
+  removeCount = (val, trialResponse) => {
     const { note } = this.state
     this.closePromptOptions()
     const {
@@ -280,9 +309,9 @@ class DataRecordingBlock extends React.Component {
           type: 'sessionrecording/UPDATE_TARGET_TRIAL',
           payload: {
             object: trialObject,
-            response: 'Error',
+            response: trialResponse,
             promptId: '',
-            note
+            note,
           },
         })
         if (trialObject.trial === 'CORRECT') {
@@ -301,28 +330,14 @@ class DataRecordingBlock extends React.Component {
         dispatch({
           type: 'sessionrecording/TARGET_CORRECT',
           payload: {
-            response: 'Error',
+            response: trialResponse,
             promptId: '',
-            note
+            note,
           },
         })
       }
     }
     this.resetNote()
-  }
-
-  resetCorrectIncorrectButtonStyle = () => {
-    var element = document.getElementById('correctResponseButton')
-
-    // If it isn't "undefined" and it isn't "null", then it exists.
-    if (typeof element != 'undefined' && element != null) {
-      document.getElementById('correctResponseButton').style.color = 'gray'
-      document.getElementById('correctResponseButton').style.borderColor = '#e4e9f0'
-      document.getElementById('incorrectResponseButton').style.color = 'gray'
-      document.getElementById('incorrectResponseButton').style.borderColor = '#e4e9f0'
-    } else {
-      console.log('Buttons does not not exits')
-    }
   }
 
   moveToNextTrail = () => {
@@ -359,7 +374,7 @@ class DataRecordingBlock extends React.Component {
         if (object.trial === 'CORRECT') {
           this.addCorrectTrailButtonStyle()
         }
-        if (object.trial === 'ERROR') {
+        if (object.trial === 'ERROR' || object.trial === 'INCORRECT') {
           this.addInCorrectTrailButtonStyle()
         }
         if (object.trial === 'PROMPT') {
@@ -387,7 +402,7 @@ class DataRecordingBlock extends React.Component {
     if (object.trial === 'CORRECT') {
       this.addCorrectTrailButtonStyle()
     }
-    if (object.trial === 'ERROR') {
+    if (object.trial === 'ERROR' || object.trial === 'INCORRECT') {
       this.addInCorrectTrailButtonStyle()
     }
     if (object.trial === 'PROMPT') {
@@ -453,6 +468,7 @@ class DataRecordingBlock extends React.Component {
   }
 
   moveToNextSDTrail = () => {
+    console.log('called move to next sd trial')
     const {
       dispatch,
       sessionrecording: {
@@ -493,7 +509,7 @@ class DataRecordingBlock extends React.Component {
         if (object.trial === 'CORRECT') {
           this.addCorrectTrailButtonStyle()
         }
-        if (object.trial === 'ERROR') {
+        if (object.trial === 'ERROR' || object.trial === 'INCORRECT') {
           this.addInCorrectTrailButtonStyle()
         }
         if (object.trial === 'PROMPT') {
@@ -521,7 +537,7 @@ class DataRecordingBlock extends React.Component {
     if (object.trial === 'CORRECT') {
       this.addCorrectTrailButtonStyle()
     }
-    if (object.trial === 'ERROR') {
+    if (object.trial === 'ERROR' || object.trial === 'INCORRECT') {
       this.addInCorrectTrailButtonStyle()
     }
     if (object.trial === 'PROMPT') {
@@ -555,7 +571,7 @@ class DataRecordingBlock extends React.Component {
             object: trialObject,
             response: 'Correct',
             promptId: '',
-            note
+            note,
           },
         })
 
@@ -579,12 +595,13 @@ class DataRecordingBlock extends React.Component {
             response: 'Correct',
             promptId: '',
             sdId: StimulusActiveId,
-            note
+            note,
           },
         })
       }
     }
     this.resetNote()
+    // this.trialAutoMove('sd')
   }
 
   promptSDCount = (val, promptObject) => {
@@ -613,9 +630,8 @@ class DataRecordingBlock extends React.Component {
             object: trialObject,
             response: 'Prompt',
             promptId: promptObject.id,
-            note
+            note,
           },
-
         })
 
         if (trialObject.trial === 'CORRECT') {
@@ -637,7 +653,7 @@ class DataRecordingBlock extends React.Component {
             response: 'Prompt',
             promptId: promptObject.id,
             sdId: StimulusActiveId,
-            note
+            note,
           },
         })
       }
@@ -645,7 +661,7 @@ class DataRecordingBlock extends React.Component {
     this.resetNote()
   }
 
-  removeSDCount = val => {
+  removeSDCount = (val, trialResponse) => {
     const { note } = this.state
     this.closePromptOptions()
     const {
@@ -669,9 +685,9 @@ class DataRecordingBlock extends React.Component {
           type: 'sessionrecording/UPDATE_TARGET_SD_TRIAL',
           payload: {
             object: trialObject,
-            response: 'Error',
+            response: trialResponse,
             promptId: '',
-            note
+            note,
           },
         })
         if (trialObject.trial === 'CORRECT') {
@@ -690,10 +706,10 @@ class DataRecordingBlock extends React.Component {
         dispatch({
           type: 'sessionrecording/TARGET_SD_CORRECT',
           payload: {
-            response: 'Error',
+            response: trialResponse,
             promptId: '',
             sdId: StimulusActiveId,
-            note
+            note,
           },
         })
       }
@@ -800,7 +816,7 @@ class DataRecordingBlock extends React.Component {
         if (object.trial === 'CORRECT') {
           this.addCorrectTrailButtonStyle()
         }
-        if (object.trial === 'ERROR') {
+        if (object.trial === 'ERROR' || object.trial === 'INCORRECT') {
           this.addInCorrectTrailButtonStyle()
         }
         if (object.trial === 'PROMPT') {
@@ -828,12 +844,13 @@ class DataRecordingBlock extends React.Component {
     if (object.trial === 'CORRECT') {
       this.addCorrectTrailButtonStyle()
     }
-    if (object.trial === 'ERROR') {
+    if (object.trial === 'ERROR' || object.trial === 'INCORRECT') {
       this.addInCorrectTrailButtonStyle()
     }
     if (object.trial === 'PROMPT') {
       this.addPromptTrailButtonStyle()
     }
+
     this.setNoteText(object)
   }
 
@@ -862,7 +879,7 @@ class DataRecordingBlock extends React.Component {
             object: trialObject,
             response: 'Correct',
             promptId: '',
-            note
+            note,
           },
         })
 
@@ -886,7 +903,7 @@ class DataRecordingBlock extends React.Component {
             response: 'Correct',
             promptId: '',
             stepId: StepActiveId,
-            note
+            note,
           },
         })
       }
@@ -920,7 +937,7 @@ class DataRecordingBlock extends React.Component {
             object: trialObject,
             response: 'Prompt',
             promptId: promptObject.id,
-            note
+            note,
           },
         })
 
@@ -943,7 +960,7 @@ class DataRecordingBlock extends React.Component {
             response: 'Prompt',
             promptId: promptObject.id,
             stepId: StepActiveId,
-            note
+            note,
           },
         })
       }
@@ -951,7 +968,7 @@ class DataRecordingBlock extends React.Component {
     this.resetNote()
   }
 
-  removeSTEPCount = val => {
+  removeSTEPCount = (val, trialResponse) => {
     const { note } = this.state
     this.closePromptOptions()
     const {
@@ -975,9 +992,9 @@ class DataRecordingBlock extends React.Component {
           type: 'sessionrecording/UPDATE_TARGET_STEP_TRIAL',
           payload: {
             object: trialObject,
-            response: 'Error',
+            response: trialResponse,
             promptId: '',
-            note
+            note,
           },
         })
         if (trialObject.trial === 'CORRECT') {
@@ -996,10 +1013,10 @@ class DataRecordingBlock extends React.Component {
         dispatch({
           type: 'sessionrecording/TARGET_STEP_CORRECT',
           payload: {
-            response: 'Error',
+            response: trialResponse,
             promptId: '',
             stepId: StepActiveId,
-            note
+            note,
           },
         })
       }
@@ -1008,8 +1025,6 @@ class DataRecordingBlock extends React.Component {
   }
 
   // End of Stimulus functions
-
-
 
   render() {
     const {
@@ -1032,7 +1047,15 @@ class DataRecordingBlock extends React.Component {
       : { display: 'none' }
     const promptOptionsDiv = showPromptOptions
       ? { display: 'none' }
-      : { display: 'block', textAlign: 'center', marginTop: '40px' }
+      : {
+        display: 'block',
+        textAlign: 'center',
+        margin: '40px auto',
+        boxShadow: '0px 0px 5px #ccc',
+        border: '1px solid #ccc',
+        width: '340px',
+        paddingBottom: '20px',
+      }
     const promptCodeButtonStyle = {
       padding: '8px auto',
       width: '300px',
@@ -1058,13 +1081,13 @@ class DataRecordingBlock extends React.Component {
 
     return (
       <>
-
         {MasterSession.targets.edges[TargetActiveIndex].node.sd.edges.length > 0 ? (
           <>
             {/* Start of Stimulus data recording section */}
             <Row>
-              <Col xs={4}>
-                <p style={{ textAlign: 'center', marginTop: '160px', marginRight: '-30px' }}>
+              <Col span={24}>
+                {/* Start of Stimulus count and description section */}
+                <p style={{ textAlign: 'center', marginTop: '10px' }}>
                   <span>
                     {StimulusActiveIndex === 0 ? (
                       <Button style={trialsLeftButtonStyle} disabled type="link">
@@ -1080,22 +1103,36 @@ class DataRecordingBlock extends React.Component {
                         </Button>
                       )}
                   </span>
-                </p>
-              </Col>
-              <Col xs={16}>
-                {/* Start of Stimulus count and description section */}
-                <p style={{ textAlign: 'center', marginTop: '10px' }}>
                   <span style={{ padding: '0px 15px' }}>
                     Stimulus {StimulusActiveIndex + 1} /{' '}
                     {MasterSession.targets.edges[TargetActiveIndex].node.sd.edges.length}
                   </span>
+                  <span>
+                    {StimulusActiveIndex ===
+                      MasterSession.targets.edges[TargetActiveIndex].node.sd.edges.length - 1 ? (
+                        <Button style={trialsRightButtonStyle} disabled type="link">
+                          <Icon type="right" />
+                        </Button>
+                      ) : (
+                        <Button
+                          style={trialsRightButtonStyle}
+                          onClick={this.moveToNextStimulus}
+                          type="link"
+                        >
+                          <Icon type="right" />
+                        </Button>
+                      )}
+                  </span>
                 </p>
                 <p style={{ textAlign: 'center', marginTop: '10px' }}>
-                  {
-                    MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[
-                      StimulusActiveIndex
-                    ].node.sd
-                  }
+                  <Title level={4} style={{ display: 'inline-block' }}>
+                    {
+                      MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[
+                        StimulusActiveIndex
+                      ].node.sd
+                    }
+                  </Title>
+
                 </p>
 
                 {/* Trials count section */}
@@ -1194,60 +1231,64 @@ class DataRecordingBlock extends React.Component {
                     )}
                 </p>
                 <p style={promptOptionsDiv}>
+                  <div style={{ display: 'block', float: 'right', width: '100%' }}>
+                    <Button
+                      type="danger"
+                      shape="circle"
+                      icon="close"
+                      onClick={() => this.closePromptOptions()}
+                      style={{ float: 'right', margin: '3px 3px 0px 0px' }}
+                    />
+                  </div>
                   {PromptCodesList.map(item => (
                     <>
                       <Popconfirm
-                        title={<Input.TextArea rows={4} value={note} onChange={(e) => this.setState({ note: e.target.value })} />}
+                        title={
+                          <Input.TextArea
+                            rows={4}
+                            value={note}
+                            onChange={e => this.setState({ note: e.target.value })}
+                          />
+                        }
                         icon={<Icon type="question-circle-o" style={{ color: 'green' }} />}
                         onConfirm={() => this.promptSDCount(Count, item)}
                       >
-                        <Button
-                          style={promptCodeButtonStyle}
-                        >
-                          {item.promptName}
-                        </Button>
+                        <Button style={promptCodeButtonStyle}>{item.promptName}</Button>
                       </Popconfirm>
 
                       <br />
                     </>
                   ))}
                   <Popconfirm
-                    title={<Input.TextArea rows={4} value={note} onChange={(e) => this.setState({ note: e.target.value })} />}
+                    title={
+                      <Input.TextArea
+                        rows={4}
+                        value={note}
+                        onChange={e => this.setState({ note: e.target.value })}
+                      />
+                    }
                     icon={<Icon type="question-circle-o" style={{ color: 'green' }} />}
-                    onConfirm={() => this.removeSDCount(Count)}
+                    onConfirm={() => this.removeSDCount(Count, error)}
                   >
-                    <Button style={promptCodeButtonStyle}>
-                      No Response
-                    </Button>
+                    <Button style={promptCodeButtonStyle}>No Response</Button>
                   </Popconfirm>
-                  <Button style={promptCodeButtonStyle} onClick={() => this.closePromptOptions()}>
-                    Close
-                  </Button>
 
+                  <Popconfirm
+                    title={
+                      <Input.TextArea
+                        rows={4}
+                        value={note}
+                        onChange={e => this.setState({ note: e.target.value })}
+                      />
+                    }
+                    icon={<Icon type="question-circle-o" style={{ color: 'green' }} />}
+                    onConfirm={() => this.removeSDCount(Count, incorrect)}
+                  >
+                    <Button style={promptCodeButtonStyle}>Incorrect Response</Button>
+                  </Popconfirm>
                 </p>
                 {/* End of Correct Incorrect Buttons */}
               </Col>
-              <Col xs={4}>
-                <p style={{ textAlign: 'center', marginTop: '160px', marginLeft: '-30px' }}>
-                  <span>
-                    {StimulusActiveIndex ===
-                      MasterSession.targets.edges[TargetActiveIndex].node.sd.edges.length - 1 ? (
-                        <Button style={trialsRightButtonStyle} disabled type="link">
-                          <Icon type="right" />
-                        </Button>
-                      ) : (
-                        <Button
-                          style={trialsRightButtonStyle}
-                          onClick={this.moveToNextStimulus}
-                          type="link"
-                        >
-                          <Icon type="right" />
-                        </Button>
-                      )}
-                  </span>
-                </p>
-              </Col>
-              {/* End of Stimulus count and description section */}
             </Row>
 
             {/* End of Stimulus data recording section */}
@@ -1284,10 +1325,13 @@ class DataRecordingBlock extends React.Component {
                   </span>
                 </p>
                 <p style={{ textAlign: 'center', marginTop: '10px' }}>
-                  {
-                    MasterSession.targets.edges[TargetActiveIndex].node.steps.edges[StepActiveIndex]
-                      .node.step
-                  }
+
+                  <Title level={4} style={{ display: 'inline-block' }}>
+                    {
+                      MasterSession.targets.edges[TargetActiveIndex].node.steps.edges[StepActiveIndex]
+                        .node.step
+                    }
+                  </Title>
                 </p>
                 {/* End of Step count and description section */}
                 {/* Trials count section */}
@@ -1386,36 +1430,60 @@ class DataRecordingBlock extends React.Component {
                     )}
                 </p>
                 <p style={promptOptionsDiv}>
+                  <div style={{ display: 'block', float: 'right', width: '100%' }}>
+                    <Button
+                      type="danger"
+                      shape="circle"
+                      icon="close"
+                      onClick={() => this.closePromptOptions()}
+                      style={{ float: 'right', margin: '3px 3px 0px 0px' }}
+                    />
+                  </div>
                   {PromptCodesList.map(item => (
                     <>
                       <Popconfirm
-                        title={<Input.TextArea rows={4} value={note} onChange={(e) => this.setState({ note: e.target.value })} />}
+                        title={
+                          <Input.TextArea
+                            rows={4}
+                            value={note}
+                            onChange={e => this.setState({ note: e.target.value })}
+                          />
+                        }
                         icon={<Icon type="question-circle-o" style={{ color: 'green' }} />}
                         onConfirm={() => this.promptSTEPCount(Count, item)}
                       >
-                        <Button
-                          style={promptCodeButtonStyle}
-                        >
-                          {item.promptName}
-                        </Button>
+                        <Button style={promptCodeButtonStyle}>{item.promptName}</Button>
                       </Popconfirm>
 
                       <br />
                     </>
                   ))}
                   <Popconfirm
-                    title={<Input.TextArea rows={4} value={note} onChange={(e) => this.setState({ note: e.target.value })} />}
+                    title={
+                      <Input.TextArea
+                        rows={4}
+                        value={note}
+                        onChange={e => this.setState({ note: e.target.value })}
+                      />
+                    }
                     icon={<Icon type="question-circle-o" style={{ color: 'green' }} />}
-                    onConfirm={() => this.removeSTEPCount(Count)}
+                    onConfirm={() => this.removeSTEPCount(Count, error)}
                   >
-                    <Button style={promptCodeButtonStyle}>
-                      No Response
-                    </Button>
+                    <Button style={promptCodeButtonStyle}>No Response</Button>
                   </Popconfirm>
-                  <Button style={promptCodeButtonStyle} onClick={() => this.closePromptOptions()}>
-                    Close
-                  </Button>
-
+                  <Popconfirm
+                    title={
+                      <Input.TextArea
+                        rows={4}
+                        value={note}
+                        onChange={e => this.setState({ note: e.target.value })}
+                      />
+                    }
+                    icon={<Icon type="question-circle-o" style={{ color: 'green' }} />}
+                    onConfirm={() => this.removeSTEPCount(Count, incorrect)}
+                  >
+                    <Button style={promptCodeButtonStyle}>Incorrect Response</Button>
+                  </Popconfirm>
                 </p>
                 {/* End of Correct Incorrect Buttons */}
                 {/* End of Step data recording section */}
@@ -1491,7 +1559,7 @@ class DataRecordingBlock extends React.Component {
                         onClick={() => this.addCount(Count)}
                       >
                         <CheckOutlined /> Correct ({CorrectCount})
-                      </Button>
+                  </Button>
                       <Button
                         id="incorrectResponseButton"
                         disabled
@@ -1504,7 +1572,7 @@ class DataRecordingBlock extends React.Component {
                         onClick={() => this.showPrompt()}
                       >
                         <CloseOutlined /> Incorrect ({IncorrectCount})
-                      </Button>{' '}
+                  </Button>{' '}
                       <br />
                     </>
                   ) : (
@@ -1515,7 +1583,7 @@ class DataRecordingBlock extends React.Component {
                           onClick={() => this.addCount(Count)}
                         >
                           <CheckOutlined /> Correct ({CorrectCount})
-                        </Button>
+                  </Button>
                         <Button
                           id="incorrectResponseButton"
                           style={{
@@ -1527,42 +1595,66 @@ class DataRecordingBlock extends React.Component {
                           onClick={() => this.showPrompt()}
                         >
                           <CloseOutlined /> Incorrect ({IncorrectCount})
-                        </Button>{' '}
+                  </Button>{' '}
                         <br />
                       </>
                     )}
                 </p>
                 <p style={promptOptionsDiv}>
+                  <div style={{ display: 'block', float: 'right', width: '100%' }}>
+                    <Button
+                      type="danger"
+                      shape="circle"
+                      icon="close"
+                      onClick={() => this.closePromptOptions()}
+                      style={{ float: 'right', margin: '3px 3px 0px 0px' }}
+                    />
+                  </div>
                   {PromptCodesList.map(item => (
                     <>
                       <Popconfirm
-                        title={<Input.TextArea rows={4} value={note} onChange={(e) => this.setState({ note: e.target.value })} />}
+                        title={
+                          <Input.TextArea
+                            rows={4}
+                            value={note}
+                            onChange={e => this.setState({ note: e.target.value })}
+                          />
+                        }
                         icon={<Icon type="question-circle-o" style={{ color: 'green' }} />}
                         onConfirm={() => this.promptCount(Count, item)}
                       >
-                        <Button
-                          style={promptCodeButtonStyle}
-                        >
-                          {item.promptName}
-                        </Button>
+                        <Button style={promptCodeButtonStyle}>{item.promptName}</Button>
                       </Popconfirm>
 
                       <br />
                     </>
                   ))}
                   <Popconfirm
-                    title={<Input.TextArea rows={4} value={note} onChange={(e) => this.setState({ note: e.target.value })} />}
+                    title={
+                      <Input.TextArea
+                        rows={4}
+                        value={note}
+                        onChange={e => this.setState({ note: e.target.value })}
+                      />
+                    }
                     icon={<Icon type="question-circle-o" style={{ color: 'green' }} />}
-                    onConfirm={() => this.removeCount(Count)}
+                    onConfirm={() => this.removeCount(Count, error)}
                   >
-                    <Button style={promptCodeButtonStyle}>
-                      No Response
-                    </Button>
+                    <Button style={promptCodeButtonStyle}>No Response</Button>
                   </Popconfirm>
-                  <Button style={promptCodeButtonStyle} onClick={() => this.closePromptOptions()}>
-                    Close
-                  </Button>
-
+                  <Popconfirm
+                    title={
+                      <Input.TextArea
+                        rows={4}
+                        value={note}
+                        onChange={e => this.setState({ note: e.target.value })}
+                      />
+                    }
+                    icon={<Icon type="question-circle-o" style={{ color: 'green' }} />}
+                    onConfirm={() => this.removeCount(Count, incorrect)}
+                  >
+                    <Button style={promptCodeButtonStyle}>Incorrect Response</Button>
+                  </Popconfirm>
                 </p>
                 {/* End of Correct Incorrect Buttons */}
                 {/* End of Target data recording */}

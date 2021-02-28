@@ -3,544 +3,544 @@
 /* eslint-disable react/jsx-indent-props */
 /* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable no-unneeded-ternary */
-/* eslint-disable no-unneeded-ternary */
-/* eslint-disable no-unneeded-ternary */
-import React, { useState, useEffect } from 'react'
-import { useQuery } from 'react-apollo'
+/* eslint-disable array-callback-return */
+import React, { useState, useEffect, useRef } from 'react'
+import { useQuery, useLazyQuery } from 'react-apollo'
 import gql from 'graphql-tag'
-import { Button, Popconfirm, Drawer, Form, Input, Select, notification } from 'antd'
-import DataTable from 'react-data-table-component'
+import Highlighter from 'react-highlight-words'
+import {
+  Table,
+  Button,
+  Popconfirm,
+  Dropdown,
+  Drawer,
+  Form,
+  Menu,
+  Input,
+  Select,
+  notification,
+  Space,
+  Tabs,
+} from 'antd'
 import Authorize from 'components/LayoutComponents/Authorize'
-import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
+import {
+  CheckCircleOutlined,
+  FilterOutlined,
+  CloudDownloadOutlined,
+  CloseCircleOutlined,
+  FilterFilled,
+  SearchOutlined,
+} from '@ant-design/icons'
+import moment from 'moment'
+import { FaDownload } from 'react-icons/fa'
+import * as FileSaver from 'file-saver'
+import * as XLSX from 'xlsx'
 import client from '../../apollo/config'
+import './allClinicData.scss'
+import AllLearners from './allLearners'
+import UpdateClinicRates from './updateClinicRates'
+import InvoiceTable from './invoiceTable'
+import { CLINIC_QUERY, UPDATE_SCHOOL } from './query'
+import ClinicStaff from './clinicStaff'
+import { FilterCard } from './filterCard'
+import PrintableInvoice from './printableInvoice'
+import ViewInvoice from './viewInvoice'
 
-const { Option } = Select
-
-const layout = {
-    labelCol: {
-        span: 10
-    },
-    wrapperCol: {
-        span: 10
-    }
-}
-const tailLayout = {
-    wrapperCol: {
-        offset: 7,
-        span: 14
-    }
-}
-
-const CLINIC_QUERY = gql`
-  query{
-    clinicAllDetails{
-            invoice
-            totalLearners     
-            activeLearners     
-            lastMonthActiveLearners     
-            researchParticipent     
-            activeDays     
-            peak     
-            vbmapp     
-            cogniable     
-            lastLogin     
-            status     
-            details{
-                id
-                 schoolName
-            }  
-    } 
-}
-`
-
-
+const countrySet = []
+const { TabPane } = Tabs
 
 const AllClinicsData = () => {
-    const { data, loading, error, refetch } = useQuery(CLINIC_QUERY);
+  const [activeTab, setActiveTab] = useState('Active')
+  const [clinicsList, setClinicsList] = useState([])
+  const [mainList, setMainList] = useState([])
+  const [filterDrawer, setFilterDrawer] = useState(false)
+  const [isFilterActive, setIsFilterActive] = useState(false)
+  const [staffDrawer, setStaffDrawer] = useState(false)
+  const [drawerTitle, setDrawerTitle] = useState('')
+  const [invoiceDrawer, setInvoiceDrawer] = useState(false)
+  const [ratesDrawer, setRatesDrawer] = useState(false)
+  const [learnersTableDrawer, setLearnersTableDrawer] = useState(false)
+  const [currentClinicRow, setCurrentClinicRow] = useState()
+  const filterRef = useRef()
+  const filterSet = { name: true, email: true, mobile: true, status: true }
+  const { data, loading, error, refetch } = useQuery(CLINIC_QUERY, {
+    variables: {
+      isActive: activeTab === 'Active' ? true : false,
+    },
+  })
 
-    const [clinicsList, setClinicsList] = useState([]);
-    const [visible, setVisible] = useState(false);
-    const [visibleNew, setVisibleNew] = useState(false);
-
-    const [selectedClinic, setSelectedClinic] = useState();
-    const [peak, setPeak] = useState('');
-    const [lastInvoice, setLastInvoice] = useState('');
-    const [learnerPrice, setLearnerPrice] = useState('');
-    const [researchPrice, setResearchPrice] = useState('');
-    const [vbmpapp, setVbmapp] = useState('');
-
-
-
-    useEffect(() => {
-        if (data) {
-            setClinicsList(data && data.clinicAllDetails ? data.clinicAllDetails : [])
+  useEffect(() => {
+    if (data) {
+      data.clinicAllDetails.map(item => {
+        if (countrySet.indexOf(item.details.country.name) === -1) {
+          countrySet.push(item.details.country.name)
         }
-    }, [data])
-    // console.log('clinicsList', ratesData);
+        return countrySet
+      })
 
-    const customStyles = {
-        header: {
-            style: {
-                maxHeight: '50px'
-            }
-        },
-        headRow: {
-            style: {
-                borderTopStyle: 'solid',
-                borderTopWidth: '1px',
-                borderTopColor: '#ddd',
-                backgroundColor: '#f5f5f5'
-            }
-        },
-        headCells: {
-            style: {
-                '&:not(:last-of-type)': {
-                    borderRightStyle: 'solid',
-                    borderRightWidth: '1px',
-                    borderRightColor: '#ddd'
-                },
-                fontWeight: 'bold'
-            }
-        },
-        cells: {
-            style: {
-                '&:not(:last-of-type)': {
-                    borderRightStyle: 'solid',
-                    borderRightWidth: '1px',
-                    borderRightColor: '#ddd'
-                },
-                fontSize: '11px'
-            }
-        },
-        pagination: {
-            style: {
-                position: 'absolute',
-                top: '5px',
-                right: '5px',
-                borderTopStyle: 'none',
-                minHeight: '35px'
-            }
-        },
-        table: {
-            style: {
-                paddingBottom: '40px',
-                top: '40px'
-            }
-        }
+      setClinicsList(data && data.clinicAllDetails ? data.clinicAllDetails : [])
+      setMainList(data && data.clinicAllDetails ? data.clinicAllDetails : [])
     }
+  }, [data])
 
-    const closeTask = (e, status) => {
-        console.log('close task ===> ', e, status)
-        const val = status === "Active" ? false : true;
-
-        return client
-            .mutate({
-                mutation: gql`mutation{
-          updateSchool(input:{
-            pk:"${e.details.id}",
-            isActive:${val}})
-                    {        
-                      details{
-                      id
-                      schoolName
-                      email
-                      noLearner
-                      country{
-                      id
-                      name
-                      }
-                      }
-                      }
-                    }`
-            })
-            .then(result => {
-                refetch()
-                notification.success({
-                    message: "Clinic status Updated",
-                    description: "Clinic status updated successfully",
-                })
-            })
-            .catch(error1 => error1)
+  useEffect(() => {
+    if (error) {
+      notification.error({
+        message: 'Somthing went wrong',
+        description: 'Unable to fetch clinic data',
+      })
     }
+  }, [error])
 
-    const updateCLinicRates = (e) => {
-        e.preventDefault();
-        return client
-            .mutate({
-                mutation: gql`mutation{    maintainClinicRates(input:{        pk:"${selectedClinic}"        clinic:"${selectedClinic}"        
-        learnerPrice:${learnerPrice}        researchParticipantPrice:${researchPrice}   
-           lastInvoicePrice:${lastInvoice}     
-            peakPrice:${peak}     
-            vbmappPrice:${vbmpapp}
-                })
-                 {       
-                   details{          
-                     id  
-                       }  
-                 }
-                }`
-            })
-            .then(result => {
-                refetch()
-                notification.success({
-                    message: "Clinic Rates Updated",
-                    description: "Clinic rates updated successfully",
-                })
-            }
-            )
-            .catch(error1 => error1)
-    }
+  const closeTask = async (status, record) => {
+    const val = status === 'Active' ? false : true
 
-
-
-    const getRates = () => {
-
-        return client
-            .query({
-                query: gql`
-query{
-      getClinicRates(clinic:"${selectedClinic}")
-      {
-            edges
-          {
-            node
-            {             
-              id
-              learnerPrice
-              researchParticipantPrice
-              lastInvoicePrice               
-              peakPrice                
-              vbmappPrice                
-              clinic
-              {
-              id
-              schoolName
-              }
-            }        
-          }    
-      }
-}
-`
-            })
-            .then(result => {
-
-                if (result.data) {
-                    const clinicRates = result.data.getClinicRates && result.data.getClinicRates.edges;
-
-                    if (clinicRates.length > 0) {
-                        setPeak(clinicRates[0].node.peakPrice);
-                        setVbmapp(clinicRates[0].node.vbmappPrice);
-                        setLastInvoice(clinicRates[0].node.lastInvoicePrice);
-                        setResearchPrice(clinicRates[0].node.researchParticipantPrice);
-                        setLearnerPrice(clinicRates[0].node.learnerPrice);
-
-                        setVisible(true);
-                    }
-                    else {
-                        setPeak('');
-                        setVbmapp('');
-                        setLastInvoice('');
-                        setResearchPrice('');
-                        setLearnerPrice('');
-
-                        setVisible(true);
-                    }
-                }
-
-            })
-            .catch(error1 => console.log("errors-", error1))
-
-    }
-
-    const columns = [
-        {
-            name: 'Name',
-            sortable: true,
-            minWidth: '250px',
-            cell: row => (
-                <Button
-                    // onClick={() => this.info(row)}
-                    type='link'
-                    style={{ padding: '0px', fontWeight: 'bold', fontSize: '11px' }}
-                >
-                    {row.details && row.details.schoolName}
-                </Button>
-            )
+    console.log(record.details.id, val)
+    await client
+      .mutate({
+        mutation: UPDATE_SCHOOL,
+        variables: {
+          pk: record.details.id,
+          isActive: val,
         },
-        {
-            name: 'Total Learners',
-            selector: 'totalLearners',
-            sortable: true,
-            maxWidth: '70px',
-            minWidth: '70px'
-        },
-        {
-            name: 'Active Learners',
-            selector: 'activeLearners',
-            sortable: true,
-            maxWidth: '70px',
-            minWidth: '70px'
-        },
-        {
-            name: 'Last Month Active Learners',
-            selector: 'lastMonthActiveLearners',
-            sortable: true,
-            maxWidth: '100px',
-            minWidth: '100px'
-        },
-        {
-            name: 'Research Participants',
-            selector: 'researchParticipent',
-            sortable: true,
-            maxWidth: '100px',
-            minWidth: '100px'
-        },
-        {
-            name: 'Peak',
-            selector: 'peak',
-            sortable: true,
-            maxWidth: '70px',
-            minWidth: '70px'
-        },
+      })
+      .then(updatedData => {
+        console.log(updatedData, 'data')
+        notification.success({
+          message: 'Clinic status Updated',
+          description: 'Clinic status updated successfully',
+        })
+      })
+      .catch(updateError => console.log(updateError, 'in errororo'))
+    refetch()
+  }
 
-        {
-            name: 'VBM App',
-            selector: 'vbmapp',
-            maxWidth: '80px',
-            minWidth: '80px'
-        },
-        {
-            name: 'Cogniable',
-            selector: 'cogniable',
-            maxWidth: '80px',
-            minWidth: '80px'
-        },
-        {
-            name: 'Invoices',
-            selector: 'invoice',
-            maxWidth: '80px',
-            minWidth: '80px',
-            cell: row => (
+  const [sortOrderInfo, setSortOrderInfo] = useState(null)
 
-                <Button
-                    onClick={() => setVisibleNew(true)}
-                    type='link'
-                    style={{ padding: '0px', fontWeight: 'bold', fontSize: '11px' }}
-                >
-                    {row.invoice}
-                </Button>
+  const handleChange = (pagination, filters, sorter) => {
+    setSortOrderInfo(sorter)
+  }
 
-            )
-        },
-        {
-            name: 'Last Login',
-            selector: 'lastLogin',
-            maxWidth: '100px',
-            minWidth: '100px'
-        },
-        {
-            name: 'Status',
-            selector: 'status',
-            maxWidth: '120px',
-            minWidth: '120px',
-            cell: e => (
-                <span>
-                    <span>{e.status}</span>
-                    <Popconfirm
-                        title='Sure to deactivate the clinic?'
-                        onConfirm={() => closeTask(e, e.status)}
-                    >
-                        <Button type='link'>
-                            {e.status !== 'Active'
-                                ? <CheckCircleOutlined style={{ color: 'green' }} />
-                                : <CloseCircleOutlined style={{ color: 'red' }} />}
-                        </Button>
-                    </Popconfirm>
-                </span>
-            )
-        },
-        {
-            name: 'Action',
-            sortable: true,
-            minWidth: '100px',
-            cell: row => (
+  const sortedInfo = sortOrderInfo || {}
 
-                <Button
-                    onClick={() => {
-                        setSelectedClinic(row.details.id);
-                        getRates();
-
-                    }}
-                    type='link'
-                    style={{ padding: '0px', fontWeight: 'bold', fontSize: '11px' }}
-                >
-                    Maintain Rates
+  const columns = [
+    {
+      title: 'Name',
+      dataIndex: 'details.schoolName',
+      key: 'schoolName',
+      maxWidth: '100px',
+      width: '230px',
+      align: 'left',
+    },
+    {
+      title: 'Email',
+      dataIndex: 'details.email',
+      key: 'schoolEmail',
+      width: '200px',
+      align: 'left',
+    },
+    {
+      title: 'Contact No',
+      dataIndex: 'details.contactNo',
+      key: 'contactNo',
+      align: 'left',
+      width: '130px',
+      render: (text, row) => {
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span>{text}</span>
+            <span>{row.details.contactNo2}</span>
+          </div>
+        )
+      },
+    },
+    {
+      title: 'Staff',
+      key: 'staff',
+      width: '85px',
+      render: (text, row) => (
+        <Button
+          onClick={() => {
+            setCurrentClinicRow(row)
+            setDrawerTitle(row.details.schoolName)
+            setStaffDrawer(true)
+          }}
+          type="link"
+          style={{ padding: '0px', fontWeight: 'bold', fontSize: '13px' }}
+        >
+          {row.details.staffSet?.edges?.length}
         </Button>
-
-            )
+      ),
+    },
+    {
+      title: 'Total Learners',
+      dataIndex: 'totalLearners',
+      key: 'totalLearners',
+      sorter: (a, b) => a.totalLearners - b.totalLearners,
+      sortOrder: sortedInfo.columnKey === 'totalLearners' && sortedInfo.order,
+      sortDirections: ['ascend', 'descend'],
+      width: '95px',
+      render: (text, row) => (
+        <Button
+          onClick={() => {
+            setCurrentClinicRow(row)
+            setDrawerTitle(row.details.schoolName)
+            setLearnersTableDrawer(true)
+          }}
+          type="link"
+          style={{ padding: '0px', fontWeight: 'bold', fontSize: '13px' }}
+        >
+          {text}
+        </Button>
+      ),
+    },
+    {
+      title: 'Active Learners',
+      dataIndex: 'activeLearners',
+      key: 'activeLearners',
+      sorter: (a, b) => a.activeLearners - b.activeLearners,
+      sortOrder: sortedInfo.columnKey === 'activeLearners' && sortedInfo.order,
+      sortDirections: ['ascend', 'descend'],
+      width: '95px',
+    },
+    {
+      title: 'Last Month Active Learners',
+      dataIndex: 'lastMonthActiveLearners',
+      key: 'lastMonthsActiveLearners',
+      sorter: (a, b) => a.lastMonthsActiveLearners - b.lastMonthsActiveLearners,
+      sortOrder: sortedInfo.columnKey === 'lastMonthsActiveLearners' && sortedInfo.order,
+      sortDirections: ['ascend', 'descend'],
+      width: '110px',
+    },
+    {
+      title: 'Research Participants',
+      dataIndex: 'researchParticipent',
+      key: 'researchParticipant',
+      sorter: (a, b) => a.researchParticipant - b.researchParticipant,
+      sortOrder: sortedInfo.columnKey === 'researchParticipant' && sortedInfo.order,
+      sortDirections: ['ascend', 'descend'],
+      width: '120px',
+    },
+    {
+      title: 'Peak',
+      dataIndex: 'peak',
+      width: '85px',
+    },
+    {
+      title: 'VBM App',
+      dataIndex: 'vbmapp',
+      width: '85px',
+    },
+    {
+      title: 'Cogniable',
+      dataIndex: 'cogniable',
+      width: '85px',
+    },
+    {
+      title: 'Invoices',
+      dataIndex: 'invoice',
+      width: '85px',
+      render: (e, row) => (
+        <Button
+          onClick={() => {
+            setCurrentClinicRow(row)
+            setDrawerTitle(row.details.schoolName)
+            setInvoiceDrawer(true)
+          }}
+          type="link"
+          style={{ padding: '0px', fontWeight: 'bold', fontSize: '13px' }}
+        >
+          {e}
+        </Button>
+      ),
+    },
+    {
+      title: 'Last Login',
+      dataIndex: 'lastLogin',
+      width: '100px',
+      align: 'left',
+      ellipsis: true,
+      sorter: (a, b) => {
+        if (a.lastLogin !== 'None' && b.lastLogin !== 'None') {
+          return new Date(a.lastLogin) - new Date(b.lastLogin)
         }
-    ]
-
-    return (
-        <Authorize roles={['superUser']} redirect to='/404'>
-
-            <Drawer
-                title='Maintain Rates'
-                width='40%'
-                placement='right'
-                closable='true'
-                onClose={() => setVisible(false)}
-                visible={visible}
-            >
-                <Form {...layout} name='control-ref' onSubmit={e => updateCLinicRates(e)}>
-                    <Form.Item label='Price / Learner' style={{ marginBottom: '5px' }} size='small'>
-                        <Input size='small' style={{ borderRadius: 0 }} value={learnerPrice} onChange={(e) => setLearnerPrice(e.target.value)} />
-                    </Form.Item>
-                    <Form.Item label='Research Participants' style={{ marginBottom: '5px' }} size='small'>
-                        <Input size='small' style={{ borderRadius: 0 }} value={researchPrice} onChange={(e) => setResearchPrice(e.target.value)} />
-                    </Form.Item>
-                    <Form.Item label='Last Invoice Amount' style={{ marginBottom: '5px' }} size='small'>
-                        <Input size='small' style={{ borderRadius: 0 }} value={lastInvoice} onChange={(e) => setLastInvoice(e.target.value)} />
-                    </Form.Item>
-                    <Form.Item label='PEAK' style={{ marginBottom: '5px' }} size='small'>
-                        <Input size='small' style={{ borderRadius: 0 }} value={peak} onChange={(e) => setPeak(e.target.value)} />
-                    </Form.Item>
-
-                    <Form.Item label='VBMAPP' style={{ marginBottom: '5px' }} size='small'>
-                        <Input size='small' style={{ borderRadius: 0 }} value={vbmpapp} onChange={(e) => setVbmapp(e.target.value)} />
-                    </Form.Item>
-                    <Form.Item label='Status' style={{ marginBottom: '5px' }} size='small'>
-                        <Select mode='multiple' placeholder='Select Status' allowClear size='small' style={{ borderRadius: 0 }}>
-                            <Option value='created'>Created</Option>
-                            <Option value='paid'>Paid</Option>
-                            <Option value='due'>Due</Option>
-                            <Option value='overdue'>Over Due</Option>
-                        </Select>
-                    </Form.Item>
-                    <Form.Item {...tailLayout}>
-                        <Button type='primary' htmlType='submit' size='small'>
-                            Submit
+        return false
+      },
+      sortOrder: sortedInfo.columnKey === 'lastLogin' && sortedInfo.order,
+      sortDirections: ['ascend', 'descend'],
+      render: text => {
+        const tempDate = new Date(text)
+        return text === 'None' ? 'None' : `${moment(tempDate).format('YYYY-MM-DD')}`
+      },
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      width: '85px',
+      render: (status, row) => (
+        <span>
+          <Popconfirm
+            title={`Sure to ${status === 'Active' ? 'deactivate' : 'activate'} the clinic?`}
+            onConfirm={() => closeTask(status, row)}
+          >
+            <Button type="link">
+              {status === 'Active' ? (
+                <CheckCircleOutlined style={{ color: 'green' }} />
+              ) : (
+                <CloseCircleOutlined style={{ color: 'red' }} />
+              )}
             </Button>
-                    </Form.Item>
-                </Form>
-            </Drawer>
+          </Popconfirm>
+        </span>
+      ),
+    },
+    {
+      title: 'Action',
+      width: '130px',
+      render: (text, row) => (
+        <Button
+          onClick={() => {
+            setCurrentClinicRow(row)
+            setDrawerTitle(row.details.schoolName)
+            setRatesDrawer(true)
+          }}
+          type="link"
+          style={{ padding: '0px', fontWeight: 'bold', fontSize: '13px' }}
+        >
+          Maintain Rates
+        </Button>
+      ),
+    },
+  ]
 
-            <Drawer
-                title='Invoices'
-                width='40%'
-                placement='right'
-                closable='true'
-                onClose={() => setVisibleNew(false)}
-                visible={visibleNew}
-            >
-                <div>
-                    <table>
-                        <tr>
-                            <td>Invoice 1</td>
-                            <td><Input /></td>
-                            <td>
-                                <Select mode='default' placeholder='Select Status' allowClear style={{ width: 150 }}>
-                                    <Option value=''>Select Status</Option>
-                                    <Option value='created'>Created</Option>
-                                    <Option value='paid'>Paid</Option>
-                                    <Option value='due'>Due</Option>
-                                    <Option value='overdue'>Over Due</Option>
-                                </Select>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Invoice 1</td>
-                            <td><Input /></td>
-                            <td>
-                                <Select mode='default' placeholder='Select Status' allowClear style={{ width: 150 }}>
-                                    <Option value=''>Select Status</Option>
-                                    <Option value='created'>Created</Option>
-                                    <Option value='paid'>Paid</Option>
-                                    <Option value='due'>Due</Option>
-                                    <Option value='overdue'>Over Due</Option>
-                                </Select>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
-            </Drawer>
+  const filterHandler = ({ name, email, status, mobile }) => {
+    let tempList = mainList
+    if (!name && !email && !status) {
+      setIsFilterActive(false)
+    }
+    if (name) {
+      setIsFilterActive(true)
+      tempList =
+        tempList &&
+        tempList.filter(
+          item =>
+            item.details.schoolName &&
+            item.details.schoolName.toLowerCase().includes(name.toLowerCase()),
+        )
+    }
+    if (email) {
+      setIsFilterActive(true)
+      tempList =
+        tempList &&
+        tempList.filter(
+          item =>
+            item.details.email && item.details.email.toLowerCase().includes(email.toLowerCase()),
+        )
+    }
+    if (mobile) {
+      setIsFilterActive(true)
+      tempList =
+        tempList &&
+        tempList.filter(
+          item =>
+            item.details.contactNo?.toLowerCase().includes(mobile.toLowerCase()) ||
+            item.details.contactNo2?.toLowerCase().includes(mobile.toLowerCase()),
+        )
+    }
+    if (status === 'true' || status === 'false') {
+      setIsFilterActive(true)
+      const tempStatus = status === 'true' ? 'Active' : 'Inactive'
+      console.log(tempStatus, 'tempStatus')
+      tempList = tempList && tempList.filter(item => item.status && item.status === tempStatus)
+    }
 
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '0px 10px',
-                    backgroundColor: '#FFF',
-                    boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)'
-                }}
-            >
-                <div style={{ padding: '5px 0px' }}>
-                    {/* <Button onClick={() => this.showDrawerFilter()} size="large">
-            <FilterOutlined />
+    setClinicsList(tempList)
+  }
+
+  const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+  const fileExtension = '.xlsx'
+  const exportToCSV = () => {
+    const filename = 'Clinic_List_'
+    const currentTime = moment().format('YYYY-MM-DD_HH:mm')
+    const formattedData = []
+    clinicsList.map(item => {
+      formattedData.push({
+        'Clinic Name': item.details.schoolName,
+        Email: item.details.email,
+        'Contact No 1': item.details.contactNo,
+        'Contact No 2': item.details.contactNo2,
+        'Total Learners': item.totalLearners,
+        'Active Learners': item.activeLearners,
+        'Last Month Active Learners': item.lastMonthActiveLearners,
+        Peak: item.peak,
+        VBMAPP: item.vbmapp,
+        'Research Participants': item.researchParticipent,
+        'Cogniable Learners': item.cogniable,
+        'Invoices Count': item.invoice,
+        'Last Login': moment(item.lastLogin).format('YYYY-MM-DD HH:mm:ss'),
+        Status: item.status,
+      })
+    })
+    console.log(formattedData)
+    const ws = XLSX.utils.json_to_sheet(formattedData)
+    const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+    const excelData = new Blob([excelBuffer], { type: fileType })
+    FileSaver.saveAs(excelData, filename + currentTime + fileExtension)
+  }
+
+  const menu = (
+    <Menu>
+      <Menu.Item key="1">
+        <Button onClick={() => exportToCSV()} type="link" size="small">
+          CSV/Excel
+        </Button>
+      </Menu.Item>
+    </Menu>
+  )
+
+  const exportButton = (
+    <div style={{ display: 'flex' }}>
+      <div>
+        {isFilterActive ? (
+          <Button
+            type="link"
+            onClick={() => {
+              filterRef.current.clearFilter()
+              setIsFilterActive(false)
+            }}
+            style={{ color: '#FEBB27' }}
+            size="small"
+          >
+            Clear Filters
+            <CloseCircleOutlined />
           </Button>
+        ) : null}
+        <Button type="link" onClick={() => setFilterDrawer(true)} size="large">
+          <FilterFilled style={{ fontSize: '22px' }} />
+        </Button>
+      </div>
+      <div>
+        <Dropdown overlay={menu} trigger={['click']}>
+          <Button type="link" size="large">
+            <FaDownload style={{ fontSize: '22px' }} />{' '}
+          </Button>
+        </Dropdown>
+      </div>
+    </div>
+  )
 
-          {this.state.filterName ||
-            this.state.filterCaseManager ||
-            this.state.filterGender ||
-            this.state.filterCategory ||
-            this.state.filterLocation ? (
-              <Button
-                type="link"
-                style={{ marginLeft: '10px', color: '#FEBB27' }}
-                onClick={() =>
-                  this.setState({
-                    filterName: '',
-                    filterCaseManager: '',
-                    filterGender: '',
-                    filterCategory: '',
-                    filterLocation: '',
-                  })
-                }
-                size="small"
-              >
-                Clear Filters
-                <CloseCircleOutlined />
-              </Button>
-            ) : null} */}
-                </div>
-                <div>
-                    <span style={{ fontSize: '25px', color: '#000' }}>All Clinics Data</span>
-                </div>
-                <div style={{ padding: '5px 0px' }}>
-                    {/* <Dropdown overlay={menu} trigger={['click']}>
-            <Button style={{ marginRight: '10px' }} type="link" size="large">
-              <CloudDownloadOutlined />{' '}
-            </Button>
-          </Dropdown>
+  return (
+    <Authorize roles={['superUser']} redirect to="/404">
+      <Tabs
+        style={{ marginTop: 10, marginLeft: 10 }}
+        defaultActiveKey={activeTab}
+        type="card"
+        className="vbmappReportTabs"
+        tabBarExtraContent={exportButton}
+        onChange={setActiveTab}
+      >
+        <TabPane tab="Active" key="Active">
+          <div className=" modify-table">
+            <Table
+              scroll={{ x: '70vw' }}
+              columns={columns}
+              rowKey={record => record.details.id}
+              dataSource={clinicsList}
+              onChange={handleChange}
+              loading={loading}
+              bordered
+              pagination={{
+                defaultPageSize: 20,
+                showSizeChanger: true,
+                pageSizeOptions: ['20', '30', '50', '100'],
+                position: 'top',
+              }}
+            />
+          </div>
+        </TabPane>
 
-          <Button onClick={this.showDrawer} type="primary">
-            <PlusOutlined /> ADD LEARNER
-            </Button> */}
-                </div>
-            </div>
+        <TabPane tab="Inactive" key="Inactive">
+          <div className="modify-table">
+            <Table
+              scroll={{ x: '70vw' }}
+              columns={columns}
+              rowKey={record => record.details.id}
+              dataSource={clinicsList}
+              onChange={handleChange}
+              loading={loading}
+              bordered
+              pagination={{
+                defaultPageSize: 20,
+                showSizeChanger: true,
+                pageSizeOptions: ['20', '30', '50', '100'],
+                position: 'top',
+              }}
+            />
+          </div>
+        </TabPane>
+      </Tabs>
+      <Drawer
+        title="Filters"
+        placement="right"
+        closable="true"
+        onClose={() => setFilterDrawer(false)}
+        visible={filterDrawer}
+        width={360}
+      >
+        <FilterCard filterHandler={filterHandler} filterSet={filterSet} ref={filterRef} />
+      </Drawer>
 
-            <div className='row'>
-                <div className='col-sm-12'>
-                    <div style={{ margin: '5px', marginBottom: '50px' }}>
-                        <DataTable
-                            title='All Clinics List'
-                            columns={columns}
-                            theme='default'
-                            dense='true'
-                            pagination='true'
-                            data={clinicsList}
-                            customStyles={customStyles}
-                            noHeader='true'
-                            paginationRowsPerPageOptions={[10, 50, 100, 200, 500, 1000]}
-                        />
-                    </div>
-                </div>
-
-            </div>
-        </Authorize>
-    )
+      <Drawer
+        title={`${drawerTitle}: Invoices`}
+        width="70vw"
+        placement="right"
+        closable="true"
+        onClose={() => setInvoiceDrawer(false)}
+        visible={invoiceDrawer}
+      >
+        <InvoiceTable rowData={currentClinicRow} setInvoiceDrawer={setInvoiceDrawer} />
+      </Drawer>
+      <Drawer
+        width="70vw"
+        placement="right"
+        closable="true"
+        onClose={() => setStaffDrawer(false)}
+        visible={staffDrawer}
+        destroyOnClose="true"
+        className="change-invo-drawer"
+      >
+        <ClinicStaff rowData={currentClinicRow} />
+      </Drawer>
+      <Drawer
+        title={`${drawerTitle}: Maintain Rates`}
+        width="40%"
+        placement="right"
+        closable="true"
+        onClose={() => setRatesDrawer(false)}
+        visible={ratesDrawer}
+        destroyOnClose="true"
+      >
+        <UpdateClinicRates
+          rowData={currentClinicRow}
+          ratesDrawer={ratesDrawer}
+          setRatesDrawer={setRatesDrawer}
+        />
+      </Drawer>
+      <Drawer
+        visible={learnersTableDrawer}
+        onClose={() => setLearnersTableDrawer(false)}
+        width="70vw"
+        placement="right"
+        closable="true"
+        destroyOnClose="true"
+        className="change-invo-drawer"
+      >
+        <AllLearners rowData={currentClinicRow} />
+      </Drawer>
+    </Authorize>
+  )
 }
 
 export default AllClinicsData

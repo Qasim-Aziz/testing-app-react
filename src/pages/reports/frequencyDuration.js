@@ -1,80 +1,32 @@
-/* eslint-disable react/no-unused-state */
-/* eslint-disable no-nested-ternary */
-/* eslint-disable react/destructuring-assignment */
-/* eslint-disable react/jsx-indent */
-/* eslint-disable react/jsx-indent-props */
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/no-access-state-in-setstate */
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable eqeqeq */
-/* eslint-disable react/jsx-boolean-value */
 /* eslint-disable no-plusplus */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable no-useless-concat */
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable react/jsx-closing-tag-location */
-/* eslint-disable no-var */
-/* eslint-disable react/no-unknown-property */
-/* eslint-disable no-unused-expressions */
-/* eslint-disable react/jsx-closing-bracket-location */
-/* eslint-disable camelcase */
-/* eslint-disable prefer-const */
-/* eslint-disable guard-for-in */
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable react/jsx-no-bind */
-/* eslint-disable prefer-template */
-/* eslint-disable array-callback-return */
-/* eslint-disable no-restricted-globals */
-/* eslint-disable object-shorthand */
-/* eslint-disable dot-notation */
 
-import React from 'react'
-import { Row, Col, Card, Button, Typography, Affix, Empty } from 'antd'
-import { connect } from 'react-redux'
-import { ResponsiveBar } from '@nivo/bar'
-import { ResponsiveLine } from '@nivo/line'
-import * as FileSaver from 'file-saver'
-import * as XLSX from 'xlsx'
 import groupObj from '@hunters/group-object'
+import { Button, Empty, Modal, Table } from 'antd'
 import { gql } from 'apollo-boost'
-import { Bar } from 'react-chartjs-2'
 import 'chartjs-plugin-annotation'
+import * as FileSaver from 'file-saver'
+import html2canvas from 'html2canvas'
+import JsPDF from 'jspdf'
+import moment from 'moment'
+import LoadingComponent from 'pages/staffProfile/LoadingComponent'
+import React from 'react'
+import { Bar, Line } from 'react-chartjs-2'
+import * as XLSX from 'xlsx'
+import _ from 'lodash'
 import client from '../../apollo/config'
-
-var moment = require('moment')
-
-const { Title, Text } = Typography
-
-var line = [
-  {
-    type: 'line',
-    mode: 'vertical',
-
-    // ???
-    scaleID: 'y-axis-0',
-    value: -20000,
-
-    borderColor: '#2984c5',
-    borderWidth: 1,
-  },
-]
 
 const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
 const fileExtension = '.xlsx'
 
-class LeftArea extends React.Component {
+class FrequencyDurationGraph extends React.Component {
   constructor(props) {
     super(props)
 
     this.state = {
-      GraphData: [],
-      heighestCount: 1,
-      statusselected: null,
       data: {
         datasets: [
           {
-            label: 'Frequency',
+            label: 'Frequency ',
             type: 'line',
             fill: false,
             borderColor: '#EC932F',
@@ -83,11 +35,12 @@ class LeftArea extends React.Component {
             pointBackgroundColor: '#EC932F',
             pointHoverBackgroundColor: '#EC932F',
             pointHoverBorderColor: '#EC932F',
+            lineTension: 0,
             yAxisID: 'y-axis-2',
           },
           {
             type: 'bar',
-            label: 'Duration(In seconds)',
+            label: 'Duration ',
             fill: false,
             backgroundColor: '#a6cee3',
             borderColor: '#a6cee3',
@@ -141,24 +94,32 @@ class LeftArea extends React.Component {
               type: 'linear',
               display: true,
               position: 'left',
-              id: 'y-axis-1',
+              id: 'y-axis-2',
               gridLines: {
                 display: true,
               },
               labels: {
                 show: true,
               },
+              scaleLabel: {
+                display: true,
+                labelString: 'Frequency',
+              },
             },
             {
               type: 'linear',
               display: true,
               position: 'right',
-              id: 'y-axis-2',
+              id: 'y-axis-1',
               gridLines: {
                 display: false,
               },
               labels: {
                 show: true,
+              },
+              scaleLabel: {
+                display: true,
+                labelString: 'Duration (in seconds)',
               },
             },
           ],
@@ -168,104 +129,100 @@ class LeftArea extends React.Component {
       durationGraphData: [],
       durationGraphLabels: [],
       durationFrequencyTable: [],
+      gridData: [],
+      drilldownForChartData: null,
+      isLoading: false,
     }
   }
 
   componentWillMount() {
-    let { selectedBehavior, startDate, endDate } = this.props
+    const { selectedBehavior, selectedStudentId } = this.props
+    let { startDate, endDate } = this.props
+
+    this.setState({ isLoading: true })
+
     startDate = moment(startDate).format('YYYY-MM-DD')
     endDate = moment(endDate).format('YYYY-MM-DD')
     if (selectedBehavior !== '') {
       client
         .query({
           query: gql`query{
-                getDecelData(
-                    template:"${selectedBehavior}"
-                    date_Gte:"${startDate}", date_Lte: "${endDate}"
-                ){
-                    intherapyDate
-                    edges{
-                        node{
-                            statusname
-                            id,
-                            irt,
-                            intensity,
-                            note,
-                            date,
-                            duration,
-                            intherapyOn
-                            session{
-                                id
-                                sessionDate
-                            }
-                            template{
-                                id,
-                                intherapyOn,
-                                behaviorDef,
-                                behaviorDescription,
-                            },
-                            environment{
-                                id,
-                                name
-                            },
-                            status{
-                                id,
-                                statusName
-                            }
-                            frequency{
-                                edges{
-                                    node{
-                                        id,
-                                        count,
-                                        time
-                                    }
+								getDecelData(
+										template:"${selectedBehavior}"
+										date_Gte:"${startDate}", 
+                    date_Lte: "${endDate}"
+                    template_Student: "${selectedStudentId}"
+								){
+										intherapyDate
+										edges{
+												node{
+														id,
+														date,
+														duration,
+														template{
+																id,
+																behaviorDef,
+                                behavior{
+                                  id
+                                  behaviorName
                                 }
-                            }
-                        }
-                    }
-                }
-            }
-          `,
+														},
+														frequency{
+																edges{
+																		node{
+																				id,
+																				count,
+																				time
+																		}
+																}
+														}
+												}
+										}
+								}
+						}
+					`,
+          fetchPolicy: 'network-only',
         })
         .then(result => {
-          // console.log(result)
+          console.log(result, 'result')
           const nodeLessData = []
-          let durationGraphDataObj = []
-          let durationGraphLabelsObj = []
-          let frequencyGraphDataObj = []
-          let durationFrequencyTableObj = []
+          const durationGraphDataObj = []
+          const durationGraphLabelsObj = []
+          const frequencyGraphDataObj = []
+          const durationFrequencyTableObj = []
+
+          // For Main chart
           if (result.data.getDecelData.edges && result.data.getDecelData.edges.length > 0) {
-            result.data.getDecelData.edges.map(item => {
+            result.data.getDecelData.edges.forEach(item => {
               nodeLessData.push(item.node)
             })
-
-            const dateGroupData = groupObj.group(nodeLessData, 'date')
+            console.log(nodeLessData)
+            const dateGroupData = groupObj.group(_.orderBy(nodeLessData, 'date'), 'date')
             const dates = Object.keys(dateGroupData)
+            console.log(dateGroupData, 'group')
             for (let i = 0; i < dates.length; i++) {
               let count = 0
-              let itemObj = {}
-              dateGroupData[dates[i]].map(item => {
-                if (item.frequency.edges.length > 0) {
+              const itemObj = {}
+              let tempDuration = 0
+              dateGroupData[dates[i]].forEach(item => {
+                if (item.frequency.edges.length > 0 || item.duration) {
                   count += item.frequency.edges.length
-                }
-                if (item.duration) {
-                  durationGraphDataObj.push(
-                    Number.isNaN(Math.round(item.duration / 1000))
+
+                  if (item.duration) {
+                    tempDuration += Number.isNaN(Math.round(item.duration / 1000))
                       ? 0
-                      : Math.round(item.duration / 1000),
-                  )
-                  itemObj['duration'] = Number.isNaN(Math.round(item.duration / 1000))
-                    ? 0
-                    : Math.round(item.duration / 1000)
-                } else {
-                  durationGraphDataObj.push(0)
-                  itemObj['duration'] = 0
+                      : Math.round(item.duration / 1000)
+                  } else {
+                    tempDuration += 0
+                  }
                 }
               })
               durationGraphLabelsObj.push(dates[i])
-              itemObj['date'] = dates[i]
               frequencyGraphDataObj.push(count)
-              itemObj['frequency'] = count
+              durationGraphDataObj.push(tempDuration)
+              itemObj.date = dates[i]
+              itemObj.frequency = count
+              itemObj.duration = tempDuration
               durationFrequencyTableObj.push(itemObj)
             }
 
@@ -275,159 +232,164 @@ class LeftArea extends React.Component {
               frequencyGraphData: frequencyGraphDataObj,
               durationFrequencyTable: durationFrequencyTableObj,
               inTherapyDate: result.data.getDecelData.intherapyDate,
+              isLoading: false,
             })
           } else {
             this.setState({
               durationGraphData: [],
               durationGraphLabels: [],
               frequencyGraphData: [],
+              isLoading: false,
             })
           }
-          // console.log(baselineData)
+
+          // For Grid
+          const allRows = []
+          result.data.getDecelData.edges.forEach(({ node }) => {
+            let mainRecord = allRows.find(x => x.date === node.date)
+            if (!mainRecord) {
+              mainRecord = {
+                id: node.id,
+                date: node.date,
+                durationSum: 0,
+                frequencyCount: 0,
+                behaviorName: node.template.behavior.behaviorName,
+                daywiseData: [],
+              }
+
+              allRows.push(mainRecord)
+            }
+
+            // Update values of mainRecord
+            mainRecord.durationSum += Number(node.duration)
+            mainRecord.frequencyCount += node.frequency.edges.length
+
+            // Add Daywise Record
+            mainRecord.daywiseData.push({
+              id: node.id,
+              date: node.date,
+              duration: node.duration,
+              frequencyCount: node.frequency.edges.length,
+              behaviorName: node.template.behavior.behaviorName,
+              frequencies: node.frequency.edges.map(({ node: { id, time, count } }) => ({
+                id,
+                time,
+                count,
+              })),
+            })
+          })
+          this.setState({ gridData: _.orderBy(allRows, 'date') })
         })
-      // client
-      //   .query({
-      //     query: gql`query{
-      //           getDecelData(
-      //               template:"${selectedBehavior}"
-      //               date_Gte:"${startDate}", date_Lte: "${endDate}"
-      //           ){
-      //               intherapyDate
-      //               edges{
-      //                   node{
-      //                       statusname
-      //                       id,
-      //                       irt,
-      //                       intensity,
-      //                       note,
-      //                       date,
-      //                       duration,
-      //                       intherapyOn
-      //                       session{
-      //                           id
-      //                           sessionDate
-      //                       }
-      //                       template{
-      //                           id,
-      //                           behaviorDef,
-      //                           behaviorDescription,
-      //                       },
-      //                       environment{
-      //                           id,
-      //                           name
-      //                       },
-      //                       status{
-      //                           id,
-      //                           statusName
-      //                       }
-      //                       frequency{
-      //                           edges{
-      //                               node{
-      //                                   id,
-      //                                   count,
-      //                                   time
-      //                               }
-      //                           }
-      //                       }
-      //                   }
-      //               }
-      //           }
-      //       }
-      //     `,
-      //   })
-      //   .then(result => {
-      //     // console.log(result)
-      //     const nodeLessData = []
-      //     const baselineData = []
-      //     const frequencylineData = []
-      //     const inTherapyData = []
-      //     console.log("results ************")
-      //     if(result.data.getDecelData.edges && result.data.getDecelData.edges.length>0){
-      //       result.data.getDecelData.edges.map(item => {
-      //         nodeLessData.push(item.node)
-      //       })
-      //       let groupedData = groupObj.group(nodeLessData, 'statusname')
-      //       console.log('Grouped data', groupedData)
-
-      //       const graphData = []
-      //       if (groupedData.Baseline) {
-      //         const baselineDateGroupData = groupObj.group(groupedData.Baseline, 'date')
-      //         console.log(baselineDateGroupData)
-      //         const baselineDates = Object.keys(baselineDateGroupData)
-      //         console.log(baselineDates)
-      //         for (let i = 0; i < baselineDates.length; i++) {
-      //           let totalDuration = 0
-      //           baselineDateGroupData[baselineDates[i]].map(item => {
-      //             if (item.duration) {
-      //               if (isNaN(parseInt(item.duration, 10))) {
-      //                 totalDuration += 0
-      //               } else {
-      //                 totalDuration += parseInt(item.duration, 10)
-      //               }
-      //             }
-      //           })
-      //           baselineData.push({ x: baselineDates[i], y: totalDuration })
-      //           frequencylineData.push({ x: baselineDates[i], y: i })
-      //         }
-      //       }
-
-      //       if (groupedData['In-Therapy']) {
-      //         const inTherapyDateGroupData = groupObj.group(groupedData['In-Therapy'], 'date')
-      //         console.log(inTherapyDateGroupData)
-      //         const inTherapyDates = Object.keys(inTherapyDateGroupData)
-      //         console.log(inTherapyDates)
-      //         for (let i = 0; i < inTherapyDates.length; i++) {
-      //           let totalDuration = 0
-      //           inTherapyDateGroupData[inTherapyDates[i]].map(item => {
-      //             if (item.duration) {
-      //               if (isNaN(parseInt(item.duration, 10))) {
-      //                 totalDuration += 0
-      //               } else {
-      //                 totalDuration += parseInt(item.duration, 10)
-      //               }
-      //             }
-      //           })
-      //           inTherapyData.push({ x: inTherapyDates[i], y: totalDuration })
-      //         }
-      //       }
-      //     }
-      //     console.log(baselineData, inTherapyData)
-
-      //     this.setState({
-      //       GraphData: [
-      //         {
-      //           id: 'Baseline',
-      //           color: 'hsl(2, 70%, 50%)',
-      //           data: baselineData,
-      //         },
-      //         {
-      //           id: 'In-Therapy',
-      //           color: 'hsl(2, 70%, 50%)',
-      //           data: inTherapyData,
-      //         },
-      //         {
-      //           id: 'Frequency',
-      //           color: 'hsl(2, 70%, 50%)',
-      //           data: frequencylineData,
-      //         }
-      //       ],
-      //       inTherapyDate: result.data.getDecelData.intherapyDate,
-      //     })
-      //     // console.log(baselineData)
-      //   })
     }
+  }
+
+  getGridColumns(isForNestedGrid) {
+    if (isForNestedGrid)
+      return [
+        {
+          title: 'Date',
+          dataIndex: 'date',
+        },
+        {
+          title: 'Behavior Name',
+          dataIndex: 'behaviorName',
+        },
+        {
+          title: 'Duration',
+          dataIndex: 'duration',
+          render: text => this.getDurationText(text),
+          align: 'right',
+        },
+        {
+          title: 'Frequency',
+          dataIndex: 'frequencyCount',
+          align: 'right',
+        },
+        {
+          title: 'Drilldown',
+          dataIndex: '',
+          align: 'center',
+          render: (text, record) => (
+            <Button type="link" size="small" onClick={() => this.openDrilldownModal(record)}>
+              View Drilldown
+            </Button>
+          ),
+        },
+      ]
+
+    return [
+      {
+        title: 'Date',
+        dataIndex: 'date',
+      },
+      {
+        title: 'Duration',
+        dataIndex: 'durationSum',
+        render: text => this.getDurationText(text),
+        align: 'right',
+      },
+      {
+        title: 'Frequency',
+        dataIndex: 'frequencyCount',
+        align: 'right',
+      },
+    ]
+  }
+
+  openDrilldownModal = record => {
+    const { gridData } = this.state
+    const dateRecord = gridData.find(x => x.date === record.date)
+    const freqancyRecord = dateRecord.daywiseData.find(x => x.id === record.id)
+    this.setState({ drilldownForChartData: freqancyRecord })
+  }
+
+  closeDrilldownModal = () => {
+    this.setState({ drilldownForChartData: null })
+  }
+
+  getDurationText = miliseconds => {
+    const duration = moment.duration(miliseconds)
+
+    return (
+      <div>
+        <span className="valueText">{Number.isNaN(duration.hours()) ? 0 : duration.hours()}</span>
+        <span className="labelText">H </span>
+        <span className="valueText">
+          {Number.isNaN(duration.minutes()) ? 0 : duration.minutes()}
+        </span>
+        <span className="labelText">M </span>
+        <span className="valueText">
+          {Number.isNaN(duration.seconds()) ? 0 : duration.seconds()}
+        </span>
+        <span className="labelText">S</span>
+      </div>
+    )
+  }
+
+  exportChart = studentName => {
+    const input = document.getElementById('behaviorChart')
+    html2canvas(input).then(canvas => {
+      const imgData = canvas.toDataURL('image/png')
+      const pdf = new JsPDF({
+        orientation: 'l',
+        format: 'a4',
+      })
+      const imgProps = pdf.getImageProperties(imgData)
+      const pdfWidth = pdf.internal.pageSize.getWidth()
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width
+      pdf.addImage(imgData, 'PNG', 0, 10, pdfWidth, pdfHeight)
+      pdf.save(`behavior_chart_${studentName}.pdf`)
+    })
   }
 
   exportToCSV = studentName => {
     const filename = '_behavior_excel'
-    console.log('data', this.state.data)
-    let formattedData = this.state.durationFrequencyTable.map(function(e) {
-      return {
-        Date: e.date,
-        Duration: e.duration,
-        frequency: e.frequency,
-      }
-    })
+    const { durationFrequencyTable } = this.state
+    const formattedData = durationFrequencyTable.map(e => ({
+      Date: e.date,
+      Duration: e.duration,
+      frequency: e.frequency,
+    }))
 
     const ws = XLSX.utils.json_to_sheet(formattedData)
     const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
@@ -436,115 +398,163 @@ class LeftArea extends React.Component {
     FileSaver.saveAs(excelData, studentName + filename + fileExtension)
   }
 
-  render() {
-    const textStyle = {
-      fontSize: '16px',
-      lineHeight: '19px',
-    }
-    let ctlabels = ['January', 'February', 'March', 'April', 'May', 'June', 'July']
-    let lineData = [51, 65, 40, 49, 60, 37, 40]
-    let barData = [200, 185, 590, 621, 250, 400, 95]
+  getExpandedRowRender = row => (
+    <Table
+      rowKey="id"
+      dataSource={row.daywiseData}
+      columns={this.getGridColumns(true)}
+      bordered
+      showHeader
+      pagination={false}
+      size="small"
+    />
+  )
 
+  getDrildownChartData = () => {
+    const { drilldownForChartData } = this.state
+    const frequencies = drilldownForChartData.frequencies.map(x => x.count)
+    const time = drilldownForChartData.frequencies.map(x => (x.time / 1000).toFixed(2))
+    return {
+      labels: time,
+      datasets: [
+        {
+          label: 'Frequency',
+          fill: false,
+          lineTension: 0.1,
+          backgroundColor: 'rgba(75,192,192,0.4)',
+          borderColor: 'rgba(75,192,192,1)',
+          borderCapStyle: 'butt',
+          borderDash: [],
+          borderDashOffset: 0.0,
+          borderJoinStyle: 'miter',
+          pointSize: 15,
+          pointBorderColor: 'rgba(75,192,192,1)',
+          pointBackgroundColor: '#fff',
+          pointBorderWidth: 2,
+          pointHoverRadius: 5,
+          pointHoverBackgroundColor: 'rgba(75,192,192,1)',
+          pointHoverBorderColor: 'rgba(75,192,192,1)',
+          pointHoverBorderWidth: 5,
+          pointRadius: 4,
+          pointHitRadius: 0,
+          data: frequencies,
+        },
+      ],
+    }
+  }
+
+  render() {
     const {
-      GraphData,
       inTherapyDate,
-      heighestCount,
       data,
       options,
       durationGraphData,
       durationGraphLabels,
       frequencyGraphData,
+      drilldownForChartData,
+      gridData,
+      isLoading,
     } = this.state
-    const { selectedBehavior } = this.props
+
     options.scales.xAxes[0].labels = durationGraphLabels
     let indexVal = -1
+
     if (durationGraphLabels) {
       indexVal = durationGraphLabels.indexOf(inTherapyDate)
     }
+
     options.annotation.annotations[0].value = indexVal
     data.datasets[0].data = frequencyGraphData
     data.datasets[1].data = durationGraphData
+
+    const drillOptions = {
+      tooltips: {
+        mode: 'label',
+      },
+      scales: {
+        xAxes: [
+          {
+            id: 'x-axis-0',
+            display: true,
+            // ticks: {
+            //   suggestedMin: 0,
+            //   suggestedMax: 20,
+            // },
+            scaleLabel: {
+              display: true,
+              labelString: 'Time (in seconds)',
+            },
+          },
+        ],
+        yAxes: [
+          {
+            ticks: {
+              precision: 0,
+            },
+            display: true,
+            id: 'y-axis-1',
+            gridLines: {
+              display: true,
+            },
+            labels: {
+              show: true,
+            },
+            scaleLabel: {
+              display: true,
+              labelString: 'Frequency',
+            },
+          },
+        ],
+      },
+    }
+
     return (
       <>
-        <div
-          role="presentation"
-          style={{
-            borderRadius: 10,
-            border: '2px solid #F9F9F9',
-            // padding: '28px 27px 20px',
-            display: 'block',
-            // marginLeft: '10px',
-            width: '100%',
-            height: '350px',
-            // overflowY: 'auto'
-          }}
-        >
-          {durationGraphLabels && durationGraphLabels.length === 0 ? (
-            <>
-              <Empty style={{ marginTop: '100px' }} />
-            </>
-          ) : (
-            <Bar data={data} options={options} width="50px" height="60px" />
-          )}
-          {/* {GraphData && GraphData.length === 0 ? (
-            <>
-              <Empty style={{ marginTop: '100px' }} />
-            </>
-          ) : (
-            ''
-          )}
-          {GraphData && (
-            <ResponsiveLine
-              data={GraphData}
-              margin={{ top: 50, right: 100, bottom: 50, left: 100 }}
-              xScale={{ type: 'point' }}
-              yScale={{ type: 'linear', min: 'auto', max: 'auto', stacked: false, reverse: false }}
-              axisTop={null}
-              axisRight={null}
-              axisBottom={{
-                orient: 'bottom',
-                tickSize: 5,
-                tickPadding: 5,
-                tickRotation: 0,
-                legend: 'Date',
-                legendOffset: 36,
-                legendPosition: 'middle',
+        {isLoading && <LoadingComponent />}
+        {!isLoading && durationGraphLabels.length === 0 && (
+          <Empty className="chart" style={{ padding: '50px' }} />
+        )}
+        {!isLoading && durationGraphLabels.length !== 0 && (
+          <>
+            <div className="chart" id="behaviorChart">
+              <div className="panel">
+                <Bar data={data} options={options} width={50} height={360} />
+              </div>
+            </div>
+            <Table
+              className="frequencyTable"
+              rowKey="date"
+              columns={this.getGridColumns()}
+              dataSource={gridData}
+              expandedRowRender={this.getExpandedRowRender}
+              expandRowByClick
+              pagination={{
+                defaultPageSize: 25,
+                position: 'top',
+                showSizeChanger: true,
+                pageSizeOptions: ['25', '50', '100', '250'],
               }}
-              axisLeft={{
-                orient: 'left',
-                tickSize: 5,
-                tickPadding: 5,
-                tickRotation: 0,
-                legend: 'duration',
-                legendOffset: -40,
-                legendPosition: 'middle',
-              }}
-              colors={{ scheme: 'nivo' }}
-              pointSize={10}
-              pointColor={{ theme: 'background' }}
-              pointBorderWidth={2}
-              pointBorderColor={{ from: 'serieColor' }}
-              pointLabel="y"
-              pointLabelYOffset={-12}
-              useMesh={true}
-              markers={
-                inTherapyDate
-                  ? [
-                      {
-                        axis: 'x',
-                        value: inTherapyDate,
-                        lineStyle: { stroke: '#b0413e', strokeWidth: 2 },
-                        legend: 'Status Change',
-                      },
-                    ]
-                  : []
-              }
+              size="small"
+              bordered
             />
-          )} */}
-        </div>
+          </>
+        )}
+
+        <Modal
+          title="Drilldown"
+          visible={!!drilldownForChartData}
+          footer={null}
+          width={800}
+          height={400}
+          onCancel={this.closeDrilldownModal}
+        >
+          {drilldownForChartData && (
+            <Line options={drillOptions} data={this.getDrildownChartData()} />
+          )}
+        </Modal>
       </>
     )
   }
 }
 
-export default LeftArea
+export default FrequencyDurationGraph

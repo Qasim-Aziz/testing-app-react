@@ -48,4 +48,27 @@
 .form {
   position: relative;
   z-index: 2;
+  width: 60%;
+  margin: 0 auto;
+
+  input, select {
+    border: none;
+    border-bottom: 2px solid #f17c00;
+    padding-top: 25px;
+    padding-bottom: 25px;
+    color: black;
+  }
+}
+
+.options1, .options2 {
+  width: 200px;
+  height: 200px;
+  border: 1px solid red;
+  margin: 2px;
+  display: flex;
+  cursor: pointer;
+}
+
+.options1 {
+  float: right;
 }

@@ -1,62 +1,42 @@
 /* eslint-disable react/no-unused-state */
-/* eslint-disable no-nested-ternary */
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable react/jsx-indent */
-/* eslint-disable react/jsx-indent-props */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/no-access-state-in-setstate */
-/* eslint-disable no-underscore-dangle */
 /* eslint-disable eqeqeq */
 /* eslint-disable react/jsx-boolean-value */
-/* eslint-disable no-plusplus */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable no-useless-concat */
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable react/jsx-closing-tag-location */
-/* eslint-disable no-var */
-/* eslint-disable react/no-unknown-property */
 /* eslint-disable no-unused-expressions */
-/* eslint-disable react/jsx-closing-bracket-location */
 /* eslint-disable camelcase */
 /* eslint-disable prefer-const */
-/* eslint-disable no-unneeded-ternary */
 
 import React from 'react'
-import { Row, Col, Card, Button, Typography, Affix, Table } from 'antd'
-import { connect } from 'react-redux'
-import { ResponsiveBar } from '@nivo/bar'
+import { Typography, notification, Table } from 'antd'
 import { gql } from 'apollo-boost'
-import reqwest from 'reqwest'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import DataTable from 'react-data-table-component'
+import moment from 'moment'
 import client from '../../apollo/config'
-
-var moment = require('moment')
-
-const { Title, Text } = Typography
 
 const columns = [
   {
-    name: 'Domain',
-    fixed: 'left',
-    selector: 'targetId',
-    cell: row => <span>{row.targetId ? row.targetId.domain.domain : 'Other'}</span>,
-    maxWidth: '100px',
+    title: 'Domain',
+    dataIndex: 'targetId',
+    render: (text, row) => <span>{row.targetId ? row.targetId.domain.domain : 'Other'}</span>,
   },
   {
-    name: 'Target Name',
-    selector: 'targetAllcatedDetails',
-    cell: row => (
+    title: 'Target Name',
+    dataIndex: 'targetAllcatedDetails',
+    ellipsis: true,
+    width: '320px',
+    render: (text, row) => (
       <span>{row.targetAllcatedDetails ? row.targetAllcatedDetails.targetName : ''}</span>
     ),
-    maxWidth: '150px',
   },
   {
-    name: 'Stimulus',
-    selector: 'sd',
-    cell: row => (
+    title: 'Stimulus',
+    dataIndex: 'sd',
+    render: (text, row) => (
       <span>
         {row.sd.edges
           ? row.sd.edges.map(tag => {
@@ -65,12 +45,11 @@ const columns = [
           : ''}
       </span>
     ),
-    maxWidth: '150px',
   },
   {
-    name: 'Steps',
-    selector: 'steps',
-    cell: row => (
+    title: 'Steps',
+    dataIndex: 'steps',
+    render: (text, row) => (
       <span>
         {row.steps.edges
           ? row.steps.edges.map(tag => {
@@ -79,31 +58,30 @@ const columns = [
           : ''}
       </span>
     ),
-    maxWidth: '150px',
   },
   {
-    name: 'Baseline Date',
-    selector: 'targetAllcatedDetails',
-    cell: row => (
+    title: 'Baseline Date',
+    dataIndex: 'targetAllcatedDetails',
+    render: (text, row) => (
       <span>
         {row.targetAllcatedDetails
           ? moment(row.targetAllcatedDetails.dateBaseline).format('YYYY-MM-DD')
           : ''}
       </span>
     ),
-    maxWidth: '150px',
+    width: '130px',
   },
   {
-    name: 'In-Therapy Date',
-    selector: 'intherapyDate',
-    cell: row => <span>{row.intherapyDate ? row.intherapyDate : ''}</span>,
-    maxWidth: '150px',
+    title: 'In-Therapy Date',
+    dataIndex: 'intherapyDate',
+    render: (text, row) => <span>{row.intherapyDate ? row.intherapyDate : ''}</span>,
+    width: '130px',
   },
   {
-    name: 'Mastery date',
-    selector: 'masterDate',
-    cell: row => <span>{row.masterDate ? row.masterDate : ''}</span>,
-    maxWidth: '100px',
+    title: 'Mastery date',
+    dataIndex: 'masterDate',
+    render: (text, row) => <span>{row.masterDate ? row.masterDate : ''}</span>,
+    width: '110px',
   },
 ]
 
@@ -170,13 +148,18 @@ class Report extends React.Component {
     client
       .query({
         query: gql`{
-          domainMastered(studentId: ${studentId}, dateGte:"${start_date}", dateLte:"${end_date}", programArea:"${selectedprogram}", targetStatus:"${statusselected}")
+          domainMastered(studentId: ${studentId},
+             dateGte:"${start_date}", 
+             dateLte:"${end_date}", 
+             programArea:"${selectedprogram}", 
+             targetStatus:"${statusselected}")
           {
           totalCount
           target {
               id
               targetId
               {
+                id
                   domain
                   {
                       id
@@ -201,8 +184,9 @@ class Report extends React.Component {
               }
               targetAllcatedDetails
               {
-                  targetName
-                  dateBaseline
+                id
+                targetName
+                dateBaseline
               }
               intherapyDate
               masterDate
@@ -232,10 +216,19 @@ class Report extends React.Component {
           },
         })
       })
+      .catch(error => {
+        error.graphQLErrors.map(item => {
+          return notification.error({
+            message: 'Somthing went wrong',
+            description: item.message,
+          })
+        })
+      })
   }
 
   exportToCSV = studentName => {
     const filename = '_progress_overview_excel'
+    // eslint-disable-next-line no-unused-expressions
     let formattedData = this.state.data.map(function(e) {
       return {
         Domain: e.targetId ? e.targetId.domain.domain : 'Other',
@@ -266,11 +259,6 @@ class Report extends React.Component {
   }
 
   render() {
-    const textStyle = {
-      fontSize: '16px',
-      lineHeight: '19px',
-    }
-
     const customStyles = {
       header: {
         style: {
@@ -323,20 +311,20 @@ class Report extends React.Component {
     }
 
     const { data, pagination, loading } = this.state
-    console.log('result.data table ===> ', data)
 
     return (
       <>
-        <DataTable
+        <Table
           columns={columns}
-          theme="default"
-          dense={true}
-          pagination={true}
-          data={data}
-          customStyles={customStyles}
-          noHeader={true}
-          width="100px"
-          paginationRowsPerPageOptions={[10, 50, 100, 200, 500, 1000]}
+          dataSource={data}
+          bordered
+          size="middle"
+          pagination={{
+            defaultPageSize: 20,
+            showSizeChanger: true,
+            pageSizeOptions: ['20', '50', '100', '200', '500'],
+            position: 'top',
+          }}
         />
       </>
     )

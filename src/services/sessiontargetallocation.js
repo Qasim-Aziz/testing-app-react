@@ -24,6 +24,7 @@ export async function getAllocatedTargets(payload) {
                         morning,
                         afternoon,
                         evening,
+                        default
                         targetAllcatedDetails{
                             id,
                             targetName,
@@ -136,7 +137,8 @@ export async function getAllocatedTargets(payload) {
                                     }   
                                     morning
                                     afternoon
-                                    evening                                 
+                                    evening
+                                    default                             
                                     targetAllcatedDetails{
                                         id,
                                         targetName,
@@ -176,6 +178,7 @@ export async function filterAllocatedTargets(payload) {
                         morning
                         afternoon
                         evening
+                        default
                         targetAllcatedDetails{
                             id,
                             targetName,
@@ -269,6 +272,7 @@ export async function updateSessionTargets(payload) {
                                 morning
                                 afternoon
                                 evening
+                                default
                                 targetAllcatedDetails{
                                     id,
                                     targetName,
@@ -400,6 +404,7 @@ export async function updateSessionDetails(objects) {
                     morning
                     afternoon
                     evening
+                    default
                     targetAllcatedDetails {
                       id
                       targetName

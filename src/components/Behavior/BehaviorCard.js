@@ -18,7 +18,7 @@ const DELETE_BEHAVIOR = gql`
   }
 `
 
-const MealCard = ({ style, behaviorName, time, note, irt, frequently, id, setDeleteBehavior }) => {
+const MealCard = ({ style, behaviorName, time, note, irt, frequently, id, setDeleteBehaviour }) => {
   const [
     deleteBehavior,
     { data: deleteBehData, error: deleteBehError, loading: deleteBehLoading },
@@ -33,7 +33,7 @@ const MealCard = ({ style, behaviorName, time, note, irt, frequently, id, setDel
       notification.success({
         message: 'Behavior deleted successfully',
       })
-      setDeleteBehavior(id)
+      setDeleteBehaviour(id)
     }
     if (deleteBehError) {
       notification.error({
@@ -53,7 +53,8 @@ const MealCard = ({ style, behaviorName, time, note, irt, frequently, id, setDel
         borderRadius: 10,
         padding: '10px',
         position: 'relative',
-        width: '1108px',
+        width: '98%',
+        maxWidth: '1000px',
         border: '2px solid #2a8ff7',
         ...style,
       }}
@@ -68,19 +69,6 @@ const MealCard = ({ style, behaviorName, time, note, irt, frequently, id, setDel
             {behaviorName}
           </Title>
           <div style={{ position: 'absolute', right: '0' }}>
-            {/* <Button
-              type="link"
-              style={{
-                color: '#584f4f',
-                padding: '2px',
-              }}
-            >
-              <AiFillCopy
-                style={{
-                  fontSize: 21,
-                }}
-              />
-            </Button> */}
             <Button
               type="link"
               style={{

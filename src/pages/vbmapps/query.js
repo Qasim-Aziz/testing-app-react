@@ -36,31 +36,28 @@ export const GET_TARGET = gql`
   }
 `
 
-export const GET_VBMAPP_TARGET=gql`
-mutation vbmappTargetSuggest($pk:ID!,$area:ID!){
-  vbmappTargetSuggest(input:{
-      pk:$pk
-      area:$area
-  }){
-      targets{
+export const GET_VBMAPP_TARGET = gql`
+  mutation vbmappTargetSuggest($pk: ID!, $area: ID!) {
+    vbmappTargetSuggest(input: { pk: $pk, area: $area }) {
+      targets {
+        id
+        domain {
           id
-          domain{
-              id,
-              domain
-          },
-          targetArea{
-              id,
-              Area
-          }
-          targetInstr
-          video
-          targetMain{
-              id,
-              targetName
-          }
+          domain
+        }
+        targetArea {
+          id
+          Area
+        }
+        targetInstr
+        video
+        targetMain {
+          id
+          targetName
+        }
       }
+    }
   }
-}
 `
 
 export const TARGET_ALLOCATIONS_OPTIONS = gql`
@@ -84,8 +81,8 @@ export const TARGET_ALLOCATIONS_OPTIONS = gql`
     domain {
       edges {
         node {
-          domain
           id
+          domain
         }
       }
     }

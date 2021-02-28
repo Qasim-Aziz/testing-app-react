@@ -6,17 +6,7 @@
 /* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable consistent-return */
 import React, { Component } from 'react'
-import {
-  Button,
-  Input,
-  Slider,
-  Upload,
-  Layout,
-  Row,
-  Col,
-  Typography,
-  notification,
-} from 'antd'
+import { Button, Input, Slider, Upload, Layout, Row, Col, Typography, notification } from 'antd'
 import { Helmet } from 'react-helmet'
 import { Redirect } from 'react-router-dom'
 import Authorize from 'components/LayoutComponents/Authorize'
@@ -31,6 +21,8 @@ import apolloClient from '../../apollo/config'
 const { Content } = Layout
 const { TextArea } = Input
 const { Text } = Typography
+const peakId = 'VGFyZ2V0RGV0YWlsVHlwZTo4'
+const equivalence = 'EQUIVALENCE'
 
 const marks = {
   0: '0',
@@ -58,7 +50,9 @@ class SessionSummary extends Component {
   }
 
   componentDidMount() {
-    const { sessionrecording: { ChildSession } } = this.props
+    const {
+      sessionrecording: { ChildSession },
+    } = this.props
     if (!ChildSession) {
       return <Redirect to="/" />
     }
@@ -66,10 +60,12 @@ class SessionSummary extends Component {
   }
 
   callInitialData = () => {
-    const { sessionrecording: { ChildSession } } = this.props
+    const {
+      sessionrecording: { ChildSession },
+    } = this.props
     const date = moment(ChildSession.sessionDate).format('YYYY-MM-DD')
-    apolloClient.query(
-      {
+    apolloClient
+      .query({
         query: gql`
           query { 
             summary: getSessionDataRecording(ChildSession:"${ChildSession.id}"){
@@ -89,29 +85,52 @@ class SessionSummary extends Component {
                   id
                   targets{
                     id
+                    targetAllcatedDetails {
+                      id
+                      DailyTrials
+                      targetType {
+                        id
+                        typeTar
+                      }
+                    }
                   }
                   sessionRecord{
                     totalTrial,
-                    totalCorrect, 
-                    totalError,
+                    totalCorrect
+                    totalError
+                    totalPrompt
+                    totalIncorrect
+                    totalNr
+
+                    physical
+                    verbal
+                    gestural
+                    textual
+                  }
+                  peak{
+                    totalCorrect
+                    totalError
                     totalPrompt
                   }
                 }
               }
             }
             childSessionDetails(id:"${ChildSession.id}"){
+              id
               feedback
               rating
             }
           }
         `,
-        fetchPolicy: 'network-only'
+        fetchPolicy: 'network-only',
       })
       .then(presult => {
         this.setState({
           sessionEdges: presult.data.summary,
           feedbackText: presult.data.childSessionDetails?.feedback,
-          sliderVal: presult.data.childSessionDetails.rating ? presult.data.childSessionDetails.rating : 0,
+          sliderVal: presult.data.childSessionDetails.rating
+            ? presult.data.childSessionDetails.rating
+            : 0,
         })
       })
       .catch(error => {
@@ -128,24 +147,37 @@ class SessionSummary extends Component {
     const cardArray = []
     const data = this.state
     const item = data.sessionEdges.edges
-    const sessionArray = []
-    let totalTrial = 0
     const Mand = data.sessionEdges.mandCount
     const Behaviours = data.sessionEdges.behCount
+
+    const sessionArray = []
     let No = 0
     let Prompted = 0
     let Correct = 0
-    const Incorrect = 0
+    let Incorrect = 0
+    let totalTrial = 0
     const cardStyle = { padding: 5 }
+
     if (item !== undefined) {
       for (let i = 0; i < item.length; i += 1) {
-        sessionArray.push(item[i].node.sessionRecord)
+        if (item[i].node.targets.targetAllcatedDetails.targetType.id === peakId) {
+          const obj = item[i].node.peak
+          sessionArray.push({
+            ...obj,
+            totalTrial: obj.totalPrompt + obj.totalError + obj.totalCorrect,
+            totalIncorrect: obj.totalError,
+            totalNr: 0,
+
+          })
+        } else sessionArray.push(item[i].node.sessionRecord)
       }
       sessionArray.forEach(entry => {
         totalTrial += entry.totalTrial
         Prompted += entry.totalPrompt
         Correct += entry.totalCorrect
-        No += entry.totalError
+        No += entry.totalNr
+        Incorrect += entry.totalIncorrect
+
       })
       cardArray.push(
         <>
@@ -176,7 +208,7 @@ class SessionSummary extends Component {
               <CustomCards label="Correct" trails={Correct} />
             </Col>
             <Col span={6} style={cardStyle}>
-              <CustomCards label="Incorrect" trails={No + Prompted} />
+              <CustomCards label="Incorrect" trails={Incorrect} />
             </Col>
           </Row>
         </>,
@@ -228,11 +260,16 @@ class SessionSummary extends Component {
 
   callWeekly = () => {
     const dateLte = moment().format('YYYY-MM-DD')
-    const dateGte = moment().subtract(7, 'days').format('YYYY-MM-DD')
-    const { sessionrecording: { ChildSession } } = this.props
+    const dateGte = moment()
+      .subtract(7, 'days')
+      .format('YYYY-MM-DD')
+    const {
+      sessionrecording: { ChildSession },
+    } = this.props
 
-    apolloClient.query({
-      query: gql`query {
+    apolloClient
+      .query({
+        query: gql`query {
         summary :getSessionRecordings(ChildSession:"${ChildSession.id}",date_Gte:"${dateGte}", date_Lte:"${dateLte}"){
           totalTarget
           edges{
@@ -242,14 +279,15 @@ class SessionSummary extends Component {
                 totalTrial,
                 totalCorrect, 
                 totalError,
-                totalPrompt
+                totalPrompt,
+                totalIncorrect,
               }
             }
           }
         }
       }`,
-      fetchPolicy: 'network-only'
-    })
+        fetchPolicy: 'network-only',
+      })
       .then(presult => {
         this.setState({
           sessionEdges: presult.data.summary,
@@ -268,31 +306,25 @@ class SessionSummary extends Component {
 
     apolloClient
       .mutate({
-        mutation: gql`mutation UpdateSessionFeedback(
-          $childId: ID!
-          $feedbackText: String
-          $rating: Int
-        ) {
-          updateSessionFeedbacks(input:{
-            pk: $childId,
-            feedback: $feedbackText,
-            rating: $rating
-          })
-          { 
-            details{
-              id,
-              feedback,
-              rating
+        mutation: gql`
+          mutation UpdateSessionFeedback($childId: ID!, $feedbackText: String, $rating: Int) {
+            updateSessionFeedbacks(
+              input: { pk: $childId, feedback: $feedbackText, rating: $rating }
+            ) {
+              details {
+                id
+                feedback
+                rating
+              }
             }
           }
-        }
-      `,
-      variables: {
-        childId: ChildSession.id,
-        feedbackText: feedBack.feedbackText,
-        rating: feedBack.sliderVal
-      },
-      fetchPolicy: 'no-cache',
+        `,
+        variables: {
+          childId: ChildSession.id,
+          feedbackText: feedBack.feedbackText,
+          rating: feedBack.sliderVal,
+        },
+        fetchPolicy: 'no-cache',
       })
       .then(presult => {
         notification.success({
@@ -344,8 +376,10 @@ class SessionSummary extends Component {
                 <Col sm={16} style={colDefaultStyle}>
                   <div style={{ padding: 5, minHeight: '650px' }}>
                     <div style={{ padding: 5 }}>
-                      <Button onClick={() => this.callInitialData()}>{ChildSession.sessions.sessionName.name}</Button>
-                      <Button onClick={() => this.callWeekly()}>This Week</Button>
+                      <Button onClick={() => this.callInitialData()}>
+                        {ChildSession.sessions.sessionName.name}
+                      </Button>
+                      {/* <Button onClick={() => this.callWeekly()}>This Week</Button> */}
                     </div>
                     <div
                       style={{
@@ -356,7 +390,7 @@ class SessionSummary extends Component {
                         padding: 5,
                       }}
                     >
-                      <Graph data={data} />
+                      <Graph data={data} peakId />
                     </div>
                     <div style={{ marginTop: '10px', padding: 5 }}>{this.renderCards()}</div>
                   </div>
@@ -408,7 +442,7 @@ class SessionSummary extends Component {
                         }}
                       />
                       <Button
-                        type="primary"                
+                        type="primary"
                         onClick={() => this.submitFeedBack()}
                         className={styles.btnSub}
                       >

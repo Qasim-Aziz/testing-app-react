@@ -5,14 +5,8 @@
 /* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable no-shadow */
 import React, { useState } from 'react'
-import { Redirect } from 'react-router-dom'
 import { Typography, Tabs, Button, Card } from 'antd'
-import profileImg from './img/profile.jpg'
-import brainImg from '../../images/brain.png'
-import mandImg from '../../images/mand.png'
-import mealImg from '../../images/meal.png'
-import toiletImg from '../../images/toilet.png'
-import medicalImg from '../../images/medical.png'
+
 import MealDataPage from '../meal'
 import MandDataPage from '../mandData'
 import MedicalDataPage from '../MedicalData'
@@ -35,28 +29,6 @@ const DailyVitalsCard = props => {
     openDrawer,
   } = props
 
-  const cardStyle = {
-    background: '#F9F9F9',
-    height: 500,
-    overflow: 'auto',
-  }
-  const parentCardStyle = {
-    background: '#F9F9F9',
-    borderRadius: 10,
-    padding: '20px',
-    margin: '20px 10px 20px 10px',
-    display: 'none',
-  }
-  const targetMappingStyle = {
-    background: '#FFFFFF',
-    border: '1px solid #E4E9F0',
-    boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
-    borderRadius: 10,
-    padding: '16px 12px',
-    // display: 'flex',
-    alignItems: 'center',
-    marginBottom: '10px',
-  }
   const funcData = check => {
     if (check === 'Meal Data') {
       return (
@@ -217,7 +189,7 @@ const DailyVitalsCard = props => {
           <span style={HeadStyle}>ABC Data</span>
         </div>
       </Card>
-      <div>{funcData(TabCheck)}</div>
+      <div style={{ width: '100%', borderTop: '20px solid #F1F1F1' }}>{funcData(TabCheck)}</div>
     </div>
   )
 }

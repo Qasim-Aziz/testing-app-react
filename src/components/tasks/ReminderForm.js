@@ -19,7 +19,7 @@ export default ({
       <Form.Item>
         <TimePicker
           disabled={!reminder}
-          value={state[index].time}
+          defaultValue={state[index]?.time}
           onChange={value => {
             dispatch({ type: timeReducerType, index, time: value })
           }}
@@ -34,7 +34,7 @@ export default ({
           mode="multiple"
           disabled={!reminder}
           placeholder="Set Repeat"
-          value={state[index].frequency}
+          value={state[index]?.frequency}
           onChange={value => {
             dispatch({ type: 'UPDATE_FREQUENCY', index, frequency: value })
           }}

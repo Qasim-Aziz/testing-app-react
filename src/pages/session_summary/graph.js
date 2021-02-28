@@ -13,6 +13,8 @@ import gql from 'graphql-tag'
 import { useMutation } from 'react-apollo'
 
 const { Title, Text } = Typography
+const peakId = 'VGFyZ2V0RGV0YWlsVHlwZTo4'
+const equivalence = 'EQUIVALENCE'
 
 const Graph = ({ style, data = null }) => {
   const graphData = []
@@ -25,29 +27,53 @@ const Graph = ({ style, data = null }) => {
     let No = 0
     let Prompted = 0
     let Correct = 0
-    const Incorrect = 0
+    let Incorrect = 0
+    let physical = 0
+    let verbal = 0
+    let gestural = 0
+    let textual = 0
     if (item !== undefined) {
       for (let i = 0; i < item.length; i += 1) {
-        sessionArray.push(item[i].node.sessionRecord)
+        if (item[i].node.targets.targetAllcatedDetails.targetType.id === peakId) {
+          const obj = item[i].node.peak
+          sessionArray.push({
+            ...obj,
+            totalTrial: obj.totalPrompt + obj.totalError + obj.totalCorrect,
+            totalIncorrect: obj.totalError,
+            totalNr: 0,
+            physical : 0,
+            verbal : 0,
+            gestural : 0,
+            textual : 0,
+          })
+        } else sessionArray.push(item[i].node.sessionRecord)
       }
       sessionArray.forEach(entry => {
         totalTrial += entry.totalTrial
         Prompted += entry.totalPrompt
         Correct += entry.totalCorrect
-        No += entry.totalError
+        No += entry.totalNr
+        Incorrect += entry.totalIncorrect
+        physical += entry.physical
+        verbal += entry.verbal
+        gestural += entry.gestural
+        textual += entry.textual
+
+
       })
     }
-    graphData.push({ label: 'Total Trials', Prompted: Prompted, No: No, Correct: Correct })
+    graphData.push({ label: 'Total Trials', Prompted: Prompted, No: No, Correct: Correct, Incorrect: Incorrect })
     graphData.push({ label: 'Correct', Correct: Correct })
-    graphData.push({ label: 'Incorrect', Incorrect: No + Prompted })
+    graphData.push({ label: 'Incorrect', Incorrect: Incorrect })
     graphData.push({ label: 'Prompted', Prompted: Prompted })
-    graphData.push({ label: 'No Trials', No: No })
+    graphData.push({ label: 'Prompt Distribution', physical , verbal, gestural, textual })
+    graphData.push({ label: 'No Response', No: No })
   }
 
   return (
     <ResponsiveBar
       data={graphData}
-      keys={['Total', 'Correct', 'Incorrect', 'Prompted', 'No']}
+      keys={['Total', 'Correct', 'Incorrect', 'Prompted', 'No', 'physical', 'verbal', 'gestural', 'textual']}
       indexBy="label"
       margin={{ top: 20, right: 60, bottom: 20, left: 60 }}
       padding={0.3}

@@ -1,94 +1,47 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/jsx-indent */
-/* eslint-disable react/jsx-indent-props */
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable react/jsx-closing-tag-location */
-/* eslint-disable object-shorthand */
-/* eslint-disable react/destructuring-assignment */
-/* eslint-disable react/jsx-boolean-value */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable no-plusplus */
-
 import React from 'react'
-import { Form, Input, Button, Select, Icon, Drawer } from 'antd'
+import { Form, InputNumber, Button, Select, Row, Col, Divider } from 'antd'
 import { connect } from 'react-redux'
+import { times } from 'ramda'
+import { PlusOutlined } from '@ant-design/icons'
 import actions from 'redux/authorizationCodes/actions'
-import AddModifier from './AddModifier'
-
-const layout = {
-  labelCol: {
-    span: 8,
-  },
-  wrapperCol: {
-    span: 16,
-  },
-}
-
-const tailLayout = {
-  wrapperCol: {
-    offset: 8,
-    span: 16,
-  },
-}
-
-// let id = 0
+import { modifierActions, modifierDispatch } from './modifierActions'
+import ModifierForm from './ModifierForm'
 
 @connect(({ authorizationCode }) => ({ authorizationCode }))
 class AddFeeSchedule extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { visible: false, newCode: '', modifierRates: [] }
+    this.state = { modifierRates: [], modifierCount: 0 }
   }
 
-  addModifierRate = modifier => {
-    this.setState(prevState => ({
-      modifierRates: [...prevState.modifierRates, modifier],
-    }))
-    console.log('modifierrates', this.state.modifierRates)
-  }
-
-  showDrawer = () => {
+  updateModifierCount = updateAction => {
+    const { modifierCount } = this.state
+    const updatedCount = updateAction(modifierCount)
     this.setState({
-      visible: true,
+      modifierCount: updatedCount,
     })
   }
 
-  onClose = () => {
-    this.setState({
-      visible: false,
-    })
-  }
-
-  onCodeChange = event => {
-    console.log('change event')
-    this.setState({
-      newCode: event.target.value,
-    })
-  }
-
-  addCode = () => {
-    console.log('addItem')
-    this.setState({
-      newCode: '',
-    })
+  updateModifier = ({ type, payload }) => {
+    let { modifierRates } = this.state
+    modifierRates = modifierDispatch(type, payload, modifierRates)
+    this.setState({ modifierRates })
   }
 
   handleSubmit = e => {
     e.preventDefault()
-    const { form, dispatch } = this.props
+    const { form, dispatch, closeDrawer } = this.props
     form.validateFields((error, values) => {
-      console.log('values', values)
-      values.modifierRates = this.state.modifierRates
-      console.log('values', values)
+      const { modifierRates } = this.state
+      values.modifierRates = modifierRates
       if (!error) {
         dispatch({
           type: actions.CREATE_FEE_SCHEDULE,
           payload: {
-            values: values,
+            values,
           },
         })
-        this.props.closeDrawer()
+        closeDrawer()
         form.resetFields()
       }
     })
@@ -99,164 +52,109 @@ class AddFeeSchedule extends React.Component {
     form.resetFields()
   }
 
-  // remove = k => {
-  //   const { form } = this.props
-  //   const keys = form.getFieldValue('modifierRates')
-  //   form.setFieldsValue({
-  //     modifierRates: keys.filter(key => key !== k),
-  //   })
-  //   id--
-  // }
-
-  // add = () => {
-  //   const { form } = this.props
-  //   const keys = form.getFieldValue('modifier')
-  //   const nextKeys = keys.concat(id++)
-  //   form.setFieldsValue({
-  //     modifierRates: nextKeys,
-  //   })
-  // }
-
   render() {
+    const { modifierCount, modifierRates } = this.state
     const { form, codeList, payorList, modifiers } = this.props
-    const itemStyle = { marginBottom: '5px' }
-    const { getFieldDecorator, getFieldValue } = this.props.form
-    const { newCode } = this.state
 
-    // getFieldDecorator('modifier', { initialValue: [] })
-    // const keys = getFieldValue('modifier')
-    // const formItems = keys.map((k, index) => (
-    //   <>
-    //     <Form {...layout} onSubmit={e => this.handleSubmit(e)}>
-    //       <Form.Item
-    //         {...(index === 0 ? formItemLayout : formItemLayoutWithOutLabel)}
-    //         label={`Modifier ${k + 1}`}
-    //         style={itemStyle}
-    //         required={false}
-    //         key={k}
-    //       >
-    //         {getFieldDecorator(`modifier`, {
-    //           validateTrigger: ['onChange', 'onBlur'],
-    //           rules: [
-    //             {
-    //               required: true,
-    //               whitespace: true,
-    //               message: 'Please input modifier details or delete this field.',
-    //             },
-    //           ],
-    //         })(
-    //           <Select size="small" placeholder="Select Modifier" style={{ width: '60%' }}>
-    //             {modifiers.map(item => (
-    //               <Select.Option key={item.id} value={item.id}>
-    //                 {item.name}
-    //               </Select.Option>
-    //             ))}
-    //           </Select>,
-    //         )}
-    //         {keys.length >= 1 ? (
-    //           <Icon
-    //             className="dynamic-delete-button"
-    //             type="minus-circle-o"
-    //             onClick={() => this.remove(k)}
-    //           />
-    //         ) : null}
-    //       </Form.Item>
-    //       <Form.Item label="Unit Rate" style={itemStyle} key={`rate[${k}]`}>
-    //         {form.getFieldDecorator(`modifierRate`, { initialValue: '' })(
-    //           <Input size="small" style={{ width: '60%' }} />,
-    //         )}
-    //       </Form.Item>
-    //       <Form.Item label="Agreed Rate" style={itemStyle} key={`agreedRate[${k}]`}>
-    //         {form.getFieldDecorator(`modifierAgreedRate`, { initialValue: '' })(
-    //           <Input size="small" style={{ width: '60%' }} />,
-    //         )}
-    //       </Form.Item>
-    //     </Form>
-    //   </>
-    // ))
-
-    // const formItemLayout = {
-    //   labelCol: {
-    //     xs: { span: 24 },
-    //     sm: { span: 4 },
-    //   },
-    //   wrapperCol: {
-    //     xs: { span: 24 },
-    //     sm: { span: 20 },
-    //   },
-    // }
-    // const formItemLayoutWithOutLabel = {
-    //   wrapperCol: {
-    //     xs: { span: 24, offset: 0 },
-    //     sm: { span: 20, offset: 4 },
-    //   },
-    // }
     return (
-      <>
-        <Form {...layout} onSubmit={e => this.handleSubmit(e)}>
-          <Form.Item label="Company/Payor" style={itemStyle}>
-            {form.getFieldDecorator('payor', {
-              rules: [{ required: true, message: 'Please provide name of Payor' }],
-            })(
-              <Select placeholder="Select Name" size="small" style={{ width: '60%' }}>
-                {payorList.map(item => (
-                  <Select.Option key={item.id} value={item.id}>
-                    {item.firstname}
-                  </Select.Option>
-                ))}
-              </Select>,
-            )}
-          </Form.Item>
-          <Form.Item label="Service Code" style={itemStyle}>
-            {form.getFieldDecorator('code', {
-              rules: [{ required: true, message: 'Please select Service code' }],
-            })(
-              <Select placeholder="Select Code" size="small" style={{ width: '60%' }}>
-                {codeList.map(item => (
-                  <Select.Option key={item.id} value={item.id}>
-                    {item.code}
-                  </Select.Option>
-                ))}
-              </Select>,
-            )}
-          </Form.Item>
-          <Form.Item label="Unit Rate" style={itemStyle}>
-            {form.getFieldDecorator('rate', { initialValue: '' })(
-              <Input size="small" style={{ width: '60%' }} />,
-            )}
-          </Form.Item>
-          <Form.Item label="Agreed Rate" style={itemStyle}>
-            {form.getFieldDecorator('agreedRate', { initialValue: '' })(
-              <Input size="small" style={{ width: '60%' }} />,
-            )}
-            <Button type="dashed" onClick={this.showDrawer} style={{ marginLeft: '10px' }}>
-              <Icon type="plus" /> Add Modifier
-            </Button>
-          </Form.Item>
-          <Form.Item {...tailLayout}>
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
-            {/* <Button htmlType="primary" onClick={this.onReset} className="ml-4">
-              cancel
-            </Button> */}
-          </Form.Item>
-        </Form>
+      <Form className="addEditFeeScheduleRate" onSubmit={e => this.handleSubmit(e)}>
+        <Divider orientation="left">Basic Details</Divider>
 
-        <Drawer
-          title="Add Modifier"
-          width={350}
-          closable={false}
-          onClose={this.onClose}
-          visible={this.state.visible}
-        >
-          <AddModifier
-            modifiers={modifiers}
-            addModifierRate={this.addModifierRate}
-            closeDrawer={this.onClose}
-          />
-        </Drawer>
-      </>
+        {/* Payor - Service Code */}
+        <Row>
+          <Col sm={24} md={12}>
+            <Form.Item label="Payor" labelCol={{ sm: 8 }} wrapperCol={{ sm: 16 }}>
+              {form.getFieldDecorator('payor', {
+                rules: [{ required: true, message: 'Please select Payor' }],
+              })(
+                <Select
+                  placeholder="Select Payor"
+                  showSearch
+                  optionFilterProp="children"
+                  filterOption={(input, option) =>
+                    option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                  }
+                >
+                  {payorList.map(item => (
+                    <Select.Option key={item.id} value={item.id}>
+                      {item.firstname}
+                    </Select.Option>
+                  ))}
+                </Select>,
+              )}
+            </Form.Item>
+          </Col>
+          <Col sm={24} md={12}>
+            <Form.Item label="Service Code" labelCol={{ sm: 8 }} wrapperCol={{ sm: 16 }}>
+              {form.getFieldDecorator('code', {
+                rules: [{ required: true, message: 'Please select Service code' }],
+              })(
+                <Select placeholder="Select Code">
+                  {codeList.map(item => (
+                    <Select.Option key={item.id} value={item.id}>
+                      {item.code}
+                    </Select.Option>
+                  ))}
+                </Select>,
+              )}
+            </Form.Item>
+          </Col>
+        </Row>
+        {/* Unit Rate - Agreed Rate */}
+        <Row>
+          <Col sm={24} md={12}>
+            <Form.Item label="Unit Rate" labelCol={{ sm: 8 }} wrapperCol={{ sm: 16 }}>
+              {form.getFieldDecorator('rate', { initialValue: '' })(
+                <InputNumber placeholder="Enter Rate" />,
+              )}
+            </Form.Item>
+          </Col>
+          <Col sm={24} md={12}>
+            <Form.Item label="Agreed Rate" labelCol={{ sm: 8 }} wrapperCol={{ sm: 16 }}>
+              {form.getFieldDecorator('agreedRate', { initialValue: '' })(
+                <InputNumber placeholder="Enter Agreed Rate" />,
+              )}
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Divider orientation="left">Modifiers</Divider>
+        {console.log('modifierCount', modifierCount)}
+        {times(n => {
+          return (
+            <ModifierForm
+              key={n}
+              index={n}
+              setModifierCount={this.updateModifierCount}
+              allModifierCodes={modifiers}
+              modifierRates={modifierRates}
+              updateModifier={this.updateModifier}
+            />
+          )
+        }, modifierCount)}
+        <Row>
+          <Col offset={6} span={12}>
+            <Button
+              type="dashed"
+              onClick={() => {
+                this.updateModifierCount(value => value + 1)
+                this.updateModifier({ type: modifierActions.ADD_MODIFIER })
+              }}
+              style={{ width: '100%', margin: '10px 0px' }}
+            >
+              <PlusOutlined /> Add another Modifier
+            </Button>
+          </Col>
+        </Row>
+        <Form.Item style={{ textAlign: 'center' }}>
+          <Button type="primary" htmlType="submit">
+            Submit
+          </Button>
+          <Button onClick={this.onReset} className="ml-4">
+            Cancel
+          </Button>
+        </Form.Item>
+      </Form>
     )
   }
 }

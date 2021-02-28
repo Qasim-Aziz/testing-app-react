@@ -12,7 +12,6 @@ const GET_ACTIVITIES_QUERY = gql`
       edges {
         node {
           id
-          user
           subject
           date
           length

@@ -54,7 +54,7 @@ export const getLongTermGoals = (student, program, status) => {
     .query({
       query: gql`
         query GetLongTermGoals($student: ID!, $program: ID!, $status: ID) {
-          longTerm(student: $student, program: $program, goalStatus: $status) {
+          longTerm(student: $student, program: $program, goalStatus: $status, isDefault: false) {
             edges {
               node {
                 id
@@ -102,7 +102,7 @@ export const getLongTermGoals = (student, program, status) => {
                             targetInstr
                             peakBlocks
                             peakType
-                            
+
                             date
                             objective
                             targetStatus {
@@ -151,22 +151,23 @@ export const getLongTermGoals = (student, program, status) => {
                                 }
                               }
                             }
-                            mastery{
-                              edges{
-                                node{
-                                  sd{
+                            mastery {
+                              edges {
+                                node {
+                                  id
+                                  sd {
                                     id
                                     sd
                                   }
-                                  step{
+                                  step {
                                     id
                                     step
                                   }
-                                  mastery{
+                                  mastery {
                                     id
                                     name
                                   }
-                                  status{
+                                  status {
                                     id
                                     statusName
                                   }
@@ -189,14 +190,15 @@ export const getLongTermGoals = (student, program, status) => {
                                 }
                               }
                             }
-                            classes{
-                              edges{
-                                node{
+                            classes {
+                              edges {
+                                node {
                                   id
                                   name
-                                  stimuluses{
-                                    edges{
-                                      node{
+                                  stimuluses {
+                                    edges {
+                                      node {
+                                        id
                                         option
                                         stimulusName
                                       }
@@ -205,7 +207,6 @@ export const getLongTermGoals = (student, program, status) => {
                                 }
                               }
                             }
-
                           }
                         }
                       }
@@ -217,6 +218,7 @@ export const getLongTermGoals = (student, program, status) => {
           }
         }
       `,
+      fetchPolicy: 'network-only',
       variables: {
         student: student,
         program: program,
@@ -375,8 +377,8 @@ export const getTargetDetailsOptions = () => {
           domain {
             edges {
               node {
-                domain
                 id
+                domain
               }
             }
           }
@@ -780,22 +782,23 @@ export async function updateLongTermGoal(
                             id
                             targetName
                           }
-                          mastery{
-                            edges{
-                              node{
-                                sd{
+                          mastery {
+                            edges {
+                              node {
+                                id
+                                sd {
                                   id
                                   sd
                                 }
-                                step{
+                                step {
                                   id
                                   step
                                 }
-                                mastery{
+                                mastery {
                                   id
                                   name
                                 }
-                                status{
+                                status {
                                   id
                                   statusName
                                 }
@@ -805,7 +808,6 @@ export async function updateLongTermGoal(
                         }
                       }
                     }
-                    
                   }
                 }
               }
@@ -986,6 +988,195 @@ export async function updateShortTermGoal(
         goalStatus: goalStatus,
         longTerm: longTerm,
         goalId: goalId,
+      },
+    })
+    .then(result => result)
+    .catch(error => {
+      error.graphQLErrors.map(item => {
+        return notification.error({
+          message: 'Somthing went wrong',
+          description: item.message,
+        })
+      })
+    })
+}
+
+export const getDefaultGoals = studentId => {
+  return client
+    .query({
+      query: gql`
+        query($studentId: ID!) {
+          longTerm(student: $studentId, isDefault: true) {
+            edges {
+              node {
+                id
+                goalName
+                description
+                dateInitialted
+                dateEnd
+                student {
+                  id
+                  firstname
+                }
+                responsibility {
+                  id
+                  name
+                }
+                goalStatus {
+                  id
+                  status
+                }
+                program {
+                  id
+                  name
+                }
+                shorttermgoalSet {
+                  edges {
+                    node {
+                      id
+                      goalName
+                      dateInitialted
+                      dateEnd
+                      description
+                      assessment {
+                        id
+                        name
+                      }
+                      responsibility {
+                        id
+                        name
+                      }
+                      goalStatus {
+                        id
+                        status
+                      }
+                      targetAllocateSet {
+                        edges {
+                          node {
+                            id
+                            time
+                            targetInstr
+                            peakBlocks
+                            peakType
+
+                            date
+                            objective
+                            targetStatus {
+                              id
+                              statusName
+                            }
+                            masteryCriteria {
+                              id
+                              name
+                            }
+                            sessionSet {
+                              edges {
+                                node {
+                                  id
+                                  sessionName {
+                                    id
+                                    name
+                                  }
+                                }
+                              }
+                            }
+                            targetId {
+                              id
+                              maxSd
+                              domain {
+                                id
+                                domain
+                              }
+                            }
+                            targetAllcatedDetails {
+                              id
+                              targetName
+                              dateBaseline
+                              DailyTrials
+                              consecutiveDays
+                              targetType {
+                                id
+                                typeTar
+                              }
+                            }
+                            videos {
+                              edges {
+                                node {
+                                  id
+                                  url
+                                }
+                              }
+                            }
+                            mastery {
+                              edges {
+                                node {
+                                  id
+                                  sd {
+                                    id
+                                    sd
+                                  }
+                                  step {
+                                    id
+                                    step
+                                  }
+                                  mastery {
+                                    id
+                                    name
+                                  }
+                                  status {
+                                    id
+                                    statusName
+                                  }
+                                }
+                              }
+                            }
+                            sd {
+                              edges {
+                                node {
+                                  id
+                                  sd
+                                }
+                              }
+                            }
+                            steps {
+                              edges {
+                                node {
+                                  id
+                                  step
+                                }
+                              }
+                            }
+                            classes {
+                              edges {
+                                node {
+                                  id
+                                  name
+                                  stimuluses {
+                                    edges {
+                                      node {
+                                        id
+                                        option
+                                        stimulusName
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      `,
+      fetchPolicy: 'network-only',
+      variables: {
+        studentId,
       },
     })
     .then(result => result)

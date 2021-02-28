@@ -19,30 +19,21 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable array-callback-return */
-
+/* eslint-disable */
 import React from 'react'
 import { Helmet } from 'react-helmet'
-import {
-  Layout,
-  Row,
-  Col,
-  Card,
-  Button,
-  Typography,
-
-  Drawer,
-  Form,
-
-  Menu,
-} from 'antd'
+import { Layout, Row, Col, Card, Button, Typography, Drawer, Form, Menu, Select } from 'antd'
 import html2canvas from 'html2canvas'
 import { FilterOutlined } from '@ant-design/icons'
 import JsPDF from 'jspdf'
 import { connect } from 'react-redux'
+import { gql } from 'apollo-boost'
 
 import Moment from 'moment'
 
 import LearnerSelect from 'components/LearnerSelect'
+import StaffSelect from 'components/StaffSelect'
+import VBMappReport from 'components/VBMappReport'
 
 import DailyResponseRate from './dailyResponseRate'
 import ProgressOverview from './progressOverview'
@@ -51,12 +42,36 @@ import Behavior from './behavior'
 import Attendance from './attendance'
 import Timesheet from './timesheet'
 import Goals from './goals'
+import Mand from './mand'
 import MonthlyReport from './monthlyReport'
 import CelerationChartPanel from './celeration-chart-panel.container'
+import PeakBlockReport from './peakBlockReport'
+import Appointments from './appointments'
+import TargetResponseReport from './targetResponseReport'
+import NetworkSankey from './networkSankey'
+import client from '../../apollo/config'
+
+
+
+
 import './padding.scss'
 
 const { Title, Text } = Typography
 const { Content } = Layout
+const { Option } = Select
+
+const STAFF_LIST = gql`
+  query {
+    staffs {
+      edges {
+        node {
+          id
+          name
+        }
+      }
+    }
+  }
+`
 
 const parentCardStyle = {
   background: '#F9F9F9',
@@ -66,6 +81,28 @@ const parentCardStyle = {
   height: 300,
   overflow: 'hidden',
 }
+
+const REPORT_MAPPING = {
+  '/reports/progress_overview': 'Progress Overview',
+  '/reports/daily_res_rate': 'Daily Response Rate',
+  '/reports/behavior': 'Behavior',
+  '/reports/mand': 'Mand',
+  '/reports/sessions': 'Sessions',
+  '/reports/goals': 'Goals',
+  '/reports/celer_chart': 'Celeration Chart',
+  '/reports/appointment_report': 'Appointment Report',
+  '/reports/staff_activity': 'Staff Activity',
+  '/reports/attendance': 'Attendance',
+  '/reports/timesheet': 'Timesheet',
+  '/reports/monthly_report': 'Monthly Report',
+  '/reports/vbmapp': 'VBMAPP',
+  '/reports/peak_block_report': 'Peak Block Report',
+  '/reports/target_res_report': 'Target Response Report',
+  '/reports/network_graph': 'Network & Sankey Graph',
+}
+
+// list to exclude learner's names from report title
+const EXCLUDE_NAMES = ['Attendance', 'Timesheet']
 
 @connect(({ user, student, learnersprogram }) => ({ user, student, learnersprogram }))
 class Reports extends React.Component {
@@ -93,12 +130,17 @@ class Reports extends React.Component {
       barKey: 20,
       visibleFilter: false,
       selectedStudentId: localStorage.getItem('studentId'),
-      TabCheck: 'Progress Overview'
+      TabCheck: 'Progress Overview',
+      windowWidth: window.innerWidth,
+      staffs: [],
+      selectedStaff: { id: '', name: '' },
     }
+
+    this.updateWindowDimensions = this.updateWindowDimensions.bind(this)
   }
 
   componentDidMount() {
-    const { dispatch } = this.props
+    const { dispatch, user } = this.props
     dispatch({
       type: 'learnersprogram/LOAD_DATA',
     })
@@ -124,13 +166,44 @@ class Reports extends React.Component {
         },
       })
     }
+    window.addEventListener('resize', this.updateWindowDimensions)
+    if (this.props.match.path !== '/reports')
+      this.setState({ TabCheck: REPORT_MAPPING[this.props.match.path] })
+
+    if (user.role === 'school_admin') {
+      client.query({ query: STAFF_LIST }).then(res =>
+        this.setState({
+          staffs: res.data.staffs.edges,
+          selectedStaff: res.data.staffs.edges[0].node,
+        }),
+      )
+    } else {
+      this.setState({
+        selectedStaff: { id: user.staffId, name: user.staffName },
+      })
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    const { user } = this.props
+    console.log('user====>>>', user)
+    if (user.staffName !== prevProps.user.staffName)
+      this.setState({
+        selectedStaff: { id: user.staffId, name: user.staffName },
+      })
+    if (this.props.match.path !== prevProps.match.path) {
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({ TabCheck: REPORT_MAPPING[this.props.match.path] })
+    }
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateWindowDimensions)
   }
 
   onChange = current => {
     this.setState({ current })
   }
-
-
 
   noLearnerSelected = () => {
     return (
@@ -147,8 +220,6 @@ class Reports extends React.Component {
       </>
     )
   }
-
-
 
   onCloseFilter = () => {
     this.setState({
@@ -168,15 +239,30 @@ class Reports extends React.Component {
     })
   }
 
+  changeReportRoute = route => {
+    this.props.match.path !== `/${route}` && this.props.history.push(`/${route}`)
+  }
+
+  updateWindowDimensions() {
+    this.setState({
+      windowWidth: window.innerWidth,
+    })
+  }
+
+  selectStaff = staff => {
+    this.setState({ selectedStaff: staff })
+  }
+
   render() {
     const {
       form,
       student: { StudentName },
       user,
+      match: { path },
+      history,
       learnersprogram: { Loading, ProgramAreas, Learners, SelectedLearnerId },
     } = this.props
-    const { TabCheck, visibleFilter } = this.state
-
+    const { TabCheck, visibleFilter, selectedStaff } = this.state
 
     const std = localStorage.getItem('studentId')
 
@@ -206,7 +292,7 @@ class Reports extends React.Component {
       })
     }
 
-    const exportToCSV = () => { }
+    const exportToCSV = () => {}
 
     const menu = (
       <Menu>
@@ -233,7 +319,8 @@ class Reports extends React.Component {
       cursor: 'pointer',
       padding: '30px 20px',
       borderRadius: 0,
-      width: '100%',
+      width: '85%',
+      margin: '0 auto',
       height: 50,
       display: 'flex',
       alignItems: 'center',
@@ -256,22 +343,23 @@ class Reports extends React.Component {
 
     const SideBarHeading = {
       fontSize: '24px',
+      width: '85%',
       fontWeight: 'bold',
+      minWidth: '200px',
       lineHeight: '33px',
-      marginBottom: '25px',
+      margin: '24px auto 25px ',
     }
 
     if (TabCheck === 'Staff Activity' && user?.role === 'parents') {
       this.setState({
-        TabCheck: 'Progress Overview'
+        TabCheck: 'Progress Overview',
       })
     }
-
-
+    console.log(TabCheck, 'tabCheck')
     return (
       <>
         <Helmet title="Reports" />
-        <Layout style={{ padding: '0px' }}>
+        <Layout style={{ padding: '0px', marginBottom: '100px' }}>
           <div
             style={{
               display: 'flex',
@@ -279,6 +367,7 @@ class Reports extends React.Component {
               justifyContent: 'space-between',
               alignItems: 'center',
               padding: '0px 10px',
+              margin: '10px 0',
               backgroundColor: '#FFF',
               boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
             }}
@@ -291,10 +380,7 @@ class Reports extends React.Component {
               }}
             >
               <div style={{ padding: '5px 0px', display: 'flex', justifyContent: 'space-between' }}>
-                <div style={{ paddingTop: '5px' }}>
-                  &nbsp;
-                </div>
-
+                <div style={{ paddingTop: '5px' }}>&nbsp;</div>
 
                 <div>
                   <div
@@ -304,192 +390,379 @@ class Reports extends React.Component {
                       marginTop: '2px',
                     }}
                   >
-                    {StudentName !== '' && `${StudentName}'s ${TabCheck}`}
+                    {EXCLUDE_NAMES.indexOf(TabCheck) > -1
+                      ? TabCheck === 'Timesheet'
+                        ? selectedStaff.name !== '' && `${selectedStaff.name}'s Timesheet`
+                        : TabCheck
+                      : StudentName !== '' && `${StudentName}'s ${TabCheck}`}
                   </div>
                 </div>
 
                 <div>
-                  {user?.role !== 'parents' && (
-                    <Button onClick={this.showDrawerFilter} size="large">
-                      <FilterOutlined />
-                    </Button>
-                  )}
+                  {user?.role !== 'parents' &&
+                    !(user?.role === 'therapist' && TabCheck === 'Timesheet') && (
+                      <Button onClick={this.showDrawerFilter} size="large">
+                        <FilterOutlined />
+                      </Button>
+                    )}
 
                   <Drawer
                     visible={visibleFilter}
                     onClose={this.onCloseFilter}
                     width={350}
-                    title="Select Learner"
+                    title={`Select ${TabCheck === 'Timesheet' ? 'Staff' : 'Learner'}`}
                     placement="right"
                   >
-                    <LearnerSelect />
+                    {TabCheck === 'Timesheet' ? (
+                      <StaffSelect Staffs={this.state.staffs} selectStaff={this.selectStaff} />
+                    ) : (
+                      <LearnerSelect />
+                    )}
                   </Drawer>
                 </div>
-
               </div>
-
             </Content>
           </div>
 
           <Col style={{ paddingRight: 0 }}>
+            {this.state.windowWidth <= 1050 && (
+              <Select
+                style={{ width: 200, margin: '20px 0' }}
+                defaultValue={this.state.TabCheck}
+                onSelect={e => this.SetTabFunction(e)}
+              >
+                <Option key="1" value="Progress Overview">
+                  Progress Overview
+                </Option>
+                <Option key="2" value="Daily Response Rate">
+                  Daily Response Rate
+                </Option>
+                <Option key="3" value="Behavior">
+                  Behavior
+                </Option>
+                <Option key="4" value="Mand">
+                  Mand
+                </Option>
+                <Option key="5" value="Session">
+                  Session
+                </Option>
+                <Option key="6" value="Goals">
+                  Goals
+                </Option>
+                <Option key="7" value="Celeration Chart">
+                  Celeration Chart
+                </Option>
+                <Option key="8" value="Appointment Report">
+                  Appointment Report
+                </Option>
+                <Option key="9" value="Monthly Report">
+                  Monthly Report
+                </Option>
+                {user?.role !== 'parents' && (
+                  <Option key="10" value="Staff Activity">
+                    Staff Activity
+                  </Option>
+                )}
+                {user?.role !== 'parents' && (
+                  <Option key="11" value="Timesheet">
+                    Timesheet
+                  </Option>
+                )}
+                {user?.role !== 'parents' && (
+                  <Option key="12" value="Attendance">
+                    Attendance
+                  </Option>
+                )}
+                <Option key="13" value="VBMAPP">
+                  VBMAPP
+                </Option>
+                <Option key="14" value="Peak Block Report">
+                  Peak Block Report
+                </Option>
+                <Option key="15" value="Target Response Report">
+                  Target Response Report
+                </Option>
+              </Select>
+            )}
             <Row gutter={[0, 0]}>
-              <Col sm={5}>
-                <div style={{ display: 'flex' }}>
-                  <Card
-                    style={{
-                      background: '#F1F1F1',
-                      borderRadius: 0,
-                      minHeight: '100vh',
-                      width: '100%',
-
-                      // minWidth: '290px',
-                      // maxWidth: '350px',
-                    }}
-                  >
-                    <div style={SideBarHeading}>Reports</div>
+              {this.state.windowWidth > 1050 && (
+                <Col sm={5}>
+                  <div style={{ display: 'flex' }}>
                     <div
-                      style={TabCheck === 'Progress Overview' ? ActiveStyle : BlockStyle}
-                      onClick={() => this.SetTabFunction('Progress Overview')}
+                      style={{
+                        background: '#F1F1F1',
+                        borderRadius: 0,
+                        minHeight: '100vh',
+                        width: '100%',
+                        paddingBottom: '24px',
+                      }}
                     >
-                      <span style={HeadStyle}>Progress Overview</span>
-                    </div>
-                    <div
-                      style={TabCheck === 'Daily Response Rate' ? ActiveStyle : BlockStyle}
-                      onClick={() => this.SetTabFunction('Daily Response Rate')}
-                    >
-                      <span style={HeadStyle}>Daily Response Rate</span>
-                    </div>
-                    <div
-                      style={TabCheck === 'Behavior' ? ActiveStyle : BlockStyle}
-                      onClick={() => this.SetTabFunction('Behavior')}
-                    >
-                      <span style={HeadStyle}>Behavior</span>
-                    </div>
-                    <div
-                      style={TabCheck === 'Sessions' ? ActiveStyle : BlockStyle}
-                      onClick={() => this.SetTabFunction('Sessions')}
-                    >
-                      <span style={HeadStyle}>Sessions</span>
-                    </div>
-                    <div
-                      style={TabCheck === 'Goals' ? ActiveStyle : BlockStyle}
-                      onClick={() => this.SetTabFunction('Goals')}
-                    >
-                      <span style={HeadStyle}>Goals</span>
-                    </div>
-                    {user?.role !== 'parents' && (
+                      <div style={SideBarHeading}>Reports</div>
                       <div
-                        style={TabCheck === 'Staff Activity' ? ActiveStyle : BlockStyle}
-                        onClick={() => this.SetTabFunction('Staff Activity')}
+                        style={TabCheck === 'Progress Overview' ? ActiveStyle : BlockStyle}
+                        onClick={() => {
+                          this.SetTabFunction('Progress Overview')
+                          this.changeReportRoute('reports/progress_overview')
+                        }}
                       >
-                        <span style={HeadStyle}>Staff Activity</span>
+                        <span style={HeadStyle}>Progress Overview</span>
                       </div>
-                    )}
+                      <div
+                        style={TabCheck === 'Daily Response Rate' ? ActiveStyle : BlockStyle}
+                        onClick={() => {
+                          this.SetTabFunction('Daily Response Rate')
+                          this.changeReportRoute('reports/daily_res_rate')
+                        }}
+                      >
+                        <span style={HeadStyle}>Daily Response Rate</span>
+                      </div>
+                      <div
+                        style={TabCheck === 'Behavior' ? ActiveStyle : BlockStyle}
+                        onClick={() => {
+                          this.SetTabFunction('Behavior')
+                          this.changeReportRoute('reports/behavior')
+                        }}
+                      >
+                        <span style={HeadStyle}>Behavior</span>
+                      </div>
+                      {/* Mand Data */}
+                      <div
+                        style={TabCheck === 'Mand' ? ActiveStyle : BlockStyle}
+                        onClick={() => {
+                          this.SetTabFunction('Mand')
+                          this.changeReportRoute('reports/mand')
+                        }}
+                      >
+                        <span style={HeadStyle}>Mand</span>
+                      </div>
+                      <div
+                        style={TabCheck === 'Sessions' ? ActiveStyle : BlockStyle}
+                        onClick={() => {
+                          this.SetTabFunction('Sessions')
+                          this.changeReportRoute('reports/sessions')
+                        }}
+                      >
+                        <span style={HeadStyle}>Sessions</span>
+                      </div>
+                      <div
+                        style={TabCheck === 'Goals' ? ActiveStyle : BlockStyle}
+                        onClick={() => {
+                          this.SetTabFunction('Goals')
+                          this.changeReportRoute('reports/goals')
+                        }}
+                      >
+                        <span style={HeadStyle}>Goals</span>
+                      </div>
 
-                    <div
-                      style={TabCheck === 'Celeration Chart' ? ActiveStyle : BlockStyle}
-                      onClick={() => this.SetTabFunction('Celeration Chart')}
-                    >
-                      <span style={HeadStyle}>Celeration Chart</span>
+                      <div
+                        style={TabCheck === 'Celeration Chart' ? ActiveStyle : BlockStyle}
+                        onClick={() => {
+                          this.SetTabFunction('Celeration Chart')
+                          this.changeReportRoute('reports/celer_chart')
+                        }}
+                      >
+                        <span style={HeadStyle}>Celeration Chart</span>
+                      </div>
+
+                      <div
+                        style={TabCheck === 'Appointment Report' ? ActiveStyle : BlockStyle}
+                        onClick={() => {
+                          this.SetTabFunction('Appointment Report')
+                          this.changeReportRoute('reports/appointment_report')
+                        }}
+                      >
+                        <span style={HeadStyle}>Appointment Report</span>
+                      </div>
+
+                      {user?.role !== 'parents' && (
+                        <>
+                          {/* <div
+                            style={TabCheck === 'Staff Activity' ? ActiveStyle : BlockStyle}
+                            onClick={() => {
+                              this.SetTabFunction('Staff Activity')
+                              this.changeReportRoute('reports/staff_activity')
+                            }}
+                          >
+                            <span style={HeadStyle}>Staff Activity</span>
+                          </div> */}
+                          <div
+                            style={TabCheck === 'Attendance' ? ActiveStyle : BlockStyle}
+                            onClick={() => {
+                              this.SetTabFunction('Attendance')
+                              this.changeReportRoute('reports/attendance')
+                            }}
+                          >
+                            <span style={HeadStyle}>Attendance</span>
+                          </div>
+                          <div
+                            style={TabCheck === 'Timesheet' ? ActiveStyle : BlockStyle}
+                            onClick={() => {
+                              this.SetTabFunction('Timesheet')
+                              this.changeReportRoute('reports/timesheet')
+                            }}
+                          >
+                            <span style={HeadStyle}>Timesheet</span>
+                          </div>
+                        </>
+                      )}
+                      <div
+                        style={TabCheck === 'Monthly Report' ? ActiveStyle : BlockStyle}
+                        onClick={() => {
+                          this.SetTabFunction('Monthly Report')
+                          this.changeReportRoute('reports/monthly_report')
+                        }}
+                      >
+                        <span style={HeadStyle}>Monthly Report</span>
+                      </div>
+                      <div
+                        style={TabCheck === 'VBMAPP' ? ActiveStyle : BlockStyle}
+                        onClick={() => {
+                          this.SetTabFunction('VBMAPP')
+                          this.changeReportRoute('reports/vbmapp')
+                        }}
+                      >
+                        <span style={HeadStyle}>VBMAPP</span>
+                      </div>
+                      <div
+                        style={TabCheck === 'Peak Block Report' ? ActiveStyle : BlockStyle}
+                        onClick={() => {
+                          this.SetTabFunction('Peak Block Report')
+                          this.changeReportRoute('reports/peak_block_report')
+                        }}
+                      >
+                        <span style={HeadStyle}>Peak Block Report</span>
+                      </div>
+                      <div
+                        style={TabCheck === 'Target Response Report' ? ActiveStyle : BlockStyle}
+                        onClick={() => {
+                          this.SetTabFunction('Target Response Report')
+                          this.changeReportRoute('reports/target_res_report')
+                        }}
+                      >
+                        <span style={HeadStyle}>Target Response Report</span>
+                      </div>
+                      <div
+                        style={TabCheck === 'Network & Sankey Graph' ? ActiveStyle : BlockStyle}
+                        onClick={() => {
+                          this.SetTabFunction('Response Time Report')
+                          this.changeReportRoute('reports/network_graph')
+                        }}
+                      >
+                        <span style={HeadStyle}>Network & Sankey Graph</span>
+                      </div>
                     </div>
+                  </div>
+                </Col>
+              )}
 
-                    <div
-                      style={TabCheck === 'Attendance' ? ActiveStyle : BlockStyle}
-                      onClick={() => this.SetTabFunction('Attendance')}
-                    >
-                      <span style={HeadStyle}>Attendance</span>
-                    </div>
-
-                    <div
-                      style={TabCheck === 'Timesheet' ? ActiveStyle : BlockStyle}
-                      onClick={() => this.SetTabFunction('Timesheet')}
-                    >
-                      <span style={HeadStyle}>Timesheet</span>
-                    </div>
-                    <div
-                      style={TabCheck === 'Monthly Report' ? ActiveStyle : BlockStyle}
-                      onClick={() => this.SetTabFunction('Monthly Report')}
-                    >
-                      <span style={HeadStyle}>Monthly Report</span>
-                    </div>
-
-                  </Card>
-
-                </div>
-              </Col>
-
-              <Col sm={19}>
+              <Col sm={this.state.windowWidth > 1050 ? 19 : 24} style={{ margin: 'auto' }}>
                 <div style={{ marginTop: '1px' }}>
-                  {TabCheck === 'Progress Overview' && (
+                  {(path === '/reports/progress_overview' || path === '/reports') && (
                     <ProgressOverview
                       showDrawerFilter={this.showDrawerFilter}
                       selectedStudentId={SelectedLearnerId}
                     />
                   )}
-                  {TabCheck === 'Daily Response Rate' && (
+                  {path === '/reports/daily_res_rate' && (
                     <DailyResponseRate
                       studentName={StudentName}
                       showDrawerFilter={this.showDrawerFilter}
                     />
                   )}
-                  {TabCheck === 'Behavior' && (
+                  {path === '/reports/behavior' && (
                     <Behavior
                       studentName={StudentName}
                       showDrawerFilter={this.showDrawerFilter}
                       selectedStudentId={SelectedLearnerId}
                     />
                   )}
-                  {TabCheck === 'Sessions' && (
-                    <Sessions
-                      studentName={StudentName}
+                  {path === '/reports/mand' && (
+                    <Mand
                       showDrawerFilter={this.showDrawerFilter}
+                      selectedStudentId={SelectedLearnerId}
                     />
                   )}
-                  {TabCheck === 'Goals' && (
+                  {path === '/reports/sessions' && (
+                    <Sessions studentName={StudentName} showDrawerFilter={this.showDrawerFilter} />
+                  )}
+                  {path === '/reports/goals' && (
                     <Goals
                       showDrawerFilter={this.showDrawerFilter}
                       selectedStudentId={SelectedLearnerId}
                     />
                   )}
-                  {TabCheck === 'Staff Activity' && (
+                  {path === '/reports/staff_activity' && (
                     <div>
                       <p>Under Development</p>
                     </div>
                   )}
-                  {TabCheck === 'Celeration Chart' && (
+                  {path === '/reports/celer_chart' && (
                     <CelerationChartPanel
                       studentName={StudentName}
                       showDrawerFilter={this.showDrawerFilter}
                       selectedStudentId={SelectedLearnerId}
                     />
                   )}
-                  {TabCheck === 'Attendance' && (
+                  {path === '/reports/appointment_report' && (
+                    <Appointments
+                      studentName={StudentName}
+                      showDrawerFilter={this.showDrawerFilter}
+                      selectedStudentId={SelectedLearnerId}
+                    />
+                  )}
+                  {path === '/reports/attendance' && (
                     <Attendance
                       studentName={StudentName}
                       showDrawerFilter={this.showDrawerFilter}
                       selectedStudentId={SelectedLearnerId}
                     />
                   )}
-                  {TabCheck === 'Timesheet' && (
+                  {path === '/reports/timesheet' && (
                     <Timesheet
                       studentName={StudentName}
                       showDrawerFilter={this.showDrawerFilter}
+                      selectedStaff={selectedStaff}
+                    />
+                  )}
+                  {path === '/reports/vbmapp' && (
+                    <VBMappReport
+                      selectedStudentId={SelectedLearnerId}
+                      studentName={StudentName}
+                      showDrawerFilter={this.showDrawerFilter}
+                    />
+                  )}
+                  {path === '/reports/monthly_report' && (
+                    <MonthlyReport
+                      showDrawerFilter={this.showDrawerFilter}
+                      studentName={StudentName}
                       selectedStudentId={SelectedLearnerId}
                     />
                   )}
-                  {TabCheck === 'Monthly Report' && (
-                    <MonthlyReport
+                  {path === '/reports/peak_block_report' && (
+                    <PeakBlockReport
                       showDrawerFilter={this.showDrawerFilter}
+                      studentName={StudentName}
+                      selectedStudentId={SelectedLearnerId}
+                    />
+                  )}
+                  {path === '/reports/target_res_report' && (
+                    <TargetResponseReport
+                      showDrawerFilter={this.showDrawerFilter}
+                      studentName={StudentName}
+                      selectedStudentId={SelectedLearnerId}
+                    />
+                  )}
+                  {path === '/reports/network_graph' && (
+                    <NetworkSankey
+                      showDrawerFilter={this.showDrawerFilter}
+                      studentName={StudentName}
                       selectedStudentId={SelectedLearnerId}
                     />
                   )}
                 </div>
-
-
               </Col>
             </Row>
           </Col>
-
         </Layout>
       </>
     )

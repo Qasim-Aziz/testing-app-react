@@ -6,7 +6,7 @@ const initialState = {
   taskStatus: [],
   taskType: [],
   staffsList: [],
-  learnersList : [],
+  learnersList: [],
   SelectedTask: null,
   loading: true,
   createTaskLoading: false,
@@ -18,10 +18,17 @@ export default function userReducer(state = initialState, action) {
     case actions.SET_STATE:
       return { ...state, ...action.payload }
     case actions.APPEND_TASKS_LIST:
+      if (action.payload.tasks) {
+        return {
+          ...state,
+          TaskList: [...state.TaskList, ...action.payload.tasks],
+        }
+      }
       return {
         ...state,
         TaskList: [action.payload.task, ...state.TaskList],
       }
+
     case actions.UPDATE_TASKS_LIST:
       return {
         ...state,

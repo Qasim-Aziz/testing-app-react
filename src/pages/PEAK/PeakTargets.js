@@ -1,17 +1,14 @@
 /* eslint-disable no-lone-blocks */
 /* eslint-disable no-shadow */
 /* eslint-disable react/jsx-boolean-value */
+import { PlusOutlined } from '@ant-design/icons'
+import { Button, Col, Drawer, Row } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { useMutation } from 'react-apollo'
-import { Button, Drawer } from 'antd'
-import { PlusOutlined } from '@ant-design/icons'
-import TargetAllocate from './TargetAllocation'
 import TargetAllocationNew from '../../components/TargetAllocationAssessments/TargetAllocation'
 import { GET_TARGET } from './query'
-import CardImg from './targetCard.jpg'
 
-export default ({ suggestTarget }) => {
-
+export default ({ suggestTarget, selectedTargetCategory }) => {
   let stdId = ''
   if (!(localStorage.getItem('studentId') === null) && localStorage.getItem('studentId')) {
     stdId = JSON.parse(localStorage.getItem('studentId'))
@@ -40,46 +37,22 @@ export default ({ suggestTarget }) => {
   if (error) return <h4 style={{ color: 'red' }}>Opps therir are something wrong</h4>
 
   const Targets = data?.suggestPeakTargets.details?.map(node => {
-    return node.targets.edges?.map(({ node }) => {
-      return (
-        <div
-          key={node.id}
-          style={{
-            maxWidth: '100%',
-            border: '1px solid #e4e9f0',
-            borderRadius: 10,
-            marginBottom: 12,
-            position: 'relative',
-            background: '#fff',
-            padding: '20px 5px 60px 20px',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              fontSize: 18,
-            }}
-          >
-            <img
-              src={CardImg}
-              style={{ width: 80, height: 64, marginRight: 12, borderRadius: 10 }}
-              alt=""
-            />
-            {node.targetMain.targetName}
-          </div>
+    return node.targets.edges?.map(({ node }) => (
+      <Row
+        key={node.id}
+        style={{
+          border: '1px solid #e4e9f0',
+          borderRadius: 10,
+          background: '#fff',
+          padding: '10px 20px 10px 10px',
+          margin: '8px 0px',
+          fontSize: '18px',
+        }}
+      >
+        <Col span="22">{node.targetMain.targetName}</Col>
+        <Col span="2">
           <Button
-            type="link"
-            style={{
-              background: '#26e768',
-              width: '45px',
-              height: '43px',
-              borderBottomRightRadius: 10,
-              position: 'absolute',
-              bottom: 0,
-              right: 0,
-              display: 'flex',
-              justifyContent: 'center',
-            }}
+            type="primary"
             onClick={() => {
               setTargetName(node.targetMain.targetName)
               setSelectTarget(node.id)
@@ -87,11 +60,11 @@ export default ({ suggestTarget }) => {
               setTargetVideo(node.video)
             }}
           >
-            <PlusOutlined style={{ fontSize: 24, color: '#fff', marginTop: 8 }} />
+            <PlusOutlined style={{ fontSize: 20, color: '#fff', marginTop: 5 }} />
           </Button>
-        </div>
-      )
-    })
+        </Col>
+      </Row>
+    ))
   })
 
   if (!Targets) {
@@ -113,7 +86,7 @@ export default ({ suggestTarget }) => {
         visible={selectTarget}
         onClose={() => setSelectTarget(null)}
         title="Target Allocation"
-        width={750}
+        width={950}
       >
         <div
           style={{
@@ -127,7 +100,8 @@ export default ({ suggestTarget }) => {
             targetName={targetName}
             targetVideo={targetVideo}
             targetInstr={targetInstr}
-            peakEnable={true}
+            selectedTargetCategory={selectedTargetCategory}
+            peakEnable
           />
         </div>
       </Drawer>

@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import { Button } from 'antd'
 import { UserOutlined, DatabaseOutlined, FileTextOutlined, CloseOutlined } from '@ant-design/icons'
 import styles from './style.module.scss'
-import student from '../../images/student.jpg'
 
 class SessionInstruction extends Component {
   renderInsDuration = () => {
@@ -111,9 +110,6 @@ class SessionInstruction extends Component {
           <div className={styles.subSesHeading}>
             <p>Session Preview</p>
           </div>
-          {/* <div className={styles.subSesImg}>
-            <img src={student} alt="not_found" />
-          </div> */}
           <div className={styles.sesimgDes}>
             <p>Kunal selects an item that doesn&apos;t share the same features</p>
           </div>

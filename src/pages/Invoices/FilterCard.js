@@ -2,6 +2,7 @@ import React from 'react'
 import { Select, DatePicker, Typography } from 'antd'
 import gql from 'graphql-tag'
 import { useQuery } from 'react-apollo'
+import './invoices.scss'
 
 const { Option } = Select
 
@@ -31,26 +32,35 @@ export default ({ form, setForm, to, setTo, statusSelect, setStatusSelect, month
         paddingRight: 34,
       }}
     >
-      <div>
-        <Text style={{ display: 'block', fontSize: 18 }}>By Status:</Text>
-        <Select
-          style={{ width: 200 }}
-          size="large"
-          placeholder="Filter by status"
-          value={statusSelect}
-          onChange={value => setStatusSelect(value)}
-          allowClear
-          loading={statusLoading}
-        >
-          {statusData?.invoiceStatusList.map(({ id, statusName }) => (
-            <Option key={id} value={id}>
-              {statusName}
-            </Option>
-          ))}
-        </Select>
-      </div>
+      <div className="filter-parent">
+        <span>
+          <Text style={{ display: 'block', fontSize: 18 }}>By Status:</Text>
+          <Select
+            style={{ width: 200 }}
+            placeholder="Filter by status"
+            value={statusSelect}
+            onChange={value => setStatusSelect(value)}
+            allowClear
+            loading={statusLoading}
+          >
+            {statusData?.invoiceStatusList.map(({ id, statusName }) => (
+              <Option key={id} value={id}>
+                {statusName}
+              </Option>
+            ))}
+          </Select>
+        </span>
 
-      <div style={{ display: 'flex' }}>
+        <span>
+          <Text style={{ display: 'block', fontSize: 18 }}>By Month:</Text>
+          <MonthPicker
+            placeholder="Select A Month"
+            value={month}
+            onChange={newMonth => {
+              setMonth(newMonth)
+            }}
+          />
+        </span>
         <span>
           <Text style={{ display: 'inline-block', fontSize: 18 }}>From:</Text>
           <br />
@@ -58,21 +68,10 @@ export default ({ form, setForm, to, setTo, statusSelect, setStatusSelect, month
         </span>
 
         <span>
-          <Text style={{ display: 'inline-block', fontSize: 18, marginLeft: 20 }}>To:</Text>
+          <Text style={{ display: 'inline-block', fontSize: 18 }}>To:</Text>
           <br />
-          <DatePicker value={to} onChange={newDate => setTo(newDate)} style={{ marginLeft: 20 }} />
+          <DatePicker value={to} onChange={newDate => setTo(newDate)} />
         </span>
-      </div>
-
-      <div>
-        <Text style={{ display: 'block', fontSize: 18 }}>By Month:</Text>
-        <MonthPicker
-          placeholder="Select A Month"
-          value={month}
-          onChange={newMonth => {
-            setMonth(newMonth)
-          }}
-        />
       </div>
     </div>
   )

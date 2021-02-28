@@ -190,7 +190,7 @@ class TharepistStudents extends PureComponent {
           }
         }
       }`,
-      })
+    })
       .then(presult => {
         this.setState({
           programAreaStatus: presult.data.student.programArea.edges,
@@ -581,60 +581,71 @@ class TharepistStudents extends PureComponent {
       <Authorize roles={['therapist', 'school_admin']} redirect to="/">
         <Helmet title="Program" />
         <Layout style={{ padding: '0px' }}>
-          <Content
+          <div
             style={{
-              padding: '0px',
-              maxWidth: 1300,
-              width: '100%',
-              margin: '0px auto',
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '0px 10px',
+              backgroundColor: '#FFF',
+              boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
             }}
           >
-            <Row style={{ width: '100%', margin: 0 }} gutter={[41, 0]}>
-              <Col span={6} style={{ paddingLeft: 0 }}>
-                <Search
-                  placeholder="Search learner by name"
-                  onChange={e => {
-                    this.filterLearnerData(e)
-                  }}
-                  style={{ width: '100%' }}
-                />
-                <div style={{ height: '660px', overflow: 'auto' }}>
-                  {loading === true ?
-                    <>
-                      <p style={{ marginTop: '20px' }}>Loading studnets...</p>
-                    </>
-                    :
-                    <>
-                      {students.map(nodeItem => (
-                        <div
-                          role="presentation"
-                          onClick={() => {
-                            this.setClickHandler(nodeItem.node)
-                          }}
-                        >
-                          <LearnerCard
-                            key={nodeItem.node.id}
-                            node={nodeItem.node}
-                            name={nodeItem.node.firstname}
-                            style={{ marginTop: 18 }}
-                            leaveRequest={nodeItem.node.leaveRequest}
-                          />
-                        </div>
-                      ))}
-                    </>
-                  }
+            <Content
+              style={{
+                padding: '0px',
+                width: '100%',
+                margin: '0px auto',
+              }}
+            >
+              <Row style={{ width: '100%', margin: 0 }} gutter={[41, 0]}>
+                <Col span={6} style={{ paddingLeft: 0 }}>
+                  <Search
+                    placeholder="Search learner by name"
+                    onChange={e => {
+                      this.filterLearnerData(e)
+                    }}
+                    style={{ width: '100%' }}
+                  />
+                  <div style={{ height: '660px', overflow: 'auto' }}>
+                    {loading === true ?
+                      <>
+                        <p style={{ marginTop: '20px' }}>Loading studnets...</p>
+                      </>
+                      :
+                      <>
+                        {students.map(nodeItem => (
+                          <div
+                            role="presentation"
+                            onClick={() => {
+                              this.setClickHandler(nodeItem.node)
+                            }}
+                          >
+                            <LearnerCard
+                              key={nodeItem.node.id}
+                              node={nodeItem.node}
+                              name={nodeItem.node.firstname}
+                              style={{ marginTop: 18 }}
+                              leaveRequest={nodeItem.node.leaveRequest}
+                            />
+                          </div>
+                        ))}
+                      </>
+                    }
 
-                </div>
-              </Col>
-              <Col span={18} style={{ paddingRight: 0 }}>
-                {checkStudnetOnLocalStorage ?
-                  this.renderDetail()
-                  :
-                  <Empty />
-                }
-              </Col>
-            </Row>
-          </Content>
+                  </div>
+                </Col>
+                <Col span={18} style={{ paddingRight: 0 }}>
+                  {checkStudnetOnLocalStorage ?
+                    this.renderDetail()
+                    :
+                    <Empty />
+                  }
+                </Col>
+              </Row>
+            </Content>
+          </div>
         </Layout>
       </Authorize>
     )

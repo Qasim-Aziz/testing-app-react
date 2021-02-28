@@ -7,144 +7,153 @@ import apolloClient from '../apollo/config'
 export async function getTargets(payload) {
   return apolloClient
     .query({
-      query: gql`{
-            getsession(id: "${payload.masterSessionId}") {
-                id,
-                sessionName {
+      query: gql`
+        query($masterSessionId: ID!, $date: Date!) {
+          getsession(id: $masterSessionId) {
+            id
+            sessionName {
+              id
+              name
+            }
+            duration
+            targets {
+              edgeCount
+              edges {
+                node {
+                  id
+                  targetInstr
+                  peakBlocks
+                  peakType
+                  eqCode
+                  targetStatus {
+                    id
+                    statusName
+                  }
+                  targetId {
+                    id
+                    domain {
+                      id
+                      domain
+                    }
+                  }
+                  targetAllcatedDetails {
+                    id
+                    targetName
+                    DailyTrials
+                    targetType {
+                      id
+                      typeTar
+                    }
+                  }
+                  videos {
+                    edges {
+                      node {
+                        id
+                        url
+                      }
+                    }
+                  }
+                  sd {
+                    edges {
+                      node {
+                        id
+                        sd
+                      }
+                    }
+                  }
+                  steps {
+                    edges {
+                      node {
+                        id
+                        step
+                      }
+                    }
+                  }
+                  mastery {
+                    edges {
+                      node {
+                        id
+                        sd {
+                          id
+                          sd
+                        }
+                        step {
+                          id
+                          step
+                        }
+                        mastery {
+                          id
+                          name
+                        }
+                        status {
+                          id
+                          statusName
+                        }
+                      }
+                    }
+                  }
+                  classes {
+                    edges {
+                      node {
+                        id
+                        name
+                        stimuluses {
+                          edges {
+                            node {
+                              id
+                              option
+                              stimulusName
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          promptCodes {
+            id
+            promptName
+          }
+          getChildSession(sessions: $masterSessionId, date: $date) {
+            edges {
+              node {
+                id
+                sessionDate
+                createdAt
+                duration
+                status
+                sessions {
+                  id
+                  itemRequired
+                  sessionName {
                     id
                     name
-                },
-                duration,
-                targets {
-                    edgeCount
+                  }
+                  targets {
                     edges {
-                        node {
-                            id,
-                            targetInstr,
-                            peakBlocks,
-                            peakType,
-                            eqCode,
-                            targetStatus {
-                                id,
-                                statusName
-                            }
-                            targetId {
-                                id
-                                domain {
-                                    domain
-                                }
-                            }
-                            targetAllcatedDetails {
-                                id
-                                targetName
-                                DailyTrials
-                                targetType{
-                                    id,
-                                    typeTar
-                                }
-                            }
-                            videos{
-                                edges{
-                                    node{
-                                        id,
-                                        url
-                                    }
-                                }
-                            },
-                            sd{
-                                edges{
-                                    node{
-                                        id,
-                                        sd
-                                    }
-                                }
-                            },
-                            steps{
-                                edges{
-                                    node{
-                                        id,
-                                        step
-                                    }
-                                }
-                            }
-                            mastery{
-                              edges{
-                                node{
-                                  id
-                                  sd{
-                                    id
-                                    sd
-                                  }
-                                  step{
-                                    id
-                                    step
-                                  }
-                                  mastery{
-                                    id
-                                    name
-                                  }
-                                  status{
-                                    id
-                                    statusName
-                                  }
-                                }
-                              }
-                            }
-                            classes{
-                              edges{
-                                node{
-                                  id
-                                  name
-                                  stimuluses{
-                                    edges{
-                                      node{
-                                        option
-                                        stimulusName
-                                      }
-                                    }
-                                  }
-                                }
-                              }
-                            }
-                        }
+                      node {
+                        id
+                      }
                     }
+                  }
                 }
+              }
             }
-            promptCodes {
-                id,
-                promptName 
-            }
-            getChildSession(sessions:"${payload.masterSessionId}", date: "${payload.date}") { 
-                edges{
-                    node{
-                        id,
-                        sessionDate,
-                        createdAt,
-                        duration,
-                        status,
-                        sessions{
-                            id,
-                            itemRequired,
-                            sessionName{
-                                id,
-                                name
-                            },
-                            targets{
-                                edges{
-                                    node{
-                                        id
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }`,
+          }
+        }
+      `,
+      variables: {
+        masterSessionId: payload.masterSessionId,
+        date: payload.date,
+      },
       fetchPolicy: 'network-only',
     })
     .then(result => result)
     .catch(error => {
+      console.log(error)
       error.graphQLErrors.map(item => {
         return notification.error({
           message: 'Somthing went wrong loading session',
@@ -294,8 +303,8 @@ export async function createChildSession(payload) {
               duration
               sessions {
                 id
-                sessionName{
-                  id,
+                sessionName {
+                  id
                   name
                 }
               }
@@ -634,7 +643,7 @@ export async function updateTargetEndTime(payload) {
                 }               
             }
         }`,
-        fetchPolicy: 'no-cache'
+      fetchPolicy: 'no-cache',
     })
     .then(result => result)
     .catch(error => {
@@ -693,7 +702,7 @@ export async function createNewTargetInstance(payload) {
                 }
             }
         }`,
-        fetchPolicy: 'no-cache'
+      fetchPolicy: 'no-cache',
     })
     .then(result => result)
     .catch(error => {
@@ -918,8 +927,6 @@ export async function updateBlockTrial(payload) {
     })
 }
 
-
-
 export async function createNewTargetPeakAutomaticInstance(payload) {
   return apolloClient
     .mutate({
@@ -984,7 +991,6 @@ export async function createNewTargetPeakAutomaticInstance(payload) {
       })
     })
 }
-
 
 export async function getCombinationsByCode(payload) {
   return apolloClient
@@ -1121,7 +1127,6 @@ export async function recordEquivalenceTarget(payload) {
       })
     })
 }
-
 
 export async function recordEquivalenceTargetUpdate(payload) {
   return apolloClient

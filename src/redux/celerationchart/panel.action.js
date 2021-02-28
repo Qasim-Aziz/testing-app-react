@@ -54,6 +54,8 @@ export const fetchAllCelerationCharts = () => {
                   title
                   date
                   notes
+                  labelX
+                  labelY
                   category {
                     id
                     name
@@ -116,6 +118,8 @@ export const onCelerationChartChange = (event, key) => {
       value = getState().celerationChartReducer.celerationCategories.find(c => c.id === event)
     } else if (key === 'range') {
       value = event
+    } else if (key === 'date') {
+      value = moment(event).format('YYYY-MM-DD')
     } else {
       ;({ value } = event.target)
     }
@@ -174,6 +178,8 @@ export const addCelerationChart = event => {
                 student: ${chart.student.id},
                 date: "${chart.date}",
                 notes: "${chart.notes}",
+                labelX: "${chart.labelX}",
+                labelY: "${chart.labelY}",
                 labels:[${lables.map(label => `"${label}"`)}]
               }
             ) {
@@ -190,6 +196,8 @@ export const addCelerationChart = event => {
                   id
                   firstname
                 }
+                labelX
+                labelY
                 labels {
                   edges {
                     node {
@@ -297,6 +305,7 @@ const getCelerationChartDataAPI = (chart, category) => {
               date
               behaviour
               frequency
+              time
             }
           }
         `,
@@ -381,6 +390,8 @@ export const updateCelerationChart = event => {
                 student: "${chart.student.id}",
                 date: "${chart.date}",
                 notes: "${chart.notes}",
+                labelX: "${chart.labelX}",
+                labelY: "${chart.labelY}",
                 labels:[${lables.map(label => `"${label}"`)}],
               }
             ) {
@@ -397,6 +408,8 @@ export const updateCelerationChart = event => {
                   id
                   firstname
                 }
+                labelX
+                labelY
                 labels {
                   edges {
                     node {
@@ -462,11 +475,22 @@ export const addPoint = point => {
         `,
       })
       .then(result => {
-        console.log(result)
+        const { id, count, time, day } = result.data.recordCelerationData.details
+        const updatedDataType = pointTypeExternalToInternal(
+          result.data.recordCelerationData.details.dataType,
+        )
+
+        const addedPoint = {
+          id,
+          count,
+          time,
+          day,
+          dataType: updatedDataType,
+        }
 
         dispatch({
           type: actions.addPoint,
-          point,
+          point: addedPoint,
         })
       })
       .catch(error => {
@@ -546,12 +570,23 @@ export const updatePoint = (pointIndex, newPoint) => {
         `,
       })
       .then(result => {
-        console.log(result)
+        const { id, count, time, day } = result.data.updateCelerationData.details
+        const updatedDataType = pointTypeExternalToInternal(
+          result.data.updateCelerationData.details.dataType,
+        )
+
+        const updatedPoint = {
+          id,
+          count,
+          time,
+          day,
+          dataType: updatedDataType,
+        }
 
         dispatch({
           type: actions.updatePoint,
-          pointIndex,
-          newPoint,
+          id,
+          updatedPoint,
         })
       })
       .catch(error => {

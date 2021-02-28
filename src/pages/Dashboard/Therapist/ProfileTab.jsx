@@ -7,6 +7,7 @@ import NotiSett from '../../staffProfile/NotiSett'
 import MasteryCriteria from '../../staffProfile/MasteryCriteria'
 import LocationSett from '../../staffProfile/LocationSett'
 import PeakAutomaticTab from '../PeakAutomaticTab'
+import SessionSettingTab from '../SessionSettingTab'
 
 const { TabPane } = Tabs
 
@@ -31,6 +32,11 @@ const ProfileTab = ({ activeProfileTab, onProfileTabChange }) => {
       key: 'peak-automatic',
       title: 'Peak Automatic',
       component: <PeakAutomaticTab />,
+    },
+    {
+      key: 'session-setting',
+      title: 'Session Settings',
+      component: <SessionSettingTab />,
     },
     {
       key: 'master-criteria',

@@ -1,26 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable array-callback-return */
-/* eslint-disable react/jsx-closing-tag-location */
-import React, { useEffect, useReducer, useState } from 'react'
-import { Form, Input, Button, Select, notification, Modal, Switch, Typography } from 'antd'
-import {
-  PlusCircleOutlined,
-  MinusCircleOutlined,
-  PlusSquareOutlined,
-  MinusSquareOutlined,
-  MinusOutlined,
-  CloseOutlined,
-} from '@ant-design/icons'
-import gql from 'graphql-tag'
-import { useQuery, useMutation } from 'react-apollo'
-import { times, remove, update } from 'ramda'
-import moment from 'moment'
-import './templateform.scss'
+
+import { PlusCircleOutlined } from '@ant-design/icons'
+import { Button, Form, Input, Modal, notification, Select, Switch } from 'antd'
 import ReminderForm from 'components/Behavior/ReminderForm'
+import gql from 'graphql-tag'
+import moment from 'moment'
+import { remove, times, update } from 'ramda'
+import React, { useEffect, useReducer, useState } from 'react'
+import { useMutation, useQuery } from 'react-apollo'
+import './templateform.scss'
 
 const { Option } = Select
 const { TextArea } = Input
-const { Text, Title } = Typography
 
 const DANCLE_STATUS = gql`
   query {
@@ -226,7 +218,7 @@ const remainderReducer = (state, action) => {
   }
 }
 
-const BehaviorForm = ({ style, tempId, form, setUpdateTempId }) => {
+const UpdateTemplateForm = ({ style, tempId, form, closeUpdateDrawer }) => {
   const durationMesId = 'RGVjZWxCZWhhdmlvck1lYXN1cmluZ3NUeXBlOjQ='
   const studentId = localStorage.getItem('studentId')
   const [initialEnv, setInitialEnv] = useState()
@@ -338,7 +330,7 @@ const BehaviorForm = ({ style, tempId, form, setUpdateTempId }) => {
       notification.success({
         message: 'Update Template Sucessfully',
       })
-      setUpdateTempId('')
+      closeUpdateDrawer()
     }
   }, [updateTempData])
 
@@ -480,26 +472,13 @@ const BehaviorForm = ({ style, tempId, form, setUpdateTempId }) => {
 
   return (
     <Form
+      className="templateForm"
       {...formItemLayout}
       onSubmit={SubmitForm}
       name="control-update"
       style={{ marginLeft: 0, position: 'relative', ...style }}
       layout="horizontal"
     >
-      <Button
-        type="link"
-        onClick={() => {
-          setUpdateTempId('')
-        }}
-        style={{
-          position: 'absolute',
-          right: -12,
-          top: 0,
-          zIndex: 10,
-        }}
-      >
-        <CloseOutlined style={{ fontSize: 20, color: '#D81E06' }} />
-      </Button>
       {getTemDetailsLoading && <div style={{ minHeight: '90vh' }}>Loading...</div>}
       {getTemDetailsError && <div style={{ minHeight: '90vh' }}>Opps their something wrong</div>}
       {getTemDetailsData && (
@@ -507,7 +486,6 @@ const BehaviorForm = ({ style, tempId, form, setUpdateTempId }) => {
           <div
             style={{
               position: 'relative',
-              paddingTop: 50,
             }}
           >
             <PlusCircleOutlined
@@ -515,7 +493,7 @@ const BehaviorForm = ({ style, tempId, form, setUpdateTempId }) => {
               style={{
                 position: 'absolute',
                 right: '0px',
-                top: '60px',
+                top: '8px',
                 zIndex: '100',
                 fontSize: '20px',
               }}
@@ -637,28 +615,19 @@ const BehaviorForm = ({ style, tempId, form, setUpdateTempId }) => {
           <Form.Item label={<span style={{ fontSize: '16px' }}>Behavior description</span>}>
             {form.getFieldDecorator('description', {
               initialValue: getTemDetailsData.getTemplateDetails.behaviorDescription,
-            })(
-              <TextArea
-                placeholder="Describe the behavior"
-                style={{
-                  height: 174,
-                  resize: 'none',
-                  color: '#000',
-                }}
-              />,
-            )}
+            })(<TextArea className="small-textarea" placeholder="Describe the behavior" />)}
           </Form.Item>
 
           <Form.Item label={<span style={{ fontSize: '16px' }}>Reactive Procedure</span>}>
             {form.getFieldDecorator('procedure', {
               initialValue: getTemDetailsData.getTemplateDetails.reactiveProcedures,
-            })(<Input size="large" placeholder="Give reactive procedure" />)}
+            })(<TextArea className="small-textarea" placeholder="Give reactive procedure" />)}
           </Form.Item>
 
           <Form.Item label={<span style={{ fontSize: '16px' }}>Antecedent Manipulation</span>}>
             {form.getFieldDecorator('manipulation', {
               initialValue: getTemDetailsData.getTemplateDetails.antecedentManipulations,
-            })(<Input size="large" placeholder="Give antecedent manipulation" />)}
+            })(<TextArea className="small-textarea" placeholder="Give antecedent manipulation" />)}
           </Form.Item>
           <Form.Item label={<span style={{ fontSize: '16px' }}>Behavior Reminders</span>}>
             <Switch
@@ -669,7 +638,7 @@ const BehaviorForm = ({ style, tempId, form, setUpdateTempId }) => {
               size="large"
             />
           </Form.Item>
-          <Form.Item label={<span style={{ fontSize: '16px' }}>Add Remainder</span>}>
+          <Form.Item label={<span style={{ fontSize: '16px' }}>Add Reminder</span>}>
             {remainderState &&
               times(n => {
                 return (
@@ -706,8 +675,9 @@ const BehaviorForm = ({ style, tempId, form, setUpdateTempId }) => {
                 type="primary"
                 htmlType="submit"
                 style={{
-                  width: '47%',
+                  width: 120,
                   height: 40,
+                  marginLeft: 10,
                   borderRadius: 0,
                 }}
                 loading={updateTempLoading}
@@ -717,18 +687,19 @@ const BehaviorForm = ({ style, tempId, form, setUpdateTempId }) => {
               <Button
                 type="danger"
                 style={{
-                  width: '47%',
+                  width: 120,
                   height: 40,
+                  marginLeft: 10,
                   borderRadius: 0,
                   border: '0px solid',
                 }}
                 disabled={updateTempLoading}
                 onClick={() => {
                   form.resetFields()
-                  setUpdateTempId('')
+                  closeUpdateDrawer()
                 }}
               >
-                Cancle
+                Cancel
               </Button>
             </div>
           </Form.Item>
@@ -802,4 +773,4 @@ const BehaviorForm = ({ style, tempId, form, setUpdateTempId }) => {
   )
 }
 
-export default Form.create()(BehaviorForm)
+export default Form.create()(UpdateTemplateForm)

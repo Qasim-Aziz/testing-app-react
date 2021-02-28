@@ -25,21 +25,14 @@ const { Title, Text } = Typography
 
 @connect(({ sessionrecording }) => ({ sessionrecording }))
 class RecordingBlock extends Component {
-  
-
   // componentWillMount(){
-    
+
   // }
 
   componentDidMount() {
     const {
       dispatch,
-      sessionrecording: {
-        TargetResponse,
-        TargetActiveId,
-        PeakBlockIndex,
-        PeakTrialCount,        
-      },
+      sessionrecording: { TargetResponse, TargetActiveId, PeakBlockIndex, PeakTrialCount },
     } = this.props
 
     dispatch({
@@ -48,10 +41,6 @@ class RecordingBlock extends Component {
         CurrentPeakBlocks: TargetResponse[TargetActiveId].peak,
       },
     })
-
-    
-
-    
   }
 
   updateSessionClockTime = () => {
@@ -89,18 +78,32 @@ class RecordingBlock extends Component {
     document.getElementById('peakResponseButtonTen').style.backgroundColor = '#e4e9f0'
   }
 
-  peakSelectedStimulusIndexReset = (count) => {
+  peakSelectedStimulusIndexReset = count => {
     const {
       dispatch,
-      sessionrecording: { PeakBlockIndex, PeakAutomatic, TargetActiveId, TargetResponse, PeakTrialCount, SelectedPeakStimulusIndex, MasterSession, TargetActiveIndex },
+      sessionrecording: {
+        PeakBlockIndex,
+        PeakAutomatic,
+        TargetActiveId,
+        TargetResponse,
+        PeakTrialCount,
+        SelectedPeakStimulusIndex,
+        MasterSession,
+        TargetActiveIndex,
+      },
     } = this.props
 
     let sdList = null
     let ind = 0
-    if (MasterSession.targets.edges[TargetActiveIndex].node.sd.edges.length > 0) sdList = MasterSession.targets.edges[TargetActiveIndex].node.sd.edges
-    if (sdList.length > 0){
+    if (MasterSession.targets.edges[TargetActiveIndex].node.sd.edges.length > 0)
+      sdList = MasterSession.targets.edges[TargetActiveIndex].node.sd.edges
+    if (sdList.length > 0) {
       sdList.map((item, index) => {
-        if(TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[count - 1].response?.sd?.id === item.node.id) ind = index
+        if (
+          TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[count - 1].response?.sd?.id ===
+          item.node.id
+        )
+          ind = index
       })
     }
 
@@ -110,9 +113,7 @@ class RecordingBlock extends Component {
         SelectedPeakStimulusIndex: ind,
       },
     })
-
   }
-
 
   goToNextTrial = () => {
     this.resetZero()
@@ -123,7 +124,13 @@ class RecordingBlock extends Component {
 
     const {
       dispatch,
-      sessionrecording: { PeakBlockIndex, TargetActiveId, TargetResponse, PeakTrialCount, PeakAutomatic },
+      sessionrecording: {
+        PeakBlockIndex,
+        TargetActiveId,
+        TargetResponse,
+        PeakTrialCount,
+        PeakAutomatic,
+      },
     } = this.props
     if (PeakTrialCount < 10) {
       if (
@@ -169,10 +176,9 @@ class RecordingBlock extends Component {
           document.getElementById('peakResponseButtonTen').style.backgroundColor = '#4BAEA0'
         }
 
-        if (!PeakAutomatic){
+        if (!PeakAutomatic) {
           this.peakSelectedStimulusIndexReset(PeakTrialCount + 1)
         }
-
       } else {
         notification.warning({
           message: 'Warning!!',
@@ -192,10 +198,14 @@ class RecordingBlock extends Component {
     this.updateStartTrialClockTime()
     const {
       dispatch,
-      sessionrecording: { PeakTrialCount, TargetResponse, TargetActiveId, PeakBlockIndex, PeakAutomatic },
+      sessionrecording: {
+        PeakTrialCount,
+        TargetResponse,
+        TargetActiveId,
+        PeakBlockIndex,
+        PeakAutomatic,
+      },
     } = this.props
-
-
 
     if (PeakTrialCount > 1) {
       dispatch({
@@ -235,10 +245,9 @@ class RecordingBlock extends Component {
       ) {
         document.getElementById('peakResponseButtonTen').style.backgroundColor = '#4BAEA0'
       }
-      if (!PeakAutomatic){
+      if (!PeakAutomatic) {
         this.peakSelectedStimulusIndexReset(PeakTrialCount - 1)
       }
-
     }
   }
 
@@ -317,40 +326,60 @@ class RecordingBlock extends Component {
 
     const {
       dispatch,
-      sessionrecording: { PeakBlockIndex, PeakAutomatic, TargetActiveId, TargetResponse, PeakTrialCount, SelectedPeakStimulusIndex, MasterSession, TargetActiveIndex },
+      sessionrecording: {
+        PeakBlockIndex,
+        PeakAutomatic,
+        TargetActiveId,
+        TargetResponse,
+        PeakTrialCount,
+        SelectedPeakStimulusIndex,
+        MasterSession,
+        TargetActiveIndex,
+      },
     } = this.props
     this.updateSessionClockTime()
 
-    if (TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].recordedData) {
+    if (
+      TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1]?.recordedData
+    ) {
       if (PeakAutomatic) {
         dispatch({
           type: 'sessionrecording/UPDATE_BLOCK_TRIAL',
           payload: {
             marks: 0,
-            sd: TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].response.sd.id,
+            sd:
+              TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1]
+                .response.sd.id,
             promptId: prompt,
-            responseId: TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].response.id,
+            responseId:
+              TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1]
+                .response.id,
           },
         })
-      }
-      else {
+      } else {
         dispatch({
           type: 'sessionrecording/UPDATE_BLOCK_TRIAL',
           payload: {
             marks: 0,
-            sd: MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[SelectedPeakStimulusIndex]?.node.id,
+            sd:
+              MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[
+                SelectedPeakStimulusIndex
+              ]?.node.id,
             promptId: prompt,
-            responseId: TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].response.id,
+            responseId:
+              TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1]
+                .response.id,
           },
         })
       }
-
     } else {
       dispatch({
         type: 'sessionrecording/RECORD_BLOCK_TRIAL',
         payload: {
           marks: 0,
-          sd: MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[SelectedPeakStimulusIndex]?.node.id,
+          sd:
+            MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[SelectedPeakStimulusIndex]
+              ?.node.id,
           promptId: prompt,
         },
       })
@@ -368,40 +397,60 @@ class RecordingBlock extends Component {
 
     const {
       dispatch,
-      sessionrecording: { PeakBlockIndex, PeakAutomatic, TargetActiveId, TargetResponse, PeakTrialCount, SelectedPeakStimulusIndex, MasterSession, TargetActiveIndex },
+      sessionrecording: {
+        PeakBlockIndex,
+        PeakAutomatic,
+        TargetActiveId,
+        TargetResponse,
+        PeakTrialCount,
+        SelectedPeakStimulusIndex,
+        MasterSession,
+        TargetActiveIndex,
+      },
     } = this.props
     this.updateSessionClockTime()
 
-    if (TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].recordedData) {
+    if (
+      TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1]?.recordedData
+    ) {
       if (PeakAutomatic) {
         dispatch({
           type: 'sessionrecording/UPDATE_BLOCK_TRIAL',
           payload: {
             marks: 2,
-            sd: TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].response.sd.id,
+            sd:
+              TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1]
+                .response.sd.id,
             promptId: prompt,
-            responseId: TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].response.id,
+            responseId:
+              TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1]
+                .response.id,
           },
         })
-      }
-      else {
+      } else {
         dispatch({
           type: 'sessionrecording/UPDATE_BLOCK_TRIAL',
           payload: {
             marks: 2,
-            sd: MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[SelectedPeakStimulusIndex]?.node.id,
+            sd:
+              MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[
+                SelectedPeakStimulusIndex
+              ]?.node.id,
             promptId: prompt,
-            responseId: TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].response.id,
+            responseId:
+              TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1]
+                .response.id,
           },
         })
       }
-
     } else {
       dispatch({
         type: 'sessionrecording/RECORD_BLOCK_TRIAL',
         payload: {
           marks: 2,
-          sd: MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[SelectedPeakStimulusIndex]?.node.id,
+          sd:
+            MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[SelectedPeakStimulusIndex]
+              ?.node.id,
           promptId: prompt,
         },
       })
@@ -419,40 +468,60 @@ class RecordingBlock extends Component {
 
     const {
       dispatch,
-      sessionrecording: { PeakBlockIndex, PeakAutomatic, TargetActiveId, TargetResponse, PeakTrialCount, SelectedPeakStimulusIndex, MasterSession, TargetActiveIndex },
+      sessionrecording: {
+        PeakBlockIndex,
+        PeakAutomatic,
+        TargetActiveId,
+        TargetResponse,
+        PeakTrialCount,
+        SelectedPeakStimulusIndex,
+        MasterSession,
+        TargetActiveIndex,
+      },
     } = this.props
     this.updateSessionClockTime()
 
-    if (TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].recordedData) {
+    if (
+      TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].recordedData
+    ) {
       if (PeakAutomatic) {
         dispatch({
           type: 'sessionrecording/UPDATE_BLOCK_TRIAL',
           payload: {
             marks: 4,
-            sd: TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].response.sd.id,
+            sd:
+              TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1]
+                .response.sd.id,
             promptId: prompt,
-            responseId: TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].response.id,
+            responseId:
+              TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1]
+                .response.id,
           },
         })
-      }
-      else {
+      } else {
         dispatch({
           type: 'sessionrecording/UPDATE_BLOCK_TRIAL',
           payload: {
             marks: 4,
-            sd: MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[SelectedPeakStimulusIndex]?.node.id,
+            sd:
+              MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[
+                SelectedPeakStimulusIndex
+              ]?.node.id,
             promptId: prompt,
-            responseId: TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].response.id,
+            responseId:
+              TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1]
+                .response.id,
           },
         })
       }
-
     } else {
       dispatch({
         type: 'sessionrecording/RECORD_BLOCK_TRIAL',
         payload: {
           marks: 4,
-          sd: MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[SelectedPeakStimulusIndex]?.node.id,
+          sd:
+            MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[SelectedPeakStimulusIndex]
+              ?.node.id,
           promptId: prompt,
         },
       })
@@ -470,40 +539,60 @@ class RecordingBlock extends Component {
 
     const {
       dispatch,
-      sessionrecording: { PeakBlockIndex, PeakAutomatic, TargetActiveId, TargetResponse, PeakTrialCount, SelectedPeakStimulusIndex, MasterSession, TargetActiveIndex },
+      sessionrecording: {
+        PeakBlockIndex,
+        PeakAutomatic,
+        TargetActiveId,
+        TargetResponse,
+        PeakTrialCount,
+        SelectedPeakStimulusIndex,
+        MasterSession,
+        TargetActiveIndex,
+      },
     } = this.props
     this.updateSessionClockTime()
 
-    if (TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].recordedData) {
+    if (
+      TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].recordedData
+    ) {
       if (PeakAutomatic) {
         dispatch({
           type: 'sessionrecording/UPDATE_BLOCK_TRIAL',
           payload: {
             marks: 8,
-            sd: TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].response.sd.id,
+            sd:
+              TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1]
+                .response.sd.id,
             promptId: prompt,
-            responseId: TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].response.id,
+            responseId:
+              TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1]
+                .response.id,
           },
         })
-      }
-      else {
+      } else {
         dispatch({
           type: 'sessionrecording/UPDATE_BLOCK_TRIAL',
           payload: {
             marks: 8,
-            sd: MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[SelectedPeakStimulusIndex]?.node.id,
+            sd:
+              MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[
+                SelectedPeakStimulusIndex
+              ]?.node.id,
             promptId: prompt,
-            responseId: TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].response.id,
+            responseId:
+              TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1]
+                .response.id,
           },
         })
       }
-
     } else {
       dispatch({
         type: 'sessionrecording/RECORD_BLOCK_TRIAL',
         payload: {
           marks: 8,
-          sd: MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[SelectedPeakStimulusIndex]?.node.id,
+          sd:
+            MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[SelectedPeakStimulusIndex]
+              ?.node.id,
           promptId: prompt,
         },
       })
@@ -521,40 +610,60 @@ class RecordingBlock extends Component {
 
     const {
       dispatch,
-      sessionrecording: { PeakBlockIndex, PeakAutomatic, TargetActiveId, TargetResponse, PeakTrialCount, SelectedPeakStimulusIndex, MasterSession, TargetActiveIndex },
+      sessionrecording: {
+        PeakBlockIndex,
+        PeakAutomatic,
+        TargetActiveId,
+        TargetResponse,
+        PeakTrialCount,
+        SelectedPeakStimulusIndex,
+        MasterSession,
+        TargetActiveIndex,
+      },
     } = this.props
     this.updateSessionClockTime()
 
-    if (TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].recordedData) {
+    if (
+      TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].recordedData
+    ) {
       if (PeakAutomatic) {
         dispatch({
           type: 'sessionrecording/UPDATE_BLOCK_TRIAL',
           payload: {
             marks: 10,
-            sd: TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].response.sd.id,
+            sd:
+              TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1]
+                .response.sd.id,
             promptId: prompt,
-            responseId: TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].response.id,
+            responseId:
+              TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1]
+                .response.id,
           },
         })
-      }
-      else {
+      } else {
         dispatch({
           type: 'sessionrecording/UPDATE_BLOCK_TRIAL',
           payload: {
             marks: 10,
-            sd: MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[SelectedPeakStimulusIndex]?.node.id,
+            sd:
+              MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[
+                SelectedPeakStimulusIndex
+              ]?.node.id,
             promptId: prompt,
-            responseId: TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1].response.id,
+            responseId:
+              TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1]
+                .response.id,
           },
         })
       }
-
     } else {
       dispatch({
         type: 'sessionrecording/RECORD_BLOCK_TRIAL',
         payload: {
           marks: 10,
-          sd: MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[SelectedPeakStimulusIndex]?.node.id,
+          sd:
+            MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[SelectedPeakStimulusIndex]
+              ?.node.id,
           promptId: prompt,
         },
       })
@@ -562,12 +671,16 @@ class RecordingBlock extends Component {
   }
 
   changePeakStimulus = (operation, listLen) => {
-    const { dispatch, sessionrecording: { SelectedPeakStimulusIndex } } = this.props
+    const {
+      dispatch,
+      sessionrecording: { SelectedPeakStimulusIndex },
+    } = this.props
     if (operation === 'plus') {
       dispatch({
         type: 'sessionrecording/SET_STATE',
         payload: {
-          SelectedPeakStimulusIndex: SelectedPeakStimulusIndex + 2 > listLen ? 0 : (SelectedPeakStimulusIndex + 1),
+          SelectedPeakStimulusIndex:
+            SelectedPeakStimulusIndex + 2 > listLen ? 0 : SelectedPeakStimulusIndex + 1,
         },
       })
     }
@@ -575,7 +688,8 @@ class RecordingBlock extends Component {
       dispatch({
         type: 'sessionrecording/SET_STATE',
         payload: {
-          SelectedPeakStimulusIndex: SelectedPeakStimulusIndex - 1 < 0 ? (listLen-1) : (SelectedPeakStimulusIndex - 1),
+          SelectedPeakStimulusIndex:
+            SelectedPeakStimulusIndex - 1 < 0 ? listLen - 1 : SelectedPeakStimulusIndex - 1,
         },
       })
     }
@@ -608,74 +722,69 @@ class RecordingBlock extends Component {
     const getButton8 = document.getElementById('peakResponseButtonEight')
     const getButton10 = document.getElementById('peakResponseButtonTen')
 
-
-    if (TargetResponse[TargetActiveId].peak[PeakBlockIndex].block[PeakTrialCount - 1].response?.marks === 0) {
+    if (
+      TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block &&
+      TargetResponse[TargetActiveId].peak[PeakBlockIndex]?.block[PeakTrialCount - 1]?.response
+        ?.marks === 0
+    ) {
       if (typeof getButton0 != 'undefined' && getButton0 != null) {
         document.getElementById('peakResponseButtonZero').style.backgroundColor = '#FF8080'
       }
-    }
-    else{
+    } else {
       if (typeof getButton0 != 'undefined' && getButton0 != null) {
         document.getElementById('peakResponseButtonZero').style.backgroundColor = '#e4e9f0'
       }
     }
 
-    
-    if (TargetResponse[TargetActiveId].peak[PeakBlockIndex].block[PeakTrialCount - 1].response?.marks === 2
+    if (
+      TargetResponse[TargetActiveId].peak[PeakBlockIndex].block[PeakTrialCount - 1]?.response
+        ?.marks === 2
     ) {
       if (typeof getButton2 != 'undefined' && getButton2 != null) {
         document.getElementById('peakResponseButtonTwo').style.backgroundColor = '#FF9C52'
       }
-    }
-    else{
+    } else {
       if (typeof getButton2 != 'undefined' && getButton2 != null) {
         document.getElementById('peakResponseButtonTwo').style.backgroundColor = '#e4e9f0'
       }
     }
     if (
-      TargetResponse[TargetActiveId].peak[PeakBlockIndex].block[PeakTrialCount - 1].response
+      TargetResponse[TargetActiveId].peak[PeakBlockIndex].block[PeakTrialCount - 1]?.response
         ?.marks === 4
     ) {
       if (typeof getButton4 != 'undefined' && getButton4 != null) {
         document.getElementById('peakResponseButtonFour').style.backgroundColor = '#FF9C52'
       }
-    }
-    else{
+    } else {
       if (typeof getButton4 != 'undefined' && getButton4 != null) {
         document.getElementById('peakResponseButtonFour').style.backgroundColor = '#e4e9f0'
       }
     }
 
-
     if (
-      TargetResponse[TargetActiveId].peak[PeakBlockIndex].block[PeakTrialCount - 1].response
+      TargetResponse[TargetActiveId].peak[PeakBlockIndex].block[PeakTrialCount - 1]?.response
         ?.marks === 8
     ) {
       if (typeof getButton8 != 'undefined' && getButton8 != null) {
         document.getElementById('peakResponseButtonEight').style.backgroundColor = '#FF9C52'
       }
-    }
-    else{
+    } else {
       if (typeof getButton8 != 'undefined' && getButton8 != null) {
         document.getElementById('peakResponseButtonEight').style.backgroundColor = '#e4e9f0'
       }
     }
     if (
-      TargetResponse[TargetActiveId].peak[PeakBlockIndex].block[PeakTrialCount - 1].response
+      TargetResponse[TargetActiveId].peak[PeakBlockIndex].block[PeakTrialCount - 1]?.response
         ?.marks === 10
     ) {
-      
       if (typeof getButton10 != 'undefined' && getButton10 != null) {
         document.getElementById('peakResponseButtonTen').style.backgroundColor = '#4BAEA0'
       }
-    }
-    else{
+    } else {
       if (typeof getButton10 != 'undefined' && getButton10 != null) {
         document.getElementById('peakResponseButtonTen').style.backgroundColor = '#e4e9f0'
       }
     }
-
-    
 
     // const copylist = TargetResponse[TargetActiveId].peak
     let item = null
@@ -684,7 +793,8 @@ class RecordingBlock extends Component {
     }
 
     let sdList = null
-    if (MasterSession.targets.edges[TargetActiveIndex].node.sd.edges.length > 0) sdList = MasterSession.targets.edges[TargetActiveIndex].node.sd.edges
+    if (MasterSession.targets.edges[TargetActiveIndex].node.sd.edges.length > 0)
+      sdList = MasterSession.targets.edges[TargetActiveIndex].node.sd.edges
 
     // console.log('Item Object =======>', item)
     const recordingButtonStyle = {
@@ -730,30 +840,33 @@ class RecordingBlock extends Component {
           </div>
           {/* <br /> */}
 
-          {PeakAutomatic ? 
+          {PeakAutomatic ? (
             <Title level={4} style={{ lineHeight: '27px', display: 'inline-block' }}>
               Stimulus: {item?.response?.sd?.sd}
             </Title>
-
-            :
+          ) : (
             <>
               <Title level={4} style={{ lineHeight: '27px', display: 'inline-block' }}>
-                Stimulus: {sdList[SelectedPeakStimulusIndex]?.node.sd}
+                Stimulus: {sdList && sdList[SelectedPeakStimulusIndex]?.node.sd}
               </Title>
 
               <span style={{ float: 'right', display: 'inline-block' }}>
-                <Button style={{ border: 'none' }} onClick={() => this.changePeakStimulus('minus', sdList?.length)}>
+                <Button
+                  style={{ border: 'none' }}
+                  onClick={() => this.changePeakStimulus('minus', sdList?.length)}
+                >
                   <Icon type="left" />
                 </Button>
-                Stimulus {SelectedPeakStimulusIndex + 1} / {sdList.length}
-                <Button style={{ border: 'none' }} onClick={() => this.changePeakStimulus('plus', sdList?.length)}>
+                Stimulus {SelectedPeakStimulusIndex + 1} / {sdList?.length}
+                <Button
+                  style={{ border: 'none' }}
+                  onClick={() => this.changePeakStimulus('plus', sdList?.length)}
+                >
                   <Icon type="right" />
                 </Button>
               </span>
             </>
-          }
-
-
+          )}
 
           <br />
           <div style={{ textAlign: 'center', marginTop: '20px' }}>

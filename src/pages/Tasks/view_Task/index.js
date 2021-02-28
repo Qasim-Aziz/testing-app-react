@@ -1,3 +1,5 @@
+/* eslint-disable no-nested-ternary */
+/* eslint-disable no-undef */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/jsx-indent */
@@ -33,26 +35,22 @@ import {
   Popconfirm,
   Menu,
   Dropdown,
+  Typography,
+  Radio,
 } from 'antd'
 import Authorize from 'components/LayoutComponents/Authorize'
 import { Scrollbars } from 'react-custom-scrollbars'
 import {
-  ContactsOutlined,
-  FileDoneOutlined,
-  AuditOutlined,
-  FilterOutlined,
   PlusOutlined,
-  FileExcelOutlined,
-  FilePdfOutlined,
-  PrinterOutlined,
-  CheckCircleOutlined,
-  FormOutlined,
   CloseCircleOutlined,
   CloudDownloadOutlined,
+  MinusOutlined,
 } from '@ant-design/icons'
+import { RiCheckboxCircleLine, RiCheckboxBlankCircleLine } from 'react-icons/ri'
 import { connect } from 'react-redux'
 import DataTable from 'react-data-table-component'
 import JsPDF from 'jspdf'
+import moment from 'moment'
 import 'jspdf-autotable'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
@@ -60,7 +58,9 @@ import CreateOrUpdateTask from '../CreateOrUpdateTask'
 import './style.scss'
 
 const { Meta } = Card
-const { RangePicker } = DatePicker
+const { Text } = Typography
+
+const tableFilterStyles = { margin: '0px 32px 0 8px' }
 
 @connect(({ user, tasks }) => ({ user, tasks }))
 class TaskTable extends React.Component {
@@ -75,7 +75,7 @@ class TaskTable extends React.Component {
     filteredInfo: null,
 
     filterName: '',
-    filterStatus: '',
+    filterStatus: 'Open',
     filterType: '',
     filterPriority: '',
 
@@ -220,16 +220,50 @@ class TaskTable extends React.Component {
     this.setState({ searchText: '' })
   }
 
+  incrementCounter = (count, id, row) => {
+    const { dispatch } = this.props
+    count += 1
+    dispatch({
+      type: 'tasks/UPDATE_TASK_COUNTER',
+      payload: {
+        id,
+        count,
+      },
+    })
+  }
+
+  decrementCounter = (count, id) => {
+    const { dispatch } = this.props
+    count -= 1
+    dispatch({
+      type: 'tasks/UPDATE_TASK_COUNTER',
+      payload: {
+        id,
+        count,
+      },
+    })
+  }
+
   closeTask = (e, status) => {
     console.log('close task ===> ', e, status)
     const { dispatch } = this.props
-    dispatch({
-      type: 'tasks/UPDATE_TASK_STATUS',
-      payload: {
-        id: e.id,
-        status: 'VGFza1N0YXR1c1R5cGU6Mg==',
-      },
-    })
+    if (status.taskStatus === 'Closed') {
+      dispatch({
+        type: 'tasks/UPDATE_TASK_STATUS',
+        payload: {
+          id: e.id,
+          status: 'VGFza1N0YXR1c1R5cGU6MQ==',
+        },
+      })
+    } else {
+      dispatch({
+        type: 'tasks/UPDATE_TASK_STATUS',
+        payload: {
+          id: e.id,
+          status: 'VGFza1N0YXR1c1R5cGU6Mg==',
+        },
+      })
+    }
     // this.setState({
     //   divShow: false,
     // })
@@ -264,6 +298,7 @@ class TaskTable extends React.Component {
       item =>
         item.taskName && item.taskName.toLowerCase().includes(this.state.filterName.toLowerCase()),
     )
+    console.log('filteredList-->', filteredList)
 
     if (this.state.filterStatus) {
       filteredList = filteredList.filter(
@@ -340,6 +375,7 @@ class TaskTable extends React.Component {
             borderRightWidth: '1px',
             borderRightColor: '#ddd',
           },
+          fontSize: '13px',
           fontWeight: 'bold',
         },
       },
@@ -350,7 +386,7 @@ class TaskTable extends React.Component {
             borderRightWidth: '1px',
             borderRightColor: '#ddd',
           },
-          fontSize: '11px',
+          fontSize: '12px',
         },
       },
       pagination: {
@@ -393,30 +429,85 @@ class TaskTable extends React.Component {
           ),
       },
       {
-        name: 'Description',
+        name: 'Summary',
         selector: 'description',
         minWidth: '250px',
         maxWidth: '250px',
       },
       {
         name: 'Status',
-        selector: 'status.taskStatus',
+        // selector: 'status?.taskStatus',
+        cell: row => row?.status?.taskStatus,
       },
       {
         name: 'Type',
-        selector: 'taskType.taskType',
+        // selector: 'taskType?.taskType',
+        cell: row => row?.taskType?.taskType,
       },
       {
         name: 'Priority',
-        cell: e => <>{e.priority?.name}</>,
+        cell: e => <>{e?.priority?.name}</>,
       },
       {
         name: 'Start Date',
-        selector: 'startDate',
+        // selector: 'startDate',
+        cell: row => row?.startDate,
       },
       {
         name: 'End Date',
-        selector: 'dueDate',
+        // selector: 'dueDate',
+        cell: row => row?.dueDate,
+      },
+      {
+        name: (
+          <span
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              minWidth: '100px',
+              maxWidth: '130px',
+            }}
+          >
+            Count
+          </span>
+        ),
+        minWidth: '100px',
+        maxWidth: '120px',
+        cell: row => {
+          const {
+            taskcounterSet: { edges },
+          } = row
+          const currentCount = edges.length
+            ? edges[edges.length - 1].node.date === moment().format('YYYY-MM-DD')
+              ? edges[edges.length - 1].node.count
+              : 0
+            : 0
+          return (
+            <>
+              <Button
+                disabled={currentCount === 0}
+                onClick={() => {
+                  this.decrementCounter(currentCount, row.id)
+                }}
+                size="small"
+              >
+                <MinusOutlined style={{ fontSize: '12px' }} />
+              </Button>
+              <Text className="taskCompletionCount" style={{ margin: '0 6px', fontSize: '14px' }}>
+                {currentCount}
+              </Text>
+              <Button
+                onClick={() => {
+                  this.incrementCounter(currentCount, row.id, row)
+                }}
+                size="small"
+              >
+                <PlusOutlined style={{ fontSize: '12px' }} />
+              </Button>
+            </>
+          )
+        },
       },
       {
         name: 'Complete',
@@ -425,15 +516,21 @@ class TaskTable extends React.Component {
         cell: e => (
           <span
             onClick={e => {
-              e.stopPropagation()
+              e?.stopPropagation()
             }}
           >
             <Popconfirm
-              title="Sure to close this task?"
-              onConfirm={() => this.closeTask(e, e.status)}
+              title={`Sure to ${
+                e?.status?.taskStatus === 'Closed' ? 're-open' : 'close'
+              } this task?`}
+              onConfirm={() => this.closeTask(e, e?.status)}
             >
               <Button type="link">
-                <CheckCircleOutlined style={{ color: 'green' }} />
+                {e?.status?.taskStatus === 'Closed' ? (
+                  <RiCheckboxCircleLine style={{ color: 'green' }} />
+                ) : (
+                  <RiCheckboxBlankCircleLine style={{ color: 'green' }} />
+                )}
               </Button>
             </Popconfirm>
           </span>
@@ -552,6 +649,7 @@ class TaskTable extends React.Component {
               >
                 <Select.Option value="">Select Status</Select.Option>
                 <Select.Option value="Open">Open</Select.Option>
+                <Select.Option value="In-progress">In Progress</Select.Option>
                 <Select.Option value="Close">Close</Select.Option>
                 {/* {statusGrouped.map((i, index) => {
                   return <Select.Option value={i}>{i}</Select.Option>
@@ -569,7 +667,11 @@ class TaskTable extends React.Component {
               >
                 <Select.Option value="">Select Type</Select.Option>
                 {typesGrouped.map((i, index) => {
-                  return <Select.Option value={i}>{i}</Select.Option>
+                  return (
+                    <Select.Option key={i} value={i}>
+                      {i}
+                    </Select.Option>
+                  )
                 })}
               </Select>
             </div>
@@ -585,7 +687,11 @@ class TaskTable extends React.Component {
               >
                 <Select.Option value="">Select Priority</Select.Option>
                 {prioritiesGrouped.map((i, index) => {
-                  return <Select.Option value={i}>{i}</Select.Option>
+                  return (
+                    <Select.Option key={i} value={i}>
+                      {i}
+                    </Select.Option>
+                  )
                 })}
               </Select>
             </div>
@@ -600,7 +706,11 @@ class TaskTable extends React.Component {
           onClose={() => this.setState({ divShow: false })}
           visible={divShow}
         >
-          <CreateOrUpdateTask {...this.props} task={SelectedTask} />
+          <CreateOrUpdateTask
+            {...this.props}
+            task={SelectedTask}
+            onClose={() => this.setState({ divShow: false })}
+          />
         </Drawer>
 
         <Drawer
@@ -611,7 +721,7 @@ class TaskTable extends React.Component {
           onClose={this.onClose}
           visible={this.state.visible}
         >
-          <CreateOrUpdateTask {...this.props} />
+          <CreateOrUpdateTask {...this.props} onClose={() => this.setState({ divShow: false })} />
         </Drawer>
 
         <div
@@ -621,14 +731,15 @@ class TaskTable extends React.Component {
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '0px 10px',
+            margin: '20px auto 10px',
             backgroundColor: '#FFF',
             boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
           }}
         >
           <div style={{ padding: '5px 0px' }}>
-            <Button onClick={() => this.filterToggle(filterShow)} size="large">
+            {/* <Button onClick={() => this.filterToggle(filterShow)} size="large">
               <FilterOutlined />
-            </Button>
+            </Button> */}
 
             {this.state.filterName ||
             this.state.filterPriority ||
@@ -673,11 +784,95 @@ class TaskTable extends React.Component {
             <div className="row">
               <div className={divClass}>
                 <div style={{ margin: '5px', marginBottom: '50px' }}>
+                  <div className="filter_div">
+                    <span style={{ display: 'flex', alignItems: 'center', zIndex: 45 }}>
+                      <span>Name :</span>
+                      <Input
+                        size="small"
+                        placeholder="Task Name"
+                        value={this.state.filterName}
+                        onChange={e => this.setState({ filterName: e.target.value })}
+                        style={{ ...tableFilterStyles, width: '112px' }}
+                      />
+                    </span>
+                    <span
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        zIndex: 45,
+                        ...tableFilterStyles,
+                      }}
+                    >
+                      <Radio.Group
+                        size="small"
+                        buttonStyle="solid"
+                        value={this.state.filterStatus}
+                        onChange={e => this.setState({ filterStatus: e.target.value })}
+                        style={{ zIndex: 45 }}
+                      >
+                        <Radio.Button value="">All</Radio.Button>
+                        <Radio.Button value="Open">Open</Radio.Button>
+                        <Radio.Button value="In-progress">In Progress</Radio.Button>
+                        <Radio.Button value="Close">Close</Radio.Button>
+                        {/* {statusGrouped.map((i, index) => {
+                  return <Select.Option value={i}>{i}</Select.Option>
+                })} */}
+                      </Radio.Group>
+                    </span>
+                    <span
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        zIndex: 45,
+                        ...tableFilterStyles,
+                      }}
+                    >
+                      <Radio.Group
+                        size="small"
+                        buttonStyle="solid"
+                        value={this.state.filterPriority}
+                        onChange={e => this.setState({ filterPriority: e.target.value })}
+                      >
+                        <Radio.Button value="">All</Radio.Button>
+                        {prioritiesGrouped.map((i, index) => {
+                          return (
+                            <Radio.Button key={i} value={i}>
+                              {i}
+                            </Radio.Button>
+                          )
+                        })}
+                      </Radio.Group>
+                    </span>
+                    <span
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        zIndex: 45,
+                        ...tableFilterStyles,
+                      }}
+                    >
+                      <Select
+                        size="small"
+                        value={this.state.filterType}
+                        onSelect={value => this.setState({ filterType: value })}
+                        style={{ width: 140 }}
+                      >
+                        <Select.Option value="">Select Type</Select.Option>
+                        {typesGrouped.map((i, index) => {
+                          return (
+                            <Select.Option key={i} value={i}>
+                              {i}
+                            </Select.Option>
+                          )
+                        })}
+                      </Select>
+                    </span>
+                  </div>
                   <DataTable
                     title="Tasks List"
                     columns={columns}
                     theme="default"
-                    dense={true}
+                    // dense={true}
                     pagination={true}
                     data={filteredList}
                     customStyles={customStyles}

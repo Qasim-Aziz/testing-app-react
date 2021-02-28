@@ -33,25 +33,26 @@ import {
   Modal,
   Layout,
   Table,
-  Tooltip
+  Tooltip,
 } from 'antd'
 import { connect } from 'react-redux'
 import { gql } from 'apollo-boost'
 import DataTable from 'react-data-table-component'
-import { PlusOutlined, PlayCircleOutlined } from '@ant-design/icons'
+import { PlusOutlined, PlayCircleOutlined, FilterOutlined } from '@ant-design/icons'
+import LearnerSelect from 'components/LearnerSelect'
 import AssessmentForm from './AssessmentForm'
 import CogniAbleTargets from './CogniAbleTargets'
 import apolloClient from '../../apollo/config'
 
 const { Title, Text } = Typography
 const { Content } = Layout
-const { TabPane } = Tabs;
-const { confirm } = Modal;
+const { TabPane } = Tabs
+const { confirm } = Modal
 const customStyles = {
   title: {
     style: {
-      fontSize: '15px'
-    }
+      fontSize: '15px',
+    },
   },
   header: {
     style: {
@@ -64,13 +65,13 @@ const customStyles = {
       borderTopWidth: '1px',
       borderTopColor: '#ddd',
       backgroundColor: '#f5f5f5',
-      minHeight: '30px'
+      minHeight: '30px',
     },
   },
   rows: {
     style: {
       minHeight: '30px', // override the row height
-    }
+    },
   },
   headCells: {
     style: {
@@ -78,7 +79,7 @@ const customStyles = {
         borderRightStyle: 'solid',
         borderRightWidth: '1px',
         borderRightColor: '#ddd',
-        minHeight: '30px'
+        minHeight: '30px',
       },
       fontWeight: 'bold',
     },
@@ -89,10 +90,10 @@ const customStyles = {
         borderRightStyle: 'solid',
         borderRightWidth: '1px',
         borderRightColor: '#ddd',
-        minHeight: '30px'
+        minHeight: '30px',
       },
       '.ebCczK:not(:last-of-type)': {
-        minHeight: '30px'
+        minHeight: '30px',
       },
       fontSize: '11px',
     },
@@ -124,14 +125,42 @@ class RightArea extends React.Component {
       suggestTarget: false,
       selectedAssessment: '',
       open: false,
-      key: Math.random()
+      key: Math.random(),
+      studentID: '',
     }
   }
 
   componentDidMount() {
     const { dispatch } = this.props
+    if (localStorage.getItem('studentId')) {
+      const studentID = JSON.parse(localStorage.getItem('studentId'))
+      if (studentID) {
+        dispatch({
+          type: 'student/STUDENT_DETAILS',
+        })
+        dispatch({
+          type: 'learnersprogram/LOAD_DATA',
+        })
+      }
+      this.setState({ studentID })
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const studentID = JSON.parse(localStorage.getItem('studentId'))
+    if (this.props.student.StudentName !== prevProps.student.StudentName) {
+      this.getAssessmentData(studentID)
+    }
+  }
+
+  getAssessmentData = id => {
+    this.setState({ studentID: id })
+    const { dispatch } = this.props
     dispatch({
-      type: 'student/STUDENT_DETAILS',
+      type: 'cogniableassessment/LOAD_DATA',
+      payload: {
+        studentId: id,
+      },
     })
   }
 
@@ -168,8 +197,7 @@ class RightArea extends React.Component {
     this.setState({
       selectedAssessment: id,
       suggestTarget: true,
-      key: Math.random()
-
+      key: Math.random(),
     })
   }
 
@@ -184,20 +212,21 @@ class RightArea extends React.Component {
   }
 
   generateReport = id => {
-    apolloClient.mutate({
-      mutation: gql`mutation GetCogniableReport($objectId: String!){
-        cogniableAssessmentReport(input:{
-          pk: $objectId
-        }){
-          status
-          data
-          file
-        }
-      }`,
-      variables: {
-        objectId: id
-      }
-    })
+    apolloClient
+      .mutate({
+        mutation: gql`
+          mutation GetCogniableReport($objectId: String!) {
+            cogniableAssessmentReport(input: { pk: $objectId }) {
+              status
+              data
+              file
+            }
+          }
+        `,
+        variables: {
+          objectId: id,
+        },
+      })
       .then(result => {
         if (result.data.cogniableAssessmentReport.status) {
           confirm({
@@ -205,15 +234,14 @@ class RightArea extends React.Component {
             // content: 'Please click download button to start downloading.',
             okText: 'Download',
             onOk() {
-              document.getElementById('my_iframe').src = result.data.cogniableAssessmentReport.file;
+              document.getElementById('my_iframe').src = result.data.cogniableAssessmentReport.file
               return new Promise((resolve, reject) => {
-                setTimeout(Math.random() > 0.5 ? resolve : reject, 1000);
-              }).catch(() => console.log('Oops errors!'));
+                setTimeout(Math.random() > 0.5 ? resolve : reject, 1000)
+              }).catch(() => console.log('Oops errors!'))
             },
-            onCancel() { },
-          });
+            onCancel() {},
+          })
         }
-
       })
       .catch(error => {
         error.graphQLErrors.map(item => {
@@ -225,14 +253,13 @@ class RightArea extends React.Component {
       })
   }
 
-  DataTable = (status) => {
+  DataTable = status => {
     const {
       student: { StudentName },
       cogniableassessment: { AssessmentList, AssessmentObject, NewAssessmentForm },
     } = this.props
     return (
       <div>
-
         <DataTable
           // title="DIRECT TRAINING MODULE"
           columns={[
@@ -256,7 +283,7 @@ class RightArea extends React.Component {
                 return (
                   <div style={{ color: obj.node.status === 'PROGRESS' ? '#f5222d' : 'green' }}>
                     {obj.node.status === 'PROGRESS' ? 'IN-PROGRESS' : obj.node.status} &nbsp;
-                </div>
+                  </div>
                 )
               },
             },
@@ -266,7 +293,6 @@ class RightArea extends React.Component {
               cell: obj => {
                 return (
                   <>
-
                     {obj.node.status === 'COMPLETED' ? (
                       <>
                         <Tooltip placement="topRight" title="See Result">
@@ -295,24 +321,24 @@ class RightArea extends React.Component {
                         </Tooltip>
                       </>
                     ) : (
-                        <Tooltip placement="topRight" title="Start Assessment">
-                          <Button
-                            onClick={() => {
-                              localStorage.setItem('cogniAbleId', obj.node.id)
-                              window.location.href = '/#/cogniableAssessment/start'
-                            }}
-                            type="link"
+                      <Tooltip placement="topRight" title="Start Assessment">
+                        <Button
+                          onClick={() => {
+                            localStorage.setItem('cogniAbleId', obj.node.id)
+                            window.location.href = '/#/cogniableAssessment/start'
+                          }}
+                          type="link"
                           // style={{
                           //   background: '#faad14',
                           //   color: '#fff',
                           //   marginLeft: 10,
                           // }}
-                          >
-                            <PlayCircleOutlined />
-                            {/* {obj.node.submitpeakresponsesSet.totalAttended > 0 ? "Resume" : "Start"} */}
-                          </Button>
-                        </Tooltip>
-                      )}
+                        >
+                          <PlayCircleOutlined />
+                          {/* {obj.node.submitpeakresponsesSet.totalAttended > 0 ? "Resume" : "Start"} */}
+                        </Button>
+                      </Tooltip>
+                    )}
                     <Button type="link" onClick={() => this.suggestTarget(obj.node.id)}>
                       Suggest Target
                     </Button>
@@ -332,9 +358,7 @@ class RightArea extends React.Component {
                           </Button>
                         </Popconfirm>
                       </Tooltip>
-
                     </div>
-
                   </>
                 )
               },
@@ -343,7 +367,15 @@ class RightArea extends React.Component {
           theme="default"
           dense={true}
           pagination={true}
-          data={status === 'COMPLETED' ? AssessmentList?.filter(({ node }) => { return node.status === status }) : AssessmentList?.filter(({ node }) => { return node.status !== 'COMPLETED' })}
+          data={
+            status === 'COMPLETED'
+              ? AssessmentList?.filter(({ node }) => {
+                  return node.status === status
+                })
+              : AssessmentList?.filter(({ node }) => {
+                  return node.status !== 'COMPLETED'
+                })
+          }
           customStyles={customStyles}
           noHeader={true}
           paginationRowsPerPageOptions={[10, 50, 100, 200, 500, 1000]}
@@ -445,6 +477,17 @@ class RightArea extends React.Component {
     )
   }
 
+  onCloseFilter = () => {
+    this.setState({
+      visibleFilter: false,
+    })
+  }
+
+  showDrawerFilter = () => {
+    this.setState({
+      visibleFilter: true,
+    })
+  }
 
   render() {
     const cardStyle = {
@@ -508,6 +551,7 @@ class RightArea extends React.Component {
     const {
       student: { StudentName },
       cogniableassessment: { AssessmentList, AssessmentObject, NewAssessmentForm },
+      user,
     } = this.props
 
     return (
@@ -540,10 +584,27 @@ class RightArea extends React.Component {
               >
                 {StudentName}&apos;s - CogniAble Assessment
               </Text>
-              <Button type="primary" size="large" onClick={() => this.setState({ open: true })}>
-                <PlusOutlined />
-                Create New Assessment
-              </Button>
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                {user?.role !== 'parents' && (
+                  <Button onClick={this.showDrawerFilter} size="large">
+                    <FilterOutlined />
+                  </Button>
+                )}
+
+                <Drawer
+                  visible={this.state.visibleFilter}
+                  onClose={this.onCloseFilter}
+                  width={350}
+                  title="Select Learner"
+                  placement="right"
+                >
+                  <LearnerSelect />
+                </Drawer>
+                <Button type="primary" size="large" onClick={() => this.setState({ open: true })}>
+                  <PlusOutlined />
+                  Create New Assessment
+                </Button>
+              </div>
             </div>
 
             <Tabs type="card">
@@ -568,7 +629,12 @@ class RightArea extends React.Component {
                   padding: '0px 30px',
                 }}
               >
-                <AssessmentForm onClose={() => { this.setState({ open: false }) }} closeAssessmentForm={this.toggleForm} />
+                <AssessmentForm
+                  onClose={() => {
+                    this.setState({ open: false })
+                  }}
+                  closeAssessmentForm={this.toggleForm}
+                />
               </div>
             </Drawer>
             <Drawer
@@ -578,7 +644,10 @@ class RightArea extends React.Component {
               title="Target Allocation from CogniAble Assessment"
             >
               {this.state.selectedAssessment && (
-                <CogniAbleTargets key={this.state.key} assessmentId={this.state.selectedAssessment} />
+                <CogniAbleTargets
+                  key={this.state.key}
+                  assessmentId={this.state.selectedAssessment}
+                />
               )}
             </Drawer>
           </Content>

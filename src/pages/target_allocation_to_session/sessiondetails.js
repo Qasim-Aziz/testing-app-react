@@ -38,7 +38,7 @@ class SessionDetailsForm extends React.Component {
   componentDidMount() {
     const {
       form,
-      sessiontargetallocation: { MorningSession, AfternoonSession, EveningSession, CurrentSession },
+      sessiontargetallocation: { MorningSession, AfternoonSession, EveningSession, DefaultSession, CurrentSession },
     } = this.props
 
     let sessionObject = null
@@ -50,6 +50,9 @@ class SessionDetailsForm extends React.Component {
     }
     if (CurrentSession === 'Evening') {
       sessionObject = EveningSession
+    }
+    if (CurrentSession === 'Default') {
+      sessionObject = DefaultSession
     }
 
     const hostList = []
@@ -154,6 +157,7 @@ class SessionDetailsForm extends React.Component {
         MorningSession,
         AfternoonSession,
         EveningSession,
+        DefaultSession,
         CurrentSession,
       },
     } = this.props
@@ -179,6 +183,9 @@ class SessionDetailsForm extends React.Component {
     }
     if (CurrentSession === 'Evening') {
       sessionObject = EveningSession
+    }
+    if (CurrentSession === 'Default') {
+      sessionObject = DefaultSession
     }
 
     const instructionIndex = []

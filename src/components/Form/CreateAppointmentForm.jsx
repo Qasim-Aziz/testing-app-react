@@ -31,7 +31,7 @@ import './appointmentForms.scss'
 const { TextArea } = Input
 const { Option } = Select
 
-const CreateAppointmentForm = ({ setNeedToReloadData, form, startDate, endDate }) => {
+const CreateAppointmentForm = ({ setNeedToReloadData, form, startDate, endDate, therapistId }) => {
   const userRole = useSelector(state => state.user.role)
   const therapistReduxId = useSelector(state => state.user.staffId)
   const [openStatus, setOpenStatus] = useState()
@@ -39,12 +39,14 @@ const CreateAppointmentForm = ({ setNeedToReloadData, form, startDate, endDate }
   const { data: allSudent, loading: allSudentLoading } = useQuery(ALL_STUDENT)
   const { data: allTherapist, loading: allTherapistLoading } = useQuery(ALL_THERAPIST)
   const { data: allLocation, loading: allLocationLoading } = useQuery(ALL_LOCATION)
-  const { data: allAppointmentStatus } = useQuery(ALL_APPOINTMENT_STATUS)
+  const { data: allAppointmentStatus, loading: allAppointmentStatusLoading } = useQuery(
+    ALL_APPOINTMENT_STATUS,
+  )
 
   useEffect(() => {
     if (allAppointmentStatus) {
       const openStatusAsArray = allAppointmentStatus.appointmentStatuses.filter(
-        x => x.appointmentStatus === 'Open',
+        x => x.appointmentStatus === 'Pending',
       )
       if (openStatusAsArray.length) setOpenStatus(openStatusAsArray[0])
     }
@@ -114,7 +116,7 @@ const CreateAppointmentForm = ({ setNeedToReloadData, form, startDate, endDate }
             endTime: timeToUtc(values.endTime),
             selectedDays: selectedDays ? selectedDays.map(x => x.value) : [],
             isApproved: true,
-            appointmentStatus: openStatus ? openStatus.id : null,
+            appointmentStatus: values.appointmentStatus,
           },
         })
       }
@@ -177,6 +179,7 @@ const CreateAppointmentForm = ({ setNeedToReloadData, form, startDate, endDate }
               wrapperCol={{ sm: 18 }}
             >
               {form.getFieldDecorator('therapist', {
+                initialValue: therapistId,
                 rules: [
                   {
                     required: true,
@@ -390,6 +393,27 @@ const CreateAppointmentForm = ({ setNeedToReloadData, form, startDate, endDate }
                   allLocation.schoolLocation.edges.map(({ node }) => (
                     <Option key={node.id} location={node.location}>
                       {node.location}
+                    </Option>
+                  ))}
+              </Select>,
+            )}
+          </Form.Item>
+        </Col>
+        <Col sm={24} md={12} lg={12}>
+          <Form.Item
+            label="Status"
+            labelCol={{ sm: 10 }}
+            wrapperCol={{ sm: 12 }}
+            rules={[{ required: true, message: 'Please select a status!' }]}
+          >
+            {form.getFieldDecorator('appointmentStatus', {
+              initialValue: openStatus?.id,
+            })(
+              <Select placeholder="Select Status" loading={allAppointmentStatusLoading}>
+                {allAppointmentStatus &&
+                  allAppointmentStatus.appointmentStatuses.map(node => (
+                    <Option key={node.id} appointmentStatus={node.appointmentStatus}>
+                      {node.appointmentStatus}
                     </Option>
                   ))}
               </Select>,

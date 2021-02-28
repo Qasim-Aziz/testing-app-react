@@ -14,7 +14,8 @@ const initialState = {
   CurrentPage: 1,
   ItemPerPage: 10,
   CurrentStatus: 'active',
-  loadingLearners: false
+  loadingLearners: false,
+  LearnerCreated: false,
 }
 
 export default function userReducer(state = initialState, action) {
@@ -37,6 +38,7 @@ export default function userReducer(state = initialState, action) {
       return {
         ...state,
         LearnersList: [action.payload.student, ...state.LearnersList],
+        LearnerCreated: 'Created',
       }
     case actions.UPDATE_LEARNER_ACTIVE_INACTIVE:
       return {

@@ -32,6 +32,10 @@ export async function getClinicStaffs() {
                 emergencyContact
                 emergencyName
                 employeeId
+                user {
+                  id
+                  lastLogin
+                }
                 clinicLocation {
                   id
                   location
@@ -41,6 +45,14 @@ export async function getClinicStaffs() {
                   name
                 }
                 isActive
+                tags {
+                  edges {
+                    node {
+                      id
+                      name
+                    }
+                  }
+                }
               }
             }
           }
@@ -51,7 +63,7 @@ export async function getClinicStaffs() {
     .catch(error => {
       error.graphQLErrors.map(item => {
         return notification.error({
-          message: 'Somthing want wrong fetching Staffs',
+          message: 'Something went wrong fetching Staffs',
           description: item.message,
         })
       })
@@ -82,7 +94,7 @@ export async function getStaffDropdown() {
     .catch(error => {
       error.graphQLErrors.map(item => {
         return notification.error({
-          message: 'Somthing want wrong fetching staff dropdowns',
+          message: 'Something went wrong fetching staff dropdowns',
           description: item.message,
         })
       })
@@ -92,99 +104,115 @@ export async function getStaffDropdown() {
 export async function createStaff(payload) {
   return apolloClient
     .mutate({
-      mutation: gql`mutation CreateStaff (
-        $empId : String!,
-        $doj: Date,
-        $designation: String,
-        $role: ID!,
-        $location: ID,
-        $name: String!,
-        $lastname: String,
-        $email: String!,
-        $gender: String,
-        $mobile: String,
-        $address: String,
-        $dob: Date,
-        $qualification: String,
-        $emergencyName: String,
-        $emergencyContact: String,
-      ) {
-			createStaff(
-				input:{
-					staffData:{
-						empId: $empId,
-						dateOfJoining: $doj,
-						designation: $designation,
-						role: $role,
-						clinicLocation: $location,
-						firstname: $name,
-						surname: $lastname,
-						email: $email,
-						gender: $gender,
-						mobile: $mobile,
-						address: $address,
-						dob: $dob,
-						qualification: $qualification,
-						emergencyName: $emergencyName,
-						emergencyContact: $emergencyContact,
-						authLearner:[]
-					}
-				}
-			)
-			{ 
-				staff {
-					id
-          name
-          email
-          gender
-          localAddress
-          designation
-          empType
-          salutation
-          qualification
-          dateOfJoining
-          dob
-          surname
-          contactNo
-          emergencyContact
-          emergencyName
-          employeeId
-          clinicLocation {
-            id
-            location
+      mutation: gql`
+        mutation CreateStaff(
+          $empId: String!
+          $doj: Date
+          $designation: String
+          $role: ID!
+          $location: ID
+          $name: String!
+          $lastname: String
+          $email: String!
+          $gender: String
+          $mobile: String
+          $address: String
+          $dob: Date
+          $qualification: String
+          $emergencyName: String
+          $emergencyContact: String
+          $tags: [String]
+        ) {
+          createStaff(
+            input: {
+              staffData: {
+                empId: $empId
+                dateOfJoining: $doj
+                designation: $designation
+                role: $role
+                clinicLocation: $location
+                firstname: $name
+                surname: $lastname
+                email: $email
+                gender: $gender
+                mobile: $mobile
+                address: $address
+                dob: $dob
+                qualification: $qualification
+                emergencyName: $emergencyName
+                emergencyContact: $emergencyContact
+                authLearner: []
+                tags: $tags
+              }
+            }
+          ) {
+            staff {
+              id
+              name
+              email
+              gender
+              localAddress
+              designation
+              empType
+              salutation
+              qualification
+              dateOfJoining
+              dob
+              surname
+              contactNo
+              emergencyContact
+              emergencyName
+              employeeId
+              clinicLocation {
+                id
+                location
+              }
+              userRole {
+                id
+                name
+              }
+              isActive
+              tags {
+                edges {
+                  node {
+                    id
+                    name
+                  }
+                }
+              }
+            }
           }
-          userRole {
-            id
-            name
-          }
-          isActive
-				}
-			}
-    }`,
-    variables: {
-      empId : payload.values.staffId,
-      doj: payload.values.dateOfJoining ? moment(payload.values.dateOfJoining).format('YYYY-MM-DD') : null,
-      designation: payload.values.designation,
-      role: payload.values.role,
-      location: payload.values.clinicLocation,
-      name: payload.values.firstname,
-      lastname: payload.values.lastname,
-      email: payload.values.email,
-      gender: payload.values.gender,
-      mobile: payload.values.contactNumber,
-      address: payload.values.address,
-      dob: moment(payload.values.dob).format('YYYY-MM-DD'),
-      qualification: payload.values.qualification,
-      emergencyName: payload.values.emergencyName,
-      emergencyContact: payload.values.emergencyContactNumber,
-    }
-
+        }
+      `,
+      variables: {
+        empId: payload.values.staffId,
+        doj: payload.values.dateOfJoining
+          ? moment(payload.values.dateOfJoining).format('YYYY-MM-DD')
+          : null,
+        designation: payload.values.designation,
+        role: payload.values.role,
+        location: payload.values.clinicLocation,
+        name: payload.values.firstname,
+        lastname: payload.values.lastname,
+        email: payload.values.email,
+        gender: payload.values.gender,
+        mobile: payload.values.contactNumber,
+        address: payload.values.address,
+        dob: moment(payload.values.dob).format('YYYY-MM-DD'),
+        qualification: payload.values.qualification,
+        emergencyName: payload.values.emergencyName,
+        emergencyContact: payload.values.emergencyContactNumber,
+        tags: payload.values.tags,
+      },
     })
-    .then(result => result)
+    .then(result => {
+      console.log('MY RESU', result)
+      return result
+    })
     .catch(err => {
       err.graphQLErrors.map(item => {
         return notification.error({
-          message: 'Somthing want wrong',
+          message: 'Something went wrong',
           description: item.message,
         })
       })
@@ -197,6 +225,7 @@ export async function updateStaff(payload) {
       mutation: gql`mutation UpdateStaff (
         $location: ID,
         $doj: Date,
+        $tags: [String]
       ) {
         updateStaff(input:{
           staffData:{
@@ -223,6 +252,7 @@ export async function updateStaff(payload) {
             duration:"", 
             dateOfJoining: $doj,
             clinicLocation: $location,
+            tags: $tags
           }
         })
         { 
@@ -252,19 +282,30 @@ export async function updateStaff(payload) {
               name
             }
             isActive
+            tags {
+              edges {
+                node {
+                  id
+                  name
+                }
+              }
+            }
           }
         }
       }`,
       variables: {
         location: payload.values.clinicLocation,
-        doj: payload.values.dateOfJoining ? moment(payload.values.dateOfJoining).format('YYYY-MM-DD') : null,
-      }
+        doj: payload.values.dateOfJoining
+          ? moment(payload.values.dateOfJoining).format('YYYY-MM-DD')
+          : null,
+        tags: payload.values.tags,
+      },
     })
     .then(result => result)
     .catch(error => {
       error.graphQLErrors.map(item => {
         return notification.error({
-          message: 'Somthing want wrong',
+          message: 'Something went wrong',
           description: item.message,
         })
       })
@@ -293,7 +334,7 @@ export async function staffActiveInactive(payload) {
     .catch(error => {
       error.graphQLErrors.map(item => {
         return notification.error({
-          message: 'Somthing want wrong',
+          message: 'Something went wrong',
           description: item.message,
         })
       })

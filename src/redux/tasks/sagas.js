@@ -8,13 +8,14 @@ import {
   createTask,
   getTasksDropdown,
   updateTaskStatus,
+  updateTaskCounter,
 } from 'services/tasks'
 import actions from './actions'
 
 export function* GET_DATA() {
   yield put({
     type: 'tasks/SET_STATE',
-    payload: {loading: true,},
+    payload: { loading: true },
   })
 
   const response = yield call(getTasks)
@@ -29,20 +30,20 @@ export function* GET_DATA() {
 
     yield put({
       type: 'tasks/SET_STATE',
-      payload: {TaskList: tasks,},
+      payload: { TaskList: tasks },
     })
   }
 
   yield put({
     type: 'tasks/SET_STATE',
-    payload: {loading: false,},
+    payload: { loading: false },
   })
 }
 
 export function* GET_CLOSED_DATA() {
   yield put({
     type: 'tasks/SET_STATE',
-    payload: {loading: true,},
+    payload: { loading: true },
   })
 
   const response = yield call(getClosedTasks)
@@ -56,14 +57,14 @@ export function* GET_CLOSED_DATA() {
     }
 
     yield put({
-      type: 'tasks/SET_STATE',
-      payload: {TaskList: tasks,},
+      type: 'tasks/APPEND_TASKS_LIST',
+      payload: { tasks },
     })
   }
 
   yield put({
     type: 'tasks/SET_STATE',
-    payload: {loading: false,},
+    payload: { loading: false },
   })
 }
 
@@ -78,13 +79,11 @@ export function* GET_TASKS_DROPDOWNS() {
         taskStatus: response.data.taskStatus,
         taskType: response.data.taskType,
         staffsList: response.data.staffs,
-        learnersList: response.data.students
+        learnersList: response.data.students,
       },
     })
   }
 }
-
-
 
 export function* CREATE_TASK({ payload }) {
   // setting create task button loading true
@@ -103,7 +102,7 @@ export function* CREATE_TASK({ payload }) {
       message: 'Task Created Successfully',
     })
 
-    // adding created task in the task list 
+    // adding created task in the task list
     yield put({
       type: 'tasks/APPEND_TASKS_LIST',
       payload: {
@@ -119,7 +118,6 @@ export function* CREATE_TASK({ payload }) {
       createTaskLoading: false,
     },
   })
-
 }
 
 export function* EDIT_TASK({ payload }) {
@@ -139,7 +137,7 @@ export function* EDIT_TASK({ payload }) {
       message: 'Task Edited Successfully',
     })
 
-    // adding created task in the task list 
+    // adding created task in the task list
     yield put({
       type: 'tasks/UPDATE_TASKS_LIST',
       payload: {
@@ -155,20 +153,27 @@ export function* EDIT_TASK({ payload }) {
       createTaskLoading: false,
     },
   })
-
 }
 
 export function* UPDATE_TASK_STATUS({ payload }) {
-
   const response = yield call(updateTaskStatus, payload)
 
   if (response && response.data) {
     // generating notification
+    const status = response.data.updateTask.task.status.taskStatus
     notification.success({
-      message: 'Task Closed Successfully',
+      message: `Task ${status === 'Open' ? 'Opened' : 'Closed'} Successfully`,
     })
 
-    // adding created task in the task list 
+    // updating task status on store
+    yield put({
+      type: 'tasks/UPDATE_TASKS_LIST',
+      payload: {
+        object: response.data.updateTask.task,
+      },
+    })
+
+    // adding created task in the task list
     // yield put({
     //   type: 'tasks/UPDATE_TASKS_LIST',
     //   payload: {
@@ -176,9 +181,27 @@ export function* UPDATE_TASK_STATUS({ payload }) {
     //   },
     // })
   }
-
 }
 
+export function* UPDATE_TASK_COUNTER({ payload }) {
+  const response = yield call(updateTaskCounter, payload)
+  console.log('after counter change', response)
+
+  if (response && response.data) {
+    // generating notification
+    notification.success({
+      message: 'Task Updated Successfully',
+    })
+
+    // updating task status on store
+    yield put({
+      type: 'tasks/UPDATE_TASKS_LIST',
+      payload: {
+        object: response.data.taskCounter.details,
+      },
+    })
+  }
+}
 
 export default function* rootSaga() {
   yield all([
@@ -189,6 +212,6 @@ export default function* rootSaga() {
     takeEvery(actions.CREATE_TASK, CREATE_TASK),
     takeEvery(actions.EDIT_TASK, EDIT_TASK),
     takeEvery(actions.UPDATE_TASK_STATUS, UPDATE_TASK_STATUS),
-    
+    takeEvery(actions.UPDATE_TASK_COUNTER, UPDATE_TASK_COUNTER),
   ])
 }

@@ -1,16 +1,34 @@
 /* eslint-disable no-plusplus */
 import { all, takeEvery, put, call } from 'redux-saga/effects'
 import { notification } from 'antd'
-import { createPayor, updatePayor, activeInactivePayor } from 'services/payor'
+import { createPayor, updatePayor, activeInactivePayor, uploadPayorDocument } from 'services/payor'
 import actions from './actions'
 
 export function* CREATE_PAYOR({ payload }) {
   const response = yield call(createPayor, payload)
   if (response && response.data) {
-    // generating notification
     notification.success({
       message: 'Payor Created Successfully',
     })
+
+    // Upload Documents
+    const docsResponse = yield call(uploadPayorDocument, {
+      fileList: payload.fileList,
+      payorId: response.data.createPayor.details.id,
+    })
+
+    if (docsResponse && docsResponse.message === 'OK') {
+      if (docsResponse.fileUrl.length) {
+        notification.success({
+          message: 'Document added to Payor successfully.',
+        })
+      }
+    } else {
+      notification.error({
+        message: 'An error occurred to upload Document.',
+        description: docsResponse.message,
+      })
+    }
   }
 }
 
@@ -21,6 +39,23 @@ export function* EDIT_PAYOR({ payload }) {
     notification.success({
       message: 'Payor Updated Successfully',
     })
+
+    // Upload Documents
+    const docsResponse = yield call(uploadPayorDocument, {
+      fileList: payload.fileList,
+      payorId: payload.id,
+    })
+
+    if (docsResponse && docsResponse.message === 'OK') {
+      notification.success({
+        message: 'Document added to Payor successfully.',
+      })
+    } else {
+      notification.error({
+        message: 'An error occurred to upload Document.',
+        description: docsResponse.message,
+      })
+    }
   }
 }
 

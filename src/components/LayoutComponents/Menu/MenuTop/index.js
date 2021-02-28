@@ -2,50 +2,108 @@
 /* eslint-disable react/jsx-indent */
 /* eslint-disable react/jsx-props-no-multi-spaces */
 /* eslint-disable eqeqeq */
-/* eslint-disable eqeqeq */
-/* eslint-disable eqeqeq */
-/* eslint-disable eqeqeq */
-import React from 'react'
+/* eslint-disable  */
+/* eslint-disable array-callback-return */
+/* eslint-disable react/destructuring-assignment */
+
+import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
-import { Menu, Button, Badge, Dropdown, Avatar, Comment, Tooltip, Popover } from 'antd'
+import { Menu, Badge, Dropdown, Avatar, Comment, notification } from 'antd'
+import { BellOutlined } from '@ant-design/icons'
 import { Link, withRouter } from 'react-router-dom'
-// import { Trans } from 'react-i18next'
+import gql from 'graphql-tag'
+import _ from 'lodash'
 import Moment from 'react-moment'
 import store from 'store'
-import _ from 'lodash'
-import { BellOutlined } from '@ant-design/icons'
+import moment from 'moment'
+import client from '../../../../apollo/config'
 import styles from './style.module.scss'
 import ProfileMenu from './ProfileMenu'
 
 const { SubMenu, Divider } = Menu
 // const { t } = Trans
 
-const mapStateToProps = ({ menu, settings }) => ({
-  menuData: menu.menuTopData,
-  isLightTheme: settings.isLightTheme,
-  isSettingsOpen: settings.isSettingsOpen,
-})
+function compare(a, b) {
+  if (moment(a.timestamp) < moment(b.timestamp)) {
+    return 1
+  }
+  return -1
+}
 
-@withRouter
-@connect(mapStateToProps)
-class MenuTop extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      selectedKeys: store.get('app.menu.selectedKeys') || [],
+function MenuTop(props) {
+  const [userId, setUserId] = useState(localStorage.getItem('userId'))
+  const [selectedKeys, setSelectedKeys] = useState(store.get('app.menu.selectedKeys') || [])
+  const [notificationList, setNotificationList] = useState([])
+  const [unreadNotifications, setUnreadNotifications] = useState(0)
+  const [selectedNotifcation, setSelectedNotifcation] = useState(null)
+  const [notificationRedirectUrl, setnotificationRedirectUrl] = useState('#')
+
+  useEffect(() => {
+    setSelectedKeysFun(props)
+    if (userId) {
+      fetchNotification(userId)
     }
+    setTimeout(function() {
+      setUserId(localStorage.getItem('userId'))
+    }, 3000)
+    setTimeout(function() {
+      setUserId(localStorage.getItem('userId'))
+    }, 5000)
+  }, [])
+
+  useEffect(() => {
+    if (userId) {
+      fetchNotification(userId)
+    }
+  }, [selectedNotifcation, userId])
+
+  const fetchNotification = id => {
+    client
+      .query({
+        query: gql`
+            query {
+              notification(recipient: ${id}) {
+                edges {
+                  node {
+                    id
+                    title
+                    description
+                    timestamp
+                    read
+                    recipient{
+                        id
+                        username
+                    }
+                    notifyType
+                    modelId
+                  }
+                }
+              }
+            }
+          `,
+        fetchPolicy: 'network-only',
+      })
+      .then(res => {
+        let notiList = []
+        let tempCount = 0
+        res.data.notification.edges.map(item => {
+          notiList.push(item.node)
+          tempCount += item.node.read === false ? 1 : 0
+        })
+        notiList = notiList.sort(compare)
+        setNotificationList(notiList)
+        setUnreadNotifications(tempCount)
+      })
+      .catch(err =>
+        notification.error({
+          message: 'Something went wrong',
+          description: 'Unable to fetch recent notifications',
+        }),
+      )
   }
 
-  componentWillMount() {
-    this.setSelectedKeys(this.props)
-  }
-
-  componentWillReceiveProps(newProps) {
-    this.setSelectedKeys(newProps)
-  }
-
-  setSelectedKeys = props => {
-    const { menuData } = this.props
+  const setSelectedKeysFun = tt => {
+    const { menuData } = props
     const flattenItems = (items, key) =>
       items.reduce((flattenedItems, item) => {
         flattenedItems.push(item)
@@ -54,17 +112,13 @@ class MenuTop extends React.Component {
         }
         return flattenedItems
       }, [])
-    const selectedItem = _.find(flattenItems(menuData, 'children'), [
-      'url',
-      props.location.pathname,
-    ])
-    this.setState({
-      selectedKeys: selectedItem ? [selectedItem.key] : [],
-    })
+    const selectedItem = _.find(flattenItems(menuData, 'children'), ['url', tt.location.pathname])
+
+    setSelectedKeys(selectedItem ? [selectedItem.key] : [])
   }
 
-  handleClick = e => {
-    const { dispatch, isSettingsOpen } = this.props
+  const handleClick = e => {
+    const { dispatch, isSettingsOpen } = props
     store.set('app.menu.selectedKeys', [e.key])
     if (e.key === 'settings') {
       dispatch({
@@ -76,13 +130,12 @@ class MenuTop extends React.Component {
       })
       return
     }
-    this.setState({
-      selectedKeys: [e.key],
-    })
+
+    setSelectedKeys([e.key])
   }
 
-  generateMenuItems = () => {
-    const { menuData = [] } = this.props
+  const generateMenuItems = () => {
+    const { menuData = [] } = props
 
     const generateItem = (item, isSubMenu) => {
       const { key, title, url, icon, pro, disabled } = item
@@ -92,61 +145,67 @@ class MenuTop extends React.Component {
       }
       if (item.url) {
         return (
-
-          <Menu.Item key={key} title={title} disabled={disabled} style={{ padding: '0px 20px', textAlign: 'left', minWidth: 100 }}>
+          <Menu.Item
+            key={key}
+            title={title}
+            disabled={disabled}
+            style={{ padding: '0px 20px', textAlign: 'left', minWidth: 100 }}
+          >
             {item.target ? (
               <a href={url} target={item.target} rel="noopener noreferrer">
-                {icon &&
+                {icon && (
                   <>
-                    <span style={{margin: 0}} title={title} className={`${icon} ${styles.icon}`} />
+                    <span
+                      style={{ margin: 0 }}
+                      title={title}
+                      className={`${icon} ${styles.icon}`}
+                    />
                     <p style={{ marginTop: -13, lineHeight: '10px', fontSize: 10 }}>{title}</p>
                   </>
-                }
-                {isSubMenu &&
+                )}
+                {isSubMenu && (
                   <>
                     <span className={styles.title}>
                       {/* <Trans>{title}</Trans> */}
                       {title}
                     </span>
                   </>
-                }
+                )}
                 {pro && <span className="badge badge-primary ml-2">PRO</span>}
               </a>
             ) : (
-                <Link to={url}>
-                  {icon &&
-                    <div style={{margin: 0, textAlign: 'center'}}>
-                      <span style={{margin: 0}} title={title} className={`${icon} ${styles.icon}`} />
-                      <p style={{ marginTop: -13, lineHeight: '10px', fontSize: 10 }}>{title}</p>
-                    </div>
-                  }
-                  {isSubMenu &&
-                    <>
-                      <span className={styles.title}>
-                        {/* <Trans>{title}</Trans> */}
-                        {title}
-                      </span>
-                    </>
-                  }
-                  {pro && <span className="badge badge-primary ml-2">PRO</span>}
-                </Link>
-              )}
+              <Link to={url}>
+                {icon && (
+                  <div style={{ margin: 0, textAlign: 'center' }}>
+                    <span
+                      style={{ margin: 0 }}
+                      title={title}
+                      className={`${icon} ${styles.icon}`}
+                    />
+                    <p style={{ marginTop: -13, lineHeight: '10px', fontSize: 10 }}>{title}</p>
+                  </div>
+                )}
+                {isSubMenu && (
+                  <>
+                    <span className={styles.title}>{title}</span>
+                  </>
+                )}
+                {pro && <span className="badge badge-primary ml-2">PRO</span>}
+              </Link>
+            )}
           </Menu.Item>
         )
       }
       return (
         <Menu.Item key={key} title={title} disabled={disabled}>
-          {icon &&
+          {icon && (
             <>
-              <span style={{margin: 0}} title={title} className={`${icon} ${styles.icon}`} />
+              <span style={{ margin: 0 }} title={title} className={`${icon} ${styles.icon}`} />
               <p style={{ marginTop: -13, lineHeight: '10px', fontSize: 10 }}>{title}</p>
             </>
-          }
+          )}
           <>
-            <span className={styles.title}>
-              {/* <Trans>{title}</Trans> */}
-
-            </span>
+            <span className={styles.title}>{/* <Trans>{title}</Trans> */}</span>
             {title}
           </>
           {pro && <span className="badge badge-primary ml-2">PRO</span>}
@@ -154,17 +213,15 @@ class MenuTop extends React.Component {
       )
     }
 
-
     const generateSubmenu = items =>
       items.map(menuItem => {
         if (menuItem.children) {
           const subMenuTitle = (
             <span className={styles.menu} key={menuItem.key}>
-              <span className={styles.title}>
-                {/* <Trans>{menuItem.title}</Trans> */}
-                {menuItem.title}
-              </span>
-              {menuItem.icon && <span style={{margin: 0}} className={`${menuItem.icon} ${styles.icon}`} />}
+              <span className={styles.title}>{menuItem.title}</span>
+              {menuItem.icon && (
+                <span style={{ margin: 0 }} className={`${menuItem.icon} ${styles.icon}`} />
+              )}
             </span>
           )
           return (
@@ -176,25 +233,34 @@ class MenuTop extends React.Component {
         return generateItem(menuItem, true)
       })
 
-
     return menuData.map(menuItem => {
       if (menuItem.children) {
         const subMenuTitle = (
-          <p className={styles.menu} key={menuItem.key} style={{display: 'block'}}>
-            {/* <span className={styles.title}>
-              <Trans>{menuItem.title}</Trans>
-            </span> */}
-            {menuItem.icon &&
+          <div
+            className={styles.menu}
+            key={menuItem.key}
+            style={{ marginBottom: '11px', display: 'block' }}
+          >
+            {menuItem.icon && (
               <>
-                <span style={{margin: 0}} title={menuItem.title} className={`${menuItem.icon} ${styles.icon}`} />
-                <p style={{fontSize: 10, lineHeight: '13px', marginTop: -14, marginBottom: 3 }}>{menuItem.title}</p>
+                <span
+                  style={{ margin: 0 }}
+                  title={menuItem.title}
+                  className={`${menuItem.icon} ${styles.icon}`}
+                />
+                <p style={{ fontSize: 10, lineHeight: '13px', marginTop: -14, marginBottom: 3 }}>
+                  {menuItem.title}
+                </p>
               </>
-            }
-          </p>
+            )}
+          </div>
         )
         return (
-          <SubMenu title={subMenuTitle} key={menuItem.key} style={{ padding: '0px 0px', textAlign: 'center', minWidth: 100 }}>
-
+          <SubMenu
+            title={subMenuTitle}
+            key={menuItem.key}
+            style={{ padding: '0px 0px', textAlign: 'center', minWidth: 100 }}
+          >
             {generateSubmenu(menuItem.children)}
           </SubMenu>
         )
@@ -203,102 +269,164 @@ class MenuTop extends React.Component {
     })
   }
 
-  render() {
-    const { selectedKeys } = this.state
-    const {
-      isLightTheme,
-      history: { goBack },
-    } = this.props
-    const menu = (
-      <Menu style={{ width: 300 }}>
-        <Menu.Item
-          key="1"
-          style={{
-            width: 300,
-            textOverflow: 'inherit',
-            wordWrap: 'break-word',
-            whiteSpace: 'normal',
-          }}
-        >
-          <Comment
-            author={<a>New Task</a>}
-            avatar={
-              <Avatar
-                src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                alt="Han Solo"
-              />
+  const handleReadNotification = item => {
+    if (item && item.id) {
+      client
+        .mutate({
+          mutation: gql`
+        mutation {
+          markAsRead(input: { pk: "${item.id}"  }) {
+            details {
+              id
+              title
             }
-            content={<p>You have assigned a new task.....</p>}
-            datetime={<Moment fromNow>2020-07-17T11:17-0500</Moment>}
+          }
+        }
+        `,
+        })
+        .then(res => console.log(res, 'from read nitu'))
+        .catch(err => {
+          console.log(err, 'erer')
+          notification.error({
+            message: 'Somthing went wrong',
+            description: 'Unable to mark notification as read',
+          })
+        })
+      setSelectedNotifcation(item)
+      // updatenotificationRedirectUrl(item.title)
+    }
+  }
+
+  const {
+    isLightTheme,
+    history: { goBack },
+  } = props
+
+  const menu = (
+    <Menu
+      className={styles.menu}
+      style={{
+        width: 400,
+        height: `${notificationList.length > 0 ? 320 : 180}px`,
+        paddingTop: '12px',
+        paddingBottom: '12px',
+        overflowY: 'auto',
+      }}
+    >
+      {notificationList.length > 0 ? (
+        notificationList.map((item, itemIdx) => {
+          let url = '#'
+          switch (item.title) {
+            case 'New Task':
+              // setnotificationRedirectUrl('#/viewTask')
+              url = '#/viewTask'
+              break
+            case 'Appointment':
+              setnotificationRedirectUrl('#/appointmentData')
+              url = '#/appointmentData'
+              break
+            default:
+              // setnotificationRedirectUrl('#')
+              url = '#'
+              break
+          }
+          return (
+            <Menu.Item
+              key={Math.random()}
+              style={{
+                width: 384,
+                textOverflow: 'inherit',
+                wordWrap: 'break-word',
+                whiteSpace: 'normal',
+                fontWeight: `${item.read ? 500 : 700}`,
+                color: `${!item.read && 'black'}`,
+              }}
+              onClick={() => handleReadNotification(item)}
+            >
+              <a href={url}>
+                <div className={styles.temp}>
+                  <Comment
+                    author={item.title}
+                    avatar={
+                      <Avatar
+                        src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
+                        alt="Han Solo"
+                      />
+                    }
+                    content={
+                      item.description.length > 80 ? (
+                        <p style={{ height: '35px' }}>{item.description.slice(0, 80)}....</p>
+                      ) : (
+                        <p style={{ height: '35px' }}>{item.description}</p>
+                      )
+                    }
+                    datetime={<Moment fromNow>{item.timestamp}</Moment>}
+                  />
+                </div>
+              </a>
+            </Menu.Item>
+          )
+        })
+      ) : (
+        <div style={{ textAlign: 'center', margin: '35px autp' }}>No notification</div>
+      )}
+    </Menu>
+  )
+
+  return (
+    <div>
+      <div className={styles.logo}>
+        <div
+          className={styles.logoContainer}
+          style={{ backgroundColor: 'white', borderBottom: '1px solid #f2f2f2' }}
+        >
+          <img
+            src="resources/images/HeaderLogo.png"
+            alt="CogniAble Logo"
+            style={{ marginLeft: '14px' }}
           />
+        </div>
+      </div>
+
+      <Menu
+        theme={isLightTheme ? 'light' : 'dark'}
+        onClick={handleClick}
+        selectedKeys={selectedKeys}
+        mode="horizontal"
+      >
+        {generateMenuItems()}
+
+        <Menu.Item
+          style={{ padding: '8px 20px', textAlign: 'center', float: 'right', height: '58px' }}
+        >
+          <ProfileMenu />
         </Menu.Item>
-        <Menu.Divider />
         <Menu.Item
-          key="2"
-          style={{
-            width: 300,
-            textOverflow: 'inherit',
-            wordWrap: 'break-word',
-            whiteSpace: 'normal',
-          }}
+          style={{ padding: '8px 20px', textAlign: 'center', float: 'right', height: '58px' }}
+          onClick={goBack}
         >
-          <Comment
-            author={<a>New Task</a>}
-            avatar={
-              <Avatar
-                src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                alt="Han Solo"
-              />
-            }
-            content={<p>You have assigned a new task.....</p>}
-            datetime={<Moment fromNow>2020-07-16T12:10-0500</Moment>}
-          />
+          <span className={styles.title}>Go Back</span>
+        </Menu.Item>
+        <Menu.Item
+          style={{ padding: '8px 20px', textAlign: 'center', float: 'right', height: '58px' }}
+        >
+          <Dropdown className={styles.menu} overlay={menu} trigger={['click']} placement="topRight">
+            <div>
+              <Badge count={unreadNotifications}>
+                <BellOutlined />
+              </Badge>
+            </div>
+          </Dropdown>
         </Menu.Item>
       </Menu>
-    )
-
-    return (
-      <div>
-        <div className={styles.logo}>
-          <div
-            className={styles.logoContainer}
-            style={{ backgroundColor: 'white', borderBottom: '1px solid #f2f2f2' }}
-          >
-            <img
-              src="resources/images/HeaderLogo.png"
-              alt="CogniAble Logo"
-              style={{ marginLeft: '14px' }}
-            />
-          </div>
-        </div>
-
-        <Menu
-          theme={isLightTheme ? 'light' : 'dark'}
-          onClick={this.handleClick}
-          selectedKeys={selectedKeys}
-          mode="horizontal"
-        >
-          {this.generateMenuItems()}
-
-          <Menu.Item style={{ padding: '8px 20px', textAlign: 'center', float: 'right', height: '58px' }}>
-            <ProfileMenu />
-          </Menu.Item>
-          <Menu.Item style={{ padding: '8px 20px', textAlign: 'center', float: 'right', height: '58px' }} onClick={goBack}>
-            <span className={styles.title}>Go Back</span>
-          </Menu.Item>
-          <Menu.Item style={{ padding: '8px 20px', textAlign: 'center', float: 'right', height: '58px' }}>
-            <Dropdown overlay={menu} trigger={['click']} placement="topRight">
-              <div className={styles.dropdown}>
-                <Badge count={2}>
-                  <BellOutlined />
-                </Badge>
-              </div>
-            </Dropdown>
-          </Menu.Item>
-        </Menu>
-      </div>
-    )
-  }
+    </div>
+  )
 }
 
-export default MenuTop
+const mapStateToProps = ({ menu, settings }) => ({
+  menuData: menu.menuTopData,
+  isLightTheme: settings.isLightTheme,
+  isSettingsOpen: settings.isSettingsOpen,
+})
+
+export default withRouter(connect(mapStateToProps)(MenuTop))

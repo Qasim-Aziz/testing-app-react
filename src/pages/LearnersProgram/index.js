@@ -22,375 +22,362 @@
 /* eslint-disable lines-between-class-members */
 /* eslint-disable react/jsx-closing-bracket-location */
 
+import { FilterOutlined } from '@ant-design/icons'
+import { Button, Card, Col, Drawer, Form, Layout, Row, Typography } from 'antd'
+import LearnerSelect from 'components/LearnerSelect'
 import React from 'react'
 import { Helmet } from 'react-helmet'
-import {
-    Layout,
-    Row,
-    Col,
-    Card,
-    Button,
-    Typography,
-    Tabs,
-    Drawer,
-    Form,
-} from 'antd'
 import { connect } from 'react-redux'
-
-
-import { FilterOutlined, PlusOutlined, CloudDownloadOutlined } from '@ant-design/icons'
-
-
-import LearnerSelect from 'components/LearnerSelect'
 import LearnerAssessments from './LearnerAssessments'
-import LearnerSession from './LearnerSession'
 import LearnerGoals from './LearnerGoals'
-import client from '../../apollo/config'
+import LearnerSession from './LearnerSession'
 import './padding.scss'
+import SessionsTabs from './SessionsTabs'
 
 const { Title, Text } = Typography
 const { Content } = Layout
 
-
-
 const parentCardStyle = {
-    // background: '#F9F9F9',
-    borderRadius: 10,
-    padding: '20px',
-    margin: '10px 0 0 10px',
-    overflow: 'auto'
+  // background: '#F9F9F9',
+  borderRadius: 10,
+  padding: '20px',
+  margin: '10px 0 0 10px',
+  overflow: 'auto',
 }
 const targetMappingStyle = {
-    background: '#FFFFFF',
-    border: '1px solid #E4E9F0',
-    boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
-    borderRadius: 10,
-    padding: '16px 12px',
-    // display: 'flex',
-    alignItems: 'center',
-    marginBottom: '10px'
+  background: '#FFFFFF',
+  border: '1px solid #E4E9F0',
+  boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
+  borderRadius: 10,
+  padding: '16px 12px',
+  // display: 'flex',
+  alignItems: 'center',
+  marginBottom: '10px',
 }
-
 
 @connect(({ user, student, learnersprogram }) => ({ user, student, learnersprogram }))
 class PeakEqvi extends React.Component {
-    constructor(props) {
-        super(props)
+  constructor(props) {
+    super(props)
 
-        this.state = {
-            current: 0,
-            visibleFilter: false,
-            // TabCheck: 'Assessments',
-        }
+    this.state = {
+      current: 0,
+      visibleFilter: false,
+      // TabCheck: 'Assessments',
+    }
+  }
+
+  componentDidMount() {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'learnersprogram/LOAD_DATA',
+    })
+
+    dispatch({
+      type: 'student/STUDENT_DETAILS',
+    })
+
+    let std = localStorage.getItem('studentId')
+    if (std) {
+      std = JSON.parse(std)
+      dispatch({
+        type: 'learnersprogram/SET_STATE',
+        payload: {
+          SelectedLearnerId: std,
+        },
+      })
+    } else {
+      dispatch({
+        type: 'student/SET_STATE',
+        payload: {
+          StudentName: '',
+        },
+      })
+    }
+  }
+
+  noLearnerSelected = () => {
+    return (
+      <>
+        <Row>
+          <Col sm={24}>
+            <div style={parentCardStyle}>
+              <Title style={{ fontSize: 20, lineHeight: '27px', textAlign: 'center' }}>
+                Select any learner from the list
+              </Title>
+            </div>
+          </Col>
+        </Row>
+      </>
+    )
+  }
+
+  onCloseFilter = () => {
+    this.setState({
+      visibleFilter: false,
+    })
+  }
+
+  showDrawerFilter = () => {
+    this.setState({
+      visibleFilter: true,
+    })
+  }
+
+  SetTabFunction = val => {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'learnersprogram/SET_STATE',
+      payload: {
+        TabCheck: val,
+      },
+    })
+  }
+
+  render() {
+    const {
+      form,
+      user,
+      student: { StudentName },
+      learnersprogram: { SelectedLearnerId, TabCheck },
+    } = this.props
+
+    const { visibleFilter } = this.state
+
+    // if (Loading) {
+    //     return 'Loading...'
+    // }
+
+    const BlockStyle = {
+      background: '#FFF',
+      borderBottom: '1px solid #bcbcbc',
+      cursor: 'pointer',
+      padding: '30px 20px',
+      borderRadius: 0,
+      width: '100%',
+      height: 50,
+      display: 'flex',
+      alignItems: 'center',
+      minWidth: '200px',
     }
 
-    componentDidMount() {
-        const { dispatch } = this.props
-        dispatch({
-            type: 'learnersprogram/LOAD_DATA',
-        })
-
-        dispatch({
-            type: 'student/STUDENT_DETAILS',
-        })
-
-        let std = localStorage.getItem('studentId')
-        if (std) {
-            std = JSON.parse(std)
-            dispatch({
-                type: 'learnersprogram/SET_STATE',
-                payload: {
-                    SelectedLearnerId: std
-                }
-            })
-        }
-        else {
-            dispatch({
-                type: 'student/SET_STATE',
-                payload: {
-                    StudentName: '',
-                },
-            })
-        }
-
+    const ActiveStyle = {
+      ...BlockStyle,
+      background: '#a7a6a6',
     }
 
-    noLearnerSelected = () => {
-        return <>
+    const HeadStyle = {
+      color: '#000',
+      fontSize: 16,
+      lineHeight: '25px',
+      display: 'inline',
+      margin: 0,
+      fontWeight: '500',
+    }
+
+    const SideBarHeading = {
+      fontSize: '24px',
+      fontWeight: 'bold',
+      lineHeight: '33px',
+      marginBottom: '25px',
+    }
+
+    const tdStyle = { border: '1px solid #dddddd', padding: 8, textAlign: 'center' }
+    const pstyle = { marginBottom: 0 }
+    const std = localStorage.getItem('studentId')
+
+    return (
+      <>
+        <Helmet title="Learners Program" />
+        <Layout style={{ padding: '0px' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '0px 10px',
+              backgroundColor: '#FFF',
+              boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
+            }}
+          >
+            <Content
+              style={{
+                padding: '0px',
+                width: '100%',
+                margin: '0px auto',
+              }}
+            >
+              <div style={{ padding: '5px 0px', display: 'flex', justifyContent: 'space-between' }}>
+                <div style={{ paddingTop: '5px' }}>&nbsp;</div>
+
+                <div>
+                  <div
+                    style={{
+                      fontSize: 25,
+                      marginRight: '9px',
+                      marginTop: '2px',
+                    }}
+                  >
+                    {StudentName !== '' && `${StudentName}'s ${TabCheck}`}
+                  </div>
+                </div>
+
+                <div>
+                  {user?.role !== 'parents' && (
+                    <Button onClick={this.showDrawerFilter} size="large">
+                      <FilterOutlined />
+                    </Button>
+                  )}
+
+                  <Drawer
+                    visible={visibleFilter}
+                    onClose={this.onCloseFilter}
+                    width={350}
+                    title="Select Learner"
+                    placement="right"
+                  >
+                    <LearnerSelect />
+                  </Drawer>
+                </div>
+              </div>
+            </Content>
+          </div>
+
+          <Col style={{ paddingRight: 0 }}>
             <Row>
-                <Col sm={24}>
-                    <div style={parentCardStyle}>
-                        <Title style={{ fontSize: 20, lineHeight: '27px', textAlign: 'center' }}>Select any learner from the list</Title>
-                    </div>
-                </Col>
-            </Row>
-        </>
-    }
-
-    onCloseFilter = () => {
-        this.setState({
-            visibleFilter: false,
-        })
-    }
-
-    showDrawerFilter = () => {
-        this.setState({
-            visibleFilter: true,
-        })
-    }
-
-    SetTabFunction = val => {
-        const { dispatch } = this.props
-        dispatch({
-            type: 'learnersprogram/SET_STATE',
-            payload: {
-                TabCheck: val
-            }
-        })
-    }
-
-    render() {
-        const {
-            form,
-            user,
-            student: { StudentName },
-            learnersprogram: {
-                SelectedLearnerId,
-                TabCheck
-            }
-        } = this.props
-
-        const {
-            visibleFilter,
-        } = this.state
-
-        // if (Loading) {
-        //     return 'Loading...'
-        // }
-
-        const BlockStyle = {
-            background: '#FFF',
-            borderBottom: '1px solid #bcbcbc',
-            cursor: 'pointer',
-            padding: '30px 20px',
-            borderRadius: 0,
-            width: '100%',
-            height: 50,
-            display: 'flex',
-            alignItems: 'center',
-            minWidth: '200px',
-        }
-
-        const ActiveStyle = {
-            ...BlockStyle,
-            background: '#a7a6a6',
-        }
-
-        const HeadStyle = {
-            color: '#000',
-            fontSize: 16,
-            lineHeight: '25px',
-            display: 'inline',
-            margin: 0,
-            fontWeight: '500',
-        }
-
-        const SideBarHeading = {
-            fontSize: '24px',
-            fontWeight: 'bold',
-            lineHeight: '33px',
-            marginBottom: '25px',
-        }
-
-        const tdStyle = { border: '1px solid #dddddd', padding: 8, textAlign: 'center' }
-        const pstyle = { marginBottom: 0 }
-        const std = localStorage.getItem('studentId')
-
-
-
-        return (
-            <>
-                <Helmet title="Learners Program" />
-                <Layout style={{ padding: '0px' }}>
+              <Col sm={5}>
+                <div style={{ display: 'flex' }}>
+                  <Card
+                    style={{
+                      background: '#F1F1F1',
+                      borderRadius: 0,
+                      minHeight: '100vh',
+                      minWidth: '290px',
+                      maxWidth: '350px',
+                    }}
+                  >
+                    <div style={SideBarHeading}>Intervention</div>
                     <div
-                        style={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            padding: '0px 10px',
-                            backgroundColor: '#FFF',
-                            boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
-                        }}
+                      style={TabCheck === 'Assessments' ? ActiveStyle : BlockStyle}
+                      onClick={() => this.SetTabFunction('Assessments')}
                     >
-                        <Content
-                            style={{
-                                padding: '0px',
-                                width: '100%',
-                                margin: '0px auto',
-                            }}
-                        >
-                            <div style={{ padding: '5px 0px', display: 'flex', justifyContent: 'space-between' }}>
-                                <div style={{ paddingTop: '5px' }}>
-                                    &nbsp;
-                                </div>
-                                
-
-                                <div>
-                                    <div
-                                        style={{
-                                            fontSize: 25,
-                                            marginRight: '9px',
-                                            marginTop: '2px',
-                                        }}
-                                    >
-                                        {StudentName !== '' && `${StudentName}'s ${TabCheck}`}
-                                    </div>
-                                </div>
-
-                                <div>
-                                    {user?.role !== 'parents' && (
-                                        <Button onClick={this.showDrawerFilter} size="large">
-                                            <FilterOutlined />
-                                        </Button>
-                                    )}
-
-                                    <Drawer
-                                        visible={visibleFilter}
-                                        onClose={this.onCloseFilter}
-                                        width={350}
-                                        title="Select Learner"
-                                        placement="right"
-                                    >
-                                        <LearnerSelect />
-                                    </Drawer>
-                                </div>
-
-                            </div>
-
-                        </Content>
+                      <span style={HeadStyle}>Assessments</span>
                     </div>
+                    <div
+                      style={TabCheck === 'Goals' ? ActiveStyle : BlockStyle}
+                      onClick={() => this.SetTabFunction('Goals')}
+                    >
+                      <span style={HeadStyle}>Goals</span>
+                    </div>
+                    <div
+                      style={TabCheck === 'Build Sessions' ? ActiveStyle : BlockStyle}
+                      onClick={() => this.SetTabFunction('Build Sessions')}
+                    >
+                      <span style={HeadStyle}>Build Sessions</span>
+                    </div>
+                    <div
+                      style={TabCheck === 'Sessions' ? ActiveStyle : BlockStyle}
+                      onClick={() => this.SetTabFunction('Sessions')}
+                    >
+                      <span style={HeadStyle}>Sessions</span>
+                    </div>
+                  </Card>
+                </div>
+              </Col>
 
-                    <Col style={{ paddingRight: 0 }}>
-                        <Row>
-                            <Col sm={5}>
-                                <div style={{ display: 'flex' }}>
-                                    <Card
-                                        style={{
-                                            background: '#F1F1F1',
-                                            borderRadius: 0,
-                                            minHeight: '100vh',
-                                            minWidth: '290px',
-                                            maxWidth: '350px',
-                                        }}
+              <Col sm={19}>
+                {std ? (
+                  <>
+                    {TabCheck === 'Assessments' && (
+                      <>
+                        <div style={parentCardStyle}>
+                          <LearnerAssessments key={SelectedLearnerId} />
+                        </div>
+                      </>
+                    )}
+                    {TabCheck === 'Goals' && (
+                      <>
+                        <div style={parentCardStyle}>
+                          <LearnerGoals key={SelectedLearnerId} />
+                        </div>
+                      </>
+                    )}
+                    {TabCheck === 'Build Sessions' && (
+                      <>
+                        <div style={parentCardStyle}>
+                          <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                            <tr>
+                              <td style={tdStyle}>
+                                <a href="/#/targetsAllocationToSession/">
+                                  <Button type="link">
+                                    Click here to manage targets in Sessions
+                                  </Button>
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+                        </div>
+                      </>
+                    )}
+                    {TabCheck === 'Sessions' && (
+                      <>
+                        {!localStorage.getItem('isOldSessionUI') ? (
+                          <SessionsTabs studentId={SelectedLearnerId} />
+                        ) : (
+                          <Row>
+                            <Col span={12}>
+                              <div style={parentCardStyle}>
+                                <Title style={{ fontSize: 20, lineHeight: '27px' }}>
+                                  Today&apos;s Sessions
+                                </Title>
+                                <LearnerSession key={SelectedLearnerId} />
+                              </div>
+                            </Col>
+                            <Col span={12}>
+                              <div style={parentCardStyle}>
+                                <Title style={{ fontSize: 20, lineHeight: '27px' }}>
+                                  Previous Sessions
+                                </Title>
+                                <a href="/#/sessionDetails">
+                                  <div style={targetMappingStyle}>
+                                    <Title
+                                      style={{
+                                        fontSize: '20px',
+                                        lineHeight: '27px',
+                                        display: 'block',
+                                      }}
                                     >
-                                        <div style={SideBarHeading}>Intervention</div>
-                                        <div
-                                            style={TabCheck === 'Assessments' ? ActiveStyle : BlockStyle}
-                                            onClick={() => this.SetTabFunction('Assessments')}
-                                        >
-                                            <span style={HeadStyle}>Assessments</span>
-                                        </div>
-                                        <div
-                                            style={TabCheck === 'Goals' ? ActiveStyle : BlockStyle}
-                                            onClick={() => this.SetTabFunction('Goals')}
-                                        >
-                                            <span style={HeadStyle}>Goals</span>
-                                        </div>
-                                        <div
-                                            style={TabCheck === 'Build Sessions' ? ActiveStyle : BlockStyle}
-                                            onClick={() => this.SetTabFunction('Build Sessions')}
-                                        >
-                                            <span style={HeadStyle}>Build Sessions</span>
-                                        </div>
-                                        <div
-                                            style={TabCheck === 'Sessions' ? ActiveStyle : BlockStyle}
-                                            onClick={() => this.SetTabFunction('Sessions')}
-                                        >
-                                            <span style={HeadStyle}>Sessions</span>
-                                        </div>
-                                    </Card>
-
-                                </div>
+                                      Sessions
+                                    </Title>
+                                    <p
+                                      style={{
+                                        display: 'block',
+                                        marginTop: '5px',
+                                        marginBottom: '-5px',
+                                      }}
+                                    >
+                                      <i>Click here to see previous Sessions </i>
+                                    </p>
+                                  </div>
+                                </a>
+                              </div>
                             </Col>
-
-                            <Col sm={19}>
-
-                                {std ?
-
-                                    <>
-                                        {TabCheck === 'Assessments' && (
-                                            <>
-                                                <div style={parentCardStyle}>
-
-                                                    <LearnerAssessments key={SelectedLearnerId} />
-                                                </div>
-                                            </>
-                                        )}
-                                        {TabCheck === 'Goals' && (
-                                            <>
-                                                <div style={parentCardStyle}>
-                                                    <LearnerGoals key={SelectedLearnerId} />
-                                                </div>
-                                            </>
-                                        )}
-                                        {TabCheck === 'Build Sessions' && (
-                                            <>
-                                                <div style={parentCardStyle}>
-
-
-                                                    <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-                                                        <tr>
-                                                            <td style={tdStyle}><a href="/#/targetsAllocationToSession/"><Button type="link">Click here to manage targets in Sessions</Button></a></td>
-                                                        </tr>
-                                                    </table>
-
-                                                </div>
-                                            </>
-                                        )}
-                                        {TabCheck === 'Sessions' && (
-                                            <>
-                                                <Row>
-                                                    <Col span={12}>
-                                                        <div style={parentCardStyle}>
-
-                                                            <Title style={{ fontSize: 20, lineHeight: '27px' }}>Today&apos;s Sessions</Title>
-                                                            <LearnerSession key={SelectedLearnerId} />
-
-                                                        </div>
-                                                    </Col>
-                                                    <Col span={12}>
-                                                        <div style={parentCardStyle}>
-
-                                                            <Title style={{ fontSize: 20, lineHeight: '27px' }}>Previous Sessions</Title>
-                                                            <a href="/#/sessionDetails">
-                                                                <div style={targetMappingStyle}>
-                                                                    <Title style={{ fontSize: '20px', lineHeight: '27px', display: 'block' }}>Sessions</Title>
-                                                                    <p style={{ display: 'block', marginTop: '5px', marginBottom: '-5px' }}><i>Click here to see previous Sessions </i></p>
-                                                                </div>
-                                                            </a>
-
-                                                        </div>
-                                                    </Col>
-                                                </Row>
-                                            </>
-                                        )}
-                                    </>
-
-                                    :
-                                    <>
-                                        {this.noLearnerSelected()}
-                                    </>
-                                }
-                            </Col>
-
-                        </Row>
-                    </Col>
-
-                </Layout>
-            </>
-        )
-    }
+                          </Row>
+                        )}
+                      </>
+                    )}
+                  </>
+                ) : (
+                  <>{this.noLearnerSelected()}</>
+                )}
+              </Col>
+            </Row>
+          </Col>
+        </Layout>
+      </>
+    )
+  }
 }
 
 export default Form.create()(PeakEqvi)

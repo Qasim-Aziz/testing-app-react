@@ -69,11 +69,73 @@ export const CREATE_INVOICE = gql`
   }
 `
 
-export const PRODUCTS = gql`
-  query {
-    invoiceProductsList {
-      id
-      name
+export const UPDATE_INVOICE = gql`
+  mutation updateInvoice(
+    $invoiceId: ID!
+    # $customer: ID!
+    $email: String!
+    $status: ID!
+    $issueDate: Date!
+    $dueDate: Date!
+    $address: String!
+    $taxableSubtotal: Float!
+    $discount: Float!
+    $products: [FeeInput2]
+    $total: Float!
+    $due: Float!
+  ) {
+    updateInvoice(
+      input: {
+        pk: $invoiceId
+        invoiceNo: "#0002"
+        # customer: $customer
+        email: $email
+        status: $status
+        issueDate: $issueDate
+        dueDate: $dueDate
+        amount: $due
+        address: $address
+        taxableSubtotal: $taxableSubtotal
+        discount: $discount
+        total: $total
+        products: $products
+      }
+    ) {
+      details {
+        id
+        invoiceNo
+        email
+        issueDate
+        dueDate
+        amount
+        address
+        taxableSubtotal
+        discount
+        total
+        clinic {
+          id
+          schoolName
+        }
+        status {
+          id
+          statusName
+        }
+        invoiceFee {
+          edges {
+            node {
+              id
+              quantity
+              rate
+              amount
+              tax
+              schoolServices {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
     }
   }
 `
@@ -95,6 +157,18 @@ export const ALL_STUDENT = gql`
 export const CREATE_PRODUCT = gql`
   mutation($name: String!, $description: String) {
     createInvoiceProduct(input: { name: $name, description: $description }) {
+      details {
+        id
+        name
+        description
+      }
+    }
+  }
+`
+
+export const UPDATE_PRODUCT = gql`
+  mutation($name: String!, $description: String) {
+    updateInvoiceProduct(input: { name: $name, description: $description }) {
       details {
         id
         name
@@ -167,6 +241,51 @@ export const GET_INVOICES = gql`
                   description
                 }
               }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+export const GET_INVOICE = gql`
+  query invoiceDetail($id: ID!) {
+    invoiceDetail(id: $id) {
+      id
+      invoiceNo
+      email
+      issueDate
+      dueDate
+      amount
+      address
+      taxableSubtotal
+      discount
+      total
+      clinic {
+        id
+        schoolName
+      }
+      customer {
+        id
+        firstname
+      }
+      status {
+        id
+        statusName
+      }
+      invoiceFee {
+        edges {
+          node {
+            id
+            quantity
+            rate
+            amount
+            tax
+            schoolServices {
+              id
+              name
+              description
             }
           }
         }

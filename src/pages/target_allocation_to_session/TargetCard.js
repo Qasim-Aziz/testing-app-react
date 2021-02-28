@@ -6,7 +6,7 @@ import style from './style.module.scss'
 
 const {Text, Title} = Typography
 
-const TargetCard = ({ id = '', text = '', showDelete = false, onDelete, srNo, node, sessionId = '', showAllocation = false }) => {
+const TargetCard = ({ id = '', text = '', showDelete = false, onDelete, onEditTarget, srNo, node, sessionId = '', showAllocation = false }) => {
   const cardStyle = {
     backgroundColor: 'white',
     borderRadius: '10px',
@@ -34,6 +34,14 @@ const TargetCard = ({ id = '', text = '', showDelete = false, onDelete, srNo, no
     zIndex: '999',
   }
 
+  const closeBtnStyle3 = {
+    position: 'absolute',
+    right: '110px',
+    bottom: '5px',
+    cursor: 'pointer',
+    zIndex: '999',
+  }
+
   const dispatch = useDispatch()
 
   const deleteTargetFromSession = targetId => {
@@ -47,6 +55,10 @@ const TargetCard = ({ id = '', text = '', showDelete = false, onDelete, srNo, no
       }
     })
 
+  }
+
+  const editTargetDrawer = targetNode => {
+    console.log("edit target targetNode ===> ", targetNode)
   }
 
   const allocatedTagetBadgeStyle = {backgroundColor: '#52c41a'}
@@ -80,11 +92,16 @@ const TargetCard = ({ id = '', text = '', showDelete = false, onDelete, srNo, no
         #{srNo}
       </div>
 
+      <div style={closeBtnStyle3}>
+        <Badge count="Edit" onClick={() => onEditTarget()} style={notAllocatedTagetBadgeStyle} />
+      </div>
+
       {showAllocation && (
         <>
           <Badge count='M' style={node.morning ? allocatedTagetBadgeStyle : notAllocatedTagetBadgeStyle} />
           <Badge count='A' style={node.afternoon ? allocatedTagetBadgeStyle : notAllocatedTagetBadgeStyle} />
           <Badge count='E' style={node.evening ? allocatedTagetBadgeStyle : notAllocatedTagetBadgeStyle} />
+          <Badge count='D' style={node.default ? allocatedTagetBadgeStyle : notAllocatedTagetBadgeStyle} />
         </>
       )}
       

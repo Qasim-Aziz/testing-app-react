@@ -10,6 +10,7 @@ import gql from 'graphql-tag'
 
 import './index.scss'
 import { useSelector } from 'react-redux'
+import Scrollbars from 'react-custom-scrollbars'
 
 const { Content } = Layout
 const { Title, Text } = Typography
@@ -104,15 +105,15 @@ export default () => {
     },
   })
 
-  const [recodeMandData, { data: mandNewData, error: mandNewDataError }] = useMutation(
-    RECORD_MAND_DATA,
-    {
-      variables: {
-        date: moment().format('YYYY-MM-DD'),
-        session: sessionId,
-      },
+  const [
+    recodeMandData,
+    { data: mandNewData, loading: mandNewDataLoading, error: mandNewDataError },
+  ] = useMutation(RECORD_MAND_DATA, {
+    variables: {
+      date: moment().format('YYYY-MM-DD'),
+      session: sessionId,
     },
-  )
+  })
 
   const [
     createNewMand,
@@ -167,6 +168,7 @@ export default () => {
     e.preventDefault()
     createNewMand()
   }
+  console.log(newMandLoading, 'dfmd')
 
   return (
     <Authorize roles={['school_admin', 'therapist', 'parents']} redirect to="/dashboard/beta">
@@ -174,127 +176,18 @@ export default () => {
       <Layout style={{ padding: '0px' }}>
         <Content
           style={{
-            padding: '0px 20px',
+            // padding: '0px 20px',
             maxWidth: 1300,
             width: '100%',
             margin: '0px auto',
           }}
         >
           <Row gutter={[46, 0]}>
-            <Col span={16}>
-              <div
-                style={{
-                  marginTop: 41,
-                }}
-              >
-                <div
-                  style={{
-                    marginTop: 17,
-                  }}
-                >
-                  {/* {data &&
-                    <pre>
-                      {JSON.stringify(data.getClickData.edges, null, 2)}
-                    </pre>} */}
-                  {loading ? (
-                    'Loading...'
-                  ) : (
-                    <>
-                      {error && <pre>{JSON.stringify(error, null, 2)}</pre>}
-                      {data &&
-                        data.mand.edges.map(({ node }, index) => {
-                          // eslint-disable-next-line no-shadow
-                          // const dailyClickData = node.data ? parseInt(node.data, 10) : 0
-                          const mandId = node.id
-                          const dailyClickData =
-                            data.data.edges.find(({ node }) => {
-                              return node.dailyClick.id === mandId
-                            })?.node.data || 0
-
-                          return (
-                            <div
-                              id={node.id}
-                              style={{
-                                background: '#FFFFFF',
-                                border: '1px solid #E4E9F0',
-                                boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
-                                borderRadius: 10,
-                                padding: '26px 35px',
-                                position: 'relative',
-                                marginTop: index !== 0 ? 20 : 0,
-                              }}
-                            >
-                              <div
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                }}
-                              >
-                                <Title
-                                  style={{
-                                    fontSize: 24,
-                                    lineHeight: '33px',
-                                    margin: 0,
-                                  }}
-                                >
-                                  {studnetInfo && studnetInfo.student.firstname}&apos;s requests for{' '}
-                                  {node.measurments}
-                                </Title>
-
-                                <Button
-                                  style={{ marginLeft: 'auto' }}
-                                  onClick={() => {
-                                    let newDailyClickData = dailyClickData
-                                    if (dailyClickData > 0) {
-                                      newDailyClickData -= 1
-                                      recodeMandData({
-                                        variables: {
-                                          id: node.id,
-                                          data: newDailyClickData,
-                                        },
-                                      })
-                                    }
-                                  }}
-                                >
-                                  <MinusOutlined />
-                                </Button>
-                                <Text
-                                  style={{
-                                    fontSize: 14,
-                                    lineHeight: '19px',
-                                    color: '#2E2E2E',
-                                    marginLeft: 9,
-                                    marginRight: 19,
-                                  }}
-                                >
-                                  {dailyClickData}
-                                </Text>
-                                <Button
-                                  onClick={() => {
-                                    recodeMandData({
-                                      variables: {
-                                        id: node.id,
-                                        data: dailyClickData + 1,
-                                      },
-                                    })
-                                  }}
-                                >
-                                  <PlusOutlined />
-                                </Button>
-                              </div>
-                            </div>
-                          )
-                        })}
-                    </>
-                  )}
-                </div>
-              </div>
-            </Col>
-
             <Col span={8}>
               <Title
                 style={{
-                  marginLeft: '30px',
+                  marginTop: '15px',
+                  marginLeft: '15px',
                   fontSize: '30px',
                   lineHeight: '41px',
                 }}
@@ -336,6 +229,111 @@ export default () => {
                     </Button>
                   </Form.Item>
                 </Form>
+              </div>
+            </Col>
+
+            <Col span={16}>
+              <div
+                style={{
+                  marginTop: 20,
+                }}
+              >
+                <div>
+                  <Scrollbars style={{ height: 560 }} autoHide>
+                    {loading ? (
+                      'Loading...'
+                    ) : (
+                      <>
+                        {error && <pre>{JSON.stringify(error, null, 2)}</pre>}
+                        {data &&
+                          data.mand.edges.map(({ node }, index) => {
+                            // eslint-disable-next-line no-shadow
+                            // const dailyClickData = node.data ? parseInt(node.data, 10) : 0
+                            const mandId = node.id
+                            const dailyClickData =
+                              data.data.edges.find(({ node }) => {
+                                return node.dailyClick.id === mandId
+                              })?.node.data || 0
+
+                            return (
+                              <div
+                                id={node.id}
+                                style={{
+                                  background: '#FFFFFF',
+                                  border: '1px solid #E4E9F0',
+                                  boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
+                                  borderRadius: 10,
+                                  padding: '22px 30px',
+                                  width: '98%',
+                                  position: 'relative',
+                                  marginTop: index !== 0 ? 20 : 0,
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                  }}
+                                >
+                                  <Title
+                                    style={{
+                                      fontSize: 24,
+                                      lineHeight: '33px',
+                                      margin: 0,
+                                    }}
+                                  >
+                                    {studnetInfo && studnetInfo.student.firstname}&apos;s requests
+                                    for {node.measurments}
+                                  </Title>
+
+                                  <Button
+                                    style={{ marginLeft: 'auto' }}
+                                    onClick={() => {
+                                      let newDailyClickData = dailyClickData
+                                      if (dailyClickData > 0) {
+                                        newDailyClickData -= 1
+                                        recodeMandData({
+                                          variables: {
+                                            id: node.id,
+                                            data: newDailyClickData,
+                                          },
+                                        })
+                                      }
+                                    }}
+                                  >
+                                    <MinusOutlined />
+                                  </Button>
+                                  <Text
+                                    style={{
+                                      fontSize: 14,
+                                      lineHeight: '19px',
+                                      color: '#2E2E2E',
+                                      marginLeft: 12,
+                                      marginRight: 12,
+                                    }}
+                                  >
+                                    {dailyClickData}
+                                  </Text>
+                                  <Button
+                                    onClick={() => {
+                                      recodeMandData({
+                                        variables: {
+                                          id: node.id,
+                                          data: dailyClickData + 1,
+                                        },
+                                      })
+                                    }}
+                                  >
+                                    <PlusOutlined />
+                                  </Button>
+                                </div>
+                              </div>
+                            )
+                          })}
+                      </>
+                    )}
+                  </Scrollbars>
+                </div>
               </div>
             </Col>
           </Row>

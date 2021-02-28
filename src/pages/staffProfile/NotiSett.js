@@ -106,7 +106,7 @@ const SettingForm = () => {
     }
   }, [changeSettingError, changeSettingData])
 
-  const SwitchFrom = ({ title, info, style, value, setValue }) => {
+  const SwitchFrom = ({ title, style, value, setValue }) => {
     return (
       <div
         style={{

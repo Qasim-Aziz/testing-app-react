@@ -1,32 +1,28 @@
-/* eslint-disable array-callback-return */
-/* eslint-disable react/jsx-indent */
-import React, { useEffect, useState } from 'react'
-import { Typography, Empty, Input } from 'antd'
-import styles from './style.module.scss'
+import { Empty, Input, Typography } from 'antd'
+import React, { useState, useEffect } from 'react'
 import AllocatedTargetCard from '../../../components/AllocatedTargetCard'
-import { alreadyAlloctedTarget } from './TargetAllocation.query'
-import { notNull } from '../../../utilities'
 
-const { Title, Text } = Typography
+const { Title } = Typography
 
 const AllocatedTarget = ({ allocatedTarget, editAllocatedTarget, editAble }) => {
   const [allocatedTargetClone, setAllocatedTargetClone] = useState(allocatedTarget)
 
+  useEffect(() => {
+    // On changind all target, we also need to update here
+    setAllocatedTargetClone(allocatedTarget)
+  }, [allocatedTarget])
+
   const searchTarget = text => {
-    // console.log(text)
     const searchedTargetList = []
     if (allocatedTarget.length > 0) {
-      allocatedTarget.map(target => {
+      allocatedTarget.forEach(target => {
         if (target.node.targetAllcatedDetails.targetName.includes(text)) {
           searchedTargetList.push(target)
         }
       })
     }
-    // console.log(searchedTargetList)
     setAllocatedTargetClone(searchedTargetList)
   }
-
-
 
   return (
     <>
@@ -43,7 +39,6 @@ const AllocatedTarget = ({ allocatedTarget, editAllocatedTarget, editAble }) => 
         >
           Allocated Targets
         </Title>
-        {/* <Title style={{ fontSize: 18, lineHeight: '22px', }}>Allocated Targets</Title> */}
         {allocatedTarget && allocatedTarget.length > 0 && (
           <>
             <Input
@@ -54,7 +49,7 @@ const AllocatedTarget = ({ allocatedTarget, editAllocatedTarget, editAble }) => 
           </>
         )}
 
-        <div style={{height: 550, overflow: 'auto'}}>
+        <div style={{ height: 550, overflow: 'auto' }}>
           {allocatedTargetClone && allocatedTargetClone.length > 0 ? (
             allocatedTargetClone.map(aTarget => {
               return (
@@ -69,10 +64,10 @@ const AllocatedTarget = ({ allocatedTarget, editAllocatedTarget, editAble }) => 
               )
             })
           ) : (
-              <div className="text-center">
-                <Empty />
-              </div>
-            )}
+            <div className="text-center" style={{ marginTop: '80px' }}>
+              <Empty />
+            </div>
+          )}
         </div>
       </div>
     </>

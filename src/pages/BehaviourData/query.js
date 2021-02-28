@@ -127,3 +127,170 @@ export const CREATE_ENVIRONMENT = gql`
     }
   }
 `
+
+export const RECORD_DATA = gql`
+  mutation createDecel($templateId: ID!) {
+    createDecel(input: { template: $templateId }) {
+      details {
+        id
+        date
+        irt
+        note
+        duration
+        frequency {
+          edges {
+            node {
+              id
+              count
+              time
+            }
+          }
+        }
+        template {
+          id
+          behaviorDescription
+          behavior {
+            behaviorName
+          }
+          status {
+            statusName
+          }
+          environment {
+            edges {
+              node {
+                id
+                name
+              }
+            }
+          }
+          measurments {
+            edges {
+              node {
+                id
+                measuringType
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+export const UPDATE_RECORD = gql`
+  mutation updateDecel(
+    $id: ID!
+    $env: ID!
+    $irt: Int
+    $intensity: String
+    $duration: String!
+    $date: Date!
+  ) {
+    updateDecel(
+      input: {
+        pk: $id
+        environment: $env
+        irt: $irt
+        intensity: $intensity
+        duration: $duration
+        date: $date
+      }
+    ) {
+      details {
+        id
+        irt
+        note
+        duration
+        date
+        intensity
+        environment {
+          id
+        }
+        frequency {
+          edges {
+            node {
+              id
+              count
+              time
+            }
+          }
+        }
+        template {
+          id
+          behavior {
+            id
+            behaviorName
+          }
+          environment {
+            edges {
+              node {
+                id
+                name
+              }
+            }
+          }
+          measurments {
+            edges {
+              node {
+                id
+                measuringType
+              }
+            }
+          }
+        }
+        status {
+          id
+          statusName
+        }
+      }
+    }
+  }
+`
+
+export const UPDATE_FREQUENCY = gql`
+  mutation updateDecelFrequency($id: ID!, $count: Int!, $time: Int!) {
+    updateDecelFrequency(input: { pk: $id, count: $count, time: $time }) {
+      details {
+        frequency {
+          edges {
+            node {
+              id
+              count
+              time
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+export const GET_BEHAVIOR_CHART_DATA = gql`
+  query getDecelData($studentId: ID!, $templateId: ID!) {
+    getDecelData(template_Student: $studentId, template: $templateId) {
+      edges {
+        node {
+          id
+          date
+          duration
+          frequency {
+            edges {
+              node {
+                id
+                count
+                time
+              }
+            }
+          }
+          template {
+            id
+            behavior {
+              id
+              behaviorName
+            }
+          }
+        }
+      }
+    }
+  }
+`

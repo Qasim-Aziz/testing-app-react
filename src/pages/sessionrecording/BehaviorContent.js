@@ -2,9 +2,10 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable consistent-return */
 /* eslint-disable react/jsx-closing-tag-location */
+/* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet'
-import { Row, Col, Layout, Typography, Button } from 'antd'
+import { Row, Col, Layout, Typography, Button, Drawer } from 'antd'
 import { useQuery } from 'react-apollo'
 import gql from 'graphql-tag'
 import Scrollbars from 'react-custom-scrollbars'
@@ -116,6 +117,7 @@ export default () => {
     data: dancleTemplateData,
     error: dancleTemplateError,
     loading: dancleTemplateLoading,
+    refetch: refetchDancleTemplate,
   } = useQuery(GET_TEMPLETES, {
     variables: {
       studentId,
@@ -206,25 +208,42 @@ export default () => {
     }
   }, [newTamplate])
 
+  const checkIsBehaviorAlreadyExist = newId => tamplateList.some(x => x.node.behavior.id === newId)
+
+  const onCreatingTemplate = () => {
+    // refetchDancleTemplate()
+    setNewTamplateFromOpen(false)
+  }
+
+  const closeUpdateDrawer = () => {
+    setUpdateTempId(null)
+  }
+
+  const selectRecord = id => {
+    setSelectTamplate(id)
+    setNewTamplateFromOpen(false)
+    setUpdateTempId(null)
+  }
+
   return (
-    <div>
+    <div className="site-drawer-render-in-current-wrapper">
       <Helmet title="Dashboard Alpha" />
       <Layout style={{ padding: '0px' }}>
         <Content
           style={{
-            padding: '0px 20px',
             maxWidth: 1300,
             width: '100%',
             margin: '0px auto',
           }}
         >
           <Row gutter={[46, 0]}>
-            <Col span={9}>
+            <Col span={8}>
               <Title
                 style={{
-                  marginLeft: '30px',
                   fontSize: '25px',
                   lineHeight: '41px',
+                  marginLeft: '15px',
+                  marginTop: '12px',
                 }}
               >
                 {newTampletFromOpen ? 'New Behavior Templates' : 'Behavior Templates'}
@@ -233,171 +252,174 @@ export default () => {
                 style={{
                   background: '#F9F9F9',
                   borderRadius: 10,
-                  padding: '30px',
-                  paddingBottom: '20px',
+                  padding: '12px',
                 }}
               >
-                {updateTempId ? (
-                  <UpdateTemplateForm tempId={updateTempId} setUpdateTempId={setUpdateTempId} />
-                ) : (
-                  <div>
-                    {newTampletFromOpen ? (
-                      <TemplateForm
-                        setNewTampletFromOpen={setNewTamplateFromOpen}
-                        setNewTamplate={setNewTamplate}
+                <div>
+                  {dancleTemplateLoading ? (
+                    <div
+                      style={{
+                        height: 440,
+                      }}
+                    >
+                      Loading...
+                    </div>
+                  ) : (
+                    <Scrollbars
+                      style={{
+                        height: 440,
+                      }}
+                      autoHide
+                    >
+                      {dancleTemplateError && 'Opps their is something wrong'}
+
+                      <Search
+                        placeholder="Search by template name"
+                        size="large"
+                        style={{
+                          width: '99.70%',
+                          marginLeft: 'auto',
+                          marginBottom: 10,
+                          marginRight: 'auto',
+                        }}
+                        value={filterTemText}
+                        onChange={e => setFilterTemText(e.target.value)}
                       />
-                    ) : (
-                      <div>
-                        {dancleTemplateLoading ? (
-                          <div
-                            style={{
-                              height: 'calc(100vh - 320px)',
-                              minHeight: 'calc(100vh - 320px)',
-                            }}
-                          >
-                            Loading...
-                          </div>
-                        ) : (
-                          <Scrollbars
-                            style={{
-                              height: 'calc(100vh - 320px)',
-                              minHeight: 'calc(100vh - 320px)',
-                            }}
-                            autoHide
-                          >
-                            {dancleTemplateError && 'Opps their is something wrong'}
 
-                            <Search
-                              placeholder="Search by template name"
-                              size="large"
-                              style={{
-                                width: '99.70%',
-                                marginLeft: 'auto',
-                                marginBottom: 10,
-                                marginRight: 'auto',
-                              }}
-                              value={filterTemText}
-                              onChange={e => setFilterTemText(e.target.value)}
-                            />
-
-                            {tamplateList?.length === 0 && (
-                              <div
-                                style={{
-                                  width: '100%',
-                                  height: '70%',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                }}
-                              >
-                                <Text
-                                  style={{
-                                    fontSize: 16,
-                                    textAlign: 'center',
-                                  }}
-                                >
-                                  There is no behavior template <br />
-                                  Please create one.
-                                </Text>
-                              </div>
-                            )}
-
-                            {tamplateList?.map(({ node }, index) => {
-                              return (
-                                <TamplateCard
-                                  key={node.id}
-                                  id={node.id}
-                                  behaviourName={node.behavior.behaviorName}
-                                  description={node.behaviorDescription}
-                                  status={node.status.statusName}
-                                  envsNum={node.environment.edges.length}
-                                  style={{
-                                    marginTop: index === 0 ? 0 : 20,
-                                  }}
-                                  setSelectTamplate={setSelectTamplate}
-                                  setDeleteTem={setDeleteTem}
-                                  setUpdateTempId={setUpdateTempId}
-                                />
-                              )
-                            })}
-                          </Scrollbars>
-                        )}
-                        <Button
-                          type="primary"
-                          htmlType="submit"
-                          onClick={() => {
-                            setNewTamplateFromOpen(true)
-                          }}
+                      {tamplateList?.length === 0 && (
+                        <div
                           style={{
                             width: '100%',
-                            height: 40,
-                            background: '#0B35B3',
-                            boxShadow:
-                              '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04) !importent',
-                            borderRadius: 8,
-                            fontSize: 17,
-                            fontWeight: 'bold',
-                            marginTop: 10,
+                            height: '70%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
                           }}
                         >
-                          New Template
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </Col>
-            <Col span={15}>
-              <div
-                style={{
-                  marginTop: 25,
-                }}
-              >
-                {selectTamplate && (
-                  <UpdateBehaviour
-                    setNewTamplateFromOpen={setNewTamplateFromOpen}
-                    selectTamplate={selectTamplate}
-                    setNewRecord={setNewRecord}
-                    setSelectTamplate={setSelectTamplate}
-                    setUpdateBehavior={setUpdateBehavior}
-                  />
-                )}
-                {!selectTamplate && (
-                  <div
+                          <Text
+                            style={{
+                              fontSize: 16,
+                              textAlign: 'center',
+                            }}
+                          >
+                            There is no behavior template <br />
+                            Please create one.
+                          </Text>
+                        </div>
+                      )}
+
+                      {tamplateList?.map(({ node }, index) => {
+                        return (
+                          <TamplateCard
+                            key={node.id}
+                            id={node.id}
+                            behaviourName={node.behavior.behaviorName}
+                            description={node.behaviorDescription}
+                            status={node.status.statusName}
+                            envsNum={node.environment.edges.length}
+                            style={{
+                              marginTop: index === 0 ? 0 : 20,
+                            }}
+                            setSelectTamplate={selectRecord}
+                            setDeleteTem={setDeleteTem}
+                            setUpdateTempId={setUpdateTempId}
+                          />
+                        )
+                      })}
+                    </Scrollbars>
+                  )}
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    onClick={() => {
+                      setUpdateTempId(null)
+                      setNewTamplateFromOpen(true)
+                    }}
                     style={{
-                      marginTop: 17,
+                      width: '100%',
+                      height: 40,
+                      background: '#0B35B3',
+                      boxShadow:
+                        '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04) !importent',
+                      borderRadius: 5,
+                      fontSize: 17,
+                      fontWeight: 'bold',
+                      marginTop: 10,
                     }}
                   >
-                    {loading ? (
-                      'Loading...'
-                    ) : (
-                      <>
-                        {error && <pre>{JSON.stringify(error, null, 2)}</pre>}
-                        {data &&
-                          viewBehaviorRecordData &&
-                          viewBehaviorRecordData.map(({ node }, index) => {
-                            return (
-                              <BehaviourCard
-                                key={node.id}
-                                id={node.id}
-                                behaviorName={node.template.behavior.behaviorName}
-                                time={node.duration}
-                                note={node.note}
-                                irt={node.irt}
-                                frequently={node.frequency.edges.length}
-                                style={{ marginTop: index === 0 ? 0 : 20 }}
-                                setDeleteBehaviour={setDeleteBehaviour}
-                              />
-                            )
-                          })}
-                        {data && viewBehaviorRecordData?.length === 0 && (
-                          <Text>Record a behavior</Text>
-                        )}
-                      </>
-                    )}
-                  </div>
-                )}
+                    New Template
+                  </Button>
+                </div>
+              </div>
+            </Col>
+            <Col span={16}>
+              <div
+                style={{
+                  marginTop: 20,
+                }}
+              >
+                <Scrollbars style={{ height: 560 }} autoHide>
+                  {updateTempId ? (
+                    <div style={{ paddingRight: '15px' }}>
+                      <UpdateTemplateForm
+                        tempId={updateTempId}
+                        setUpdateTempId={setUpdateTempId}
+                        closeUpdateDrawer={closeUpdateDrawer}
+                      />
+                    </div>
+                  ) : newTampletFromOpen ? (
+                    <div style={{ paddingRight: '15px' }}>
+                      <TemplateForm
+                        onCreatingTemplate={onCreatingTemplate}
+                        isBehaviorAlreadyExist={checkIsBehaviorAlreadyExist}
+                        cancel={setNewTamplateFromOpen}
+                      />
+                    </div>
+                  ) : (
+                    <div>
+                      {selectTamplate && (
+                        <UpdateBehaviour
+                          setNewTamplateFromOpen={setNewTamplateFromOpen}
+                          selectTamplate={selectTamplate}
+                          setNewRecord={setNewRecord}
+                          setSelectTamplate={setSelectTamplate}
+                          setUpdateBehavior={setUpdateBehavior}
+                        />
+                      )}
+                      {!selectTamplate && (
+                        <div>
+                          {loading ? (
+                            'Loading...'
+                          ) : (
+                            <>
+                              {error && <pre>{JSON.stringify(error, null, 2)}</pre>}
+                              {data &&
+                                viewBehaviorRecordData &&
+                                viewBehaviorRecordData.map(({ node }, index) => {
+                                  return (
+                                    <BehaviourCard
+                                      key={node.id}
+                                      id={node.id}
+                                      behaviorName={node.template.behavior.behaviorName}
+                                      time={node.duration}
+                                      note={node.note}
+                                      irt={node.irt}
+                                      frequently={node.frequency.edges.length}
+                                      style={{ marginTop: index === 0 ? 0 : 20 }}
+                                      setDeleteBehaviour={setDeleteBehaviour}
+                                    />
+                                  )
+                                })}
+                              {data && viewBehaviorRecordData?.length === 0 && (
+                                <Text>Record a behavior</Text>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </Scrollbars>
               </div>
             </Col>
           </Row>

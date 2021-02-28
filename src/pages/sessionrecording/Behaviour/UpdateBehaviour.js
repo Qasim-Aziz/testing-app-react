@@ -178,6 +178,7 @@ const CreateFrom = ({
   }, [updateRecordData])
 
   useEffect(() => {
+    console.log('im in useeffect')
     createRecord({
       variables: {
         templateId: selectTamplate,
@@ -259,7 +260,7 @@ const CreateFrom = ({
               textAlign: 'center',
             }}
           >
-            <Timer id={selectTamplate} ref={timerRef}>
+            {/* <Timer id={selectTamplate} ref={timerRef}>
               {() => {
                 return (
                   <span>
@@ -268,6 +269,30 @@ const CreateFrom = ({
                   </span>
                 )
               }}
+            </Timer> */}
+            <Timer id={selectTamplate} ref={timerRef} startImmediately={false}>
+              {({ start, resume, pause, stop }) => (
+                <div className="timer">
+                  <div style={{ marginBottom: '20px' }}>
+                    <span className="timeText">
+                      <Timer.Minutes />
+                    </span>
+                    <span className="labelText">min&nbsp;:&nbsp;</span>
+                    <span className="timeText">
+                      <Timer.Seconds />
+                    </span>
+                    <span className="labelText"> sec</span>
+                  </div>
+                  <div>
+                    <Button icon="play-circle" onClick={start}>
+                      Start
+                    </Button>
+                    <Button icon="pause-circle" onClick={pause} style={{ marginLeft: '20px' }}>
+                      Pause
+                    </Button>
+                  </div>
+                </div>
+              )}
             </Timer>
           </span>
           <div className={classes.horizontalView}>

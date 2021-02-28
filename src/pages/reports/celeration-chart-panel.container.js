@@ -1,64 +1,35 @@
-/* eslint-disable react/jsx-indent */
-/* eslint-disable react/jsx-indent-props */
+import { PlusOutlined } from '@ant-design/icons'
+import { Button, Col, DatePicker, Drawer, Icon, Row, Table, Badge } from 'antd'
+import moment from 'moment'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import moment from 'moment'
-
-import { Row, Col, Table, Drawer, Button, Icon, DatePicker } from 'antd'
-import { FilterOutlined, PlusOutlined } from '@ant-design/icons'
-
+import AddCelerationChart from '../../components/CelerationChart/add-new-chart.component'
+import CelerationGraph from '../../components/CelerationChart/celeration-graph.component'
+import UpdateCelerationChart from '../../components/CelerationChart/update-chart.component'
 import {
+  addCelerationChart,
+  addPoint,
   fetchAllCelerationCategories,
   fetchAllCelerationCharts,
-  onCelerationChartChange,
-  addCelerationChart,
-  onSelectChart,
-  updateCelerationChart,
-  addPoint,
-  updatePoint,
-  onRecordingParametersChange,
-  resetCelerationChart,
-  openAddDrawer,
-  onDisplaySelectedChart,
   onBehaviorTypesChange,
+  onCelerationChartChange,
+  onDisplaySelectedChart,
+  onRecordingParametersChange,
+  onSelectChart,
+  openAddDrawer,
+  resetCelerationChart,
+  updateCelerationChart,
+  updatePoint,
 } from '../../redux/celerationchart/panel.action'
-
-import AddCelerationChart from '../../components/CelerationChart/add-new-chart.component'
-import UpdateCelerationChart from '../../components/CelerationChart/update-chart.component'
-import CelerationGraph from '../../components/CelerationChart/celeration-graph.component'
+import './celerationReport.scss'
 
 const { RangePicker } = DatePicker
-
-const filterCardStyle = {
-  background: '#F1F1F1',
-  padding: 10,
-  margin: 0,
-  height: 50,
-  overflow: 'hidden',
-  backgroundColor: 'rgb(241, 241, 241)',
-}
-
-
-
-const cardStyle = {
-  background: '#F9F9F9',
-  height: 500,
-  overflow: 'auto',
-}
-
-const antcol1 = {
-  display: 'block',
-  width: '6%',
-}
-
-
 class CelerationChartPanel extends Component {
   constructor(props) {
     super(props)
-    const { celerationCharts } = this.props
     this.state = {
-      range: [moment().startOf('week'), moment().endOf('week')],
-      charts: celerationCharts,
+      range: [moment().subtract(6, 'd'), moment()],
+      editingChartId: null,
     }
   }
 
@@ -81,7 +52,7 @@ class CelerationChartPanel extends Component {
   }
 
   render() {
-    const { range, charts } = this.state
+    const { range, editingChartId } = this.state
     const iconStyle = {
       paddingRight: '20px',
     }
@@ -93,16 +64,15 @@ class CelerationChartPanel extends Component {
     }
 
     const {
-      studentName,
       celerationCategories,
       celerationCharts,
       celerationChartIndex,
       celerationChart,
       drawer,
       behaviorTypesSelected,
+      isCelerationChartLoading,
     } = this.props
     const {
-      showDrawerFilter,
       onCelerationChartChangeAction,
       addCelerationChartAction,
       onSelectChartAction,
@@ -149,18 +119,22 @@ class CelerationChartPanel extends Component {
         key: 'pointsTypeLables',
         render: pointsTypeLables => (
           <>
-            <div>{pointsTypeLables.type1}</div>
-            <div>{pointsTypeLables.type2}</div>
-            <div>{pointsTypeLables.type3}</div>
+            <Badge
+              count={pointsTypeLables.type1}
+              style={{ marginRight: '5px', background: '#52c41a' }}
+            />
+            <Badge count={pointsTypeLables.type2} style={{ marginRight: '5px' }} />
+            <Badge count={pointsTypeLables.type3} style={{ background: '#faad14' }} />
           </>
         ),
       },
       {
         title: 'Operation',
         key: 'operation',
-        render: (text, record, index) => (
+        align: 'center',
+        render: (text, record) => (
           <div>
-            <Icon type="edit" onClick={() => onSelectChartAction(record)} style={iconStyle} />
+            <Icon type="edit" onClick={() => openEditDrawer(record)} style={iconStyle} />
             <Icon
               type="line-chart"
               onClick={() => onDisplaySelectedChartAction(record)}
@@ -185,106 +159,103 @@ class CelerationChartPanel extends Component {
       )
     }
 
-    return (
-      <Row>
-        <Col sm={24}>
-          {celerationChartIndex === -1 ? (
-            <Row>
-              <Col span={26}>
-                <div style={filterCardStyle}>
+    const openEditDrawer = record => {
+      this.setState({
+        editingChartId: record.id,
+      })
+      onSelectChartAction(record)
+    }
 
-                  <Row>
-                    <Col span={1} style={antcol1}>
-                      <span style={{ fontSize: '15px', color: '#000' }}>Date :</span>
-                    </Col>
-                    <Col span={4}>
-                      <RangePicker
-                        value={range}
-                        onChange={setRange}
-                        size="default"
-                        style={{
-                          marginLeft: 'auto',
-                          width: 250,
-                          marginRight: 31,
-                        }}
-                      />
-                    </Col>
-                  </Row>
-                </div>
+    const handleBack = () => {
+      this.setState({
+        editingChartId: null,
+      })
+      resetCelerationChartAction()
+    }
+
+    return (
+      <div className="celerationReport">
+        {celerationChartIndex === -1 || editingChartId !== null ? (
+          // If any chart is not selected & not in edit mode then
+          <>
+            <Row className="filterCard">
+              <Col span={1}>
+                <span className="label">Date:</span>
+              </Col>
+              <Col span={4}>
+                <RangePicker
+                  value={range}
+                  onChange={setRange}
+                  size="default"
+                  className="datePaicker"
+                />
               </Col>
             </Row>
-          ) : null}
-          <Row>
-            <Col span={24}>
-              <div style={{padding: 10}}>
-                {celerationChartIndex === -1 ? (
-                  <Row>
-                    <Row type="flex" justify="space-between">
-                      <Col>
-                        <h1>Charts</h1>
-                      </Col>
-                      <Col>
-                        <Button type="primary" htmlType="button" onClick={openAddDrawerAction}>
-                          <PlusOutlined />
-                          Add New Chart
-                        </Button>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Table dataSource={getCharts(celerationCharts)} columns={dataColumns} />
-                    </Row>
-                  </Row>
-                ) : (
-                    <div>
-                      <CelerationGraph
-                        chart={celerationChart}
-                        addPoint={addPointAction}
-                        updatePoint={updatePointAction}
-                        onCelerationChartChange={onCelerationChartChangeAction}
-                        updateCelerationChart={updateCelerationChartAction}
-                        behaviorTypesSelected={behaviorTypesSelected}
-                        onBehaviorTypesChange={onBehaviorTypesChangeAction}
-                        resetCelerationChartAction={resetCelerationChartAction}
-                      />
-                    </div>
-                  )}
-                <Drawer
-                  placement="right"
-                  width="40%"
-                  closable
-                  onClose={resetCelerationChartAction}
-                  visible={drawer}
-                  destroyOnClose
-                >
-                  {celerationChartIndex !== -1 ? (
-                    <div>
-                      <h1>{celerationChart.title}</h1>
-                      <UpdateCelerationChart
-                        celerationCategories={celerationCategories}
-                        chart={celerationChart}
-                        onCelerationChartChange={onCelerationChartChangeAction}
-                        updateCelerationChart={updateCelerationChartAction}
-                        onRecordingParametersChange={onRecordingParametersChangeAction}
-                      />
-                    </div>
-                  ) : (
-                      <>
-                        <h1>Create a New Chart</h1>
-                        <AddCelerationChart
-                          celerationCategories={celerationCategories}
-                          chart={celerationChart}
-                          onCelerationChartChange={onCelerationChartChangeAction}
-                          addCelerationChart={addCelerationChartAction}
-                          onRecordingParametersChange={onRecordingParametersChangeAction}
-                        />
-                      </>
-                    )}
-                </Drawer>
-              </div>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
+            <Row className="charts">
+              <Row type="flex" justify="space-between">
+                <Col>
+                  <h3>Charts</h3>
+                </Col>
+                <Col>
+                  <Button type="primary" htmlType="button" onClick={openAddDrawerAction}>
+                    <PlusOutlined />
+                    Add New Chart
+                  </Button>
+                </Col>
+              </Row>
+              <Table
+                rowKey="id"
+                style={{ paddingTop: '5px' }}
+                dataSource={getCharts(celerationCharts)}
+                columns={dataColumns}
+                loading={isCelerationChartLoading}
+                bordered
+                size="small"
+              />
+            </Row>
+          </>
+        ) : (
+          // If any chart is selected then
+          <CelerationGraph
+            chart={celerationChart}
+            addPoint={addPointAction}
+            updatePoint={updatePointAction}
+            onCelerationChartChange={onCelerationChartChangeAction}
+            updateCelerationChart={updateCelerationChartAction}
+            behaviorTypesSelected={behaviorTypesSelected}
+            onBehaviorTypesChange={onBehaviorTypesChangeAction}
+            resetCelerationChartAction={handleBack}
+          />
+        )}
+
+        <Drawer
+          placement="right"
+          width="40%"
+          title={editingChartId ? celerationChart.title : 'Create a New Chart'}
+          closable
+          onClose={handleBack}
+          visible={drawer}
+          destroyOnClose
+        >
+          {editingChartId ? (
+            <UpdateCelerationChart
+              celerationCategories={celerationCategories}
+              chart={celerationChart}
+              onCelerationChartChange={onCelerationChartChangeAction}
+              updateCelerationChart={updateCelerationChartAction}
+              onRecordingParametersChange={onRecordingParametersChangeAction}
+            />
+          ) : (
+            <AddCelerationChart
+              celerationCategories={celerationCategories}
+              chart={celerationChart}
+              onCelerationChartChange={onCelerationChartChangeAction}
+              addCelerationChart={addCelerationChartAction}
+              onRecordingParametersChange={onRecordingParametersChangeAction}
+            />
+          )}
+        </Drawer>
+      </div>
     )
   }
 }
@@ -292,6 +263,7 @@ class CelerationChartPanel extends Component {
 const mapStateToProps = state => ({
   celerationCategories: state.celerationChartReducer.celerationCategories,
   celerationChart: state.celerationChartReducer.celerationChart,
+  isCelerationChartLoading: state.celerationChartReducer.loading,
   celerationCharts: state.celerationChartReducer.celerationCharts,
   celerationChartIndex: state.celerationChartReducer.celerationChartIndex,
   drawer: state.celerationChartReducer.drawer,

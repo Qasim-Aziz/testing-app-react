@@ -1,18 +1,119 @@
 /* table */
-.ant-table {
-  font-size: 11px;
-}
-/* row data */
-.ant-table-tbody > tr > td {
-  height: 5px;
-  padding: 4px;
-  color: rgba(0, 0, 0, 0.87);
+
+.peak-block-report {
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td {
+    padding: 16px 8px;
+    overflow-wrap: break-word;
+  }
 }
 
-.ant-table-thead > tr > th {
-  height: 5px;
-  padding: 4px;
-  font-size: 12px;
-  color: rgba(0, 0, 0, 0.87);
-  font-weight: bold;
+.mand-table {
+  .ant-table {
+    font-size: 12px;
+  }
+  .ant-table-small
+    > .ant-table-content
+    > .ant-table-fixed-left
+    > .ant-table-body-outer
+    > .ant-table-body-inner
+    > table
+    > .ant-table-thead
+    > tr
+    > th {
+    background-color: #fafafa;
+  }
+
+  .ant-table-small
+    > .ant-table-content
+    > .ant-table-scroll
+    > .ant-table-body
+    > table
+    > .ant-table-thead
+    > tr
+    > th {
+    background-color: #fafafa;
+  }
+
+  .ant-table-thead > tr > th {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.87);
+    font-weight: bold;
+  }
+
+  /* row data */
+  .ant-table-tbody > tr > td {
+    color: rgba(0, 0, 0, 0.87);
+  }
+}
+
+.goal-table {
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td {
+    padding: 16px 8px;
+    overflow-wrap: break-word;
+  }
+}
+
+.session-table {
+  .ant-table {
+    font-size: 12px;
+  }
+
+  .ant-table-body {
+    overflow-y: hidden;
+  }
+
+  .ant-table-thead > tr > th {
+    padding: 5px 5px;
+    text-align: center;
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.87);
+    font-weight: bold;
+  }
+  /* row data */
+  .ant-table-tbody > tr > td {
+    padding: 4px 5px;
+    text-align: center;
+    background-color: white;
+    color: rgba(0, 0, 0, 0.87);
+  }
+}
+
+.response-rate-table {
+  .ant-table-middle
+    > .ant-table-content
+    > .ant-table-fixed-left
+    > .ant-table-body-outer
+    > .ant-table-body-inner
+    > table
+    > .ant-table-tbody
+    > tr
+    > td {
+    max-height: 45px;
+    padding: 0 8px;
+  }
+
+  .ant-table {
+    font-size: 12px;
+  }
+
+  .ant-table-thead > tr > th {
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.87);
+    font-weight: bold;
+  }
+
+  .ant-table-tbody > tr.ant-table-row-hover:not(.ant-table-expanded-row) > td {
+    background: unset; //Change the existing color to `unset`
+  }
+}
+
+.peak-block-detail-table {
+  .ant-table,
+  .ant-table-middle,
+  .ant-table-bordered,
+  .ant-table-scroll-position-left {
+    font-size: 13px !important;
+  }
 }

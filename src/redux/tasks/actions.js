@@ -8,6 +8,7 @@ const actions = {
   APPEND_TASKS_LIST: 'tasks/APPEND_TASKS_LIST',
   GET_TASKS_DROPDOWNS: 'tasks/GET_TASKS_DROPDOWNS',
   UPDATE_TASK_STATUS: 'tasks/UPDATE_TASK_STATUS',
+  UPDATE_TASK_COUNTER: 'tasks/UPDATE_TASK_COUNTER',
 }
 
 export default actions

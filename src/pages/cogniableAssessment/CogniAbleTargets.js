@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from 'react'
-import { useMutation } from 'react-apollo'
-import { Button, Drawer } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
-import { GET_TARGET } from './query'
-import CardImg from '../PEAK/targetCard.jpg'
-import TargetAllocation from './TargetAllocation'
+import { Button, Col, Drawer, Row } from 'antd'
+import React, { useEffect, useState } from 'react'
+import { useMutation } from 'react-apollo'
 import TargetAllocationNew from '../../components/TargetAllocationAssessments/TargetAllocation'
+import { GET_TARGET } from './query'
 
 export default ({ assessmentId }) => {
   let stdId = ''
@@ -53,7 +51,7 @@ export default ({ assessmentId }) => {
       style={{
         height: 'calc(100vh - 110px)',
         overflowY: 'scroll',
-        padding: 15,
+        padding: 10,
         backgroundColor: 'rgb(249, 249, 249)',
         borderRadius: 10,
       }}
@@ -61,77 +59,47 @@ export default ({ assessmentId }) => {
       {data?.suggestCogniableTargets.targets.length === 0 && (
         <h4 style={{ textAlign: 'center', marginTop: 60 }}>Their is no targets</h4>
       )}
-      {targetSuggation?.map(node => {
-        return (
-          <div
-            style={{
-              maxWidth: '100%',
-              border: '1px solid #e4e9f0',
-              borderRadius: 10,
-              marginBottom: 12,
-              position: 'relative',
-              background: '#fff',
-              padding: '20px 5px 60px 20px',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                fontSize: 18,
-              }}
-            >
-              <img
-                src={CardImg}
-                style={{ width: 80, height: 64, marginRight: 12, borderRadius: 10 }}
-                alt=""
-              />
-              {node.targetMain.targetName}
-            </div>
+      {targetSuggation?.map(node => (
+        <Row
+          key={node.id}
+          style={{
+            border: '1px solid #e4e9f0',
+            borderRadius: 10,
+            background: '#fff',
+            padding: '10px 20px 10px 10px',
+            margin: '8px 0px',
+            fontSize: '18px',
+          }}
+        >
+          <Col span="22">{node.targetMain.targetName}</Col>
+          <Col span="2">
             <Button
-              type="link"
-              style={{
-                background: '#26e768',
-                width: '45px',
-                height: '43px',
-                borderBottomRightRadius: 10,
-                position: 'absolute',
-                bottom: 0,
-                right: 0,
-                display: 'flex',
-                justifyContent: 'center',
-              }}
+              type="primary"
               onClick={() => {
-                setSelectedTarget({"node":node})
+                setSelectedTarget({ node })
                 setTargetName(node.targetMain.targetName)
                 setSelectTarget(node.id)
                 setTargetInstr(node.targetInstr)
                 setTargetVideo(node.video)
               }}
             >
-              <PlusOutlined style={{ fontSize: 24, color: '#fff', marginTop: 8 }} />
+              <PlusOutlined style={{ fontSize: 20, color: '#fff', marginTop: 5 }} />
             </Button>
-          </div>
-        )
-      })}
+          </Col>
+        </Row>
+      ))}
 
       <Drawer
         visible={selectTarget}
         onClose={() => setSelectTarget(null)}
         title="Target Allocation"
-        width={750}
+        width={950}
       >
         <div
           style={{
             padding: '0px 23px',
           }}
         >
-          {/* <TargetAllocation
-            selectedTargetId={selectTarget}
-            targetName={targetName}
-            targetVideo={targetVideo}
-            targetInstr={targetInstr}
-            setOpen={setSelectTarget}
-          /> */}
           <TargetAllocationNew
             key={Math.random()}
             studentId={selectedStudent}
