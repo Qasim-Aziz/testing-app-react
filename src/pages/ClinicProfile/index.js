@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState, useEffect } from 'react'
 import { Layout, Dropdown, Button, Menu, Modal, Switch, notification, Tabs } from 'antd'
 import gql from 'graphql-tag'

@@ -15,7 +15,18 @@
 /* eslint-disable import/no-extraneous-dependencies */
 
 import React from 'react'
-import { Button, Switch, Form, Input, Icon, notification, Row, Col, Typography, Popconfirm } from 'antd'
+import {
+  Button,
+  Switch,
+  Form,
+  Input,
+  Icon,
+  notification,
+  Row,
+  Col,
+  Typography,
+  Popconfirm,
+} from 'antd'
 import gql from 'graphql-tag'
 import apolloClient from '../../apollo/config'
 
@@ -54,54 +65,55 @@ class ChangePasswordForm extends React.Component {
       domains: [],
       targetAreas: [],
       targets: [],
-
     }
   }
 
   componentWillMount() {
     this.setState({
-      loading: true
+      loading: true,
     })
     apolloClient
       .query({
-        query: gql`{
-        programArea(isActive:false){
-          edges{
-            node{
-              id,
-              name
+        query: gql`
+          {
+            programArea(isActive: false) {
+              edges {
+                node {
+                  id
+                  name
+                }
+              }
             }
-          }
-        }
-        domain(isActive:false){
-          edges{
-            node{
-              id
-              domain
+            domain(isActive: false) {
+              edges {
+                node {
+                  id
+                  domain
+                }
+              }
             }
-          }
-        }
-        targetArea(isActive:false) {
-          edges {
-            node {
-              id
-              Area
+            targetArea(isActive: false) {
+              edges {
+                node {
+                  id
+                  Area
+                }
+              }
             }
-          }
-        }
-        target(isActive: false){
-          edges{
-            node{
-              id,              
-              targetMain{
-                  id,
-                  targetName
+            target(isActive: false) {
+              edges {
+                node {
+                  id
+                  targetMain {
+                    id
+                    targetName
+                  }
+                }
               }
             }
           }
-        }
-      }`,
-        fetchPolicy: 'network-only'
+        `,
+        fetchPolicy: 'network-only',
       })
       .then(result => {
         console.log(result)
@@ -110,7 +122,6 @@ class ChangePasswordForm extends React.Component {
           domains: result.data.domain.edges,
           targetAreas: result.data.targetArea.edges,
           targets: result.data.target.edges,
-
         })
       })
       .catch(error => {
@@ -123,35 +134,31 @@ class ChangePasswordForm extends React.Component {
       })
 
     this.setState({
-      loading: false
+      loading: false,
     })
   }
 
   activateProgramArea = id => {
     const { programAreas } = this.state
-    apolloClient.mutate({
-      mutation: gql`mutation ActivateProgramArea(
-        $objectId: ID!
-      ){
-        disableProgramArea(
-          input:{
-            programArea: $objectId
-            isActive: true
+    apolloClient
+      .mutate({
+        mutation: gql`
+          mutation ActivateProgramArea($objectId: ID!) {
+            disableProgramArea(input: { programArea: $objectId, isActive: true }) {
+              status
+              msg
+            }
           }
-        ){
-          status
-          msg
-        }
-      }`,
-      variables: {
-        objectId: id
-      }
-    })
+        `,
+        variables: {
+          objectId: id,
+        },
+      })
       .then(result => {
         if (result.data.disableProgramArea.status) {
           const newList = programAreas.filter(item => item.node.id !== id)
           this.setState({
-            programAreas: newList
+            programAreas: newList,
           })
 
           notification.success({
@@ -169,34 +176,29 @@ class ChangePasswordForm extends React.Component {
           })
         }
       })
-
   }
 
   activateDomain = id => {
     const { domains } = this.state
-    apolloClient.mutate({
-      mutation: gql`mutation ActivateDomain(
-        $objectId: ID!
-      ){
-        disableDomain(
-          input:{
-            pk: $objectId
-            isActive:true
+    apolloClient
+      .mutate({
+        mutation: gql`
+          mutation ActivateDomain($objectId: ID!) {
+            disableDomain(input: { pk: $objectId, isActive: true }) {
+              status
+              msg
+            }
           }
-        ){
-          status
-          msg
-        }
-      }`,
-      variables: {
-        objectId: id
-      }
-    })
+        `,
+        variables: {
+          objectId: id,
+        },
+      })
       .then(result => {
         if (result.data.disableDomain.status) {
           const newList = domains.filter(item => item.node.id !== id)
           this.setState({
-            domains: newList
+            domains: newList,
           })
 
           notification.success({
@@ -218,29 +220,25 @@ class ChangePasswordForm extends React.Component {
 
   activateTargetArea = id => {
     const { targetAreas } = this.state
-    apolloClient.mutate({
-      mutation: gql`mutation ActivateTargetArea(
-        $objectId: ID!
-      ){
-        disableTargetArea(
-          input:{
-            pk: $objectId
-            isActive:true
+    apolloClient
+      .mutate({
+        mutation: gql`
+          mutation ActivateTargetArea($objectId: ID!) {
+            disableTargetArea(input: { pk: $objectId, isActive: true }) {
+              status
+              msg
+            }
           }
-        ){
-          status
-          msg
-        }
-      }`,
-      variables: {
-        objectId: id
-      }
-    })
+        `,
+        variables: {
+          objectId: id,
+        },
+      })
       .then(result => {
         if (result.data.disableTargetArea.status) {
           const newList = targetAreas.filter(item => item.node.id !== id)
           this.setState({
-            targetAreas: newList
+            targetAreas: newList,
           })
 
           notification.success({
@@ -262,29 +260,25 @@ class ChangePasswordForm extends React.Component {
 
   activateTarget = id => {
     const { targets } = this.state
-    apolloClient.mutate({
-      mutation: gql`mutation ActivateTargetArea(
-        $objectId: ID!
-      ){
-        disableTarget(
-          input:{
-            pk: $objectId
-            isActive:true
+    apolloClient
+      .mutate({
+        mutation: gql`
+          mutation ActivateTargetArea($objectId: ID!) {
+            disableTarget(input: { pk: $objectId, isActive: true }) {
+              status
+              msg
+            }
           }
-        ){
-          status
-          msg
-        }
-      }`,
-      variables: {
-        objectId: id
-      }
-    })
+        `,
+        variables: {
+          objectId: id,
+        },
+      })
       .then(result => {
         if (result.data.disableTarget.status) {
           const newList = targets.filter(item => item.node.id !== id)
           this.setState({
-            targets: newList
+            targets: newList,
           })
 
           notification.success({
@@ -304,8 +298,6 @@ class ChangePasswordForm extends React.Component {
       })
   }
 
-
-
   render() {
     const {
       form: { getFieldDecorator },
@@ -318,7 +310,12 @@ class ChangePasswordForm extends React.Component {
 
     const divStyle = { height: 600, overflow: 'auto', backgroundColor: '#f9f9f9' }
     const childDivStyle = { padding: 4 }
-    const childChildDivStyle = { border: '1px solid black', backgroundColor: 'white', borderRadius: 4, padding: 4 }
+    const childChildDivStyle = {
+      border: '1px solid black',
+      backgroundColor: 'white',
+      borderRadius: 4,
+      padding: 4,
+    }
 
     return (
       <div style={{ paddingTop: 30 }}>
@@ -326,7 +323,7 @@ class ChangePasswordForm extends React.Component {
           <Col span={6}>
             <Title style={{ fontSize: 18, lineHeight: '21px' }}>Program Areas</Title>
             <div style={divStyle}>
-              {programAreas.map(item =>
+              {programAreas.map(item => (
                 <div style={childDivStyle}>
                   <div className="d-flex flex-wrap align-items-center" style={childChildDivStyle}>
                     <div>
@@ -346,13 +343,13 @@ class ChangePasswordForm extends React.Component {
                     </div>
                   </div>
                 </div>
-              )}
+              ))}
             </div>
           </Col>
           <Col span={6}>
             <Title style={{ fontSize: 18, lineHeight: '21px' }}>Domains</Title>
             <div style={divStyle}>
-              {domains.map(item =>
+              {domains.map(item => (
                 <div style={childDivStyle}>
                   <div className="d-flex flex-wrap align-items-center" style={childChildDivStyle}>
                     <div className="mr-auto">
@@ -372,13 +369,13 @@ class ChangePasswordForm extends React.Component {
                     </div>
                   </div>
                 </div>
-              )}
+              ))}
             </div>
           </Col>
           <Col span={6}>
             <Title style={{ fontSize: 18, lineHeight: '21px' }}>Target Areas</Title>
             <div style={divStyle}>
-              {targetAreas.map(item =>
+              {targetAreas.map(item => (
                 <div style={childDivStyle}>
                   <div className="d-flex flex-wrap align-items-center" style={childChildDivStyle}>
                     <div className="mr-auto">
@@ -398,17 +395,19 @@ class ChangePasswordForm extends React.Component {
                     </div>
                   </div>
                 </div>
-              )}
+              ))}
             </div>
           </Col>
           <Col span={6}>
             <Title style={{ fontSize: 18, lineHeight: '21px' }}>Targets</Title>
             <div style={divStyle}>
-              {targets.map(item =>
+              {targets.map(item => (
                 <div style={childDivStyle}>
                   <div className="d-flex flex-wrap align-items-center" style={childChildDivStyle}>
                     <div className="mr-auto">
-                      <p className="text-uppercase font-weight-bold mb-1">{item.node.targetMain.targetName}</p>
+                      <p className="text-uppercase font-weight-bold mb-1">
+                        {item.node.targetMain.targetName}
+                      </p>
                       <p className="mb-0">
                         <Popconfirm
                           // style={{ float: 'right', marginBottom: '10px' }}
@@ -424,7 +423,7 @@ class ChangePasswordForm extends React.Component {
                     </div>
                   </div>
                 </div>
-              )}
+              ))}
             </div>
           </Col>
         </Row>

@@ -3,7 +3,8 @@
 /* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable no-unneeded-ternary */
+/* eslint-disable */
+
 import React, { useState, useEffect } from 'react'
 import { Table, Drawer, Tag, Button, Input, Form, notification } from 'antd'
 import { useQuery, useMutation } from '@apollo/react-hooks'
