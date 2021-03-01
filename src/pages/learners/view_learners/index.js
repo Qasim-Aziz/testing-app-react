@@ -58,10 +58,7 @@ import CreateLearner from '../createLearner'
 import client from '../../../apollo/config'
 import './style.scss'
 
-const { Panel } = Collapse
 const { Meta } = Card
-const { Search } = Input
-const { RangePicker } = DatePicker
 
 const customStyles = {
   header: {
@@ -213,8 +210,7 @@ class LearnerTable extends React.Component {
     const { dispatch } = this.props
     // setting student id to local storage for further operations
     localStorage.setItem('studentId', JSON.stringify(e.id))
-    console.log('asd')
-    console.log(e)
+
     dispatch({
       type: 'learners/SET_STATE',
       payload: {
@@ -222,9 +218,9 @@ class LearnerTable extends React.Component {
         isUserProfile: true,
       },
     })
-    // this.setState({
-    //   divShow: true,
-    // })
+    this.setState({
+      divShow: true,
+    })
     this.showEditDrawer()
   }
 
@@ -818,8 +814,6 @@ class LearnerTable extends React.Component {
         </Menu.Item>
       </Menu>
     )
-
-    console.log(filteredList, 'filtereList ')
 
     return (
       <Authorize roles={['school_admin', 'therapist']} redirect to="/dashboard/beta">

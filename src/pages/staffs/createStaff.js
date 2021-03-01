@@ -96,12 +96,11 @@ class StaffBasicInfo extends React.Component {
     data.append('resume', this.state.selectedFile)
     data.append('tags', this.state.tagArray)
     form.validateFields((error, values) => {
-      console.log('data', data)
       const newValues = {
         ...values,
         tags: this.state.tagArray,
       }
-      console.log('values', newValues)
+
       if (!error) {
         dispatch({
           type: 'staffs/CREATE_STAFF',
@@ -158,7 +157,6 @@ class StaffBasicInfo extends React.Component {
         </Form.Item>
 
         <Form.Item label="Tags" style={itemStyle}>
-          {console.log('TAG ARRAY', this.state.tagArray)}
           {form.getFieldDecorator('tags')(
             <AntdTag
               style={itemStyle}

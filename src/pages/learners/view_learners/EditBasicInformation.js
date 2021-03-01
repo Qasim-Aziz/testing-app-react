@@ -146,7 +146,6 @@ class EditBasicInformation extends React.Component {
           .post('https://application.cogniable.us/apis/student-docs/', data, { headers: headers })
           .then(res => {
             // then print response status
-            console.log(res.statusText)
             values = { ...values, tags: this.state.tagArray }
             message.success('Upload Successfully.')
             dispatch({
@@ -195,7 +194,6 @@ class EditBasicInformation extends React.Component {
         </Form.Item>
 
         <Form.Item label="Tags" style={itemStyle}>
-          {console.log('TAG ARRAY', this.state.tagArray)}
           {form.getFieldDecorator('tags')(
             <AntdTag
               style={itemStyle}

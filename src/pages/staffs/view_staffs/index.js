@@ -57,7 +57,6 @@ import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import JsPDF from 'jspdf'
 import 'jspdf-autotable'
-import Highlighter from 'react-highlight-words'
 import { Scrollbars } from 'react-custom-scrollbars'
 import { FilterCard } from '../../../components/FilterCard/FilterTable'
 import EditStaffBasicInfo from './EditStaffBasicInfo'
@@ -250,7 +249,6 @@ class StaffTable extends React.Component {
       dispatch,
       staffs: { StaffProfile },
     } = this.props
-    console.log(StaffProfile.id, checked)
 
     dispatch({
       type: 'staffs/STAFF_ACTIVE_INACTIVE',

@@ -19,9 +19,7 @@ class EditableTagGroup extends React.Component {
 
   handleClose = removedTag => {
     const { changeTagsHandler, tagArray } = this.props
-    console.log(tagArray)
     const Tags = tagArray?.filter(tag => tag !== removedTag)
-    console.log(Tags)
     this.setState({ tags: Tags })
     changeTagsHandler(Tags)
   }
@@ -39,8 +37,6 @@ class EditableTagGroup extends React.Component {
     const { inputValue } = this.state
     let tags = this.state.tags ? this.state.tags : []
 
-    console.log(tags, inputValue, ' handle INputinput 1 ')
-
     if (inputValue) {
       if (tags.length > 0 && tagArray?.length > 0 && tags?.indexOf(inputValue) === -1) {
         tags = [...tagArray, inputValue]
@@ -52,8 +48,6 @@ class EditableTagGroup extends React.Component {
     } else {
       tags = tagArray
     }
-
-    console.log(tags, inputValue, ' handle INputinput 2')
 
     this.setState({
       tags,
@@ -68,7 +62,6 @@ class EditableTagGroup extends React.Component {
   }
 
   handleEditInputConfirm = () => {
-    console.log('handleEdit Input')
     const { changeTagsHandler, tagArray } = this.props
     this.setState(({ tags, editInputIndex, editInputValue }) => {
       const newTags = [...tagArray]
@@ -93,8 +86,6 @@ class EditableTagGroup extends React.Component {
   render() {
     const { tags, inputVisible, inputValue, editInputIndex, editInputValue } = this.state
     const { tagArray } = this.props
-    console.log(this.props.defaultVal, tags, 'props')
-    console.log(this.state)
     return (
       <>
         <div

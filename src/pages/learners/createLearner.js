@@ -75,14 +75,13 @@ class BasicInformationForm extends React.Component {
     form.validateFields((error, values) => {
       if (!error) {
         console.log(error, values)
-        // values = { ...values, tags: this.state.tagArray }
-        // dispatch({
-        //   type: 'learners/CREATE_LEARNER',
-        //   payload: {
-        //     values: values,
-        //     data: data,
-        //   },
-        // })
+        dispatch({
+          type: 'learners/CREATE_LEARNER',
+          payload: {
+            values: values,
+            data: data,
+          },
+        })
         form.resetFields()
       }
     })
@@ -124,7 +123,6 @@ class BasicInformationForm extends React.Component {
         </Form.Item>
 
         <Form.Item label="Tags" style={itemStyle}>
-          {console.log('TAG ARRAY', this.state.tagArray)}
           {form.getFieldDecorator('tags')(
             <AntdTag
               style={itemStyle}

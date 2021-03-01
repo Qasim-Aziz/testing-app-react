@@ -6,25 +6,12 @@
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable object-shorthand */
 import React from 'react'
-import {
-  Form,
-  Input,
-  Button,
-  Select,
-  DatePicker,
-  Divider,
-  Tag,
-  Checkbox,
-  Icon,
-  message,
-} from 'antd'
+import { Form, Input, Button, Select, DatePicker, Divider, Tag, message } from 'antd'
 import moment from 'moment'
 import { connect } from 'react-redux'
 import axios from 'axios'
 import AntdTag from '../antdTag'
 
-const { TextArea } = Input
-const { Option } = Select
 const layout = {
   labelCol: {
     span: 6,
@@ -133,9 +120,7 @@ class EditBasicInformation extends React.Component {
           .post('https://application.cogniable.us/apis/staff-docs/', data, { headers: headers })
           .then(res => {
             // then print response status
-            console.log(res.statusText)
             values = { ...values, tags: this.state.tagArray }
-            console.log('values in edit', values)
             message.success('Upload Successfully.')
             dispatch({
               type: 'staffs/EDIT_STAFF',
@@ -166,10 +151,10 @@ class EditBasicInformation extends React.Component {
     })
   }
 
-  // onReset = () => {
-  //   const { form, CloseDrawer } = this.props
-  //   form.resetFields()
-  // }
+  onReset = () => {
+    const { form, CloseDrawer } = this.props
+    form.resetFields()
+  }
 
   render() {
     const itemStyle = { marginBottom: '0', color: 'black', fontWeight: 'bold' }
@@ -190,7 +175,6 @@ class EditBasicInformation extends React.Component {
         </Form.Item>
 
         <Form.Item label="Tags" style={itemStyle}>
-          {console.log('TAG ARRAY', defaultTags, this.state.tagArray)}
           {form.getFieldDecorator('tags')(
             <AntdTag
               style={itemStyle}
