@@ -13,9 +13,6 @@ import { GET_VIDEO_LIVERY, LIBERARY_DETAILS, CLINIC_QUERY } from './query'
 import './style.scss'
 
 
-
-
-
 const { Title, Text } = Typography
 
 export default () => {
