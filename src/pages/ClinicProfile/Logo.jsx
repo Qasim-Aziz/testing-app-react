@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import {Upload, message, Button, Form} from 'antd'
+import { Upload, message, Button, Form } from 'antd'
 import { UploadOutlined, LoadingOutlined, PlusOutlined } from '@ant-design/icons'
 import styles from './clinicalProfile.module.scss'
 
@@ -51,7 +51,7 @@ const Logo = () => {
   )
 
   const saveLogo = () => {
-    console.log("saveLogo==>");
+    console.log('saveLogo==>')
   }
 
   return (

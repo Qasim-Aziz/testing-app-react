@@ -1,10 +1,10 @@
-import React, {useEffect, useRef} from 'react'
-import {Button, Form, Input, Select} from "antd";
+import React, { useEffect, useRef } from 'react'
+import { Button, Form, Input, Select } from 'antd'
 import styles from './clinicalProfile.module.scss'
 
-const InvoicingCurrencyForm = (props) => {
+const InvoicingCurrencyForm = props => {
   const { form } = props
-  const { Option } = Select;
+  const { Option } = Select
   const formRef = useRef(null)
 
   console.log('form==?', form)
@@ -19,12 +19,12 @@ const InvoicingCurrencyForm = (props) => {
 
   useEffect(() => {
     form.setFieldsValue({
-      invoicingCurrency: 'inr'
+      invoicingCurrency: 'inr',
     })
   }, [])
 
-  const handleChange = (d) => {
-    console.log("d ==>",d);
+  const handleChange = d => {
+    console.log('d ==>', d)
   }
 
   return (
@@ -49,8 +49,8 @@ const InvoicingCurrencyForm = (props) => {
             <Select style={{ width: 200 }}>
               <Option value="inr">INR</Option>
               <Option value="us">US</Option>
-            </Select>
-            )}
+            </Select>,
+          )}
         </Form.Item>
 
         <Form.Item>
@@ -58,7 +58,6 @@ const InvoicingCurrencyForm = (props) => {
             Save Invoicing Currency
           </Button>
         </Form.Item>
-
       </Form>
     </div>
   )
