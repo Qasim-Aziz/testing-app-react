@@ -76,6 +76,14 @@ export async function getClinicLearners(payload) {
                     }
                   }
                 }
+                tags {
+                  edges {
+                    node {
+                      id
+                      name
+                    }
+                  }
+                }
                 isActive
               }
             }
@@ -176,6 +184,7 @@ export async function updateLearner(payload) {
           $learnerLanguage: ID
           $isActive: Boolean
           $researchParticipant: Boolean
+          $tags: [String]
         ) {
           updateStudent(
             input: {
@@ -200,6 +209,7 @@ export async function updateLearner(payload) {
                 language: $learnerLanguage
                 isActive: $isActive
                 researchParticipant: $researchParticipant
+                tags: $tags
               }
             }
           ) {
@@ -241,6 +251,14 @@ export async function updateLearner(payload) {
                   }
                 }
               }
+              tags {
+                edges {
+                  node {
+                    id
+                    name
+                  }
+                }
+              }
               isActive
               researchParticipant
             }
@@ -270,6 +288,7 @@ export async function updateLearner(payload) {
         learnerLanguage: payload.values.learnerLanguage,
         isActive: payload.values.isActive,
         researchParticipant: payload.values.researchParticipant,
+        tags: payload.values.tags,
       },
     })
     .then(result => result)
@@ -315,6 +334,7 @@ export async function createLearner(payload) {
           $defaultProgram: Boolean
           $learnerLanguage: ID
           $researchParticipant: Boolean
+          $tags: [String]
         ) {
           createStudent(
             input: {
@@ -339,6 +359,7 @@ export async function createLearner(payload) {
                 defaultProgram: $defaultProgram
                 language: $learnerLanguage
                 researchParticipant: $researchParticipant
+                tags: $tags
               }
             }
           ) {
@@ -380,6 +401,14 @@ export async function createLearner(payload) {
                   }
                 }
               }
+              tags {
+                edges {
+                  node {
+                    id
+                    name
+                  }
+                }
+              }
               isActive
               researchParticipant
             }
@@ -409,6 +438,7 @@ export async function createLearner(payload) {
         isActive: payload.values.isActive,
         defaultProgram: payload.values.defaultProgram,
         researchParticipant: payload.values.researchParticipant,
+        tags: payload.values.tags,
       },
     })
     .then(result => result)

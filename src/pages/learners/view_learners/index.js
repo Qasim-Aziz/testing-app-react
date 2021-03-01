@@ -31,6 +31,7 @@ import {
   Dropdown,
   Menu,
   Radio,
+  Tag,
 } from 'antd'
 import DataTable from 'react-data-table-component'
 import JsPDF from 'jspdf'
@@ -160,6 +161,7 @@ class LearnerTable extends React.Component {
     noOfRows: 10,
     filterName: '',
     filterEmail: '',
+    filterTags: '',
   }
 
   filterRef = React.createRef()
@@ -186,8 +188,10 @@ class LearnerTable extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (prevProps?.learners !== this.props?.learners) {
+      console.log(this.props.learners.LearnersList, 'updated Learnerse')
       this.setState({
         mainData: this.props.learners.LearnersList,
+
         tableData: this.props.learners.LearnersList,
       })
 
@@ -397,7 +401,7 @@ class LearnerTable extends React.Component {
     })
   }
 
-  filterHandler = ({ name, email, mobile, gender, caseMngr, address }) => {
+  filterHandler = ({ name, email, mobile, gender, caseMngr, address, tags }) => {
     let filteredList = this.state.mainData
     let tempFilterActive = false
     console.log(name, email, 'clinic filter')
@@ -444,6 +448,24 @@ class LearnerTable extends React.Component {
         filteredList &&
         filteredList.filter(item => item.currentAddress?.toLowerCase().includes(name.toLowerCase()))
     }
+    if (tags) {
+      tempFilterActive = true
+      filteredList =
+        filteredList &&
+        filteredList.filter(item => {
+          if (item.tags && item.tags.length > 0) {
+            let exist = false
+            for (let i = 0; i < item.tags.length; i += 1) {
+              if (item.tags[i].toLowerCase().includes(tags.toLowerCase())) {
+                exist = true
+                break
+              }
+            }
+            return exist
+          }
+          return false
+        })
+    }
     if (gender) {
       tempFilterActive = true
       filteredList =
@@ -459,7 +481,15 @@ class LearnerTable extends React.Component {
   }
 
   clearFilter = () => {
-    this.filterHandler({ name: '', email: '', mobile: '', gender: '', caseMngr: '', address: '' })
+    this.filterHandler({
+      name: '',
+      email: '',
+      mobile: '',
+      gender: '',
+      caseMngr: '',
+      address: '',
+      tags: '',
+    })
     this.selectActiveStatus('all')
   }
 
@@ -554,14 +584,14 @@ class LearnerTable extends React.Component {
       {
         name: 'Contact No',
         selector: 'mobileno',
-        maxWidth: '110px',
+        maxWidth: '120px',
       },
 
       {
         name: 'Date of Birth',
         selector: 'dob',
         sortable: true,
-        width: '110px',
+        width: '120px',
         cell: row => <span>{row.dob ? row.dob : ''}</span>,
       },
       {
@@ -596,11 +626,7 @@ class LearnerTable extends React.Component {
         maxWidth: '80px',
         cell: row => <span>{row.category?.category}</span>,
       },
-      {
-        name: 'Address',
-        selector: 'currentAddress',
-        maxWidth: '100px',
-      },
+
       {
         name: 'Clinic Location',
         selector: 'clinicLocation',
@@ -620,50 +646,73 @@ class LearnerTable extends React.Component {
         ),
       },
       {
+        name: 'Tags',
+        selector: 'tags',
+        width: 120,
+        cell: row => {
+          if (row.tags?.length > 0) {
+            return (
+              <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                {row.tags?.map(r => {
+                  return (
+                    <Tag key={r} color="blue" style={{ margin: '1px' }}>
+                      {r}
+                    </Tag>
+                  )
+                })}
+              </div>
+            )
+          }
+
+          return null
+        },
+      },
+      {
+        name: 'Address',
+        selector: 'currentAddress',
+        maxWidth: '160px',
+      },
+      {
         name: 'Assessments',
         ignoreRowClick: true,
         button: true,
-        width: '100px',
+        width: '210px',
         cell: obj => (
-          <span>
+          <div style={{ display: 'flex', justifyContent: 'space-evenly', width: '100%' }}>
             <Button
               onClick={() => this.showAssessments(obj)}
-              style={{ padding: '0px', color: '#0190fe', border: 'none', fontSize: '11px' }}
+              style={{
+                padding: '0px',
+                color: '#0190fe',
+                border: 'none',
+                fontSize: '11px',
+              }}
             >
               Assessments
             </Button>
-          </span>
-        ),
-      },
-      {
-        name: 'Program',
-        ignoreRowClick: true,
-        button: true,
-        width: '80px',
-        cell: obj => (
-          <span>
             <Button
               onClick={() => this.showProgram(obj)}
-              style={{ padding: '0px', color: '#0190fe', border: 'none', fontSize: '11px' }}
+              style={{
+                padding: '0px',
+                color: '#0190fe',
+                border: 'none',
+                fontSize: '11px',
+              }}
             >
               Program
             </Button>
-          </span>
-        ),
-      },
-      {
-        name: 'Session',
-        ignoreRowClick: true,
-        button: true,
-        cell: obj => (
-          <span>
             <Button
               onClick={() => this.showSession(obj)}
-              style={{ padding: '0px', color: '#0190fe', border: 'none', fontSize: '11px' }}
+              style={{
+                padding: '0px',
+                color: '#0190fe',
+                border: 'none',
+                fontSize: '11px',
+              }}
             >
               Session
             </Button>
-          </span>
+          </div>
         ),
       },
     ]
@@ -769,6 +818,8 @@ class LearnerTable extends React.Component {
         </Menu.Item>
       </Menu>
     )
+
+    console.log(filteredList, 'filtereList ')
 
     return (
       <Authorize roles={['school_admin', 'therapist']} redirect to="/dashboard/beta">
@@ -1074,6 +1125,23 @@ class LearnerTable extends React.Component {
                     )
                   })}
                 </Radio.Group>
+              </span>
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <span>Tags :</span>
+                <Input
+                  size="small"
+                  name="tags"
+                  placeholder="Search tag"
+                  value={this.state.filterTags}
+                  onChange={e => {
+                    this.setState({
+                      filterTags: e.target.value,
+                      isFilterActive: e.target.value && true,
+                    })
+                    this.filterHandler({ tags: e.target.value })
+                  }}
+                  style={{ ...tableFilterStyles, width: '148px' }}
+                />
               </span>
             </div>
             <div className="modify-data-table">

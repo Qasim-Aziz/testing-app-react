@@ -18,10 +18,10 @@ class EditableTagGroup extends React.Component {
   }
 
   handleClose = removedTag => {
-    const { tags } = this.state
-    const { changeTagsHandler } = this.props
-    const Tags = tags.filter(tag => tag !== removedTag)
-    // console.log(Tags)
+    const { changeTagsHandler, tagArray } = this.props
+    console.log(tagArray)
+    const Tags = tagArray?.filter(tag => tag !== removedTag)
+    console.log(Tags)
     this.setState({ tags: Tags })
     changeTagsHandler(Tags)
   }
@@ -49,6 +49,8 @@ class EditableTagGroup extends React.Component {
       } else if (tags.length === 0) {
         tags = [inputValue]
       }
+    } else {
+      tags = tagArray
     }
 
     console.log(tags, inputValue, ' handle INputinput 2')
@@ -95,68 +97,82 @@ class EditableTagGroup extends React.Component {
     console.log(this.state)
     return (
       <>
-        {tagArray?.map((tag, index) => {
-          if (editInputIndex === index) {
-            return (
-              <Input
-                ref={this.saveEditInputRef}
-                key={tag}
-                className="tag-input"
-                value={editInputValue}
-                onChange={this.handleEditInputChange}
-                onBlur={this.handleEditInputConfirm}
-                onPressEnter={this.handleEditInputConfirm}
-              />
-            )
-          }
+        <div
+          style={{
+            display: 'flex',
+            minHeight: 35,
+            flexWrap: 'wrap',
+            alignContent: 'center',
+            margin: '2px 0 0',
+          }}
+        >
+          {tagArray?.map((tag, index) => {
+            if (editInputIndex === index) {
+              return (
+                <Input
+                  ref={this.saveEditInputRef}
+                  key={tag}
+                  className="tag-input"
+                  style={{ margin: 'auto 2px', minWidth: 100, maxWidth: 160 }}
+                  value={editInputValue}
+                  onChange={this.handleEditInputChange}
+                  onBlur={this.handleEditInputConfirm}
+                  onPressEnter={this.handleEditInputConfirm}
+                />
+              )
+            }
 
-          const isLongTag = tag.length > 20
-          const { closeable } = this.props
-          const tagElem = (
-            <Tag
-              className="edit-tag"
-              key={tag}
-              closable={closeable}
-              onClose={() => this.handleClose(tag)}
-            >
-              <span
-                onClick={e => {
-                  if (index !== 0) {
-                    this.setState({ editInputIndex: index, editInputValue: tag }, () => {
-                      this.editInput.focus()
-                    })
-                    e.preventDefault()
-                  }
-                }}
+            const isLongTag = tag.length > 20
+            const { closeable } = this.props
+            const tagElem = (
+              <Tag
+                className="edit-tag"
+                key={tag}
+                style={{ margin: '2px' }}
+                closable={closeable}
+                onClose={() => this.handleClose(tag)}
               >
-                {isLongTag ? `${tag.slice(0, 20)}...` : tag}
-              </span>
+                <span
+                  onClick={e => {
+                    if (index !== 0) {
+                      this.setState({ editInputIndex: index, editInputValue: tag }, () => {
+                        this.editInput.focus()
+                      })
+                      e.preventDefault()
+                    }
+                  }}
+                >
+                  {isLongTag ? `${tag.slice(0, 20)}...` : tag}
+                </span>
+              </Tag>
+            )
+            return isLongTag ? (
+              <Tooltip title={tag} key={tag}>
+                {tagElem}
+              </Tooltip>
+            ) : (
+              tagElem
+            )
+          })}
+          {inputVisible && (
+            <Input
+              ref={this.saveInputRef}
+              type="text"
+              size="small"
+              className="tag-input"
+              value={inputValue}
+              style={{ margin: 'auto 2px', minWidth: 100, maxWidth: 160 }}
+              onChange={this.handleInputChange}
+              onBlur={this.handleInputConfirm}
+              onPressEnter={this.handleInputConfirm}
+            />
+          )}
+          {!inputVisible && (
+            <Tag className="site-tag-plus" style={{ margin: '2px' }} onClick={this.showInput}>
+              <PlusOutlined />
             </Tag>
-          )
-          return isLongTag ? (
-            <Tooltip title={tag} key={tag}>
-              {tagElem}
-            </Tooltip>
-          ) : (
-            tagElem
-          )
-        })}
-        {inputVisible && (
-          <Input
-            ref={this.saveInputRef}
-            type="text"
-            className="tag-input"
-            value={inputValue}
-            onChange={this.handleInputChange}
-            onBlur={this.handleInputConfirm}
-            onPressEnter={this.handleInputConfirm}
-          />
-        )}
-        {!inputVisible && (
-          <Tag className="site-tag-plus" onClick={this.showInput}>
-            <PlusOutlined /> New Tag
-          </Tag>
-        )}
+          )}
+        </div>
       </>
     )
   }

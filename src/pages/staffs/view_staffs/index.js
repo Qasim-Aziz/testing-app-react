@@ -104,7 +104,7 @@ const customStyles = {
         borderRightColor: '#ddd',
       },
       padding: '4px 8px',
-      fontSize: '11px',
+      fontSize: '12px',
     },
   },
   pagination: {
@@ -125,7 +125,7 @@ const customStyles = {
 }
 
 const inputCustom = { width: '180px', marginBottom: '8px', display: 'block' }
-const tableFilterStyles = { margin: '0px 32px 0 8px' }
+const tableFilterStyles = { margin: '0px 22px 0 8px' }
 const customLabel = {
   fontSize: '17px',
   color: '#000',
@@ -154,6 +154,7 @@ class StaffTable extends React.Component {
     filterName: '',
     filterEmail: '',
     filterDesignation: '',
+    filterTags: '',
   }
 
   filterRef = React.createRef()
@@ -365,10 +366,11 @@ class StaffTable extends React.Component {
       })
   }
 
-  filterHandler = ({ name, email, mobile, gender, designation, address }) => {
+  filterHandler = ({ name, email, mobile, gender, designation, tags, address }) => {
     let filteredList = this.state.mainData
     let tempFilterActive = false
     if (name) {
+      console.log(name, 'name')
       tempFilterActive = true
       filteredList =
         filteredList &&
@@ -402,6 +404,24 @@ class StaffTable extends React.Component {
       filteredList =
         filteredList &&
         filteredList.filter(item => item.localAddress?.toLowerCase().includes(name.toLowerCase()))
+    }
+    if (tags) {
+      tempFilterActive = true
+      filteredList =
+        filteredList &&
+        filteredList.filter(item => {
+          if (item.tags && item.tags.length > 0) {
+            let exist = false
+            for (let i = 0; i < item.tags.length; i += 1) {
+              if (item.tags[i].toLowerCase().includes(tags.toLowerCase())) {
+                exist = true
+                break
+              }
+            }
+            return exist
+          }
+          return false
+        })
     }
     if (gender) {
       tempFilterActive = true
@@ -472,8 +492,7 @@ class StaffTable extends React.Component {
         name: 'Contact No',
         selector: 'contactNo',
         key: 'email',
-        maxWidth: '160px',
-        minWidth: '160px',
+        width: '120px',
       },
 
       {
@@ -541,12 +560,12 @@ class StaffTable extends React.Component {
         selector: 'tags',
         width: 60,
         cell: row => {
-          if (row.tags.length > 0) {
+          if (row.tags?.length > 0) {
             return (
               <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                 {row.tags?.map(r => {
                   return (
-                    <Tag color="blue" style={{ margin: '1px' }}>
+                    <Tag key={r} color="blue" style={{ margin: '1px' }}>
                       {r}
                     </Tag>
                   )
@@ -570,7 +589,6 @@ class StaffTable extends React.Component {
       staffs: { StaffList, StaffProfile },
     } = this.props
 
-    console.log(StaffList, 'stafflist')
     // let tagArrList = [
     //   ...this.state.tableData.map(ele => {
     //     if (typeof ele.tags === 'object') {
@@ -585,7 +603,8 @@ class StaffTable extends React.Component {
     //   }),
     // ]
 
-    let filteredList = StaffList
+    let filteredList = this.state.tableData
+
     console.log('TABLE DATA', filteredList)
     if (this.state.filterRole) {
       filteredList = filteredList.filter(
@@ -638,7 +657,7 @@ class StaffTable extends React.Component {
     if (staffs.loading) {
       return <div>Loading...</div>
     }
-    const divClass = divShow ? 'col-sm-12' : 'col-sm-12'
+    const divClass = 'col-sm-12'
     const detailsDiv = divShow ? { display: 'block', paddingLeft: '0' } : { display: 'none' }
 
     const exportPDF = () => {
@@ -703,13 +722,12 @@ class StaffTable extends React.Component {
       </Menu>
     )
 
-    console.log(filteredList, 'filteredList')
     return (
       <Authorize roles={['school_admin']} redirect to="/dashboard/beta">
         <Helmet title="Partner" />
         <Drawer
           title="CREATE STAFF"
-          width="75%"
+          width="65%"
           placement="right"
           closable={true}
           onClose={this.onClose}
@@ -755,7 +773,7 @@ class StaffTable extends React.Component {
 
         <Drawer
           title="EDIT LEARNER"
-          width="75%"
+          width="65%"
           placement="right"
           closable={true}
           onClose={this.onCloseEdit}
@@ -889,6 +907,7 @@ class StaffTable extends React.Component {
                     filterDesignation: '',
                     filterName: '',
                     filterEmail: '',
+                    filterTags: '',
                   })
                 }}
               >
@@ -944,7 +963,6 @@ class StaffTable extends React.Component {
                   style={{ ...tableFilterStyles, width: '112px' }}
                 />
               </span>
-
               <span style={{ display: 'flex', alignItems: 'center' }}>
                 <span>Email :</span>
                 <Input
@@ -962,7 +980,6 @@ class StaffTable extends React.Component {
                   style={{ ...tableFilterStyles, width: '148px' }}
                 />
               </span>
-
               <span style={{ display: 'flex', alignItems: 'center' }}>
                 <span>Designation :</span>
                 <Input
@@ -1000,11 +1017,29 @@ class StaffTable extends React.Component {
                   })}
                 </Radio.Group>
               </span>
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <span>Tag :</span>
+                <Input
+                  size="small"
+                  name="tags"
+                  placeholder="Search Tag"
+                  value={this.state.filterTags}
+                  onChange={e => {
+                    this.setState({
+                      filterTags: e.target.value,
+                      isFilterActive: e.target.value && true,
+                    })
+                    this.filterHandler({ tags: e.target.value })
+                  }}
+                  style={{ ...tableFilterStyles, width: '148px' }}
+                />
+              </span>
             </div>
             <div className="modify-data-table">
               <DataTable
                 columns={columns}
                 theme="default"
+                keyField="id"
                 dense={true}
                 pagination={true}
                 data={filteredList}
@@ -1014,96 +1049,6 @@ class StaffTable extends React.Component {
               />
             </div>
           </div>
-        </div>
-        <div className="col-sm-4" style={detailsDiv}>
-          {StaffProfile ? (
-            <Scrollbars key={StaffProfile.id} style={{ height: 650 }}>
-              <div
-                className="card"
-                style={{ marginTop: '5px', minHeight: '600px', border: '1px solid #f4f6f8' }}
-              >
-                <div className="card-body">
-                  <div className="table-operations" style={{ marginBottom: '16px' }}>
-                    <Button
-                      style={{
-                        marginRight: '-12px',
-                        float: 'right',
-                        border: 'none',
-                        padding: 'none',
-                      }}
-                      onClick={() => this.setState({ divShow: false })}
-                    >
-                      X
-                    </Button>
-                  </div>
-                  <div>
-                    <Card style={{ marginTop: '26px', border: 'none' }}>
-                      <Meta
-                        avatar={
-                          <Avatar
-                            src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-                            style={{
-                              width: '100px',
-                              height: '100px',
-                              border: '1px solid #f6f7fb',
-                            }}
-                          />
-                        }
-                        title={
-                          <h5 style={{ marginTop: '20px' }}>
-                            {StaffProfile ? StaffProfile.name : ''}
-                            <span
-                              style={{
-                                float: 'right',
-                                fontSize: '12px',
-                                padding: '5px',
-                                color: '#0190fe',
-                              }}
-                            >
-                              {StaffProfile.isActive === true ? (
-                                <Switch
-                                  checkedChildren={<Icon type="check" />}
-                                  unCheckedChildren={<Icon type="close" />}
-                                  defaultChecked
-                                  onChange={this.staffActiveInactive}
-                                />
-                              ) : (
-                                <Switch
-                                  checkedChildren={<Icon type="check" />}
-                                  unCheckedChildren={<Icon type="close" />}
-                                  onChange={this.staffActiveInactive}
-                                />
-                              )}
-                            </span>
-                          </h5>
-                        }
-                        description={
-                          <div>
-                            <p style={{ fontSize: '13px', marginBottom: '4px' }}>
-                              {' '}
-                              Therapist{' '}
-                              <span
-                                style={{
-                                  backgroundColor: '#52c41a',
-                                  color: 'white',
-                                  borderRadius: '3px',
-                                  padding: '1px 5px',
-                                }}
-                              >
-                                Active
-                              </span>
-                            </p>
-                          </div>
-                        }
-                      />
-                    </Card>
-                  </div>
-                </div>
-              </div>
-            </Scrollbars>
-          ) : (
-            ''
-          )}
         </div>
       </Authorize>
     )
