@@ -102,7 +102,10 @@ export const getLongTermGoals = (student, program, status) => {
                             targetInstr
                             peakBlocks
                             peakType
-
+                            manualAllocateDomain {
+                              id
+                              domain
+                            }
                             date
                             objective
                             targetStatus {

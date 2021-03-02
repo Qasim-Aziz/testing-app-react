@@ -12,7 +12,7 @@ import { useMutation, useQuery } from 'react-apollo'
 import CKEditor from 'react-ckeditor-component'
 import { capitalize } from '../../utilities'
 import NumberCard from './NumberCard'
-import { TARGET_ALLOCATIONS_OPTIONS, UPDATE_TARGET, SHORT_TERM_GOALS } from './query'
+import { TARGET_ALLOCATIONS_OPTIONS, UPDATE_TARGET, SHORT_TERM_GOALS, GET_DOMAINS } from './query'
 
 let id = 0
 let stepId = 0
@@ -36,7 +36,6 @@ export default Form.create()(
     selectedShortTermGoal,
     equivalenceEnable = false,
   }) => {
-    console.log(activeAllocatedTarget)
     const [targetInstructions, setTargetInstructions] = useState('')
     const [dailyTrials, setDailyTrials] = useState(0)
     const [sessionConsecutiveDays, setSessionConsecutiveDays] = useState(0)
@@ -127,6 +126,8 @@ export default Form.create()(
       error: targetOptionsError,
       loading: targetOptionsLoading,
     } = useQuery(TARGET_ALLOCATIONS_OPTIONS)
+
+    const { data: domainData, error: domainError, loading: isDomainLoading } = useQuery(GET_DOMAINS)
 
     const [
       updateTarget,
@@ -356,6 +357,7 @@ export default Form.create()(
                 peakBlocks: peakBlockCount,
                 peakType: values.category ? values.category : null,
                 classes,
+                domain: values.domain,
               },
               errorPolicy: 'all',
               fetchPolicy: 'no-cache',
@@ -365,7 +367,7 @@ export default Form.create()(
       })
     }
 
-    if (targetOptionsError) {
+    if (targetOptionsError || domainError) {
       return <h4 style={{ color: 'red', marginTop: 40 }}>Opps therir are something wrong</h4>
     }
 
@@ -655,6 +657,20 @@ export default Form.create()(
                 activeAllocatedTarget && activeAllocatedTarget.targetAllcatedDetails.targetName,
               rules: [{ required: true, message: 'Please give a target name' }],
             })(<Input name="targetName" />)}
+          </Form.Item>
+          <Form.Item label="Domain Name" name="Domain Name">
+            {form.getFieldDecorator('domain', {
+              initialValue: activeAllocatedTarget && activeAllocatedTarget.manualAllocateDomain?.id,
+              rules: [{ required: true, message: 'Please select a domain' }],
+            })(
+              <Select name="domain" {...searchableDropDownOption} loading={isDomainLoading}>
+                {domainData?.domain.edges.map(({ node }) => (
+                  <Select.Option key={node.id} value={node.id}>
+                    {node.domain}
+                  </Select.Option>
+                ))}
+              </Select>,
+            )}
           </Form.Item>
           <Form.Item label="Target Type">
             {form.getFieldDecorator('type', {

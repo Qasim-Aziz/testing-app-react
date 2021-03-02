@@ -9,7 +9,13 @@ import React, { useEffect, useState } from 'react'
 import { useMutation, useQuery } from 'react-apollo'
 import CKEditor from 'react-ckeditor-component'
 import NumberCard from './NumberCard'
-import { CREATE_TARGET, SETTING, TARGET_ALLOCATIONS_OPTIONS, SHORT_TERM_GOALS } from './query'
+import {
+  CREATE_TARGET,
+  SETTING,
+  TARGET_ALLOCATIONS_OPTIONS,
+  SHORT_TERM_GOALS,
+  GET_DOMAINS,
+} from './query'
 import './style.scss'
 
 let id = 0
@@ -65,6 +71,8 @@ export default Form.create()(
       error: targetOptionsError,
       loading: targetOptionsLoading,
     } = useQuery(TARGET_ALLOCATIONS_OPTIONS)
+
+    const { data: domainData, error: domainError, loading: isDomainLoading } = useQuery(GET_DOMAINS)
 
     const [
       allocateTarget,
@@ -304,6 +312,7 @@ export default Form.create()(
                   peakType: values.category ? values.category : null,
                   classes,
                   equiCode: values.equiCode ? values.equiCode : null,
+                  domain: values.domain,
                 },
                 errorPolicy: 'all',
                 onError(err) {
@@ -318,7 +327,7 @@ export default Form.create()(
       })
     }
 
-    if (targetOptionsError || settingError) {
+    if (targetOptionsError || settingError || domainError) {
       return <h4 style={{ color: 'red', marginTop: 40 }}>Opps therir are something wrong</h4>
     }
 
@@ -607,6 +616,21 @@ export default Form.create()(
               initialValue: targetName,
               rules: [{ required: true, message: 'Please give a target name' }],
             })(<Input name="targetName" />)}
+          </Form.Item>
+          <Form.Item label="Domain Name" name="Domain Name">
+            {form.getFieldDecorator('domain', {
+              initialValue: domainData?.domain.edges.find(({ node }) => node.domain === 'Others')
+                ?.node.id,
+              rules: [{ required: true, message: 'Please select a domain' }],
+            })(
+              <Select name="domain" {...searchableDropDownOption} loading={isDomainLoading}>
+                {domainData?.domain.edges.map(({ node }) => (
+                  <Select.Option key={node.id} value={node.id}>
+                    {node.domain}
+                  </Select.Option>
+                ))}
+              </Select>,
+            )}
           </Form.Item>
           {peakEnable ? (
             <Form.Item label="Target Type" name="Target Type">

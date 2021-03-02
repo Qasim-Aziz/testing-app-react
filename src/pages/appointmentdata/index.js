@@ -120,7 +120,6 @@ export default () => {
   }
 
   const createAppointment = () => {
-    console.log('createAppointment is called')
     setUpdatingAppointmentId(null)
     setVisibleDraw(true)
   }
