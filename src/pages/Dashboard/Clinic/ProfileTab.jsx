@@ -7,7 +7,7 @@ import InvCurrency from 'pages/ClinicProfile/InvCurrency'
 import ChangePassword from 'components/changePassword/form'
 import MasterCriteria from 'pages/ClinicProfile/MasteryCriteria'
 import LocationSett from 'pages/ClinicProfile/LocationSett'
-import Assessment from 'pages/ClinicProfile/Assessment/index'
+import Assessment from 'pages/GeneralAssessment/ForProfile/index'
 import DisabledCurriculum from 'pages/ClinicProfile/DisabledCurriculum'
 import PeakAutomaticTab from '../PeakAutomaticTab'
 import AssessmentsTab from '../../../components/AssessmentsProfileTab'
@@ -17,11 +17,6 @@ const { TabPane } = Tabs
 
 const ProfileTab = ({ activeProfileTab, onProfileTabChange }) => {
   const tabs = [
-    {
-      key: 'assessment',
-      title: 'Assessment',
-      component: <Assessment />,
-    },
     {
       key: 'contact-details',
       title: 'Contact Details',
@@ -71,6 +66,11 @@ const ProfileTab = ({ activeProfileTab, onProfileTabChange }) => {
       key: 'disabled-curriculum',
       title: 'Disabled Curriculum',
       component: <DisabledCurriculum />,
+    },
+    {
+      key: 'assessment',
+      title: 'Assessment',
+      component: <Assessment />,
     },
   ]
 

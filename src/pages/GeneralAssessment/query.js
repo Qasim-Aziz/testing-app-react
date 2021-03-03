@@ -101,6 +101,16 @@ export const DELETE_GENERAL_ASSESSMENT = gql`
     }
   }
 `
+
+export const STUDNET_INFO = gql`
+  query student($studentId: ID!) {
+    student(id: $studentId) {
+      firstname
+      lastname
+    }
+  }
+`
+
 export const RECORD_GENERAL_DATA = gql`
   mutation {
     recordGeneralData(

@@ -39,6 +39,7 @@ import './allClinicData.scss'
 import { CreateProductForm } from '../../components/invoice/InvoiceProductsTable'
 import {
   ALL_LEARNERS,
+  ALL_LEARNERS_ASSESS_CHARGES,
   CLINIC_RATES,
   CREATE_INVOICE,
   GENERATE_LINK,
@@ -100,7 +101,7 @@ const d = new Date()
 const month = 'February'
 const days = daysInMonth(d.getMonth() === 0 ? 12 : d.getMonth(), d.getFullYear())
 
-const DAYS_365 = 10
+const DAYS_365 = 2592000000
 
 const RATES_ZERO = {
   learnerPrice: 0,
@@ -287,7 +288,7 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
   const [
     getLearners,
     { data: learnerData, loading: learnerLoading, error: learnerError },
-  ] = useLazyQuery(ALL_LEARNERS)
+  ] = useLazyQuery(ALL_LEARNERS_ASSESS_CHARGES)
 
   const [getRates, { data: ratesData, loading: ratesLoading }] = useLazyQuery(CLINIC_RATES, {
     fetchPolicy: 'network-only',
@@ -336,16 +337,14 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
   }, [learnerData])
 
   useEffect(() => {
-    console.log(details, 'learnerDaaatat')
     if (details.length === count && learnerData && ratesData && productData) {
       let learnerCount = 0
       let peakCount = 0
       let cogCount = 0
       let vbmappCount = 0
       let researchCount = 0
-
+      console.log(learnerData, 'ldld')
       details.map((item, index) => {
-        console.log(learnerData, 'ldld')
         const tempStudent = learnerData.students.edges.filter(
           studentItem => studentItem.node.id === item.id,
         )
@@ -366,7 +365,7 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
           checkCogniable = cogniable.length > 0 ? checkYear(cogniable) : true
         }
 
-        if (true) {
+        if (!tempStudent[0].node.researchParticipant) {
           learnerCount += item.activeDays
 
           if (item.peakDays > 0 && checkPeak) {
@@ -391,6 +390,7 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
             vbmappCount += 1
           }
         } else {
+          console.log(tempStudent, 'temper')
           researchCount += 1
         }
       })
@@ -471,7 +471,6 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
 
   const getLearnerDetails = learnerId => {
     learnerId.map((item, index) => {
-      console.log(item, month, 'itemMonet')
       client
         .mutate({
           mutation: LEARNER_ACTIVE_DETAILS,

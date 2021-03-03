@@ -30,7 +30,7 @@ import {
   GET_GENERAL_ASSESSMENT,
   UPDATE_GENERAL_ASSESSMENT,
   DELETE_GENERAL_ASSESSMENT,
-} from './query'
+} from '../query'
 import { useQuery, useLazyQuery, useMutation } from 'react-apollo'
 import CreateGenAssessForm from './CreateGenAssessForm'
 
@@ -101,6 +101,7 @@ function Assessment() {
     }
   }
 
+  console.log(tableData, 'tb')
   const columns = [
     {
       title: 'Sr No.',
@@ -170,12 +171,11 @@ function Assessment() {
               color: '#000',
             }}
           >
-            PEAK Assessment
+            Assessment
           </Text>
           <div style={{ display: 'flex', gap: '16px' }}>
             <Button
               type="primary"
-              size="large"
               onClick={() => {
                 setUpdate(false)
                 setCreateAssessDrawer(true)

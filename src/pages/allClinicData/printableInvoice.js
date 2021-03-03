@@ -310,10 +310,10 @@ function PrintableInvoice() {
                   <Text style={rightText}>Quantity</Text>
                 </View>
                 <View style={{ ...qtyCol, fontWeight: '600' }}>
-                  <Text style={rightText}>Rate</Text>
+                  <Text style={rightText}>Rate ({currentCurrencyName})</Text>
                 </View>
                 <View style={{ ...qtyCol, fontWeight: '600', width: '24%' }}>
-                  <Text style={rightText}>Amount</Text>
+                  <Text style={rightText}>Amount ({currentCurrencyName})</Text>
                 </View>
               </View>
               {invoice.invoiceFee.edges.map((item, index) => {
@@ -334,14 +334,10 @@ function PrintableInvoice() {
                       <Text style={rightText}>{item.node.quantity}</Text>
                     </View>
                     <View style={qtyCol}>
-                      <Text style={rightText}>
-                        {currentCurrency} {item.node.rate}
-                      </Text>
+                      <Text style={rightText}>{item.node.rate}</Text>
                     </View>
                     <View style={{ ...qtyCol, width: '24%' }}>
-                      <Text style={rightText}>
-                        {currentCurrency} {tempTotal}
-                      </Text>
+                      <Text style={rightText}>{tempTotal}</Text>
                     </View>
                   </View>
                 )
@@ -357,7 +353,7 @@ function PrintableInvoice() {
                 <Text style={{ ...general }}>Subtotal :</Text>
                 <View style={{ ...qtyCol, width: '18.8%', borderLeft: 'none' }}>
                   <Text style={rightText}>
-                    {currentCurrency} {subTotal}
+                    {subTotal} {currentCurrencyName}
                   </Text>
                 </View>
               </View>
@@ -381,8 +377,8 @@ function PrintableInvoice() {
                   >
                     <View style={taxSection}>
                       <Text style={{ ...rightText, fontWeight: '600' }}>
-                        {currentCurrency} -
-                        {Number((subTotal / 100) * parseFloat(invoice.discount || 0)).toFixed(2)}
+                        {Number((subTotal / 100) * parseFloat(invoice.discount || 0)).toFixed(2)}{' '}
+                        {currentCurrencyName}
                       </Text>
                     </View>
                     <View style={taxSection}>
@@ -394,8 +390,8 @@ function PrintableInvoice() {
                   <View style={{ ...flexSection, flexDirection: 'row-reverse' }}>
                     <View style={taxSection}>
                       <Text style={{ ...rightText, fontWeight: '600' }}>
-                        {currentCurrency}{' '}
-                        {Number((subTotal / 100) * parseFloat(invoice.cgst || 0)).toFixed(2)}
+                        {Number((subTotal / 100) * parseFloat(invoice.cgst || 0)).toFixed(2)}{' '}
+                        {currentCurrencyName}
                       </Text>
                     </View>
                     <View style={taxSection}>
@@ -412,8 +408,8 @@ function PrintableInvoice() {
                   >
                     <View style={taxSection}>
                       <Text style={{ ...rightText, fontWeight: '600' }}>
-                        {currentCurrency}{' '}
-                        {Number((subTotal / 100) * parseFloat(invoice.sgst || 0)).toFixed(2)}
+                        {Number((subTotal / 100) * parseFloat(invoice.sgst || 0)).toFixed(2)}{' '}
+                        {currentCurrencyName}
                       </Text>
                     </View>
                     <View style={taxSection}>
@@ -430,10 +426,10 @@ function PrintableInvoice() {
                   >
                     <View style={taxSection}>
                       <Text style={{ ...rightText, fontWeight: '600' }}>
-                        {currentCurrency}{' '}
                         {Number(
                           (subTotal / 100) * parseFloat(invoice.taxableSubtotal || 0),
-                        ).toFixed(2)}
+                        ).toFixed(2)}{' '}
+                        {currentCurrencyName}
                       </Text>
                     </View>
                     <View style={taxSection}>
@@ -445,7 +441,7 @@ function PrintableInvoice() {
                   <View style={{ ...flexSection, flexDirection: 'row-reverse' }}>
                     <View style={taxSection}>
                       <Text style={{ ...rightText, fontWeight: '600' }}>
-                        {currentCurrency} {total}
+                        {total} {currentCurrencyName}
                       </Text>
                     </View>
                     <View style={taxSection}>

@@ -32,7 +32,7 @@ import client from '../../apollo/config'
 import InvoiceForm from './invoiceForm'
 import FilterCard from '../Invoices/FilterCard'
 import ViewInvoice from './viewInvoice'
-import { NOTIFICATION, GET_INVOICES, DELETE_INVOICE } from './query'
+import { NOTIFICATION, GET_INVOICES, DELETE_INVOICE, tt } from './query'
 import './allClinicData.scss'
 
 const { Content } = Layout
@@ -67,6 +67,14 @@ function InvoiceTable({ rowData }) {
   const [currentInvoice, setCurrentInvoice] = useState(null)
   const [currentInvoiceId, setCurrentInvoiceId] = useState(null)
   const [popOverVisible, setPopOverVisible] = useState(false)
+  const [
+    deleteAssessmentCharges,
+    {
+      data: deleteAssessChargeData,
+      loading: deleteAssessChargeLoading,
+      error: deleteAssessChargeError,
+    },
+  ] = useMutation(tt)
   const { data: invoiceData, error: invoiceError, loading: invoiceLoading, refetch } = useQuery(
     GET_INVOICES,
     {
@@ -97,6 +105,23 @@ function InvoiceTable({ rowData }) {
   ] = useMutation(DELETE_INVOICE)
 
   useEffect(() => {
+    if (invoiceData) {
+      const dataList = [...invoiceData.getInvoices.edges]
+      const arrengedData = dataList.map(({ node }) => {
+        return node
+      })
+      arrengedData.reverse()
+      setTableData(arrengedData)
+    }
+    if (invoiceError) {
+      notification.error({
+        message: 'Something went wrong',
+        description: 'Unable to fetch invoices',
+      })
+    }
+  }, [invoiceData, invoiceError])
+
+  useEffect(() => {
     if (deleteInvoiceData) {
       notification.success({
         message: 'Delete invoice sucessfully',
@@ -107,35 +132,23 @@ function InvoiceTable({ rowData }) {
         })
       })
     }
-  }, [deleteInvoiceData])
-
-  useEffect(() => {
     if (deleteInvoiceError) {
       notification.error({
         message: 'opps error on delete invoice',
       })
     }
-  }, [deleteInvoiceError])
-
-  useEffect(() => {
-    if (invoiceData) {
-      const dataList = [...invoiceData.getInvoices.edges]
-      const arrengedData = dataList.map(({ node }) => {
-        return node
+    if (deleteAssessChargeData) {
+      notification.success({
+        message: 'Assessment charges updated successfully',
       })
-      arrengedData.reverse()
-      setTableData(arrengedData)
     }
-  }, [invoiceData])
-
-  useEffect(() => {
-    if (invoiceError) {
+    if (deleteAssessChargeError) {
       notification.error({
         message: 'Something went wrong',
-        description: 'Unable to fetch invoices',
+        description: 'Unable to update assessment charges',
       })
     }
-  }, [invoiceError])
+  }, [deleteInvoiceData, deleteInvoiceError, deleteAssessChargeData, deleteAssessChargeError])
 
   const handleSendReminder = async invoiceId => {
     console.log(invoiceId, 'invoiceId')
@@ -159,6 +172,7 @@ function InvoiceTable({ rowData }) {
     }
   }
   console.log(invoiceData, 'nv')
+
   const col = [
     {
       title: 'Invoice No',
@@ -216,9 +230,11 @@ function InvoiceTable({ rowData }) {
             <Tooltip placement="top" title="Delete Invoice">
               <Popconfirm
                 title="Are you sure ?"
-                onConfirm={() =>
+                onConfirm={() => {
+                  console.log(invoice.id)
+                  deleteAssessmentCharges({ variables: { invoices: [invoice.id] } })
                   deleteInvoice({ variables: { id: invoice.id } }).then(res => refetch())
-                }
+                }}
                 okText="Yes"
                 cancelText="No"
               >
@@ -232,6 +248,7 @@ function InvoiceTable({ rowData }) {
       },
     },
   ]
+  console.log(deleteAssessChargeData, deleteAssessChargeLoading, deleteAssessChargeError)
   console.log(currentInvoice, 'current')
   return (
     <div>

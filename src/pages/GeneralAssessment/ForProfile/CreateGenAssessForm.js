@@ -10,7 +10,7 @@ import {
   CREATE_GENERAL_ASSESSMENT,
   GET_GENERAL_ASSESSMENT,
   UPDATE_GENERAL_ASSESSMENT,
-} from './query'
+} from '../query'
 
 const { TextArea } = Input
 const { Option } = Select
@@ -51,7 +51,9 @@ const CreateGenAssessForm = ({
     submodulesReducer,
     update && currentRow.submodules
       ? currentRow.submodules.length > 0
-        ? currentRow.submodules
+        ? currentRow.submodules.map(item => {
+            return { name: item.name }
+          })
         : [{ name: '' }]
       : [{ name: '' }],
   )
@@ -198,11 +200,7 @@ const CreateGenAssessForm = ({
           />,
         )}
       </Form.Item>
-      <Form.Item
-        initialValue={currentRow?.hasSubmodule}
-        style={{ display: 'flex' }}
-        label="Submodules"
-      >
+      <Form.Item style={{ display: 'flex' }} label="Submodules">
         <Checkbox
           size="large"
           value={hasSubmodules}

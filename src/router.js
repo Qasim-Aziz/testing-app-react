@@ -18,8 +18,6 @@ import clinicDash from './pages/Dashboard/Clinic'
 import payorCom from './pages/payor'
 import PrintTableInvoice from './pages/allClinicData/printableInvoice'
 
-
-
 const loadable = loader =>
   Loadable({
     loader,
@@ -248,7 +246,7 @@ const routes = [
     exact: true,
   },
 
-    // clinic specific video tutorials
+  // clinic specific video tutorials
   {
     path: '/clinicTutorial/step1',
     component: loadable(() => import('pages/clinicTutorial/step1')),
@@ -281,6 +279,11 @@ const routes = [
     path: '/peakReport/',
     // component: loadable(() => import('pages/PEAK/PeakReport')),
     component: peakReprotCom,
+    exact: true,
+  },
+  {
+    path: '/genAssessment/',
+    component: loadable(() => import('pages/GeneralAssessment')),
     exact: true,
   },
   {
@@ -354,7 +357,6 @@ const routes = [
     component: loadable(() => import('pages/behaviorGraph')),
     exact: true,
   },
-
 
   // community, doctors & commitments
   {
@@ -435,8 +437,7 @@ const routes = [
     exact: true,
   },
 
-
-  // Therapist Urls 
+  // Therapist Urls
   // Program
   // {
   //   path: '/therapistStudent',
@@ -597,14 +598,14 @@ const routes = [
   {
     path: '/activitylog',
     component: loadable(() => import('pages/activity/ActivityList')),
-    exact: true
+    exact: true,
   },
   {
     path: '/allClinicData',
     component: loadable(() => import('pages/allClinicData')),
-    exact: true
+    exact: true,
   },
-   // Payors
+  // Payors
   {
     path: '/payors/view_payors',
     // component: loadable(() => import('pages/payor')),
@@ -632,7 +633,6 @@ const routes = [
     component: loadable(() => import('pages/ClinicProfile/VideoTutorial')),
     exact: true,
   },
-
 ]
 
 class Router extends React.Component {

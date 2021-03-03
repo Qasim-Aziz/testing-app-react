@@ -74,7 +74,7 @@ const taxSection = {
   padding: '0',
   alignSelf: 'flex-end',
   textAlign: 'right',
-  minWidth: '100px',
+  minWidth: '120px',
 }
 const monthNames = [
   'January',
@@ -108,6 +108,7 @@ function ViewInvoice({ invoice }) {
   const currentCurrency = invoice.clinic.currency ? invoice.clinic.currency.symbol : '$'
   const currentCurrencyName = invoice.clinic.currency ? invoice.clinic.currency.currency : 'USD'
 
+  console.log(currentCurrencyName, 'currentCyName')
   useEffect(() => {
     let tempSubTotal = 0
     invoice.invoiceFee.edges.map(item => {
@@ -330,10 +331,10 @@ function ViewInvoice({ invoice }) {
                 <div style={rightText}>Quantity</div>
               </div>
               <div style={{ ...qtyCol, fontWeight: '600' }}>
-                <div style={rightText}>Rate</div>
+                <div style={rightText}>Rate ({currentCurrencyName})</div>
               </div>
               <div style={{ ...qtyCol, fontWeight: '600', width: '24%' }}>
-                <div style={rightText}>Amount</div>
+                <div style={rightText}>Amount ({currentCurrencyName})</div>
               </div>
             </div>
             {invoice.invoiceFee.edges.map((item, index) => {
@@ -354,14 +355,10 @@ function ViewInvoice({ invoice }) {
                     <div style={rightText}>{item.node.quantity}</div>
                   </div>
                   <div style={qtyCol}>
-                    <div style={rightText}>
-                      {currentCurrency} {item.node.rate}
-                    </div>
+                    <div style={rightText}>{item.node.rate}</div>
                   </div>
                   <div style={{ ...qtyCol, width: '24%' }}>
-                    <div style={rightText}>
-                      {currentCurrency} {tempTotal}
-                    </div>
+                    <div style={rightText}>{tempTotal}</div>
                   </div>
                 </div>
               )
@@ -378,10 +375,10 @@ function ViewInvoice({ invoice }) {
                   ...general,
                   alignSelf: 'flex-end',
                   textAlign: 'right',
-                  minWidth: '98px',
+                  minWidth: '120px',
                 }}
               >
-                {currentCurrency} {subTotal}
+                {subTotal} {currentCurrencyName}
               </div>
               <div style={general}>Subtotal :</div>
             </div>
@@ -404,8 +401,8 @@ function ViewInvoice({ invoice }) {
                   }}
                 >
                   <div style={taxSection}>
-                    {currentCurrency} -
-                    {Number((subTotal / 100) * parseFloat(invoice.discount || 0)).toFixed(2)}
+                    {Number((subTotal / 100) * parseFloat(invoice.discount || 0)).toFixed(2)}{' '}
+                    {currentCurrencyName}
                   </div>
                   <div style={{ ...taxSection, fontWeight: '600' }}>
                     Dicount({invoice.discount || 0}%) :
@@ -418,11 +415,11 @@ function ViewInvoice({ invoice }) {
                   }}
                 >
                   <div style={taxSection}>
-                    {currentCurrency}{' '}
-                    {Number((subTotal / 100) * parseFloat(invoice.gst || 0)).toFixed(2)}
+                    {Number((subTotal / 100) * parseFloat(invoice.cgst || 0)).toFixed(2)}{' '}
+                    {currentCurrencyName}
                   </div>
                   <div style={{ ...taxSection, fontWeight: '600' }}>
-                    CGST({invoice.gst || 0}%) :
+                    CGST({invoice.cgst || 0}%) :
                   </div>
                 </div>
                 <div
@@ -432,8 +429,8 @@ function ViewInvoice({ invoice }) {
                   }}
                 >
                   <div style={taxSection}>
-                    {currentCurrency}{' '}
-                    {Number((subTotal / 100) * parseFloat(invoice.sgst || 0)).toFixed(2)}
+                    {Number((subTotal / 100) * parseFloat(invoice.sgst || 0)).toFixed(2)}{' '}
+                    {currentCurrencyName}
                   </div>
                   <div style={{ ...taxSection, fontWeight: '600' }}>
                     SGST({invoice.sgst || 0}%) :
@@ -446,8 +443,8 @@ function ViewInvoice({ invoice }) {
                   }}
                 >
                   <div style={taxSection}>
-                    {currentCurrency}{' '}
-                    {Number((subTotal / 100) * parseFloat(invoice.taxableSubtotal || 0)).toFixed(2)}
+                    {Number((subTotal / 100) * parseFloat(invoice.taxableSubtotal || 0)).toFixed(2)}{' '}
+                    {currentCurrencyName}
                   </div>
                   <div style={{ ...taxSection, fontWeight: '600' }}>
                     Taxes({invoice.taxableSubtotal || 0}%) :
@@ -455,14 +452,14 @@ function ViewInvoice({ invoice }) {
                 </div>
                 <div style={{ ...flexSection, flexDirection: 'row-reverse' }}>
                   <div style={taxSection}>
-                    {currentCurrency}
                     {getTotal(
                       subTotal,
                       invoice.discount,
-                      invoice.gst,
+                      invoice.cgst,
                       invoice.sgst,
                       invoice.taxableSubtotal,
-                    )}
+                    )}{' '}
+                    {currentCurrencyName}
                   </div>
                   <div style={{ ...taxSection, fontWeight: '600' }}>Total :</div>
                 </div>

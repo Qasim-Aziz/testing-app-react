@@ -114,6 +114,33 @@ export const ALL_LEARNERS = gql`
     }
   }
 `
+
+export const ALL_LEARNERS_ASSESS_CHARGES = gql`
+  query Students($schoolId: ID!) {
+    students(school: $schoolId) {
+      edges {
+        node {
+          id
+          isActive
+          isPeakActive
+          isCogActive
+          researchParticipant
+          assessmentCharges {
+            edges {
+              node {
+                id
+                date
+                assessType
+                amount
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 export const UPDATE_STUDENT = gql`
   mutation UpdateStudent($id: ID!, $isActive: Boolean) {
     updateStudent(input: { studentData: { id: $id, isActive: $isActive } }) {
@@ -271,6 +298,8 @@ export const GET_INVOICES = gql`
           amount
           address
           taxableSubtotal
+          sgst
+          cgst
           discount
           total
           clinic {
@@ -399,6 +428,14 @@ export const PRODUCT_LIST = gql`
       id
       name
       description
+    }
+  }
+`
+export const tt = gql`
+  mutation($invoices: [String]) {
+    deleteAssessmentChargeByInvoice(input: { invoices: $invoices }) {
+      status
+      msg
     }
   }
 `
