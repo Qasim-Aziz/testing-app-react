@@ -70,8 +70,8 @@ export function* LOGIN({ payload }) {
 
       if (response.tokenAuth.user.groups.edges[0].node.name === 'school_admin') {
         const result4 = yield call(clinicDetails)
-        localStorage.setItem('userId', JSON.stringify(response.tokenAuth.user.id))
         if (result4) {
+          localStorage.setItem('userId', JSON.stringify(result4.data.schoolDetail.id))
           yield put({
             type: 'user/SET_STATE',
             payload: {

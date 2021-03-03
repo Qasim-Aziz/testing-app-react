@@ -358,11 +358,11 @@ export const LEARNER_ACTIVE_DETAILS = gql`
 `
 
 export const MAKE_ASSESS = gql`
-  mutation makeAssessmentCharge($pk: ID!, $assessType: String!, $amount: Float) {
+  mutation makeAssessmentCharge($pk: ID!, $assessType: String!, $amount: Float, $invoiceId: ID) {
     makeAssessmentCharge(
       input: {
         pk: $pk
-        charges: [{ assessType: $assessType, amount: $amount, currency: "Q3VycmVuY3lUeXBlOjE=" }]
+        charges: [{ assessType: $assessType, amount: $amount, invoiceId: $invoiceId }]
       }
     ) {
       clientMutationId
@@ -376,6 +376,10 @@ export const MAKE_ASSESS = gql`
               assessType
               date
               amount
+              invoice {
+                id
+                invoiceNo
+              }
               currency {
                 id
                 symbol

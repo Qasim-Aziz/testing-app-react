@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable array-callback-return */
+/* eslint-disable */
 import React, { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet'
 import {

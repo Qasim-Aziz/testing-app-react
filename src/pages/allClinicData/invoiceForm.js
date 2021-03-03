@@ -97,10 +97,10 @@ function daysInMonth(month, year) {
 }
 
 const d = new Date()
-const month = monthNames[d.getMonth()]
+const month = 'February'
 const days = daysInMonth(d.getMonth() === 0 ? 12 : d.getMonth(), d.getFullYear())
 
-const DAYS_365 = 31556952000
+const DAYS_365 = 10
 
 const RATES_ZERO = {
   learnerPrice: 0,
@@ -336,6 +336,7 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
   }, [learnerData])
 
   useEffect(() => {
+    console.log(details, 'learnerDaaatat')
     if (details.length === count && learnerData && ratesData && productData) {
       let learnerCount = 0
       let peakCount = 0
@@ -470,6 +471,7 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
 
   const getLearnerDetails = learnerId => {
     learnerId.map((item, index) => {
+      console.log(item, month, 'itemMonet')
       client
         .mutate({
           mutation: LEARNER_ACTIVE_DETAILS,
@@ -526,8 +528,9 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
             console.log(data.data.createInvoice, 'invoice data')
             setInvoiceId(data.data.createInvoice.details.id)
             setIsCreated(true)
-
-            updateAssess()
+            generatePaymentLink(data.data.createInvoice.details.id)
+            updateAssess(data.data.createInvoice.details.id)
+            setInvoiceFormDrawer(false)
             return notification.success({
               message: 'Invoice Created Succesfully',
             })
@@ -541,9 +544,8 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
     })
   }
 
-  const updateAssess = () => {
+  const updateAssess = invoiceId => {
     updateAssessList.map(async item => {
-      console.log(item.id, item.assessType, item.amount, updateAssessList, 'item item')
       try {
         const data = await client.mutate({
           mutation: MAKE_ASSESS,
@@ -551,8 +553,10 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
             pk: item.id,
             assessType: item.assessType,
             amount: item.amount,
+            invoiceId,
           },
         })
+        console.log(data, 'data')
       } catch (e) {
         notification.error({
           message: 'Unable to update assess type',
@@ -561,9 +565,9 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
     })
   }
 
-  const generatePaymentLink = async () => {
+  const generatePaymentLink = invoiceId => {
     try {
-      const res = await client.mutate({
+      const res = client.mutate({
         mutation: GENERATE_LINK,
         variables: {
           pk: invoiceId,
