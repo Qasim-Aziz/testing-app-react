@@ -1,4 +1,4 @@
-## Installation
+## Installation ##
 
 * Install latest node.js: https://nodejs.org​
 * Install latest yarn package manager: https://yarnpkg.com/​
@@ -6,6 +6,6 @@
 * Run the app `yarn start`
 * For build production files use `yarn build` (build to /build/ folder)
 
-## Reference
+## Reference ##
 
 [https://facebook.github.io/create-react-app/](https://facebook.github.io/create-react-app/)
