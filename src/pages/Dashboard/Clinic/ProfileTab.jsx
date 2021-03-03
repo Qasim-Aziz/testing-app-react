@@ -11,6 +11,7 @@ import DisabledCurriculum from 'pages/ClinicProfile/DisabledCurriculum'
 import PeakAutomaticTab from '../PeakAutomaticTab'
 import AssessmentsTab from '../../../components/AssessmentsProfileTab'
 import SessionSettingTab from '../SessionSettingTab'
+import TherapistShiftTab from '../TherapistShiftTab'
 
 const { TabPane } = Tabs
 
@@ -65,6 +66,11 @@ const ProfileTab = ({ activeProfileTab, onProfileTabChange }) => {
       key: 'disabled-curriculum',
       title: 'Disabled Curriculum',
       component: <DisabledCurriculum />,
+    },
+    {
+      key: 'therapist-shifting',
+      title: 'Theapist Shifting',
+      component: <TherapistShiftTab />,
     },
   ]
 
