@@ -17,6 +17,7 @@ import {
   Icon,
   Input,
   Layout,
+  Tag,
   Menu,
   notification,
   Popconfirm,
@@ -31,6 +32,7 @@ import {
   UPDATE_GENERAL_ASSESSMENT,
   DELETE_GENERAL_ASSESSMENT,
 } from '../query'
+import client from '../../../apollo/config'
 import { useQuery, useLazyQuery, useMutation } from 'react-apollo'
 import CreateGenAssessForm from './CreateGenAssessForm'
 
@@ -40,41 +42,17 @@ const { Content } = Layout
 const { Text } = Typography
 
 function Assessment() {
-  const clinicId = JSON.parse(localStorage.getItem('userId'))
-
   const [createAssessDrawer, setCreateAssessDrawer] = useState(false)
   const [update, setUpdate] = useState(false)
   const [currentRow, setCurrentRow] = useState(null)
   const [tableData, setTableData] = useState(null)
 
-  const [
-    getGenAssess,
-    { data: genAssessData, loading: genAssessLoading, error: genAssessError, refetch },
-  ] = useLazyQuery(GET_GENERAL_ASSESSMENT)
-
-  const [
-    deleteGenAssess,
-    { data: deleteAssessData, loading: deleteAssessLoading, error: deleteAssessError },
-  ] = useMutation(DELETE_GENERAL_ASSESSMENT)
-
-  useEffect(() => {
-    getGenAssess()
-  }, [])
-
-  useEffect(() => {
-    if (deleteAssessData) {
-      notification.success({
-        message: 'Assessment deleted successfully',
-      })
-      refetch()
-    }
-    if (deleteAssessError) {
-      notification.error({
-        message: 'Something went wrong',
-        description: 'Unable to delete assessment',
-      })
-    }
-  }, [deleteAssessData, deleteAssessError])
+  const {
+    data: genAssessData,
+    loading: genAssessLoading,
+    error: genAssessError,
+    refetch,
+  } = useQuery(GET_GENERAL_ASSESSMENT)
 
   useEffect(() => {
     if (genAssessData) {
@@ -89,19 +67,37 @@ function Assessment() {
       })
       setTableData(temp)
     }
-  }, [genAssessData])
+    if (genAssessError) {
+      notification.error({
+        message: 'Something went wrong',
+        description: 'Unable to fetch assessments',
+      })
+    }
+  }, [genAssessData, genAssessError])
 
   const handleDelete = row => {
     if (row.id) {
-      deleteGenAssess({
-        variables: {
-          pk: row.id,
-        },
-      })
+      client
+        .mutate({
+          mutation: DELETE_GENERAL_ASSESSMENT,
+          variables: {
+            pk: row.id,
+          },
+        })
+        .then(res => {
+          notification.success({
+            message: 'Assessment deleted successfully',
+          })
+          refetch()
+        })
+        .catch(err => {
+          notification.error({
+            message: 'Something went wrong',
+            description: 'Unable to delete assessment',
+          })
+        })
     }
   }
-
-  console.log(tableData, 'tb')
   const columns = [
     {
       title: 'Sr No.',
@@ -109,20 +105,29 @@ function Assessment() {
       render: (text, row) => tableData.indexOf(row) + 1,
     },
     {
-      title: 'Title',
+      title: 'Assessment',
       dataIndex: 'name',
       render: (text, row) => {
         return (
-          <Button
-            type="link"
-            onClick={() => {
-              setUpdate(true)
-              setCurrentRow(row)
-              setCreateAssessDrawer(true)
-            }}
-          >
-            {text}
-          </Button>
+          <span>
+            <Button
+              type="link"
+              onClick={() => {
+                setUpdate(true)
+                setCurrentRow(row)
+                setCreateAssessDrawer(true)
+              }}
+            >
+              {text}
+            </Button>
+            {row.submodules.map(tag => {
+              return (
+                <Tag className="edit-tag" key={tag.name}>
+                  <span>{tag.name.length > 15 ? `${tag.slice(0, 15)}...` : tag.name}</span>
+                </Tag>
+              )
+            })}
+          </span>
         )
       },
     },
@@ -130,16 +135,18 @@ function Assessment() {
       title: 'Actions',
       render: (text, row) => {
         return (
-          <div>
-            <Button>More</Button>
-            <Button
-              onClick={() => {
-                handleDelete(row)
-              }}
+          <>
+            <Popconfirm
+              title="Are you sure you don't want this record?"
+              onConfirm={() => handleDelete(text)}
+              okText="Yes"
+              cancelText="No"
             >
-              Delete
-            </Button>
-          </div>
+              <Button type="link" style={{ color: 'red' }}>
+                <DeleteOutlined /> Delete
+              </Button>
+            </Popconfirm>
+          </>
         )
       },
     },
@@ -178,6 +185,7 @@ function Assessment() {
               type="primary"
               onClick={() => {
                 setUpdate(false)
+                setCurrentRow(null)
                 setCreateAssessDrawer(true)
               }}
             >

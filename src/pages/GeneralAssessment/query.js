@@ -111,20 +111,51 @@ export const STUDNET_INFO = gql`
   }
 `
 
+export const GET_GENERAL_DATA = gql`
+  query($student: ID) {
+    getGeneralData(student: $student) {
+      edges {
+        node {
+          id
+          score
+          time
+          student {
+            id
+            firstname
+          }
+          module {
+            id
+            name
+            date
+            hasSubmodule
+          }
+          note
+          submodule {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+`
+
 export const RECORD_GENERAL_DATA = gql`
-  mutation {
+  mutation($student: ID!, $module: ID!, $submodule: ID, $score: Int!, $note: String) {
     recordGeneralData(
       input: {
-        student: "U3R1ZGVudFR5cGU6MTYz"
-        module: "R2VuZXJhbEFzc2Vzc21lbnRUeXBlOjE="
-        submodule: "R2VuZXJhbFN1Yk1vZHVsZXNUeXBlOjE="
-        score: 2
+        student: $student
+        module: $module
+        submodule: $submodule
+        score: $score
+        note: $note
       }
     ) {
       details {
         id
         score
         time
+        note
         student {
           id
           firstname
@@ -144,44 +175,10 @@ export const RECORD_GENERAL_DATA = gql`
   }
 `
 
-export const GET_GENERAL_DATA = gql`
-  query {
-    getGeneralData(student: "U3R1ZGVudFR5cGU6MTYz", date: "2021-03-01") {
-      edges {
-        node {
-          id
-          score
-          time
-          student {
-            id
-            firstname
-          }
-          module {
-            id
-            name
-            date
-            hasSubmodule
-          }
-          submodule {
-            id
-            name
-          }
-        }
-      }
-    }
-  }
-`
-
 export const UPDATE_GENERAL_DATA = gql`
-  mutation {
+  mutation($pk: ID!, $module: ID, $submodule: ID, $score: Int, $note: String) {
     updateGeneralData(
-      input: {
-        pk: "R2VuZXJhbFJlY29yZGluZ1R5cGU6MQ=="
-        student: "U3R1ZGVudFR5cGU6MTYz"
-        module: "R2VuZXJhbEFzc2Vzc21lbnRUeXBlOjE="
-        submodule: "R2VuZXJhbFN1Yk1vZHVsZXNUeXBlOjE="
-        score: 2
-      }
+      input: { pk: $pk, module: $module, submodule: $submodule, score: $score, note: $note }
     ) {
       details {
         id
@@ -207,8 +204,8 @@ export const UPDATE_GENERAL_DATA = gql`
 `
 
 export const DELETE_GENERAL_DATA = gql`
-  mutation {
-    deleteGeneralData(input: { pk: "" }) {
+  mutation($pk: ID!) {
+    deleteGeneralData(input: { pk: $pk }) {
       status
       msg
     }

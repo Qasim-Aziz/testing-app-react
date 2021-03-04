@@ -25,23 +25,16 @@ export default ({ index, dispatch, setSubmodulesCount, state }) => {
           value={state[index]?.name}
         />
       </Form.Item>
-
       {index !== 0 && (
         <MinusOutlined
           style={{ fontSize: 22, marginTop: 2, marginLeft: 10 }}
           onClick={() => {
             console.log(index, 'index')
+            if (state.length === 2) {
+              console.log(state, 'state')
+            }
             setSubmodulesCount(state => state - 1)
             dispatch({ type: 'REMOVE_SUBMODULE', index })
-          }}
-        />
-      )}
-      {index === 0 && (
-        <PlusOutlined
-          style={{ fontSize: 22, marginTop: 2, marginLeft: 10 }}
-          onClick={() => {
-            setSubmodulesCount(state => state + 1)
-            dispatch({ type: 'ADD_SUBMODULE' })
           }}
         />
       )}

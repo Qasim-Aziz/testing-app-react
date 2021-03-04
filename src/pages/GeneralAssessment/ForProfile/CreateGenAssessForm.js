@@ -2,6 +2,7 @@
 /* eslint-disable  */
 import React, { useEffect, useState, useReducer } from 'react'
 import { Form, Input, DatePicker, Select, Button, notification, Radio, Checkbox } from 'antd'
+import { PlusOutlined } from '@ant-design/icons'
 import { useMutation } from 'react-apollo'
 import { remove, times, update } from 'ramda'
 import moment from 'moment'
@@ -17,6 +18,18 @@ const { Option } = Select
 
 const submodulesReducer = (state, action) => {
   switch (action.type) {
+    case 'SET_STATE': {
+      if (action.payload.length > 0) {
+        let temp = []
+        temp = action.payload.map(item => {
+          return { name: item.name }
+        })
+        return temp
+      } else {
+        return [{ name: '' }]
+      }
+    }
+
     case 'ADD_SUBMODULE':
       return [
         ...state,
@@ -46,18 +59,11 @@ const CreateGenAssessForm = ({
     update && currentRow.hasSubmodule ? currentRow?.submodules.length : 1,
   )
   const [hasSubmodules, setHasSubmodules] = useState(false)
-  const [pk, setPk] = useState(currentRow.id)
-  const [submodulesState, submodulesDispatch] = useReducer(
-    submodulesReducer,
-    update && currentRow.submodules
-      ? currentRow.submodules.length > 0
-        ? currentRow.submodules.map(item => {
-            return { name: item.name }
-          })
-        : [{ name: '' }]
-      : [{ name: '' }],
-  )
+  const [pk, setPk] = useState(currentRow?.id)
+  console.log(update, 'update')
+  const [submodulesState, submodulesDispatch] = useReducer(submodulesReducer, [{ name: '' }])
 
+  console.log(submodulesState, 'sub mode sd state')
   const [createGenAssess, { data, error, loading }] = useMutation(
     CREATE_GENERAL_ASSESSMENT,
     //   , {
@@ -93,12 +99,17 @@ const CreateGenAssessForm = ({
   ] = useMutation(UPDATE_GENERAL_ASSESSMENT)
 
   useEffect(() => {
-    console.log(update, currentRow.hasSubmodule)
+    console.log(update, currentRow?.hasSubmodule)
     if (update && currentRow.hasSubmodule) {
-      console.log(currentRow.hasSubmodule, 'useEffect')
+      submodulesDispatch({
+        type: 'SET_STATE',
+        payload: currentRow.submodules,
+      })
       setHasSubmodules(true)
+      console.log(currentRow.hasSubmodule, 'useEffect')
     }
   }, [])
+
   useEffect(() => {
     if (data) {
       notification.success({
@@ -128,13 +139,6 @@ const CreateGenAssessForm = ({
     }
   }, [data, error, updatedData, updatedError])
 
-  // useEffect(() => {
-  //   form.setFieldsValue({
-  //     date: moment(),
-  //     category: 'Direct',
-  //   })
-  // }, [])
-
   const handleUpdate = e => {
     e.preventDefault()
     form.validateFields((errors, values) => {
@@ -161,8 +165,7 @@ const CreateGenAssessForm = ({
     e.preventDefault()
     form.validateFields((formError, values) => {
       if (!formError) {
-        console.log(formError, values)
-        console.log(hasSubmodules, submodulesState)
+        console.log(values, hasSubmodules, submodulesState, 'in submitt')
         createGenAssess({
           variables: {
             name: values.name,
@@ -176,9 +179,7 @@ const CreateGenAssessForm = ({
   }
 
   console.log(updatedError, updatedData, updatedLoading, 'updated response')
-  // console.log(hasSubmodules)
-  // console.log(update, currentRow, ' state ', submodulesState)
-  // console.log(data, loading, error, update, currentRow, 'create')
+  console.log(update, currentRow, 'currentRw')
   return (
     <Form onSubmit={update ? handleUpdate : handleSubmit}>
       <Form.Item label="Assessment Title">
@@ -200,17 +201,27 @@ const CreateGenAssessForm = ({
           />,
         )}
       </Form.Item>
-      <Form.Item style={{ display: 'flex' }} label="Submodules">
-        <Checkbox
-          size="large"
-          value={hasSubmodules}
-          style={{
-            width: '100%',
-          }}
-          checked={hasSubmodules}
-          onChange={e => setHasSubmodules(e.target.checked)}
-        />
-      </Form.Item>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Form.Item style={{ display: 'flex' }} label="Submodules">
+          <Checkbox
+            size="large"
+            style={{
+              width: '100%',
+            }}
+            checked={hasSubmodules}
+            onChange={e => setHasSubmodules(e.target.checked)}
+          />
+        </Form.Item>
+        {hasSubmodules && (
+          <PlusOutlined
+            style={{ fontSize: 22, marginTop: 10 }}
+            onClick={() => {
+              setSubmodulesCount(state => state + 1)
+              submodulesDispatch({ type: 'ADD_SUBMODULE' })
+            }}
+          />
+        )}
+      </div>
       <Form.Item>
         {hasSubmodules &&
           submodulesState &&
@@ -220,6 +231,7 @@ const CreateGenAssessForm = ({
                 key={n}
                 state={submodulesState}
                 index={n}
+                setHasSubmodules={setHasSubmodules}
                 dispatch={submodulesDispatch}
                 setSubmodulesCount={setSubmodulesCount}
               />

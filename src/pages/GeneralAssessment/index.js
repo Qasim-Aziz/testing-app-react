@@ -5,23 +5,13 @@
 /* eslint-disable react/jsx-closing-bracket-location */
 /* eslint-disable array-callback-return */
 /* eslint-disable no-unused-expressions */
+import { DeleteOutlined, PlusOutlined, FilterOutlined } from '@ant-design/icons'
 import {
-  CheckSquareFilled,
-  DeleteOutlined,
-  PauseOutlined,
-  PlayCircleOutlined,
-  PlusOutlined,
-  FilterOutlined,
-} from '@ant-design/icons'
-import {
-  Badge,
   Button,
   Drawer,
-  Dropdown,
   Icon,
   Input,
   Layout,
-  Menu,
   notification,
   Popconfirm,
   Radio,
@@ -30,13 +20,15 @@ import {
   Tooltip,
   Typography,
 } from 'antd'
-import gql from 'graphql-tag'
 import React, { useEffect, useState } from 'react'
 import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import LearnerSelect from 'components/LearnerSelect'
-import { STUDNET_INFO } from './query'
+import moment from 'moment'
+import client from '../../apollo/config'
+import RecordAssessmentForm from './recordAssessmentForm'
+import { STUDNET_INFO, GET_GENERAL_DATA, DELETE_GENERAL_DATA } from './query'
 // import './index.scss'
 
 const { TabPane } = Tabs
@@ -46,21 +38,23 @@ const { Text } = Typography
 
 export default () => {
   const [open, setOpen] = useState(false)
-  const [suggestTarget, setSuggestTarget] = useState()
-  const [selectedTarget, setSelectedTarget] = useState()
-  const [suggestEquiTarget, setSuggestEquiTarget] = useState()
   const studentId = localStorage.getItem('studentId')
   const [originalData, setOriginalData] = useState([])
   const [tableData, setTableData] = useState([])
-  const history = useHistory()
+  const [update, setUpdate] = useState(false)
+  const [currentRow, setCurrentRow] = useState(null)
   const dispatch = useDispatch()
+  const [filterAssessment, setFilterAssessment] = useState('')
+  const [filterSubmodule, setFilterSubmodule] = useState('')
   const [filterNote, setFilterNote] = useState('')
-  const [filterTitle, setFilterTitle] = useState('')
-  const [filterCategory, setFilterCategory] = useState('')
-  const [filterStatus, setFilterStatus] = useState('')
   const [visibleFilter, setVisibleFilter] = useState(false)
 
-  const [selectedIdForDelete, setSelectedIdForDelete] = useState(null)
+  const { data, loading, error, refetch } = useQuery(GET_GENERAL_DATA, {
+    variables: {
+      student: studentId,
+    },
+    fetchPolicy: 'network-only',
+  })
 
   const [loadStudentData, { data: studnetInfo }] = useLazyQuery(STUDNET_INFO, {
     variables: {
@@ -72,8 +66,26 @@ export default () => {
   const student = useSelector(state => state.student)
 
   useEffect(() => {
-    console.log(studnetInfo)
-  }, [studnetInfo])
+    updateTableData()
+    dispatch({
+      type: 'learnersprogram/LOAD_DATA',
+    })
+  }, [])
+
+  useEffect(() => {
+    updateTableData()
+  }, [data])
+
+  const updateTableData = () => {
+    if (data) {
+      const tempTable = []
+      data.getGeneralData.edges.map(item => {
+        tempTable.push(item.node)
+      })
+      setOriginalData(tempTable)
+      setTableData(tempTable)
+    }
+  }
 
   useEffect(() => {
     if (studentId) {
@@ -81,175 +93,127 @@ export default () => {
     }
   }, [studentId])
 
-  useEffect(() => {
-    dispatch({
-      type: 'learnersprogram/LOAD_DATA',
-    })
-  }, [])
+  console.log(data, loading, error, tableData, 'sd')
 
   useEffect(() => {
     let tempList = originalData
-    if (filterTitle) {
+    if (filterAssessment) {
       tempList =
         tempList &&
         tempList.filter(
-          item => item.node.title && item.node.title.toLowerCase().includes(filterTitle),
+          item => item.module.name && item.module.name.toLowerCase().includes(filterAssessment),
         )
     }
     if (filterNote) {
       tempList =
         tempList &&
-        tempList.filter(
-          item => item.node.notes && item.node.notes.toLowerCase().includes(filterNote),
-        )
+        tempList.filter(item => item.note && item.note.toLowerCase().includes(filterNote))
     }
-    if (filterCategory) {
+    if (filterSubmodule) {
       tempList =
         tempList &&
         tempList.filter(
-          item => item.node.category && item.node.category.toLowerCase().includes(filterCategory),
-        )
-    }
-    if (filterStatus) {
-      tempList =
-        tempList &&
-        tempList.filter(
-          item => item.node.status && item.node.status.toLowerCase().includes(filterStatus),
+          item => item.submodule && item.submodule.name.toLowerCase().includes(filterSubmodule),
         )
     }
     setTableData(tempList)
-  }, [filterTitle, filterNote, filterCategory, filterStatus])
+  }, [filterAssessment, filterSubmodule, filterNote])
 
-  const startPeakEquivalence = node => {
-    dispatch({
-      type: 'peakequivalence/SET_STATE',
-      payload: {
-        ProgramId: node.id,
-      },
-    })
-    window.location.href = '/#/peakEqvi'
+  const handleDelete = row => {
+    if (row && row.id) {
+      client
+        .mutate({
+          mutation: DELETE_GENERAL_DATA,
+          variables: {
+            pk: row.id,
+          },
+        })
+        .then(res => {
+          refetch()
+          notification.success({
+            message: 'Record deleted successfully',
+          })
+        })
+        .catch(err => {
+          notification.error({
+            message: 'Something went wrong',
+            description: 'Unable to delete record',
+          })
+        })
+    }
   }
 
-  const makeInactive = id => {
-    console.log('selected id ======> ', id)
-    const newData = tableData?.filter(item => item.node.id !== id)
-    setTableData(newData)
+  const [sortOrderInfo, setSortOrderInfo] = useState(null)
 
-    // write make assessment inActive code below
-    setSelectedIdForDelete(id)
+  const handleSortChange = (pagination, filters, sorter) => {
+    setSortOrderInfo(sorter)
   }
+  const sortedInfo = sortOrderInfo || {}
+
   const columns = [
     {
       title: 'Date',
-      dataIndex: 'node.date',
+      dataIndex: 'date',
+      key: 'date',
+      sorter: (a, b) => {
+        if (a.date !== 'None' && b.date !== 'None') {
+          return new Date(a.date) - new Date(b.date)
+        }
+        return false
+      },
+      sortOrder: sortedInfo.columnKey === 'date' && sortedInfo.order,
+      sortDirections: ['ascend', 'descend'],
+      render: text => moment(text).format('YYYY-MM-DD'),
     },
-
     {
-      title: 'Title',
-      dataIndex: 'node.title',
+      title: 'Assessment',
+      dataIndex: 'module.name',
+    },
+    {
+      title: 'Sub Module',
+      dataIndex: 'submodule.name',
     },
     {
       title: 'Note',
-      dataIndex: 'node.notes',
-    },
-
-    {
-      title: 'Status',
-      align: 'center',
-      render: (text, obj) => (
-        <Badge
-          count={obj.node.status.charAt(0).toUpperCase() + obj.node.status.slice(1).toLowerCase()}
-          style={{ background: obj.node.status === 'PROGRESS' ? '#52c41a' : '#faad14' }}
-        />
-      ),
+      dataIndex: 'note',
     },
     {
-      title: 'Action',
-      align: 'center',
-      minWidth: '100px',
-      maxWidth: '100px',
-      render: (text, obj) => {
-        if (obj.node.category === 'TRANSFORMATION') {
-          return <p>Under development</p>
-        } else {
-          const seeAssesmentMenu = (
-            <Menu.Item key="seeAssesment">
-              <CheckSquareFilled /> See Assesment
-            </Menu.Item>
-          )
-
-          const seeReportMenu = (
-            <Menu.Item key="seeReport">
-              <Icon type="snippets" /> See Report
-            </Menu.Item>
-          )
-
-          const suggestTargetMenu = (
-            <Menu.Item key="suggestTarget">
-              <Icon type="diff" /> Suggest Target
-            </Menu.Item>
-          )
-
-          const resumeAssesmentMenu = (
-            <Menu.Item key="resumeAssesment">
-              <PauseOutlined /> Resume Assesment
-            </Menu.Item>
-          )
-
-          const startAssesmentMenu = (
-            <Menu.Item key="startAssesment">
-              <PlayCircleOutlined /> Start Assesment
-            </Menu.Item>
-          )
-
-          const menuItems = []
-
-          if (obj.node.status === 'COMPLETED') {
-            menuItems.push(seeAssesmentMenu)
-            menuItems.push(seeReportMenu)
-            menuItems.push(<Menu.Divider />)
-            menuItems.push(suggestTargetMenu)
-          } else if (obj.node.submitpeakresponsesSet.totalAttended > 0) {
-            menuItems.push(resumeAssesmentMenu)
-            menuItems.push(seeReportMenu)
-            menuItems.push(<Menu.Divider />)
-            menuItems.push(suggestTargetMenu)
-          } else {
-            menuItems.push(startAssesmentMenu)
-            menuItems.push(<Menu.Divider />)
-            menuItems.push(suggestTargetMenu)
-          }
-
-          //   const menu = <Menu onClick={e => handleMenuActions(e, obj)}>{menuItems}</Menu>
-
-          return (
-            <>
-              <Tooltip placement="topRight" title="Delete Assessment">
-                <Popconfirm
-                  title="Are you sure you don't want this assessment?"
-                  onConfirm={() => makeInactive(obj.node.id)}
-                  okText="Yes"
-                  cancelText="No"
-                >
-                  <Button type="link" style={{ color: 'red' }}>
-                    <DeleteOutlined /> Delete
-                  </Button>
-                </Popconfirm>
-              </Tooltip>
-              <span style={{ borderRight: '1px solid #ccc', margin: '0 8px' }} />
-              <Dropdown>
-                <a
-                  role="presentation"
-                  className="ant-dropdown-link"
-                  onClick={e => e.preventDefault()}
-                  style={{ color: '#1890ff' }}
-                >
-                  More <Icon type="down" />
-                </a>
-              </Dropdown>
-            </>
-          )
-        }
+      title: 'Score',
+      dataIndex: 'score',
+      key: 'score',
+      sorter: (a, b) => a.score - b.score,
+      sortOrder: sortedInfo.columnKey === 'score' && sortedInfo.order,
+      sortDirections: ['ascend', 'descend'],
+    },
+    {
+      title: 'Actions',
+      render: text => {
+        return (
+          <>
+            <Popconfirm
+              title="Are you sure you don't want this record?"
+              onConfirm={() => handleDelete(text)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button type="link" style={{ color: 'red' }}>
+                <DeleteOutlined /> Delete
+              </Button>
+            </Popconfirm>
+            <span style={{ borderRight: '1px solid #ccc', margin: '0 8px' }} />
+            <Button
+              type="link"
+              onClick={() => {
+                setCurrentRow(text)
+                setUpdate(true)
+                setOpen(true)
+              }}
+            >
+              <Icon type="edit" />
+              Edit
+            </Button>
+          </>
+        )
       },
     },
   ]
@@ -261,20 +225,30 @@ export default () => {
         height: 'fit-content',
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'space-between',
       }}
     >
-      <div style={{ margin: 'auto', display: 'flex' }}>
-        <span style={{ marginRight: '6px', marginTop: '2px' }}>Title: </span>
+      <div style={{ margin: 'auto 35px auto 0', display: 'flex' }}>
+        <span style={{ marginRight: '6px', marginTop: '2px' }}>Assessment: </span>
         <Input
           size="small"
-          placeholder="Search Title"
-          value={filterTitle}
-          onChange={e => setFilterTitle(e.target.value)}
+          placeholder="Search Assessment"
+          value={filterAssessment}
+          onChange={e => setFilterAssessment(e.target.value)}
           style={{ width: 140, marginRight: 8, display: 'block' }}
         />
       </div>
-      <div style={{ margin: 'auto', display: 'flex' }}>
+
+      <div style={{ margin: 'auto 35px', display: 'flex' }}>
+        <span style={{ marginRight: '6px', marginTop: '2px' }}>Sub-Module: </span>
+        <Input
+          size="small"
+          placeholder="Search Sub-Module"
+          value={filterSubmodule}
+          onChange={e => setFilterSubmodule(e.target.value)}
+          style={{ width: 140, marginRight: 8, display: 'block' }}
+        />
+      </div>
+      <div style={{ margin: 'auto 35px', display: 'flex' }}>
         <span style={{ marginRight: '6px', marginTop: '2px' }}>Note: </span>
         <Input
           size="small"
@@ -283,19 +257,6 @@ export default () => {
           onChange={e => setFilterNote(e.target.value)}
           style={{ width: 140, marginRight: 8, display: 'block' }}
         />
-      </div>
-      <div style={{ margin: 'auto' }}>
-        <span style={{ marginRight: '6px' }}>Status: </span>
-        <Radio.Group
-          size="small"
-          value={filterStatus}
-          onChange={e => setFilterStatus(e.target.value)}
-          buttonStyle="solid"
-        >
-          <Radio.Button value="">All</Radio.Button>
-          <Radio.Button value="progress">In Progress</Radio.Button>
-          <Radio.Button value="completed">Completed</Radio.Button>
-        </Radio.Group>
       </div>
     </div>
   )
@@ -352,7 +313,15 @@ export default () => {
             >
               <LearnerSelect />
             </Drawer>
-            <Button type="primary" size="large" onClick={() => setOpen(true)}>
+            <Button
+              type="primary"
+              size="large"
+              onClick={() => {
+                setUpdate(false)
+                setCurrentRow(null)
+                setOpen(true)
+              }}
+            >
               <PlusOutlined />
               Record Assessment
             </Button>
@@ -361,9 +330,10 @@ export default () => {
         <div className="modify-peak-22-table">
           <Table
             columns={columns}
-            size="small"
+            onChange={handleSortChange}
             bordered
-            dataSource={null}
+            rowKey={record => record.id}
+            dataSource={tableData}
             title={() => {
               return filterHeader
             }}
@@ -373,8 +343,27 @@ export default () => {
               pageSizeOptions: ['10', '20', '30', '50'],
               position: 'top',
             }}
-            // loading={true}
+            loading={loading}
           />
+        </div>
+        <div>
+          <Drawer
+            visible={open}
+            onClose={() => setOpen(false)}
+            placement="right"
+            width={600}
+            title="Record Assessmet"
+            destroyOnClose
+          >
+            <RecordAssessmentForm
+              update={update}
+              currentRow={currentRow}
+              setUpdate={setUpdate}
+              setCurrentRow={setCurrentRow}
+              setOpen={setOpen}
+              refetch={refetch}
+            />
+          </Drawer>
         </div>
       </Content>
     </Layout>
