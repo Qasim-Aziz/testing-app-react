@@ -225,19 +225,19 @@ const MedicalDataPage = props => {
   return (
     <div>
       <Helmet title="Dashboard Alpha" />
+      <FilterComp
+        handleSelectDate={handleSelectDate}
+        startDate={date.gte}
+        endDate={date.lte}
+        searchText={searchText}
+        onTextChange={searchMedData}
+        searchLabel="Medical Condition"
+        rangePicker
+      />
       <Layout style={{ padding: '0px' }}>
         <Content style={{ padding: '0px 20px', maxWidth: 1300, width: '100%', margin: '0px auto' }}>
           <Row gutter={[46, 0]}>
             <Col className="medicalData">
-              {/* <Calendar value={date} handleOnChange={handleSelectDate} /> */}
-              {filter && (
-                <FilterComp
-                  handleSelectDate={handleSelectDate}
-                  startDate={date.gte}
-                  endDate={date.lte}
-                  rangePicker
-                />
-              )}
               <div>
                 <div style={{ marginTop: 17 }}>
                   <Table
@@ -252,7 +252,6 @@ const MedicalDataPage = props => {
                       pageSizeOptions: ['10', '25', '50', '100'],
                     }}
                     size="small"
-                    title={header}
                     bordered
                   />
                   {/* {loading && 'Loading...'}

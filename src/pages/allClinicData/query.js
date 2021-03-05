@@ -28,6 +28,7 @@ export const CLINIC_QUERY = gql`
           firstName
         }
         country {
+          id
           name
           isActive
           dbName
@@ -101,11 +102,6 @@ export const ALL_LEARNERS = gql`
                 date
                 assessType
                 amount
-                currency {
-                  id
-                  symbol
-                  currency
-                }
               }
             }
           }
@@ -170,6 +166,7 @@ export const CLINIC_RATES = gql`
             id
             schoolName
             country {
+              id
               name
             }
           }
@@ -199,6 +196,7 @@ export const UPDATE_RATES = gql`
       }
     ) {
       details {
+        id
         clinic {
           id
           schoolName
@@ -290,25 +288,27 @@ export const GET_INVOICES = gql`
     getInvoices(date_Gte: $from, date_Lte: $to, status: $status, clinic: $clinic) {
       edges {
         node {
-          id
           invoiceNo
           email
-          issueDate
-          dueDate
           amount
+          issueDate
+          linkGenerated
+          paymentLink
+          paymentLinkId
           address
           taxableSubtotal
           sgst
           cgst
           discount
           total
+          id
+          dueDate
           clinic {
             id
             schoolName
             currency {
               id
               currency
-              symbol
             }
           }
           status {
@@ -408,11 +408,6 @@ export const MAKE_ASSESS = gql`
               invoice {
                 id
                 invoiceNo
-              }
-              currency {
-                id
-                symbol
-                currency
               }
             }
           }

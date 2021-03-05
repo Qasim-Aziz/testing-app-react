@@ -362,6 +362,11 @@ function PrintableInvoice() {
                   <Text style={{ ...general, alignSelf: 'flex-start', width: '100%' }}>
                     {toWords.convert(total)}
                   </Text>
+                  <Text
+                    style={{ ...general, alignSelf: 'flex-start', color: 'blue', width: '100%' }}
+                  >
+                    {invoice.paymentLink}
+                  </Text>
                 </View>
                 <View
                   style={{

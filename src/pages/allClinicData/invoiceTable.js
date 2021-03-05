@@ -96,6 +96,7 @@ function InvoiceTable({ rowData }) {
         status: statusSelect,
         clinic: rowData?.details.id,
       },
+      fetchPolicy: 'network-only',
     },
   )
 
@@ -116,7 +117,7 @@ function InvoiceTable({ rowData }) {
     if (invoiceError) {
       notification.error({
         message: 'Something went wrong',
-        description: 'Unable to fetch invoices',
+        description: 'Network error - Response not successful: Unable to fetch invoices',
       })
     }
   }, [invoiceData, invoiceError])
@@ -137,6 +138,9 @@ function InvoiceTable({ rowData }) {
         message: 'opps error on delete invoice',
       })
     }
+  }, [deleteInvoiceData, deleteInvoiceError])
+
+  useEffect(() => {
     if (deleteAssessChargeData) {
       notification.success({
         message: 'Assessment charges updated successfully',
@@ -148,7 +152,7 @@ function InvoiceTable({ rowData }) {
         description: 'Unable to update assessment charges',
       })
     }
-  }, [deleteInvoiceData, deleteInvoiceError, deleteAssessChargeData, deleteAssessChargeError])
+  }, [deleteAssessChargeData, deleteAssessChargeError])
 
   const handleSendReminder = async invoiceId => {
     console.log(invoiceId, 'invoiceId')
@@ -165,7 +169,7 @@ function InvoiceTable({ rowData }) {
       console.log(reminder)
       return reminder
     } catch (error) {
-      console.log(error, 'er')
+      console.log(error, 'from remainer errororor er')
       return notification.error({
         message: 'Unable to send reminder',
       })
@@ -229,7 +233,7 @@ function InvoiceTable({ rowData }) {
 
             <Tooltip placement="top" title="Delete Invoice">
               <Popconfirm
-                title="Are you sure ?"
+                title="Are you sure to delete this invoice?"
                 onConfirm={() => {
                   console.log(invoice.id)
                   deleteAssessmentCharges({ variables: { invoices: [invoice.id] } })
@@ -307,6 +311,7 @@ function InvoiceTable({ rowData }) {
           >
             <InvoiceForm
               rowData={rowData}
+              refetchInvoices={refetch}
               invoiceFormDrawer={invoiceFormDrawer}
               setInvoiceFormDrawer={setInvoiceFormDrawer}
             />

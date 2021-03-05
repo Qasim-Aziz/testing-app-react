@@ -11,7 +11,6 @@ import { Tooltip, Button } from 'antd'
 import { PrinterOutlined } from '@ant-design/icons'
 import moment from 'moment'
 import { ToWords } from 'to-words'
-import 'jspdf-autotable'
 import { useHistory } from 'react-router-dom'
 import logo from '../../images/WhatsApp Image 2020-04-23 at 10.00.40 (1).jpeg'
 
@@ -92,7 +91,6 @@ const monthNames = [
 ]
 
 function getTotal(subTotal, discount = 0, gst = 0, sgst = 0, taxableSubtotal = 0) {
-  console.log(subTotal, discount, gst, sgst, taxableSubtotal)
   return Number(
     subTotal -
       (subTotal / 100) * parseFloat(discount || 0) +
@@ -105,10 +103,9 @@ function getTotal(subTotal, discount = 0, gst = 0, sgst = 0, taxableSubtotal = 0
 function ViewInvoice({ invoice }) {
   const [subTotal, setSubtotal] = useState(0)
   const history = useHistory()
-  const currentCurrency = invoice.clinic.currency ? invoice.clinic.currency.symbol : '$'
   const currentCurrencyName = invoice.clinic.currency ? invoice.clinic.currency.currency : 'USD'
 
-  console.log(currentCurrencyName, 'currentCyName')
+  console.log(invoice, 'currentCyName')
   useEffect(() => {
     let tempSubTotal = 0
     invoice.invoiceFee.edges.map(item => {
@@ -137,7 +134,6 @@ function ViewInvoice({ invoice }) {
 
   const invoke = () => {
     localStorage.setItem('currentInvoice', JSON.stringify(invoice))
-    console.log('invoke')
     history.push('/printInvoice')
   }
 
@@ -192,7 +188,6 @@ function ViewInvoice({ invoice }) {
                 </div>
                 <div
                   style={{
-                    // marginBottom: '8px',
                     fontSize: 10,
                     width: '100%',
                     alignSelf: 'flex-start',
@@ -204,7 +199,6 @@ function ViewInvoice({ invoice }) {
                 </div>
                 <div
                   style={{
-                    // marginBottom: '8px',
                     fontSize: 10,
                     width: '100%',
                     alignSelf: 'flex-start',
@@ -386,6 +380,11 @@ function ViewInvoice({ invoice }) {
               <div style={{ width: '50%' }}>
                 <div style={{ ...general, alignSelf: 'flex-start', width: '100%' }}>
                   {toWords.convert(total)}
+                </div>
+                <div style={{ ...general, alignSelf: 'flex-start', color: 'blue', width: '100%' }}>
+                  <a href={invoice.paymentLink} rel="noopener noreferrer" target="_blank">
+                    {invoice.paymentLink}
+                  </a>
                 </div>
               </div>
               <div

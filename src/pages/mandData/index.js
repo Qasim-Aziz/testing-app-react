@@ -254,6 +254,14 @@ const MandDataPage = props => {
   return (
     <Authorize roles={['school_admin', 'therapist', 'parents']} redirect to="/dashboard/beta">
       <Helmet title="Dashboard Alpha" />
+      <FilterComp
+        handleSelectDate={handleSelectDate}
+        searchVal={searchVal}
+        searchValHandler={searchValHandler}
+        startDate={date.gte}
+        endDate={date.lte}
+        rangePicker
+      />
       <Layout style={{ padding: '0px' }}>
         <Content
           style={{
@@ -265,16 +273,6 @@ const MandDataPage = props => {
         >
           <Row gutter={[46, 0]}>
             <Col span={24}>
-              {filter && (
-                <FilterComp
-                  handleSelectDate={handleSelectDate}
-                  searchVal={searchVal}
-                  searchValHandler={searchValHandler}
-                  startDate={date.gte}
-                  endDate={date.lte}
-                  rangePicker
-                />
-              )}
               <div>
                 <div
                   style={{

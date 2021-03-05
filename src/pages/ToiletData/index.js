@@ -79,6 +79,12 @@ const ToiletDataPage = props => {
   return (
     <div>
       <Helmet title="Dashboard Alpha" />
+      <FilterComp
+        handleSelectDate={handleSelectDate}
+        startDate={date.gte}
+        endDate={date.lte}
+        rangePicker
+      />
       <Layout style={{ padding: '0px' }}>
         <Content
           style={{
@@ -91,14 +97,6 @@ const ToiletDataPage = props => {
           <Row gutter={[46, 0]}>
             <Col span={24}>
               {/* <Calendar value={date} handleOnChange={handleSelectDate} /> */}
-              {filter && (
-                <FilterComp
-                  handleSelectDate={handleSelectDate}
-                  startDate={date.gte}
-                  endDate={date.lte}
-                  rangePicker
-                />
-              )}
               <div>
                 <div
                   style={{

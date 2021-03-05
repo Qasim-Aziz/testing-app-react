@@ -33,14 +33,11 @@ const FilterCard = ({
     <div
       style={{
         background: '#FFFFFF',
-        border: '1px solid #E4E9F0',
         boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
-        borderRadius: 10,
-        padding: '10px 35px',
         position: 'relative',
         display: 'flex',
         justifyContent: 'center',
-        ...style,
+        // ...style,
       }}
     >
       <Form.Item style={ItemStyle} {...formItemLayout} label={<span style={fontSize}>Type</span>}>

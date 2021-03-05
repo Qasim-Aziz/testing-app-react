@@ -146,6 +146,7 @@ const DailyVitalsCard = props => {
         style={{
           background: '#F1F1F1',
           borderRadius: 0,
+          border: 'none',
           minHeight: '100vh',
           minWidth: '290px',
           maxWidth: '350px',
@@ -189,7 +190,7 @@ const DailyVitalsCard = props => {
           <span style={HeadStyle}>ABC Data</span>
         </div>
       </Card>
-      <div style={{ width: '100%', borderTop: '20px solid #F1F1F1' }}>{funcData(TabCheck)}</div>
+      <div style={{ width: '100%' }}>{funcData(TabCheck)}</div>
     </div>
   )
 }

@@ -94,10 +94,10 @@ class ProfileMenu extends React.Component {
         ) : (
           ''
         )} */}
-        
+
         <Menu.Divider />
         <Menu.Item onClick={this.logout}>
-          <a href="javascript: void(0);">
+          <a>
             <i className={`${styles.menuIcon} icmn-exit`} />
             <FormattedMessage id="topBar.profileMenu.logout" />
           </a>

@@ -31,7 +31,6 @@ import {
 import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
 import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
 import gql from 'graphql-tag'
-import axios from 'axios'
 import moment from 'moment'
 import client from '../../apollo/config'
 import '../../components/invoice/invoiceForm.scss'
@@ -53,12 +52,29 @@ const { Option } = Select
 const { Text, Title } = Typography
 const { TextArea } = Input
 
-const countSubTotal = data => {
-  let total = 0
-  data.forEach(({ qty, rate }) => {
-    total += Math.round(qty) * rate
-  })
-  return Number(total).toFixed(2)
+const amParent = {
+  display: 'flex',
+  color: 'black',
+  width: '100%',
+  justifyContent: 'flex-end',
+  alignItems: 'flex-end',
+}
+const gen = {
+  fontSize: 18,
+  fontWeight: 600,
+  whiteSpace: 'nowrap',
+  textAlign: 'right',
+}
+const amLabel = {
+  ...gen,
+  width: '180px',
+  margin: 'auto 10px',
+}
+const amStyle = {
+  ...gen,
+  marginLeft: 30,
+  minWidth: '140px',
+  margin: 'auto 0',
 }
 
 const calculatDateAdd = (form, dayNum) => {
@@ -76,21 +92,6 @@ function getTotal(subTotal, discount = 0, cgst = 0, sgst = 0, taxableSubtotal = 
       (subTotal / 100) * parseFloat(taxableSubtotal || 0),
   ).toFixed(3)
 }
-
-const monthNames = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-]
 
 function daysInMonth(month, year) {
   // Use 1 for January, 2 for February, etc.
@@ -114,6 +115,14 @@ const RATES_ZERO = {
 const roundNumber = (num, digitFigure) => {
   return Number(Number(num).toFixed(digitFigure))
 }
+
+const essentialServices = [
+  'SW52b2ljZVByb2R1Y3RzVHlwZToxMg==',
+  'SW52b2ljZVByb2R1Y3RzVHlwZToxNg==',
+  'SW52b2ljZVByb2R1Y3RzVHlwZToxNA==',
+  'SW52b2ljZVByb2R1Y3RzVHlwZToxMw==',
+  'SW52b2ljZVByb2R1Y3RzVHlwZToxNQ==',
+]
 
 const checkYear = item => {
   const lastDate = new Date(Math.max(...item.map(e => new Date(e.node.date))))
@@ -267,7 +276,7 @@ const EditableCell = ({
   return <td {...restProps}>{childNode}</td>
 }
 
-const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer }) => {
+const InvoiceForm = ({ form, rowData, refetchInvoices, setInvoiceFormDrawer }) => {
   const [subTotal, setSubTotal] = useState(0)
   const [count, setCount] = useState(-1)
   const [currencySymbol, setCurrencySymbol] = useState('$')
@@ -284,7 +293,7 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
   )
   const [createProModal, setCreateProModal] = useState(false)
   const [isCreated, setIsCreated] = useState(false)
-  const [invoiceId, setInvoiceId] = useState(null)
+
   const [
     getLearners,
     { data: learnerData, loading: learnerLoading, error: learnerError },
@@ -343,7 +352,6 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
       let cogCount = 0
       let vbmappCount = 0
       let researchCount = 0
-      console.log(learnerData, 'ldld')
       details.map((item, index) => {
         const tempStudent = learnerData.students.edges.filter(
           studentItem => studentItem.node.id === item.id,
@@ -469,6 +477,19 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
     }
   }, [details.length === count])
 
+  useEffect(() => {
+    if (newInvoiceData) {
+      notification.success({
+        message: 'Invoice Created Succesfully',
+      })
+    }
+    if (newInvoiceError) {
+      notification.error({
+        message: 'Unable to create invoice',
+      })
+    }
+  }, [newInvoiceData, newInvoiceError])
+
   const getLearnerDetails = learnerId => {
     learnerId.map((item, index) => {
       client
@@ -522,23 +543,14 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
               }
             }),
           },
+        }).then(data => {
+          console.log(data.data.createInvoice, 'invoice data')
+          setIsCreated(true)
+          refetchInvoices()
+          generatePaymentLink(data.data.createInvoice.details.id)
+          updateAssess(data.data.createInvoice.details.id)
+          setInvoiceFormDrawer(false)
         })
-          .then(data => {
-            console.log(data.data.createInvoice, 'invoice data')
-            setInvoiceId(data.data.createInvoice.details.id)
-            setIsCreated(true)
-            generatePaymentLink(data.data.createInvoice.details.id)
-            updateAssess(data.data.createInvoice.details.id)
-            setInvoiceFormDrawer(false)
-            return notification.success({
-              message: 'Invoice Created Succesfully',
-            })
-          })
-          .catch(err => {
-            notification.error({
-              message: 'Unable to create invoice',
-            })
-          })
       }
     })
   }
@@ -581,6 +593,44 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
         message: 'Unable to send payment link',
       })
     }
+  }
+
+  const handleSave = (row, data) => {
+    console.log(row, data, 'row')
+    const newData = [...tableData]
+    const index = newData.findIndex(item => row.key === item.key)
+    console.log(index, 'index')
+    newData[index] = { ...row, ...data }
+
+    let tempTotal = 0
+    newData.map(item => {
+      tempTotal += roundNumber(Number(item.rate) * Number(item.qty), 3)
+    })
+    setSubTotal(roundNumber(tempTotal, 3))
+    setTableData(newData)
+  }
+
+  const handleDelete = row => {
+    const tempTableData = [...tableData]
+    console.log(tempTableData, '11')
+    for (let i = 0; i < tempTableData.length; i++) {
+      if (tempTableData[i].key === row.key) {
+        tempTableData.splice(i, 1)
+      }
+    }
+    setTableData(tempTableData)
+  }
+
+  const handleAdd = () => {
+    const newProductData = {
+      key: Math.random(),
+      service: productData?.invoiceProductsList[0].id,
+      qty: 1,
+      rate: 0,
+      amount: roundNumber(1 * 0, 3),
+    }
+    console.log(productData, 'productData')
+    setTableData(row => [...row, newProductData])
   }
 
   const dataColumns = [
@@ -626,55 +676,20 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
     {
       title: 'Operation',
       width: '100px',
-      render: (text, row) => (
-        <span>
-          <Popconfirm title="Sure to delete this product?" onConfirm={() => handleDelete(row)}>
-            <Button type="danger">Delete</Button>
-          </Popconfirm>
-        </span>
-      ),
+      render: (text, row) => {
+        if (essentialServices.indexOf(row.service) === -1) {
+          return (
+            <span>
+              <Popconfirm title="Sure to delete this product?" onConfirm={() => handleDelete(row)}>
+                <Button type="danger">Delete</Button>
+              </Popconfirm>
+            </span>
+          )
+        }
+        return null
+      },
     },
   ]
-
-  const handleSave = (row, data) => {
-    console.log(row, data, 'row')
-    const newData = [...tableData]
-    const index = newData.findIndex(item => row.key === item.key)
-    console.log(index, 'index')
-    newData[index] = { ...row, ...data }
-
-    let tempTotal = 0
-    newData.map(item => {
-      tempTotal += roundNumber(Number(item.rate) * Number(item.qty), 3)
-    })
-    setSubTotal(roundNumber(tempTotal, 3))
-    setTableData(newData)
-  }
-
-  const handleDelete = row => {
-    const tempTableData = [...tableData]
-    console.log(tempTableData, '11')
-    for (let i = 0; i < tempTableData.length; i++) {
-      if (tempTableData[i].key === row.key) {
-        tempTableData.splice(i, 1)
-      }
-    }
-    setTableData(tempTableData)
-  }
-
-  console.log(tableData, 'tableData')
-
-  const handleAdd = () => {
-    const newProductData = {
-      key: Math.random(),
-      service: productData?.invoiceProductsList[0].id,
-      qty: 1,
-      rate: 0,
-      amount: roundNumber(1 * 0, 3),
-    }
-    console.log(productData, 'productData')
-    setTableData(row => [...row, newProductData])
-  }
 
   const components = {
     body: {
@@ -699,31 +714,6 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
       }),
     }
   })
-
-  const amParent = {
-    display: 'flex',
-    color: 'black',
-    width: '100%',
-    justifyContent: 'flex-end',
-    alignItems: 'flex-end',
-  }
-  const gen = {
-    fontSize: 18,
-    fontWeight: 600,
-    whiteSpace: 'nowrap',
-    textAlign: 'right',
-  }
-  const amLabel = {
-    ...gen,
-    width: '180px',
-    margin: 'auto 10px',
-  }
-  const amStyle = {
-    ...gen,
-    marginLeft: 30,
-    minWidth: '140px',
-    margin: 'auto 0',
-  }
 
   return (
     <div style={{ padding: '0 100px' }}>
@@ -759,7 +749,7 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
           <div style={{ minWidth: '160px' }}>
             <Text style={{ fontSize: 20, color: '#000' }}>BALANCE DUE:</Text>
             <Title style={{ marginTop: 10 }}>
-              {currencySymbol}{' '}
+              {currencySymbol}
               {getTotal(
                 subTotal,
                 form.getFieldValue('discount'),
@@ -837,7 +827,6 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
             dataSource={tableData}
             loading={ratesLoading || learnerLoading || details.length !== count || productLoading}
             bordered
-            // rowKey={record => record.key}
             pagination={false}
             footer={() => (
               <div
@@ -893,7 +882,7 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
               {Number((subTotal / 100) * parseFloat(form.getFieldValue('discount') || 0)).toFixed(
                 3,
               )}
-            </span>{' '}
+            </span>
           </div>
           <div style={amParent} className="edit-checkBox">
             <Tooltip
@@ -923,9 +912,9 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
               )}
             </Form.Item>
             <span style={{ ...amStyle, color: `${addCgst ? 'black' : '#D9D9D9'}` }}>
-              {currencySymbol}{' '}
+              {currencySymbol}
               {Number((subTotal / 100) * parseFloat(form.getFieldValue('cgst') || 0)).toFixed(3)}
-            </span>{' '}
+            </span>
           </div>
           <div style={amParent} className="edit-checkBox">
             <Tooltip
@@ -955,9 +944,9 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
               )}
             </Form.Item>
             <span style={{ ...amStyle, color: `${addSgst ? 'black' : '#D9D9D9'}` }}>
-              {currencySymbol}{' '}
+              {currencySymbol}
               {Number((subTotal / 100) * parseFloat(form.getFieldValue('sgst') || 0)).toFixed(3)}
-            </span>{' '}
+            </span>
           </div>
           <div style={amParent}>
             <span style={amLabel}>Taxable:</span>
@@ -973,16 +962,16 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
               )}
             </Form.Item>
             <span style={amStyle}>
-              {currencySymbol}{' '}
+              {currencySymbol}
               {Number(
                 (subTotal / 100) * parseFloat(form.getFieldValue('taxableSubtotal') || 0),
               ).toFixed(3)}
-            </span>{' '}
+            </span>
           </div>
           <div style={{ ...amParent, margin: '5px 0', marginTop: '15px' }}>
             <span style={{ ...amLabel, fontSize: '20px' }}>Total:</span>
             <span style={{ ...amStyle, fontSize: '20px' }}>
-              {currencySymbol}{' '}
+              {currencySymbol}
               {getTotal(
                 subTotal,
                 form.getFieldValue('discount'),
@@ -990,12 +979,12 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
                 form.getFieldValue('sgst'),
                 form.getFieldValue('taxableSubtotal'),
               )}
-            </span>{' '}
+            </span>
           </div>
           <div style={{ ...amParent, margin: '5px 0' }}>
             <span style={{ ...amLabel, fontSize: '20px' }}>Balance Due:</span>
             <span style={{ ...amStyle, fontSize: '20px' }}>
-              {currencySymbol}{' '}
+              {currencySymbol}
               {getTotal(
                 subTotal,
                 form.getFieldValue('discount'),
@@ -1003,7 +992,7 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
                 form.getFieldValue('sgst'),
                 form.getFieldValue('taxableSubtotal'),
               )}
-            </span>{' '}
+            </span>
           </div>
         </div>
 
@@ -1011,6 +1000,7 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
           style={{
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'flex-end',
             width: '100%',
             margin: '50px 0px',
             border: '1px solid #e4e9f0',
@@ -1025,13 +1015,11 @@ const InvoiceForm = ({ form, rowData, invoiceFormDrawer, setInvoiceFormDrawer })
           <Button
             htmlType="submit"
             disabled={isCreated}
+            loading={newInvoiceLoading}
             type="primary"
-            style={{ marginLeft: 'auto', marginRight: 10 }}
+            style={{ margin: 'auto 10px' }}
           >
             Create
-          </Button>
-          <Button disabled={!isCreated} type="primary" onClick={generatePaymentLink}>
-            Send
           </Button>
         </div>
 
