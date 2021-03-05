@@ -58,7 +58,9 @@ function RecordAssessmentForm({
     if (currentAssessment) {
       console.log(assessments, 'assesments')
       console.log(currentRow, 'current row')
+
       const tt = assessments.filter(item => item.id === currentAssessment)
+
       if (tt[0].hasSubmodule) {
         console.log(tt[0].submodules.edges, 'sbm')
         setSubmodulesList(tt[0].submodules.edges)
@@ -139,9 +141,8 @@ function RecordAssessmentForm({
     })
   }
 
-  //   console.log(updatedData, updatedError, 'recorodferfuerfhiuehuereiurfhwiufhwieufhweiuhweif')
-  //   console.log(currentAssessment, 'asdas')
-  //   console.log(submodulesList, 'subModulesLsot')
+  console.log(submodulesList, 'subModeulsr')
+
   return (
     <div style={{ maxWidth: 400, margin: 'auto' }}>
       <Form onSubmit={update ? handleUpdate : handleSubmitt}>

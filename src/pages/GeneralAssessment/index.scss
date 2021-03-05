@@ -1,0 +1,18 @@
+.gen-assess-content {
+  padding: 0 20px;
+  max-width: 86%;
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media screen and (max-width: 1000px) {
+  .gen-assess-content {
+    max-width: 100%;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .gen-assess-content {
+    padding: 0;
+  }
+}

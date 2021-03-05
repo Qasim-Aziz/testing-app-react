@@ -14,24 +14,19 @@ import {
   Layout,
   notification,
   Popconfirm,
-  Radio,
   Table,
-  Tabs,
   Tooltip,
   Typography,
 } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
 import { useDispatch, useSelector } from 'react-redux'
-import { useHistory } from 'react-router-dom'
 import LearnerSelect from 'components/LearnerSelect'
 import moment from 'moment'
 import client from '../../apollo/config'
 import RecordAssessmentForm from './recordAssessmentForm'
 import { STUDNET_INFO, GET_GENERAL_DATA, DELETE_GENERAL_DATA } from './query'
-// import './index.scss'
-
-const { TabPane } = Tabs
+import './index.scss'
 
 const { Content } = Layout
 const { Text } = Typography
@@ -63,7 +58,6 @@ export default () => {
   })
 
   const user = useSelector(state => state.user)
-  const student = useSelector(state => state.student)
 
   useEffect(() => {
     updateTableData()
@@ -117,7 +111,7 @@ export default () => {
         )
     }
     setTableData(tempList)
-  }, [filterAssessment, filterSubmodule, filterNote])
+  }, [originalData, filterAssessment, filterSubmodule, filterNote])
 
   const handleDelete = row => {
     if (row && row.id) {
@@ -128,13 +122,13 @@ export default () => {
             pk: row.id,
           },
         })
-        .then(res => {
+        .then(() => {
           refetch()
           notification.success({
             message: 'Record deleted successfully',
           })
         })
-        .catch(err => {
+        .catch(() => {
           notification.error({
             message: 'Something went wrong',
             description: 'Unable to delete record',
@@ -155,6 +149,7 @@ export default () => {
       title: 'Date',
       dataIndex: 'date',
       key: 'date',
+      width: 140,
       sorter: (a, b) => {
         if (a.date !== 'None' && b.date !== 'None') {
           return new Date(a.date) - new Date(b.date)
@@ -174,10 +169,6 @@ export default () => {
       dataIndex: 'submodule.name',
     },
     {
-      title: 'Note',
-      dataIndex: 'note',
-    },
-    {
       title: 'Score',
       dataIndex: 'score',
       key: 'score',
@@ -186,7 +177,12 @@ export default () => {
       sortDirections: ['ascend', 'descend'],
     },
     {
+      title: 'Note',
+      dataIndex: 'note',
+    },
+    {
       title: 'Actions',
+      width: '250px',
       render: text => {
         return (
           <>
@@ -271,14 +267,7 @@ export default () => {
 
   return (
     <Layout style={{ padding: '0px' }}>
-      <Content
-        style={{
-          padding: '0px 20px',
-          maxWidth: '86%',
-          width: '100%',
-          margin: '0px auto',
-        }}
-      >
+      <Content className="gen-assess-content">
         <div
           style={{
             display: 'flex',
@@ -341,7 +330,7 @@ export default () => {
               defaultPageSize: 10,
               showSizeChanger: true,
               pageSizeOptions: ['10', '20', '30', '50'],
-              position: 'top',
+              position: 'bottom',
             }}
             loading={loading}
           />
