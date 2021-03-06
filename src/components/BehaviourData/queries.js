@@ -275,6 +275,7 @@ export const GET_TEMPLETES = gql`
             behaviorName
             definition
           }
+          createdAt
           status {
             id
             statusName

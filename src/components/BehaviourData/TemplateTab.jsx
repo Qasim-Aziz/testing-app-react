@@ -19,6 +19,7 @@ import UpdateTemplateForm from 'pages/BehaviourData/UpdateTemplateForm'
 import CreateTemplateForm from 'pages/BehaviourData/Templateform'
 import RecordDrawer from 'pages/BehaviourData/RecordDrawer'
 import BehaviorChart from 'pages/BehaviourData/BehaviorChart'
+import moment from 'moment'
 import { GET_TEMPLETES, DELETE_TEMPLATE } from './queries'
 
 const { Search } = Input
@@ -45,6 +46,8 @@ const TemplateTab = ({ studentId }) => {
     fetchPolicy: 'network-only',
   })
 
+  console.log(templateData, 'tpl')
+
   const [deleteTemplate, { data: deleteTemplateData, error: deleteTemplateError }] = useMutation(
     DELETE_TEMPLATE,
   )
@@ -53,6 +56,7 @@ const TemplateTab = ({ studentId }) => {
     if (templateData) {
       const templateList = templateData.getTemplate.edges.map(({ node }) => ({
         id: node.id,
+        date: moment(node.createdAt).format('YYYY-MM-DD'),
         behaviourId: node.behavior.id,
         templateName: node.behavior.behaviorName,
         status: node.status.statusName,
@@ -228,11 +232,6 @@ const TemplateTab = ({ studentId }) => {
           </Form.Item>
         </Form>
       </Col>
-      <Col span={10} style={{ textAlign: 'right' }}>
-        <Button type="primary" onClick={() => setCreatingNewTemplate(true)}>
-          <Icon type="plus" /> Create new Template
-        </Button>
-      </Col>
     </Row>
   )
 
@@ -240,6 +239,7 @@ const TemplateTab = ({ studentId }) => {
     console.error(templateError)
     return <h3>An error occurred to load data.</h3>
   }
+  console.log(filteredTemplates, 'flt')
 
   return (
     <>
@@ -255,7 +255,6 @@ const TemplateTab = ({ studentId }) => {
           pageSizeOptions: ['10', '25', '50', '100'],
         }}
         size="small"
-        title={header}
         bordered
       />
       <Drawer
