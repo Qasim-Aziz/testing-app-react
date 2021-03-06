@@ -9,6 +9,7 @@ import MasterCriteria from 'pages/ClinicProfile/MasteryCriteria'
 import LocationSett from 'pages/ClinicProfile/LocationSett'
 import Assessment from 'pages/GeneralAssessment/ForProfile/index'
 import DisabledCurriculum from 'pages/ClinicProfile/DisabledCurriculum'
+import TherapistShifting from 'pages/ClinicProfile/TherapistShifting'
 import PeakAutomaticTab from '../PeakAutomaticTab'
 import AssessmentsTab from '../../../components/AssessmentsProfileTab'
 import SessionSettingTab from '../SessionSettingTab'
@@ -71,6 +72,9 @@ const ProfileTab = ({ activeProfileTab, onProfileTabChange }) => {
       key: 'assessment',
       title: 'Assessment',
       component: <Assessment />,
+      key: 'therapist-shifting',
+      title: 'Theapist Shifting',
+      component: <TherapistShifting />,
     },
   ]
 

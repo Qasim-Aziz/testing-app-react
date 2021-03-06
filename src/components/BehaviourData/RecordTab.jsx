@@ -18,7 +18,7 @@ import { useMutation, useQuery } from 'react-apollo'
 import Highlighter from 'react-highlight-words'
 import EditRecordDrawer from 'pages/BehaviourData/EditRecordDrawer'
 import BehaviorChartDrildown from 'pages/BehaviourData/BehaviorChartDrildown'
-import { BEHAVIOR_RECORD_DATA, DELETE_BEHAVIOR_RECORD1 } from './queries'
+import { BEHAVIOR_RECORD_DATA, DELETE_BEHAVIOR_RECORD } from './queries'
 
 const { Search } = Input
 
@@ -61,7 +61,7 @@ const RecordTab = ({ studentId, activeTab, date, searchText, searchStatus }) => 
   const [
     deleteBehaviorRecord,
     { data: deleteBehaviorRecordData, error: deleteBehaviorRecordError },
-  ] = useMutation(DELETE_BEHAVIOR_RECORD1)
+  ] = useMutation(DELETE_BEHAVIOR_RECORD)
 
   useEffect(() => {
     if (behaviorRecordData) {

@@ -364,11 +364,11 @@ export const BEHAVIOR_RECORD_DATA = gql`
   }
 `
 
-export const DELETE_BEHAVIOR_RECORD1 = gql`
+export const DELETE_BEHAVIOR_RECORD = gql`
   mutation($id: ID!) {
-    deleteBehaviour(input: { pk: $id }) {
+    deleteDecel(input: { pk: $id }) {
       status
-      message
+      msg
     }
   }
 `
