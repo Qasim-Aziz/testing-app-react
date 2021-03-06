@@ -72,6 +72,8 @@ const ProfileTab = ({ activeProfileTab, onProfileTabChange }) => {
       key: 'assessment',
       title: 'Assessment',
       component: <Assessment />,
+    },
+    {
       key: 'therapist-shifting',
       title: 'Theapist Shifting',
       component: <TherapistShifting />,
