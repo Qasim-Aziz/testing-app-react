@@ -15,6 +15,27 @@ export const GET_THERAPIST = gql`
   }
 `
 
+export const GET_APPOINTMENT_STATUSES = gql`
+  query {
+    appointmentStatuses {
+      id
+      appointmentStatus
+    }
+  }
+`
+export const GET_AVAILABLE_SLOTS = gql`
+  query getAppointmentSlots($therapistId: ID!, $date: Date!) {
+    getAppointmentSlots(therapist: $therapistId, start: $date, end: $date) {
+      data {
+        slots {
+          time
+          isAvailable
+        }
+      }
+    }
+  }
+`
+
 export const CREATE_APPOINTMENT = gql`
   mutation CreateAppointment(
     $title: String!
@@ -24,13 +45,10 @@ export const CREATE_APPOINTMENT = gql`
     $purposeAssignment: String!
     $startDateAndTime: DateTime!
     $endDateAndTime: DateTime!
-    $enableRecurring: Boolean!
     $startDate: String!
     $endDate: String!
     $startTime: String!
     $endTime: String!
-    $isApproved: Boolean!
-    $selectedDays: [String]
     $appointmentStatus: ID
   ) {
     CreateAppointment(
@@ -39,23 +57,19 @@ export const CREATE_APPOINTMENT = gql`
           title: $title
           student: $studentId
           therapist: $therapistId
-          attendee: $additionalStaff
-          location: $locationId
           note: $note
           purposeAssignment: $purposeAssignment
           start: $startDateAndTime
           end: $endDateAndTime
-          isApproved: $isApproved
-          staffToStaff: $staffToStaff
           appointmentStatus: $appointmentStatus
         }
         recurring: {
-          enableRecurring: $enableRecurring
+          enableRecurring: false
           startDate: $startDate
           endDate: $endDate
           startTime: $startTime
           endTime: $endTime
-          days: $selectedDays
+          days: []
         }
       }
     ) {
