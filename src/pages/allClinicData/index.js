@@ -6,31 +6,9 @@
 /* eslint-disable array-callback-return */
 import React, { useState, useEffect, useRef } from 'react'
 import { useQuery, useLazyQuery } from 'react-apollo'
-import gql from 'graphql-tag'
-import Highlighter from 'react-highlight-words'
-import {
-  Table,
-  Button,
-  Popconfirm,
-  Dropdown,
-  Drawer,
-  Form,
-  Menu,
-  Input,
-  Select,
-  notification,
-  Space,
-  Tabs,
-} from 'antd'
+import { Table, Button, Popconfirm, Dropdown, Drawer, Menu, notification, Tabs } from 'antd'
 import Authorize from 'components/LayoutComponents/Authorize'
-import {
-  CheckCircleOutlined,
-  FilterOutlined,
-  CloudDownloadOutlined,
-  CloseCircleOutlined,
-  FilterFilled,
-  SearchOutlined,
-} from '@ant-design/icons'
+import { CheckCircleOutlined, CloseCircleOutlined, FilterFilled } from '@ant-design/icons'
 import moment from 'moment'
 import { FaDownload } from 'react-icons/fa'
 import * as FileSaver from 'file-saver'
@@ -43,8 +21,6 @@ import InvoiceTable from './invoiceTable'
 import { CLINIC_QUERY, UPDATE_SCHOOL } from './query'
 import ClinicStaff from './clinicStaff'
 import { FilterCard } from './filterCard'
-import PrintableInvoice from './printableInvoice'
-import ViewInvoice from './viewInvoice'
 
 const countrySet = []
 const { TabPane } = Tabs
@@ -61,6 +37,7 @@ const AllClinicsData = () => {
   const [ratesDrawer, setRatesDrawer] = useState(false)
   const [learnersTableDrawer, setLearnersTableDrawer] = useState(false)
   const [currentClinicRow, setCurrentClinicRow] = useState()
+  const [activeLearners, setActiveLearners] = useState(true)
   const filterRef = useRef()
   const filterSet = { name: true, email: true, mobile: true, status: true }
   const { data, loading, error, refetch } = useQuery(CLINIC_QUERY, {
@@ -111,7 +88,12 @@ const AllClinicsData = () => {
           description: 'Clinic status updated successfully',
         })
       })
-      .catch(updateError => console.log(updateError, 'in errororo'))
+      .catch(updateError => {
+        notification.error({
+          message: 'Something went wrong',
+          description: 'Unable to update clinic status',
+        })
+      })
     refetch()
   }
 
@@ -183,6 +165,7 @@ const AllClinicsData = () => {
       render: (text, row) => (
         <Button
           onClick={() => {
+            setActiveLearners(false)
             setCurrentClinicRow(row)
             setDrawerTitle(row.details.schoolName)
             setLearnersTableDrawer(true)
@@ -202,6 +185,19 @@ const AllClinicsData = () => {
       sortOrder: sortedInfo.columnKey === 'activeLearners' && sortedInfo.order,
       sortDirections: ['ascend', 'descend'],
       width: '95px',
+      render: (text, row) => (
+        <Button
+          onClick={() => {
+            setCurrentClinicRow(row)
+            setDrawerTitle(row.details.schoolName)
+            setLearnersTableDrawer(true)
+          }}
+          type="link"
+          style={{ padding: '0px', fontWeight: 'bold', fontSize: '13px' }}
+        >
+          {text}
+        </Button>
+      ),
     },
     {
       title: 'Last Month Active Learners',
@@ -537,7 +533,7 @@ const AllClinicsData = () => {
         destroyOnClose="true"
         className="change-invo-drawer"
       >
-        <AllLearners rowData={currentClinicRow} />
+        <AllLearners rowData={currentClinicRow} active={activeLearners} />
       </Drawer>
     </Authorize>
   )

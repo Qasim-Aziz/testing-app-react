@@ -282,6 +282,11 @@ const routes = [
     exact: true,
   },
   {
+    path: '/genAssessment/',
+    component: loadable(() => import('pages/GeneralAssessment')),
+    exact: true,
+  },
+  {
     path: '/tableReportPdf/',
     component: loadable(() => import('pages/PEAK/TableReportPdf')),
     exact: true,

@@ -11,7 +11,6 @@ import { Tooltip, Button } from 'antd'
 import { PrinterOutlined } from '@ant-design/icons'
 import moment from 'moment'
 import { ToWords } from 'to-words'
-import 'jspdf-autotable'
 import { useHistory } from 'react-router-dom'
 import logo from '../../images/WhatsApp Image 2020-04-23 at 10.00.40 (1).jpeg'
 
@@ -74,7 +73,7 @@ const taxSection = {
   padding: '0',
   alignSelf: 'flex-end',
   textAlign: 'right',
-  minWidth: '100px',
+  minWidth: '120px',
 }
 const monthNames = [
   'January',
@@ -92,7 +91,6 @@ const monthNames = [
 ]
 
 function getTotal(subTotal, discount = 0, gst = 0, sgst = 0, taxableSubtotal = 0) {
-  console.log(subTotal, discount, gst, sgst, taxableSubtotal)
   return Number(
     subTotal -
       (subTotal / 100) * parseFloat(discount || 0) +
@@ -105,9 +103,9 @@ function getTotal(subTotal, discount = 0, gst = 0, sgst = 0, taxableSubtotal = 0
 function ViewInvoice({ invoice }) {
   const [subTotal, setSubtotal] = useState(0)
   const history = useHistory()
-  const currentCurrency = invoice.clinic.currency ? invoice.clinic.currency.symbol : '$'
   const currentCurrencyName = invoice.clinic.currency ? invoice.clinic.currency.currency : 'USD'
 
+  console.log(invoice, 'currentCyName')
   useEffect(() => {
     let tempSubTotal = 0
     invoice.invoiceFee.edges.map(item => {
@@ -136,7 +134,6 @@ function ViewInvoice({ invoice }) {
 
   const invoke = () => {
     localStorage.setItem('currentInvoice', JSON.stringify(invoice))
-    console.log('invoke')
     history.push('/printInvoice')
   }
 
@@ -191,7 +188,6 @@ function ViewInvoice({ invoice }) {
                 </div>
                 <div
                   style={{
-                    // marginBottom: '8px',
                     fontSize: 10,
                     width: '100%',
                     alignSelf: 'flex-start',
@@ -203,7 +199,6 @@ function ViewInvoice({ invoice }) {
                 </div>
                 <div
                   style={{
-                    // marginBottom: '8px',
                     fontSize: 10,
                     width: '100%',
                     alignSelf: 'flex-start',
@@ -330,10 +325,10 @@ function ViewInvoice({ invoice }) {
                 <div style={rightText}>Quantity</div>
               </div>
               <div style={{ ...qtyCol, fontWeight: '600' }}>
-                <div style={rightText}>Rate</div>
+                <div style={rightText}>Rate ({currentCurrencyName})</div>
               </div>
               <div style={{ ...qtyCol, fontWeight: '600', width: '24%' }}>
-                <div style={rightText}>Amount</div>
+                <div style={rightText}>Amount ({currentCurrencyName})</div>
               </div>
             </div>
             {invoice.invoiceFee.edges.map((item, index) => {
@@ -354,14 +349,10 @@ function ViewInvoice({ invoice }) {
                     <div style={rightText}>{item.node.quantity}</div>
                   </div>
                   <div style={qtyCol}>
-                    <div style={rightText}>
-                      {currentCurrency} {item.node.rate}
-                    </div>
+                    <div style={rightText}>{item.node.rate}</div>
                   </div>
                   <div style={{ ...qtyCol, width: '24%' }}>
-                    <div style={rightText}>
-                      {currentCurrency} {tempTotal}
-                    </div>
+                    <div style={rightText}>{tempTotal}</div>
                   </div>
                 </div>
               )
@@ -378,10 +369,10 @@ function ViewInvoice({ invoice }) {
                   ...general,
                   alignSelf: 'flex-end',
                   textAlign: 'right',
-                  minWidth: '98px',
+                  minWidth: '120px',
                 }}
               >
-                {currentCurrency} {subTotal}
+                {subTotal} {currentCurrencyName}
               </div>
               <div style={general}>Subtotal :</div>
             </div>
@@ -389,6 +380,11 @@ function ViewInvoice({ invoice }) {
               <div style={{ width: '50%' }}>
                 <div style={{ ...general, alignSelf: 'flex-start', width: '100%' }}>
                   {toWords.convert(total)}
+                </div>
+                <div style={{ ...general, alignSelf: 'flex-start', color: 'blue', width: '100%' }}>
+                  <a href={invoice.paymentLink} rel="noopener noreferrer" target="_blank">
+                    {invoice.paymentLink}
+                  </a>
                 </div>
               </div>
               <div
@@ -404,8 +400,8 @@ function ViewInvoice({ invoice }) {
                   }}
                 >
                   <div style={taxSection}>
-                    {currentCurrency} -
-                    {Number((subTotal / 100) * parseFloat(invoice.discount || 0)).toFixed(2)}
+                    {Number((subTotal / 100) * parseFloat(invoice.discount || 0)).toFixed(2)}{' '}
+                    {currentCurrencyName}
                   </div>
                   <div style={{ ...taxSection, fontWeight: '600' }}>
                     Dicount({invoice.discount || 0}%) :
@@ -418,11 +414,11 @@ function ViewInvoice({ invoice }) {
                   }}
                 >
                   <div style={taxSection}>
-                    {currentCurrency}{' '}
-                    {Number((subTotal / 100) * parseFloat(invoice.gst || 0)).toFixed(2)}
+                    {Number((subTotal / 100) * parseFloat(invoice.cgst || 0)).toFixed(2)}{' '}
+                    {currentCurrencyName}
                   </div>
                   <div style={{ ...taxSection, fontWeight: '600' }}>
-                    CGST({invoice.gst || 0}%) :
+                    CGST({invoice.cgst || 0}%) :
                   </div>
                 </div>
                 <div
@@ -432,8 +428,8 @@ function ViewInvoice({ invoice }) {
                   }}
                 >
                   <div style={taxSection}>
-                    {currentCurrency}{' '}
-                    {Number((subTotal / 100) * parseFloat(invoice.sgst || 0)).toFixed(2)}
+                    {Number((subTotal / 100) * parseFloat(invoice.sgst || 0)).toFixed(2)}{' '}
+                    {currentCurrencyName}
                   </div>
                   <div style={{ ...taxSection, fontWeight: '600' }}>
                     SGST({invoice.sgst || 0}%) :
@@ -446,8 +442,8 @@ function ViewInvoice({ invoice }) {
                   }}
                 >
                   <div style={taxSection}>
-                    {currentCurrency}{' '}
-                    {Number((subTotal / 100) * parseFloat(invoice.taxableSubtotal || 0)).toFixed(2)}
+                    {Number((subTotal / 100) * parseFloat(invoice.taxableSubtotal || 0)).toFixed(2)}{' '}
+                    {currentCurrencyName}
                   </div>
                   <div style={{ ...taxSection, fontWeight: '600' }}>
                     Taxes({invoice.taxableSubtotal || 0}%) :
@@ -455,14 +451,14 @@ function ViewInvoice({ invoice }) {
                 </div>
                 <div style={{ ...flexSection, flexDirection: 'row-reverse' }}>
                   <div style={taxSection}>
-                    {currentCurrency}
                     {getTotal(
                       subTotal,
                       invoice.discount,
-                      invoice.gst,
+                      invoice.cgst,
                       invoice.sgst,
                       invoice.taxableSubtotal,
-                    )}
+                    )}{' '}
+                    {currentCurrencyName}
                   </div>
                   <div style={{ ...taxSection, fontWeight: '600' }}>Total :</div>
                 </div>

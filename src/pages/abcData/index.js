@@ -64,6 +64,12 @@ const AbcDataPage = props => {
   return (
     <Authorize roles={['school_admin', 'parents', 'therapist']} redirect to="/dashboard/beta">
       <Helmet title="Dashboard Alpha" />
+      <FilterComp
+        handleSelectDate={handleSelectDate}
+        startDate={date.gte}
+        endDate={date.lte}
+        rangePicker
+      />
       <Layout style={{ padding: '0px' }}>
         <Content
           style={{
@@ -75,47 +81,36 @@ const AbcDataPage = props => {
         >
           <Row>
             <Col>
-              {/* <Calendar value={date} handleOnChange={handleSelectDate} /> */}
-              {filter && (
-                <FilterComp
-                  handleSelectDate={handleSelectDate}
-                  startDate={date.gte}
-                  endDate={date.lte}
-                  rangePicker
-                />
-              )}
-              <div>
-                <div
-                  style={{
-                    marginTop: 17,
-                  }}
-                >
-                  {loading ? (
-                    'Loading...'
-                  ) : (
-                    <>
-                      {error && 'Opps their something wrong'}
-                      {data?.getABC.edges.map(({ node }) => {
-                        return (
-                          <ABCCard
-                            key={node.id}
-                            style={{ marginTop: 20 }}
-                            time={node.time}
-                            behavior={node.behavior.edges}
-                            // location={node.location.edges}
-                            environment={node.environments}
-                            id={node.id}
-                            date={date}
-                            setUpdateAbc={setUpdateAbc}
-                            node={node}
-                            refetchAbc={refetch}
-                            openDrawer={openDrawer}
-                          />
-                        )
-                      })}
-                    </>
-                  )}
-                </div>
+              <div
+                style={{
+                  marginTop: 17,
+                }}
+              >
+                {loading ? (
+                  'Loading...'
+                ) : (
+                  <>
+                    {error && 'Opps their something wrong'}
+                    {data?.getABC.edges.map(({ node }) => {
+                      return (
+                        <ABCCard
+                          key={node.id}
+                          style={{ marginTop: 20 }}
+                          time={node.time}
+                          behavior={node.behavior.edges}
+                          // location={node.location.edges}
+                          environment={node.environments}
+                          id={node.id}
+                          date={date}
+                          setUpdateAbc={setUpdateAbc}
+                          node={node}
+                          refetchAbc={refetch}
+                          openDrawer={openDrawer}
+                        />
+                      )
+                    })}
+                  </>
+                )}
               </div>
             </Col>
             <Drawer

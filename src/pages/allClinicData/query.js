@@ -28,6 +28,7 @@ export const CLINIC_QUERY = gql`
           firstName
         }
         country {
+          id
           name
           isActive
           dbName
@@ -74,8 +75,8 @@ export const UPDATE_SCHOOL = gql`
 `
 
 export const ALL_LEARNERS = gql`
-  query Students($schoolId: ID!) {
-    students(school: $schoolId) {
+  query Students($schoolId: ID!, $isActive: Boolean) {
+    students(school: $schoolId, isActive: $isActive) {
       edges {
         node {
           id
@@ -87,11 +88,14 @@ export const ALL_LEARNERS = gql`
           parentMobile
           gender
           isActive
+          admissionDate
+          createdAt
           isPeakActive
           isCogActive
           researchParticipant
           parent {
             id
+            dateJoined
             lastLogin
           }
           assessmentCharges {
@@ -101,11 +105,6 @@ export const ALL_LEARNERS = gql`
                 date
                 assessType
                 amount
-                currency {
-                  id
-                  symbol
-                  currency
-                }
               }
             }
           }
@@ -114,6 +113,33 @@ export const ALL_LEARNERS = gql`
     }
   }
 `
+
+export const ALL_LEARNERS_ASSESS_CHARGES = gql`
+  query Students($schoolId: ID!) {
+    students(school: $schoolId) {
+      edges {
+        node {
+          id
+          isActive
+          isPeakActive
+          isCogActive
+          researchParticipant
+          assessmentCharges {
+            edges {
+              node {
+                id
+                date
+                assessType
+                amount
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 export const UPDATE_STUDENT = gql`
   mutation UpdateStudent($id: ID!, $isActive: Boolean) {
     updateStudent(input: { studentData: { id: $id, isActive: $isActive } }) {
@@ -143,6 +169,7 @@ export const CLINIC_RATES = gql`
             id
             schoolName
             country {
+              id
               name
             }
           }
@@ -172,6 +199,7 @@ export const UPDATE_RATES = gql`
       }
     ) {
       details {
+        id
         clinic {
           id
           schoolName
@@ -263,23 +291,27 @@ export const GET_INVOICES = gql`
     getInvoices(date_Gte: $from, date_Lte: $to, status: $status, clinic: $clinic) {
       edges {
         node {
-          id
           invoiceNo
           email
-          issueDate
-          dueDate
           amount
+          issueDate
+          linkGenerated
+          paymentLink
+          paymentLinkId
           address
           taxableSubtotal
+          sgst
+          cgst
           discount
           total
+          id
+          dueDate
           clinic {
             id
             schoolName
             currency {
               id
               currency
-              symbol
             }
           }
           status {
@@ -358,11 +390,11 @@ export const LEARNER_ACTIVE_DETAILS = gql`
 `
 
 export const MAKE_ASSESS = gql`
-  mutation makeAssessmentCharge($pk: ID!, $assessType: String!, $amount: Float) {
+  mutation makeAssessmentCharge($pk: ID!, $assessType: String!, $amount: Float, $invoiceId: ID) {
     makeAssessmentCharge(
       input: {
         pk: $pk
-        charges: [{ assessType: $assessType, amount: $amount, currency: "Q3VycmVuY3lUeXBlOjE=" }]
+        charges: [{ assessType: $assessType, amount: $amount, invoiceId: $invoiceId }]
       }
     ) {
       clientMutationId
@@ -376,10 +408,9 @@ export const MAKE_ASSESS = gql`
               assessType
               date
               amount
-              currency {
+              invoice {
                 id
-                symbol
-                currency
+                invoiceNo
               }
             }
           }
@@ -395,6 +426,14 @@ export const PRODUCT_LIST = gql`
       id
       name
       description
+    }
+  }
+`
+export const tt = gql`
+  mutation($invoices: [String]) {
+    deleteAssessmentChargeByInvoice(input: { invoices: $invoices }) {
+      status
+      msg
     }
   }
 `

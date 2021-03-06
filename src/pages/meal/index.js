@@ -107,30 +107,27 @@ const MealDataPage = props => {
 
   const studentId = localStorage.getItem('studentId')
 
-  const mealQuery = useQuery(MEAL, {
-    variables: {
-      studentId,
-      startDate,
-      endDate,
-      mealType: mealType === 'All' ? '' : mealType,
-      mealNameContain: mealNameSearchContent,
+  const { data: mealData, loading: mealLoading, error: mealError, refetch: refetchMeal } = useQuery(
+    MEAL,
+    {
+      variables: {
+        studentId,
+        startDate,
+        endDate,
+        mealType: mealType === 'All' ? '' : mealType,
+        mealNameContain: mealNameSearchContent,
+      },
     },
-  })
-
-  const { data: studnetInfo } = useQuery(STUDNET_INFO, {
-    variables: {
-      studentId,
-    },
-  })
+  )
 
   const [deleteMeal, { data: deleteData, error: deleteError }] = useMutation(DELETE_MEAL)
 
   useEffect(() => {
-    if (mealQuery.data) {
-      const mealTableData = mealQuery.data.getFood.edges.map(item => item.node)
+    if (mealData) {
+      const mealTableData = mealData.getFood.edges.map(item => item.node)
       setMealList(mealTableData)
     }
-  }, [mealQuery.data])
+  }, [mealData])
 
   useEffect(() => {
     if (updateMealId) {
@@ -141,13 +138,18 @@ const MealDataPage = props => {
   }, [updateMealId])
 
   useEffect(() => {
-    console.log(deleteData)
+    if (deleteError) {
+      notification.error({
+        message: 'Something went wrong',
+        description: 'Unable to delete meal record',
+      })
+    }
     if (deleteData) {
       notification.success({
         message: 'Meal Data',
         description: 'Meal Data Deleted Successfully',
       })
-      mealQuery.refetch()
+      refetchMeal()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deleteData])
@@ -157,14 +159,13 @@ const MealDataPage = props => {
       console.log('new meal created--->', newMealDate)
       setMealList(state => {
         if (state.length) {
-          console.log('running inside state')
           setMealList([...state, newMeal])
         }
         return [newMeal]
       })
       setNewMeal(null)
     }
-  }, [newMealDate, mealQuery, startDate, newMeal])
+  }, [newMealDate, mealData, startDate, newMeal])
 
   useEffect(() => {
     if (updateMeal) {
@@ -182,18 +183,14 @@ const MealDataPage = props => {
 
   useEffect(() => {
     if (mealDeleted) {
-      mealQuery.refetch()
+      refetchMeal()
       setMealDeleted(false)
     }
-  }, [mealDeleted, mealQuery])
+  }, [mealDeleted, mealError])
 
   useEffect(() => {
     updateDrawerForm(openRightdrawer)
   }, [openRightdrawer])
-
-  // const handleFilterToggle = () => {
-  //   setFilter(state => !state)
-  // }
 
   const MealColumns = [
     {
@@ -273,30 +270,18 @@ const MealDataPage = props => {
     })
   }
 
-  const header = () => (
-    <Row>
-      <Col span={14}>
-        <Form layout="inline">
-          <Form.Item label="Meal Name" style={{ fontSize: '14px' }}>
-            <Search placeholder="Search by meal name" value={searchText} onChange={searchMeal} />
-          </Form.Item>
-        </Form>
-      </Col>
-    </Row>
-  )
-
   const searchMeal = e => {
     // Update Text
     const text = e.target.value
     setSearchText(text)
 
     // Filter Meals
-    if (mealQuery.data) {
-      const filteredMeals = mealQuery.data.getFood.edges.filter(x =>
+    if (mealData) {
+      const filteredMeals = mealData.getFood.edges.filter(x =>
         x.node.mealName.toLowerCase().includes(text.toLowerCase()),
       )
-      const mealData = filteredMeals.map(edge => edge.node)
-      setMealList(mealData)
+      const temp = filteredMeals.map(edge => edge.node)
+      setMealList(temp)
     }
   }
 
@@ -316,50 +301,48 @@ const MealDataPage = props => {
   return (
     <Authorize roles={['school_admin', 'parents', 'therapist']} redirect to="/dashboard/beta">
       <Helmet title="Dashboard Alpha" />
-      <Layout style={{ padding: '0px' }}>
-        <Content
-          style={{
-            padding: '0px 20px',
-            maxWidth: 1300,
-            width: '100%',
-            margin: '0px auto',
-          }}
-        >
-          <Row>
-            <Col className="mealData">
-              <div>
-                {filter && (
-                  <FilterComp
-                    handleSelectDate={handleSelectDate}
-                    startDate={startDate}
-                    endDate={endDate}
-                    rangePicker
-                  />
-                )}
-                <div
-                  style={{
-                    marginTop: 17,
-                  }}
-                >
-                  <Table
-                    loading={mealQuery.loading}
-                    className="mealTable"
-                    rowKey="id"
-                    columns={MealColumns}
-                    dataSource={mealList}
-                    pagination={{
-                      position: 'bottom',
-                      showSizeChanger: true,
-                      pageSizeOptions: ['10', '25', '50', '100'],
-                    }}
-                    size="small"
-                    title={header}
-                    bordered
-                  />
-                </div>
-              </div>
-            </Col>
-
+      <FilterComp
+        handleSelectDate={handleSelectDate}
+        startDate={startDate}
+        endDate={endDate}
+        searchText={searchText}
+        onTextChange={searchMeal}
+        rangePicker
+      />
+      <Row>
+        <Col className="mealData">
+          <div>
+            <div
+              style={{
+                marginTop: 17,
+              }}
+            >
+              <Table
+                loading={mealLoading}
+                className="mealTable"
+                rowKey="id"
+                columns={MealColumns}
+                dataSource={mealList}
+                pagination={{
+                  position: 'bottom',
+                  showSizeChanger: true,
+                  pageSizeOptions: ['10', '25', '50', '100'],
+                }}
+                size="small"
+                bordered
+              />
+            </div>
+          </div>
+        </Col>
+        <Layout style={{ padding: '0px' }}>
+          <Content
+            style={{
+              padding: '0px 10px',
+              maxWidth: 1300,
+              width: '100%',
+              margin: '0px auto',
+            }}
+          >
             <Drawer
               title="New Meal"
               width="52%"
@@ -388,49 +371,9 @@ const MealDataPage = props => {
                 />
               )}
             </Drawer>
-
-            {/* <Col span={8} style={{ display: 'none' }}>
-              <Title
-                style={{
-                  marginLeft: '30px',
-                  fontSize: '30px',
-                  lineHeight: '41px',
-                }}
-              >
-                New Meal
-              </Title>
-              <div
-                style={{
-                  background: '#F9F9F9',
-                  borderRadius: 10,
-                  padding: '30px',
-                }}
-              >
-                {updateMealForm ? (
-                  <UpdateMealForm
-                    handleNewMealDate={newDate => {
-                      setNewMealDate(newDate)
-                    }}
-                    setNewMeal={setNewMeal}
-                    updateMealId={updateMealId}
-                    setUpdateMealId={setUpdateMealId}
-                    setUpdateMeal={setUpdateMeal}
-                    closeDrawer={closeDrawer}
-                  />
-                ) : (
-                  <MealForm
-                    handleNewMealDate={newDate => {
-                      setNewMealDate(newDate)
-                    }}
-                    setNewMeal={setNewMeal}
-                    closeDrawer={closeDrawer}
-                  />
-                )}
-              </div>
-            </Col> */}
-          </Row>
-        </Content>
-      </Layout>
+          </Content>
+        </Layout>
+      </Row>
     </Authorize>
   )
 }

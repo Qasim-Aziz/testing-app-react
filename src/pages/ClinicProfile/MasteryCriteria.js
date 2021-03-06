@@ -264,8 +264,8 @@ const MasteryCriteria = () => {
             style={{ marginBottom: 10 }}
             onClick={() => setNewMasterDrawer(true)}
           >
-            ADD MASTERY CRITERIA
             <PlusOutlined />
+            ADD MASTERY CRITERIA
           </Button>
         </div>
       </div>

@@ -35,6 +35,8 @@ const CreateAssignmentForm = ({ form, setOpen, PEAK_PROGRAMS }) => {
   const studentId = localStorage.getItem('studentId')
   const [createPeak, { data, error, loading }] = useMutation(CREATE_PEAK, {
     update(cache, { data }) {
+      console.log(cache, 'cache')
+      console.log(data, 'data')
       const peakPrograms = cache.readQuery({
         query: PEAK_PROGRAMS,
         variables: {
@@ -51,7 +53,7 @@ const CreateAssignmentForm = ({ form, setOpen, PEAK_PROGRAMS }) => {
           peakPrograms: {
             edges: [
               {
-                node: data.peakCreateProgram.details,
+                node: data.peakCreateProgram.details, // above data
                 __typename: 'PeakProgramTypeEdge',
               },
               ...peakPrograms.peakPrograms.edges,

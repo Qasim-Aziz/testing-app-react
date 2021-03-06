@@ -1,57 +1,60 @@
+/* eslint-disable */
 import React from 'react'
 import { DatePicker, Input } from 'antd'
 import moment from 'moment'
 
 const FilterComp = props => {
-  const { handleSelectDate, rangePicker, searchVal, searchValHandler, startDate, endDate } = props
+  const {
+    handleSelectDate,
+    rangePicker,
+    searchLabel,
+    searchText,
+    onTextChange,
+    startDate,
+    endDate,
+  } = props
 
   const continer = {
     background: 'rgb(241 241 241)',
-    border: '1px solid #E4E9F0',
-    boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
-    borderRadius: 10,
-    padding: '10px 35px',
     position: 'relative',
     display: 'flex',
-    justifyContent: 'space-evenly',
-    marginTop: '10px',
-    width: '1108px',
+    height: '50px',
+    padding: '2px 8px',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    width: '100%',
   }
   const Headstyle = {
     fontSize: '16px',
     paddingTop: '7px',
     marginRight: '10px',
   }
-  const FieldWidth = {
-    width: '300px',
-  }
 
   return (
     <div style={continer}>
       <span>
-        <span style={Headstyle}>Filter By Date</span>
+        <span style={Headstyle}>Date: </span>
         {rangePicker ? (
           <>
             <DatePicker.RangePicker
-              style={FieldWidth}
+              style={{ width: '250px', marginRight: 40 }}
               defaultValue={[moment(startDate), moment(endDate)]}
               onChange={handleSelectDate}
             />
           </>
         ) : (
-          <DatePicker style={FieldWidth} onChange={handleSelectDate} />
+          <DatePicker style={{ width: '250px' }} onChange={handleSelectDate} />
         )}
       </span>
-      {searchValHandler && (
+      {onTextChange && (
         <span>
-          <span style={Headstyle}>Search</span>
+          <span style={Headstyle}>{searchLabel ? searchLabel : 'Name'}: </span>
           <Input.Search
-            size="small"
-            value={searchVal}
-            onChange={searchValHandler}
+            value={searchText}
+            onChange={onTextChange}
             allowClear
-            style={FieldWidth}
-            placeholder="search..."
+            style={{ width: '240px' }}
+            placeholder="Search..."
           />
         </span>
       )}
