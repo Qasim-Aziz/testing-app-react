@@ -326,13 +326,6 @@ class TharepistStudentsDailyVitals extends PureComponent {
                   </div>
                 </div>
                 <div style={{ paddingTop: '5px' }}>
-                  <Button
-                    type="primary"
-                    style={{ marginRight: '10px' }}
-                    onClick={this.handleFilterToggle}
-                  >
-                    <MdFilterList />
-                  </Button>
                   <Button type="primary" onClick={this.openDrawer}>
                     <PlusOutlined /> ADD {stateData.TabCheck}
                   </Button>

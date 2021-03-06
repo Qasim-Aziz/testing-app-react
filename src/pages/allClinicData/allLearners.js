@@ -17,17 +17,21 @@ import { FilterCard } from './filterCard'
 const { Content } = Layout
 
 function AllLearners(props) {
-  const { rowData } = props
+  const { rowData, active } = props
   const [learnersList, setLearnersList] = useState([])
   const [mainLearnerList, setMainLearnerList] = useState([])
   const [filterDrawer, setFilterDrawer] = useState(false)
   const [isFilterActive, setIsFilterActive] = useState(false)
   const [clearFilter, setClearFilter] = useState(false)
+
+  console.log(active, 'active')
   const { loading: loadingLearner, data: dataLearners, error: errorLearners, refetch } = useQuery(
     ALL_LEARNERS,
     {
       fetchPolicy: 'network-only',
-      variables: { schoolId: rowData.details.id },
+      variables: active
+        ? { schoolId: rowData.details.id, isActive: active }
+        : { schoolId: rowData.details.id },
     },
   )
   const filterRef = useRef()
@@ -39,11 +43,16 @@ function AllLearners(props) {
       dataLearners.students.edges.map(item => {
         return tempArr.push(item.node)
       })
-      console.log(tempArr)
       setLearnersList(tempArr)
       setMainLearnerList(tempArr)
     }
-  }, [dataLearners])
+    if (errorLearners) {
+      notification.error({
+        message: 'Something went wrong',
+        description: 'Unable to fetch learners list',
+      })
+    }
+  }, [dataLearners, errorLearners])
 
   const updateLearnerStatus = async (status, record) => {
     return client
@@ -55,6 +64,7 @@ function AllLearners(props) {
         },
       })
       .then(data => {
+        refetch()
         notification.success({
           message: 'Learner status Updated',
           description: 'Learner status updated successfully',
@@ -63,7 +73,7 @@ function AllLearners(props) {
       .catch(error => {
         error.graphQLErrors.map(item => {
           return notification.error({
-            message: 'Something want wrong',
+            message: 'Something went wrong',
             description: item.message,
           })
         })
@@ -151,6 +161,17 @@ function AllLearners(props) {
       dataIndex: 'dob',
       align: 'left',
       width: '120px',
+    },
+    {
+      title: 'Created At',
+      dataIndex: 'parent.dateJoined',
+      width: '110px',
+      render: text => {
+        if (text === null || text === undefined) {
+          return text
+        }
+        return text === 'None' ? 'None' : `${moment(text).format('YYYY-MM-DD')}`
+      },
     },
     {
       title: 'Last Login',

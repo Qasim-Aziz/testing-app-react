@@ -24,7 +24,15 @@ import { GET_TEMPLETES, DELETE_TEMPLATE } from './queries'
 
 const { Search } = Input
 
-const TemplateTab = ({ studentId }) => {
+const TemplateTab = ({
+  studentId,
+  searchText,
+  searchStatus,
+  date,
+  openRightdrawer,
+  openDrawer,
+  closeDrawer,
+}) => {
   const [allTemplates, setAllTemplates] = useState([])
   const [filteredTemplates, setFilteredTemplates] = useState([])
 
@@ -32,7 +40,7 @@ const TemplateTab = ({ studentId }) => {
   const [editTemplateFor, setEditTemplateFor] = useState(false)
   const [openRecordDrawerFor, setOpenRecordDrawerFor] = useState(false)
   const [openChartFor, setOpenChartFor] = useState(false)
-  const [searchText, setSearchText] = useState()
+  // const [searchText, setSearchText] = useState()
 
   const {
     data: templateData,
@@ -202,38 +210,26 @@ const TemplateTab = ({ studentId }) => {
     })
   }
 
-  const doSearchTemplate = e => {
-    // Update Text
-    const text = e.target.value
-    setSearchText(text)
-
-    if (text) {
+  useEffect(() => {
+    let tempList = allTemplates
+    if (searchText) {
       // Filter Template
-      const filteredTemplateList = allTemplates.filter(x =>
-        x.templateName.toLowerCase().includes(text.toLowerCase()),
+      tempList = tempList.filter(x =>
+        x.templateName.toLowerCase().includes(searchText.toLowerCase()),
       )
-      setFilteredTemplates(filteredTemplateList)
-    } else {
-      // If not search then show all
-      setFilteredTemplates(allTemplates)
     }
-  }
-
-  const header = () => (
-    <Row>
-      <Col span={14}>
-        <Form layout="inline">
-          <Form.Item label="Template Name">
-            <Search
-              placeholder="Search by template name"
-              value={searchText}
-              onChange={doSearchTemplate}
-            />
-          </Form.Item>
-        </Form>
-      </Col>
-    </Row>
-  )
+    if (searchStatus) {
+      tempList = tempList.filter(x => x.status.toLowerCase().includes(searchStatus.toLowerCase()))
+    }
+    if (date) {
+      tempList = tempList.filter(
+        x =>
+          x.date >= moment(date.gte).format('YYYY-MM-DD') &&
+          x.date <= moment(date.lte).format('YYYY-MM-DD'),
+      )
+    }
+    setFilteredTemplates(tempList)
+  }, [searchText, searchStatus, date])
 
   if (templateError) {
     console.error(templateError)
@@ -274,8 +270,8 @@ const TemplateTab = ({ studentId }) => {
         width={800}
         title="New Behavior Templates"
         placement="right"
-        visible={isCreatingNewTemplate}
-        onClose={() => setCreatingNewTemplate(false)}
+        visible={openRightdrawer}
+        onClose={() => closeDrawer()}
       >
         <CreateTemplateForm
           onCreatingTemplate={onCreatingTemplate}

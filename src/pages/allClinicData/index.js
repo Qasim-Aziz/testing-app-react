@@ -37,6 +37,7 @@ const AllClinicsData = () => {
   const [ratesDrawer, setRatesDrawer] = useState(false)
   const [learnersTableDrawer, setLearnersTableDrawer] = useState(false)
   const [currentClinicRow, setCurrentClinicRow] = useState()
+  const [activeLearners, setActiveLearners] = useState(true)
   const filterRef = useRef()
   const filterSet = { name: true, email: true, mobile: true, status: true }
   const { data, loading, error, refetch } = useQuery(CLINIC_QUERY, {
@@ -164,6 +165,7 @@ const AllClinicsData = () => {
       render: (text, row) => (
         <Button
           onClick={() => {
+            setActiveLearners(false)
             setCurrentClinicRow(row)
             setDrawerTitle(row.details.schoolName)
             setLearnersTableDrawer(true)
@@ -183,6 +185,19 @@ const AllClinicsData = () => {
       sortOrder: sortedInfo.columnKey === 'activeLearners' && sortedInfo.order,
       sortDirections: ['ascend', 'descend'],
       width: '95px',
+      render: (text, row) => (
+        <Button
+          onClick={() => {
+            setCurrentClinicRow(row)
+            setDrawerTitle(row.details.schoolName)
+            setLearnersTableDrawer(true)
+          }}
+          type="link"
+          style={{ padding: '0px', fontWeight: 'bold', fontSize: '13px' }}
+        >
+          {text}
+        </Button>
+      ),
     },
     {
       title: 'Last Month Active Learners',
@@ -518,7 +533,7 @@ const AllClinicsData = () => {
         destroyOnClose="true"
         className="change-invo-drawer"
       >
-        <AllLearners rowData={currentClinicRow} />
+        <AllLearners rowData={currentClinicRow} active={activeLearners} />
       </Drawer>
     </Authorize>
   )

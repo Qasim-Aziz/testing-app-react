@@ -235,71 +235,50 @@ const MedicalDataPage = props => {
         rangePicker
       />
       <Layout style={{ padding: '0px' }}>
-        <Content style={{ padding: '0px 20px', maxWidth: 1300, width: '100%', margin: '0px auto' }}>
-          <Row gutter={[46, 0]}>
-            <Col className="medicalData">
-              <div>
-                <div style={{ marginTop: 17 }}>
-                  <Table
-                    loading={loading}
-                    className="mealTable"
-                    rowKey="id"
-                    columns={MedColumns}
-                    dataSource={medTableData}
-                    pagination={{
-                      position: 'bottom',
-                      showSizeChanger: true,
-                      pageSizeOptions: ['10', '25', '50', '100'],
-                    }}
-                    size="small"
-                    bordered
-                  />
-                  {/* {loading && 'Loading...'}
-                  {error && <pre>{JSON.stringify(error, null, 2)}</pre>}
-                  {data &&
-                    data.getMedication.edges.map(({ node }, index) => (
-                      <MedicalCard
-                        key={node.id}
-                        id={node.id}
-                        condition={node.condition}
-                        note={node.note}
-                        startDate={moment(node.startDate).format('DD MMMM')}
-                        endDate={moment(node.endDate).format('DD MMMM')}
-                        style={{ marginTop: index === 0 ? 0 : 10 }}
-                        date={date}
-                        setUpdateMed={setUpdateMed}
-                        refetch={refetch}
-                        severity={node.severity.name}
-                        openDrawer={openDrawer}
-                      />
-                    ))} */}
-                </div>
-              </div>
-            </Col>
-            <Drawer
-              title={updateMed ? 'Update Medical Data' : 'New Medical Data'}
-              width="52%"
-              placement="right"
-              closable="true"
-              visible={showDrawerForm && TabCheck === 'Medical Data'}
-              onClose={closeDrawer}
-            >
-              {updateMed ? (
-                <UpdateMedicalForm
-                  id={updateMed}
-                  setOpen={setUpdateMed}
-                  closeDrawer={closeDrawer}
-                  setMedDataUpdated={setMedDataUpdated}
-                />
-              ) : (
-                <MedicalForm
-                  handleNewMediDate={newDate => {
-                    setNewMediDate(newDate)
-                  }}
-                  setNewMediCreated={setNewMediCreated}
-                />
-              )}
-            </Drawer>
+        <Content style={{ maxWidth: 1300, width: '100%', margin: '0px auto' }}>
+          <div className="medicalData">
+            <div>
+              <Table
+                loading={loading}
+                className="mealTable"
+                rowKey="id"
+                columns={MedColumns}
+                dataSource={medTableData}
+                pagination={{
+                  position: 'bottom',
+                  showSizeChanger: true,
+                  pageSizeOptions: ['10', '25', '50', '100'],
+                }}
+                size="small"
+                bordered
+              />
+            </div>
+          </div>
+          <Drawer
+            title={updateMed ? 'Update Medical Data' : 'New Medical Data'}
+            width="52%"
+            placement="right"
+            closable="true"
+            visible={showDrawerForm && TabCheck === 'Medical Data'}
+            onClose={closeDrawer}
+          >
+            {updateMed ? (
+              <UpdateMedicalForm
+                id={updateMed}
+                setOpen={setUpdateMed}
+                closeDrawer={closeDrawer}
+                setMedDataUpdated={setMedDataUpdated}
+              />
+            ) : (
+              <MedicalForm
+                handleNewMediDate={newDate => {
+                  setNewMediDate(newDate)
+                }}
+                setNewMediCreated={setNewMediCreated}
+              />
+            )}
+          </Drawer>
+          <Row>
             <Col span={8} style={{ display: 'none' }}>
               <Title
                 style={{

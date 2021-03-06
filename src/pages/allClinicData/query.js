@@ -75,8 +75,8 @@ export const UPDATE_SCHOOL = gql`
 `
 
 export const ALL_LEARNERS = gql`
-  query Students($schoolId: ID!) {
-    students(school: $schoolId) {
+  query Students($schoolId: ID!, $isActive: Boolean) {
+    students(school: $schoolId, isActive: $isActive) {
       edges {
         node {
           id
@@ -88,11 +88,14 @@ export const ALL_LEARNERS = gql`
           parentMobile
           gender
           isActive
+          admissionDate
+          createdAt
           isPeakActive
           isCogActive
           researchParticipant
           parent {
             id
+            dateJoined
             lastLogin
           }
           assessmentCharges {

@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Tabs, DatePicker, Input, Select, Button, Icon } from 'antd'
+import React, { useState, useEffect } from 'react'
+import { Tabs, DatePicker, notification, Input, Select, Button, Icon } from 'antd'
 import RecordTab from 'components/BehaviourData/RecordTab'
 import TemplateTab from 'components/BehaviourData/TemplateTab'
 import moment from 'moment'
@@ -22,41 +22,78 @@ const Headstyle = {
   paddingTop: '7px',
   marginRight: '10px',
 }
-const BehaviorDataPage = () => {
+const BehaviorDataPage = ({ openRightdrawer, openDrawer, closeDrawer }) => {
   const studentId = localStorage.getItem('studentId')
   const [activeTab, setactiveTab] = useState('templates')
-  const [startDate, setStartDate] = useState(moment())
-  const [endDate, setEndDate] = useState(moment().subtract(10, 'd'))
+  const [date, setDate] = useState({
+    gte: moment()
+      .subtract(4, 'weeks')
+      .format('YYYY-MM-DD'),
+    lte: moment().format('YYYY-MM-DD'),
+  })
+  const [searchText, setSearchText] = useState('')
+  const [searchStatus, setSearchStatus] = useState('')
 
   const { data: statusData, loading: statusLoading, error: statusError } = useQuery(DANCLE_STATUS)
 
-  console.log(statusData, 'std')
+  useEffect(() => {
+    if (statusError) {
+      notification.error({
+        message: 'Unable to fetch decel status',
+      })
+    }
+  }, [statusError])
+
+  const handleDateSelectionChange = (newDate, value) => {
+    setDate({
+      gte: moment(value[0]).format('YYYY-MM-DD'),
+      lte: moment(value[1]).format('YYYY-MM-DD'),
+    })
+  }
+
+  console.log(searchText, 'jgh')
+
   return (
     <div>
       <div style={container}>
         <span>
           <span style={Headstyle}>Date: </span>
           <DatePicker.RangePicker
-            style={{ width: '250px', marginRight: 40 }}
-            defaultValue={[moment(startDate), moment(endDate)]}
+            style={{ width: '240px', marginRight: 40 }}
+            defaultValue={[moment(date.gte), moment(date.lte)]}
+            onChange={handleDateSelectionChange}
           />
         </span>
         <span>
           <span style={Headstyle}>Behaviour: </span>
-          <Input.Search allowClear style={{ width: '240px' }} placeholder="Search..." />
+          <Input.Search
+            allowClear
+            style={{ width: '200px', marginRight: 40 }}
+            placeholder="Search..."
+            onChange={e => setSearchText(e.target.value)}
+          />
         </span>
         <span>
           <span style={Headstyle}>Status: </span>
-          {/* <Select></Select> */}
+          <Select
+            placeholder="Select Behavior"
+            loading={statusLoading}
+            showSearch
+            allowClear
+            style={{ width: '200px' }}
+            value={searchStatus}
+            onChange={e => setSearchStatus(e)}
+          >
+            <Select.Option value="">All</Select.Option>
+            {statusData?.getDecelStatus.map(item => {
+              return (
+                <Select.Option value={item.statusName} key={item.id}>
+                  {item.statusName}
+                </Select.Option>
+              )
+            })}
+          </Select>
         </span>
-
-        <Button
-          type="primary"
-          style={{ marginLeft: 'auto' }}
-          // onClick={() => setCreatingNewTemplate(true)}
-        >
-          <Icon type="plus" /> Create new Template
-        </Button>
       </div>
       <Tabs
         type="card"
@@ -65,10 +102,24 @@ const BehaviorDataPage = () => {
         defaultActiveKey="templates"
       >
         <Tabs.TabPane tab="Templates" key="templates">
-          <TemplateTab studentId={studentId} />
+          <TemplateTab
+            studentId={studentId}
+            date={date}
+            searchText={searchText}
+            searchStatus={searchStatus}
+            openRightdrawer={openRightdrawer}
+            openDrawer={openDrawer}
+            closeDrawer={closeDrawer}
+          />
         </Tabs.TabPane>
         <Tabs.TabPane tab="Records" key="records">
-          <RecordTab studentId={studentId} activeTab={activeTab} />
+          <RecordTab
+            studentId={studentId}
+            activeTab={activeTab}
+            date={date}
+            searchText={searchText}
+            searchStatus={searchStatus}
+          />
         </Tabs.TabPane>
       </Tabs>
     </div>

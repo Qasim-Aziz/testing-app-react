@@ -356,6 +356,8 @@ const InvoiceForm = ({ form, rowData, refetchInvoices, setInvoiceFormDrawer }) =
         const tempStudent = learnerData.students.edges.filter(
           studentItem => studentItem.node.id === item.id,
         )
+        // console.log(learnerData)
+        // console.log(details, 'details')
         const assessCharges = tempStudent[0].node.assessmentCharges.edges
         let checkPeak = true
         let checkVbmapp = true

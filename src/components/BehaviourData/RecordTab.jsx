@@ -22,17 +22,9 @@ import { BEHAVIOR_RECORD_DATA, DELETE_BEHAVIOR_RECORD1 } from './queries'
 
 const { Search } = Input
 
-const RecordTab = ({ studentId, activeTab }) => {
-  const [date, setDate] = useState({
-    gte: moment()
-      .subtract(4, 'weeks')
-      .format('YYYY-MM-DD'),
-    lte: moment().format('YYYY-MM-DD'),
-  })
-
+const RecordTab = ({ studentId, activeTab, date, searchText, searchStatus }) => {
   const [allBehaviorRecords, setAllBehaviorRecords] = useState([])
   const [filteredBehaviorRecords, setFilteredBehaviorRecords] = useState([])
-  const [searchText, setSearchText] = useState()
   const [editRecordingFor, setEditRecordingFor] = useState()
   const [openDrilldownChartFor, setDrilldownChartFor] = useState()
 
@@ -49,6 +41,16 @@ const RecordTab = ({ studentId, activeTab }) => {
     },
     fetchPolicy: 'network-only',
   })
+
+  useEffect(() => {
+    refetchBehaviorRecord({
+      variables: {
+        studentId,
+        dateGte: date.gte,
+        dateLte: date.lte,
+      },
+    })
+  }, [date])
 
   useEffect(() => {
     if (activeTab === 'records') {
@@ -94,14 +96,11 @@ const RecordTab = ({ studentId, activeTab }) => {
       })
       refetchBehaviorRecord()
     }
-  }, [deleteBehaviorRecordData])
-
-  useEffect(() => {
     if (deleteBehaviorRecordError)
       notification.error({
         message: 'Opps their something wrong',
       })
-  }, [deleteBehaviorRecordError])
+  }, [deleteBehaviorRecordData, deleteBehaviorRecordError])
 
   const behaviourRecordColumns = [
     {
@@ -194,55 +193,24 @@ const RecordTab = ({ studentId, activeTab }) => {
     }
   }
 
-  const doSearchBehaviorRecord = e => {
-    // Update Text
-    const text = e.target.value
-    setSearchText(text)
+  useEffect(() => {
+    let tempList = allBehaviorRecords
 
-    if (text) {
+    if (searchText) {
       // Filter Template
-      const filteredBehaviorRecordList = allBehaviorRecords.filter(x =>
-        x.behaviorName.toLowerCase().includes(text.toLowerCase()),
+      tempList = tempList.filter(x =>
+        x.behaviorName.toLowerCase().includes(searchText.toLowerCase()),
       )
-      setFilteredBehaviorRecords(filteredBehaviorRecordList)
-    } else {
-      // If not search then show all
-      setFilteredBehaviorRecords(allBehaviorRecords)
     }
-  }
+    if (searchStatus) {
+      console.log(allBehaviorRecords, 'status all beha')
+      tempList = tempList.filter(x => x.status.toLowerCase().includes(searchStatus.toLowerCase()))
+    }
 
-  const handleDateSelectionChange = (newDate, value) => {
-    setDate({
-      gte: moment(value[0]).format('YYYY-MM-DD'),
-      lte: moment(value[1]).format('YYYY-MM-DD'),
-    })
-  }
-
-  const header = () => (
-    <Row>
-      <Col span={24}>
-        <Form layout="inline">
-          <Form.Item label="Behavior Name">
-            <Search
-              placeholder="Search by behavior name"
-              value={searchText}
-              onChange={doSearchBehaviorRecord}
-            />
-          </Form.Item>
-          <Form.Item label="Date Range">
-            <DatePicker.RangePicker
-              value={[moment(date.gte), moment(date.lte)]}
-              onChange={handleDateSelectionChange}
-              style={{ width: '250px' }}
-            />
-          </Form.Item>
-        </Form>
-      </Col>
-    </Row>
-  )
+    setFilteredBehaviorRecords(tempList)
+  }, [searchText, searchStatus])
 
   if (behaviorRecordError) {
-    console.error(behaviorRecordError)
     return <h3>An error occurred to load data.</h3>
   }
 
@@ -260,7 +228,6 @@ const RecordTab = ({ studentId, activeTab }) => {
           pageSizeOptions: ['10', '25', '50', '100'],
         }}
         size="small"
-        title={header}
         bordered
       />
 
