@@ -28,7 +28,7 @@ export function* GET_DATA() {
       UserProfile: null,
       isUserProfile: false,
       TotalLearners: 0,
-      PageInfo: null
+      PageInfo: null,
     },
   })
 
@@ -64,16 +64,21 @@ export function* GET_LEARNERS({ payload }) {
     let i = 0
     if (response.data.students.edges.length > 0) {
       for (i = 0; i < response.data.students.edges.length; i++) {
+        if (response.data.students.edges[i].node.tags.edges.length > 0) {
+          const tempTagArr = response.data.students.edges[i].node.tags.edges.map(e => e.node.name)
+          response.data.students.edges[i].node.tags = tempTagArr
+        }
         learners.push(response.data.students.edges[i].node)
       }
     }
 
+    console.log(learners, 'jnxckjvnkjnxck')
     yield put({
       type: 'learners/SET_STATE',
       payload: {
         LearnersList: learners,
         TotalLearners: response.data.students.clinicTotal,
-        PageInfo: response.data.students.pageInfo
+        PageInfo: response.data.students.pageInfo,
       },
     })
   }
@@ -106,47 +111,49 @@ export function* PAGE_CHANGED({ payload }) {
   let last = null
   let first = perPage
 
-  if (payload.page === 1){
+  if (payload.page === 1) {
     after = null
     before = null
-  }
-  else if(payload.page >= payload.rows/perPage){
-    after  = null
+  } else if (payload.page >= payload.rows / perPage) {
+    after = null
     before = null
     first = null
     last = payload.rows % perPage
-  }
-  else if(payload.page > currentPage){
+  } else if (payload.page > currentPage) {
     console.log('trriger after', payload.page, currentPage)
     after = pageInfo.endCursor
-  }
-  else if (payload.page < currentPage){
+  } else if (payload.page < currentPage) {
     console.log('trriger before', payload.page, currentPage)
     before = pageInfo.startCursor
   }
-  
+
   // if (pageInfo){
   //   after = pageInfo.endCursor
   // }
-  
-  const response = yield call(getClinicLearners, {isActive: active, first, after, before, last})
-  
+
+  const response = yield call(getClinicLearners, { isActive: active, first, after, before, last })
+
   const oldLearners = []
   if (response) {
     let i = 0
     if (response.data.students.edges.length > 0) {
       for (i = 0; i < response.data.students.edges.length; i++) {
+        if (response.data.students.edges[i].node.tags.edges.length > 0) {
+          const tempTagArr = response.data.students.edges[i].node.tags.edges.map(e => e.node.name)
+          response.data.students.edges[i].node.tags = tempTagArr
+        }
         oldLearners.push(response.data.students.edges[i].node)
       }
     }
 
+    console.log(oldLearners, 'jnskjfnesknsdkjcnsdkcnsdkjsde')
     yield put({
       type: 'learners/SET_STATE',
       payload: {
         LearnersList: oldLearners,
         TotalLearners: response.data.students.clinicTotal,
         PageInfo: response.data.students.pageInfo,
-        CurrentPage: payload.page
+        CurrentPage: payload.page,
       },
     })
   }
@@ -179,32 +186,36 @@ export function* ROWS_CHANGED({ payload }) {
   let last = null
   let first = payload.currentRowsPerPage
 
-  if (payload.currentPage === 1){
+  if (payload.currentPage === 1) {
     after = null
     before = null
-  }
-  else if(payload.currentPage >= totalLearners/payload.currentRowsPerPage){
-    after  = null
+  } else if (payload.currentPage >= totalLearners / payload.currentRowsPerPage) {
+    after = null
     before = null
     first = null
     last = totalLearners % payload.currentRowsPerPage
   }
-  
+
   // if (pageInfo){
   //   after = pageInfo.endCursor
   // }
-  
-  const response = yield call(getClinicLearners, {isActive: active, first, after, before, last})
-  
+
+  const response = yield call(getClinicLearners, { isActive: active, first, after, before, last })
+
   const oldLearners = []
   if (response) {
     let i = 0
     if (response.data.students.edges.length > 0) {
       for (i = 0; i < response.data.students.edges.length; i++) {
+        if (response.data.students.edges[i].node.tags.edges.length > 0) {
+          const tempTagArr = response.data.students.edges[i].node.tags.edges.map(e => e.node.name)
+          response.data.students.edges[i].node.tags = tempTagArr
+        }
         oldLearners.push(response.data.students.edges[i].node)
       }
     }
 
+    console.log(oldLearners, 'oldLeanrernss')
     yield put({
       type: 'learners/SET_STATE',
       payload: {
@@ -248,17 +259,25 @@ export function* EDIT_LEARNER({ payload }) {
       message: 'Learner Updated Successfully',
     })
 
+    let updatedLearner = response.data.updateStudent.student
+    if (response.data.updateStudent.student) {
+      if (response.data.updateStudent.student.tags.edges.length > 0) {
+        const tempTagArr = response.data.updateStudent.student.tags.edges.map(e => e.node.name)
+        updatedLearner = { ...updatedLearner, tags: tempTagArr }
+      }
+    }
+
     yield put({
       type: 'learners/UPDATE_LERNERS_LIST',
       payload: {
-        object: response.data.updateStudent.student,
+        object: updatedLearner,
       },
     })
 
     yield put({
       type: 'learners/SET_STATE',
       payload: {
-        UserProfile: response.data.updateStudent.student,
+        UserProfile: updatedLearner,
       },
     })
   }
@@ -363,6 +382,5 @@ export default function* rootSaga() {
     takeEvery(actions.LEARNER_ACTIVE_INACTIVE, LEARNER_ACTIVE_INACTIVE),
     takeEvery(actions.PAGE_CHANGED, PAGE_CHANGED),
     takeEvery(actions.ROWS_CHANGED, ROWS_CHANGED),
-
   ])
 }

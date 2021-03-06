@@ -22,6 +22,7 @@ import {
 import moment from 'moment'
 import { connect } from 'react-redux'
 import axios from 'axios'
+import AntdTag from '../../staffs/antdTag'
 
 const { TextArea } = Input
 const { Option } = Select
@@ -63,6 +64,7 @@ class EditBasicInformation extends React.Component {
     checked: true,
     selectedFile: null,
     userProfileID: null,
+    tagArray: [],
   }
 
   componentDidMount() {
@@ -95,6 +97,7 @@ class EditBasicInformation extends React.Component {
       isActive: UserProfile.isActive
         ? this.setState({ checked: UserProfile.isActive })
         : this.setState({ checked: UserProfile.isActive }),
+      tags: UserProfile.tags,
     })
 
     this.setState({
@@ -106,6 +109,7 @@ class EditBasicInformation extends React.Component {
         : 'No Case Manager Set',
       categoryTag: UserProfile.category?.category,
       userProfileID: UserProfile.id,
+      tagArray: UserProfile.tags && UserProfile.tags.length > 0 ? UserProfile.tags : [],
     })
   }
 
@@ -142,7 +146,7 @@ class EditBasicInformation extends React.Component {
           .post('https://application.cogniable.us/apis/student-docs/', data, { headers: headers })
           .then(res => {
             // then print response status
-            console.log(res.statusText)
+            values = { ...values, tags: this.state.tagArray }
             message.success('Upload Successfully.')
             dispatch({
               type: 'learners/EDIT_LEARNER',
@@ -167,13 +171,19 @@ class EditBasicInformation extends React.Component {
     })
   }
 
+  tagArrayHandler = tags => {
+    this.setState({
+      tagArray: tags,
+    })
+  }
+
   render() {
     const itemStyle = { marginBottom: '5px', fontWeight: 'bold' }
     const {
       form,
       learners: { clinicLocationList, categoryList, staffDropdownList, languageList },
     } = this.props
-    const itemStyle1 = { textAlign: 'center', marginBottom: '5px', fontWeight: 'bold' }
+    const itemStyle1 = { marginBottom: '5px', fontWeight: 'bold' }
     console.log(this.props.form, 'pppp')
     return (
       <Form {...layout} onSubmit={e => this.handleSubmit(e)}>
@@ -181,6 +191,17 @@ class EditBasicInformation extends React.Component {
           <Tag>{this.state.locationTag}</Tag>
           <Tag>{this.state.caseManagerTag}</Tag>
           <Tag>{this.state.categoryTag}</Tag>
+        </Form.Item>
+
+        <Form.Item label="Tags" style={itemStyle}>
+          {form.getFieldDecorator('tags')(
+            <AntdTag
+              style={itemStyle}
+              changeTagsHandler={this.tagArrayHandler}
+              closeable="true"
+              tagArray={this.state.tagArray}
+            />,
+          )}
         </Form.Item>
 
         <Divider orientation="left">Mandatory Fields</Divider>
@@ -197,7 +218,7 @@ class EditBasicInformation extends React.Component {
         </Form.Item>
         <Form.Item label="Last Name" style={itemStyle}>
           {form.getFieldDecorator('lastName', {
-            rules: [{ required: true, message: 'Please proovide lastName!' }],
+            rules: [{ required: false, message: 'Please provide lastName!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="Email" style={itemStyle}>

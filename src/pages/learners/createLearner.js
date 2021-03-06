@@ -8,6 +8,7 @@
 import React from 'react'
 import { Form, Input, Button, Select, DatePicker, Checkbox, Divider, message, Tag } from 'antd'
 import { connect } from 'react-redux'
+import AntdTag from '../staffs/antdTag'
 
 const { TextArea } = Input
 const { Option } = Select
@@ -45,10 +46,12 @@ class BasicInformationForm extends React.Component {
     super(props)
 
     this.state = {}
+    this.tagArrayHandler = this.tagArrayHandler.bind(this)
   }
 
   state = {
     selectedFile: null,
+    tagArray: [],
   }
 
   componentDidMount() {
@@ -71,6 +74,7 @@ class BasicInformationForm extends React.Component {
     data.append('file', this.state.selectedFile)
     form.validateFields((error, values) => {
       if (!error) {
+        console.log(error, values)
         dispatch({
           type: 'learners/CREATE_LEARNER',
           payload: {
@@ -87,6 +91,12 @@ class BasicInformationForm extends React.Component {
     console.log(event.target.files[0])
     this.setState({
       selectedFile: event.target.files[0],
+    })
+  }
+
+  tagArrayHandler = tags => {
+    this.setState({
+      tagArray: tags,
     })
   }
 
@@ -110,6 +120,17 @@ class BasicInformationForm extends React.Component {
           <Tag>Location</Tag>
           <Tag>Case Manager</Tag>
           <Tag>Category</Tag>
+        </Form.Item>
+
+        <Form.Item label="Tags" style={itemStyle}>
+          {form.getFieldDecorator('tags')(
+            <AntdTag
+              style={itemStyle}
+              changeTagsHandler={this.tagArrayHandler}
+              closeable="true"
+              tagArray={this.state.tagArray}
+            />,
+          )}
         </Form.Item>
 
         <Divider orientation="left">Mandatory Fields</Divider>
