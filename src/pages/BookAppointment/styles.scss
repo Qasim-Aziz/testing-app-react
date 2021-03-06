@@ -1,0 +1,44 @@
+.bookAppointment {
+  box-shadow: 0 0 3px #888;
+  padding: 8px;
+
+  .hidden {
+    display: none;
+  }
+
+  .visible {
+    display: initial;
+  }
+
+  .leftPanel {
+    padding-right: 8px;
+
+    &.bordered {
+      border-right: 1px solid #ddd;
+    }
+
+    .calander-selection {
+      zoom: 1.1;
+    }
+  }
+
+  .rightPanel {
+    padding: 0 10px;
+  }
+
+  .ant-form-item label {
+    font-size: 14px;
+    font-weight: bold;
+  }
+}
+
+.timeslot {
+  .ant-form-item {
+    margin: 0;
+  }
+
+  .ant-form-item label {
+    font-size: 14px;
+    font-weight: bold;
+  }
+}

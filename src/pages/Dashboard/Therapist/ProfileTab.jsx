@@ -6,6 +6,7 @@ import ContactDetails from '../../staffProfile/ContactDetails'
 import NotiSett from '../../staffProfile/NotiSett'
 import MasteryCriteria from '../../staffProfile/MasteryCriteria'
 import LocationSett from '../../staffProfile/LocationSett'
+import TherapistShifting from '../../staffProfile/TherapistShifting'
 import PeakAutomaticTab from '../PeakAutomaticTab'
 import SessionSettingTab from '../SessionSettingTab'
 
@@ -47,6 +48,11 @@ const ProfileTab = ({ activeProfileTab, onProfileTabChange }) => {
       key: 'location',
       title: 'Location',
       component: <LocationSett />,
+    },
+    {
+      key: 'therapist-shifting',
+      title: 'Theapist Shifting',
+      component: <TherapistShifting />,
     },
   ]
 

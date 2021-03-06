@@ -8,6 +8,7 @@ import ChangePassword from 'components/changePassword/form'
 import MasterCriteria from 'pages/ClinicProfile/MasteryCriteria'
 import LocationSett from 'pages/ClinicProfile/LocationSett'
 import DisabledCurriculum from 'pages/ClinicProfile/DisabledCurriculum'
+import TherapistShifting from 'pages/ClinicProfile/TherapistShifting'
 import PeakAutomaticTab from '../PeakAutomaticTab'
 import AssessmentsTab from '../../../components/AssessmentsProfileTab'
 import SessionSettingTab from '../SessionSettingTab'
@@ -65,6 +66,11 @@ const ProfileTab = ({ activeProfileTab, onProfileTabChange }) => {
       key: 'disabled-curriculum',
       title: 'Disabled Curriculum',
       component: <DisabledCurriculum />,
+    },
+    {
+      key: 'therapist-shifting',
+      title: 'Theapist Shifting',
+      component: <TherapistShifting />,
     },
   ]
 
