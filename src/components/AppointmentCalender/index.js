@@ -254,9 +254,9 @@ const AppointmentCalender = ({
         resourceOrder="title"
         filterResourcesWithEvents={!showAllTherapist && selectedTherapist.length === 0}
         dateClick={(date, jsEvent, view) => {
-          console.log("It's date cell clicked")
+          //   console.log("It's date cell clicked")
           if (FullCalendarActions.isDblClick()) {
-            console.log("It's date cell DOUBLE clicked...!")
+            // console.log("It's date cell DOUBLE clicked...!")
             createAppointment()
           }
         }}

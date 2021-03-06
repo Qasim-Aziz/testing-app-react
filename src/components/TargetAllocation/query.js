@@ -1,6 +1,5 @@
-import gql from 'graphql-tag'
-
 /* eslint-disable import/prefer-default-export */
+import gql from 'graphql-tag'
 
 export const IER_REPORTS = gql`
   mutation($id: ID!) {
@@ -159,6 +158,7 @@ export const CREATE_TARGET = gql`
     $peakType: String
     $classes: [ClassesInput]
     $equiCode: String
+    $domain: ID!
   ) {
     createTargetAllocate2(
       input: {
@@ -186,6 +186,7 @@ export const CREATE_TARGET = gql`
           peakBlocks: $peakBlocks
           peakType: $peakType
           eqCode: $equiCode
+          domain: $domain
         }
         classes: $classes
       }
@@ -197,6 +198,10 @@ export const CREATE_TARGET = gql`
         targetInstr
         peakBlocks
         peakType
+        manualAllocateDomain {
+          id
+          domain
+        }
         targetStatus {
           id
           statusName
@@ -325,6 +330,7 @@ export const UPDATE_TARGET = gql`
     $peakBlocks: Int
     $peakType: String
     $classes: [ClassesInput]
+    $domain: ID!
   ) {
     updateTargetAllocate2(
       input: {
@@ -347,6 +353,7 @@ export const UPDATE_TARGET = gql`
           videos: $video
           peakBlocks: $peakBlocks
           peakType: $peakType
+          domain: $domain
         }
         classes: $classes
       }
@@ -358,6 +365,10 @@ export const UPDATE_TARGET = gql`
         targetInstr
         peakBlocks
         peakType
+        manualAllocateDomain {
+          id
+          domain
+        }
         targetStatus {
           id
           statusName
@@ -455,6 +466,19 @@ export const UPDATE_TARGET = gql`
               }
             }
           }
+        }
+      }
+    }
+  }
+`
+
+export const GET_DOMAINS = gql`
+  query getDomains {
+    domain {
+      edges {
+        node {
+          id
+          domain
         }
       }
     }
