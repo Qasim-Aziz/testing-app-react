@@ -8,9 +8,11 @@ import { ALL_THERAPIST, UPDATE_SHIFTING } from './queries'
 const TherapistShifting = () => {
   const [isForAllTherapist, setIsForAllTherapist] = useState(false)
   const [selectedDays, setSelectedDays] = useState([])
-  const [selectedTherapist, setSelectedTherapist] = useState()
+  const [selectedTherapists, setSelectedTherapists] = useState([])
   const [startTime, setStartTime] = useState(moment())
   const [endTime, setEndTime] = useState(moment().add(30, 'minutes'))
+
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
   const { data: allTherapist, loading: allTherapistLoading, error: therapistErrors } = useQuery(
     ALL_THERAPIST,
@@ -38,24 +40,17 @@ const TherapistShifting = () => {
     }
   }, [updateShiftingError])
 
-  const days = [
-    { value: 'Sun', displayText: 'Sunday' },
-    { value: 'Mon', displayText: 'Monday' },
-    { value: 'Tue', displayText: 'Tuesday' },
-    { value: 'Wed', displayText: 'Wednesday' },
-    { value: 'Thur', displayText: 'Thursday' },
-    { value: 'Fri', displayText: 'Friday' },
-    { value: 'Sat', displayText: 'Saturday' },
-  ]
-
   const handleSubmit = e => {
     e.preventDefault()
+
+    const allTherapistIds = []
+    if (allTherapist) allTherapistIds.push(allTherapist.staffs.edges.map(({ node }) => node.id))
+
     updateShifting({
       variables: {
-        isForAllTherapist,
-        therapistId: selectedTherapist,
-        startTime,
-        endTime,
+        therapistIds: isForAllTherapist ? allTherapistIds : selectedTherapists,
+        startTime: startTime.format('hh:mm A'),
+        endTime: endTime.format('hh:mm A'),
         workingDays: selectedDays,
       },
     })
@@ -97,9 +92,10 @@ const TherapistShifting = () => {
               loading={allTherapistLoading}
               showSearch
               optionFilterProp="name"
-              value={selectedTherapist}
-              onChange={setSelectedTherapist}
+              value={selectedTherapists}
+              onChange={setSelectedTherapists}
               disabled={isForAllTherapist}
+              mode="tags"
             >
               {allTherapist &&
                 allTherapist.staffs.edges.map(({ node }) => (
@@ -148,9 +144,9 @@ const TherapistShifting = () => {
               value={selectedDays}
               onChange={setSelectedDays}
             >
-              {days.map(({ displayText, value }) => (
-                <Select.Option key={value} name={value}>
-                  {displayText}
+              {days.map(day => (
+                <Select.Option key={day} name={day}>
+                  {day}
                 </Select.Option>
               ))}
             </Select>
