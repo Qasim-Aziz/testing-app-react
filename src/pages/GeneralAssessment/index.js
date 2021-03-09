@@ -44,12 +44,15 @@ export default () => {
   const [filterNote, setFilterNote] = useState('')
   const [visibleFilter, setVisibleFilter] = useState(false)
 
-  const { data, loading, error, refetch } = useQuery(GET_GENERAL_DATA, {
-    variables: {
-      student: studentId,
+  const [fetchAssessmentRecords, { data, loading, error, refetch }] = useLazyQuery(
+    GET_GENERAL_DATA,
+    {
+      variables: {
+        student: studentId,
+      },
+      fetchPolicy: 'network-only',
     },
-    fetchPolicy: 'network-only',
-  })
+  )
 
   const [loadStudentData, { data: studnetInfo }] = useLazyQuery(STUDNET_INFO, {
     variables: {
@@ -65,6 +68,16 @@ export default () => {
       type: 'learnersprogram/LOAD_DATA',
     })
   }, [])
+
+  useEffect(() => {
+    if (studentId) {
+      fetchAssessmentRecords({
+        variables: {
+          student: studentId,
+        },
+      })
+    }
+  }, [studentId])
 
   useEffect(() => {
     updateTableData()
