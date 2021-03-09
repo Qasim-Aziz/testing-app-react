@@ -462,6 +462,7 @@ class DataRecording extends React.Component {
         StimulusActiveId,
         StepActiveId,
         ResponseLoading,
+        SelectedPeakStimulusIndex,
       },
     } = this.props
 
@@ -469,19 +470,19 @@ class DataRecording extends React.Component {
 
     const style2 = Disabled
       ? {
-          border: '2px solid #f4f6f8',
-          overflow: 'hidden',
-          position: 'relative',
-          minHeight: '600px',
-          pointerEvents: 'none',
-          opacity: '0.4',
-        }
+        border: '2px solid #f4f6f8',
+        overflow: 'hidden',
+        position: 'relative',
+        minHeight: '600px',
+        pointerEvents: 'none',
+        opacity: '0.4',
+      }
       : {
-          border: '2px solid #f4f6f8',
-          overflow: 'hidden',
-          position: 'relative',
-          minHeight: '600px',
-        }
+        border: '2px solid #f4f6f8',
+        overflow: 'hidden',
+        position: 'relative',
+        minHeight: '600px',
+      }
 
     const style3 = {
       border: '2px solid #f4f6f8',
@@ -535,23 +536,23 @@ class DataRecording extends React.Component {
                             <Icon type="left" />
                           </Button>
                         ) : (
-                          <Button
-                            style={{ marginRight: '10px' }}
-                            onClick={this.moveToPreviousTarget}
-                          >
-                            <Icon type="left" />
-                          </Button>
-                        )}
+                            <Button
+                              style={{ marginRight: '10px' }}
+                              onClick={this.moveToPreviousTarget}
+                            >
+                              <Icon type="left" />
+                            </Button>
+                          )}
                         Target {TargetActiveIndex + 1} / {MasterSession.targets.edgeCount}
                         {MasterSession?.targets.edgeCount > TargetActiveIndex + 1 ? (
                           <Button style={{ marginLeft: '10px' }} onClick={this.changeTarget}>
                             <Icon type="right" />
                           </Button>
                         ) : (
-                          <Button style={{ marginLeft: '10px' }} disabled>
-                            <Icon type="right" />
-                          </Button>
-                        )}
+                            <Button style={{ marginLeft: '10px' }} disabled>
+                              <Icon type="right" />
+                            </Button>
+                          )}
                       </span>
                     </div>
 
@@ -594,16 +595,16 @@ class DataRecording extends React.Component {
                       />
                       {MasterSession?.targets.edges[TargetActiveIndex]?.node.targetAllcatedDetails
                         .targetType.id === peakId && (
-                        <Badge
-                          style={badgeStyle}
-                          count={MasterSession?.targets.edges[TargetActiveIndex]?.node.peakType}
-                        />
-                      )}
+                          <Badge
+                            style={badgeStyle}
+                            count={MasterSession?.targets.edges[TargetActiveIndex]?.node.peakType}
+                          />
+                        )}
                     </div>
                   </>
                 ) : (
-                  ''
-                )}
+                    ''
+                  )}
               </Card>
               {/* End of Header block details */}
               <Row>
@@ -611,17 +612,17 @@ class DataRecording extends React.Component {
                 <Col xs={24} sm={24} md={24} lg={24} xl={24}>
                   {MasterSession?.targets.edges[TargetActiveIndex].node.targetAllcatedDetails
                     .targetType.id === peakId ? (
-                    <>
-                      {MasterSession?.targets.edges[TargetActiveIndex].node.peakType ===
-                      equivalence ? (
-                        <EquivalenceRecordingBlock key={TargetActiveIndex} />
-                      ) : (
-                        <PeakRecordingBlock />
-                      )}
-                    </>
-                  ) : (
-                    <DataRecordingBlock />
-                  )}
+                      <>
+                        {MasterSession?.targets.edges[TargetActiveIndex].node.peakType ===
+                          equivalence ? (
+                            <EquivalenceRecordingBlock key={TargetActiveIndex} />
+                          ) : (
+                            <PeakRecordingBlock />
+                          )}
+                      </>
+                    ) : (
+                      <DataRecordingBlock />
+                    )}
                   {/* <EquivalenceRecordingBlock /> */}
                 </Col>
                 {/* End of Target recording section */}
@@ -630,18 +631,18 @@ class DataRecording extends React.Component {
               <Card bodyStyle={{ padding: '5px', border: 'none' }} style={{ border: 'none' }}>
                 {MasterSession?.targets.edges[TargetActiveIndex].node.targetAllcatedDetails
                   .targetType.id === peakId ? (
-                  <>
-                    {MasterSession.targets.edges[TargetActiveIndex].node.peakType ===
-                    equivalence ? (
-                      // <p>1</p>
-                      <EquivalenceScoreBoard key={TargetActiveIndex} />
-                    ) : (
-                      <PeakTrialBoxes trails={10} boxWidth="45px" boxHeight="20px" />
-                    )}
-                  </>
-                ) : (
-                  <>
-                    {/* {MasterSession?.targets.edges[TargetActiveIndex].node.sd.edges.length > 0 ? (
+                    <>
+                      {MasterSession.targets.edges[TargetActiveIndex].node.peakType ===
+                        equivalence ? (
+                          // <p>1</p>
+                          <EquivalenceScoreBoard key={TargetActiveIndex} />
+                        ) : (
+                          <PeakTrialBoxes trails={10} boxWidth="45px" boxHeight="20px" />
+                        )}
+                    </>
+                  ) : (
+                    <>
+                      {/* {MasterSession?.targets.edges[TargetActiveIndex].node.sd.edges.length > 0 ? (
                         <>
                           {MasterSession?.targets.edges[TargetActiveIndex].node.sd.edges.map(
                             item2 => (
@@ -701,8 +702,8 @@ class DataRecording extends React.Component {
                               boxWidth="35px"
                             />
                           )} */}
-                  </>
-                )}
+                    </>
+                  )}
               </Card>
               {/* End of Trials list section */}
               {this.state.visible && (
@@ -760,23 +761,23 @@ class DataRecording extends React.Component {
                       {VideoLoading === true ? (
                         <p>Loading video...</p>
                       ) : (
-                        <>
-                          {VideoAvailable === true ? (
-                            <ReactPlayer url={VideoUrl} controls height="250px" width="100%" />
-                          ) : (
-                            <Empty />
-                          )}
-                        </>
-                      )}
+                          <>
+                            {VideoAvailable === true ? (
+                              <ReactPlayer url={VideoUrl} controls height="250px" width="100%" />
+                            ) : (
+                                <Empty />
+                              )}
+                          </>
+                        )}
                     </>
                   ) : (
-                    <Empty style={{ height: '250px' }} />
-                  )}
+                      <Empty style={{ height: '250px' }} />
+                    )}
                 </Card>
               </Drawer>
               <Drawer
                 title="Target Response Graph"
-                width="40%"
+                width="65%"
                 placement="left"
                 closable={false}
                 onClose={this.onGraphClose}
@@ -791,10 +792,11 @@ class DataRecording extends React.Component {
                   <TargetResponseGraph
                     key={
                       MasterSession.targets.edges[TargetActiveIndex].node.sd.edges.length > 0
-                        ? StimulusActiveId
-                        : MasterSession.targets.edges[TargetActiveIndex].node.steps.edges.length > 0
-                        ? StepActiveId
-                        : TargetActiveId
+                        ? StimulusActiveId + SelectedPeakStimulusIndex
+                        : MasterSession.targets.edges[TargetActiveIndex].node.steps.edges
+                          .length > 0
+                          ? StepActiveId
+                          : TargetActiveId
                     }
                     targetId={MasterSession.targets.edges[TargetActiveIndex].node.id}
                     sessionId={MasterSession?.id}

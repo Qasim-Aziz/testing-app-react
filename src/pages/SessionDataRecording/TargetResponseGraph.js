@@ -63,6 +63,7 @@ class TargetResponseGraph extends Component {
         StimulusActiveId,
         StepActiveIndex,
         StepActiveId,
+        SelectedPeakStimulusIndex,
       },
     } = this.props
 
@@ -76,7 +77,7 @@ class TargetResponseGraph extends Component {
     ) {
       console.log('Peak Found')
       activeTargetId = TargetActiveId
-      activeStimulusId = StimulusActiveId
+      activeStimulusId = MasterSession.targets.edges[TargetActiveIndex].node.sd.edges[SelectedPeakStimulusIndex]?.node.id
     } else if (MasterSession.targets.edges[TargetActiveIndex].node.sd.edges.length > 0) {
       console.log('found stimulus')
       activeTargetId = TargetActiveId
@@ -127,6 +128,8 @@ class TargetResponseGraph extends Component {
             { id: 'Correct', data: correctData },
           ],
         })
+
+        
       })
       .catch(error => {
         error.graphQLErrors.map(item => {
@@ -140,6 +143,8 @@ class TargetResponseGraph extends Component {
 
   render() {
     const { loading, data, GraphData } = this.state
+
+    console.log("GraphData- " ,GraphData)
     if (loading) {
       return 'Loading...'
     }
@@ -241,8 +246,8 @@ class TargetResponseGraph extends Component {
           data={GraphData}
           margin={{ top: 30, right: 50, bottom: 30, left: 60 }}
           xScale={{ type: 'point' }}
-          yScale={{ type: 'linear', min: 0, max: 100, stacked: true, reverse: false }}
-          curve="natural"
+          yScale={{ type: 'linear', min: 0, max: 100, stacked: false, reverse: false }}
+          curve="linear"
           axisTop={null}
           axisRight={null}
           // axisBottom={{
