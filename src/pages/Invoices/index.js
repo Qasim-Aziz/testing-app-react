@@ -29,15 +29,17 @@ export default () => {
   const [to, setTo] = useState()
   const [month, setMonth] = useState()
   const [statusSelect, setStatusSelect] = useState()
+  const [bankDetailsDrawer, setBankDetailsDrawer] = useState(false)
+
+  const paymentDetailsButton = (
+    <Button onClick={() => setBankDetailsDrawer(true)}>Bank Details</Button>
+  )
 
   return (
     <div>
       <Helmet title="Dashboard Alpha" />
       <Layout style={{ padding: '0px' }}>
-        <Tabs>
-          <TabPane tab="Details" key="Details">
-            <BankDetails />
-          </TabPane>
+        <Tabs tabBarExtraContent={paymentDetailsButton}>
           <TabPane tab="Customer" key="Customer">
             <CustomerList />
           </TabPane>
@@ -46,6 +48,14 @@ export default () => {
           </TabPane>
         </Tabs>
       </Layout>
+      <Drawer
+        width={600}
+        title="Update Payment accepting details"
+        visible={bankDetailsDrawer}
+        onClose={() => setBankDetailsDrawer(false)}
+      >
+        <BankDetails />
+      </Drawer>
     </div>
   )
 }

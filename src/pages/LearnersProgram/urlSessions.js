@@ -5,23 +5,23 @@ import Index from './index'
 
 @connect(({ user, student, learnersprogram }) => ({ user, student, learnersprogram }))
 class Assessments extends React.Component {
-    componentDidMount() {
-        const { dispatch } = this.props
-        dispatch({
-            type: 'learnersprogram/SET_STATE',
-            payload: {
-                TabCheck: "Sessions"
-            }
-        })
-    }
+  componentDidMount() {
+    const { dispatch } = this.props
+    dispatch({
+      type: 'learnersprogram/SET_STATE',
+      payload: {
+        TabCheck: 'Sessions',
+      },
+    })
+  }
 
-    render() {
-        return (
-            <>
-                <Index />
-            </>
-        )
-    }
+  render() {
+    return (
+      <>
+        <Index />
+      </>
+    )
+  }
 }
 
 export default Assessments

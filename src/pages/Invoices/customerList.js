@@ -25,6 +25,7 @@ import {
 import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
 import moment from 'moment'
 import AdvanceInvoiceForm from './advanceInvoice'
+import MonthlyInvoiceForm from './monthlyInvoice'
 import { CLINIC_QUERY } from './query'
 
 const { Option } = Select
@@ -69,6 +70,9 @@ function CustomerList() {
       dataIndex: 'details.schoolName',
     },
     {
+      title: 'Billing Name',
+    },
+    {
       title: 'Invoices',
       dataIndex: 'invoice',
     },
@@ -84,9 +88,9 @@ function CustomerList() {
                 setAdvInvForm(true)
               }}
             >
-              + Adv Invoice
+              Adv Invoice +
             </Button>
-            <span style={{ borderRight: '1px solid #ccc', margin: '0 8px' }} />
+            <span style={{ borderRight: '1px solid #ccc' }} />
             <Button
               type="link"
               onClick={() => {
@@ -94,7 +98,17 @@ function CustomerList() {
                 setMonthlyInvForm(true)
               }}
             >
-              + Monthly Invoice
+              Monthly Invoice +
+            </Button>
+            <span style={{ borderRight: '1px solid #ccc' }} />
+            <Button
+              type="link"
+              onClick={() => {
+                setCurrentRow(text)
+                setMonthlyInvForm(true)
+              }}
+            >
+              Edit <Icon type="edit" />
             </Button>
           </div>
         )
@@ -199,6 +213,20 @@ function CustomerList() {
           rowData={currentRow}
           invoiceFormDrawer={advInvForm}
           setInvoiceFormDrawer={setAdvInvForm}
+        />
+      </Drawer>
+      <Drawer
+        visible={monthlyInvForm}
+        onClose={() => setMonthlyInvForm(false)}
+        width="100vw"
+        placement="right"
+        closable="true"
+        destroyOnClose="true"
+      >
+        <MonthlyInvoiceForm
+          rowData={currentRow}
+          invoiceFormDrawer={monthlyInvForm}
+          setInvoiceFormDrawer={setMonthlyInvForm}
         />
       </Drawer>
       <Table

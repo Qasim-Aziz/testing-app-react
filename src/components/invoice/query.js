@@ -261,14 +261,23 @@ export const GET_INVOICE = gql`
       address
       taxableSubtotal
       discount
+      sgst
+      cgst
       total
       clinic {
         id
         schoolName
+        address
+        currency {
+          id
+          currency
+          symbol
+        }
       }
       customer {
         id
         firstname
+        lastname
       }
       status {
         id

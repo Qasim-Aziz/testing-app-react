@@ -184,7 +184,6 @@ export default () => {
       minWidth: '200px',
       maxWidth: '220px',
       cell: row => {
-        console.log(row, 'in row')
         return (
           <div>
             <Button
@@ -427,7 +426,12 @@ export default () => {
         )}
       </div>
 
-      <Drawer visible={isPreviewInvoice} width="60%" onClose={() => setPreviewInvoice(false)}>
+      <Drawer
+        visible={isPreviewInvoice}
+        width="50vw"
+        className="change-invo-drawer"
+        onClose={() => setPreviewInvoice(false)}
+      >
         <PreviewInvoice invoiceId={selectedInvoiceId} />
       </Drawer>
 

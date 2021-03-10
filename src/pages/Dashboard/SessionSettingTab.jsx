@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Switch, Form, Button, Icon } from 'antd'
+import { Switch, Form, Input, Button, Icon, Modal } from 'antd'
 import gql from 'graphql-tag'
 import { useQuery, useMutation } from 'react-apollo'
 import { useSelector } from 'react-redux'
@@ -78,24 +78,45 @@ const UPDATE_EVENING_SESSION = gql`
     }
   }
 `
-
+const UPDATE_SESSION_NAME = gql`
+  mutation($pk: ID!, $name: String) {
+    updateMasterSession(input: { pk: $pk, name: $name }) {
+      details {
+        name
+        id
+      }
+    }
+  }
+`
+const SESSION_NAME = gql`
+  query {
+    sessionName {
+      id
+      name
+    }
+  }
+`
 const SessionSettingTab = () => {
   const [defaultSession, setDefaultSession] = useState(false)
   const [morningSession, setMorningSession] = useState(false)
   const [afternoonSession, setAfternoonSession] = useState(false)
   const [eveningSession, setEveningSession] = useState(false)
+  const [sessionNameModal, setSessionNameModal] = useState(false)
   const reduxUser = useSelector(state => state.user)
 
-  const { data: userDetails, loading } = useQuery(USER_SETTINGS, {
+  const { data: userDetails, loading: userLoading } = useQuery(USER_SETTINGS, {
     variables: {
       id: reduxUser?.id,
     },
   })
 
+  const { data, loading, error } = useQuery(SESSION_NAME)
   const [updateDefaultSession] = useMutation(UPDATE_DEFAULT_SESSION)
   const [updateMorningSession] = useMutation(UPDATE_MORNING_SESSION)
   const [updateAfternoonSession] = useMutation(UPDATE_AFTERNOON_SESSION)
   const [updateEveningSession] = useMutation(UPDATE_EVENING_SESSION)
+  const [updateSessionName] = useMutation(UPDATE_SESSION_NAME)
+  const [currentSessionName, setCurrentSessionName] = useState('')
 
   useEffect(() => {
     if (userDetails) {
@@ -147,11 +168,22 @@ const SessionSettingTab = () => {
     })
   }
 
+  const handleModalOk = e => {
+    updateSessionName({
+      variables: {},
+    })
+  }
+
+  const handleModalCancel = e => {
+    setSessionNameModal(false)
+  }
+
+  console.log(data, loading, error)
   const tdStyle = { border: '1px solid #dddddd', padding: 8, textAlign: 'center' }
 
   return (
     <div className="miscConfigTab">
-      {loading ? (
+      {userLoading || loading ? (
         <span>Loading...</span>
       ) : (
         <>
@@ -159,7 +191,12 @@ const SessionSettingTab = () => {
             <tbody>
               <tr>
                 <td style={{ ...tdStyle, width: 200 }}>
-                  <p
+                  <Button
+                    type="link"
+                    onClick={() => {
+                      setCurrentSessionName(data.sessionName[3].name)
+                      setSessionNameModal(true)
+                    }}
                     style={{
                       color: '#1C8FFA',
                       fontSize: 15,
@@ -168,8 +205,8 @@ const SessionSettingTab = () => {
                       marginBottom: '5px',
                     }}
                   >
-                    Default Session
-                  </p>
+                    {data.sessionName[3].name} Session
+                  </Button>
                 </td>
                 <td style={{ ...tdStyle, width: 100 }}>
                   <Switch
@@ -189,7 +226,12 @@ const SessionSettingTab = () => {
               </tr>
               <tr>
                 <td style={{ ...tdStyle, width: 200 }}>
-                  <p
+                  <Button
+                    type="link"
+                    onClick={() => {
+                      setCurrentSessionName(data.sessionName[0].name)
+                      setSessionNameModal(true)
+                    }}
                     style={{
                       color: '#1C8FFA',
                       fontSize: 15,
@@ -198,8 +240,8 @@ const SessionSettingTab = () => {
                       marginBottom: '5px',
                     }}
                   >
-                    Morning Session
-                  </p>
+                    {data.sessionName[0].name} Session
+                  </Button>
                 </td>
                 <td style={{ ...tdStyle, width: 100 }}>
                   <Switch
@@ -218,7 +260,12 @@ const SessionSettingTab = () => {
               </tr>
               <tr>
                 <td style={{ ...tdStyle, width: 200 }}>
-                  <p
+                  <Button
+                    type="link"
+                    onClick={() => {
+                      setCurrentSessionName(data.sessionName[1].name)
+                      setSessionNameModal(true)
+                    }}
                     style={{
                       color: '#1C8FFA',
                       fontSize: 15,
@@ -227,8 +274,8 @@ const SessionSettingTab = () => {
                       marginBottom: '5px',
                     }}
                   >
-                    Afternoon Session
-                  </p>
+                    {data.sessionName[1].name} Session
+                  </Button>
                 </td>
                 <td style={{ ...tdStyle, width: 100 }}>
                   <Switch
@@ -248,7 +295,12 @@ const SessionSettingTab = () => {
               </tr>
               <tr>
                 <td style={{ ...tdStyle, width: 200 }}>
-                  <p
+                  <Button
+                    type="link"
+                    onClick={() => {
+                      setCurrentSessionName(data.sessionName[2].name)
+                      setSessionNameModal(true)
+                    }}
                     style={{
                       color: '#1C8FFA',
                       fontSize: 15,
@@ -257,8 +309,8 @@ const SessionSettingTab = () => {
                       marginBottom: '5px',
                     }}
                   >
-                    Evening Session
-                  </p>
+                    {data.sessionName[2].name} Session
+                  </Button>
                 </td>
                 <td style={{ ...tdStyle, width: 100 }}>
                   <Switch
@@ -280,6 +332,16 @@ const SessionSettingTab = () => {
           </table>
         </>
       )}
+      <Modal
+        title="Modal"
+        visible={sessionNameModal}
+        onOk={handleModalOk}
+        onCancel={handleModalCancel}
+        okText="Update"
+        cancelText="Cancel"
+      >
+        <Input value={currentSessionName} onChange={e => setCurrentSessionName(e.target.value)} />
+      </Modal>
     </div>
   )
 }

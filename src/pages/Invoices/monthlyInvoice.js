@@ -1,18 +1,5 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-nested-ternary */
-/* eslint-disable array-callback-return */
-/* eslint-disable consistent-return */
-/* eslint-disable no-plusplus */
-/* eslint-disable no-shadow */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable react/no-access-state-in-setstate */
-/* eslint-disable react/destructuring-assignment */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-/* eslint-disable-next-line jsx-a11y/click-events-have-key-events */
-/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react/jsx-closing-tag-location */
-import React, { useEffect, useState } from 'react'
+/* eslint-disable */
+import React, { useEffect, useState, useReducer, useRef, useContext } from 'react'
 import {
   Form,
   Select,
@@ -29,10 +16,10 @@ import {
   Popconfirm,
 } from 'antd'
 import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
+import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
+import gql from 'graphql-tag'
 import moment from 'moment'
 import client from '../../apollo/config'
-import '../../components/invoice/invoiceForm.scss'
-import '../allClinicData/allClinicData.scss'
 import {
   ALL_LEARNERS,
   ALL_LEARNERS_ASSESS_CHARGES,
@@ -44,6 +31,7 @@ import {
   PRODUCT_LIST,
   LEARNER_ACTIVE_DETAILS,
 } from '../allClinicData/query'
+import { retry } from '@redux-saga/core/effects'
 
 const { Option } = Select
 const { Text, Title } = Typography
@@ -113,11 +101,38 @@ const roundNumber = (num, digitFigure) => {
   return Number(Number(num).toFixed(digitFigure))
 }
 
+const peakComp = (a, b) => {
+  if (a.category === b.category) {
+    if (a.days > b.days) {
+      return -1
+    }
+    if (a.days < b.days) {
+      return 1
+    }
+  }
+
+  if (a.category < b.category) {
+    return -1
+  }
+  if (a.category > b.category) {
+    return 1
+  }
+
+  return 0
+}
+
+const checkYear = item => {
+  const lastDate = new Date(Math.max(...item.map(e => new Date(e.node.date))))
+  const currentDate = new Date()
+  return currentDate - lastDate > DAYS_365
+}
+
 const InvoiceForm = ({ form, rowData, refetchInvoices, setInvoiceFormDrawer }) => {
   const [subTotal, setSubTotal] = useState(0)
   const [count, setCount] = useState(-1)
   const [currencySymbol, setCurrencySymbol] = useState('$')
   const [tableData, setTableData] = useState([])
+  const [peakTableData, setPeakTableData] = useState([])
   const [details, setDetails] = useState([])
   const [perDayRates, setPerDayRates] = useState({})
   const [updateAssessList, setUpdateAssessList] = useState([])
@@ -136,6 +151,11 @@ const InvoiceForm = ({ form, rowData, refetchInvoices, setInvoiceFormDrawer }) =
     fetchPolicy: 'network-only',
   })
 
+  const [
+    createInvoice,
+    { data: newInvoiceData, loading: newInvoiceLoading, error: newInvoiceError },
+  ] = useMutation(CREATE_INVOICE)
+
   useEffect(() => {
     getRates({ variables: { clinic: rowData.details.id } })
     getLearners({ variables: { schoolId: rowData.details.id } })
@@ -148,6 +168,7 @@ const InvoiceForm = ({ form, rowData, refetchInvoices, setInvoiceFormDrawer }) =
         ratesData.getClinicRates.edges.length > 0
           ? {
               learnerPrice: ratesData.getClinicRates.edges[0].node.learnerPrice,
+
               researchParticipantPrice:
                 ratesData.getClinicRates.edges[0].node.researchParticipantPrice,
               peakPrice: ratesData.getClinicRates.edges[0].node.peakPrice,
@@ -165,6 +186,7 @@ const InvoiceForm = ({ form, rowData, refetchInvoices, setInvoiceFormDrawer }) =
       learnerData.students.edges.map(item => {
         learnerId.push(item.node.id)
       })
+
       setCount(learnerId.length)
       getLearnerDetails(learnerId)
     }
@@ -172,7 +194,10 @@ const InvoiceForm = ({ form, rowData, refetchInvoices, setInvoiceFormDrawer }) =
 
   useEffect(() => {
     if (details.length === count && learnerData && ratesData) {
-      const tempTable = []
+      console.log(learnerData)
+      console.log(details, 'details')
+      let tempTable = []
+      let tempPeakTable = []
       details.map((item, index) => {
         const tempStudent = learnerData.students.edges.filter(
           studentItem => studentItem.node.id === item.id,
@@ -218,7 +243,7 @@ const InvoiceForm = ({ form, rowData, refetchInvoices, setInvoiceFormDrawer }) =
             }
           } else {
             tempTable.push({
-              // key: Math.random(),
+              key: Math.random(),
               service: `Research Participant - ${item.activeDays} Days`,
               category: 'research',
               days: item.activeDays,
@@ -227,17 +252,145 @@ const InvoiceForm = ({ form, rowData, refetchInvoices, setInvoiceFormDrawer }) =
             })
           }
         }
+
+        const assessCharges = tempStudent[0].node.assessmentCharges.edges
+        let checkPeak = true
+        let checkVbmapp = true
+        let checkCogniable = true
+
+        if (assessCharges.length > 0) {
+          const peak = assessCharges.filter(assessItem => assessItem.node.assessType === 'PEAK')
+          const vbmapp = assessCharges.filter(assessItem => assessItem.node.assessType === 'VBMAPP')
+          const cogniable = assessCharges.filter(
+            assessItem => assessItem.node.assessType === 'COGNIABLE',
+          )
+
+          console.log(peak, vbmapp, cogniable, 'peak bvmapp cogniable')
+
+          checkPeak = peak.length > 0 ? checkYear(peak) : true
+          checkVbmapp = vbmapp.length > 0 ? checkYear(vbmapp) : true
+          checkCogniable = cogniable.length > 0 ? checkYear(cogniable) : true
+        }
+
+        if (checkPeak) {
+          setUpdateAssessList(ids => [
+            ...ids,
+            { id: item.id, assessType: 'Peak', amount: perDayRates.peakPrice },
+          ])
+          let exist = false
+          let idx = -1
+          for (let i = 0; i < tempPeakTable.length; i++) {
+            if (tempPeakTable[i].category === 'peak' && item.peakDays == tempPeakTable[i].days) {
+              exist = true
+              idx = i
+            }
+          }
+          if (exist) {
+            tempPeakTable[idx] = {
+              ...tempPeakTable[idx],
+              qty: tempPeakTable[idx].qty + 1,
+            }
+          } else {
+            tempPeakTable.push({
+              key: Math.random(),
+              service: `Peak - ${item.peakDays} Days`,
+              category: 'peak',
+              days: item.peakDays,
+              qty: 1,
+              rate: perDayRates.peakPrice,
+            })
+          }
+        }
+        if (checkCogniable) {
+          setUpdateAssessList(ids => [
+            ...ids,
+            { id: item.id, assessType: 'Cogniable', amount: perDayRates.cogPrice },
+          ])
+
+          let exist = false
+          let idx = -1
+          for (let i = 0; i < tempPeakTable.length; i++) {
+            if (
+              tempPeakTable[i].category === 'cogniable' &&
+              item.cogDays == tempPeakTable[i].days
+            ) {
+              exist = true
+              idx = i
+            }
+          }
+          if (exist) {
+            tempPeakTable[idx] = {
+              ...tempPeakTable[idx],
+              qty: tempPeakTable[idx].qty + 1,
+            }
+          } else {
+            tempPeakTable.push({
+              key: Math.random(),
+              service: `Cogniable - ${item.peakDays} Days`,
+              category: 'cogniable',
+              days: item.cogDays,
+              qty: 1,
+              rate: perDayRates.cogPrice,
+            })
+          }
+        }
+        if (checkVbmapp) {
+          setUpdateAssessList(ids => [
+            ...ids,
+            { id: item.id, assessType: 'Vbmapp', amount: perDayRates.vbmappPrice },
+          ])
+
+          let exist = false
+          let idx = -1
+          for (let i = 0; i < tempPeakTable.length; i++) {
+            if (
+              tempPeakTable[i].category === 'vbmapp' &&
+              item.vbmappDays == tempPeakTable[i].days
+            ) {
+              exist = true
+              idx = i
+            }
+          }
+          if (exist) {
+            tempPeakTable[idx] = {
+              ...tempPeakTable[idx],
+              qty: tempPeakTable[idx].qty + 1,
+            }
+          } else {
+            tempPeakTable.push({
+              key: Math.random(),
+              service: `VBMAPP - ${item.vbmappDays} Days`,
+              category: 'vbmapp',
+              days: item.vbmappDays,
+              qty: 1,
+              rate: perDayRates.vbmappPrice,
+            })
+          }
+        }
       })
 
-      // let tempTotal = subTotal
-      // tempTable.map(item => {
-      //   tempTotal += Number(item.amount)
-      //   return tempTotal
-      // })
-      // setSubTotal(roundNumber(tempTotal, 3))
+      let tempTotal = 0
+      tempTable.sort(peakComp)
+      tempPeakTable.sort(peakComp)
+      console.log(tempTable)
+      console.log(tempPeakTable)
+      setPeakTableData(tempPeakTable)
       setTableData(tempTable)
     }
   }, [details.length === count])
+
+  useEffect(() => {
+    if (newInvoiceData) {
+      notification.success({
+        message: 'Invoice Created Succesfully',
+      })
+    }
+    if (newInvoiceError) {
+      notification.error({
+        message: 'Unable to create invoice',
+      })
+    }
+  }, [newInvoiceData, newInvoiceError])
 
   const getLearnerDetails = learnerId => {
     learnerId.map((item, index) => {
@@ -295,8 +448,9 @@ const InvoiceForm = ({ form, rowData, refetchInvoices, setInvoiceFormDrawer }) =
         // }).then(data => {
         //   console.log(data.data.createInvoice, 'invoice data')
         //   setIsCreated(true)
-        // //   generatePaymentLink(data.data.createInvoice.details.id)
-        // //   updateAssess(data.data.createInvoice.details.id)
+        //   refetchInvoices()
+        //   generatePaymentLink(data.data.createInvoice.details.id)
+        //   updateAssess(data.data.createInvoice.details.id)
         //   setInvoiceFormDrawer(false)
         // })
       }
@@ -372,6 +526,41 @@ const InvoiceForm = ({ form, rowData, refetchInvoices, setInvoiceFormDrawer }) =
     },
     {
       title: 'Amount',
+      dataIndex: 'amount',
+      width: '300px',
+      align: 'right',
+      render: (text, row) => {
+        const amount = parseFloat(row.qty) * parseFloat(row.rate)
+        return <span>{amount === 0 ? amount : `${currencySymbol} ${amount}`}</span>
+      },
+    },
+  ]
+
+  const col2 = [
+    {
+      width: '80px',
+      render: (text, row) => peakTableData.indexOf(row) + 1,
+    },
+    {
+      dataIndex: 'service',
+      editable: true,
+      align: 'left',
+    },
+    {
+      dataIndex: 'qty',
+      width: '300px',
+      editable: true,
+      align: 'right',
+    },
+    {
+      title: 'Rate / Year',
+      dataIndex: 'rate',
+      width: '300px',
+      editable: true,
+      align: 'right',
+      render: rate => (rate === 0 ? rate : `${currencySymbol} ${rate}`),
+    },
+    {
       dataIndex: 'amount',
       width: '300px',
       align: 'right',
@@ -490,33 +679,41 @@ const InvoiceForm = ({ form, rowData, refetchInvoices, setInvoiceFormDrawer }) =
         <div style={{ marginTop: '15px' }}>
           <Table
             columns={dataColumns}
-            dataSource={tableData}
             loading={ratesLoading || learnerLoading || details.length !== count}
+            dataSource={tableData}
             bordered
             pagination={false}
-            footer={() => (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-              >
-                <Text
+          />
+          {ratesLoading || learnerLoading || details.length !== count ? null : (
+            <Table
+              columns={col2}
+              dataSource={peakTableData}
+              bordered
+              pagination={false}
+              footer={() => (
+                <div
                   style={{
-                    marginLeft: 'auto',
-                    marginRight: '10%',
-                    fontSize: 18,
-                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
                   }}
                 >
-                  Subtotal
-                </Text>
-                <Text style={{ fontSize: 18, fontWeight: 600 }}>
-                  {currencySymbol} {subTotal}
-                </Text>
-              </div>
-            )}
-          />
+                  <Text
+                    style={{
+                      marginLeft: 'auto',
+                      marginRight: '10%',
+                      fontSize: 18,
+                      fontWeight: 600,
+                    }}
+                  >
+                    Subtotal
+                  </Text>
+                  <Text style={{ fontSize: 18, fontWeight: 600 }}>
+                    {currencySymbol} {subTotal}
+                  </Text>
+                </div>
+              )}
+            />
+          )}
         </div>
 
         <div style={{ marginTop: 30, padding: '0 16px' }}>
@@ -671,6 +868,7 @@ const InvoiceForm = ({ form, rowData, refetchInvoices, setInvoiceFormDrawer }) =
           <Button
             htmlType="submit"
             disabled={isCreated}
+            loading={newInvoiceLoading}
             type="primary"
             style={{ margin: 'auto 10px' }}
           >

@@ -1,14 +1,20 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react'
-import { Button, Form, Row, Col, Select, notification } from 'antd'
+import { Button, Form, Row, Col, Select, notification, Input } from 'antd'
 import gql from 'graphql-tag'
 import { useQuery, useMutation } from 'react-apollo'
 
 const { Option } = Select
 
 const SCHOOL_CURRENCY = gql`
-  query {
-    schoolDetail {
+  query($id: ID!) {
+    school(id: $id) {
+      id
+      bankAccountNo
+      bankName
+      ifscCode
+      bankBrach
+      accountTitle
       currency {
         id
         currency
@@ -42,8 +48,11 @@ const ADD_CURRENCY = gql`
 
 export default () => {
   const [newCurrency, setNewCurrency] = useState()
-
+  const schoolId = localStorage.getItem('userId')
   const { data, error, loading, refetch } = useQuery(SCHOOL_CURRENCY, {
+    variables: {
+      id: schoolId,
+    },
     fetchPolicy: 'no-cache',
   })
   const { data: currencyData, error: currencyError, loading: currencyLoading } = useQuery(CURRENCY)
@@ -53,11 +62,12 @@ export default () => {
     { data: addCurrencyData, error: addCurrencyError, loading: addCurrencyLoading },
   ] = useMutation(ADD_CURRENCY)
 
-  useEffect(() => {
-    if (data) {
-      setNewCurrency(data.schoolDetail.currency?.id)
-    }
-  }, [data])
+  console.log(data, 'currencyData')
+  // useEffect(() => {
+  //   if (data) {
+  //     setNewCurrency(data.schoolDetail.currency?.id)
+  //   }
+  // }, [data])
 
   useEffect(() => {
     if (currencyError) {
@@ -91,6 +101,21 @@ export default () => {
 
   return (
     <div className="profileForm">
+      <Form.Item label="Bank Name" labelCol={{ span: 8 }} wrapperCol={{ span: 15 }}>
+        <Input style={{ width: 220 }} />
+      </Form.Item>
+      <Form.Item label="A/C No" labelCol={{ span: 8 }} wrapperCol={{ span: 15 }}>
+        <Input style={{ width: 220 }} />
+      </Form.Item>{' '}
+      <Form.Item label="IFSC Code" labelCol={{ span: 8 }} wrapperCol={{ span: 15 }}>
+        <Input style={{ width: 220 }} />
+      </Form.Item>{' '}
+      <Form.Item label="A/C Holder's Name" labelCol={{ span: 8 }} wrapperCol={{ span: 15 }}>
+        <Input style={{ width: 220 }} />
+      </Form.Item>{' '}
+      <Form.Item label="Billing Name" labelCol={{ span: 8 }} wrapperCol={{ span: 15 }}>
+        <Input style={{ width: 220 }} />
+      </Form.Item>
       <Form.Item label="Change Currency" labelCol={{ span: 8 }} wrapperCol={{ span: 15 }}>
         <Select
           loading={currencyLoading}
@@ -98,7 +123,7 @@ export default () => {
           value={newCurrency}
           onChange={v => setNewCurrency(v)}
           placeholder="Select a currency"
-          style={{ width: 120 }}
+          style={{ width: 220 }}
         >
           {currencyData?.currency.map(({ id, currency, symbol }) => {
             return (
