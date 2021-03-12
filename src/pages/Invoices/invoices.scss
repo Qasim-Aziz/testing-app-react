@@ -8,6 +8,12 @@
   margin: 10px 5px;
 }
 
+.update-bank-details {
+  .ant-form-item-required::before {
+    content: '*';
+  }
+}
+
 @media screen and (max-width: 1000px) {
   .filter-parent {
     flex-wrap: wrap;

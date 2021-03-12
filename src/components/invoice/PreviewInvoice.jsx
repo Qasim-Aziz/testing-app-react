@@ -14,11 +14,10 @@ import moment from 'moment'
 import { ToWords } from 'to-words'
 import { useQuery } from 'react-apollo'
 import LoadingComponent from '../../pages/staffProfile/LoadingComponent'
-import { GET_INVOICE } from './query'
+import { GET_INVOICE, GET_PAYMENT_RECIEVING_DETIAILS } from './query'
 import './PreviewInvoice.scss'
 
 import logo from '../../images/WhatsApp Image 2020-04-23 at 10.00.40 (1).jpeg'
-import { SET_PREVIOUS_COUNTS } from 'redux/sessionrecording/sagas'
 
 const general = {
   fontSize: '12px',
@@ -115,6 +114,12 @@ const PreviewInvoice = ({ invoiceId }) => {
       },
     },
   )
+
+  const { data: detailsData, loading: detailsLoading, error: detailsError } = useQuery(
+    GET_PAYMENT_RECIEVING_DETIAILS,
+  )
+
+  console.log(detailsData, detailsLoading, detailsError, 'details')
   const [invoice, setInvoice] = useState(null)
   const [currencyName, setCurrencyName] = useState(null)
   const [subTotal, setSubtotal] = useState(0)
@@ -166,7 +171,9 @@ const PreviewInvoice = ({ invoiceId }) => {
 
   console.log(invoice, 'invoiceDAta')
 
-  if (isInvoiceDataLoading || !invoice) return <LoadingComponent />
+  if (isInvoiceDataLoading || !invoice || detailsLoading) return <LoadingComponent />
+
+  const { ifscCode, bankName, accountHolderName, bankAccountNo } = detailsData.schoolDetail
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -420,6 +427,31 @@ const PreviewInvoice = ({ invoiceId }) => {
                   <a href={invoice.paymentLink} rel="noopener noreferrer" target="_blank">
                     {invoice.paymentLink}
                   </a>
+                </div>
+                <div
+                  style={{
+                    ...general,
+                    paddingBottom: '1px',
+                    alignSelf: 'flex-start',
+                    width: '100%',
+                  }}
+                >
+                  <b>Bank A/C No:</b> <span>{bankAccountNo}</span>
+                </div>
+                <div
+                  style={{ ...general, padding: '1px 8px', alignSelf: 'flex-start', width: '100%' }}
+                >
+                  <b>IFSC Code:</b> {ifscCode}
+                </div>
+                <div
+                  style={{ ...general, padding: '1px 8px', alignSelf: 'flex-start', width: '100%' }}
+                >
+                  <b>Branch:</b> {bankName}
+                </div>
+                <div
+                  style={{ ...general, padding: '1px 8px', alignSelf: 'flex-start', width: '100%' }}
+                >
+                  <b>A/C Holder Name:</b> {accountHolderName}
                 </div>
               </div>
               <div

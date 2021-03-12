@@ -9,7 +9,10 @@
 import React, { useEffect, useState } from 'react'
 import { Page, Text, View, Document, Image, PDFViewer } from '@react-pdf/renderer'
 import { ToWords } from 'to-words'
+import { useQuery } from 'react-apollo'
 import moment from 'moment'
+import LoadingComponent from 'components/VBMappReport/LoadingComponent'
+import { GET_PAYMENT_DETAILS } from './query'
 import logo from '../../images/WhatsApp Image 2020-04-23 at 10.00.40 (1).jpeg'
 
 const general = {
@@ -40,7 +43,7 @@ const flexSection = {
   textAlign: 'left',
 }
 const dateSection = {
-  width: '50%',
+  width: '40%',
   fontSize: 12,
   alignSelf: 'flex-start',
   textAlign: 'left',
@@ -101,8 +104,8 @@ function getTotal(subTotal, discount = 0, cgst = 0, sgst = 0, taxableSubtotal = 
 function PrintableInvoice() {
   const invoice = JSON.parse(localStorage.getItem('currentInvoice'))
   const [subTotal, setSubtotal] = useState(0)
-  const currentCurrency = invoice.clinic.currency ? invoice.clinic.currency.symbol : '$'
   const currentCurrencyName = invoice.clinic.currency ? invoice.clinic.currency.currency : 'USD'
+  const { data, loading, error } = useQuery(GET_PAYMENT_DETAILS)
 
   useEffect(() => {
     let tempSubTotal = 0
@@ -129,6 +132,28 @@ function PrintableInvoice() {
     invoice.sgst,
     invoice.taxableSubtotal,
   )
+  if (loading) {
+    return <LoadingComponent />
+  }
+  console.log(data)
+  console.log(invoice, 'invoice ')
+
+  const {
+    institutionName,
+    streetAddress,
+    city,
+    state,
+    country,
+    pincode,
+    accountHolderName,
+    ifscCode,
+    gpay,
+    paytm,
+    upi,
+    bankName,
+    gstin,
+    accountNo,
+  } = data.recievingPaymentDetails
 
   return (
     <PDFViewer style={{ width: '100%', height: '1000px' }}>
@@ -159,16 +184,17 @@ function PrintableInvoice() {
                   <Text
                     style={{
                       fontSize: 12,
+                      marginBottom: '4px',
                       width: '100%',
                       alignSelf: 'flex-start',
                       textAlign: 'left',
                     }}
                   >
-                    SM Learning Skills Academy for Special Needs Pvt. Ltd.
+                    {institutionName}
                   </Text>
                   <Text
                     style={{
-                      // marginBottom: '8px',
+                      marginBottom: '4px',
                       fontSize: 10,
                       width: '100%',
                       alignSelf: 'flex-start',
@@ -176,11 +202,11 @@ function PrintableInvoice() {
                       fontWeight: '600',
                     }}
                   >
-                    Gurugram, Haryana 122002 India
+                    {streetAddress} {city}, {state} {country?.name}, {pincode}
                   </Text>
                   <Text
                     style={{
-                      // marginBottom: '8px',
+                      marginBottom: '4px',
                       fontSize: 10,
                       width: '100%',
                       alignSelf: 'flex-start',
@@ -188,7 +214,7 @@ function PrintableInvoice() {
                       fontWeight: '600',
                     }}
                   >
-                    GSTIN 06AAXCS2626LIZQ
+                    GSTIN {gstin}
                   </Text>
                 </View>
                 <View
@@ -205,21 +231,21 @@ function PrintableInvoice() {
                 <View style={{ width: '50%', height: '100%', borderRight: '1px solid black' }}>
                   <View style={{ ...flexSection, paddingBottom: '0' }}>
                     <Text style={{ ...dateSection, fontWeight: '600' }}> #INV</Text>
-                    <Text style={dateSection}> : {invoice.invoiceNo}</Text>
+                    <Text style={{ ...dateSection, width: '60%' }}> : {invoice.invoiceNo}</Text>
                   </View>
                   <View style={{ ...flexSection, paddingBottom: '0' }}>
                     <Text style={{ ...dateSection, fontWeight: '600' }}> Issue Date</Text>
-                    <Text style={dateSection}> : {invoice.issueDate}</Text>
+                    <Text style={{ ...dateSection, width: '60%' }}> : {invoice.issueDate}</Text>
                   </View>
                   <View style={{ ...flexSection, paddingBottom: '0' }}>
                     <Text style={{ ...dateSection, fontWeight: '600' }}> Due Date</Text>
-                    <Text style={dateSection}> : {invoice.dueDate}</Text>
+                    <Text style={{ ...dateSection, width: '60%' }}> : {invoice.dueDate}</Text>
                   </View>
                 </View>
                 <View style={{ width: '50%' }}>
                   <View style={{ ...flexSection, paddingBottom: '0' }}>
                     <Text style={{ ...dateSection, fontWeight: '600' }}> Place of supply</Text>
-                    <Text style={dateSection}> : {invoice.address}</Text>
+                    <Text style={{ ...dateSection, width: '60%' }}> : {invoice.address}</Text>
                   </View>
                 </View>
               </View>
@@ -357,16 +383,121 @@ function PrintableInvoice() {
                   </Text>
                 </View>
               </View>
-              <View style={{ ...section, padding: '0', height: '180px', borderBottom: 'none' }}>
+              <View style={{ ...section, padding: '0', height: '220px', borderBottom: 'none' }}>
                 <View style={{ width: '50%' }}>
                   <Text style={{ ...general, alignSelf: 'flex-start', width: '100%' }}>
                     {toWords.convert(total)}
                   </Text>
-                  <Text
-                    style={{ ...general, alignSelf: 'flex-start', color: 'blue', width: '100%' }}
+                  <View
+                    style={{
+                      ...general,
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignSelf: 'flex-start',
+                      width: '100%',
+                    }}
                   >
-                    {invoice.paymentLink}
-                  </Text>
+                    <Text style={{ fontWeight: 'bold' }}>Razor Pay: </Text>
+                    <Text style={{ color: 'blue' }}>{invoice.paymentLink}</Text>
+                  </View>
+
+                  <View
+                    style={{
+                      ...general,
+                      paddingBottom: '2px',
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignSelf: 'flex-start',
+                      width: '100%',
+                    }}
+                  >
+                    <Text style={{ fontWeight: 'bold' }}>Bank A/C No: </Text>
+                    <Text>{accountNo}</Text>
+                  </View>
+                  <View
+                    style={{
+                      ...general,
+                      padding: '2px 8px',
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignSelf: 'flex-start',
+                      width: '100%',
+                    }}
+                  >
+                    <Text style={{ fontWeight: 'bold' }}>IFSC Code: </Text>
+                    <Text>{ifscCode}</Text>
+                  </View>
+                  <View
+                    style={{
+                      ...general,
+                      display: 'flex',
+                      padding: '2px 8px',
+                      flexDirection: 'row',
+                      alignSelf: 'flex-start',
+                      width: '100%',
+                    }}
+                  >
+                    <Text style={{ fontWeight: 'bold' }}>Branch: </Text>
+                    <Text>{bankName}</Text>
+                  </View>
+                  <View
+                    style={{
+                      ...general,
+                      display: 'flex',
+                      padding: '2px 8px',
+                      flexDirection: 'row',
+                      alignSelf: 'flex-start',
+                      width: '100%',
+                    }}
+                  >
+                    <Text style={{ fontWeight: 'bold' }}>A/C Holder Name: </Text>
+                    <Text>{accountHolderName}</Text>
+                  </View>
+                  {upi ? (
+                    <View
+                      style={{
+                        ...general,
+                        display: 'flex',
+                        padding: '6px 8px 2px',
+                        flexDirection: 'row',
+                        alignSelf: 'flex-start',
+                        width: '100%',
+                      }}
+                    >
+                      <Text style={{ fontWeight: 'bold' }}>UPI: </Text>
+                      <Text>{upi}</Text>
+                    </View>
+                  ) : null}
+                  {gpay ? (
+                    <View
+                      style={{
+                        ...general,
+                        display: 'flex',
+                        padding: '2px 8px',
+                        flexDirection: 'row',
+                        alignSelf: 'flex-start',
+                        width: '100%',
+                      }}
+                    >
+                      <Text style={{ fontWeight: 'bold' }}>Google Pay: </Text>
+                      <Text>{gpay}</Text>
+                    </View>
+                  ) : null}
+                  {paytm ? (
+                    <View
+                      style={{
+                        ...general,
+                        display: 'flex',
+                        padding: '2px 8px 6px',
+                        flexDirection: 'row',
+                        alignSelf: 'flex-start',
+                        width: '100%',
+                      }}
+                    >
+                      <Text style={{ fontWeight: 'bold' }}>Paytm: </Text>
+                      <Text>{paytm}</Text>
+                    </View>
+                  ) : null}
                 </View>
                 <View
                   style={{

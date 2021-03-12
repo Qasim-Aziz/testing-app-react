@@ -49,12 +49,13 @@ export default () => {
         </Tabs>
       </Layout>
       <Drawer
-        width={600}
+        width={650}
         title="Update Payment accepting details"
         visible={bankDetailsDrawer}
         onClose={() => setBankDetailsDrawer(false)}
+        destroyOnClose
       >
-        <BankDetails />
+        <BankDetails setBankDetailsDrawer={setBankDetailsDrawer} />
       </Drawer>
     </div>
   )

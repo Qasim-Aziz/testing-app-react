@@ -79,3 +79,9 @@
     font-weight: 600;
   }
 }
+
+.invoice-related {
+  .ant-form-item-required::before {
+    content: '*';
+  }
+}

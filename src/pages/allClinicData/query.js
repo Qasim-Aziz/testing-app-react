@@ -437,3 +437,27 @@ export const tt = gql`
     }
   }
 `
+export const GET_PAYMENT_DETAILS = gql`
+  query {
+    recievingPaymentDetails(id: "UmVjaWV2aW5nUGF5bWVudERldGFpbHNUeXBlOjE=") {
+      id
+      institutionName
+      streetAddress
+      state
+      city
+      pincode
+      gstin
+      bankName
+      accountHolderName
+      ifscCode
+      accountNo
+      upi
+      paytm
+      gpay
+      country {
+        id
+        name
+      }
+    }
+  }
+`

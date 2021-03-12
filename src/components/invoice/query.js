@@ -302,3 +302,16 @@ export const GET_INVOICE = gql`
     }
   }
 `
+
+export const GET_PAYMENT_RECIEVING_DETIAILS = gql`
+  query {
+    schoolDetail {
+      id
+      schoolName
+      bankName
+      bankAccountNo
+      ifscCode
+      accountHolderName
+    }
+  }
+`

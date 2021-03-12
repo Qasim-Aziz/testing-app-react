@@ -7,11 +7,14 @@
 /* eslint-disable array-callback-return */
 
 import React, { useEffect, useState } from 'react'
-import { Tooltip, Button } from 'antd'
+import { Tooltip, Button, notification } from 'antd'
 import { PrinterOutlined } from '@ant-design/icons'
 import moment from 'moment'
 import { ToWords } from 'to-words'
 import { useHistory } from 'react-router-dom'
+import { useQuery } from 'react-apollo'
+import LoadingComponent from 'components/VBMappReport/LoadingComponent'
+import { GET_PAYMENT_DETAILS } from './query'
 import logo from '../../images/WhatsApp Image 2020-04-23 at 10.00.40 (1).jpeg'
 
 const general = {
@@ -104,8 +107,17 @@ function ViewInvoice({ invoice }) {
   const [subTotal, setSubtotal] = useState(0)
   const history = useHistory()
   const currentCurrencyName = invoice.clinic.currency ? invoice.clinic.currency.currency : 'USD'
+  const { data, loading, error } = useQuery(GET_PAYMENT_DETAILS)
 
-  console.log(invoice, 'currentCyName')
+  useEffect(() => {
+    if (error) {
+      notification.error({
+        message: 'Something went wrong',
+        description: 'Unable tp fetch payment recieving method details',
+      })
+    }
+  }, [error])
+
   useEffect(() => {
     let tempSubTotal = 0
     invoice.invoiceFee.edges.map(item => {
@@ -136,6 +148,27 @@ function ViewInvoice({ invoice }) {
     localStorage.setItem('currentInvoice', JSON.stringify(invoice))
     history.push('/printInvoice')
   }
+
+  if (loading) {
+    return <LoadingComponent />
+  }
+
+  const {
+    institutionName,
+    streetAddress,
+    city,
+    state,
+    country,
+    pincode,
+    accountHolderName,
+    ifscCode,
+    gpay,
+    paytm,
+    upi,
+    bankName,
+    gstin,
+    accountNo,
+  } = data.recievingPaymentDetails
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -170,9 +203,10 @@ function ViewInvoice({ invoice }) {
               <div
                 style={{
                   textAlign: 'center',
-                  width: '250px',
+                  width: '300px',
                   alignSelf: 'center',
                   fontWeight: '600',
+                  padding: '0 20px',
                   marginLeft: '20px',
                 }}
               >
@@ -184,7 +218,7 @@ function ViewInvoice({ invoice }) {
                     textAlign: 'left',
                   }}
                 >
-                  SM Learning Skills Academy for Special Needs Pvt. Ltd.
+                  {institutionName}
                 </div>
                 <div
                   style={{
@@ -195,7 +229,7 @@ function ViewInvoice({ invoice }) {
                     fontWeight: '600',
                   }}
                 >
-                  Gurugram, Haryana 122002 India
+                  {streetAddress} {city}, {state} {country?.name}, {pincode}
                 </div>
                 <div
                   style={{
@@ -206,7 +240,7 @@ function ViewInvoice({ invoice }) {
                     fontWeight: '600',
                   }}
                 >
-                  GSTIN 06AAXCS2626LIZQ
+                  GSTIN {gstin}
                 </div>
               </div>
               <div
@@ -222,22 +256,24 @@ function ViewInvoice({ invoice }) {
             <div style={{ ...section, height: '120px', padding: '0' }}>
               <div style={{ width: '50%', height: '100%', borderRight: '1px solid black' }}>
                 <div style={{ ...flexSection, paddingBottom: '0' }}>
-                  <div style={{ ...dateSection, fontWeight: '600' }}> #INV</div>
-                  <div style={dateSection}> : {invoice.invoiceNo}</div>
+                  <div style={{ ...dateSection, widh: '40%', fontWeight: '600' }}> #INV</div>
+                  <div style={{ ...dateSection, width: '60%' }}> : {invoice.invoiceNo}</div>
                 </div>
                 <div style={{ ...flexSection, paddingBottom: '0' }}>
-                  <div style={{ ...dateSection, fontWeight: '600' }}> Issue Date</div>
-                  <div style={dateSection}> : {invoice.issueDate}</div>
+                  <div style={{ ...dateSection, widh: '40%', fontWeight: '600' }}> Issue Date</div>
+                  <div style={{ ...dateSection, width: '60%' }}> : {invoice.issueDate}</div>
                 </div>
                 <div style={{ ...flexSection, paddingBottom: '0' }}>
-                  <div style={{ ...dateSection, fontWeight: '600' }}> Due Date</div>
-                  <div style={dateSection}> : {invoice.dueDate}</div>
+                  <div style={{ ...dateSection, widh: '40%', fontWeight: '600' }}> Due Date</div>
+                  <div style={{ ...dateSection, width: '60%' }}> : {invoice.dueDate}</div>
                 </div>
               </div>
               <div style={{ width: '50%' }}>
                 <div style={{ ...flexSection, paddingBottom: '0' }}>
-                  <div style={{ ...dateSection, fontWeight: '600' }}> Place of supply</div>
-                  <div style={dateSection}> : {invoice.address}</div>
+                  <div style={{ ...dateSection, width: '40%', fontWeight: '600' }}>
+                    Place of supply
+                  </div>
+                  <div style={{ ...dateSection, width: '60%' }}> : {invoice.address}</div>
                 </div>
               </div>
             </div>
@@ -378,14 +414,80 @@ function ViewInvoice({ invoice }) {
             </div>
             <div style={{ ...section, padding: '0', borderBottom: 'none' }}>
               <div style={{ width: '50%' }}>
-                <div style={{ ...general, alignSelf: 'flex-start', width: '100%' }}>
+                <div
+                  style={{ ...general, fontWeight: 'bold', alignSelf: 'flex-start', width: '100%' }}
+                >
                   {toWords.convert(total)}
                 </div>
-                <div style={{ ...general, alignSelf: 'flex-start', color: 'blue', width: '100%' }}>
-                  <a href={invoice.paymentLink} rel="noopener noreferrer" target="_blank">
-                    {invoice.paymentLink}
-                  </a>
+                {invoice.paymentLink ? (
+                  <div style={{ ...general, alignSelf: 'flex-start', width: '100%' }}>
+                    <b>Razor pay:</b>{' '}
+                    <a href={invoice.paymentLink} rel="noopener noreferrer" target="_blank">
+                      {invoice.paymentLink}
+                    </a>
+                  </div>
+                ) : null}
+                <div
+                  style={{
+                    ...general,
+                    paddingBottom: '1px',
+                    alignSelf: 'flex-start',
+                    width: '100%',
+                  }}
+                >
+                  <b>Bank A/C No:</b> <span>{accountNo}</span>
                 </div>
+                <div
+                  style={{ ...general, padding: '1px 8px', alignSelf: 'flex-start', width: '100%' }}
+                >
+                  <b>IFSC Code:</b> {ifscCode}
+                </div>
+                <div
+                  style={{ ...general, padding: '1px 8px', alignSelf: 'flex-start', width: '100%' }}
+                >
+                  <b>Branch:</b> {bankName}
+                </div>
+                <div
+                  style={{ ...general, padding: '1px 8px', alignSelf: 'flex-start', width: '100%' }}
+                >
+                  <b>A/C Holder Name:</b> {accountHolderName}
+                </div>
+                {upi ? (
+                  <div
+                    style={{
+                      ...general,
+                      paddingBottom: '1px',
+                      alignSelf: 'flex-start',
+                      width: '100%',
+                    }}
+                  >
+                    <b>UPI:</b> {upi}
+                  </div>
+                ) : null}
+                {gpay ? (
+                  <div
+                    style={{
+                      ...general,
+                      padding: '1px 8px',
+                      alignSelf: 'flex-start',
+                      width: '100%',
+                    }}
+                  >
+                    <b>Google Pay: </b> {gpay}
+                  </div>
+                ) : null}
+                {paytm ? (
+                  <div
+                    style={{
+                      ...general,
+                      padding: '1px 8px 5px',
+                      alignSelf: 'flex-start',
+                      width: '100%',
+                    }}
+                  >
+                    <b>Paytm:</b> {paytm}
+                  </div>
+                ) : null}
               </div>
               <div
                 style={{
