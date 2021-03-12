@@ -70,6 +70,11 @@ class TargetResponseGraph extends Component {
     let activeTargetId = ''
     let activeStimulusId = ''
     let activeStepId = ''
+    let sessionTypeId = ''
+
+    if (MasterSession){
+      sessionTypeId = MasterSession.sessionName?.id
+    }
 
     if (
       MasterSession.targets.edges[TargetActiveIndex].node.targetAllcatedDetails.targetType.id ===
@@ -94,12 +99,14 @@ class TargetResponseGraph extends Component {
     apolloClient
       .query({
         query: gql`
-          query GetTargetPercentage($target: ID!, $sd: ID, $step: ID) {
-            get5dayPercentage2(target: $target, sd: $sd, step: $step) {
+          query GetTargetPercentage($target: ID!, $sd: ID, $step: ID, $sessionId: ID) {
+            get5dayPercentage2(target: $target, sd: $sd, step: $step, sessionType: $sessionId) {
               date
               correctPercent
               errorPercent
               promptPercent
+              incorrectPercent
+              noResponsePercent
             }
           }
         `,
@@ -107,6 +114,7 @@ class TargetResponseGraph extends Component {
           target: activeTargetId,
           sd: activeStimulusId,
           step: activeStepId,
+          sessionId: sessionTypeId,
         },
         fetchPolicy: 'network-only',
       })
@@ -117,7 +125,7 @@ class TargetResponseGraph extends Component {
 
         result.data.get5dayPercentage2?.map(item => {
           correctData.push({ x: item.date, y: item.correctPercent })
-          incorrectData.push({ x: item.date, y: item.errorPercent })
+          incorrectData.push({ x: item.date, y: (item.errorPercent - item.promptPercent) })
           promptData.push({ x: item.date, y: item.promptPercent })
         })
 
