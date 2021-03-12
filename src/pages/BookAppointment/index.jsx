@@ -15,7 +15,12 @@ const BookAppointment = () => {
 
   const [
     loadAvailableSlots,
-    { data: availableSlotsData, loading: isAvailableSlotsLoading, error: availableSlotsError },
+    {
+      data: availableSlotsData,
+      loading: isAvailableSlotsLoading,
+      error: availableSlotsError,
+      refetch: refetchAvailableSlotTime,
+    },
   ] = useLazyQuery(GET_AVAILABLE_SLOTS)
 
   const { data: appointmentStatusesData, error: appointmentStatusErrors } = useQuery(
@@ -52,12 +57,14 @@ const BookAppointment = () => {
   }, [selectedTherapist])
 
   useEffect(() => {
-    loadAvailableSlots({
-      variables: {
-        therapistId: selectedTherapist,
-        date: selectedDate.format('YYYY-MM-DD'),
-      },
-    })
+    if (selectedDate && selectedTherapist) {
+      loadAvailableSlots({
+        variables: {
+          therapistId: selectedTherapist,
+          date: selectedDate.format('YYYY-MM-DD'),
+        },
+      })
+    }
   }, [selectedDate, selectedTherapist])
 
   if (therapistErrors || appointmentStatusErrors)
@@ -115,6 +122,7 @@ const BookAppointment = () => {
                       selectedTherapist={selectedTherapist}
                       allTherapist={allTherapist}
                       pendingStatusId={pendingStatusId}
+                      refetchAvailableSlotTime={refetchAvailableSlotTime}
                     />
                   </Col>
                 ))}

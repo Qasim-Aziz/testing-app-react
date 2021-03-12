@@ -45,10 +45,8 @@ export const CREATE_APPOINTMENT = gql`
     $purposeAssignment: String!
     $startDateAndTime: DateTime!
     $endDateAndTime: DateTime!
-    $startDate: String!
-    $endDate: String!
-    $startTime: String!
-    $endTime: String!
+    $slotDate: String!
+    $slotTime: String!
     $appointmentStatus: ID
   ) {
     CreateAppointment(
@@ -62,15 +60,11 @@ export const CREATE_APPOINTMENT = gql`
           start: $startDateAndTime
           end: $endDateAndTime
           appointmentStatus: $appointmentStatus
+          isApproved: true
+          staffToStaff: false
+          attendee: [$therapistId]
         }
-        recurring: {
-          enableRecurring: false
-          startDate: $startDate
-          endDate: $endDate
-          startTime: $startTime
-          endTime: $endTime
-          days: []
-        }
+        slot: { isSlot: true, date: $slotDate, time: $slotTime }
       }
     ) {
       appointment {

@@ -10,6 +10,7 @@ const Timeslot = ({
   selectedTherapist,
   allTherapist,
   pendingStatusId,
+  refetchAvailableSlotTime,
 }) => {
   const [isPopoverVisible, setPopoverVisible] = useState(false)
   const [titleText, setTitleText] = useState()
@@ -27,14 +28,24 @@ const Timeslot = ({
   ] = useMutation(CREATE_APPOINTMENT)
 
   useEffect(() => {
-    if (createAppointmentData)
+    if (createAppointmentData) {
       notification.success({ message: 'Appointment created successfully.' })
+      if (refetchAvailableSlotTime)
+        refetchAvailableSlotTime({
+          variables: {
+            therapistId: selectedTherapist,
+            date: selectedDate.format('YYYY-MM-DD'),
+          },
+        })
+    }
   }, [createAppointmentData])
 
   useEffect(() => {
     if (createAppointmentError)
       notification.error({ message: 'An error occurred to create Appointment.' })
   }, [createAppointmentError])
+
+  const getDateTime = momentObj => momentObj.format('YYYY-MM-DDTHH:mm:ssZ')
 
   const bookAppointment = e => {
     e.preventDefault()
@@ -45,12 +56,10 @@ const Timeslot = ({
         therapistId: selectedTherapist,
         note: noteText,
         purposeAssignment: purposeText,
-        startDate: selectedDate,
-        endDate: selectedDate,
-        startTime: selectedTimeSlot,
-        endTime: null,
-        startDateAndTime: null,
-        endDateAndTime: null,
+        startDateAndTime: getDateTime(selectedDate),
+        endDateAndTime: getDateTime(selectedDate),
+        slotDate: selectedDate.format('YYYY-MM-DD'),
+        slotTime: selectedTimeSlot,
         appointmentStatus: pendingStatusId,
       },
     })
