@@ -2,8 +2,8 @@
 import gql from 'graphql-tag'
 
 export const APPOINTMENTS_FOR_RANGE = gql`
-  query appointments($dateFrom: Date, $dateTo: Date) {
-    appointments(dateFrom: $dateFrom, dateTo: $dateTo) {
+  query appointments($dateFrom: Date, $dateTo: Date, $therapistId: ID) {
+    appointments(dateFrom: $dateFrom, dateTo: $dateTo, therapist: $therapistId) {
       edges {
         node {
           id

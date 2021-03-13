@@ -101,6 +101,7 @@ const BookAppointment = () => {
               className="calander-selection"
               fullscreen={false}
               onChange={setSelectedDate}
+              disabledDate={date => date < moment()}
             />
           </Form.Item>
         </Col>
@@ -110,8 +111,10 @@ const BookAppointment = () => {
         >
           <Row>
             {isAvailableSlotsLoading && <LoadingComponent />}
-            {availableSlotsError && <h3>An error occurred to load slots.</h3>}
-            {availableSlotsData && (
+            {!isAvailableSlotsLoading && availableSlotsError && (
+              <h3>An error occurred to load slots.</h3>
+            )}
+            {!isAvailableSlotsLoading && availableSlotsData && (
               <>
                 <Form.Item label="Select Timeslot" />
                 {availableSlotsData.getAppointmentSlots[0].data[0].slots.map(item => (

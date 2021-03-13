@@ -1,13 +1,19 @@
 import React from 'react'
 import { Tooltip, Button } from 'antd'
 import FullCalendar from '@fullcalendar/react'
-import interactionPlugin from '@fullcalendar/interaction'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
+import interactionPlugin from '@fullcalendar/interaction'
 
 import './style.scss'
 
-const CalendarForTherapist = ({ isLoading, loadData, onDateSelect, onAppointmentClick }) => {
+const CalendarForTherapist = ({
+  isLoading,
+  loadData,
+  onDateSelect,
+  onAppointmentClick,
+  feedbackClick,
+}) => {
   const renderEventContent = eventInfo => {
     const { student, location } = eventInfo.event.extendedProps
     let studentName = 'N/A'
@@ -52,6 +58,13 @@ const CalendarForTherapist = ({ isLoading, loadData, onDateSelect, onAppointment
                 >
                   Edit
                 </Button>
+                <Button
+                  onClick={() => feedbackClick(eventInfo.event.id)}
+                  size="small"
+                  type="primary"
+                >
+                  Feedback
+                </Button>
               </div>
             </div>
           }
@@ -74,7 +87,8 @@ const CalendarForTherapist = ({ isLoading, loadData, onDateSelect, onAppointment
         center: 'title',
         right: 'dayGridMonth,timeGridWeek,timeGridDay',
       }}
-      initialView="dayGridMonth"
+      initialView="timeGridDay"
+      selectable
       weekends
       dayMaxEvents={3}
       events={loadData}

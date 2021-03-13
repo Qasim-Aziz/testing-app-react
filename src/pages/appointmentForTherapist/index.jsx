@@ -1,26 +1,39 @@
 import React, { useState, useEffect } from 'react'
-import { Drawer } from 'antd'
+import { Drawer, Button } from 'antd'
 import moment from 'moment'
 import { useQuery } from 'react-apollo'
-import CalendarForTherapist from 'components/AppointmentCalender/CalendarForTherapist'
+import { useSelector, useDispatch } from 'react-redux'
+import { PlusOutlined } from '@ant-design/icons'
+import CreateAppointmentForm from 'components/Form/CreateAppointmentForm'
 import UpdateAppointmentForm from 'components/Form/UpdateAppointmentForm'
+import CalendarForTherapist from 'components/AppointmentCalender/CalendarForTherapist'
 import Authorize from 'components/LayoutComponents/Authorize'
 import { APPOINTMENTS_FOR_RANGE } from './query'
+import SessionFeedbackForm from '../sessionFeedback'
 import { dateTimeToDate } from '../../utilities'
 
 export default () => {
   let loadAppointmentCallback = null
+
+  const dispatch = useDispatch()
+  const therapistId = useSelector(state => state.user.staffId)
+
   const [needToReloadData, setNeedToReloadData] = useState(false)
   const [updatingAppointmentId, setUpdatingAppointmentId] = useState()
+  const [selectedStartDate, setSelectedStartDate] = useState()
+  const [selectedEndDate, setSelectedEndDate] = useState()
   const [loadedAppointments, setLoadedAppointments] = useState([])
   const [renderedStartDate, setRenderedStartDate] = useState(moment())
   const [renderedEndDate, setRenderedEndDate] = useState(moment())
   const [visibleDraw, setVisibleDraw] = useState(false)
+  const [feedbackDrawer, setFeedbackDrawer] = useState(false)
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState('')
 
   const { data, loading, error, refetch } = useQuery(APPOINTMENTS_FOR_RANGE, {
     variables: {
       dateFrom: dateTimeToDate(renderedStartDate),
       dateTo: dateTimeToDate(renderedEndDate),
+      therapistId,
     },
   })
 
@@ -55,6 +68,17 @@ export default () => {
     }
   }, [needToReloadData])
 
+  const handleSelectDates = selection => {
+    let endDate = selection.end
+    if (selection.allDay) {
+      // If multiple dates are selected then we need to remove 1 day from endDate
+      endDate = moment(selection.end).subtract(1, 'days')
+    }
+
+    setSelectedStartDate(selection.start)
+    setSelectedEndDate(endDate)
+  }
+
   const loadAppointments = (fetchInfo, successCallback, failureCallback) => {
     const isSameStartDate = moment(renderedStartDate).isSame(moment(fetchInfo.start), 'day')
     const isSameEndDate = moment(renderedEndDate).isSame(moment(fetchInfo.end), 'day')
@@ -68,6 +92,11 @@ export default () => {
     }
   }
 
+  const createAppointment = () => {
+    setUpdatingAppointmentId(null)
+    setVisibleDraw(true)
+  }
+
   const updateAppointment = id => {
     setUpdatingAppointmentId(id)
     setVisibleDraw(true)
@@ -78,6 +107,17 @@ export default () => {
     setVisibleDraw(false)
   }
 
+  const showFeedback = id => {
+    setFeedbackDrawer(true)
+
+    setSelectedAppointmentId(id)
+    dispatch({
+      type: 'feedback/SET_STATE',
+      payload: {
+        AppointmnetId: id,
+      },
+    })
+  }
   return (
     <Authorize roles={['therapist']} redirect to="/">
       <div style={{ padding: '0px' }}>
@@ -95,12 +135,19 @@ export default () => {
           <div>
             <span style={{ fontSize: '25px', color: '#000' }}>Appointments</span>
           </div>
+          <div style={{ padding: '5px 0px' }}>
+            <Button onClick={createAppointment} type="primary">
+              <PlusOutlined /> ADD APPOINTMENT
+            </Button>
+          </div>
         </div>
         <div style={{ marginTop: 10 }}>
           <CalendarForTherapist
             isLoading={loading}
             loadData={loadAppointments}
+            onDateSelect={handleSelectDates}
             onAppointmentClick={clickInfo => updateAppointment(clickInfo.event.id)}
+            feedbackClick={showFeedback}
           />
         </div>
       </div>
@@ -113,11 +160,29 @@ export default () => {
         onClose={() => setVisibleDraw(false)}
         visible={visibleDraw}
       >
-        <UpdateAppointmentForm
-          appointmentId={updatingAppointmentId}
-          setNeedToReloadData={setNeedToReloadData}
-          closeUpdateAppointment={closeUpdateAppointment}
-        />
+        {updatingAppointmentId ? (
+          <UpdateAppointmentForm
+            appointmentId={updatingAppointmentId}
+            setNeedToReloadData={setNeedToReloadData}
+            closeUpdateAppointment={closeUpdateAppointment}
+          />
+        ) : (
+          <CreateAppointmentForm
+            setNeedToReloadData={setNeedToReloadData}
+            startDate={selectedStartDate}
+            endDate={selectedEndDate}
+          />
+        )}
+      </Drawer>
+      <Drawer
+        title="Give Session Feedback"
+        placement="right"
+        width="500px"
+        closable
+        onClose={() => setFeedbackDrawer(false)}
+        visible={feedbackDrawer}
+      >
+        <SessionFeedbackForm appointmentId={selectedAppointmentId} key={selectedAppointmentId} />
       </Drawer>
     </Authorize>
   )
