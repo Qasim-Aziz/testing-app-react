@@ -45,14 +45,14 @@
       margin-left: 12px;
     }
   }
-}
-.right-align {
-  padding: 0 20px;
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  height: fit-content;
-  margin: 5px auto 5px;
+  .right-align {
+    padding: 0 20px;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    height: fit-content;
+    margin: 5px auto 5px;
+  }
 }
 
 .addOrEditPayor {

@@ -370,7 +370,7 @@ const PayorTable = () => {
         )}
       </Drawer>
       {error && <pre>{JSON.stringify(error, null, 2)}</pre>}
-      <div className="row">
+      <div className="row payorTable">
         <div className="right-align">
           <div style={{ width: '120px', display: 'flex' }}>
             {isFilterActive ? (
@@ -403,7 +403,6 @@ const PayorTable = () => {
           <div style={{ margin: '10px 5px 50px' }}>
             <Table
               loading={loading}
-              className="payorTable"
               rowKey="id"
               columns={antColumns}
               dataSource={payorList}

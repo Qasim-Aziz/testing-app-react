@@ -15,6 +15,7 @@ import {
   GET_PAYORS,
   GET_USER_ROLE,
 } from './query'
+import '../style.scss'
 
 const CodesTable = () => {
   const [showRightDrawer, setShowRightDrawer] = useState(false)
@@ -312,66 +313,71 @@ const CodesTable = () => {
   }
 
   const header = currentPageData => (
-    <div className="header">
-      <span className="pageTitle">Service Codes</span>
+    <div
+      className="header"
+      style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+    >
+      <div>
+        <span className="filterTitle">Status:</span>
+        <Radio.Group
+          defaultValue="all"
+          buttonStyle="solid"
+          size="small"
+          style={{ marginRight: '20px' }}
+          onChange={e => updateFilterValues('isActive', e.target.value)}
+          value={
+            appliedFilters.isActive && appliedFilters.isActive.length
+              ? appliedFilters.isActive[0]
+              : 'inactive'
+          }
+        >
+          {['all', 'active', 'inactive'].map(status => (
+            <Radio.Button key={status} value={status} style={{ textTransform: 'capitalize' }}>
+              {status}
+            </Radio.Button>
+          ))}
+        </Radio.Group>
 
-      <span className="filterTitle">Status:</span>
-      <Radio.Group
-        defaultValue="all"
-        buttonStyle="solid"
-        size="small"
-        onChange={e => updateFilterValues('isActive', e.target.value)}
-        value={
-          appliedFilters.isActive && appliedFilters.isActive.length
-            ? appliedFilters.isActive[0]
-            : 'inactive'
-        }
-      >
-        {['all', 'active', 'inactive'].map(status => (
-          <Radio.Button key={status} value={status} style={{ textTransform: 'capitalize' }}>
-            {status}
-          </Radio.Button>
-        ))}
-      </Radio.Group>
+        <span className="filterTitle">Type:</span>
+        <Radio.Group
+          defaultValue="all"
+          buttonStyle="solid"
+          size="small"
+          style={{ marginRight: '20px' }}
+          onChange={e => updateFilterValues('billable', e.target.value)}
+          value={
+            appliedFilters.billable && appliedFilters.billable.length
+              ? appliedFilters.billable[0]
+              : 'nonbillable'
+          }
+        >
+          {['all', 'billable', 'nonbillable'].map(value => (
+            <Radio.Button key={value} value={value} style={{ textTransform: 'capitalize' }}>
+              {value}
+            </Radio.Button>
+          ))}
+        </Radio.Group>
 
-      <span className="filterTitle">Type:</span>
-      <Radio.Group
-        defaultValue="all"
-        buttonStyle="solid"
-        size="small"
-        onChange={e => updateFilterValues('billable', e.target.value)}
-        value={
-          appliedFilters.billable && appliedFilters.billable.length
-            ? appliedFilters.billable[0]
-            : 'nonbillable'
-        }
-      >
-        {['all', 'billable', 'nonbillable'].map(value => (
-          <Radio.Button key={value} value={value} style={{ textTransform: 'capitalize' }}>
-            {value}
-          </Radio.Button>
-        ))}
-      </Radio.Group>
-
-      <span className="filterTitle">Permission:</span>
-      <Radio.Group
-        defaultValue="all"
-        buttonStyle="solid"
-        size="small"
-        onChange={e => updateFilterValues('codePermission', e.target.value)}
-        value={
-          appliedFilters.codePermission && appliedFilters.codePermission.length
-            ? appliedFilters.codePermission[0]
-            : 'Technician'
-        }
-      >
-        {[{ name: 'all' }, ...roleList].map(role => (
-          <Radio.Button key={role.name} value={role.name} style={{ textTransform: 'capitalize' }}>
-            {role.name}
-          </Radio.Button>
-        ))}
-      </Radio.Group>
-
+        <span className="filterTitle">Permission:</span>
+        <Radio.Group
+          defaultValue="all"
+          buttonStyle="solid"
+          size="small"
+          style={{ marginRight: '20px' }}
+          onChange={e => updateFilterValues('codePermission', e.target.value)}
+          value={
+            appliedFilters.codePermission && appliedFilters.codePermission.length
+              ? appliedFilters.codePermission[0]
+              : 'Technician'
+          }
+        >
+          {[{ name: 'all' }, ...roleList].map(role => (
+            <Radio.Button key={role.name} value={role.name} style={{ textTransform: 'capitalize' }}>
+              {role.name}
+            </Radio.Button>
+          ))}
+        </Radio.Group>
+      </div>
       <div className="right-align">
         <ExportData data={currentPageData} />
         <Button
@@ -431,7 +437,7 @@ const CodesTable = () => {
           columns={columns}
           dataSource={codeList}
           pagination={{
-            position: 'both',
+            position: 'bottom',
             showSizeChanger: true,
             pageSizeOptions: ['3', '10', '25', '50', '100'],
           }}
