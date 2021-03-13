@@ -195,6 +195,8 @@ class PeakEqvi extends React.Component {
               display: 'flex',
               flexDirection: 'row',
               justifyContent: 'space-between',
+              margin: '20px auto',
+              width: '100%',
               alignItems: 'center',
               padding: '0px 10px',
               backgroundColor: '#FFF',

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Button, Drawer, Table, Radio } from 'antd'
-import { PlusOutlined } from '@ant-design/icons'
+import { Button, Drawer, Table, Radio, Input } from 'antd'
+import { PlusOutlined, CloseCircleOutlined } from '@ant-design/icons'
 import { useQuery } from 'react-apollo'
 import Highlighter from 'react-highlight-words'
 import _ from 'lodash'
@@ -12,10 +12,20 @@ import AddPayor from './AddPayor'
 import { GET_PAYORS, GET_CONTACT_TYPES, GET_PAYOR_PLANS } from './query'
 import './style.scss'
 
+const inputCustom = { width: '180px', marginBottom: '8px', display: 'block' }
+const tableFilterStyles = { margin: '0px 22px 0 8px' }
+const customLabel = {
+  fontSize: '17px',
+  color: '#000',
+  marginRight: '12px',
+  marginBottom: '12px',
+}
+
 const PayorTable = () => {
   const [showRightDrawer, setShowRightDrawer] = useState(false)
   const [showForm, setShowForm] = useState('')
   const [payorList, setPayorList] = useState([])
+  const [mainData, setMainData] = useState([])
   const [contactTypeList, setContactTypeList] = useState([])
   const [payorPlanList, setPayorPlanList] = useState([])
   const [payorProfile, setPayorProfile] = useState(null)
@@ -30,10 +40,21 @@ const PayorTable = () => {
     columnKey: 'age',
   })
 
+  const [filter, setFilter] = useState({
+    status: '',
+    name: '',
+    email: '',
+    phone: '',
+    responsibility: '',
+  })
+
+  const [isFilterActive, setIsFilterActive] = useState(false)
+
   useEffect(() => {
     if (payors) {
       const nodes = payors.getPayors.edges.map(({ node }) => node)
       setPayorList(nodes)
+      setMainData(nodes)
     }
   }, [payors])
 
@@ -89,28 +110,77 @@ const PayorTable = () => {
     setFilters({ ...appliedFilters, responsibility: [newSelection] })
   }
 
+  useEffect(() => {
+    filterHandler()
+  }, [filter])
+
+  const filterHandler = () => {
+    let filteredList = mainData
+    const { name, email, status, phone, responsibility } = filter
+
+    let tempFilterActive = false
+    if (name) {
+      tempFilterActive = true
+      filteredList =
+        filteredList &&
+        filteredList.filter(
+          item =>
+            item.firstname?.toLowerCase().includes(name.toLowerCase()) ||
+            item.lastname?.toLowerCase().includes(name.toLowerCase()),
+        )
+    }
+    if (email) {
+      tempFilterActive = true
+      filteredList =
+        filteredList &&
+        filteredList.filter(item => item.email.toLowerCase().includes(email.toLowerCase()))
+    }
+    if (phone) {
+      tempFilterActive = true
+      filteredList =
+        filteredList &&
+        filteredList.filter(
+          item =>
+            (item.homePhone && item.homePhone.toLowerCase().includes(phone.toLowerCase())) ||
+            (item.workPhone && item.workPhone.toLowerCase().includes(phone.toLowerCase())),
+        )
+    }
+    if (status) {
+      tempFilterActive = true
+      if (status === 'Active') {
+        filteredList = filteredList && filteredList.filter(item => item.isActive === true)
+      } else {
+        filteredList = filteredList && filteredList.filter(item => item.isActive === false)
+      }
+    }
+    if (responsibility) {
+      tempFilterActive = true
+      filteredList =
+        filteredList &&
+        filteredList.filter(item =>
+          item.responsibility.toLowerCase().includes(responsibility.toLowerCase()),
+        )
+    }
+    setIsFilterActive(tempFilterActive)
+    setPayorList(filteredList)
+  }
+
+  const resetFilter = () => {
+    setFilter({
+      status: '',
+      name: '',
+      email: '',
+      phone: '',
+      responsibility: '',
+    })
+  }
+
   const columnCommonProps = [appliedFilters, appliedSorting, handleSearch, handleReset]
   const antColumns = [
     {
-      ...defaultColumnProps('Payor Name', 'firstname', 'firstname', ...columnCommonProps),
-      render: (text, row) => (
-        <Button
-          onClick={() => openInEditMode(row)}
-          type="link"
-          style={{ padding: '0px', fontWeight: 'bold', fontSize: '13px' }}
-        >
-          {appliedFilters.firstname ? (
-            <Highlighter
-              highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-              searchWords={[appliedFilters.firstName]}
-              autoEscape
-              textToHighlight={`${row.firstname} ${row.lastname}`}
-            />
-          ) : (
-            `${row.firstname} ${row.lastname}`
-          )}
-        </Button>
-      ),
+      title: 'Name',
+      dataIndex: 'firstName',
+      render: (tt, row) => `${tt} ${row.lastname}`,
     },
     {
       ...defaultColumnProps(
@@ -120,74 +190,36 @@ const PayorTable = () => {
         ...columnCommonProps,
       ),
     },
+
     {
-      ...defaultColumnProps(
-        'Responsibility',
-        'responsibility',
-        'responsibility',
-        ...columnCommonProps,
-        true,
-      ),
-      filterMultiple: false,
-      filters: getResponsibilities(true).map(item => ({
-        text: item,
-        value: item,
-      })),
-      filteredValue: appliedFilters.responsibility || null,
-      onFilter: (value, record) => {
-        if (value === 'All') return true
-        if (value === 'N/A') return !record.responsibility
-        return record.responsibility === value.toUpperCase()
-      },
+      title: 'Email',
+      dataIndex: 'email',
+    },
+    {
+      title: 'Home Phone',
+      dataIndex: 'homePhone',
+    },
+    {
+      title: 'Work Phone',
+      dataIndex: 'workPhone',
+    },
+    {
+      title: 'Responsibility',
+      dataIndex: 'responsibility',
       render: text => (text ? text.charAt(0).toUpperCase() + text.slice(1).toLowerCase() : 'N/A'),
     },
     {
-      ...defaultColumnProps('Email', 'email', 'email', ...columnCommonProps),
+      title: 'Address',
+      dataIndex: 'state',
+      render: (text, row) => `${row.city}, ${text}`,
     },
     {
-      ...defaultColumnProps('City', 'city', 'city', ...columnCommonProps),
+      title: 'Primary Location',
+      dataIndex: 'primaryLocation',
     },
     {
-      ...defaultColumnProps('State', 'state', 'state', ...columnCommonProps),
-    },
-    {
-      ...defaultColumnProps(
-        'Primary Locatioin',
-        'primaryLocation',
-        'primaryLocation',
-        ...columnCommonProps,
-      ),
-    },
-    {
-      ...defaultColumnProps('Home Phone', 'homePhone', 'homePhone', ...columnCommonProps),
-    },
-    {
-      ...defaultColumnProps('Work Phone', 'workPhone', 'workPhone', ...columnCommonProps),
-    },
-    {
-      ...defaultColumnProps('Active/Inactive', 'isActive', 'isActive', ...columnCommonProps, true),
-      filterMultiple: false,
-      filters: [
-        {
-          text: 'All',
-          value: 'all',
-        },
-        {
-          text: 'Active',
-          value: 'active',
-        },
-        {
-          text: 'Inactive',
-          value: 'inactive',
-        },
-      ],
-      filteredValue: appliedFilters.isActive || null,
-      onFilter: (value, record) => {
-        if (value === 'all') return true
-        if (value === 'active') return record.isActive
-        if (value === 'inactive') return !record.isActive
-        return false
-      },
+      title: 'Status',
+      dataIndex: 'status',
       render: text => (text ? 'Active' : 'Inactive'),
     },
   ]
@@ -203,56 +235,110 @@ const PayorTable = () => {
     refetchPayors()
   }
 
-  const header = currentPageData => (
-    <div className="header">
-      <span className="pageTitle">Payor List</span>
-
+  const header = () => (
+    <div
+      className="header"
+      style={{
+        height: '40px',
+        display: 'flex',
+        justifyContent: 'flex-start',
+        alignItems: 'center',
+      }}
+    >
+      <span style={{ display: 'flex', alignItems: 'center' }}>
+        <span>Name :</span>
+        <Input
+          size="small"
+          name="name"
+          allowClear
+          placeholder="Search Name"
+          onChange={e => {
+            setFilter({ ...filter, name: e.target.value })
+          }}
+          value={filter.name}
+          style={{ ...tableFilterStyles, width: '150px' }}
+        />
+      </span>
+      <span style={{ display: 'flex', alignItems: 'center' }}>
+        <span>Email :</span>
+        <Input
+          size="small"
+          name="phone"
+          allowClear
+          placeholder="Search Phone"
+          onChange={e => {
+            setFilter({ ...filter, email: e.target.value })
+          }}
+          value={filter.email}
+          style={{ ...tableFilterStyles, width: '150px' }}
+        />
+      </span>
+      <span style={{ display: 'flex', alignItems: 'center' }}>
+        <span>Phone :</span>
+        <Input
+          size="small"
+          name="email"
+          allowClear
+          placeholder="Search Email"
+          onChange={e => {
+            setFilter({ ...filter, phone: e.target.value })
+          }}
+          value={filter.phone}
+          style={{ ...tableFilterStyles, width: '150px' }}
+        />
+      </span>
       <span className="filterTitle">Status:</span>
       <Radio.Group
         defaultValue="all"
         buttonStyle="solid"
         size="small"
-        onChange={e => onStatusFilterChange(e.target.value)}
-        value={appliedFilters.isActive[0]}
+        onChange={e => {
+          setFilter({ ...filter, status: e.target.value })
+        }}
+        value={filter.status}
+        style={{ marginRight: '20px' }}
       >
-        {['all', 'active', 'inactive'].map(status => (
-          <Radio.Button key={status} value={status} style={{ textTransform: 'capitalize' }}>
-            {status}
-          </Radio.Button>
-        ))}
+        <Radio.Button key={1} value="">
+          All
+        </Radio.Button>
+        <Radio.Button key={2} value="Active">
+          Active
+        </Radio.Button>
+        <Radio.Button key={3} value="Inactive">
+          Inactive
+        </Radio.Button>
       </Radio.Group>
 
       <span className="filterTitle">Responsibility:</span>
       <Radio.Group
-        defaultValue="all"
+        defaultValue=""
         buttonStyle="solid"
         size="small"
-        onChange={e => onResponsibilityFilterChange(e.target.value)}
-        value={appliedFilters.responsibility[0]}
+        onChange={e => {
+          setFilter({ ...filter, responsibility: e.target.value })
+        }}
+        value={filter.responsibility}
       >
-        {getResponsibilities(true).map(value => (
-          <Radio.Button key={value} value={value} style={{ textTransform: 'capitalize' }}>
-            {value}
-          </Radio.Button>
-        ))}
+        <Radio.Button key={1} value="">
+          All
+        </Radio.Button>
+        <Radio.Button key={2} value="n/a">
+          N/A
+        </Radio.Button>
+        <Radio.Button key={3} value="primary">
+          Primary
+        </Radio.Button>
+        <Radio.Button key={4} value="secondary">
+          Secondary
+        </Radio.Button>
+        <Radio.Button key={5} value="tertiary">
+          Tertiary
+        </Radio.Button>
       </Radio.Group>
-
-      <div className="right-align">
-        <ExportData data={currentPageData} />
-        <Button
-          onClick={() => {
-            setShowForm('Add')
-            setShowRightDrawer(true)
-          }}
-          type="primary"
-          size="small"
-        >
-          <PlusOutlined /> ADD PAYOR
-        </Button>
-      </div>
     </div>
   )
 
+  console.log(payorList, '[ayoutlsdfnsjd')
   return (
     <Authorize roles={['school_admin']} redirect to="/dashboard/beta">
       <Drawer
@@ -284,9 +370,37 @@ const PayorTable = () => {
         )}
       </Drawer>
       {error && <pre>{JSON.stringify(error, null, 2)}</pre>}
-      <div className="row" style={{ marginTop: '30px' }}>
+      <div className="row">
+        <div className="right-align">
+          <div style={{ width: '120px', display: 'flex' }}>
+            {isFilterActive ? (
+              <Button
+                type="link"
+                style={{ marginLeft: '10px', color: '#FEBB27', margin: 'auto' }}
+                size="small"
+                onClick={resetFilter}
+              >
+                Clear Filters
+                <CloseCircleOutlined />
+              </Button>
+            ) : null}
+          </div>
+          <div>
+            <ExportData data={payorList} />
+            <Button
+              onClick={() => {
+                setShowForm('Add')
+                setShowRightDrawer(true)
+              }}
+              type="primary"
+              size="large"
+            >
+              <PlusOutlined /> ADD PAYOR
+            </Button>
+          </div>
+        </div>
         <div className="col-sm-12">
-          <div style={{ margin: '5px', marginBottom: '50px' }}>
+          <div style={{ margin: '10px 5px 50px' }}>
             <Table
               loading={loading}
               className="payorTable"
@@ -294,11 +408,10 @@ const PayorTable = () => {
               columns={antColumns}
               dataSource={payorList}
               pagination={{
-                position: 'top',
+                position: 'bottom',
                 showSizeChanger: true,
-                pageSizeOptions: ['3', '10', '25', '50', '100'],
+                pageSizeOptions: ['10', '20', '50', '100'],
               }}
-              size="small"
               bordered
               onChange={handleFilterAndSorting}
               title={header}

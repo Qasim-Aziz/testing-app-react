@@ -4,7 +4,6 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-undef */
 /* eslint-disable radix */
-
 /* eslint-disable */
 import React, { useState, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
@@ -156,13 +155,6 @@ const PreviewInvoice = ({ invoiceId }) => {
   })
 
   const total = 0
-  // const total = getTotal(
-  //   subTotal,
-  //   invoice.discount,
-  //   invoice.gst,
-  //   invoice.sgst,
-  //   invoice.taxableSubtotal,
-  // )
 
   const invoke = () => {
     localStorage.setItem('currentInvoice', JSON.stringify(invoice))

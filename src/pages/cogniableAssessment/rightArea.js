@@ -258,116 +258,107 @@ class RightArea extends React.Component {
       student: { StudentName },
       cogniableassessment: { AssessmentList, AssessmentObject, NewAssessmentForm },
     } = this.props
-    return (
-      <div>
-        <DataTable
-          // title="DIRECT TRAINING MODULE"
-          columns={[
-            {
-              name: 'Date',
-              selector: 'node.date',
-            },
-            {
-              name: 'Title',
-              selector: 'node.name',
-            },
-            {
-              name: 'Note',
-              selector: 'node.notes',
-            },
 
-            {
-              name: 'Status',
-              width: '240px',
-              cell: obj => {
-                return (
-                  <div style={{ color: obj.node.status === 'PROGRESS' ? '#f5222d' : 'green' }}>
-                    {obj.node.status === 'PROGRESS' ? 'IN-PROGRESS' : obj.node.status} &nbsp;
-                  </div>
-                )
-              },
-            },
-            {
-              name: 'Action',
-              width: '340px',
-              cell: obj => {
-                return (
+    const columns = [
+      {
+        title: 'Date',
+        dataIndex: 'node.date',
+      },
+      {
+        title: 'Title',
+        dataIndex: 'node.name',
+      },
+      {
+        title: 'Note',
+        dataIndex: 'node.notes',
+      },
+
+      {
+        title: 'Status',
+        width: '240px',
+        render: obj => {
+          return (
+            <div style={{ color: obj.node.status === 'PROGRESS' ? '#f5222d' : 'green' }}>
+              {obj.node.status === 'PROGRESS' ? 'IN-PROGRESS' : obj.node.status} &nbsp;
+            </div>
+          )
+        },
+      },
+      {
+        title: 'Action',
+        width: '340px',
+        render: obj => {
+          return (
+            <>
+              <div style={{ display: 'flex', justifyContent: 'center', justifyItems: 'center' }}>
+                {obj.node.status === 'COMPLETED' ? (
                   <>
-                    {obj.node.status === 'COMPLETED' ? (
-                      <>
-                        <Tooltip placement="topRight" title="See Result">
-                          <Button
-                            onClick={() => {
-                              localStorage.setItem('cogniAbleId', obj.node.id)
-                              window.location.href = '/#/cogniableAssessment/start'
-                              // history.push('/peakResult')
-                            }}
-                            type="link"
-                          >
-                            <PlayCircleOutlined />
-                          </Button>
-                        </Tooltip>
-                        <Tooltip placement="topRight" title="See Report">
-                          <Button
-                            onClick={() => {
-                              localStorage.setItem('cogniAbleId', obj.node.id)
-                              // history.push('/peakReport')
-                              this.generateReport(obj.node.id)
-                            }}
-                            type="link"
-                          >
-                            <Icon type="snippets" />
-                          </Button>
-                        </Tooltip>
-                      </>
-                    ) : (
-                      <Tooltip placement="topRight" title="Start Assessment">
-                        <Button
-                          onClick={() => {
-                            localStorage.setItem('cogniAbleId', obj.node.id)
-                            window.location.href = '/#/cogniableAssessment/start'
-                          }}
-                          type="link"
-                          // style={{
-                          //   background: '#faad14',
-                          //   color: '#fff',
-                          //   marginLeft: 10,
-                          // }}
-                        >
-                          <PlayCircleOutlined />
-                          {/* {obj.node.submitpeakresponsesSet.totalAttended > 0 ? "Resume" : "Start"} */}
-                        </Button>
-                      </Tooltip>
-                    )}
-                    <Button type="link" onClick={() => this.suggestTarget(obj.node.id)}>
-                      Suggest Target
-                    </Button>
-
-                    <div style={{ right: 15, position: 'absolute' }}>
-                      <Tooltip placement="topRight" title="Delete Assessment">
-                        <Popconfirm
-                          // style={{marginBottom: '10px'}}
-                          title="Are you sure you don't want this assessment?"
-                          onConfirm={() => this.makeInactive(obj.node.id)}
-                          // onCancel={cancel}
-                          okText="Yes"
-                          cancelText="No"
-                        >
-                          <Button type="link">
-                            <Icon type="eye-invisible" />
-                          </Button>
-                        </Popconfirm>
-                      </Tooltip>
-                    </div>
+                    <Tooltip placement="topRight" title="See Result">
+                      <Button
+                        onClick={() => {
+                          localStorage.setItem('cogniAbleId', obj.node.id)
+                          window.location.href = '/#/cogniableAssessment/start'
+                        }}
+                        type="link"
+                      >
+                        <PlayCircleOutlined />
+                      </Button>
+                    </Tooltip>
+                    <Tooltip placement="topRight" title="See Report">
+                      <Button
+                        onClick={() => {
+                          localStorage.setItem('cogniAbleId', obj.node.id)
+                          this.generateReport(obj.node.id)
+                        }}
+                        type="link"
+                      >
+                        <Icon type="snippets" />
+                      </Button>
+                    </Tooltip>
                   </>
-                )
-              },
-            },
-          ]}
-          theme="default"
-          dense={true}
-          pagination={true}
-          data={
+                ) : (
+                  <Tooltip placement="topRight" title="Start Assessment">
+                    <Button
+                      onClick={() => {
+                        localStorage.setItem('cogniAbleId', obj.node.id)
+                        window.location.href = '/#/cogniableAssessment/start'
+                      }}
+                      type="link"
+                    >
+                      <PlayCircleOutlined />
+                    </Button>
+                  </Tooltip>
+                )}
+                <Button type="link" onClick={() => this.suggestTarget(obj.node.id)}>
+                  Suggest Target
+                </Button>
+
+                <div>
+                  <Tooltip placement="topRight" title="Delete Assessment">
+                    <Popconfirm
+                      title="Are you sure you don't want this assessment?"
+                      onConfirm={() => this.makeInactive(obj.node.id)}
+                      okText="Yes"
+                      cancelText="No"
+                    >
+                      <Button type="link">
+                        <Icon type="eye-invisible" />
+                      </Button>
+                    </Popconfirm>
+                  </Tooltip>
+                </div>
+              </div>
+            </>
+          )
+        },
+      },
+    ]
+
+    return (
+      <div style={{ marginTop: '32px' }}>
+        <Table
+          columns={columns}
+          dataSource={
             status === 'COMPLETED'
               ? AssessmentList?.filter(({ node }) => {
                   return node.status === status
@@ -376,103 +367,15 @@ class RightArea extends React.Component {
                   return node.status !== 'COMPLETED'
                 })
           }
-          customStyles={customStyles}
-          noHeader={true}
+          pagination={{
+            defaultPageSize: 20,
+            showSizeChanger: true,
+            pageSizeOptions: ['20', '30', '50', '100'],
+            position: 'bottom',
+          }}
+          bordered
           paginationRowsPerPageOptions={[10, 50, 100, 200, 500, 1000]}
         />
-
-        {/* <Table
-          bordered
-          columns={[
-            {
-              title: 'Date',
-              dataIndex: 'node.date',
-            },
-            {
-              title: 'Title',
-              dataIndex: 'node.name',
-            },
-            {
-              title: 'Note',
-              dataIndex: 'node.notes',
-            },
-
-            {
-              title: 'Status',
-              width: '240px',
-              render: obj => {
-                return (
-                  <div style={{ color: obj.node.status === 'PROGRESS' ? '#f5222d' : 'green' }}>
-                    {obj.node.status === 'PROGRESS' ? 'IN-PROGRESS' : obj.node.status} &nbsp;
-                </div>
-                )
-              },
-            },
-            {
-              title: 'Action',
-              width: '340px',
-              render: obj => {
-                return (
-                  <div>
-                    <Button onClick={() => this.suggestTarget(obj.node.id)}>
-                      Suggest Target
-                    </Button>
-                    {obj.node.status === 'COMPLETED' ? (
-                      <>
-                        <Button
-                          onClick={() => {
-                            localStorage.setItem('cogniAbleId', obj.node.id)
-                            window.location.href = '/#/cogniableAssessment/start'
-                            // history.push('/peakResult')
-                          }}
-                          style={{
-                            background: '#faad14',
-                            color: '#fff',
-                            marginLeft: 10,
-                          }}
-                        >
-                          Result
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            localStorage.setItem('cogniAbleId', obj.node.id)
-                            // history.push('/peakReport')
-                            this.generateReport(obj.node.id)
-                          }}
-                          style={{
-                            background: '#faad14',
-                            color: '#fff',
-                            marginLeft: 10,
-                          }}
-                        >
-                          Report
-                        </Button>
-                      </>
-                    ) : (
-                        <Button
-                          onClick={() => {
-                            localStorage.setItem('cogniAbleId', obj.node.id)
-                            window.location.href = '/#/cogniableAssessment/start'
-                          }}
-                          style={{
-                            background: '#faad14',
-                            color: '#fff',
-                            marginLeft: 10,
-                          }}
-                        >
-                          Start
-                        </Button>
-                      )}
-
-
-                  </div>
-                )
-              },
-            },
-          ]}
-          dataSource={status === 'COMPLETED' ? AssessmentList?.filter(({ node }) => { return node.status === status }) : AssessmentList?.filter(({ node }) => { return node.status !== 'COMPLETED' })}
-        // loading={loading}
-        /> */}
       </div>
     )
   }
@@ -560,7 +463,6 @@ class RightArea extends React.Component {
           <Content
             style={{
               padding: '0px 20px',
-              maxWidth: 1100,
               width: '100%',
               margin: '0px auto',
             }}
