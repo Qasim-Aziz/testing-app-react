@@ -125,7 +125,7 @@ class TargetResponseGraph extends Component {
 
         result.data.get5dayPercentage2?.map(item => {
           correctData.push({ x: item.date, y: item.correctPercent })
-          incorrectData.push({ x: item.date, y: (item.errorPercent - item.promptPercent) })
+          incorrectData.push({ x: item.date, y: item.incorrectPercent + item.noResponsePercent })
           promptData.push({ x: item.date, y: item.promptPercent })
         })
 

@@ -9,9 +9,10 @@ import { setContext } from 'apollo-link-context'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { onError } from "apollo-link-error";
 import { notification } from 'antd'
+import API_END_POINT from '../env'
 
 const httpLink = createHttpLink({
-  uri: 'https://application.cogniable.us/apis/graphql',
+  uri: API_END_POINT,
 })
 
 const errorLink = onError(({ graphQLErrors, networkError,response, operation, forward }) => {
