@@ -428,114 +428,116 @@ const AllClinicsData = () => {
   )
 
   return (
-    <Authorize roles={['superUser']} redirect to="/404">
-      <Tabs
-        style={{ marginTop: 10, marginLeft: 10 }}
-        defaultActiveKey={activeTab}
-        type="card"
-        className="vbmappReportTabs"
-        tabBarExtraContent={exportButton}
-        onChange={setActiveTab}
-      >
-        <TabPane tab="Active" key="Active">
-          <div className=" modify-table">
-            <Table
-              scroll={{ x: '70vw' }}
-              columns={columns}
-              rowKey={record => record.details.id}
-              dataSource={clinicsList}
-              onChange={handleChange}
-              loading={loading}
-              bordered
-              pagination={{
-                defaultPageSize: 20,
-                showSizeChanger: true,
-                pageSizeOptions: ['20', '30', '50', '100'],
-                position: 'top',
-              }}
-            />
-          </div>
-        </TabPane>
+    <div className="all-clinic-data">
+      <Authorize roles={['superUser']} redirect to="/404">
+        <Tabs
+          style={{ marginTop: 10, marginLeft: 10 }}
+          defaultActiveKey={activeTab}
+          type="card"
+          className="vbmappReportTabs"
+          tabBarExtraContent={exportButton}
+          onChange={setActiveTab}
+        >
+          <TabPane tab="Active" key="Active">
+            <div className=" modify-table">
+              <Table
+                scroll={{ x: '70vw' }}
+                columns={columns}
+                rowKey={record => record.details.id}
+                dataSource={clinicsList}
+                onChange={handleChange}
+                loading={loading}
+                bordered
+                pagination={{
+                  defaultPageSize: 20,
+                  showSizeChanger: true,
+                  pageSizeOptions: ['20', '30', '50', '100'],
+                  position: 'top',
+                }}
+              />
+            </div>
+          </TabPane>
 
-        <TabPane tab="Inactive" key="Inactive">
-          <div className="modify-table">
-            <Table
-              scroll={{ x: '70vw' }}
-              columns={columns}
-              rowKey={record => record.details.id}
-              dataSource={clinicsList}
-              onChange={handleChange}
-              loading={loading}
-              bordered
-              pagination={{
-                defaultPageSize: 20,
-                showSizeChanger: true,
-                pageSizeOptions: ['20', '30', '50', '100'],
-                position: 'top',
-              }}
-            />
-          </div>
-        </TabPane>
-      </Tabs>
-      <Drawer
-        title="Filters"
-        placement="right"
-        closable="true"
-        onClose={() => setFilterDrawer(false)}
-        visible={filterDrawer}
-        width={360}
-      >
-        <FilterCard filterHandler={filterHandler} filterSet={filterSet} ref={filterRef} />
-      </Drawer>
+          <TabPane tab="Inactive" key="Inactive">
+            <div className="modify-table">
+              <Table
+                scroll={{ x: '70vw' }}
+                columns={columns}
+                rowKey={record => record.details.id}
+                dataSource={clinicsList}
+                onChange={handleChange}
+                loading={loading}
+                bordered
+                pagination={{
+                  defaultPageSize: 20,
+                  showSizeChanger: true,
+                  pageSizeOptions: ['20', '30', '50', '100'],
+                  position: 'top',
+                }}
+              />
+            </div>
+          </TabPane>
+        </Tabs>
+        <Drawer
+          title="Filters"
+          placement="right"
+          closable="true"
+          onClose={() => setFilterDrawer(false)}
+          visible={filterDrawer}
+          width={360}
+        >
+          <FilterCard filterHandler={filterHandler} filterSet={filterSet} ref={filterRef} />
+        </Drawer>
 
-      <Drawer
-        title={`${drawerTitle}: Invoices`}
-        width="70vw"
-        placement="right"
-        closable="true"
-        onClose={() => setInvoiceDrawer(false)}
-        visible={invoiceDrawer}
-      >
-        <InvoiceTable rowData={currentClinicRow} setInvoiceDrawer={setInvoiceDrawer} />
-      </Drawer>
-      <Drawer
-        width="70vw"
-        placement="right"
-        closable="true"
-        onClose={() => setStaffDrawer(false)}
-        visible={staffDrawer}
-        destroyOnClose="true"
-        className="change-invo-drawer"
-      >
-        <ClinicStaff rowData={currentClinicRow} />
-      </Drawer>
-      <Drawer
-        title={`${drawerTitle}: Maintain Rates`}
-        width="40%"
-        placement="right"
-        closable="true"
-        onClose={() => setRatesDrawer(false)}
-        visible={ratesDrawer}
-        destroyOnClose="true"
-      >
-        <UpdateClinicRates
-          rowData={currentClinicRow}
-          ratesDrawer={ratesDrawer}
-          setRatesDrawer={setRatesDrawer}
-        />
-      </Drawer>
-      <Drawer
-        visible={learnersTableDrawer}
-        onClose={() => setLearnersTableDrawer(false)}
-        width="70vw"
-        placement="right"
-        closable="true"
-        destroyOnClose="true"
-        className="change-invo-drawer"
-      >
-        <AllLearners rowData={currentClinicRow} active={activeLearners} />
-      </Drawer>
-    </Authorize>
+        <Drawer
+          title={`${drawerTitle}: Invoices`}
+          width="70vw"
+          placement="right"
+          closable="true"
+          onClose={() => setInvoiceDrawer(false)}
+          visible={invoiceDrawer}
+        >
+          <InvoiceTable rowData={currentClinicRow} setInvoiceDrawer={setInvoiceDrawer} />
+        </Drawer>
+        <Drawer
+          width="70vw"
+          placement="right"
+          closable="true"
+          onClose={() => setStaffDrawer(false)}
+          visible={staffDrawer}
+          destroyOnClose="true"
+          className="change-invo-drawer"
+        >
+          <ClinicStaff rowData={currentClinicRow} />
+        </Drawer>
+        <Drawer
+          title={`${drawerTitle}: Maintain Rates`}
+          width="40%"
+          placement="right"
+          closable="true"
+          onClose={() => setRatesDrawer(false)}
+          visible={ratesDrawer}
+          destroyOnClose="true"
+        >
+          <UpdateClinicRates
+            rowData={currentClinicRow}
+            ratesDrawer={ratesDrawer}
+            setRatesDrawer={setRatesDrawer}
+          />
+        </Drawer>
+        <Drawer
+          visible={learnersTableDrawer}
+          onClose={() => setLearnersTableDrawer(false)}
+          width="70vw"
+          placement="right"
+          closable="true"
+          destroyOnClose="true"
+          className="change-invo-drawer"
+        >
+          <AllLearners rowData={currentClinicRow} active={activeLearners} />
+        </Drawer>
+      </Authorize>
+    </div>
   )
 }
 

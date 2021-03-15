@@ -266,7 +266,7 @@ class TharepistStudentsDailyVitals extends PureComponent {
               justifyContent: 'space-between',
               alignItems: 'center',
               padding: '0px 10px',
-              margin: '10px 0',
+              margin: '15px 0',
               backgroundColor: '#FFF',
               boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
             }}

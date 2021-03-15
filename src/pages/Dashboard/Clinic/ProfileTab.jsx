@@ -3,7 +3,7 @@ import { Tabs } from 'antd'
 
 import EmailNotiSett from 'pages/ClinicProfile/EmailNotiSett'
 import ContactDetails from 'pages/ClinicProfile/ContactDetails'
-import InvCurrency from 'pages/ClinicProfile/InvCurrency'
+import InvCurrency from 'pages/ClinicProfile/InvoiceRelated'
 import ChangePassword from 'components/changePassword/form'
 import MasterCriteria from 'pages/ClinicProfile/MasteryCriteria'
 import LocationSett from 'pages/ClinicProfile/LocationSett'
@@ -30,7 +30,7 @@ const ProfileTab = ({ activeProfileTab, onProfileTabChange }) => {
     },
     {
       key: 'invoice-currency',
-      title: 'Invoice Currency',
+      title: 'Invoice',
       component: <InvCurrency />,
     },
     {

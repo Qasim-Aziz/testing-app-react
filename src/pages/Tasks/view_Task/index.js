@@ -264,9 +264,6 @@ class TaskTable extends React.Component {
         },
       })
     }
-    // this.setState({
-    //   divShow: false,
-    // })
   }
 
   filterToggle(toggle) {
@@ -298,7 +295,6 @@ class TaskTable extends React.Component {
       item =>
         item.taskName && item.taskName.toLowerCase().includes(this.state.filterName.toLowerCase()),
     )
-    console.log('filteredList-->', filteredList)
 
     if (this.state.filterStatus) {
       filteredList = filteredList.filter(
@@ -511,8 +507,7 @@ class TaskTable extends React.Component {
       },
       {
         name: 'Complete',
-        minWidth: '80px',
-        maxWidth: '80px',
+        width: '120px',
         cell: e => (
           <span
             onClick={e => {
@@ -539,7 +534,7 @@ class TaskTable extends React.Component {
     ]
 
     const { divShow, filterShow } = this.state
-    const divClass = divShow ? 'col-sm-8' : 'col-sm-12'
+    const divClass = 'col-sm-12'
 
     const fileType =
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
@@ -617,274 +612,266 @@ class TaskTable extends React.Component {
     )
 
     return (
-      <Authorize roles={['school_admin', 'therapist', 'parents']} redirect to="/dashboard/beta">
-        <Helmet title="Partner" />
-        <Drawer
-          title="Filters"
-          placement="left"
-          closable={true}
-          onClose={() => this.filterToggle(filterShow)}
-          visible={filterShow}
-          width={300}
-        >
-          <div>
-            <div className="filter_sub_div">
-              <span style={{ fontSize: '15px', color: '#000' }}>Name :</span>
-              <Input
-                size="small"
-                placeholder="Search Name"
-                value={this.state.filterName}
-                onChange={e => this.setState({ filterName: e.target.value })}
-                style={{ width: 188, marginBottom: 8, display: 'block' }}
-              />
+      <div className="task-list-index">
+        <Authorize roles={['school_admin', 'therapist', 'parents']} redirect to="/dashboard/beta">
+          <Helmet title="Partner" />
+          <Drawer
+            title="Filters"
+            placement="left"
+            closable={true}
+            onClose={() => this.filterToggle(filterShow)}
+            visible={filterShow}
+            width={300}
+          >
+            <div>
+              <div className="filter_sub_div">
+                <span style={{ fontSize: '15px', color: '#000' }}>Name :</span>
+                <Input
+                  size="small"
+                  placeholder="Search Name"
+                  value={this.state.filterName}
+                  onChange={e => this.setState({ filterName: e.target.value })}
+                  style={{ width: 188, marginBottom: 8, display: 'block' }}
+                />
+              </div>
+
+              <div className="filter_sub_div">
+                <span style={{ fontSize: '15px', color: '#000' }}>Status :</span>
+                <Select
+                  size="small"
+                  value={this.state.filterStatus}
+                  onSelect={value => this.setState({ filterStatus: value })}
+                  style={{ width: 188 }}
+                >
+                  <Select.Option value="">Select Status</Select.Option>
+                  <Select.Option value="Open">Open</Select.Option>
+                  <Select.Option value="In-progress">In Progress</Select.Option>
+                  <Select.Option value="Close">Close</Select.Option>
+                </Select>
+              </div>
+              <div className="filter_sub_div">
+                <span style={{ fontSize: '15px', color: '#000' }}>Type :</span>
+
+                <Select
+                  size="small"
+                  value={this.state.filterType}
+                  onSelect={value => this.setState({ filterType: value })}
+                  style={{ width: 188 }}
+                >
+                  <Select.Option value="">Select Type</Select.Option>
+                  {typesGrouped.map((i, index) => {
+                    return (
+                      <Select.Option key={i} value={i}>
+                        {i}
+                      </Select.Option>
+                    )
+                  })}
+                </Select>
+              </div>
+
+              <div className="filter_sub_div">
+                <span style={{ fontSize: '15px', color: '#000' }}>Priority :</span>
+
+                <Select
+                  size="small"
+                  value={this.state.filterPriority}
+                  onSelect={value => this.setState({ filterPriority: value })}
+                  style={{ width: 188 }}
+                >
+                  <Select.Option value="">Select Priority</Select.Option>
+                  {prioritiesGrouped.map((i, index) => {
+                    return (
+                      <Select.Option key={i} value={i}>
+                        {i}
+                      </Select.Option>
+                    )
+                  })}
+                </Select>
+              </div>
             </div>
+          </Drawer>
 
-            <div className="filter_sub_div">
-              <span style={{ fontSize: '15px', color: '#000' }}>Status :</span>
-              <Select
-                size="small"
-                value={this.state.filterStatus}
-                onSelect={value => this.setState({ filterStatus: value })}
-                style={{ width: 188 }}
-              >
-                <Select.Option value="">Select Status</Select.Option>
-                <Select.Option value="Open">Open</Select.Option>
-                <Select.Option value="In-progress">In Progress</Select.Option>
-                <Select.Option value="Close">Close</Select.Option>
-                {/* {statusGrouped.map((i, index) => {
-                  return <Select.Option value={i}>{i}</Select.Option>
-                })} */}
-              </Select>
-            </div>
-            <div className="filter_sub_div">
-              <span style={{ fontSize: '15px', color: '#000' }}>Type :</span>
-
-              <Select
-                size="small"
-                value={this.state.filterType}
-                onSelect={value => this.setState({ filterType: value })}
-                style={{ width: 188 }}
-              >
-                <Select.Option value="">Select Type</Select.Option>
-                {typesGrouped.map((i, index) => {
-                  return (
-                    <Select.Option key={i} value={i}>
-                      {i}
-                    </Select.Option>
-                  )
-                })}
-              </Select>
-            </div>
-
-            <div className="filter_sub_div">
-              <span style={{ fontSize: '15px', color: '#000' }}>Priority :</span>
-
-              <Select
-                size="small"
-                value={this.state.filterPriority}
-                onSelect={value => this.setState({ filterPriority: value })}
-                style={{ width: 188 }}
-              >
-                <Select.Option value="">Select Priority</Select.Option>
-                {prioritiesGrouped.map((i, index) => {
-                  return (
-                    <Select.Option key={i} value={i}>
-                      {i}
-                    </Select.Option>
-                  )
-                })}
-              </Select>
-            </div>
-          </div>
-        </Drawer>
-
-        <Drawer
-          title="UPDATE TASK"
-          width="50%"
-          placement="right"
-          closable={true}
-          onClose={() => this.setState({ divShow: false })}
-          visible={divShow}
-        >
-          <CreateOrUpdateTask
-            {...this.props}
-            task={SelectedTask}
+          <Drawer
+            title="UPDATE TASK"
+            width="50%"
+            placement="right"
+            closable={true}
             onClose={() => this.setState({ divShow: false })}
-          />
-        </Drawer>
+            visible={divShow}
+          >
+            <CreateOrUpdateTask
+              {...this.props}
+              task={SelectedTask}
+              onClose={() => this.setState({ divShow: false })}
+            />
+          </Drawer>
 
-        <Drawer
-          title="CREATE TASK"
-          width="50%"
-          placement="right"
-          closable={true}
-          onClose={this.onClose}
-          visible={this.state.visible}
-        >
-          <CreateOrUpdateTask {...this.props} onClose={() => this.setState({ divShow: false })} />
-        </Drawer>
+          <Drawer
+            title="CREATE TASK"
+            width="50%"
+            placement="right"
+            closable={true}
+            onClose={this.onClose}
+            visible={this.state.visible}
+          >
+            <CreateOrUpdateTask {...this.props} onClose={() => this.setState({ divShow: false })} />
+          </Drawer>
 
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: '0px 10px',
-            margin: '20px auto 10px',
-            backgroundColor: '#FFF',
-            boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
-          }}
-        >
-          <div style={{ padding: '5px 0px' }}>
-            {/* <Button onClick={() => this.filterToggle(filterShow)} size="large">
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '0px 10px',
+              margin: '20px auto 10px',
+              backgroundColor: '#FFF',
+              boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
+            }}
+          >
+            <div style={{ padding: '5px 0px' }}>
+              {/* <Button onClick={() => this.filterToggle(filterShow)} size="large">
               <FilterOutlined />
             </Button> */}
 
-            {this.state.filterName ||
-            this.state.filterPriority ||
-            this.state.filterStatus ||
-            this.state.filterType ? (
-              <Button
-                type="link"
-                style={{ marginLeft: '10px', color: '#FEBB27' }}
-                onClick={() =>
-                  this.setState({
-                    filterName: '',
-                    filterPriority: '',
-                    filterStatus: '',
-                    filterType: '',
-                  })
-                }
-                size="small"
-              >
-                Clear Filters
-                <CloseCircleOutlined />
-              </Button>
-            ) : null}
-          </div>
-          <div>
-            <span style={{ fontSize: '25px', color: '#000' }}>Tasks List</span>
-          </div>
-          <div style={{ padding: '5px 0px' }}>
-            <Dropdown overlay={menu} trigger={['click']}>
-              <Button style={{ marginRight: '10px' }} type="link" size="large">
-                <CloudDownloadOutlined />{' '}
-              </Button>
-            </Dropdown>
+              {this.state.filterName ||
+              this.state.filterPriority ||
+              this.state.filterStatus ||
+              this.state.filterType ? (
+                <Button
+                  type="link"
+                  style={{ marginLeft: '10px', color: '#FEBB27' }}
+                  onClick={() =>
+                    this.setState({
+                      filterName: '',
+                      filterPriority: '',
+                      filterStatus: '',
+                      filterType: '',
+                    })
+                  }
+                  size="small"
+                >
+                  Clear Filters
+                  <CloseCircleOutlined />
+                </Button>
+              ) : null}
+            </div>
+            <div>
+              <span style={{ fontSize: '25px', color: '#000' }}>Tasks List</span>
+            </div>
+            <div style={{ padding: '5px 0px' }}>
+              <Dropdown overlay={menu} trigger={['click']}>
+                <Button style={{ marginRight: '10px' }} type="link" size="large">
+                  <CloudDownloadOutlined />{' '}
+                </Button>
+              </Dropdown>
 
-            <Button onClick={this.showDrawer} type="primary">
-              <PlusOutlined /> ADD TASK
-            </Button>
+              <Button onClick={this.showDrawer} type="primary">
+                <PlusOutlined /> ADD TASK
+              </Button>
+            </div>
           </div>
-        </div>
 
-        <div className="row">
-          <div className={divClass}>
-            <div className="row">
-              <div className={divClass}>
-                <div style={{ margin: '5px', marginBottom: '50px' }}>
-                  <div className="filter_div">
-                    <span style={{ display: 'flex', alignItems: 'center', zIndex: 45 }}>
-                      <span>Name :</span>
-                      <Input
-                        size="small"
-                        placeholder="Task Name"
-                        value={this.state.filterName}
-                        onChange={e => this.setState({ filterName: e.target.value })}
-                        style={{ ...tableFilterStyles, width: '112px' }}
-                      />
-                    </span>
-                    <span
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        zIndex: 45,
-                        ...tableFilterStyles,
-                      }}
+          <div className="row">
+            <div className={divClass}>
+              <div style={{ margin: '5px', marginBottom: '50px' }}>
+                <div className="filter_div">
+                  <span style={{ display: 'flex', alignItems: 'center', zIndex: 45 }}>
+                    <span>Name :</span>
+                    <Input
+                      size="small"
+                      placeholder="Task Name"
+                      value={this.state.filterName}
+                      onChange={e => this.setState({ filterName: e.target.value })}
+                      style={{ ...tableFilterStyles, width: '112px' }}
+                    />
+                  </span>
+                  <span
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      zIndex: 45,
+                      ...tableFilterStyles,
+                    }}
+                  >
+                    <Radio.Group
+                      size="small"
+                      buttonStyle="solid"
+                      value={this.state.filterStatus}
+                      onChange={e => this.setState({ filterStatus: e.target.value })}
+                      style={{ zIndex: 45 }}
                     >
-                      <Radio.Group
-                        size="small"
-                        buttonStyle="solid"
-                        value={this.state.filterStatus}
-                        onChange={e => this.setState({ filterStatus: e.target.value })}
-                        style={{ zIndex: 45 }}
-                      >
-                        <Radio.Button value="">All</Radio.Button>
-                        <Radio.Button value="Open">Open</Radio.Button>
-                        <Radio.Button value="In-progress">In Progress</Radio.Button>
-                        <Radio.Button value="Close">Close</Radio.Button>
-                        {/* {statusGrouped.map((i, index) => {
-                  return <Select.Option value={i}>{i}</Select.Option>
-                })} */}
-                      </Radio.Group>
-                    </span>
-                    <span
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        zIndex: 45,
-                        ...tableFilterStyles,
-                      }}
+                      <Radio.Button value="">All</Radio.Button>
+                      <Radio.Button value="Open">Open</Radio.Button>
+                      <Radio.Button value="In-progress">In Progress</Radio.Button>
+                      <Radio.Button value="Close">Close</Radio.Button>
+                    </Radio.Group>
+                  </span>
+                  <span
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      zIndex: 45,
+                      ...tableFilterStyles,
+                    }}
+                  >
+                    <Radio.Group
+                      size="small"
+                      buttonStyle="solid"
+                      value={this.state.filterPriority}
+                      onChange={e => this.setState({ filterPriority: e.target.value })}
                     >
-                      <Radio.Group
-                        size="small"
-                        buttonStyle="solid"
-                        value={this.state.filterPriority}
-                        onChange={e => this.setState({ filterPriority: e.target.value })}
-                      >
-                        <Radio.Button value="">All</Radio.Button>
-                        {prioritiesGrouped.map((i, index) => {
-                          return (
-                            <Radio.Button key={i} value={i}>
-                              {i}
-                            </Radio.Button>
-                          )
-                        })}
-                      </Radio.Group>
-                    </span>
-                    <span
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        zIndex: 45,
-                        ...tableFilterStyles,
-                      }}
+                      <Radio.Button value="">All</Radio.Button>
+                      {prioritiesGrouped.map((i, index) => {
+                        return (
+                          <Radio.Button key={i} value={i}>
+                            {i}
+                          </Radio.Button>
+                        )
+                      })}
+                    </Radio.Group>
+                  </span>
+                  <span
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      zIndex: 45,
+                      ...tableFilterStyles,
+                    }}
+                  >
+                    <Select
+                      size="small"
+                      value={this.state.filterType}
+                      onSelect={value => this.setState({ filterType: value })}
+                      style={{ width: 140 }}
                     >
-                      <Select
-                        size="small"
-                        value={this.state.filterType}
-                        onSelect={value => this.setState({ filterType: value })}
-                        style={{ width: 140 }}
-                      >
-                        <Select.Option value="">Select Type</Select.Option>
-                        {typesGrouped.map((i, index) => {
-                          return (
-                            <Select.Option key={i} value={i}>
-                              {i}
-                            </Select.Option>
-                          )
-                        })}
-                      </Select>
-                    </span>
-                  </div>
-                  <DataTable
-                    title="Tasks List"
-                    columns={columns}
-                    theme="default"
-                    // dense={true}
-                    pagination={true}
-                    data={filteredList}
-                    customStyles={customStyles}
-                    noHeader={true}
-                    paginationRowsPerPageOptions={[10, 50, 100, 200, 500, 1000]}
-                  />
+                      <Select.Option value="">Select Type</Select.Option>
+                      {typesGrouped.map((i, index) => {
+                        return (
+                          <Select.Option key={i} value={i}>
+                            {i}
+                          </Select.Option>
+                        )
+                      })}
+                    </Select>
+                  </span>
                 </div>
+                <DataTable
+                  title="Tasks List"
+                  columns={columns}
+                  theme="default"
+                  // dense={true}
+                  pagination={true}
+                  data={filteredList}
+                  customStyles={customStyles}
+                  noHeader={true}
+                  paginationRowsPerPageOptions={[10, 50, 100, 200, 500, 1000]}
+                />
               </div>
             </div>
           </div>
-        </div>
-      </Authorize>
+        </Authorize>
+      </div>
     )
   }
 }

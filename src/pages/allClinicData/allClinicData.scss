@@ -41,8 +41,10 @@ input[type='number'] {
   font-size: 14px;
 }
 
-.utils__content {
-  padding: 10px 0 30px;
+.all-clinic-data {
+  .utils__content {
+    padding: 10px 0 30px;
+  }
 }
 
 .avatarlogo {

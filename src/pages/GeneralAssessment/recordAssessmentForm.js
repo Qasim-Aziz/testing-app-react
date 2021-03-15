@@ -151,6 +151,8 @@ function RecordAssessmentForm({
             style={{ width: '100%' }}
             placeholder="Select a module"
             size="large"
+            showSearch
+            optionFilterProp="name"
             value={currentAssessment}
             onChange={e => setCurrentAssessment(e)}
             loading={assessmentsLoading}
@@ -158,7 +160,7 @@ function RecordAssessmentForm({
             {assessments &&
               assessments.map(item => {
                 return (
-                  <Option value={item.id} key={item.id}>
+                  <Option value={item.id} name={item.name} key={item.id}>
                     {item.name}
                   </Option>
                 )
@@ -170,6 +172,8 @@ function RecordAssessmentForm({
             style={{ width: '100%' }}
             placeholder="Select a submodule"
             size="large"
+            showSearch
+            optionFilterProp="name"
             disabled={!submodulesList}
             value={currentSubmodules}
             onChange={e => setCurrentSubmodules(e)}
@@ -178,7 +182,7 @@ function RecordAssessmentForm({
             {submodulesList &&
               submodulesList.map(item => {
                 return (
-                  <Option value={item.node.id} key={item.node.id}>
+                  <Option value={item.node.id} name={item.node.name} key={item.node.id}>
                     {item.node.name}
                   </Option>
                 )

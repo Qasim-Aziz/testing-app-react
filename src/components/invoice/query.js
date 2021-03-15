@@ -261,14 +261,23 @@ export const GET_INVOICE = gql`
       address
       taxableSubtotal
       discount
+      sgst
+      cgst
       total
       clinic {
         id
         schoolName
+        address
+        currency {
+          id
+          currency
+          symbol
+        }
       }
       customer {
         id
         firstname
+        lastname
       }
       status {
         id
@@ -290,6 +299,19 @@ export const GET_INVOICE = gql`
           }
         }
       }
+    }
+  }
+`
+
+export const GET_PAYMENT_RECIEVING_DETIAILS = gql`
+  query {
+    schoolDetail {
+      id
+      schoolName
+      bankName
+      bankAccountNo
+      ifscCode
+      accountHolderName
     }
   }
 `

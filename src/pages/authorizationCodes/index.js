@@ -20,9 +20,6 @@ const ServiceTable = () => (
           <TabPane tab="Fee Schedule Rates" key="2">
             <RateTable />
           </TabPane>
-          {/* <TabPane tab="Fee Structures" key="3">
-                <FeeStructureTable />
-              </TabPane> */}
         </Tabs>
       </Col>
     </Row>

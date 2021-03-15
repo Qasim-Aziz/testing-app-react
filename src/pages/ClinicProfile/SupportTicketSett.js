@@ -483,7 +483,6 @@ export default () => {
             ) : null}
             <div>
               <Select
-                size="large"
                 value={filterStatus}
                 onSelect={value => setFilterStatus(value)}
                 style={{ width: 188, marginRight: 20 }}
@@ -496,7 +495,6 @@ export default () => {
             </div>
             <div>
               <Input
-                size="small"
                 placeholder="Search Raised By"
                 value={filterAssignedTo}
                 onChange={e => setFilterAssignedTo(e.target.value)}
@@ -504,18 +502,12 @@ export default () => {
               />
             </div>
             <DatePicker
-              size="small"
               placeholder="Form Date"
               value={form}
               onChange={newDate => setForm(newDate)}
               style={{ marginRight: 20 }}
             />
-            <DatePicker
-              placeholder="To Date"
-              size="small"
-              value={to}
-              onChange={newDate => setTo(newDate)}
-            />
+            <DatePicker placeholder="To Date" value={to} onChange={newDate => setTo(newDate)} />
           </div>
         </div>
       </div>

@@ -154,6 +154,7 @@ class StaffTable extends React.Component {
     filterEmail: '',
     filterDesignation: '',
     filterTags: '',
+    filterActive: 'all',
   }
 
   filterRef = React.createRef()
@@ -180,6 +181,7 @@ class StaffTable extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.staffs.StaffList !== this.props.staffs.StaffList) {
+      console.log(this.props.staffs, 'staffs props')
       this.setState({
         tableData: this.props.staffs.StaffList,
         mainData: this.props.staffs.StaffList,
@@ -508,6 +510,7 @@ class StaffTable extends React.Component {
         name: 'Join Date',
         selector: 'dateOfJoining',
         key: 'joining',
+        sortable: true,
         maxWidth: '120px',
       },
       {
@@ -535,6 +538,18 @@ class StaffTable extends React.Component {
             {row.user && row.user.lastLogin ? moment(row.user.lastLogin).format('YYYY-MM-DD') : ''}
           </span>
         ),
+      },
+      {
+        name: 'Status',
+        selector: 'isActive',
+        width: '100px',
+        sortable: true,
+        cell: row => {
+          if (row.isActive) {
+            return <span>Active</span>
+          }
+          return <span>In-Active</span>
+        },
       },
       {
         name: 'Session',
@@ -586,20 +601,6 @@ class StaffTable extends React.Component {
       staffs,
       staffs: { StaffList, StaffProfile },
     } = this.props
-
-    // let tagArrList = [
-    //   ...this.state.tableData.map(ele => {
-    //     if (typeof ele.tags === 'object') {
-    //       if ('__typename' in ele.tags) {
-    //         ele.tags = ''
-    //       } else if (ele.tags !== '') {
-    //         console.log('ELSE', ele.tags)
-    //         ele.tags.edges.node.tags
-    //       }
-    //     }
-    //     return ele
-    //   }),
-    // ]
 
     let filteredList = this.state.tableData
 

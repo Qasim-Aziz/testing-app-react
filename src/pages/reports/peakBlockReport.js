@@ -7,13 +7,13 @@
 /* eslint-disable */
 import React, { useState, useEffect, useRef } from 'react'
 import { Dropdown, Menu, Row, DatePicker, Button, notification, Radio, Tabs } from 'antd'
-import { useLazyQuery } from 'react-apollo'
+import { useLazyQuery, useQuery } from 'react-apollo'
 import { FaDownload } from 'react-icons/fa'
 import moment from 'moment'
 import { PeakBlockWiseTable } from './peakBlockWiseTable'
 import { PeakStimulusReport } from './peakStimulusWiseTable'
 import { PeakBlockEqui } from './peakBlockEqui'
-import { PEAK_BLOCKWISE, PEAK_EQUIVALENCE } from './query'
+import { PEAK_BLOCKWISE, PEAK_EQUIVALENCE, SESSION_NAME } from './query'
 import './form.scss'
 import './table.scss'
 
@@ -54,6 +54,9 @@ function PeakBlockReport({ selectedStudentId, studentName }) {
     getPeakEquiData,
     { data: peakEqui, error: peakEquiError, loading: peakEquiLoading },
   ] = useLazyQuery(PEAK_EQUIVALENCE)
+
+  const { data, loading, error } = useQuery(SESSION_NAME)
+  console.log(data, loading, error, 'data ')
 
   const downloadCsvRef = useRef()
   const [peakBlockGen, setPeakBlockGen] = useState([])

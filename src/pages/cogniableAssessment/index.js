@@ -24,6 +24,7 @@ import { Layout, Row, Col, Card, Button, Typography } from 'antd'
 import { Redirect } from 'react-router-dom'
 import Authorize from 'components/LayoutComponents/Authorize'
 import { connect } from 'react-redux'
+import LoadingComponent from 'components/VBMappReport/LoadingComponent'
 import RightArea from './rightArea'
 import LeftArea from './leftArea'
 
@@ -76,7 +77,7 @@ class Screeing extends React.Component {
     // }
 
     if (loading) {
-      return 'Loading...'
+      return <LoadingComponent />
     }
 
     return (
@@ -95,9 +96,6 @@ class Screeing extends React.Component {
               <Col sm={24}>
                 <RightArea style={{ marginRight: '10px' }} />
               </Col>
-              {/* <Col sm={16}>
-                                <LeftArea />   
-                            </Col> */}
             </Row>
           </Content>
         </Layout>
