@@ -143,7 +143,7 @@ export const ALL_STUDENT = gql`
 
 export const ALL_THERAPIST = gql`
   query {
-    staffs(userRole: "Therapist") {
+    staffs(userRole: "Therapist", isActive: true) {
       edges {
         node {
           id

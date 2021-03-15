@@ -123,6 +123,28 @@ const CreateAppointmentForm = ({ setNeedToReloadData, form, startDate, endDate, 
     })
   }
 
+  const getDisabledStartHours = () => {
+    const startDateObj = new Date(form.getFieldValue('startDate')).toISOString().split('T')[0]
+    const today = new Date().toISOString().split('T')[0]
+    const now = startDateObj === today ? new Date().getHours() : 6
+    const result = []
+    for (let i = 0; i < 24; i += 1) {
+      if (i < 6 || i > 20 || i < now) result.push(i)
+    }
+    return result
+  }
+
+  const getDisabledEndHours = () => {
+    const startHour = new Date(form.getFieldValue('startTime')).getHours()
+    const result = []
+    for (let i = 0; i < 24; i += 1) {
+      if (i < startHour || i > 21) result.push(i)
+    }
+    return result
+  }
+
+  const disabledDate = date => date < moment().startOf('day')
+
   return (
     <Form
       name="addAppointment"
@@ -261,6 +283,7 @@ const CreateAppointmentForm = ({ setNeedToReloadData, form, startDate, endDate, 
                 placeholder="Date"
                 format="YYYY-MM-DD"
                 picker="date"
+                disabledDate={disabledDate}
                 showTime={{ format: 'YYYY-MM-DD', defaultValue: moment() }}
               />,
             )}
@@ -290,6 +313,8 @@ const CreateAppointmentForm = ({ setNeedToReloadData, form, startDate, endDate, 
                 placeholder="Start Time"
                 format="HH:mm"
                 picker="time"
+                minuteStep={15}
+                disabledHours={getDisabledStartHours}
               />,
             )}
           </Form.Item>
@@ -318,6 +343,8 @@ const CreateAppointmentForm = ({ setNeedToReloadData, form, startDate, endDate, 
                 placeholder="End Time"
                 format="HH:mm"
                 picker="time"
+                minuteStep={15}
+                disabledHours={getDisabledEndHours}
               />,
             )}
           </Form.Item>
@@ -359,6 +386,7 @@ const CreateAppointmentForm = ({ setNeedToReloadData, form, startDate, endDate, 
                   placeholder="End Date"
                   format="YYYY-MM-DD"
                   picker="date"
+                  disabledDate={disabledDate}
                   showTime={{ format: 'YYYY-MM-DD', defaultValue: moment() }}
                 />,
               )}

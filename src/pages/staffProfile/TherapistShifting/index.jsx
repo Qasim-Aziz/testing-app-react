@@ -12,12 +12,13 @@ const TherapistShifting = () => {
   const [endTime, setEndTime] = useState(moment().add(30, 'minutes'))
 
   const therapistId = useSelector(state => state.user.staffId)
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
   const { data: getShiftData, error: shiftErrors, loading: isShiftingDataLoading } = useQuery(
     GET_SHIFTING,
     {
       variables: {
-        id: therapistId,
+        therapistId,
       },
     },
   )
@@ -28,10 +29,11 @@ const TherapistShifting = () => {
   ] = useMutation(UPDATE_SHIFTING)
 
   useEffect(() => {
-    if (getShiftData) {
-      setSelectedDays(getShiftData.days)
-      setStartTime(getShiftData.startTime)
-      setEndTime(getShiftData.endTime)
+    if (getShiftData?.staff?.shift) {
+      const { shift } = getShiftData.staff
+      setSelectedDays(shift.days.edges.map(({ node }) => node.name))
+      setStartTime(moment(`2020-01-01 ${shift.startTime}`)) // Here dumped with dummy date to convert time to moment
+      setEndTime(moment(`2020-01-01 ${shift.endTime}`))
     }
   }, [getShiftData])
 
@@ -53,23 +55,13 @@ const TherapistShifting = () => {
     }
   }, [updateShiftingError])
 
-  const days = [
-    { value: 'Sun', displayText: 'Sunday' },
-    { value: 'Mon', displayText: 'Monday' },
-    { value: 'Tue', displayText: 'Tuesday' },
-    { value: 'Wed', displayText: 'Wednesday' },
-    { value: 'Thur', displayText: 'Thursday' },
-    { value: 'Fri', displayText: 'Friday' },
-    { value: 'Sat', displayText: 'Saturday' },
-  ]
-
   const handleSubmit = e => {
     e.preventDefault()
     updateShifting({
       variables: {
         therapistId,
-        startTime,
-        endTime,
+        startTime: startTime.format('hh:mm A'),
+        endTime: endTime.format('hh:mm A'),
         workingDays: selectedDays,
       },
     })
@@ -122,9 +114,9 @@ const TherapistShifting = () => {
               value={selectedDays}
               onChange={setSelectedDays}
             >
-              {days.map(({ displayText, value }) => (
-                <Select.Option key={value} name={value}>
-                  {displayText}
+              {days.map(day => (
+                <Select.Option key={day} name={day}>
+                  {day}
                 </Select.Option>
               ))}
             </Select>

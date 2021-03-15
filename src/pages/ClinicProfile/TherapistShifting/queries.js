@@ -16,20 +16,30 @@ export const ALL_THERAPIST = gql`
 
 export const UPDATE_SHIFTING = gql`
   mutation UpdateShifting(
-    $isForAllTherapist: Boolean!
-    $therapistId: ID!
+    $therapistIds: [String!]!
     $startTime: String!
     $endTime: String!
     $workingDays: [String!]!
   ) {
-    UpdateShifting(
-      isForAllTherapist: isForAllTherapist
-      therapistId: therapistId
-      startTime: startTime
-      endTime: endTime
-      workingDays: workingDays
+    createShift(
+      input: { startTime: $startTime, endTime: $endTime, staffs: $therapistIds, days: $workingDays }
     ) {
-      status
+      details {
+        id
+        name
+        shift {
+          startTime
+          endTime
+          days {
+            edges {
+              node {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
     }
   }
 `

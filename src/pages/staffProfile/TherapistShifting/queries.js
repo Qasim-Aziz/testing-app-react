@@ -2,12 +2,20 @@
 import gql from 'graphql-tag'
 
 export const GET_SHIFTING = gql`
-  query {
-    staffs(userRole: "Therapist") {
-      edges {
-        node {
-          id
-          name
+  query($therapistId: ID!) {
+    staff(id: $therapistId) {
+      id
+      name
+      shift {
+        startTime
+        endTime
+        days {
+          edges {
+            node {
+              id
+              name
+            }
+          }
         }
       }
     }
@@ -16,19 +24,35 @@ export const GET_SHIFTING = gql`
 
 export const UPDATE_SHIFTING = gql`
   mutation UpdateShifting(
-    $therapistId: ID!
+    $therapistId: String!
     $startTime: String!
     $endTime: String!
     $workingDays: [String!]!
   ) {
-    UpdateShifting(
-      isForAllTherapist: false
-      therapistId: therapistId
-      startTime: startTime
-      endTime: endTime
-      workingDays: workingDays
+    createShift(
+      input: {
+        startTime: $startTime
+        endTime: $endTime
+        staffs: [$therapistId]
+        days: $workingDays
+      }
     ) {
-      status
+      details {
+        id
+        name
+        shift {
+          startTime
+          endTime
+          days {
+            edges {
+              node {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
     }
   }
 `

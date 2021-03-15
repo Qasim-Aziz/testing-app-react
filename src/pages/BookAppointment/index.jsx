@@ -15,7 +15,12 @@ const BookAppointment = () => {
 
   const [
     loadAvailableSlots,
-    { data: availableSlotsData, loading: isAvailableSlotsLoading, error: availableSlotsError },
+    {
+      data: availableSlotsData,
+      loading: isAvailableSlotsLoading,
+      error: availableSlotsError,
+      refetch: refetchAvailableSlotTime,
+    },
   ] = useLazyQuery(GET_AVAILABLE_SLOTS)
 
   const { data: appointmentStatusesData, error: appointmentStatusErrors } = useQuery(
@@ -52,12 +57,14 @@ const BookAppointment = () => {
   }, [selectedTherapist])
 
   useEffect(() => {
-    loadAvailableSlots({
-      variables: {
-        therapistId: selectedTherapist,
-        date: selectedDate.format('YYYY-MM-DD'),
-      },
-    })
+    if (selectedDate && selectedTherapist) {
+      loadAvailableSlots({
+        variables: {
+          therapistId: selectedTherapist,
+          date: selectedDate.format('YYYY-MM-DD'),
+        },
+      })
+    }
   }, [selectedDate, selectedTherapist])
 
   if (therapistErrors || appointmentStatusErrors)
@@ -94,6 +101,7 @@ const BookAppointment = () => {
               className="calander-selection"
               fullscreen={false}
               onChange={setSelectedDate}
+              disabledDate={date => date < moment()}
             />
           </Form.Item>
         </Col>
@@ -103,8 +111,10 @@ const BookAppointment = () => {
         >
           <Row>
             {isAvailableSlotsLoading && <LoadingComponent />}
-            {availableSlotsError && <h3>An error occurred to load slots.</h3>}
-            {availableSlotsData && (
+            {!isAvailableSlotsLoading && availableSlotsError && (
+              <h3>An error occurred to load slots.</h3>
+            )}
+            {!isAvailableSlotsLoading && availableSlotsData && (
               <>
                 <Form.Item label="Select Timeslot" />
                 {availableSlotsData.getAppointmentSlots[0].data[0].slots.map(item => (
@@ -115,6 +125,7 @@ const BookAppointment = () => {
                       selectedTherapist={selectedTherapist}
                       allTherapist={allTherapist}
                       pendingStatusId={pendingStatusId}
+                      refetchAvailableSlotTime={refetchAvailableSlotTime}
                     />
                   </Col>
                 ))}
