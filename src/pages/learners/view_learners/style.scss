@@ -22,8 +22,15 @@
   content: '*';
 }
 
-.modify-data-table {
-  .jzCzGz {
-    min-width: 40px;
+.view_learner {
+  .ant-table-tbody > tr > td {
+    padding: 6px 10px;
+    overflow-wrap: break-word;
+  }
+  .ant-table-thead > tr > th {
+    padding: 16px 10px;
+  }
+  .ant-table {
+    border: 1px solid #e8e8e8;
   }
 }

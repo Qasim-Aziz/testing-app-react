@@ -100,17 +100,22 @@ class EditBasicInformation extends React.Component {
       tags: UserProfile.tags,
     })
 
-    this.setState({
-      locationTag: UserProfile.clinicLocation
-        ? UserProfile.clinicLocation.location
-        : 'No Location Set',
-      caseManagerTag: UserProfile.caseManager
-        ? UserProfile.caseManager.name
-        : 'No Case Manager Set',
-      categoryTag: UserProfile.category?.category,
-      userProfileID: UserProfile.id,
-      tagArray: UserProfile.tags && UserProfile.tags.length > 0 ? UserProfile.tags : [],
-    })
+    this.setState(
+      {
+        locationTag: UserProfile.clinicLocation
+          ? UserProfile.clinicLocation.location
+          : 'No Location Set',
+        caseManagerTag: UserProfile.caseManager
+          ? UserProfile.caseManager.name
+          : 'No Case Manager Set',
+        categoryTag: UserProfile.category?.category,
+        userProfileID: UserProfile.id,
+        tagArray: UserProfile.tags && UserProfile.tags.length > 0 ? UserProfile.tags : [],
+      },
+      () => {
+        console.log(this.state.tagArray, 'this is tagArray')
+      },
+    )
   }
 
   onChange1 = e => {
@@ -184,7 +189,7 @@ class EditBasicInformation extends React.Component {
       learners: { clinicLocationList, categoryList, staffDropdownList, languageList },
     } = this.props
     const itemStyle1 = { marginBottom: '5px', fontWeight: 'bold' }
-    console.log(this.props.form, 'pppp')
+    console.log(this.state.tagArray, 'pppp')
     return (
       <Form {...layout} onSubmit={e => this.handleSubmit(e)}>
         <Form.Item {...layout1} label="Profile" style={itemStyle1}>

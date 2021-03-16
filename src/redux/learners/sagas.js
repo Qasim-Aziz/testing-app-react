@@ -11,6 +11,7 @@ import {
   getLearnersDropdown,
   learnerActiveInactive,
   createLearnersProgram,
+  getLearner,
 } from 'services/learners'
 import axios from 'axios'
 import actions from './actions'
@@ -72,7 +73,6 @@ export function* GET_LEARNERS({ payload }) {
       }
     }
 
-    console.log(learners, 'jnxckjvnkjnxck')
     yield put({
       type: 'learners/SET_STATE',
       payload: {
@@ -120,10 +120,8 @@ export function* PAGE_CHANGED({ payload }) {
     first = null
     last = payload.rows % perPage
   } else if (payload.page > currentPage) {
-    console.log('trriger after', payload.page, currentPage)
     after = pageInfo.endCursor
   } else if (payload.page < currentPage) {
-    console.log('trriger before', payload.page, currentPage)
     before = pageInfo.startCursor
   }
 
@@ -146,7 +144,6 @@ export function* PAGE_CHANGED({ payload }) {
       }
     }
 
-    console.log(oldLearners, 'jnskjfnesknsdkjcnsdkcnsdkjsde')
     yield put({
       type: 'learners/SET_STATE',
       payload: {
@@ -215,7 +212,6 @@ export function* ROWS_CHANGED({ payload }) {
       }
     }
 
-    console.log(oldLearners, 'oldLeanrernss')
     yield put({
       type: 'learners/SET_STATE',
       payload: {
@@ -253,7 +249,6 @@ export function* GET_LEARNERS_DROPDOWNS() {
 
 export function* EDIT_LEARNER({ payload }) {
   const response = yield call(updateLearner, payload)
-
   if (response && response.data) {
     notification.success({
       message: 'Learner Updated Successfully',
@@ -291,12 +286,6 @@ export function* CREATE_LEARNER({ payload }) {
     notification.success({
       message: 'Learner Created Successfully',
     })
-
-    console.log('CREATE_LEARNER')
-    console.log(response)
-    console.log(payload.data.get('file'))
-    console.log(response.data.createStudent)
-    console.log(response.data.createStudent.student)
 
     let token = ''
     if (!(localStorage.getItem('token') === null) && localStorage.getItem('token')) {
@@ -351,7 +340,6 @@ export function* LEARNER_ACTIVE_INACTIVE({ payload }) {
 
   if (response && response.data) {
     // generating notification
-    console.log(response.data.updateStudent.student)
     if (payload.checked === true) {
       notification.success({
         message: 'Learner Activated Successfully',
@@ -371,6 +359,28 @@ export function* LEARNER_ACTIVE_INACTIVE({ payload }) {
   }
 }
 
+export function* GET_SINGLE_LEARNER({ payload }) {
+  const response = yield call(getLearner, payload.UserProfile)
+  console.log(payload, response.data, 'palylsdfnf kfdvfh vfjh vjh fv')
+  if (response && response.data) {
+    // generating notification
+    const userData = {
+      ...response.data.student,
+      tags: response.data.student.tags
+        ? response.data.student.tags.edges.map(item => item.node.name)
+        : [],
+    }
+
+    yield put({
+      type: 'learners/SET_STATE',
+      payload: {
+        UserProfile: userData,
+        isUserProfile: true,
+      },
+    })
+  }
+}
+
 export default function* rootSaga() {
   yield all([
     // GET_DATA(), // run once on app load to fetch menu data
@@ -382,5 +392,6 @@ export default function* rootSaga() {
     takeEvery(actions.LEARNER_ACTIVE_INACTIVE, LEARNER_ACTIVE_INACTIVE),
     takeEvery(actions.PAGE_CHANGED, PAGE_CHANGED),
     takeEvery(actions.ROWS_CHANGED, ROWS_CHANGED),
+    takeEvery(actions.GET_SINGLE_LEARNER, GET_SINGLE_LEARNER),
   ])
 }

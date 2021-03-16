@@ -12,6 +12,7 @@ const actions = {
   GET_LEARNERS: 'learners/GET_LEARNERS',
   PAGE_CHANGED: 'learners/PAGE_CHANGED',
   ROWS_CHANGED: 'learners/ROWS_CHANGED',
+  GET_SINGLE_LEARNER: 'learners/GET_SINGLE_LEARNER',
 }
 
 export default actions

@@ -26,17 +26,12 @@ export async function getClinicLearners(payload) {
             after: $after
             before: $before
           ) {
-            pageInfo {
-              startCursor
-              endCursor
-            }
             clinicTotal
             edges {
               node {
                 id
                 firstname
                 email
-                dob
                 parent {
                   id
                   lastLogin
@@ -44,37 +39,14 @@ export async function getClinicLearners(payload) {
                 mobileno
                 lastname
                 gender
-                currentAddress
-                clientId
-                ssnAadhar
                 parentMobile
-                parentName
-                dateOfDiagnosis
-                researchParticipant
                 category {
                   id
                   category
                 }
-                clinicLocation {
-                  id
-                  location
-                }
                 caseManager {
                   id
                   name
-                }
-                language {
-                  id
-                  name
-                }
-                authStaff {
-                  edges {
-                    node {
-                      id
-                      name
-                      surname
-                    }
-                  }
                 }
                 tags {
                   edges {
@@ -227,6 +199,23 @@ export async function updateLearner(payload) {
               parentMobile
               parentName
               dateOfDiagnosis
+              diagnoses {
+                edges {
+                  node {
+                    id
+                    name
+                  }
+                }
+              }
+              learnermedicationSet {
+                edges {
+                  node {
+                    id
+                    date
+                    condition
+                  }
+                }
+              }
               category {
                 id
                 category
@@ -377,6 +366,23 @@ export async function createLearner(payload) {
               parentMobile
               parentName
               dateOfDiagnosis
+              diagnoses {
+                edges {
+                  node {
+                    id
+                    name
+                  }
+                }
+              }
+              learnermedicationSet {
+                edges {
+                  node {
+                    id
+                    date
+                    condition
+                  }
+                }
+              }
               category {
                 id
                 category
@@ -502,6 +508,141 @@ export async function learnerActiveInactive(payload) {
     .then(result => result)
     .catch(error => {
       error.graphQLErrors.map(item => {
+        return notification.error({
+          message: 'Something went wrong',
+          description: item.message,
+        })
+      })
+    })
+}
+
+export async function getLearner(payload) {
+  return apolloClient
+    .query({
+      query: gql`
+        query($id: ID!) {
+          student(id: $id) {
+            id
+            admissionNo
+            internalNo
+            school {
+              id
+              schoolName
+            }
+            parent {
+              id
+              lastLogin
+            }
+            admissionDate
+            firstname
+            email
+            dob
+            image
+            file
+            report
+            createdAt
+            fatherName
+            fatherPhone
+            motherName
+            motherPhone
+            isActive
+            mobileno
+            lastname
+            gender
+            currentAddress
+            streetAddress
+            city
+            state
+            country
+            zipCode
+            height
+            weight
+            clientId
+            ssnAadhar
+            parentMobile
+            parentName
+            dateOfDiagnosis
+            clinicLocation {
+              id
+              location
+            }
+            isPeakActive
+            isCogActive
+            researchParticipant
+            diagnoses {
+              edges {
+                node {
+                  id
+                  name
+                }
+              }
+            }
+            learnermedicationSet {
+              edges {
+                node {
+                  id
+                  date
+                  condition
+                }
+              }
+            }
+            category {
+              id
+              category
+            }
+            clinicLocation {
+              id
+              location
+            }
+            caseManager {
+              id
+              name
+            }
+            language {
+              id
+              name
+            }
+            authStaff {
+              edges {
+                node {
+                  id
+                  name
+                  surname
+                }
+              }
+            }
+            tags {
+              edges {
+                node {
+                  id
+                  name
+                }
+              }
+            }
+            invoiceSet {
+              edges {
+                node {
+                  id
+                  amount
+                  issueDate
+                  dueDate
+                  status {
+                    id
+                    statusName
+                  }
+                }
+              }
+            }
+          }
+        }
+      `,
+      variables: {
+        id: payload.id,
+      },
+    })
+    .then(result => result)
+    .catch(err => {
+      err.graphQLErrors.map(item => {
         return notification.error({
           message: 'Something went wrong',
           description: item.message,
