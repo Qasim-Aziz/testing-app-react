@@ -34,3 +34,14 @@
     border: 1px solid #e8e8e8;
   }
 }
+
+.profile-css {
+  .ant-card-body {
+    padding: 0;
+    zoom: 1;
+  }
+
+  .ant-drawer-body {
+    padding: 0;
+  }
+}

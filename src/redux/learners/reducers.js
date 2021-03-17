@@ -21,10 +21,6 @@ const initialState = {
 export default function userReducer(state = initialState, action) {
   switch (action.type) {
     case actions.SET_STATE:
-      console.log(
-        action.payload,
-        'got gtngrtgnirfifbsdjfhbsdfj sdj sdvhs dvjs vbs vjsf vsjfv sjdf vjdfv sdjfv sdf',
-      )
       return { ...state, ...action.payload }
     case actions.UPDATE_LERNERS_LIST:
       return {

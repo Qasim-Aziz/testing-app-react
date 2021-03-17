@@ -917,12 +917,13 @@ class LearnerTable extends React.Component {
           </div>
         </Drawer>
         <Drawer
+          className="profile-css"
           title="Profile"
           placement="right"
           closable={true}
           onClose={() => this.setState({ showProfile: false })}
           visible={this.state.showProfile}
-          width={'80%'}
+          width={'70%'}
         >
           <Profile />
         </Drawer>
@@ -1110,7 +1111,7 @@ class LearnerTable extends React.Component {
                     TotalLearners > 100
                       ? ['20', '50', '80', '100', `${TotalLearners}`]
                       : ['20', '50', '80', '100'],
-                  position: 'top',
+                  position: 'bottom',
                 }}
               />
             </div>
