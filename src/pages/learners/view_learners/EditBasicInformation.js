@@ -78,21 +78,17 @@ class EditBasicInformation extends React.Component {
     UserProfile.authStaff.edges.map(item => selectedStaffList.push(item.node.id))
     form.setFieldsValue({
       clientId: UserProfile.clientId,
-      category: UserProfile.category?.id,
       email: UserProfile.email,
       gender: UserProfile.gender,
       dob: moment(UserProfile.dob),
       dateOfDiagnosis: UserProfile.dateOfDiagnosis ? moment(UserProfile.dateOfDiagnosis) : null,
-      clinicLocation: UserProfile.clinicLocation ? UserProfile.clinicLocation.id : null,
       firstName: UserProfile.firstname,
       lastName: UserProfile.lastname,
-      authStaff: selectedStaffList,
       parentFirstName: UserProfile.parentName,
       parentMobileNumber: UserProfile.parentMobile,
       ssnCard: UserProfile.ssnAadhar,
       mobileNo: UserProfile.mobileno,
       address: UserProfile.currentAddress,
-      caseManager: UserProfile.caseManager?.id,
       learnerLanguage: UserProfile.language?.id,
       researchParticipant: UserProfile.researchParticipant,
       isActive: UserProfile.isActive

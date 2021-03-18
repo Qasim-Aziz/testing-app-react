@@ -13,10 +13,14 @@ import {
   Icon,
   message,
   Switch,
+  notification,
+  Descriptions,
 } from 'antd'
 import moment from 'moment'
 import { Link, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
+import { useMutation } from 'react-apollo'
+import { GEN_INFO } from './query'
 import axios from 'axios'
 import AntdTag from '../../staffs/antdTag'
 
@@ -53,37 +57,97 @@ function ProgramInfo(props) {
   const {
     form,
     userProfile,
+    dispatch,
+    closeDrawer,
     learners: { clinicLocationList, categoryList, staffDropdownList },
   } = props
 
+  const [updateInfo, { loading: updateLoading }] = useMutation(GEN_INFO)
+
   useEffect(() => {
     if (userProfile) {
-      console.log('abler')
+      form.setFieldsValue({
+        defaultProgram: userProfile.defaultProgram ? userProfile.defaultProgram : false,
+        isVbmappActive: userProfile.isVbmappActive ? userProfile.isVbmappActive : false,
+        isPeakActive: userProfile.isPeakActive,
+        isCogActive: userProfile.isCogActive,
+        researchParticipant: userProfile.researchParticipant,
+      })
     }
   }, [userProfile])
 
-  const learnerActiveInactive = checked => {
-    // const {
-    //   dispatch,
-    //   learners: { UserProfile },
-    // } = this.props
-    // console.log(UserProfile.id, checked)
+  const handleSubmit = e => {
+    e.preventDefault()
+    form.validateFields((err, values) => {
+      if (!err) {
+        console.log(values, 'values')
+        const selectedStaffList = []
+        userProfile.authStaff.edges.map(item => selectedStaffList.push(item.node.id))
 
-    // dispatch({
-    //   type: 'learners/LEARNER_ACTIVE_INACTIVE',
-    //   payload: {
-    //     id: UserProfile.id,
-    //     checked: checked,
-    //   },
-    // })
-    console.log('kgrkjgnrkjsrk srk srk srksr vksr vsrkj vser')
+        updateInfo({
+          variables: {
+            id: userProfile.id,
+
+            firstname: userProfile.firstname,
+            lastname: userProfile.lastname,
+            email: userProfile.email,
+            mobileno: userProfile.mobileno,
+            dob: moment(userProfile.dob).format('YYYY-MM-DD'),
+            gender: userProfile.gender,
+            tags: userProfile.tags,
+            streetAddress: userProfile.streetAddress,
+            state: userProfile.state,
+            country: userProfile.country,
+            city: userProfile.city,
+            zipCode: userProfile.zipCode,
+
+            parentName: userProfile.parentName,
+            parentMobile: userProfile.parentMobile,
+            // fatherName: userProfile.fatherName,
+            // fatherPhone: userProfile.fatherPhone,
+            // motherName: userProfile.motherName,
+            // motherPhone: userProfile.motherPhone,
+            // height: userProfile.height,
+            // weight: userProfile.weight,
+            ssnAadhar: userProfile.ssnAadhar,
+            language: userProfile.language?.id,
+
+            category: userProfile.category?.id,
+            clinicLocation: userProfile.clinicLocation?.id,
+            caseManager: userProfile.caseManager?.id,
+            authStaff: selectedStaffList,
+
+            isPeakActive: values.isPeakActive,
+            isCogActive: values.isCogActive,
+            researchParticipant: values.researchParticipant,
+          },
+        })
+          .then(result => {
+            dispatch({
+              type: 'learners/EDIT_GENERAL_INFO',
+              payload: {
+                id: userProfile.id,
+                response: result,
+              },
+            })
+            closeDrawer(false)
+          })
+          .catch(error => {
+            notification.error({
+              message: 'Something went wrong',
+              description: 'Unable to update learner data',
+            })
+          })
+      }
+    })
   }
+
   console.log(userProfile, 'ser')
   return (
     <div>
-      <Form {...layout} onSubmit={e => this.handleSubmit(e)}>
+      <Form {...layout} onSubmit={handleSubmit}>
         <Form.Item label="Default Active" style={itemStyle}>
-          {form.getFieldDecorator('isDefaultActive', {
+          {form.getFieldDecorator('defaultProgram', {
             rules: [{ required: false, message: 'Please Select parent activation if needed' }],
           })(
             <Switch
@@ -91,20 +155,6 @@ function ProgramInfo(props) {
               checkedChildren={<Icon type="check" />}
               unCheckedChildren={<Icon type="close" />}
               defaultChecked
-              onChange={learnerActiveInactive}
-            />,
-          )}
-        </Form.Item>
-        <Form.Item label="Peak Active" style={itemStyle}>
-          {form.getFieldDecorator('isPeakActive', {
-            rules: [{ required: false, message: 'Please Select parent activation if needed' }],
-          })(
-            <Switch
-              style={rightCol}
-              checkedChildren={<Icon type="check" />}
-              unCheckedChildren={<Icon type="close" />}
-              defaultChecked
-              onChange={learnerActiveInactive}
             />,
           )}
         </Form.Item>
@@ -117,10 +167,21 @@ function ProgramInfo(props) {
               checkedChildren={<Icon type="check" />}
               unCheckedChildren={<Icon type="close" />}
               defaultChecked
-              onChange={learnerActiveInactive}
             />,
           )}
         </Form.Item>
+        <Form.Item label="Peak Active" style={itemStyle}>
+          {form.getFieldDecorator('isPeakActive', {
+            rules: [{ required: false, message: 'Please Select parent activation if needed' }],
+          })(
+            <Switch
+              style={rightCol}
+              checkedChildren={<Icon type="check" />}
+              unCheckedChildren={<Icon type="close" />}
+            />,
+          )}
+        </Form.Item>
+
         <Form.Item label="Cogniable Active" style={itemStyle}>
           {form.getFieldDecorator('isCogActive', {
             rules: [{ required: false, message: 'Please Select parent activation if needed' }],
@@ -129,21 +190,20 @@ function ProgramInfo(props) {
               style={rightCol}
               checkedChildren={<Icon type="check" />}
               unCheckedChildren={<Icon type="close" />}
-              defaultChecked
-              onChange={learnerActiveInactive}
             />,
           )}
         </Form.Item>
         <Form.Item label="Research Participant" style={itemStyle}>
-          {form.getFieldDecorator('isresearchParticipant', {
+          {form.getFieldDecorator('researchParticipant', {
             rules: [{ required: false, message: 'Please Select parent activation if needed' }],
           })(<Checkbox style={rightCol} />)}
         </Form.Item>
         <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-          <Button type="primary" style={submitButton}>
+          <Button type="primary" htmlType="submit" loading={updateLoading} style={submitButton}>
             Submitt
           </Button>
           <Button
+            onClick={() => closeDrawer(false)}
             type="default"
             style={{ ...submitButton, color: 'white', background: 'red', boxShadow: 'none' }}
           >
@@ -159,4 +219,10 @@ const mapStateToProps = ({ learners }) => ({
   learners,
 })
 
-export default withRouter(connect(mapStateToProps)(Form.create()(ProgramInfo)))
+const mapDispatchToProps = dispatch => {
+  return {
+    dispatch,
+  }
+}
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Form.create()(ProgramInfo)))

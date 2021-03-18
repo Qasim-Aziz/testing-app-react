@@ -12,12 +12,15 @@ import {
   Checkbox,
   Icon,
   message,
+  notification,
 } from 'antd'
 import moment from 'moment'
+import { useMutation } from 'react-apollo'
 import { Link, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import axios from 'axios'
 import AntdTag from '../../staffs/antdTag'
+import { GEN_INFO } from './query'
 
 const { TextArea } = Input
 const { Option } = Select
@@ -46,33 +49,110 @@ const itemStyle = { marginBottom: '5px', fontWeight: 'bold' }
 function PersonalInfo(props) {
   const {
     form,
+    dispatch,
+    closeDrawer,
     userProfile,
     learners: { languageList },
   } = props
   console.log(props, languageList)
-  const [tagArray, setTagArray] = useState(userProfile.tags)
+
+  const [updateInfo, { loading: updateLoading }] = useMutation(GEN_INFO)
 
   useEffect(() => {
     if (userProfile) {
-      setTagArray(userProfile.tags)
+      form.setFieldsValue({
+        parentName: userProfile.parentName,
+        parentMobile: userProfile.parentMobile,
+        fatherName: userProfile.fatherName,
+        motherName: userProfile.motherName,
+        fatherPhone: userProfile.fatherPhone,
+        motherPhone: userProfile.motherPhone,
+        height: userProfile.height,
+        weight: userProfile.weight,
+        ssnAadhar: userProfile.ssnAadhar,
+        language: userProfile.language?.id,
+      })
     }
   }, [userProfile])
 
-  const tagArrayHandler = tags => {
-    setTagArray(tags)
-  }
+  const handleSubmit = e => {
+    e.preventDefault()
+    form.validateFields((err, values) => {
+      if (!err) {
+        const selectedStaffList = []
+        userProfile.authStaff.edges.map(item => selectedStaffList.push(item.node.id))
+        console.log(values, 'values')
+        updateInfo({
+          variables: {
+            id: userProfile.id,
 
+            firstname: userProfile.firstname,
+            lastname: userProfile.lastname,
+            email: userProfile.email,
+            mobileno: userProfile.mobileno,
+            dob: moment(userProfile.dob).format('YYYY-MM-DD'),
+            gender: userProfile.gender,
+            tags: userProfile.tags,
+            streetAddress: userProfile.streetAddress,
+            state: userProfile.state,
+            country: userProfile.country,
+            city: userProfile.city,
+            zipCode: userProfile.zipCode,
+
+            parentName: values.parentName,
+            parentMobile: values.parentMobile,
+            // fatherName: values.fatherName,
+            // fatherPhone: values.fatherPhone,
+            // motherName: values.motherName,
+            // motherPhone: values.motherPhone,
+            // height: values.height,
+            // weight: values.weight,
+            ssnAadhar: values.ssnAadhar,
+            language: values.language,
+
+            category: userProfile.category?.id,
+            clinicLocation: userProfile.clinicLocation?.id,
+            caseManager: userProfile.caseManager?.id,
+            authStaff: selectedStaffList,
+
+            isPeakActive: userProfile.isPeakActive,
+            isCogActive: userProfile.isCogActive,
+            researchParticipant: userProfile.researchParticipant,
+          },
+        })
+          .then(result => {
+            console.log(result, 'response sekfjskfjskjbdfbdfjbsjbsjbsjhbsjhsjhs v ')
+            dispatch({
+              type: 'learners/EDIT_GENERAL_INFO',
+              payload: {
+                id: userProfile.id,
+                response: result,
+              },
+            })
+            closeDrawer(false)
+          })
+          .catch(error => {
+            console.log(error)
+            notification.error({
+              message: 'Something went wrong',
+              description: 'Unable to update learner data',
+            })
+          })
+      }
+    })
+  }
+  console.log(languageList, 'lang use lsit')
   console.log(userProfile, 'ser')
   return (
     <div>
-      <Form {...layout} onSubmit={e => this.handleSubmit(e)}>
+      <Form {...layout} onSubmit={handleSubmit}>
         <Form.Item label="Guardian Name" style={itemStyle}>
-          {form.getFieldDecorator('parentFirstName', {
+          {form.getFieldDecorator('parentName', {
             rules: [{ required: false, message: 'Please provide Parent Name!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="Guardian Mobile no" style={itemStyle}>
-          {form.getFieldDecorator('parentMobileNumber', {
+          {form.getFieldDecorator('parentMobile', {
             rules: [{ message: 'Please provide Mobile No!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
@@ -108,12 +188,12 @@ function PersonalInfo(props) {
         </Form.Item>
 
         <Form.Item label="SSN/Adhaar card" style={itemStyle}>
-          {form.getFieldDecorator('ssnCard', { rules: [{ message: 'Please provide Mobile No!' }] })(
-            <Input style={{ borderRadius: 0 }} />,
-          )}
+          {form.getFieldDecorator('ssnAadhar', {
+            rules: [{ message: 'Please provide Mobile No!' }],
+          })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="Default Language" style={itemStyle}>
-          {form.getFieldDecorator('learnerLanguage', {
+          {form.getFieldDecorator('language', {
             rules: [{ required: false, message: 'Please provide Default Language!' }],
           })(
             <Select placeholder="Select a default Language" allowClear>
@@ -126,10 +206,11 @@ function PersonalInfo(props) {
           )}
         </Form.Item>
         <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-          <Button type="primary" style={submitButton}>
+          <Button type="primary" htmlType="submit" loading={updateLoading} style={submitButton}>
             Submitt
           </Button>
           <Button
+            onClick={() => closeDrawer(false)}
             type="default"
             style={{ ...submitButton, color: 'white', background: 'red', boxShadow: 'none' }}
           >
@@ -145,4 +226,10 @@ const mapStateToProps = ({ learners }) => ({
   learners,
 })
 
-export default withRouter(connect(mapStateToProps)(Form.create()(PersonalInfo)))
+const mapDispatchToProps = dispatch => {
+  return {
+    dispatch,
+  }
+}
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Form.create()(PersonalInfo)))

@@ -8,6 +8,7 @@ import {
   DatePicker,
   Divider,
   Upload,
+  notification,
   Tag,
   Checkbox,
   Icon,
@@ -15,157 +16,14 @@ import {
 } from 'antd'
 import moment from 'moment'
 import { Link, withRouter } from 'react-router-dom'
+import gql from 'graphql-tag'
 import { useMutation } from 'react-apollo'
 import { connect } from 'react-redux'
 import axios from 'axios'
 import AntdTag from '../../staffs/antdTag'
 import LoadingComponent from 'components/LoadingComponent'
+import { GEN_INFO } from './query'
 
-const MUT = gql`
-  mutation UpdateStudent(
-    $id: ID!
-    $clientId: String!
-    $email: String!
-    $gender: String!
-    $dob: Date!
-    $firstName: String!
-    $lastName: String
-    $mobileNo: String
-    $streetAddress: String
-    $state: String
-    $city: String
-    $country: String
-    $zipCode: String
-    $tags: [String]
-  ) {
-    updateStudent(
-      input: {
-        studentData: {
-          id: $id
-          clientId: $clientId
-          email: $email
-          gender: $gender
-          dob: $dob
-          firstname: $firstName
-          lastname: $lastName
-          mobileno: $mobileNo
-          streetAddress: $streetAddress
-          city: $city
-          state: $state
-          country: $country
-          zipCode: $zipCode
-          tags: $tags
-        }
-      }
-    ) {
-      student {
-        id
-        admissionNo
-        internalNo
-        school {
-          id
-          schoolName
-        }
-        parent {
-          id
-          lastLogin
-        }
-        admissionDate
-        firstname
-        email
-        dob
-        image
-        file
-        report
-        createdAt
-        fatherName
-        fatherPhone
-        motherName
-        motherPhone
-        isActive
-        mobileno
-        lastname
-        gender
-        currentAddress
-        streetAddress
-        city
-        state
-        country
-        zipCode
-        height
-        weight
-        clientId
-        ssnAadhar
-        parentMobile
-        parentName
-        dateOfDiagnosis
-        clinicLocation {
-          id
-          location
-        }
-        isPeakActive
-        isCogActive
-        researchParticipant
-        diagnoses {
-          edges {
-            node {
-              id
-              name
-            }
-          }
-        }
-        category {
-          id
-          category
-        }
-        clinicLocation {
-          id
-          location
-        }
-        caseManager {
-          id
-          name
-        }
-        language {
-          id
-          name
-        }
-        family {
-          id
-          members {
-            edges {
-              node {
-                id
-                memberName
-                relationship {
-                  id
-                  name
-                }
-              }
-            }
-          }
-        }
-        authStaff {
-          edges {
-            node {
-              id
-              name
-              surname
-            }
-          }
-        }
-        tags {
-          edges {
-            node {
-              id
-              name
-            }
-          }
-        }
-      }
-    }
-  }
-`
 const { TextArea } = Input
 const { Option } = Select
 const layout = {
@@ -191,10 +49,10 @@ const submitButton = {
 const itemStyle = { marginBottom: '5px', fontWeight: 'bold' }
 
 function GenDetails(props) {
-  const { form, dispatch, userProfile } = props
+  const { closeDrawer, form, dispatch, userProfile } = props
   console.log(props, 'porpre er')
   const [tagArray, setTagArray] = useState(userProfile.tags)
-  const [updateInfo] = useMutation(MUT)
+  const [updateInfo, { data: updateData, loading: updateLoading }] = useMutation(GEN_INFO)
 
   useEffect(() => {
     if (userProfile && form) {
@@ -205,15 +63,15 @@ function GenDetails(props) {
         email: userProfile.email,
         gender: userProfile.gender,
         dob: moment(userProfile.dob),
-        firstName: userProfile.firstname,
-        lastName: userProfile.lastname,
-        mobileNo: userProfile.mobileno,
+        firstname: userProfile.firstname,
+        lastname: userProfile.lastname,
+        mobileno: userProfile.mobileno,
         tags: userProfile.tags,
-        street: userProfile.streetAddress,
+        streetAddress: userProfile.streetAddress,
         city: userProfile.city,
         state: userProfile.state,
         country: userProfile.country,
-        pincode: userProfile.zipCode,
+        zipCode: userProfile.zipCode,
       })
     }
   }, [userProfile])
@@ -226,44 +84,67 @@ function GenDetails(props) {
     e.preventDefault()
     form.validateFields((err, values) => {
       if (!err) {
-        values = { ...values, tags: tagArray }
         console.log(err, values)
+
+        const selectedStaffList = []
+        userProfile.authStaff.edges.map(item => selectedStaffList.push(item.node.id))
+
         updateInfo({
           variables: {
             id: userProfile.id,
-            clientId: values.clientId,
-            firstName: values.firstName,
-            lastName: values.lastName,
+
+            firstname: values.firstname,
+            lastname: values.lastname,
             email: values.email,
-            mobileNo: values.mobileNo,
+            mobileno: values.mobileno,
             dob: moment(values.dob).format('YYYY-MM-DD'),
             gender: values.gender,
             tags: tagArray,
-            streetAddress: values.street,
+            streetAddress: values.streetAddress,
             state: values.state,
             country: values.country,
             city: values.city,
-            zipCode: values.pincode,
+            zipCode: values.zipCode,
+
+            parentName: userProfile.parentName,
+            parentMobile: userProfile.parentMobile,
+            // fatherName: userProfile.fatherName,
+            // fatherPhone: userProfile.fatherPhone,
+            // motherName: userProfile.motherName,
+            // motherPhone: userProfile.motherPhone,
+            // height: userProfile.height,
+            // weight: userProfile.weight,
+            ssnAadhar: userProfile.ssnAadhar,
+            language: userProfile.language?.id,
+
+            category: userProfile.category?.id,
+            clinicLocation: userProfile.clinicLocation?.id,
+            caseManager: userProfile.caseManager?.id,
+            authStaff: selectedStaffList,
+
+            isPeakActive: userProfile.isPeakActive,
+            isCogActive: userProfile.isCogActive,
+            researchParticipant: userProfile.researchParticipant,
           },
         })
           .then(result => {
             console.log(result, 'Result')
+            dispatch({
+              type: 'learners/EDIT_GENERAL_INFO',
+              payload: {
+                id: userProfile.id,
+                response: result,
+              },
+            })
+            closeDrawer(false)
           })
           .catch(error => {
-            error.graphQLErrors.map(item => {
-              return notification.error({
-                message: 'Something went wrong',
-                description: item.message,
-              })
+            console.log(error, 'rorororoorororroro')
+            notification.error({
+              message: 'Something went wrong',
+              description: 'Unable to update data',
             })
           })
-        // dispatch({
-        //   type: 'learners/EDIT_GENERAL_INFO',
-        //   payload: {
-        //     id: userProfile.id,
-        //     values: values,
-        //   },
-        // })
       }
     })
   }
@@ -288,16 +169,16 @@ function GenDetails(props) {
 
         <Form.Item label="Client Id" style={itemStyle}>
           {form.getFieldDecorator('clientId', {
-            rules: [{ required: true, message: 'Please provide ClientId!' }],
+            rules: [{ required: false, message: 'Please provide ClientId!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="First Name" style={itemStyle}>
-          {form.getFieldDecorator('firstName', {
+          {form.getFieldDecorator('firstname', {
             rules: [{ required: true, message: 'Please provide firstName!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="Last Name" style={itemStyle}>
-          {form.getFieldDecorator('lastName', {
+          {form.getFieldDecorator('lastname', {
             rules: [{ required: false, message: 'Please provide lastName!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
@@ -308,7 +189,7 @@ function GenDetails(props) {
         </Form.Item>
 
         <Form.Item label="Mobile no" style={itemStyle}>
-          {form.getFieldDecorator('mobileNo', {
+          {form.getFieldDecorator('mobileno', {
             rules: [{ required: true, message: 'Please provide Mobile No!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
@@ -332,9 +213,9 @@ function GenDetails(props) {
         <Divider orientation="left">Address</Divider>
 
         <Form.Item label="Street Address" style={itemStyle}>
-          {form.getFieldDecorator('street', { rules: [{ message: 'Please provide Street Name' }] })(
-            <Input placeholder="Street Address" style={{ borderRadius: 0 }} />,
-          )}
+          {form.getFieldDecorator('streetAddress', {
+            rules: [{ message: 'Please provide Street Name' }],
+          })(<Input placeholder="Street Address" style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="City" style={itemStyle}>
           {form.getFieldDecorator('city', { rules: [{ message: 'Please provide City' }] })(
@@ -352,12 +233,12 @@ function GenDetails(props) {
           )}
         </Form.Item>
         <Form.Item label="Pincode" style={itemStyle}>
-          {form.getFieldDecorator('pincode', { rules: [{ message: 'Please provide pincode' }] })(
+          {form.getFieldDecorator('zipCode', { rules: [{ message: 'Please provide zipCode' }] })(
             <Input placeholder="Pincode" style={{ borderRadius: 0 }} />,
           )}
         </Form.Item>
         <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-          <Button type="primary" htmlType="submit" style={submitButton}>
+          <Button type="primary" loading={updateLoading} htmlType="submit" style={submitButton}>
             Submitt
           </Button>
           <Button

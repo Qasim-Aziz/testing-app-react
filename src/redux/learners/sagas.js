@@ -12,7 +12,6 @@ import {
   learnerActiveInactive,
   createLearnersProgram,
   getLearner,
-  updateGeneralInfo,
 } from 'services/learners'
 import axios from 'axios'
 import actions from './actions'
@@ -249,7 +248,8 @@ export function* GET_LEARNERS_DROPDOWNS() {
 }
 
 export function* EDIT_GENERAL_INFO({ payload }) {
-  const response = yield call(updateGeneralInfo, payload)
+  const { response } = payload
+  console.log(response, 'response')
   if (response && response.data) {
     notification.success({
       message: 'Learner Updated Successfully',
@@ -260,6 +260,8 @@ export function* EDIT_GENERAL_INFO({ payload }) {
       if (response.data.updateStudent.student.tags.edges.length > 0) {
         const tempTagArr = response.data.updateStudent.student.tags.edges.map(e => e.node.name)
         updatedLearner = { ...updatedLearner, tags: tempTagArr }
+      } else {
+        updatedLearner = { ...updatedLearner, tags: [] }
       }
     }
 

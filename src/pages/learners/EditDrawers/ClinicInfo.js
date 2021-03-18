@@ -12,11 +12,14 @@ import {
   Checkbox,
   Icon,
   message,
+  notification,
 } from 'antd'
 import moment from 'moment'
 import { Link, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import axios from 'axios'
+import { useMutation } from 'react-apollo'
+import { GEN_INFO } from './query'
 import AntdTag from '../../staffs/antdTag'
 
 const { TextArea } = Input
@@ -46,20 +49,98 @@ const itemStyle = { marginBottom: '5px', fontWeight: 'bold' }
 function ClinicInfo(props) {
   const {
     form,
+    dispatch,
+    closeDrawer,
     userProfile,
     learners: { clinicLocationList, categoryList, staffDropdownList },
   } = props
 
+  const [updateInfo, { loading: updateLoading }] = useMutation(GEN_INFO)
+
   useEffect(() => {
     if (userProfile) {
-      console.log('abler')
+      const selectedStaffList = []
+      userProfile.authStaff.edges.map(item => selectedStaffList.push(item.node.id))
+      form.setFieldsValue({
+        category: userProfile.category?.id,
+        clinicLocation: userProfile.clinicLocation?.id,
+        caseManager: userProfile.caseManager?.id,
+        authStaff: selectedStaffList,
+      })
     }
   }, [userProfile])
+
+  const handleSubmit = e => {
+    e.preventDefault()
+    form.validateFields((err, values) => {
+      if (!err) {
+        console.log(values, 'these arw the values')
+        const selectedStaffList = []
+        userProfile.authStaff.edges.map(item => selectedStaffList.push(item.node.id))
+
+        updateInfo({
+          variables: {
+            id: userProfile.id,
+
+            firstname: userProfile.firstname,
+            lastname: userProfile.lastname,
+            email: userProfile.email,
+            mobileno: userProfile.mobileno,
+            dob: moment(userProfile.dob).format('YYYY-MM-DD'),
+            gender: userProfile.gender,
+            tags: userProfile.tags,
+            streetAddress: userProfile.streetAddress,
+            state: userProfile.state,
+            country: userProfile.country,
+            city: userProfile.city,
+            zipCode: userProfile.zipCode,
+
+            parentName: userProfile.parentName,
+            parentMobile: userProfile.parentMobile,
+            // fatherName: userProfile.fatherName,
+            // fatherPhone: userProfile.fatherPhone,
+            // motherName: userProfile.motherName,
+            // motherPhone: userProfile.motherPhone,
+            // height: userProfile.height,
+            // weight: userProfile.weight,
+            ssnAadhar: userProfile.ssnAadhar,
+            language: userProfile.language?.id,
+
+            category: values.category,
+            clinicLocation: values.clinicLocation,
+            caseManager: values.caseManager,
+            authStaff: selectedStaffList,
+
+            isPeakActive: userProfile.isPeakActive,
+            isCogActive: userProfile.isCogActive,
+            researchParticipant: userProfile.researchParticipant,
+          },
+        })
+          .then(res => {
+            console.log(res, 'respsonse i cloincc')
+            dispatch({
+              type: 'learners/EDIT_GENERAL_INFO',
+              payload: {
+                id: userProfile.id,
+                response: res,
+              },
+            })
+            closeDrawer(false)
+          })
+          .catch(error => {
+            notification.error({
+              message: 'Something went wrong',
+              description: 'Unable to update learner data',
+            })
+          })
+      }
+    })
+  }
 
   console.log(userProfile, 'ser')
   return (
     <div>
-      <Form {...layout} onSubmit={e => this.handleSubmit(e)}>
+      <Form {...layout} onSubmit={handleSubmit}>
         <Form.Item label="Clinic Location" style={itemStyle}>
           {form.getFieldDecorator('clinicLocation', {
             rules: [{ required: true, message: 'Please provide Clinic Location!' }],
@@ -110,10 +191,11 @@ function ClinicInfo(props) {
           )}
         </Form.Item>
         <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-          <Button type="primary" style={submitButton}>
+          <Button type="primary" htmlType="submit" loading={updateLoading} style={submitButton}>
             Submitt
           </Button>
           <Button
+            onClick={() => closeDrawer(false)}
             type="default"
             style={{ ...submitButton, color: 'white', background: 'red', boxShadow: 'none' }}
           >
@@ -129,4 +211,10 @@ const mapStateToProps = ({ learners }) => ({
   learners,
 })
 
-export default withRouter(connect(mapStateToProps)(Form.create()(ClinicInfo)))
+const mapDispatchToProps = dispatch => {
+  return {
+    dispatch,
+  }
+}
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Form.create()(ClinicInfo)))

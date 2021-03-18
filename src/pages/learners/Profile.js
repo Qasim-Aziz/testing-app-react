@@ -115,37 +115,41 @@ function Profile(props) {
         title="Edit Basic Information"
         width="600px"
         closable
+        destroyOnClose
         visible={genInfoDrawer}
         onClose={() => setGenInfoDrawer(false)}
       >
-        <GenDetails userProfile={userProfile} />
+        <GenDetails closeDrawer={setGenInfoDrawer} userProfile={userProfile} />
       </Drawer>
       <Drawer
         title="Edit Personal Information"
         width="600px"
         closable
+        destroyOnClose
         visible={personalInfoDrawer}
         onClose={() => setPersonalInfoDrawer(false)}
       >
-        <PersonalInfo userProfile={userProfile} />
+        <PersonalInfo closeDrawer={setPersonalInfoDrawer} userProfile={userProfile} />
       </Drawer>
       <Drawer
         title="Edit Clinical Information"
         width="600px"
+        destroyOnClose
         closable
         visible={clinicInfoDrawer}
         onClose={() => setClinicInfoDrawer(false)}
       >
-        <ClinicInfo userProfile={userProfile} />
+        <ClinicInfo closeDrawer={setClinicInfoDrawer} userProfile={userProfile} />
       </Drawer>
       <Drawer
         title="Edit Program Information"
         width="600px"
+        destroyOnClose
         closable
         visible={programInfoDrawer}
         onClose={() => setProgramInfoDrawer(false)}
       >
-        <ProgramInfo userProfile={userProfile} />
+        <ProgramInfo closeDrawer={setProgramInfoDrawer} userProfile={userProfile} />
       </Drawer>
       <div style={mainCard}>
         <div
@@ -469,33 +473,64 @@ function Profile(props) {
 
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>Default Active</p>
-            <CheckCircleOutlined
-              style={{ fontSize: 20, color: 'green', fontWeight: '700', margin: 'auto' }}
-            />{' '}
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-            <p style={labelHead}>Peak</p>
-            <CheckCircleOutlined
-              style={{ fontSize: 20, color: 'green', fontWeight: '700', margin: 'auto' }}
-            />
+            {userProfile.isDefaultActive ? (
+              <CheckCircleOutlined
+                style={{ fontSize: 20, color: 'green', fontWeight: '700', margin: 'auto' }}
+              />
+            ) : (
+              <CloseCircleOutlined
+                style={{ fontSize: 20, color: 'red', fontWeight: '700', margin: 'auto' }}
+              />
+            )}
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>VBMAPP</p>
-            <CheckCircleOutlined
-              style={{ fontSize: 20, color: 'green', fontWeight: '700', margin: 'auto' }}
-            />{' '}
+            {userProfile.isVbmappActive ? (
+              <CheckCircleOutlined
+                style={{ fontSize: 20, color: 'green', fontWeight: '700', margin: 'auto' }}
+              />
+            ) : (
+              <CloseCircleOutlined
+                style={{ fontSize: 20, color: 'red', fontWeight: '700', margin: 'auto' }}
+              />
+            )}
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+            <p style={labelHead}>Peak</p>
+            {userProfile.isPeakActive ? (
+              <CheckCircleOutlined
+                style={{ fontSize: 20, color: 'green', fontWeight: '700', margin: 'auto' }}
+              />
+            ) : (
+              <CloseCircleOutlined
+                style={{ fontSize: 20, color: 'red', fontWeight: '700', margin: 'auto' }}
+              />
+            )}
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>Cogniable </p>
-            <CheckCircleOutlined
-              style={{ fontSize: 20, color: 'green', fontWeight: '700', margin: 'auto' }}
-            />
+            {userProfile.isCogActive ? (
+              <CheckCircleOutlined
+                style={{ fontSize: 20, color: 'green', fontWeight: '700', margin: 'auto' }}
+              />
+            ) : (
+              <CloseCircleOutlined
+                style={{ fontSize: 20, color: 'red', fontWeight: '700', margin: 'auto' }}
+              />
+            )}
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>Research Participant </p>
-            <CheckCircleOutlined
-              style={{ fontSize: 20, color: 'green', fontWeight: '700', margin: 'auto' }}
-            />
+            {userProfile.researchParticipant ? (
+              <CheckCircleOutlined
+                style={{ fontSize: 20, color: 'green', fontWeight: '700', margin: 'auto' }}
+              />
+            ) : (
+              <CloseCircleOutlined
+                style={{ fontSize: 20, color: 'red', fontWeight: '700', margin: 'auto' }}
+              />
+            )}
           </div>
         </div>
       </div>
