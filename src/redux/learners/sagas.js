@@ -12,6 +12,7 @@ import {
   learnerActiveInactive,
   createLearnersProgram,
   getLearner,
+  updateGeneralInfo,
 } from 'services/learners'
 import axios from 'axios'
 import actions from './actions'
@@ -247,6 +248,53 @@ export function* GET_LEARNERS_DROPDOWNS() {
   }
 }
 
+export function* EDIT_GENERAL_INFO({ payload }) {
+  const response = yield call(updateGeneralInfo, payload)
+  if (response && response.data) {
+    notification.success({
+      message: 'Learner Updated Successfully',
+    })
+
+    let updatedLearner = response.data.updateStudent.student
+    if (response.data.updateStudent.student) {
+      if (response.data.updateStudent.student.tags.edges.length > 0) {
+        const tempTagArr = response.data.updateStudent.student.tags.edges.map(e => e.node.name)
+        updatedLearner = { ...updatedLearner, tags: tempTagArr }
+      }
+    }
+
+    const obj = {
+      id: updatedLearner.id,
+      caseManager: updatedLearner.caseManager,
+      category: updatedLearner.category,
+      email: updatedLearner.email,
+      firstname: updatedLearner.firstname,
+      lastname: updatedLearner.lastname,
+      gender: updatedLearner.gender,
+      isActive: updatedLearner.isActive,
+      mobileno: updatedLearner.mobileno,
+      parentMobile: updatedLearner.parentMobile,
+      tags: updatedLearner.tags,
+    }
+
+    console.log(response, 'response')
+    console.log(updatedLearner, obj, 'updated kjfbsdf ksf')
+    yield put({
+      type: 'learners/UPDATE_LERNERS_LIST',
+      payload: {
+        object: obj,
+      },
+    })
+
+    yield put({
+      type: 'learners/SET_STATE',
+      payload: {
+        UserProfile: updatedLearner,
+      },
+    })
+  }
+}
+
 export function* EDIT_LEARNER({ payload }) {
   const response = yield call(updateLearner, payload)
   if (response && response.data) {
@@ -393,5 +441,6 @@ export default function* rootSaga() {
     takeEvery(actions.PAGE_CHANGED, PAGE_CHANGED),
     takeEvery(actions.ROWS_CHANGED, ROWS_CHANGED),
     takeEvery(actions.GET_SINGLE_LEARNER, GET_SINGLE_LEARNER),
+    takeEvery(actions.EDIT_GENERAL_INFO, EDIT_GENERAL_INFO),
   ])
 }

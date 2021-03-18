@@ -72,6 +72,7 @@ class EditBasicInformation extends React.Component {
       form,
       learners: { UserProfile },
     } = this.props
+    console.log(this.props, 'dgdfgddfgf')
 
     const selectedStaffList = []
     UserProfile.authStaff.edges.map(item => selectedStaffList.push(item.node.id))

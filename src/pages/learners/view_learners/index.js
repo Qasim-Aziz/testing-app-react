@@ -61,8 +61,8 @@ import { FilterCard } from '../../../components/FilterCard/FilterTable'
 import EditBasicInformation from './EditBasicInformation'
 import CreateLearner from '../createLearner'
 import client from '../../../apollo/config'
-import './style.scss'
-import Profile from './Profile'
+import '../style.scss'
+import Profile from '../Profile'
 
 const { Meta } = Card
 
@@ -260,7 +260,8 @@ class LearnerTable extends React.Component {
   }
 
   showProgram = obj => {
-    console.log('===> studnet selected')
+    console.log('===> studnet selected', obj)
+
     localStorage.setItem('studentId', JSON.stringify(obj?.id))
     window.location.href = '/#/therapistStudent'
 
@@ -523,12 +524,12 @@ class LearnerTable extends React.Component {
           </Button>
         </Menu.Item>
         <Menu.Item key="1">
-          <Button onClick={() => this.showProgram()} type="link" size="small">
+          <Button onClick={() => this.showProgram(obj)} type="link" size="small">
             Program
           </Button>
         </Menu.Item>
         <Menu.Item key="2">
-          <Button onClick={() => this.showSession()} type="link" size="small">
+          <Button onClick={() => this.showSession(obj)} type="link" size="small">
             Session
           </Button>
         </Menu.Item>
