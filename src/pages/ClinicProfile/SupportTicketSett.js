@@ -534,7 +534,7 @@ export default () => {
         visible={createTicketDrawer}
         onClose={() => setCreateTicketDrawer(false)}
         title="Add Support Ticket"
-        width={450}
+        width="75%"
       >
         <div
           style={{
@@ -552,7 +552,7 @@ export default () => {
         visible={updateTicket}
         onClose={() => setUpdateTicket(null)}
         title="Update Support Ticket"
-        width={450}
+        width="75%"
       >
         <div
           style={{
