@@ -627,19 +627,6 @@ class LearnerTable extends React.Component {
         button: true,
         render: obj => (
           <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <Button
-              onClick={() => {
-                this.info(obj)
-                this.setState({
-                  divShow: true,
-                })
-                this.showEditDrawer()
-              }}
-              type="link"
-              style={{ padding: '0px', fontWeight: 'bold', fontSize: '22px' }}
-            >
-              <EditOutlined />
-            </Button>
             <Dropdown overlay={() => moreAction(obj)} trigger={['click']}>
               <Button style={{ marginRight: '10px' }} type="link">
                 <MoreOutlined style={{ fontSize: 22 }} />
@@ -924,7 +911,7 @@ class LearnerTable extends React.Component {
           closable={true}
           onClose={() => this.setState({ showProfile: false })}
           visible={this.state.showProfile}
-          width={'70%'}
+          width="750px"
         >
           <Profile />
         </Drawer>

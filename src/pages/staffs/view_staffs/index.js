@@ -39,15 +39,16 @@ import {
 import {
   ContactsOutlined,
   FileDoneOutlined,
-  AuditOutlined,
   UserOutlined,
   FilterOutlined,
   PlusOutlined,
   FileExcelOutlined,
   FilePdfOutlined,
   PrinterOutlined,
+  HistoryOutlined,
   CloseCircleOutlined,
   CloudDownloadOutlined,
+  CheckCircleOutlined,
 } from '@ant-design/icons'
 import moment from 'moment'
 import { gql } from 'apollo-boost'
@@ -63,7 +64,8 @@ import EditStaffBasicInfo from './EditStaffBasicInfo'
 import CreateStaff from '../createStaff'
 import Authorize from '../../../components/LayoutComponents/Authorize'
 import client from '../../../apollo/config'
-import './style.scss'
+import '../style.scss'
+import Profile from '../Profile'
 
 const { Panel } = Collapse
 const { Meta } = Card
@@ -143,14 +145,15 @@ class StaffTable extends React.Component {
     isFilterActive: false,
     UserProfile: null,
     isLoaded: false,
-    searchText: '',
-    searchedColumn: '',
     filteredInfo: null,
-    filterRole: '',
     // for create learner drawer
     visible: false,
     visibleEdit: false,
+    profileDrawer: false,
     filterName: '',
+    searchText: '',
+    searchedColumn: '',
+    filterRole: '',
     filterEmail: '',
     filterDesignation: '',
     filterTags: '',
@@ -199,16 +202,25 @@ class StaffTable extends React.Component {
     console.log(e, 'ewewe')
     const { dispatch } = this.props
     dispatch({
-      type: 'staffs/SET_STATE',
-      payload: {
-        StaffProfile: e,
-        isStaffProfile: true,
-      },
+      type: 'staffs/GET_STAFF_PROFILE',
+      payload: e,
     })
     this.setState({
       divShow: true,
     })
     this.showEditDrawer()
+  }
+
+  info2 = e => {
+    console.log(e, 'ewewe')
+    const { dispatch } = this.props
+    dispatch({
+      type: 'staffs/GET_STAFF_PROFILE',
+      payload: e,
+    })
+    this.setState({
+      profileDrawer: true,
+    })
   }
 
   showEditDrawer = () => {
@@ -236,7 +248,6 @@ class StaffTable extends React.Component {
   }
 
   handleChange = (pagination, filters, sorter) => {
-    //   console.log('Various parameters', pagination, filters, sorter);
     this.setState({
       filteredInfo: filters,
     })
@@ -466,119 +477,67 @@ class StaffTable extends React.Component {
 
     const columns = [
       {
-        name: 'Name',
-        selector: 'name',
-        sortable: true,
-        minWidth: '160px',
-        maxWidth: '160px',
-        cell: row => (
+        title: '#',
+        render: row => filteredList.indexOf(row) + 1,
+      },
+      {
+        title: 'Name',
+        dataIndex: 'name',
+        key: 'k2',
+        render: (text, row) => (
           <Button
-            onClick={() => this.info(row)}
+            onClick={() => this.info2(row)}
             type="link"
-            style={{ padding: '0px', fontWeight: 'bold', fontSize: '11px' }}
+            style={{ padding: '0px', fontWeight: 'bold', fontSize: '14px' }}
           >
             {row.name}
           </Button>
         ),
       },
       {
-        name: 'Email',
-        selector: 'email',
+        title: 'Email',
+        dataIndex: 'email',
         key: 'email',
-        maxWidth: '160px',
-        minWidth: '160px',
       },
       {
-        name: 'Contact No',
-        selector: 'contactNo',
-        key: 'email',
-        width: '120px',
-      },
-
-      {
-        name: 'Role',
-        selector: 'userRole',
-        cell: row => <span>{row.userRole ? row.userRole.name : ''}</span>,
-        maxWidth: '80px',
+        title: 'Contact No',
+        dataIndex: 'contactNo',
       },
       {
-        name: 'Gender',
-        selector: 'gender',
-        maxWidth: '60px',
+        title: 'Role',
+        dataIndex: 'userRole',
+        render: (text, row) => <span>{row.userRole ? row.userRole.name : ''}</span>,
       },
       {
-        name: 'Join Date',
-        selector: 'dateOfJoining',
-        key: 'joining',
-        sortable: true,
-        maxWidth: '120px',
-      },
-      {
-        name: 'Date of Birth',
-        selector: 'dob',
-        key: 'dob',
-        maxWidth: '120px',
-      },
-      {
-        name: 'Designation',
-        selector: 'designation',
-        maxWidth: '120px',
-      },
-      {
-        name: 'Qualification',
-        selector: 'qualification',
-        maxWidth: '120px',
-      },
-      {
-        name: 'Last Login',
-        selector: 'user',
-        width: '100px',
-        cell: row => (
+        title: 'Last Login',
+        dataIndex: 'user',
+        render: (text, row) => (
           <span>
             {row.user && row.user.lastLogin ? moment(row.user.lastLogin).format('YYYY-MM-DD') : ''}
           </span>
         ),
       },
       {
-        name: 'Status',
-        selector: 'isActive',
-        width: '100px',
-        sortable: true,
-        cell: row => {
+        title: 'Status',
+        dataIndex: 'isActive',
+        width: '140px',
+        render: (text, row) => {
           if (row.isActive) {
-            return <span>Active</span>
+            return <CheckCircleOutlined style={{ fontSize: 22, color: 'green' }} />
           }
-          return <span>In-Active</span>
+          return <CloseCircleOutlined style={{ fontSize: 22, color: 'red' }} />
         },
       },
       {
-        name: 'Session',
-        ignoreRowClick: true,
-        button: true,
-        maxWidth: '80px',
-        minWidth: '80px',
-        cell: () => (
-          <span>
-            <Button
-              onClick={this.showSession}
-              style={{ padding: '0px', color: '#0190fe', border: 'none', fontSize: '11px' }}
-            >
-              Time
-            </Button>
-          </span>
-        ),
-      },
-      {
-        name: 'Tags',
-        selector: 'tags',
-        width: 60,
-        cell: row => {
+        title: 'Tags',
+        dataIndex: 'tags',
+        render: (text, row) => {
           if (row.tags?.length > 0) {
             return (
               <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                 {row.tags?.map(r => {
                   return (
-                    <Tag key={r} color="blue" style={{ margin: '1px' }}>
+                    <Tag key={r} color="#F89A42" style={{ margin: '1px', fontWeight: '600' }}>
                       {r}
                     </Tag>
                   )
@@ -586,14 +545,18 @@ class StaffTable extends React.Component {
               </div>
             )
           }
-
           return null
         },
       },
       {
-        name: 'Location',
-        maxWidth: '120px',
-        cell: row => <span>{row.clinicLocation ? row.clinicLocation.location : ''}</span>,
+        title: 'Session',
+        render: () => (
+          <span>
+            <Button type="link" onClick={this.showSession}>
+              <HistoryOutlined style={{ fontSize: 22 }} />
+            </Button>
+          </span>
+        ),
       },
     ]
     const { divShow, filterShow } = this.state
@@ -652,12 +615,6 @@ class StaffTable extends React.Component {
       const data = new Blob([excelBuffer], { type: fileType })
       FileSaver.saveAs(data, fileName + fileExtension)
     }
-
-    if (staffs.loading) {
-      return <div>Loading...</div>
-    }
-    const divClass = 'col-sm-12'
-    const detailsDiv = divShow ? { display: 'block', paddingLeft: '0' } : { display: 'none' }
 
     const exportPDF = () => {
       const unit = 'pt'
@@ -721,6 +678,109 @@ class StaffTable extends React.Component {
       </Menu>
     )
 
+    const tableHeader = (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          whiteSpace: 'nowrap',
+          zIndex: 2,
+          height: '28px',
+          width: '100%',
+          padding: '4px 12px',
+        }}
+      >
+        <span style={{ display: 'flex', alignItems: 'center' }}>
+          <span>Name :</span>
+          <Input
+            size="small"
+            name="name"
+            placeholder="Search Name"
+            value={this.state.filterName}
+            onChange={e => {
+              this.setState({
+                filterName: e.target.value,
+                isFilterActive: e.target.value && true,
+              })
+              this.filterHandler({ name: e.target.value })
+            }}
+            style={{ ...tableFilterStyles, width: '112px' }}
+          />
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center' }}>
+          <span>Email :</span>
+          <Input
+            size="small"
+            name="email"
+            placeholder="Search Email"
+            value={this.state.filterEmail}
+            onChange={e => {
+              this.setState({
+                filterEmail: e.target.value,
+                isFilterActive: e.target.value && true,
+              })
+              this.filterHandler({ email: e.target.value })
+            }}
+            style={{ ...tableFilterStyles, width: '148px' }}
+          />
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center' }}>
+          <span>Designation :</span>
+          <Input
+            size="small"
+            name="designation"
+            placeholder="Search Designation"
+            value={this.state.filterDesignation}
+            onChange={e => {
+              this.setState({
+                filterDesignation: e.target.value,
+                isFilterActive: e.target.value && true,
+              })
+              this.filterHandler({ designation: e.target.value })
+            }}
+            style={{ ...tableFilterStyles, width: '148px' }}
+          />
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center' }}>
+          <Radio.Group
+            size="small"
+            buttonStyle="solid"
+            value={this.state.filterRole}
+            onChange={e => {
+              this.setState({ filterRole: e.target.value, isFilterActive: true })
+            }}
+            style={tableFilterStyles}
+          >
+            <Radio.Button value="">All</Radio.Button>
+            {rolesGrouped.map((i, index) => {
+              return (
+                <Radio.Button key={i} value={i}>
+                  {i}
+                </Radio.Button>
+              )
+            })}
+          </Radio.Group>
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center' }}>
+          <span>Tag :</span>
+          <Input
+            size="small"
+            name="tags"
+            placeholder="Search Tag"
+            value={this.state.filterTags}
+            onChange={e => {
+              this.setState({
+                filterTags: e.target.value,
+                isFilterActive: e.target.value && true,
+              })
+              this.filterHandler({ tags: e.target.value })
+            }}
+            style={{ ...tableFilterStyles, width: '148px' }}
+          />
+        </span>
+      </div>
+    )
+
     return (
       <Authorize roles={['school_admin']} redirect to="/dashboard/beta">
         <Helmet title="Partner" />
@@ -768,6 +828,17 @@ class StaffTable extends React.Component {
               </Select>
             </div>
           </div>
+        </Drawer>
+
+        <Drawer
+          title="Employee Profile"
+          width="1250px"
+          closable
+          className="profile-css"
+          visible={this.state.profileDrawer}
+          onClose={() => this.setState({ profileDrawer: false })}
+        >
+          <Profile />
         </Drawer>
 
         <Drawer
@@ -931,120 +1002,22 @@ class StaffTable extends React.Component {
           </div>
         </div>
 
-        <div className={divClass}>
-          <div style={{ margin: '5px', marginBottom: '50px' }}>
-            {/* filters */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                position: 'absolute',
-                top: '20px',
-                whiteSpace: 'nowrap',
-                zIndex: 2,
-                width: 'fit-content',
-              }}
-            >
-              <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span>Name :</span>
-                <Input
-                  size="small"
-                  name="name"
-                  placeholder="Search Name"
-                  value={this.state.filterName}
-                  onChange={e => {
-                    this.setState({
-                      filterName: e.target.value,
-                      isFilterActive: e.target.value && true,
-                    })
-                    this.filterHandler({ name: e.target.value })
-                  }}
-                  style={{ ...tableFilterStyles, width: '112px' }}
-                />
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span>Email :</span>
-                <Input
-                  size="small"
-                  name="email"
-                  placeholder="Search Email"
-                  value={this.state.filterEmail}
-                  onChange={e => {
-                    this.setState({
-                      filterEmail: e.target.value,
-                      isFilterActive: e.target.value && true,
-                    })
-                    this.filterHandler({ email: e.target.value })
-                  }}
-                  style={{ ...tableFilterStyles, width: '148px' }}
-                />
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span>Designation :</span>
-                <Input
-                  size="small"
-                  name="designation"
-                  placeholder="Search Designation"
-                  value={this.state.filterDesignation}
-                  onChange={e => {
-                    this.setState({
-                      filterDesignation: e.target.value,
-                      isFilterActive: e.target.value && true,
-                    })
-                    this.filterHandler({ designation: e.target.value })
-                  }}
-                  style={{ ...tableFilterStyles, width: '148px' }}
-                />
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center' }}>
-                <Radio.Group
-                  size="small"
-                  buttonStyle="solid"
-                  value={this.state.filterRole}
-                  onChange={e => {
-                    this.setState({ filterRole: e.target.value, isFilterActive: true })
-                  }}
-                  style={tableFilterStyles}
-                >
-                  <Radio.Button value="">All</Radio.Button>
-                  {rolesGrouped.map((i, index) => {
-                    return (
-                      <Radio.Button key={i} value={i}>
-                        {i}
-                      </Radio.Button>
-                    )
-                  })}
-                </Radio.Group>
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span>Tag :</span>
-                <Input
-                  size="small"
-                  name="tags"
-                  placeholder="Search Tag"
-                  value={this.state.filterTags}
-                  onChange={e => {
-                    this.setState({
-                      filterTags: e.target.value,
-                      isFilterActive: e.target.value && true,
-                    })
-                    this.filterHandler({ tags: e.target.value })
-                  }}
-                  style={{ ...tableFilterStyles, width: '148px' }}
-                />
-              </span>
-            </div>
-            <div className="modify-data-table">
-              <DataTable
+        <div>
+          <div style={{ marginTop: '15px', marginBottom: '50px' }}>
+            <div className="view-staff">
+              <Table
+                title={() => {
+                  return tableHeader
+                }}
+                rowKey={record => record.id}
+                loading={staffs.loading}
                 columns={columns}
-                theme="default"
-                keyField="id"
-                dense={true}
-                pagination={true}
-                data={filteredList}
-                customStyles={customStyles}
-                noHeader={true}
-                paginationRowsPerPageOptions={[10, 50, 100, 200, 500, 1000]}
+                dataSource={filteredList}
+                pagination={{
+                  defaultPageSize: 20,
+                  showSizeChanger: true,
+                  pageSizeOptions: ['20', '50', '80', '100'],
+                }}
               />
             </div>
           </div>

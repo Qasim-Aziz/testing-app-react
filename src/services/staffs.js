@@ -13,32 +13,20 @@ export async function getClinicStaffs() {
     .query({
       query: gql`
         query {
-          staffs {
+          staffs(first: 20, last: 20) {
             edges {
               node {
                 id
                 name
                 email
                 gender
-                localAddress
                 designation
-                empType
-                salutation
-                qualification
-                dateOfJoining
                 dob
                 surname
                 contactNo
-                emergencyContact
-                emergencyName
-                employeeId
                 user {
                   id
                   lastLogin
-                }
-                clinicLocation {
-                  id
-                  location
                 }
                 userRole {
                   id
@@ -64,6 +52,35 @@ export async function getClinicStaffs() {
       error.graphQLErrors.map(item => {
         return notification.error({
           message: 'Something went wrong fetching Staffs',
+          description: item.message,
+        })
+      })
+    })
+}
+
+export async function staffActiveInactive(payload) {
+  return apolloClient
+    .mutate({
+      mutation: gql`mutation {
+        updateStaff(input:{
+          staffData:{
+            id:"${payload.id}", 
+            isActive: ${payload.checked}
+          }
+        })
+        { 
+          staff {
+            id,
+            isActive                    
+          }
+        }
+      }`,
+    })
+    .then(result => result)
+    .catch(error => {
+      error.graphQLErrors.map(item => {
+        return notification.error({
+          message: 'Something went wrong',
           description: item.message,
         })
       })
@@ -223,56 +240,118 @@ export async function updateStaff(payload) {
   return apolloClient
     .mutate({
       mutation: gql`mutation UpdateStaff (
-        $location: ID,
-        $doj: Date,
+        $id: ID
+        $empId:String
+        $designation: String
+        $role: ID
+        $email: ID
+        $firstname: String
+        $surname: String
+        $gender: String
+        $mobile: String
+        $address: String
+        $dob: Date
+        $authLearner: [ID]
+        $ssnAadhar: String
+        $qualification: String
+        $salutation: String
+        $emergencyName: String
+        $emergencyContact: String
+        $shiftStart: String
+        $shiftEnd: String
+        $taxId: String
+        $npi: String
+        $maritalStatus: String
+        $workExp: String
+        $dateOfJoining: Date
+        $clinicLocation: ID
+        $isActive: Boolean
+        $streetAddress: String
+        $city: String
+        $state: String
+        $country: String
+        $zipCode: String
         $tags: [String]
       ) {
         updateStaff(input:{
           staffData:{
-            id:"${payload.id}", 
-            empId:"${payload.values.staffId}",
-            designation:"${payload.values.designation}",
-            role:"${payload.values.role}",
-            email:"${payload.values.email}",
-            firstname:"${payload.values.firstname}",
-            surname:"${payload.values.lastname}",
-            gender:"${payload.values.gender}",
-            mobile:"${payload.values.contactNumber}",
-            address:"${payload.values.address}",
-            dob:"${payload.values.dob._d.toISOString().slice(0, 10)}",
-            emergencyName:"${payload.values.emergencyName}",
-            ssnAadhar:"", 
-            qualification:"${payload.values.qualification}",
-            salutation:"", 
-            emergencyContact:"${payload.values.emergencyContactNumber}",
-            shiftStart:"", 
-            shiftEnd:"", 
-            taxId:"", 
-            npi:"", 
-            duration:"", 
-            dateOfJoining: $doj,
-            clinicLocation: $location,
+            id: $id
+            empId: $empId
+            designation: $designation
+            $role: $role
+            email: $email
+            firstname: $firstname
+            surname: $surname
+            gender: $gender
+            mobile: $mobile
+            address: $address
+            dob: $dob
+            authLearner: $authLearner
+            ssnAddhar: $ssnAadhar
+            qualification: $qualification
+            salutation: $salutation
+            emergencyName: $emergencyName
+            shiftStart: $shiftStart
+            shiftEnd: $shiftEnd
+            taxId: $raxId
+            noi: $npi
+            maritalStatus: $maritalStatus
+            workExp: $workExp
+            dateOfJoining: $dateOfJoining
+            clinicLocation: $clinicLocation
+            isActive: $isActive
+            streetAddress: $streetAddress
+            city: $city
+            state: $state
+            country: $country
+            zipCode: $zipCode
             tags: $tags
           }
         })
         { 
           staff {
             id
+            employeeId
+            staffId
             name
+            surname
+            fatherName
+            motherName
+            contactNo
             email
             gender
-            localAddress
-            designation
-            empType
-            salutation
-            qualification
-            dateOfJoining
             dob
-            surname
-            contactNo
-            emergencyContact
+            dateOfJoining
+            localAddress
+            qualification
+            designation
             emergencyName
-            employeeId
+            emergencyContact
+            emergencyRelation
+            maritalStatus
+            workExp
+            image
+            resume
+            joiningLetter
+            fileName
+            fileDescription
+            isActive
+            school {
+              id
+              schoolName
+            }
+            empType
+            shiftStart
+            shiftEnd
+            ssnAadhar
+            taxId
+            npi
+            streetAddress
+            city
+            state
+            country
+            zipCode
+            salutation
             clinicLocation {
               id
               location
@@ -281,7 +360,19 @@ export async function updateStaff(payload) {
               id
               name
             }
-            isActive
+            shift {
+              id
+              startTime
+              endTime
+              days {
+               edges {
+                 node {
+                   id
+                   name
+                 }
+               } 
+              }
+            }
             tags {
               edges {
                 node {
@@ -294,11 +385,7 @@ export async function updateStaff(payload) {
         }
       }`,
       variables: {
-        location: payload.values.clinicLocation,
-        doj: payload.values.dateOfJoining
-          ? moment(payload.values.dateOfJoining).format('YYYY-MM-DD')
-          : null,
-        tags: payload.values.tags,
+        ...payload.values,
       },
     })
     .then(result => result)
@@ -312,31 +399,100 @@ export async function updateStaff(payload) {
     })
 }
 
-export async function staffActiveInactive(payload) {
+export async function getStaffProfile(payload) {
+  console.log(payload, 'oajdfvvkj')
   return apolloClient
-    .mutate({
-      mutation: gql`mutation {
-        updateStaff(input:{
-          staffData:{
-            id:"${payload.id}", 
-            isActive: ${payload.checked}
-          }
-        })
-        { 
-          staff {
-            id,
-            isActive                    
+    .query({
+      query: gql`
+        query($id: ID!) {
+          staff(id: $id) {
+            id
+            employeeId
+            name
+            surname
+            fatherName
+            motherName
+            contactNo
+            email
+            gender
+            dob
+            dateOfJoining
+            localAddress
+            qualification
+            designation
+            emergencyName
+            emergencyContact
+            emergencyRelation
+            maritalStatus
+            workExp
+            image
+            resume
+            joiningLetter
+            fileName
+            fileDescription
+            isActive
+            school {
+              id
+              schoolName
+            }
+            empType
+            shiftStart
+            shiftEnd
+            ssnAadhar
+            taxId
+            npi
+            streetAddress
+            city
+            state
+            country
+            zipCode
+            salutation
+            clinicLocation {
+              id
+              location
+            }
+            userRole {
+              id
+              name
+            }
+            user {
+              id
+              lastLogin
+            }
+            shift {
+              id
+              startTime
+              endTime
+              days {
+                edges {
+                  node {
+                    id
+                    name
+                  }
+                }
+              }
+            }
+            tags {
+              edges {
+                node {
+                  id
+                  name
+                }
+              }
+            }
           }
         }
-      }`,
+      `,
+      variables: {
+        id: payload.id,
+      },
     })
-    .then(result => result)
+    .then(response => response)
     .catch(error => {
-      error.graphQLErrors.map(item => {
-        return notification.error({
-          message: 'Something went wrong',
-          description: item.message,
-        })
+      console.log(error)
+      notification.error({
+        message: 'Something went wrong',
+        description: 'Unable to fetch staff profile data',
       })
     })
 }

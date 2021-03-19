@@ -45,37 +45,6 @@ const labelHead = {
   color: 'black',
 }
 
-const mainCard = {
-  width: '100%',
-  height: 'fit-content',
-  display: 'flex',
-  justifyContent: 'center',
-  backgroundColor: 'white',
-  marginBottom: '36px',
-  padding: '24px 0px',
-  border: '1px solid #E8E8E8',
-  boxShadow: '0 1px 1px 0 rgb(0 0 0 / 20%)',
-}
-
-const midCard = {
-  width: '50%',
-  height: '100%',
-  backgroundColor: 'white',
-  padding: '24px 18px',
-  marginRight: '18px',
-  border: '1px solid #E8E8E8',
-  boxShadow: '0 1px 1px 0 rgb(0 0 0 / 20%)',
-}
-
-const inputCustom = { width: '180px', marginBottom: '8px', display: 'block' }
-const tableFilterStyles = { margin: '0px 28px 0 6px' }
-const customLabel = {
-  fontSize: '17px',
-  color: '#000',
-  marginRight: '12px',
-  marginBottom: '12px',
-}
-
 function Profile(props) {
   const [userProfile, setUserProfile] = useState()
   const [motherName, setMotherName] = useState('')
@@ -110,7 +79,7 @@ function Profile(props) {
   console.log(userProfile, 'userProfile')
 
   return (
-    <div style={{ backgroundColor: '#F7F7F7', padding: '36px' }} className="profile-css">
+    <div style={{ backgroundColor: '#F7F7F7', padding: '28px' }} className="profile-css">
       <Drawer
         title="Edit Basic Information"
         width="600px"
@@ -151,15 +120,8 @@ function Profile(props) {
       >
         <ProgramInfo closeDrawer={setProgramInfoDrawer} userProfile={userProfile} />
       </Drawer>
-      <div style={mainCard}>
-        <div
-          style={{
-            width: '50%',
-            height: '100%',
-            padding: '0 12px 0 24px',
-            borderRight: '1px solid #E8E8E8',
-          }}
-        >
+      <div className="mainCard">
+        <div className="mainCard-left">
           <Card
             style={{
               textAlign: 'center',
@@ -271,13 +233,7 @@ function Profile(props) {
             />
           </Card>
         </div>
-        <div
-          style={{
-            width: '49%',
-            height: '100%',
-            padding: '0 12px 0 36px',
-          }}
-        >
+        <div className="mainCard-right">
           <div style={{ textAlign: 'left' }}>
             <div style={{ display: 'flex', textAlign: 'left' }}>
               <p style={labelHead}>Client ID </p>
@@ -316,8 +272,8 @@ function Profile(props) {
         </div>
       </div>
 
-      <div style={{ ...mainCard, marginBottom: '36px' }}>
-        <div style={{ width: '50%', padding: '0 12px 0 36px', borderRight: '1px solid #E8E8E8' }}>
+      <div className="mainCard" style={{ marginBottom: '28px' }}>
+        <div className="mainCard-left">
           <div style={{ fontSize: '22px', color: 'black', marginBottom: '12px' }}>
             Personal Information
             <Button
@@ -371,9 +327,9 @@ function Profile(props) {
         </div>
         <div
           style={{
-            width: '49%',
+            width: '50%',
             height: '100%',
-            padding: '0 12px 0 36px',
+            padding: '0 18px 0 24px',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
@@ -394,8 +350,8 @@ function Profile(props) {
           </div>
         </div>
       </div>
-      <div style={{ display: 'flex', height: 290, marginBottom: '36px' }}>
-        <div style={midCard}>
+      <div className="midCard-container">
+        <div className="midCard">
           <div style={{ fontSize: '22px', color: 'black', marginBottom: '12px' }}>
             Information
             <Button
@@ -411,7 +367,7 @@ function Profile(props) {
             </Button>{' '}
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-            <p style={labelHead}>ClinicLocation</p>
+            <p style={labelHead}>Clinic Location</p>
             <p> : {userProfile.clinicLocation?.location}</p>
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
@@ -426,7 +382,7 @@ function Profile(props) {
             <p style={labelHead}>Authorised Staff </p>
             <Scrollbars
               style={{
-                width: '400px',
+                width: '100%',
                 maxHeight: '120px',
                 minHeight: `${userProfile.authStaff?.edges.length > 6 ? 95 : 40}px`,
               }}
@@ -455,8 +411,8 @@ function Profile(props) {
             </Scrollbars>
           </div>
         </div>
-        <div style={{ ...midCard, marginRight: 0, height: '100%' }}>
-          <div style={{ fontSize: '22px', color: 'black', marginBottom: '12px' }}>
+        <div className="midCard">
+          <div style={{ fontSize: '22px', color: 'black', marginBottom: '28px' }}>
             Program Status
             <Button
               type="link"

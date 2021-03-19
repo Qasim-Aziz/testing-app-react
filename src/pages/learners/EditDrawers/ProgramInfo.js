@@ -63,6 +63,15 @@ function ProgramInfo(props) {
   } = props
 
   const [updateInfo, { loading: updateLoading }] = useMutation(GEN_INFO)
+  const [defaultProg, setDefaultProg] = useState(
+    userProfile.defaultProgram ? userProfile.defaultProgram : false,
+  )
+  const [isVbmappActive, setIsVbmappActive] = useState(
+    userProfile.isVbmappActive ? userProfile.isVbmappActive : false,
+  )
+  const [isPeakActive, setIsPeakActive] = useState(userProfile.isPeakActive)
+  const [isCogActive, setIsCogActive] = useState(userProfile.isCogActive)
+  const [researchPart, setResearchPart] = useState(userProfile.researchParticipant)
 
   useEffect(() => {
     if (userProfile) {
@@ -154,7 +163,8 @@ function ProgramInfo(props) {
               style={rightCol}
               checkedChildren={<Icon type="check" />}
               unCheckedChildren={<Icon type="close" />}
-              defaultChecked
+              defaultChecked={userProfile.defaultProgram}
+              onChange={e => setDefaultProg(e)}
             />,
           )}
         </Form.Item>
@@ -166,7 +176,8 @@ function ProgramInfo(props) {
               style={rightCol}
               checkedChildren={<Icon type="check" />}
               unCheckedChildren={<Icon type="close" />}
-              defaultChecked
+              defaultChecked={userProfile.isVbmappActive}
+              onChange={e => setIsVbmappActive(e)}
             />,
           )}
         </Form.Item>
@@ -178,6 +189,8 @@ function ProgramInfo(props) {
               style={rightCol}
               checkedChildren={<Icon type="check" />}
               unCheckedChildren={<Icon type="close" />}
+              defaultChecked={userProfile.isPeakActive}
+              onChange={e => setIsPeakActive(e)}
             />,
           )}
         </Form.Item>
@@ -190,6 +203,7 @@ function ProgramInfo(props) {
               style={rightCol}
               checkedChildren={<Icon type="check" />}
               unCheckedChildren={<Icon type="close" />}
+              defaultChecked={userProfile.isCogActive}
             />,
           )}
         </Form.Item>
