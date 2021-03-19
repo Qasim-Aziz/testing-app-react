@@ -113,6 +113,7 @@ class LearnerTable extends React.Component {
     filterStatus: 'active',
     filterCategory: '',
     filterTags: '',
+    windowWidth: window.innerWidth,
   }
 
   filterRef = React.createRef()
@@ -135,6 +136,7 @@ class LearnerTable extends React.Component {
     dispatch({
       type: 'learners/GET_LEARNERS_DROPDOWNS',
     })
+    window.addEventListener('resize', this.handleWindowResize)
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -152,6 +154,16 @@ class LearnerTable extends React.Component {
         })
       }
     }
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleWindowResize)
+  }
+
+  handleWindowResize = () => {
+    this.setState({
+      windowWidth: window.innerWidth,
+    })
   }
 
   handleChange = (pagination, filters, sorter) => {
@@ -332,7 +344,6 @@ class LearnerTable extends React.Component {
       },
     })
   }
-
   rowsChanged = (currentRowsPerPage, currentPage) => {
     console.log(currentRowsPerPage, currentPage, 'rowChange')
     const {
@@ -911,7 +922,7 @@ class LearnerTable extends React.Component {
           closable={true}
           onClose={() => this.setState({ showProfile: false })}
           visible={this.state.showProfile}
-          width="750px"
+          width={this.state.windowWidth > 1250 ? 1140 : 650}
         >
           <Profile />
         </Drawer>

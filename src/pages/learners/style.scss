@@ -36,6 +36,8 @@
 }
 
 .profile-css {
+  min-width: fit-content;
+
   .ant-card-body {
     padding: 0;
     width: 100%;
@@ -67,22 +69,20 @@
   box-shadow: 0 1px 1px 0 rgb(242, 242, 242);
 }
 
-.mainCard-left {
+.mainCard-child {
   width: 50%;
   height: 100%;
-  padding: 0 12px 0 24px;
-  border-right: 1px solid #e8e8e8;
+  padding: 0 12px 0 28px;
 }
 
-.mainCard-right {
-  width: 50%;
-  height: 100%;
-  padding: 0 18px 0 24px;
+.right-border {
+  border-right: 1px solid #e8e8e8;
 }
 
 .midCard {
   width: 50%;
-  height: 100%;
+  height: fit-content;
+  min-height: 290px;
   background-color: white;
   padding: 24px 12px 24px 28px;
   margin-bottom: 0;
@@ -90,6 +90,7 @@
   border: 1px solid #e8e8e8;
   box-shadow: 0 1px 1px 0 rgb(242, 242, 242);
 }
+
 .midCard-rMargin {
   margin-right: 0;
   margin-left: 14px;
@@ -98,28 +99,32 @@
 .midCard-container {
   display: flex;
   flex-direction: row;
-  height: 290;
+  height: fit-content;
   margin-bottom: 28px;
 }
 
-@media screen and (max-width: 1350px) {
+@media screen and (max-width: 1250px) {
   .mainCard {
     flex-direction: column;
-    padding: 24px;
+    padding: 24px 28px;
   }
 
-  .mainCard-left {
+  .right-border {
     border-right: none;
   }
 
-  .mainCard-left,
-  .mainCard-right {
+  .mainCard-child {
     width: 100%;
     padding-left: 0;
   }
 
+  .midCard-rMargin {
+    margin-left: 0;
+  }
+
   .midCard {
     width: 100%;
+    padding: 24px 28px;
     margin-right: 0;
     margin-bottom: 28px;
   }

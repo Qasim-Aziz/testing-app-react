@@ -2,22 +2,10 @@
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Card, Switch, Icon, Avatar, Tag, Tooltip, Button, Drawer } from 'antd'
-import {
-  FilterOutlined,
-  CloseCircleOutlined,
-  FilePdfOutlined,
-  FileExcelOutlined,
-  DownOutlined,
-  CheckCircleOutlined,
-  CloudDownloadOutlined,
-  PlusOutlined,
-  MoreOutlined,
-  EditOutlined,
-} from '@ant-design/icons'
+import { EditOutlined } from '@ant-design/icons'
 import { Link, withRouter } from 'react-router-dom'
 import LoadingComponent from 'components/VBMappReport/LoadingComponent'
 import moment from 'moment'
-import { Scrollbars } from 'react-custom-scrollbars'
 import GenDetails from './EditDrawers/GenInfo'
 import PersonalInfo from './EditDrawers/PersonalInfo'
 import ClinicInfo from './EditDrawers/ClinicInfo'
@@ -46,35 +34,10 @@ const labelHead = {
   color: 'black',
 }
 
-const mainCard = {
-  width: '100%',
-  height: 'fit-content',
-  display: 'flex',
-  justifyContent: 'center',
-  backgroundColor: 'white',
-  marginBottom: '28px',
-  padding: '24px 0px',
-  border: '1px solid #E8E8E8',
-  boxShadow: '0 1px 1px 0 rgb(0 0 0 / 20%)',
-}
-
-const midCard = {
-  width: '50%',
-  height: '100%',
-  backgroundColor: 'white',
-  padding: '24px 18px 24px 28px',
-  marginRight: '14px',
-  border: '1px solid #E8E8E8',
-  boxShadow: '0 1px 1px 0 rgb(0 0 0 / 20%)',
-}
-
-const inputCustom = { width: '180px', marginBottom: '8px', display: 'block' }
-const tableFilterStyles = { margin: '0px 28px 0 6px' }
-const customLabel = {
-  fontSize: '17px',
-  color: '#000',
-  marginRight: '12px',
-  marginBottom: '12px',
+const th2 = {
+  minWidth: 140,
+  fontWeight: 700,
+  color: 'black',
 }
 
 function Profile(props) {
@@ -181,16 +144,8 @@ function Profile(props) {
       >
         <MiscInfo closeDrawer={setMiscInfoDrawer} staffProfile={staffProfile} />
       </Drawer>
-      <div style={mainCard}>
-        <div
-          style={{
-            width: '50%',
-            height: '100%',
-            padding: '0 12px 0 24px',
-            borderRight: '1px solid #E8E8E8',
-            color: 'black',
-          }}
-        >
+      <div className="mainCard">
+        <div className="mainCard-child right-border">
           <Card
             style={{
               textAlign: 'center',
@@ -212,6 +167,7 @@ function Profile(props) {
                       width: '170px',
                       height: '170px',
                       border: '1px solid #f6f7fb',
+                      marginBottom: `${staffProfile.image ? '10px' : 0}`,
                     }}
                   />
                   <div>
@@ -244,6 +200,7 @@ function Profile(props) {
                     marginTop: '0px',
                     textAlign: 'left',
                     alignContent: 'center',
+                    color: 'black',
                   }}
                 >
                   <div style={{ fontSize: '32px', width: '100%', wordWrap: 'no-wrap' }}>
@@ -274,7 +231,7 @@ function Profile(props) {
               description={
                 <div>
                   <div style={{ display: 'flex', textAlign: 'left' }}>
-                    <p style={labelHead}>Status </p>
+                    <p style={th2}>Status </p>
                     <p>
                       {staffProfile.isActive ? (
                         <button style={customSpanStyle}>Active</button>
@@ -284,11 +241,11 @@ function Profile(props) {
                     </p>
                   </div>
                   <div style={{ display: 'flex', textAlign: 'left' }}>
-                    <p style={labelHead}>Employee Id</p>
+                    <p style={th2}>Employee Id</p>
                     <p> : {staffProfile.employeeId}</p>
                   </div>
                   <div style={{ display: 'flex', textAlign: 'left' }}>
-                    <p style={labelHead}>Date of Joining </p>
+                    <p style={th2}>Date of Joining </p>
                     <p>
                       :{' '}
                       {staffProfile.dateOfJoining
@@ -299,7 +256,7 @@ function Profile(props) {
                     </p>
                   </div>
                   <div style={{ display: 'flex', textAlign: 'left' }}>
-                    <p style={labelHead}>Last Login </p>
+                    <p style={th2}>Last Login </p>
                     <p>
                       :{' '}
                       {staffProfile.user?.lastLogin
@@ -314,13 +271,7 @@ function Profile(props) {
             />
           </Card>
         </div>
-        <div
-          style={{
-            width: '49%',
-            height: '100%',
-            padding: '0 12px 0 36px',
-          }}
-        >
+        <div className="mainCard-child">
           <div style={{ textAlign: 'left' }}>
             <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
               <p style={labelHead}>Staff ID </p>
@@ -359,8 +310,8 @@ function Profile(props) {
         </div>
       </div>
 
-      <div style={{ display: 'flex', height: 270, marginBottom: '28px' }}>
-        <div style={midCard}>
+      <div className="midCard-container">
+        <div className="midCard">
           <div style={{ fontSize: '22px', color: 'black', marginBottom: '12px' }}>
             Personal Information
             <Button
@@ -392,7 +343,7 @@ function Profile(props) {
             <p> : {staffProfile.maritalStatus}</p>
           </div>
         </div>
-        <div style={{ ...midCard, marginRight: 0, marginLeft: '14px' }}>
+        <div className="midCard midCard-rMargin">
           <div style={{ fontSize: '22px', color: 'black', marginBottom: '12px' }}>
             Emergency Contact
             <Button
@@ -421,8 +372,8 @@ function Profile(props) {
           </div>
         </div>
       </div>
-      <div style={{ display: 'flex', height: 270, marginBottom: '30px' }}>
-        <div style={midCard}>
+      <div className="midCard-container">
+        <div className="midCard">
           <div style={{ fontSize: '22px', color: 'black', marginBottom: '14px' }}>
             Information
             <Button
@@ -454,7 +405,7 @@ function Profile(props) {
             <p> : {staffProfile.salutation}</p>
           </div>
         </div>
-        <div style={{ ...midCard, marginRight: 0, marginLeft: '14px', height: '100%' }}>
+        <div className="midCard midCard-rMargin">
           <div style={{ fontSize: '22px', color: 'black', marginBottom: '12px' }}>
             Misc
             <Button

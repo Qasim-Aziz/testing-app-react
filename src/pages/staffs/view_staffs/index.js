@@ -71,60 +71,6 @@ const { Panel } = Collapse
 const { Meta } = Card
 const { RangePicker } = DatePicker
 
-const customStyles = {
-  header: {
-    style: {
-      maxHeight: '50px',
-    },
-  },
-  headRow: {
-    style: {
-      borderTopStyle: 'solid',
-      borderTopWidth: '1px',
-      borderTopColor: '#ddd',
-      backgroundColor: '#f5f5f5',
-    },
-  },
-  headCells: {
-    style: {
-      '&:not(:last-of-type)': {
-        borderRightStyle: 'solid',
-        borderRightWidth: '1px',
-        borderRightColor: '#ddd',
-      },
-      height: '40px',
-      padding: '12px 8px 7px',
-      fontWeight: 'bold',
-    },
-  },
-  cells: {
-    style: {
-      '&:not(:last-of-type)': {
-        borderRightStyle: 'solid',
-        borderRightWidth: '1px',
-        borderRightColor: '#ddd',
-      },
-      padding: '4px 8px',
-      fontSize: '12px',
-    },
-  },
-  pagination: {
-    style: {
-      position: 'absolute',
-      top: '12px',
-      right: '5px',
-      borderTopStyle: 'none',
-      minHeight: '35px',
-    },
-  },
-  table: {
-    style: {
-      paddingBottom: '64px',
-      top: '64px',
-    },
-  },
-}
-
 const inputCustom = { width: '180px', marginBottom: '8px', display: 'block' }
 const tableFilterStyles = { margin: '0px 22px 0 8px' }
 const customLabel = {
@@ -158,6 +104,7 @@ class StaffTable extends React.Component {
     filterDesignation: '',
     filterTags: '',
     filterActive: 'all',
+    windowWidth: window.innerWidth,
   }
 
   filterRef = React.createRef()
@@ -180,6 +127,8 @@ class StaffTable extends React.Component {
     dispatch({
       type: 'staffs/GET_STAFF_DROPDOWNS',
     })
+
+    window.addEventListener('resize', this.handleWindowResize)
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -196,6 +145,10 @@ class StaffTable extends React.Component {
         })
       }
     }
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleWindowResize)
   }
 
   info = e => {
@@ -456,6 +409,12 @@ class StaffTable extends React.Component {
       gender: '',
       designation: '',
       address: '',
+    })
+  }
+
+  handleWindowResize = () => {
+    this.setState({
+      windowWidth: window.innerWidth,
     })
   }
 
@@ -832,7 +791,7 @@ class StaffTable extends React.Component {
 
         <Drawer
           title="Employee Profile"
-          width="1250px"
+          width={this.state.windowWidth > 1250 ? 1200 : 650}
           closable
           className="profile-css"
           visible={this.state.profileDrawer}

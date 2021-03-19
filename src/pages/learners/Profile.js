@@ -2,18 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Card, Switch, Icon, Avatar, Tag, Tooltip, Button, Drawer } from 'antd'
-import {
-  FilterOutlined,
-  CloseCircleOutlined,
-  FilePdfOutlined,
-  FileExcelOutlined,
-  DownOutlined,
-  CheckCircleOutlined,
-  CloudDownloadOutlined,
-  PlusOutlined,
-  MoreOutlined,
-  EditOutlined,
-} from '@ant-design/icons'
+import { CloseCircleOutlined, CheckCircleOutlined, EditOutlined } from '@ant-design/icons'
 import { Link, withRouter } from 'react-router-dom'
 import LoadingComponent from 'components/VBMappReport/LoadingComponent'
 import moment from 'moment'
@@ -53,6 +42,8 @@ function Profile(props) {
   const [personalInfoDrawer, setPersonalInfoDrawer] = useState(false)
   const [clinicInfoDrawer, setClinicInfoDrawer] = useState(false)
   const [programInfoDrawer, setProgramInfoDrawer] = useState(false)
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+
   useEffect(() => {
     if (props.learners.UserProfile) {
       const tt = props.learners.UserProfile
@@ -121,7 +112,7 @@ function Profile(props) {
         <ProgramInfo closeDrawer={setProgramInfoDrawer} userProfile={userProfile} />
       </Drawer>
       <div className="mainCard">
-        <div className="mainCard-left">
+        <div className="mainCard-child right-border">
           <Card
             style={{
               textAlign: 'center',
@@ -233,7 +224,7 @@ function Profile(props) {
             />
           </Card>
         </div>
-        <div className="mainCard-right">
+        <div className="mainCard-child">
           <div style={{ textAlign: 'left' }}>
             <div style={{ display: 'flex', textAlign: 'left' }}>
               <p style={labelHead}>Client ID </p>
@@ -273,7 +264,7 @@ function Profile(props) {
       </div>
 
       <div className="mainCard" style={{ marginBottom: '28px' }}>
-        <div className="mainCard-left">
+        <div className="mainCard-child right-border">
           <div style={{ fontSize: '22px', color: 'black', marginBottom: '12px' }}>
             Personal Information
             <Button
@@ -325,13 +316,7 @@ function Profile(props) {
             </div>
           ) : null}
         </div>
-        <div
-          style={{
-            width: '50%',
-            height: '100%',
-            padding: '0 18px 0 24px',
-          }}
-        >
+        <div className="mainCard-child">
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>Height </p>
             <p> : {userProfile.height}</p>
@@ -350,6 +335,7 @@ function Profile(props) {
           </div>
         </div>
       </div>
+
       <div className="midCard-container">
         <div className="midCard">
           <div style={{ fontSize: '22px', color: 'black', marginBottom: '12px' }}>
@@ -383,7 +369,7 @@ function Profile(props) {
             <Scrollbars
               style={{
                 width: '100%',
-                maxHeight: '120px',
+                maxHeight: '100px',
                 minHeight: `${userProfile.authStaff?.edges.length > 6 ? 95 : 40}px`,
               }}
               autoHide
@@ -411,8 +397,8 @@ function Profile(props) {
             </Scrollbars>
           </div>
         </div>
-        <div className="midCard">
-          <div style={{ fontSize: '22px', color: 'black', marginBottom: '28px' }}>
+        <div className="midCard midCard-rMargin">
+          <div style={{ fontSize: '22px', color: 'black', marginBottom: '12px' }}>
             Program Status
             <Button
               type="link"
