@@ -72,7 +72,6 @@ class EditBasicInformation extends React.Component {
       form,
       learners: { UserProfile },
     } = this.props
-    console.log(this.props, 'dgdfgddfgf')
 
     const selectedStaffList = []
     UserProfile.authStaff.edges.map(item => selectedStaffList.push(item.node.id))
@@ -186,7 +185,7 @@ class EditBasicInformation extends React.Component {
       learners: { clinicLocationList, categoryList, staffDropdownList, languageList },
     } = this.props
     const itemStyle1 = { marginBottom: '5px', fontWeight: 'bold' }
-    console.log(this.state.tagArray, 'pppp')
+
     return (
       <Form {...layout} onSubmit={e => this.handleSubmit(e)}>
         <Form.Item {...layout1} label="Profile" style={itemStyle1}>
@@ -279,11 +278,6 @@ class EditBasicInformation extends React.Component {
             </Select>,
           )}
         </Form.Item>
-        {/* <Form.Item label="Address" style={itemStyle}>
-          {form.getFieldDecorator('address', { rules: [{ message: 'Please provide Address!' }] })(
-            <TextArea placeholder="Address" autoSize={{ minRows: 3 }} />,
-          )}
-        </Form.Item> */}
 
         <Divider orientation="left">Personal Details</Divider>
 
@@ -388,15 +382,10 @@ class EditBasicInformation extends React.Component {
           })(<Checkbox />)}
         </Form.Item>
 
-        {/* <Divider orientation="left"> Default program </Divider> */}
-
         <Form.Item {...tailLayout}>
           <Button style={{ width: '100%' }} type="primary" htmlType="submit">
             Save
           </Button>
-          {/* <Button htmlType="primary" onClick={this.onReset} className="ml-4">
-            cancel
-          </Button> */}
         </Form.Item>
       </Form>
     )

@@ -86,8 +86,6 @@ function GenDetails(props) {
     e.preventDefault()
     form.validateFields((err, values) => {
       if (!err) {
-        console.log(err, values)
-
         updateInfo({
           variables: {
             id: staffProfile.id,
@@ -127,7 +125,6 @@ function GenDetails(props) {
           },
         })
           .then(result => {
-            console.log(result, 'Result')
             dispatch({
               type: 'staffs/UPDATE_STAFF_INFO',
               payload: {
@@ -138,7 +135,6 @@ function GenDetails(props) {
             closeDrawer(false)
           })
           .catch(error => {
-            console.log(error, 'rorororoorororroro')
             notification.error({
               message: 'Something went wrong',
               description: 'Unable to update data',

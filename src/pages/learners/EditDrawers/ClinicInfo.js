@@ -1,28 +1,12 @@
 /* eslint-disable */
 import React, { useState, useEffect } from 'react'
-import {
-  Form,
-  Input,
-  Button,
-  Select,
-  DatePicker,
-  Divider,
-  Upload,
-  Tag,
-  Checkbox,
-  Icon,
-  message,
-  notification,
-} from 'antd'
+import { Form, Input, Button, Select, notification } from 'antd'
 import moment from 'moment'
 import { Link, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import axios from 'axios'
 import { useMutation } from 'react-apollo'
 import { GEN_INFO } from './query'
-import AntdTag from '../../staffs/antdTag'
 
-const { TextArea } = Input
 const { Option } = Select
 const layout = {
   labelCol: {
@@ -74,7 +58,6 @@ function ClinicInfo(props) {
     e.preventDefault()
     form.validateFields((err, values) => {
       if (!err) {
-        console.log(values, 'these arw the values')
         const selectedStaffList = []
         userProfile.authStaff.edges.map(item => selectedStaffList.push(item.node.id))
 
@@ -117,7 +100,6 @@ function ClinicInfo(props) {
           },
         })
           .then(res => {
-            console.log(res, 'respsonse i cloincc')
             dispatch({
               type: 'learners/EDIT_GENERAL_INFO',
               payload: {

@@ -16,16 +16,12 @@
 /* eslint-disable */
 import React, { useRef } from 'react'
 import { Helmet } from 'react-helmet'
-import Highlighter from 'react-highlight-words'
 import {
   Table,
   Button,
-  Collapse,
   Card,
   Avatar,
-  Form,
   Select,
-  DatePicker,
   Input,
   Icon,
   Drawer,
@@ -38,22 +34,16 @@ import {
 import {
   FilterOutlined,
   CloseCircleOutlined,
-  FilePdfOutlined,
-  FileExcelOutlined,
-  DownOutlined,
   CheckCircleOutlined,
   CloudDownloadOutlined,
   PlusOutlined,
   MoreOutlined,
-  EditOutlined,
 } from '@ant-design/icons'
-import DataTable from 'react-data-table-component'
 import JsPDF from 'jspdf'
 import 'jspdf-autotable'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import Authorize from 'components/LayoutComponents/Authorize'
-import { Scrollbars } from 'react-custom-scrollbars'
 import moment from 'moment'
 import { connect } from 'react-redux'
 import { gql } from 'apollo-boost'
@@ -141,7 +131,6 @@ class LearnerTable extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (prevProps?.learners !== this.props?.learners) {
-      console.log(this.props.learners.LearnersList, 'updated Learnerse')
       this.setState({
         mainData: this.props.learners.LearnersList,
         loadingLearners: this.props.learners.loadingLearners,
@@ -272,8 +261,6 @@ class LearnerTable extends React.Component {
   }
 
   showProgram = obj => {
-    console.log('===> studnet selected', obj)
-
     localStorage.setItem('studentId', JSON.stringify(obj?.id))
     window.location.href = '/#/therapistStudent'
 
@@ -288,7 +275,6 @@ class LearnerTable extends React.Component {
   }
 
   showAssessments = obj => {
-    console.log('===> studnet selected')
     localStorage.setItem('studentId', JSON.stringify(obj?.id))
     window.location.href = '/#/therapistStudent'
 
@@ -303,7 +289,6 @@ class LearnerTable extends React.Component {
   }
 
   showSession = obj => {
-    console.log('===> studnet selected')
     localStorage.setItem('studentId', JSON.stringify(obj?.id))
     window.location.href = '/#/therapistStudent'
 
@@ -345,7 +330,6 @@ class LearnerTable extends React.Component {
     })
   }
   rowsChanged = (currentRowsPerPage, currentPage) => {
-    console.log(currentRowsPerPage, currentPage, 'rowChange')
     const {
       dispatch,
       learners: { ItemPerPage, CurrentStatus },
@@ -478,7 +462,7 @@ class LearnerTable extends React.Component {
 
   render() {
     let { filteredInfo, visibleFilter, realLearnerList } = this.state
-    console.log(this.state, 'this state')
+
     filteredInfo = filteredInfo || {}
     const {
       learners: {

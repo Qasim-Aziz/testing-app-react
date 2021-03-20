@@ -1,25 +1,10 @@
 /* eslint-disable */
 import React, { useState, useEffect } from 'react'
-import {
-  Form,
-  Input,
-  Button,
-  Select,
-  DatePicker,
-  Divider,
-  Upload,
-  Tag,
-  Checkbox,
-  Icon,
-  message,
-  notification,
-} from 'antd'
+import { Form, Input, Button, Select, notification } from 'antd'
 import moment from 'moment'
 import { useMutation } from 'react-apollo'
 import { Link, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import axios from 'axios'
-import AntdTag from '../../staffs/antdTag'
 import { GEN_INFO } from './query'
 
 const { TextArea } = Input
@@ -81,7 +66,6 @@ function PersonalInfo(props) {
       if (!err) {
         const selectedStaffList = []
         userProfile.authStaff.edges.map(item => selectedStaffList.push(item.node.id))
-        console.log(values, 'values')
         updateInfo({
           variables: {
             id: userProfile.id,
@@ -121,7 +105,6 @@ function PersonalInfo(props) {
           },
         })
           .then(result => {
-            console.log(result, 'response sekfjskfjskjbdfbdfjbsjbsjbsjhbsjhsjhs v ')
             dispatch({
               type: 'learners/EDIT_GENERAL_INFO',
               payload: {
@@ -132,7 +115,6 @@ function PersonalInfo(props) {
             closeDrawer(false)
           })
           .catch(error => {
-            console.log(error)
             notification.error({
               message: 'Something went wrong',
               description: 'Unable to update learner data',
@@ -141,7 +123,6 @@ function PersonalInfo(props) {
       }
     })
   }
-  console.log(languageList, 'lang use lsit')
   console.log(userProfile, 'ser')
   return (
     <div>

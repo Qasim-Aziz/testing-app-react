@@ -133,7 +133,6 @@ class StaffTable extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.staffs.StaffList !== this.props.staffs.StaffList) {
-      console.log(this.props.staffs, 'staffs props')
       this.setState({
         tableData: this.props.staffs.StaffList,
         mainData: this.props.staffs.StaffList,
@@ -152,7 +151,6 @@ class StaffTable extends React.Component {
   }
 
   info = e => {
-    console.log(e, 'ewewe')
     const { dispatch } = this.props
     dispatch({
       type: 'staffs/GET_STAFF_PROFILE',
@@ -165,7 +163,6 @@ class StaffTable extends React.Component {
   }
 
   info2 = e => {
-    console.log(e, 'ewewe')
     const { dispatch } = this.props
     dispatch({
       type: 'staffs/GET_STAFF_PROFILE',
@@ -449,7 +446,7 @@ class StaffTable extends React.Component {
             type="link"
             style={{ padding: '0px', fontWeight: 'bold', fontSize: '14px' }}
           >
-            {row.name}
+            {row.name} {row.surname}
           </Button>
         ),
       },
@@ -968,7 +965,7 @@ class StaffTable extends React.Component {
                 title={() => {
                   return tableHeader
                 }}
-                rowKey={record => record.id}
+                rowKey="id"
                 loading={staffs.loading}
                 columns={columns}
                 dataSource={filteredList}

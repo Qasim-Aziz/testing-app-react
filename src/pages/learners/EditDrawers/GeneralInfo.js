@@ -50,7 +50,6 @@ const itemStyle = { marginBottom: '5px', fontWeight: 'bold' }
 
 function GenDetails(props) {
   const { closeDrawer, form, dispatch, userProfile } = props
-  console.log(props, 'porpre er')
   const [tagArray, setTagArray] = useState(userProfile.tags)
   const [updateInfo, { data: updateData, loading: updateLoading }] = useMutation(GEN_INFO)
 
@@ -84,8 +83,6 @@ function GenDetails(props) {
     e.preventDefault()
     form.validateFields((err, values) => {
       if (!err) {
-        console.log(err, values)
-
         const selectedStaffList = []
         userProfile.authStaff.edges.map(item => selectedStaffList.push(item.node.id))
 
@@ -128,7 +125,6 @@ function GenDetails(props) {
           },
         })
           .then(result => {
-            console.log(result, 'Result')
             dispatch({
               type: 'learners/EDIT_GENERAL_INFO',
               payload: {
@@ -139,7 +135,6 @@ function GenDetails(props) {
             closeDrawer(false)
           })
           .catch(error => {
-            console.log(error, 'rorororoorororroro')
             notification.error({
               message: 'Something went wrong',
               description: 'Unable to update data',

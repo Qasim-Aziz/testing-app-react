@@ -249,7 +249,6 @@ export function* GET_LEARNERS_DROPDOWNS() {
 
 export function* EDIT_GENERAL_INFO({ payload }) {
   const { response } = payload
-  console.log(response, 'response')
   if (response && response.data) {
     notification.success({
       message: 'Learner Updated Successfully',
@@ -354,7 +353,6 @@ export function* CREATE_LEARNER({ payload }) {
       })
       .then(res => {
         // then print response status
-        console.log(res.statusText)
         message.success('Upload Successfully.')
       })
       .catch(err1 => {
@@ -411,7 +409,7 @@ export function* LEARNER_ACTIVE_INACTIVE({ payload }) {
 
 export function* GET_SINGLE_LEARNER({ payload }) {
   const response = yield call(getLearner, payload.UserProfile)
-  console.log(payload, response.data, 'palylsdfnf kfdvfh vfjh vjh fv')
+
   if (response && response.data) {
     // generating notification
     const userData = {

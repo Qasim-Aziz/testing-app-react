@@ -49,7 +49,6 @@ const itemStyle = { marginBottom: '5px', fontWeight: 'bold' }
 
 function PersonalInfo(props) {
   const { form, dispatch, closeDrawer, staffProfile } = props
-
   const [updateInfo, { loading: updateLoading }] = useMutation(UPDATE_STAFF)
 
   useEffect(() => {
@@ -66,8 +65,6 @@ function PersonalInfo(props) {
     e.preventDefault()
     form.validateFields((err, values) => {
       if (!err) {
-        console.log(values, 'values')
-
         updateInfo({
           variables: {
             id: staffProfile.id,
@@ -126,6 +123,7 @@ function PersonalInfo(props) {
       }
     })
   }
+
   console.log(staffProfile, 'ser')
   return (
     <div>

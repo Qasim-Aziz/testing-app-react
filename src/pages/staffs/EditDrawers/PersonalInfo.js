@@ -66,7 +66,6 @@ function PersonalInfo(props) {
     e.preventDefault()
     form.validateFields((err, values) => {
       if (!err) {
-        console.log(values, 'values')
         updateInfo({
           variables: {
             id: staffProfile.id,
@@ -125,6 +124,7 @@ function PersonalInfo(props) {
       }
     })
   }
+
   console.log(staffProfile, 'ser')
   return (
     <div>

@@ -23,7 +23,6 @@ export function* GET_DATA() {
   })
 
   const response = yield call(getClinicStaffs)
-  console.log('REESSSS', response)
 
   if (response) {
     const staffs = []
@@ -69,7 +68,7 @@ export function* GET_STAFF_DROPDOWNS() {
 
 export function* GET_STAFF_PROFILE({ payload }) {
   const response = yield call(getStaffProfile, payload)
-  console.log(response, 'response')
+
   if (response && response.data) {
     const { staff } = response.data
     if (staff.tags.edges.length > 0) {
@@ -196,7 +195,6 @@ export function* STAFF_ACTIVE_INACTIVE({ payload }) {
 
   if (response && response.data) {
     // generating notification
-    // console.log(response.data.updateStaff.staff)
     if (payload.checked === true) {
       notification.success({
         message: 'Staff Activated Successfully',

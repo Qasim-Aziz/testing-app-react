@@ -47,13 +47,30 @@ function Profile(props) {
   const [clinicInfoDrawer, setClinicInfoDrawer] = useState(false)
   const [miscInfoDrawer, setMiscInfoDrawer] = useState(false)
   const [emergencyInfoDrawer, setEmergencyInfoDrawer] = useState(false)
-
-  console.log(props, 'thsee are th[rop')
+  const [address, setAddress] = useState('')
   useEffect(() => {
     if (props.staffs.StaffProfile) {
       const tt = props.staffs.StaffProfile
 
       setStaffProfile(tt)
+      let temp = ''
+      if (tt.street) {
+        temp += tt.street
+      }
+      if (tt.city) {
+        temp += tt.city?.trim() + ', '
+      }
+      if (tt.state) {
+        temp += tt.state?.trim() + ', '
+      }
+      if (tt.country) {
+        temp += tt.country?.trim() + ', '
+      }
+      if (tt.zipCode) {
+        temp += tt.zipCode?.trim()
+      }
+
+      setAddress(temp)
     }
   }, [props])
 
@@ -62,12 +79,20 @@ function Profile(props) {
 
     var years = b.diff(a, 'year')
     a.add(years, 'years')
+    console.log(b, a)
 
     var months = b.diff(a, 'months')
     a.add(months, 'months')
 
     var days = b.diff(a, 'days')
 
+    var hrs = b.diff(a, 'hours')
+    a.add(hrs, 'hours')
+
+    var min = b.diff(a, 'minutes')
+    a.add(min, 'minutes')
+
+    console.log(days, hrs, min)
     if (years > 0) {
       if (months > 0) {
         return `${years} ${years == 1 ? 'Y' : 'Y'} ${months} ${months == 1 ? 'M' : 'M'} ago`
@@ -77,9 +102,21 @@ function Profile(props) {
     } else if (months > 0) {
       if (days > 0) {
         return `${months} ${months == 1 ? 'M' : 'M'} ${days} ${days == 1 ? 'D' : 'D'} ago`
+      } else {
+        return `${moths} ${months == 1 ? 'M' : 'M'} ago`
       }
     } else if (days > 0) {
-      return `${days} ${days == 1 ? 'D' : 'D'} ago`
+      if (hrs > 0) {
+        return `${days} ${days == 1 ? 'D' : 'D'} ${hrs} ${hrs == 1 ? 'H' : 'H'}ago`
+      } else {
+        return `${days} ${days == 1 ? 'D' : 'D'} ago`
+      }
+    } else if (hrs > 0) {
+      if (min > 0) {
+        return `${hrs} H ${min} Min ago`
+      } else {
+        return `${hrs} H ago`
+      }
     } else {
       return ''
     }
@@ -240,11 +277,11 @@ function Profile(props) {
                       )}
                     </p>
                   </div>
-                  <div style={{ display: 'flex', textAlign: 'left' }}>
+                  <div style={{ display: 'flex', textAlign: 'left', color: 'black' }}>
                     <p style={th2}>Employee Id</p>
                     <p> : {staffProfile.employeeId}</p>
                   </div>
-                  <div style={{ display: 'flex', textAlign: 'left' }}>
+                  <div style={{ display: 'flex', textAlign: 'left', color: 'black' }}>
                     <p style={th2}>Date of Joining </p>
                     <p>
                       :{' '}
@@ -255,14 +292,16 @@ function Profile(props) {
                         : null}
                     </p>
                   </div>
-                  <div style={{ display: 'flex', textAlign: 'left' }}>
+                  <div style={{ display: 'flex', textAlign: 'left', color: 'black' }}>
                     <p style={th2}>Last Login </p>
                     <p>
                       :{' '}
                       {staffProfile.user?.lastLogin
-                        ? `${moment(staffProfile.user?.lastLogin).format(
-                            'YYYY-MM-DD',
-                          )} (${getMomentDiff(moment(staffProfile.user?.lastLogin))})`
+                        ? `${moment(staffProfile.user?.lastLogin).format('YYYY-MM-DD')} ${
+                            getMomentDiff(moment(staffProfile.user?.lastLogin)) !== ''
+                              ? `(${getMomentDiff(moment(staffProfile.user?.lastLogin))})`
+                              : null
+                          }`
                         : null}
                     </p>
                   </div>
@@ -304,7 +343,7 @@ function Profile(props) {
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
               <p style={labelHead}>Address </p>
-              <p> : {staffProfile.localAddress}</p>
+              <p> : {address}</p>
             </div>
           </div>
         </div>
@@ -375,7 +414,7 @@ function Profile(props) {
       <div className="midCard-container">
         <div className="midCard">
           <div style={{ fontSize: '22px', color: 'black', marginBottom: '14px' }}>
-            Information
+            Clinical Information
             <Button
               type="link"
               onClick={() => setClinicInfoDrawer(true)}

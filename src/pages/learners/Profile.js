@@ -42,7 +42,6 @@ function Profile(props) {
   const [personalInfoDrawer, setPersonalInfoDrawer] = useState(false)
   const [clinicInfoDrawer, setClinicInfoDrawer] = useState(false)
   const [programInfoDrawer, setProgramInfoDrawer] = useState(false)
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
 
   useEffect(() => {
     if (props.learners.UserProfile) {

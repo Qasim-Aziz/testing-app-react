@@ -63,15 +63,7 @@ function ProgramInfo(props) {
   } = props
 
   const [updateInfo, { loading: updateLoading }] = useMutation(GEN_INFO)
-  const [defaultProg, setDefaultProg] = useState(
-    userProfile.defaultProgram ? userProfile.defaultProgram : false,
-  )
-  const [isVbmappActive, setIsVbmappActive] = useState(
-    userProfile.isVbmappActive ? userProfile.isVbmappActive : false,
-  )
   const [isPeakActive, setIsPeakActive] = useState(userProfile.isPeakActive)
-  const [isCogActive, setIsCogActive] = useState(userProfile.isCogActive)
-  const [researchPart, setResearchPart] = useState(userProfile.researchParticipant)
 
   useEffect(() => {
     if (userProfile) {
@@ -89,7 +81,6 @@ function ProgramInfo(props) {
     e.preventDefault()
     form.validateFields((err, values) => {
       if (!err) {
-        console.log(values, 'values')
         const selectedStaffList = []
         userProfile.authStaff.edges.map(item => selectedStaffList.push(item.node.id))
 

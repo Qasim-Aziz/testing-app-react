@@ -67,8 +67,6 @@ function MiscInfo(props) {
     e.preventDefault()
     form.validateFields((err, values) => {
       if (!err) {
-        console.log(values, 'values')
-
         updateInfo({
           variables: {
             id: staffProfile.id,
@@ -119,7 +117,6 @@ function MiscInfo(props) {
             closeDrawer(false)
           })
           .catch(error => {
-            console.log(error)
             notification.error({
               message: 'Something went wrong',
               description: 'Unable to update learner data',
@@ -128,6 +125,7 @@ function MiscInfo(props) {
       }
     })
   }
+
   console.log(staffProfile, 'ser')
   return (
     <div>

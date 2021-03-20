@@ -67,13 +67,10 @@ function ClinicInfo(props) {
     }
   }, [staffProfile])
 
-  console.log(clinicLocationList, 'clinic locaion lsit')
   const handleSubmit = e => {
     e.preventDefault()
     form.validateFields((err, values) => {
       if (!err) {
-        console.log(values, 'these arw the values')
-
         updateInfo({
           variables: {
             id: staffProfile.id,
