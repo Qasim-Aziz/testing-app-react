@@ -1,29 +1,15 @@
 /* eslint-disable */
 import React, { useState, useEffect } from 'react'
-import {
-  Form,
-  Input,
-  Button,
-  Select,
-  DatePicker,
-  Divider,
-  Upload,
-  notification,
-  Tag,
-  Checkbox,
-  Icon,
-  message,
-} from 'antd'
+import { Form, Input, Button, Select, DatePicker, Divider, Upload, notification } from 'antd'
 import moment from 'moment'
 import { Link, withRouter } from 'react-router-dom'
 import gql from 'graphql-tag'
 import { useMutation } from 'react-apollo'
 import { connect } from 'react-redux'
-import axios from 'axios'
 import AntdTag from '../antdTag'
 import LoadingComponent from 'components/LoadingComponent'
 import { UPDATE_STAFF } from './query'
-import { SectionVerticalAlignAttributes } from 'docx'
+import '../style.scss'
 
 const { TextArea } = Input
 const { Option } = Select
@@ -51,7 +37,6 @@ const itemStyle = { marginBottom: '5px', fontWeight: 'bold' }
 
 function GenDetails(props) {
   const { closeDrawer, form, dispatch, staffProfile } = props
-  console.log(props, 'porpre er')
   const [tagArray, setTagArray] = useState(staffProfile.tags)
   const [updateInfo, { loading: updateLoading }] = useMutation(UPDATE_STAFF)
 

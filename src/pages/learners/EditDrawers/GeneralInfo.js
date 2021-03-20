@@ -1,19 +1,6 @@
 /* eslint-disable */
 import React, { useState, useEffect } from 'react'
-import {
-  Form,
-  Input,
-  Button,
-  Select,
-  DatePicker,
-  Divider,
-  Upload,
-  notification,
-  Tag,
-  Checkbox,
-  Icon,
-  message,
-} from 'antd'
+import { Form, Input, Button, Select, DatePicker, Divider, Upload, notification } from 'antd'
 import moment from 'moment'
 import { Link, withRouter } from 'react-router-dom'
 import gql from 'graphql-tag'

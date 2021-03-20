@@ -13,7 +13,7 @@ export async function getClinicStaffs() {
     .query({
       query: gql`
         query {
-          staffs(first: 20, last: 20) {
+          staffs {
             edges {
               node {
                 id

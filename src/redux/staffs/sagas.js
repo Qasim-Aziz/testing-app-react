@@ -193,6 +193,7 @@ export function* UPDATE_STAFF_INFO({ payload }) {
 export function* STAFF_ACTIVE_INACTIVE({ payload }) {
   const response = yield call(staffActiveInactive, payload)
 
+  console.log(response, 'got in response')
   if (response && response.data) {
     // generating notification
     if (payload.checked === true) {

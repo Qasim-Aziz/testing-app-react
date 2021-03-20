@@ -54,8 +54,8 @@ function Profile(props) {
 
       setStaffProfile(tt)
       let temp = ''
-      if (tt.street) {
-        temp += tt.street
+      if (tt.streetAddress) {
+        temp += tt.streetAddress
       }
       if (tt.city) {
         temp += tt.city?.trim() + ', '
@@ -300,7 +300,7 @@ function Profile(props) {
                         ? `${moment(staffProfile.user?.lastLogin).format('YYYY-MM-DD')} ${
                             getMomentDiff(moment(staffProfile.user?.lastLogin)) !== ''
                               ? `(${getMomentDiff(moment(staffProfile.user?.lastLogin))})`
-                              : null
+                              : ''
                           }`
                         : null}
                     </p>

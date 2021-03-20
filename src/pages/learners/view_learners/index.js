@@ -55,19 +55,6 @@ import '../style.scss'
 import Profile from '../Profile'
 
 const { Meta } = Card
-
-const customSpanStyle = {
-  backgroundColor: '#52c41a',
-  color: 'white',
-  borderRadius: '3px',
-  padding: '1px 5px',
-}
-const inActiveSpanStyle = {
-  backgroundColor: 'red',
-  color: 'white',
-  borderRadius: '3px',
-  padding: '1px 5px',
-}
 const inputCustom = { width: '180px', marginBottom: '8px', display: 'block' }
 const tableFilterStyles = { margin: '0px 28px 0 6px' }
 const customLabel = {
@@ -100,7 +87,7 @@ class LearnerTable extends React.Component {
     noOfRows: 20,
     filterName: '',
     filterEmail: '',
-    filterStatus: 'active',
+    filterStatus: '',
     filterCategory: '',
     filterTags: '',
     windowWidth: window.innerWidth,
@@ -783,22 +770,6 @@ class LearnerTable extends React.Component {
         </span>
 
         <span style={{ display: 'flex', alignItems: 'center' }}>
-          <Radio.Group
-            size="small"
-            buttonStyle="solid"
-            value={this.state.filterStatus}
-            onChange={e => {
-              this.filterHandler({ status: e.target.value })
-              this.setState({ filterStatus: e.target.value, isFilterActive: true })
-            }}
-            style={tableFilterStyles}
-          >
-            <Radio.Button value="">All</Radio.Button>
-            <Radio.Button value="active">Active</Radio.Button>
-            <Radio.Button value="in-active">In-Active</Radio.Button>
-          </Radio.Group>
-        </span>
-        <span style={{ display: 'flex', alignItems: 'center' }}>
           <span>Category :</span>
           <Radio.Group
             size="small"
@@ -836,6 +807,23 @@ class LearnerTable extends React.Component {
             }}
             style={{ ...tableFilterStyles, width: '148px' }}
           />
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center' }}>
+          <span>Status :</span>
+          <Radio.Group
+            size="small"
+            buttonStyle="solid"
+            value={this.state.filterStatus}
+            onChange={e => {
+              this.filterHandler({ status: e.target.value })
+              this.setState({ filterStatus: e.target.value, isFilterActive: true })
+            }}
+            style={tableFilterStyles}
+          >
+            <Radio.Button value="">All</Radio.Button>
+            <Radio.Button value="active">Active</Radio.Button>
+            <Radio.Button value="in-active">In-Active</Radio.Button>
+          </Radio.Group>
         </span>
       </div>
     )
@@ -930,91 +918,7 @@ class LearnerTable extends React.Component {
           onClose={this.onCloseEdit}
           visible={this.state.visibleEdit}
         >
-          {UserProfile ? (
-            <div className="card" style={{ marginTop: '5px', border: 'none' }}>
-              <div className="card-body">
-                <div className="table-operations" style={{ marginBottom: '16px' }}>
-                  <Button
-                    style={{
-                      marginRight: '-12px',
-                      float: 'right',
-                      border: 'none',
-                      padding: 'none',
-                    }}
-                    onClick={() => this.onCloseEdit()}
-                  >
-                    X
-                  </Button>
-                </div>
-                <div>
-                  <Card
-                    style={{
-                      textAlign: 'center',
-                      border: 'none',
-                      display: 'flex',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Meta
-                      avatar={
-                        <Avatar
-                          src="https://www.thewodge.com/wp-content/uploads/2019/11/avatar-icon.png"
-                          style={{
-                            width: '100px',
-                            height: '100px',
-                            border: '1px solid #f6f7fb',
-                          }}
-                        />
-                      }
-                      title={
-                        <h5 style={{ marginTop: '20px' }}>
-                          {UserProfile ? UserProfile.firstname : ''}
-                          <span
-                            style={{
-                              float: 'right',
-                              fontSize: '12px',
-                              padding: '5px',
-                              color: '#0190fe',
-                            }}
-                          >
-                            {UserProfile.isActive === true ? (
-                              <Switch
-                                checkedChildren={<Icon type="check" />}
-                                unCheckedChildren={<Icon type="close" />}
-                                defaultChecked
-                                onChange={this.learnerActiveInactive}
-                              />
-                            ) : (
-                              <Switch
-                                checkedChildren={<Icon type="check" />}
-                                unCheckedChildren={<Icon type="close" />}
-                                onChange={this.learnerActiveInactive}
-                              />
-                            )}
-                          </span>
-                        </h5>
-                      }
-                      description={
-                        <div>
-                          <p style={{ fontSize: '13px', marginBottom: '4px' }}>
-                            Enrollment Status &nbsp;{' '}
-                            {UserProfile.isActive ? (
-                              <span style={customSpanStyle}>Active</span>
-                            ) : (
-                              <span style={inActiveSpanStyle}>In-Active</span>
-                            )}
-                          </p>
-                        </div>
-                      }
-                    />
-                  </Card>
-                  {isUserProfile ? <EditBasicInformation key={UserProfile.id} /> : null}
-                </div>
-              </div>
-            </div>
-          ) : (
-            ''
-          )}
+          {UserProfile ? <EditBasicInformation key={UserProfile.id} /> : null}
         </Drawer>
 
         <div

@@ -17,8 +17,9 @@
   height: 128px !important;
   border-radius: 50%;
 }
+
 .ant-form-item-required::before {
-  content: '*';
+  content: '*' !important;
 }
 
 .modify-data-table {
