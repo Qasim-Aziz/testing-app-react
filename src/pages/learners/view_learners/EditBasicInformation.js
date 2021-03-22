@@ -17,6 +17,9 @@ import {
   Tag,
   Checkbox,
   Icon,
+  Card,
+  Avatar,
+  Switch,
   message,
 } from 'antd'
 import moment from 'moment'
@@ -25,6 +28,7 @@ import axios from 'axios'
 import AntdTag from '../../staffs/antdTag'
 
 const { TextArea } = Input
+const { Meta } = Card
 const { Option } = Select
 const layout = {
   labelCol: {
@@ -47,6 +51,19 @@ const tailLayout = {
     offset: 5,
     span: 18,
   },
+}
+
+const customSpanStyle = {
+  backgroundColor: '#52c41a',
+  color: 'white',
+  borderRadius: '3px',
+  padding: '1px 5px',
+}
+const inActiveSpanStyle = {
+  backgroundColor: 'red',
+  color: 'white',
+  borderRadius: '3px',
+  padding: '1px 5px',
 }
 
 @connect(({ user, learners }) => ({ user, learners }))
@@ -77,21 +94,17 @@ class EditBasicInformation extends React.Component {
     UserProfile.authStaff.edges.map(item => selectedStaffList.push(item.node.id))
     form.setFieldsValue({
       clientId: UserProfile.clientId,
-      category: UserProfile.category?.id,
       email: UserProfile.email,
       gender: UserProfile.gender,
       dob: moment(UserProfile.dob),
       dateOfDiagnosis: UserProfile.dateOfDiagnosis ? moment(UserProfile.dateOfDiagnosis) : null,
-      clinicLocation: UserProfile.clinicLocation ? UserProfile.clinicLocation.id : null,
       firstName: UserProfile.firstname,
       lastName: UserProfile.lastname,
-      authStaff: selectedStaffList,
       parentFirstName: UserProfile.parentName,
       parentMobileNumber: UserProfile.parentMobile,
       ssnCard: UserProfile.ssnAadhar,
       mobileNo: UserProfile.mobileno,
       address: UserProfile.currentAddress,
-      caseManager: UserProfile.caseManager?.id,
       learnerLanguage: UserProfile.language?.id,
       researchParticipant: UserProfile.researchParticipant,
       isActive: UserProfile.isActive
@@ -100,22 +113,43 @@ class EditBasicInformation extends React.Component {
       tags: UserProfile.tags,
     })
 
-    this.setState({
-      locationTag: UserProfile.clinicLocation
-        ? UserProfile.clinicLocation.location
-        : 'No Location Set',
-      caseManagerTag: UserProfile.caseManager
-        ? UserProfile.caseManager.name
-        : 'No Case Manager Set',
-      categoryTag: UserProfile.category?.category,
-      userProfileID: UserProfile.id,
-      tagArray: UserProfile.tags && UserProfile.tags.length > 0 ? UserProfile.tags : [],
-    })
+    this.setState(
+      {
+        locationTag: UserProfile.clinicLocation
+          ? UserProfile.clinicLocation.location
+          : 'No Location Set',
+        caseManagerTag: UserProfile.caseManager
+          ? UserProfile.caseManager.name
+          : 'No Case Manager Set',
+        categoryTag: UserProfile.category?.category,
+        userProfileID: UserProfile.id,
+        tagArray: UserProfile.tags && UserProfile.tags.length > 0 ? UserProfile.tags : [],
+      },
+      () => {
+        console.log(this.state.tagArray, 'this is tagArray')
+      },
+    )
   }
 
   onChange1 = e => {
     this.setState({
       checked: e.target.checked,
+    })
+  }
+
+  learnerActiveInactive = checked => {
+    const {
+      dispatch,
+      learners: { UserProfile },
+    } = this.props
+    console.log(UserProfile.id, checked)
+
+    dispatch({
+      type: 'learners/LEARNER_ACTIVE_INACTIVE',
+      payload: {
+        id: UserProfile.id,
+        checked: checked,
+      },
     })
   }
 
@@ -181,222 +215,282 @@ class EditBasicInformation extends React.Component {
     const itemStyle = { marginBottom: '5px', fontWeight: 'bold' }
     const {
       form,
-      learners: { clinicLocationList, categoryList, staffDropdownList, languageList },
+      learners: { clinicLocationList, UserProfile, categoryList, staffDropdownList, languageList },
     } = this.props
     const itemStyle1 = { marginBottom: '5px', fontWeight: 'bold' }
-    console.log(this.props.form, 'pppp')
+
     return (
-      <Form {...layout} onSubmit={e => this.handleSubmit(e)}>
-        <Form.Item {...layout1} label="Profile" style={itemStyle1}>
-          <Tag>{this.state.locationTag}</Tag>
-          <Tag>{this.state.caseManagerTag}</Tag>
-          <Tag>{this.state.categoryTag}</Tag>
-        </Form.Item>
+      <div className="card" style={{ marginTop: '5px', border: 'none' }}>
+        <div className="card-body">
+          <div>
+            <Card
+              style={{
+                textAlign: 'center',
+                border: 'none',
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            >
+              <Meta
+                avatar={
+                  <Avatar
+                    src="https://www.thewodge.com/wp-content/uploads/2019/11/avatar-icon.png"
+                    style={{
+                      width: '100px',
+                      height: '100px',
+                      border: '1px solid #f6f7fb',
+                    }}
+                  />
+                }
+                title={
+                  <h5 style={{ marginTop: '20px' }}>
+                    {UserProfile ? UserProfile.firstname : ''}
+                    <span
+                      style={{
+                        float: 'right',
+                        fontSize: '12px',
+                        padding: '5px',
+                        color: '#0190fe',
+                      }}
+                    >
+                      {UserProfile.isActive === true ? (
+                        <Switch
+                          checkedChildren={<Icon type="check" />}
+                          unCheckedChildren={<Icon type="close" />}
+                          defaultChecked
+                          onChange={this.learnerActiveInactive}
+                        />
+                      ) : (
+                        <Switch
+                          checkedChildren={<Icon type="check" />}
+                          unCheckedChildren={<Icon type="close" />}
+                          onChange={this.learnerActiveInactive}
+                        />
+                      )}
+                    </span>
+                  </h5>
+                }
+                description={
+                  <div>
+                    <p style={{ fontSize: '13px', marginBottom: '4px' }}>
+                      Enrollment Status &nbsp;{' '}
+                      {UserProfile.isActive ? (
+                        <span style={customSpanStyle}>Active</span>
+                      ) : (
+                        <span style={inActiveSpanStyle}>In-Active</span>
+                      )}
+                    </p>
+                  </div>
+                }
+              />
+            </Card>
 
-        <Form.Item label="Tags" style={itemStyle}>
-          {form.getFieldDecorator('tags')(
-            <AntdTag
-              style={itemStyle}
-              changeTagsHandler={this.tagArrayHandler}
-              closeable="true"
-              tagArray={this.state.tagArray}
-            />,
-          )}
-        </Form.Item>
+            <Form {...layout} onSubmit={e => this.handleSubmit(e)}>
+              <Form.Item {...layout1} label="Profile" style={itemStyle1}>
+                <Tag>{this.state.locationTag}</Tag>
+                <Tag>{this.state.caseManagerTag}</Tag>
+                <Tag>{this.state.categoryTag}</Tag>
+              </Form.Item>
 
-        <Divider orientation="left">Mandatory Fields</Divider>
+              <Form.Item label="Tags" style={itemStyle}>
+                {form.getFieldDecorator('tags')(
+                  <AntdTag
+                    style={itemStyle}
+                    changeTagsHandler={this.tagArrayHandler}
+                    closeable="true"
+                    tagArray={this.state.tagArray}
+                  />,
+                )}
+              </Form.Item>
 
-        <Form.Item label="Client Id" style={itemStyle}>
-          {form.getFieldDecorator('clientId', {
-            rules: [{ required: true, message: 'Please provide ClientId!' }],
-          })(<Input style={{ borderRadius: 0 }} />)}
-        </Form.Item>
-        <Form.Item label="First Name" style={itemStyle}>
-          {form.getFieldDecorator('firstName', {
-            rules: [{ required: true, message: 'Please provide firstName!' }],
-          })(<Input style={{ borderRadius: 0 }} />)}
-        </Form.Item>
-        <Form.Item label="Last Name" style={itemStyle}>
-          {form.getFieldDecorator('lastName', {
-            rules: [{ required: false, message: 'Please provide lastName!' }],
-          })(<Input style={{ borderRadius: 0 }} />)}
-        </Form.Item>
-        <Form.Item label="Email" style={itemStyle}>
-          {form.getFieldDecorator('email', {
-            rules: [{ required: true, type: 'email', message: 'Please provide email!' }],
-          })(<Input style={{ borderRadius: 0 }} />)}
-        </Form.Item>
+              <Divider orientation="left">Mandatory Fields</Divider>
 
-        <Form.Item label="Mobile no" style={itemStyle}>
-          {form.getFieldDecorator('mobileNo', {
-            rules: [{ required: true, message: 'Please provide Mobile No!' }],
-          })(<Input style={{ borderRadius: 0 }} />)}
-        </Form.Item>
+              <Form.Item label="Client Id" style={itemStyle}>
+                {form.getFieldDecorator('clientId', {
+                  rules: [{ required: true, message: 'Please provide ClientId!' }],
+                })(<Input style={{ borderRadius: 0 }} />)}
+              </Form.Item>
+              <Form.Item label="First Name" style={itemStyle}>
+                {form.getFieldDecorator('firstName', {
+                  rules: [{ required: true, message: 'Please provide firstName!' }],
+                })(<Input style={{ borderRadius: 0 }} />)}
+              </Form.Item>
+              <Form.Item label="Last Name" style={itemStyle}>
+                {form.getFieldDecorator('lastName', {
+                  rules: [{ required: false, message: 'Please provide lastName!' }],
+                })(<Input style={{ borderRadius: 0 }} />)}
+              </Form.Item>
+              <Form.Item label="Email" style={itemStyle}>
+                {form.getFieldDecorator('email', {
+                  rules: [{ required: true, type: 'email', message: 'Please provide email!' }],
+                })(<Input style={{ borderRadius: 0 }} />)}
+              </Form.Item>
 
-        <Form.Item label="Gender" style={itemStyle}>
-          {form.getFieldDecorator('gender', {
-            rules: [{ required: true, message: 'Please provide Gender' }],
-          })(
-            <Select placeholder="Please provide Gender" allowClear>
-              <Option value="male">Male</Option>
-              <Option value="female">Female</Option>
-              <Option value="other">Other</Option>
-            </Select>,
-          )}
-        </Form.Item>
-        <Form.Item label="DOB" style={itemStyle}>
-          {form.getFieldDecorator('dob', {
-            rules: [{ required: true, message: 'Please provide Date of Birth!' }],
-          })(<DatePicker style={{ borderRadius: 0 }} />)}
-        </Form.Item>
+              <Form.Item label="Mobile no" style={itemStyle}>
+                {form.getFieldDecorator('mobileNo', {
+                  rules: [{ required: true, message: 'Please provide Mobile No!' }],
+                })(<Input style={{ borderRadius: 0 }} />)}
+              </Form.Item>
 
-        <Form.Item label="Clinic Location" style={itemStyle}>
-          {form.getFieldDecorator('clinicLocation', {
-            rules: [{ required: true, message: 'Please provide Clinic Location!' }],
-          })(
-            <Select placeholder="Select a Clinic location" allowClear>
-              {clinicLocationList.map(item => (
-                <Option key={item.node.id} value={item.node.id}>
-                  {item.node.location}
-                </Option>
-              ))}
-            </Select>,
-          )}
-        </Form.Item>
+              <Form.Item label="Gender" style={itemStyle}>
+                {form.getFieldDecorator('gender', {
+                  rules: [{ required: true, message: 'Please provide Gender' }],
+                })(
+                  <Select placeholder="Please provide Gender" allowClear>
+                    <Option value="male">Male</Option>
+                    <Option value="female">Female</Option>
+                    <Option value="other">Other</Option>
+                  </Select>,
+                )}
+              </Form.Item>
+              <Form.Item label="DOB" style={itemStyle}>
+                {form.getFieldDecorator('dob', {
+                  rules: [{ required: true, message: 'Please provide Date of Birth!' }],
+                })(<DatePicker style={{ borderRadius: 0 }} />)}
+              </Form.Item>
 
-        <Form.Item label="Location Category" style={itemStyle}>
-          {form.getFieldDecorator('category', {
-            rules: [{ required: true, message: 'Please provide Location!' }],
-          })(
-            <Select placeholder="Select category" allowClear>
-              {categoryList.map(item => (
-                <Option key={item.id} value={item.id}>
-                  {item.category}
-                </Option>
-              ))}
-            </Select>,
-          )}
-        </Form.Item>
-        {/* <Form.Item label="Address" style={itemStyle}>
-          {form.getFieldDecorator('address', { rules: [{ message: 'Please provide Address!' }] })(
-            <TextArea placeholder="Address" autoSize={{ minRows: 3 }} />,
-          )}
-        </Form.Item> */}
+              <Form.Item label="Clinic Location" style={itemStyle}>
+                {form.getFieldDecorator('clinicLocation', {
+                  rules: [{ required: true, message: 'Please provide Clinic Location!' }],
+                })(
+                  <Select placeholder="Select a Clinic location" allowClear>
+                    {clinicLocationList.map(item => (
+                      <Option key={item.node.id} value={item.node.id}>
+                        {item.node.location}
+                      </Option>
+                    ))}
+                  </Select>,
+                )}
+              </Form.Item>
 
-        <Divider orientation="left">Personal Details</Divider>
+              <Form.Item label="Location Category" style={itemStyle}>
+                {form.getFieldDecorator('category', {
+                  rules: [{ required: true, message: 'Please provide Location!' }],
+                })(
+                  <Select placeholder="Select category" allowClear>
+                    {categoryList.map(item => (
+                      <Option key={item.id} value={item.id}>
+                        {item.category}
+                      </Option>
+                    ))}
+                  </Select>,
+                )}
+              </Form.Item>
 
-        <Form.Item label="Parent Activation" style={itemStyle}>
-          {form.getFieldDecorator('isActive', {
-            rules: [{ required: false, message: 'Please Select parent activation if needed' }],
-          })(
-            <Checkbox checked={this.state.checked} onChange={this.onChange1}>
-              Yes
-            </Checkbox>,
-          )}
-        </Form.Item>
+              <Divider orientation="left">Personal Details</Divider>
 
-        <Form.Item label="Parent/Guardian Name" style={itemStyle}>
-          {form.getFieldDecorator('parentFirstName', {
-            rules: [{ required: false, message: 'Please provide Parent Name!' }],
-          })(<Input style={{ borderRadius: 0 }} />)}
-        </Form.Item>
-        <Form.Item label="Parent/Guardian Mobile no" style={itemStyle}>
-          {form.getFieldDecorator('parentMobileNumber', {
-            rules: [{ message: 'Please provide Mobile No!' }],
-          })(<Input style={{ borderRadius: 0 }} />)}
-        </Form.Item>
-        <Form.Item label="SSN/Adhaar card" style={itemStyle}>
-          {form.getFieldDecorator('ssnCard', { rules: [{ message: 'Please provide Mobile No!' }] })(
-            <Input style={{ borderRadius: 0 }} />,
-          )}
-        </Form.Item>
-        <Form.Item label="Street Address" style={itemStyle}>
-          {form.getFieldDecorator('street', { rules: [{ message: 'Please provide Street Name' }] })(
-            <Input placeholder="Street Address" style={{ borderRadius: 0 }} />,
-          )}
-        </Form.Item>
-        <Form.Item label="State" style={itemStyle}>
-          {form.getFieldDecorator('state', { rules: [{ message: 'Please provide State' }] })(
-            <Input placeholder="State" style={{ borderRadius: 0 }} />,
-          )}
-        </Form.Item>
-        <Form.Item label="City" style={itemStyle}>
-          {form.getFieldDecorator('city', { rules: [{ message: 'Please provide City' }] })(
-            <Input placeholder="City" style={{ borderRadius: 0 }} />,
-          )}
-        </Form.Item>
-        <Form.Item label="Country" style={itemStyle}>
-          {form.getFieldDecorator('country', { rules: [{ message: 'Please provide Country' }] })(
-            <Input placeholder="Country" style={{ borderRadius: 0 }} />,
-          )}
-        </Form.Item>
-        <Form.Item label="Pincode" style={itemStyle}>
-          {form.getFieldDecorator('pincode', { rules: [{ message: 'Please provide pincode' }] })(
-            <Input placeholder="Pincode" style={{ borderRadius: 0 }} />,
-          )}
-        </Form.Item>
+              <Form.Item label="Parent Activation" style={itemStyle}>
+                {form.getFieldDecorator('isActive', {
+                  rules: [
+                    { required: false, message: 'Please Select parent activation if needed' },
+                  ],
+                })(
+                  <Checkbox checked={this.state.checked} onChange={this.onChange1}>
+                    Yes
+                  </Checkbox>,
+                )}
+              </Form.Item>
 
-        <Divider orientation="left">Misc details</Divider>
-        <Form.Item label="Authorized Staff" style={itemStyle}>
-          {form.getFieldDecorator('authStaff')(
-            <Select mode="multiple" placeholder="Select Therapist" allowClear maxTagCount={4}>
-              {staffDropdownList.map(item => (
-                <Option key={item.node.id} value={item.node.id}>
-                  {item.node.name} {item.node.surname}
-                </Option>
-              ))}
-            </Select>,
-          )}
-        </Form.Item>
-        <Form.Item label="Case Manager" style={itemStyle}>
-          {form.getFieldDecorator('caseManager')(
-            <Select placeholder="Select Therapist" allowClear>
-              {staffDropdownList.map(item => (
-                <Option key={item.node.id} value={item.node.id}>
-                  {item.node.name} {item.node.surname}
-                </Option>
-              ))}
-            </Select>,
-          )}
-        </Form.Item>
-        <Form.Item label="Date of Diagnosis" style={itemStyle}>
-          {form.getFieldDecorator('dateOfDiagnosis')(<DatePicker />)}
-        </Form.Item>
-        <Form.Item label="Default Language" style={itemStyle}>
-          {form.getFieldDecorator('learnerLanguage', {
-            rules: [{ required: false, message: 'Please provide Default Language!' }],
-          })(
-            <Select placeholder="Select a default Language" allowClear>
-              {languageList.map(item => (
-                <Option key={item.id} value={item.id}>
-                  {item.name}
-                </Option>
-              ))}
-            </Select>,
-          )}
-        </Form.Item>
+              <Form.Item label="Parent/Guardian Name" style={itemStyle}>
+                {form.getFieldDecorator('parentFirstName', {
+                  rules: [{ required: false, message: 'Please provide Parent Name!' }],
+                })(<Input style={{ borderRadius: 0 }} />)}
+              </Form.Item>
+              <Form.Item label="Parent/Guardian Mobile no" style={itemStyle}>
+                {form.getFieldDecorator('parentMobileNumber', {
+                  rules: [{ message: 'Please provide Mobile No!' }],
+                })(<Input style={{ borderRadius: 0 }} />)}
+              </Form.Item>
+              <Form.Item label="SSN/Adhaar card" style={itemStyle}>
+                {form.getFieldDecorator('ssnCard', {
+                  rules: [{ message: 'Please provide Mobile No!' }],
+                })(<Input style={{ borderRadius: 0 }} />)}
+              </Form.Item>
+              <Form.Item label="Street Address" style={itemStyle}>
+                {form.getFieldDecorator('street', {
+                  rules: [{ message: 'Please provide Street Name' }],
+                })(<Input placeholder="Street Address" style={{ borderRadius: 0 }} />)}
+              </Form.Item>
+              <Form.Item label="State" style={itemStyle}>
+                {form.getFieldDecorator('state', { rules: [{ message: 'Please provide State' }] })(
+                  <Input placeholder="State" style={{ borderRadius: 0 }} />,
+                )}
+              </Form.Item>
+              <Form.Item label="City" style={itemStyle}>
+                {form.getFieldDecorator('city', { rules: [{ message: 'Please provide City' }] })(
+                  <Input placeholder="City" style={{ borderRadius: 0 }} />,
+                )}
+              </Form.Item>
+              <Form.Item label="Country" style={itemStyle}>
+                {form.getFieldDecorator('country', {
+                  rules: [{ message: 'Please provide Country' }],
+                })(<Input placeholder="Country" style={{ borderRadius: 0 }} />)}
+              </Form.Item>
+              <Form.Item label="Pincode" style={itemStyle}>
+                {form.getFieldDecorator('pincode', {
+                  rules: [{ message: 'Please provide pincode' }],
+                })(<Input placeholder="Pincode" style={{ borderRadius: 0 }} />)}
+              </Form.Item>
 
-        <Form.Item label="Upload Your Documents" style={itemStyle}>
-          <input type="file" name="file" onChange={this.onChangeHandler} />
-        </Form.Item>
-        <Form.Item label="Research Participant" name="researchParticipant" style={itemStyle}>
-          {form.getFieldDecorator('researchParticipant', {
-            valuePropName: 'checked',
-            rules: [{ required: false }],
-          })(<Checkbox />)}
-        </Form.Item>
+              <Divider orientation="left">Misc details</Divider>
+              <Form.Item label="Authorized Staff" style={itemStyle}>
+                {form.getFieldDecorator('authStaff')(
+                  <Select mode="multiple" placeholder="Select Therapist" allowClear maxTagCount={4}>
+                    {staffDropdownList.map(item => (
+                      <Option key={item.node.id} value={item.node.id}>
+                        {item.node.name} {item.node.surname}
+                      </Option>
+                    ))}
+                  </Select>,
+                )}
+              </Form.Item>
+              <Form.Item label="Case Manager" style={itemStyle}>
+                {form.getFieldDecorator('caseManager')(
+                  <Select placeholder="Select Therapist" allowClear>
+                    {staffDropdownList.map(item => (
+                      <Option key={item.node.id} value={item.node.id}>
+                        {item.node.name} {item.node.surname}
+                      </Option>
+                    ))}
+                  </Select>,
+                )}
+              </Form.Item>
+              <Form.Item label="Date of Diagnosis" style={itemStyle}>
+                {form.getFieldDecorator('dateOfDiagnosis')(<DatePicker />)}
+              </Form.Item>
+              <Form.Item label="Default Language" style={itemStyle}>
+                {form.getFieldDecorator('learnerLanguage', {
+                  rules: [{ required: false, message: 'Please provide Default Language!' }],
+                })(
+                  <Select placeholder="Select a default Language" allowClear>
+                    {languageList.map(item => (
+                      <Option key={item.id} value={item.id}>
+                        {item.name}
+                      </Option>
+                    ))}
+                  </Select>,
+                )}
+              </Form.Item>
 
-        {/* <Divider orientation="left"> Default program </Divider> */}
+              <Form.Item label="Upload Your Documents" style={itemStyle}>
+                <input type="file" name="file" onChange={this.onChangeHandler} />
+              </Form.Item>
+              <Form.Item label="Research Participant" name="researchParticipant" style={itemStyle}>
+                {form.getFieldDecorator('researchParticipant', {
+                  valuePropName: 'checked',
+                  rules: [{ required: false }],
+                })(<Checkbox />)}
+              </Form.Item>
 
-        <Form.Item {...tailLayout}>
-          <Button style={{ width: '100%' }} type="primary" htmlType="submit">
-            Save
-          </Button>
-          {/* <Button htmlType="primary" onClick={this.onReset} className="ml-4">
-            cancel
-          </Button> */}
-        </Form.Item>
-      </Form>
+              <Form.Item {...tailLayout}>
+                <Button style={{ width: '100%' }} type="primary" htmlType="submit">
+                  Save
+                </Button>
+              </Form.Item>
+            </Form>
+          </div>
+        </div>
+      </div>
     )
   }
 }

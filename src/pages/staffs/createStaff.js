@@ -277,13 +277,6 @@ class StaffBasicInfo extends React.Component {
             initialValue: '',
           })(<Input />)}
         </Form.Item>
-        {/* <Form.Item label="Address" style={itemStyle}>
-          {form.getFieldDecorator('address', {
-            required: false,
-            message: 'Please provide Address',
-            initialValue: '',
-          })(<TextArea placeholder="Address" autoSize={{ minRows: 3 }}  />)}
-        </Form.Item> */}
 
         <Form.Item label="Street Address" style={itemStyle}>
           {form.getFieldDecorator('street', { rules: [{ message: 'Please provide Street Name' }] })(

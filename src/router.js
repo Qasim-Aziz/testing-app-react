@@ -648,6 +648,11 @@ const routes = [
     component: loadable(() => import('pages/Prescription')),
     exact: true,
   },
+  {
+    path: '/staffLeave',
+    component: loadable(() => import('pages/StaffLeave')),
+    exact: true,
+  },
 ]
 
 class Router extends React.Component {

@@ -3,9 +3,7 @@
 /* eslint-disable no-var */
 /* eslint-disable no-unused-vars */
 import { all, put, takeEvery, call } from 'redux-saga/effects'
-import {
-  getStudentDetails,
-} from 'services/student'
+import { getStudentDetails } from 'services/student'
 import actions from './actions'
 
 export function* SOME_FUNCTION({ payload }) {
@@ -19,11 +17,11 @@ export function* SOME_FUNCTION({ payload }) {
 
 export function* STUDENT_DETAILS() {
   const response = yield call(getStudentDetails)
-  if (response){
+  if (response) {
     yield put({
       type: 'student/SET_STATE',
       payload: {
-        StudentName: response.data.student.firstname,
+        StudentName: response.data.student?.firstname,
       },
     })
   }
@@ -32,6 +30,6 @@ export function* STUDENT_DETAILS() {
 export default function* rootSaga() {
   yield all([
     takeEvery(actions.SOME_FUNCTION, SOME_FUNCTION),
-    takeEvery(actions.STUDENT_DETAILS, STUDENT_DETAILS)
+    takeEvery(actions.STUDENT_DETAILS, STUDENT_DETAILS),
   ])
 }
