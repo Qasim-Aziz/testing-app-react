@@ -1,0 +1,148 @@
+.filter_sub_div {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+.ant-form-item label {
+  font-size: 14px;
+}
+.utils__content {
+  padding: 0;
+}
+
+.avatarlogo {
+  width: 128px !important;
+  height: 128px !important;
+  border-radius: 50%;
+}
+
+.ant-form-item-required::before {
+  content: '*' !important;
+}
+
+.modify-data-table {
+  .jzCzGz {
+    min-width: 40px;
+  }
+}
+
+.profile-css {
+  .ant-card-body {
+    padding: 0;
+    width: 100%;
+    zoom: 1;
+  }
+  .ant-card-meta {
+    display: flex;
+    flex-direction: row;
+  }
+  .ant-card-meta-detail {
+    width: 100%;
+  }
+
+  .ant-drawer-body {
+    padding: 0;
+  }
+}
+
+.view-staff {
+  .ant-table-tbody > tr > td {
+    padding: 6px 10px;
+    overflow-wrap: break-word;
+  }
+  .ant-table-thead > tr > th {
+    padding: 16px 10px;
+  }
+  .ant-table {
+    border: 1px solid #e8e8e8;
+  }
+}
+
+.mainCard {
+  width: 100%;
+  height: fit-content;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  background-color: white;
+  margin-bottom: 28px;
+  color: black;
+  padding: 24px 0;
+  border: 1px solid #e8e8e8;
+  box-shadow: 0 1px 1px 0 rgb(242, 242, 242);
+}
+
+.mainCard-child {
+  width: 50%;
+  height: 100%;
+  padding: 0 12px 0 28px;
+}
+
+.right-border {
+  border-right: 1px solid #e8e8e8;
+}
+
+.midCard {
+  width: 50%;
+  height: fit-content;
+  min-height: 245px;
+  background-color: white;
+  padding: 24px 12px 24px 28px;
+  margin-bottom: 0;
+  margin-right: 14px;
+  color: black;
+  border: 1px solid #e8e8e8;
+  box-shadow: 0 1px 1px 0 rgb(242, 242, 242);
+}
+
+.midCard-rMargin {
+  margin-right: 0;
+  margin-left: 14px;
+}
+
+.midCard-container {
+  display: flex;
+  flex-direction: row;
+  height: fit-content;
+  margin-bottom: 28px;
+}
+
+@media screen and (max-width: 1250px) {
+  .mainCard {
+    flex-direction: column;
+    padding: 24px 28px;
+  }
+
+  .right-border {
+    border-right: none;
+  }
+
+  .mainCard-child {
+    width: 100%;
+    padding-left: 0;
+  }
+
+  .midCard-rMargin {
+    margin-left: 0;
+  }
+
+  .midCard {
+    width: 100%;
+    padding: 24px 28px;
+    margin-right: 0;
+    margin-bottom: 28px;
+  }
+
+  .midCard-container {
+    margin-bottom: 0;
+    flex-direction: column;
+  }
+
+  .profile-css {
+    .ant-card-meta {
+      flex-direction: column;
+    }
+  }
+}

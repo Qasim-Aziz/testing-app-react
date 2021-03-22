@@ -26,17 +26,12 @@ export async function getClinicLearners(payload) {
             after: $after
             before: $before
           ) {
-            pageInfo {
-              startCursor
-              endCursor
-            }
             clinicTotal
             edges {
               node {
                 id
                 firstname
                 email
-                dob
                 parent {
                   id
                   lastLogin
@@ -44,37 +39,14 @@ export async function getClinicLearners(payload) {
                 mobileno
                 lastname
                 gender
-                currentAddress
-                clientId
-                ssnAadhar
                 parentMobile
-                parentName
-                dateOfDiagnosis
-                researchParticipant
                 category {
                   id
                   category
                 }
-                clinicLocation {
-                  id
-                  location
-                }
                 caseManager {
                   id
                   name
-                }
-                language {
-                  id
-                  name
-                }
-                authStaff {
-                  edges {
-                    node {
-                      id
-                      name
-                      surname
-                    }
-                  }
                 }
                 tags {
                   edges {
@@ -156,6 +128,7 @@ export async function getLearnersDropdown() {
 
 export async function updateLearner(payload) {
   const authStaffList = []
+  console.log(payload, 'this is palylos in ei')
   if (payload.values.authStaff.length > 0) {
     payload.values.authStaff.map(item => authStaffList.push(`"${item}"`))
   }
@@ -180,6 +153,11 @@ export async function updateLearner(payload) {
           $ssnCard: String
           $mobileNo: String
           $address: String
+          $streetAddress: String
+          $state: String
+          $city: String
+          $country: String
+          $zipCode: String
           $caseManager: ID
           $learnerLanguage: ID
           $isActive: Boolean
@@ -206,6 +184,11 @@ export async function updateLearner(payload) {
                 ssnAadhar: $ssnCard
                 mobileno: $mobileNo
                 address: $address
+                streetAddress: $streetAddress
+                city: $city
+                state: $state
+                country: $country
+                zipCode: $zipCode
                 language: $learnerLanguage
                 isActive: $isActive
                 researchParticipant: $researchParticipant
@@ -227,6 +210,23 @@ export async function updateLearner(payload) {
               parentMobile
               parentName
               dateOfDiagnosis
+              diagnoses {
+                edges {
+                  node {
+                    id
+                    name
+                  }
+                }
+              }
+              learnermedicationSet {
+                edges {
+                  node {
+                    id
+                    date
+                    condition
+                  }
+                }
+              }
               category {
                 id
                 category
@@ -289,6 +289,11 @@ export async function updateLearner(payload) {
         isActive: payload.values.isActive,
         researchParticipant: payload.values.researchParticipant,
         tags: payload.values.tags,
+        streetAddress: payload.values.street,
+        state: payload.values.state,
+        country: payload.values.country,
+        city: payload.values.city,
+        zipCode: payload.values.pincode,
       },
     })
     .then(result => result)
@@ -334,6 +339,11 @@ export async function createLearner(payload) {
           $defaultProgram: Boolean
           $learnerLanguage: ID
           $researchParticipant: Boolean
+          $streetAddress: String
+          $state: String
+          $city: String
+          $country: String
+          $zipCode: String
           $tags: [String]
         ) {
           createStudent(
@@ -359,6 +369,11 @@ export async function createLearner(payload) {
                 defaultProgram: $defaultProgram
                 language: $learnerLanguage
                 researchParticipant: $researchParticipant
+                streetAddress: $streetAddress
+                city: $city
+                state: $state
+                country: $country
+                zipCode: $zipCode
                 tags: $tags
               }
             }
@@ -377,6 +392,23 @@ export async function createLearner(payload) {
               parentMobile
               parentName
               dateOfDiagnosis
+              diagnoses {
+                edges {
+                  node {
+                    id
+                    name
+                  }
+                }
+              }
+              learnermedicationSet {
+                edges {
+                  node {
+                    id
+                    date
+                    condition
+                  }
+                }
+              }
               category {
                 id
                 category
@@ -439,6 +471,11 @@ export async function createLearner(payload) {
         defaultProgram: payload.values.defaultProgram,
         researchParticipant: payload.values.researchParticipant,
         tags: payload.values.tags,
+        streetAddress: payload.values.street,
+        state: payload.values.state,
+        country: payload.values.country,
+        city: payload.values.city,
+        zipCode: payload.values.pincode,
       },
     })
     .then(result => result)
@@ -502,6 +539,135 @@ export async function learnerActiveInactive(payload) {
     .then(result => result)
     .catch(error => {
       error.graphQLErrors.map(item => {
+        return notification.error({
+          message: 'Something went wrong',
+          description: item.message,
+        })
+      })
+    })
+}
+
+export async function getLearner(payload) {
+  return apolloClient
+    .query({
+      query: gql`
+        query($id: ID!) {
+          student(id: $id) {
+            id
+            admissionNo
+            internalNo
+            school {
+              id
+              schoolName
+            }
+            parent {
+              id
+              lastLogin
+            }
+            admissionDate
+            firstname
+            email
+            dob
+            image
+            file
+            report
+            createdAt
+            fatherName
+            fatherPhone
+            motherName
+            motherPhone
+            isActive
+            mobileno
+            lastname
+            gender
+            currentAddress
+            streetAddress
+            city
+            state
+            country
+            zipCode
+            height
+            weight
+            clientId
+            ssnAadhar
+            parentMobile
+            parentName
+            dateOfDiagnosis
+            clinicLocation {
+              id
+              location
+            }
+            isPeakActive
+            isCogActive
+            researchParticipant
+            diagnoses {
+              edges {
+                node {
+                  id
+                  name
+                }
+              }
+            }
+
+            category {
+              id
+              category
+            }
+
+            clinicLocation {
+              id
+              location
+            }
+            caseManager {
+              id
+              name
+            }
+            language {
+              id
+              name
+            }
+            family {
+              id
+              members {
+                edges {
+                  node {
+                    id
+                    memberName
+                    relationship {
+                      id
+                      name
+                    }
+                  }
+                }
+              }
+            }
+            authStaff {
+              edges {
+                node {
+                  id
+                  name
+                  surname
+                }
+              }
+            }
+            tags {
+              edges {
+                node {
+                  id
+                  name
+                }
+              }
+            }
+          }
+        }
+      `,
+      variables: {
+        id: payload.id,
+      },
+    })
+    .then(result => result)
+    .catch(err => {
+      err.graphQLErrors.map(item => {
         return notification.error({
           message: 'Something went wrong',
           description: item.message,
