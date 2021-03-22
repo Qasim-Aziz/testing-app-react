@@ -10,7 +10,12 @@ const initialState = {
   parentName: '',
   staffId: '',
   staffName: '',
+  staffCountry: '',
+  staffObject: null,
+  staffState: '',
   clinicName: '',
+  clinicCountry: '',
+
 }
 
 export default function userReducer(state = initialState, action) {
