@@ -1,3 +1,4 @@
+/* eslint-disable no-unneeded-ternary */
 /* eslint-disable no-else-return */
 /* eslint-disable react/jsx-boolean-value */
 /* eslint-disable react/jsx-indent */
@@ -328,7 +329,11 @@ export default () => {
       render: (text, obj) => (
         <Badge
           count={obj.node.status.charAt(0).toUpperCase() + obj.node.status.slice(1).toLowerCase()}
-          style={{ background: obj.node.status === 'PROGRESS' ? '#52c41a' : '#faad14' }}
+          style={{
+            fontWeight: 700,
+            fontSize: 14,
+            background: obj.node.status === 'PROGRESS' ? '#52c41a' : '#faad14',
+          }}
         />
       ),
     },
@@ -547,6 +552,7 @@ export default () => {
             columns={columns}
             size="small"
             dataSource={tableData}
+            rowKey={record => record.node.id}
             bordered
             title={() => {
               return filterHeader
@@ -566,7 +572,7 @@ export default () => {
         onClose={() => {
           setOpen(false)
         }}
-        width={400}
+        width={600}
         title="Create New Assessment"
       >
         <div
@@ -578,11 +584,11 @@ export default () => {
         </div>
       </Drawer>
       <Drawer
-        visible={suggestTarget}
+        visible={suggestTarget ? true : false}
         onClose={() => {
           setSuggestTarget(null)
         }}
-        width={600}
+        width={800}
         title="Target Allocation from PEAK Assessment"
       >
         {suggestTarget && (
@@ -594,11 +600,11 @@ export default () => {
         )}
       </Drawer>
       <Drawer
-        visible={suggestEquiTarget}
+        visible={suggestEquiTarget ? true : false}
         onClose={() => {
           setSuggestEquiTarget(null)
         }}
-        width={900}
+        width={800}
         title="Target Allocation from PEAK Equivalence Assessment"
       >
         {suggestEquiTarget && (

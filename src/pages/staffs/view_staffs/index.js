@@ -510,7 +510,7 @@ class StaffTable extends React.Component {
               <div style={{ display: 'flex', flexWrap: 'wrap', maxWidth: '250px' }}>
                 {row.tags?.map(r => {
                   return (
-                    <Tag key={r} color="#F89A42" style={{ margin: '1px', fontWeight: '600' }}>
+                    <Tag key={r} color="#3f72af" style={{ margin: '1px', fontWeight: '600' }}>
                       {r}
                     </Tag>
                   )

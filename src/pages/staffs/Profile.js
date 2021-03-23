@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { Card, Switch, Icon, Avatar, Tag, Tooltip, Button, Drawer } from 'antd'
 import { EditOutlined } from '@ant-design/icons'
 import { Link, withRouter } from 'react-router-dom'
+import gql from 'graphql-tag'
 import LoadingComponent from 'components/VBMappReport/LoadingComponent'
 import moment from 'moment'
 import GenDetails from './EditDrawers/GenInfo'
@@ -12,8 +13,41 @@ import ClinicInfo from './EditDrawers/ClinicInfo'
 import './style.scss'
 import EmergencyInfo from './EditDrawers/EmergencyInfo'
 import MiscInfo from './EditDrawers/MiscInfo'
+import { useQuery, useLazyQuery } from 'react-apollo'
+import AppointmentCard from './AppointmentCard/index'
 
 const { Meta } = Card
+
+const er = gql`
+  query($id: ID, $dateFrom: Date, $dateTo: Date) {
+    appointments(therapist: $id, dateFrom: $dateFrom, dateTo: $dateTo) {
+      edges {
+        node {
+          id
+          student {
+            id
+            firstname
+            lastname
+          }
+          createdBy {
+            id
+            firstName
+            lastName
+          }
+          appointmentStatus {
+            id
+            appointmentStatus
+          }
+          note
+          title
+          start
+          end
+          isApproved
+        }
+      }
+    }
+  }
+`
 
 const customSpanStyle = {
   backgroundColor: '#52c41a',
@@ -48,6 +82,8 @@ function Profile(props) {
   const [miscInfoDrawer, setMiscInfoDrawer] = useState(false)
   const [emergencyInfoDrawer, setEmergencyInfoDrawer] = useState(false)
   const [address, setAddress] = useState('')
+  console.log(props.staffs.StaffProfile, 'staffproie')
+
   useEffect(() => {
     if (props.staffs.StaffProfile) {
       const tt = props.staffs.StaffProfile
@@ -79,7 +115,7 @@ function Profile(props) {
 
     var years = b.diff(a, 'year')
     a.add(years, 'years')
-    console.log(b, a)
+    // console.log(b, a)
 
     var months = b.diff(a, 'months')
     a.add(months, 'months')
@@ -92,7 +128,7 @@ function Profile(props) {
     var min = b.diff(a, 'minutes')
     a.add(min, 'minutes')
 
-    console.log(days, hrs, min)
+    // console.log(days, hrs, min)
     if (years > 0) {
       if (months > 0) {
         return `${years} ${years == 1 ? 'Y' : 'Y'} ${months} ${months == 1 ? 'M' : 'M'} ago`
@@ -181,6 +217,8 @@ function Profile(props) {
       >
         <MiscInfo closeDrawer={setMiscInfoDrawer} staffProfile={staffProfile} />
       </Drawer>
+      <AppointmentCard />
+
       <div className="mainCard">
         <div className="mainCard-child right-border">
           <Card

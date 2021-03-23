@@ -42,6 +42,9 @@ export async function login(payload) {
             node {
               id
               parentName
+              parent {
+                id
+              }
               language{
                 id 
                 name
@@ -115,13 +118,15 @@ export async function StudentIdFromUserId(payload) {
 
 export async function clinicDetails() {
   return apolloClient
-    .query({query: gql`{
-        schoolDetail {
-          id
-          schoolName
-          address
+    .query({
+      query: gql`
+        {
+          schoolDetail {
+            id
+            schoolName
+            address
+          }
         }
-      }
       `,
     })
     .then(result => {

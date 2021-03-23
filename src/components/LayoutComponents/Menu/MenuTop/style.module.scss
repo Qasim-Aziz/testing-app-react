@@ -90,4 +90,39 @@
   :global(.ant-comment-inner) {
     padding: 0 !important;
   }
+
+  .ant-dropdown-menu {
+    -webkit-box-shadow: none;
+    box-shadow: none !important;
+    border: 1px solid black;
+  }
+}
+
+.scroll {
+  outline: none;
+  width: 470px;
+  max-height: 500px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  overflow-y: scroll;
+}
+
+/* width */
+.scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* Track */
+.scroll::-webkit-scrollbar-track {
+  background: #fff;
+}
+
+/* Handle */
+.scroll::-webkit-scrollbar-thumb {
+  background: #ccc;
+}
+
+/* Handle on hover */
+.scroll::-webkit-scrollbar-thumb:hover {
+  background: #ccc;
 }
