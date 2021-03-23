@@ -17,6 +17,7 @@ import authorizationCode from './authorizationCodes/reducers'
 import learnersprogram from './learnersprogram/reducers'
 import peakequivalence from './peakequivalence/reducers'
 import sessionrecording from './sessionrecording/reducers'
+import iisaassessment from './iisaassessment/reducers'
 import cogniableassessment from './cogniableassessment/reducers'
 import sessiontargetallocation from './sessiontargetallocation/reducers'
 import celerationChartReducer from './celerationchart/panel.reducer'
@@ -41,6 +42,7 @@ export default history =>
     learnersprogram,
     peakequivalence,
     sessionrecording,
+    iisaassessment,
     cogniableassessment,
     sessiontargetallocation,
     celerationChartReducer,

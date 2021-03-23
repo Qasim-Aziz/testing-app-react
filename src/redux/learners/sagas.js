@@ -36,7 +36,7 @@ export function* GET_DATA() {
   yield put({
     type: 'learners/GET_LEARNERS',
     payload: {
-      isActive: true,
+      isActive: null,
       first: 10,
       after: null,
       before: null,

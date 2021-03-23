@@ -653,6 +653,16 @@ const routes = [
     component: loadable(() => import('pages/StaffLeave')),
     exact: true,
   },
+  {
+    path: '/iisaAssessment',
+    component: loadable(() => import('pages/IISA')),
+    exact: true,
+  },
+  {
+    path: '/startIISA',
+    component: loadable(() => import('pages/IISA/StartAssessment')),
+    exact: true,
+  },
 ]
 
 class Router extends React.Component {
