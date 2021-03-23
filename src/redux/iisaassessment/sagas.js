@@ -119,6 +119,18 @@ export function* LOAD_ASSESSMENT_OBJECT({ payload }) {
 
   if (response) {
     const object = response.data.IISAGetAssessmentDetails
+    const domains = response.data.IISAGetDomains.edges
+    const questions = response.data.IISAGetQuestions.edges
+
+    const IISAObject = {}
+    for (let i=0; i<domains.length; i++){
+      IISAObject[domains[i]?.node.id] = []
+      for (let j=0; j<questions.length; j++){
+        if(questions[j].node.domain.id === domains[i].node.id){
+          IISAObject[domains[i]?.node.id].push({recorded: false, response: null, question: questions[j] })
+        }
+      }
+    }
     
 
     yield put({
@@ -129,6 +141,10 @@ export function* LOAD_ASSESSMENT_OBJECT({ payload }) {
         IISADomains: response.data.IISAGetDomains.edges,
         IISAOptions: response.data.IISAGetOptions.edges,
         IISAQuestions: response.data.IISAGetQuestions.edges,
+        IISAQuestionsListObject: IISAObject,
+        SelectedDomainId: response.data.IISAGetDomains.edges[0]?.node.id,
+        SelectedQuestionId: response.data.IISAGetQuestions.edges[0]?.node.id,
+        SelectedQuestionIndex: 0,
       },
     })
   }

@@ -33,14 +33,13 @@ const { Panel } = Collapse;
 
 const cardStyle = {
 	background: '#FFFFFF',
-	border: '1px solid #E4E9F0',
 	boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
-	borderRadius: 10,
-	padding: '16px 12px',
+	borderRadius: 7,
+	padding: '5px 12px',
 	alignItems: 'center',
 	display: 'block',
 	width: '100%',
-	marginBottom: '20px',
+	marginBottom: '10px',
 	lineHeight: '27px',
 	cursor: 'pointer'
 	// minHeight: '130px',
@@ -48,29 +47,28 @@ const cardStyle = {
 
 const selectedCardStyle = {
 	background: '#007acc',
-	border: '1px solid #E4E9F0',
 	color: '#fff',
 	boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
-	borderRadius: 10,
-	padding: '16px 12px',
+	borderRadius: 7,
+	padding: '5px 12px',
 	alignItems: 'center',
 	display: 'block',
 	width: '100%',
-	marginBottom: '20px',
+	marginBottom: '10px',
 	lineHeight: '27px',
 	cursor: 'pointer'
 	// minHeight: '130px',
 }
 
 const titleStyle = {
-	fontSize: '20px',
+	fontSize: '14px',
 	lineHeight: '24px',
 	display: 'block',
 	width: '100%',
 }
 
 const selectedTitleStyle = {
-	fontSize: '20px',
+	fontSize: '14px',
 	lineHeight: '24px',
 	display: 'block',
 	width: '100%',
@@ -116,32 +114,49 @@ class Screeing extends React.Component {
 	changeActiveDomian = domainId => {
 		console.log(domainId)
 		if (domainId === 'report') {
-				window.location.href = '/#/peakEquivalenceReport'
+			window.location.href = '/#/iisaReport'
 		}
 		else if (domainId && domainId !== 'report') {
 
-				const {
-						dispatch,
-						peakequivalence: {
-								SelectedQuestionIndex,
-								AssessmentObject,
-								PEQuestionsListObject,
-								SelectedDomainId,
-								SelectedTestIndex,
-						}
-				} = this.props
+			const {
+				dispatch,
+				iisaassessment: {
+					IISAQuestionsListObject,
+				}
+			} = this.props
 
-				dispatch({
-						type: actions.SET_STATE,
-						payload: {
-								SelectedDomainId: domainId,
-								SelectedQuestionIndex: 0,
-								SelectedQuestionId: PEQuestionsListObject[domainId][0]?.node.id,
-								SelectedTestIndex: 0,
-								SelectedTestId: PEQuestionsListObject[domainId][0]?.node.test.edges[0]?.node.id,
-						}
-				})
+			dispatch({
+				type: actions.SET_STATE,
+				payload: {
+					SelectedDomainId: domainId,
+					SelectedQuestionIndex: 0,
+					SelectedQuestionId: IISAQuestionsListObject[domainId][0]?.node.id,
+				}
+			})
 		}
+	}
+
+	changeQuestion = index => {
+		const {
+				dispatch,
+				peakequivalence: {
+						SelectedQuestionIndex,
+						AssessmentObject,
+						PEQuestionsListObject,
+						SelectedDomainId,
+						SelectedTestIndex,
+				}
+		} = this.props
+
+		dispatch({
+				type: 'peakequivalence/SET_STATE',
+				payload: {
+						SelectedQuestionIndex: index,
+						SelectedQuestionId: PEQuestionsListObject[SelectedDomainId][index]?.node.id,
+						SelectedTestIndex: 0,
+						SelectedTestId: PEQuestionsListObject[SelectedDomainId][index]?.node.test.edges[0]?.node.id,
+				}
+		})
 }
 
 	render() {
@@ -151,10 +166,11 @@ class Screeing extends React.Component {
 				AssessmentLoading,
 				SelectedAssessmentId,
 				AssessmentObject,
-				IISAQuestions,
 				IISADomains,
 				SelectedQuestionId,
 				SelectedDomainId,
+				IISAQuestionsListObject,
+				SelectedQuestionIndex,
 
 			},
 		} = this.props
@@ -201,7 +217,7 @@ class Screeing extends React.Component {
 
 										<div>
 											<Text style={{ fontSize: '18px', lineHeight: '24px' }}>
-												Question Name
+												{IISAQuestionsListObject[SelectedDomainId][SelectedQuestionIndex]?.question.node.question}
 											</Text>
 
 											<span style={{ float: 'right' }}>
@@ -275,13 +291,14 @@ class Screeing extends React.Component {
 												{IISADomains.map((item, index) =>
 
 													<Panel header={`${item.node.name}`} key={item.node.id}>
-
-														<>
-															<div onClick={() => this.changeQuestion(1)} style={1 === SelectedQuestionId ? selectedCardStyle : cardStyle}>
-																<Title style={1 === SelectedQuestionId ? selectedTitleStyle : titleStyle}>Question 1</Title>
-															</div>
-														</>
-														</Panel>
+														{IISAQuestionsListObject[item.node.id].map((node, nodeIndex) =>
+															<>
+																<div onClick={() => this.changeQuestion(nodeIndex)} style={node.question.node.id === SelectedQuestionId ? selectedCardStyle : cardStyle}>
+																	<Title style={node.question.node.id === SelectedQuestionId ? selectedTitleStyle : titleStyle}>{node.question.node.question}</Title>
+																</div>
+															</>
+														)}
+													</Panel>
 												)}
 												<Button onClick={() => this.showReport()} style={{ width: '100%', marginTop: '20px', padding: '8px', backgroundColor: '#007acc', color: 'white' }}>View Report</Button>
 											</Collapse>
