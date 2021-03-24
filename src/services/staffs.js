@@ -356,6 +356,15 @@ export async function updateStaff(payload) {
               id
               location
             }
+            attendanceSet{
+              edges {
+                node {
+                  id
+                  checkIn
+                  checkOut
+                }
+              }
+            }
             userRole {
               id
               name
@@ -450,6 +459,15 @@ export async function getStaffProfile(payload) {
             clinicLocation {
               id
               location
+            }
+            attendanceSet {
+              edges {
+                node {
+                  id
+                  checkIn
+                  checkOut
+                }
+              }
             }
             userRole {
               id

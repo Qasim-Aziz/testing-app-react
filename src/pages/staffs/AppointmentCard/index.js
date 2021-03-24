@@ -71,9 +71,14 @@ const th2 = {
 }
 
 function AppointmentCard(props) {
+  const extraContent = (
+    <div style={{ paddingRight: '16px', fontSize: '18px', fontWeight: '600', color: 'black' }}>
+      Appointments
+    </div>
+  )
   return (
-    <div style={{ height: 240 }}>
-      <Tabs>
+    <div style={{ height: 'fit-content', marginBottom: '28px' }}>
+      <Tabs tabBarExtraContent={extraContent} style={{ border: '1px solid #e8e8e8' }}>
         <TabPane key="upcoming" tab="Upcoming">
           <Upcoming staff={props.staffs.StaffProfile} />
         </TabPane>

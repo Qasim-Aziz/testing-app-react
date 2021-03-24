@@ -110,6 +110,15 @@ export const UPDATE_STAFF = gql`
           id
           location
         }
+        attendanceSet {
+          edges {
+            node {
+              id
+              checkIn
+              checkOut
+            }
+          }
+        }
         userRole {
           id
           name

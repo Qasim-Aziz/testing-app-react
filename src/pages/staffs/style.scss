@@ -55,6 +55,9 @@
   .ant-table-thead > tr > th {
     padding: 16px 10px;
   }
+}
+
+.with-border {
   .ant-table {
     border: 1px solid #e8e8e8;
   }
@@ -144,5 +147,12 @@
     .ant-card-meta {
       flex-direction: column;
     }
+  }
+}
+
+.appointment-card {
+  .ant-tooltip-inner {
+    padding: 8px 12px;
+    background-color: rgba(0, 0, 0, 0.6);
   }
 }

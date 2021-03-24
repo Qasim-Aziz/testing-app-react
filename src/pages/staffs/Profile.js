@@ -15,6 +15,7 @@ import EmergencyInfo from './EditDrawers/EmergencyInfo'
 import MiscInfo from './EditDrawers/MiscInfo'
 import { useQuery, useLazyQuery } from 'react-apollo'
 import AppointmentCard from './AppointmentCard/index'
+import Attendance from './Attendance'
 
 const { Meta } = Card
 
@@ -217,7 +218,6 @@ function Profile(props) {
       >
         <MiscInfo closeDrawer={setMiscInfoDrawer} staffProfile={staffProfile} />
       </Drawer>
-      <AppointmentCard />
 
       <div className="mainCard">
         <div className="mainCard-child right-border">
@@ -516,6 +516,8 @@ function Profile(props) {
           </div>
         </div>
       </div>
+      <AppointmentCard />
+      <Attendance staffProfile={staffProfile} />
     </div>
   )
 }

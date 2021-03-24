@@ -251,6 +251,14 @@ export async function updateLearner(payload) {
                   }
                 }
               }
+              allergicTo {
+                edges {
+                  node {
+                    id
+                    name
+                  }
+                }
+              }
               tags {
                 edges {
                   node {
@@ -433,6 +441,14 @@ export async function createLearner(payload) {
                   }
                 }
               }
+              allergicTo {
+                edges {
+                  node {
+                    id
+                    name
+                  }
+                }
+              }
               tags {
                 edges {
                   node {
@@ -567,6 +583,7 @@ export async function getLearner(payload) {
             admissionDate
             firstname
             email
+            isDefaultProgram
             dob
             image
             file
@@ -647,6 +664,14 @@ export async function getLearner(payload) {
                   id
                   name
                   surname
+                }
+              }
+            }
+            allergicTo {
+              edges {
+                node {
+                  id
+                  name
                 }
               }
             }

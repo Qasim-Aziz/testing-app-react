@@ -317,6 +317,33 @@ function Profile(props) {
         </div>
         <div className="mainCard-child">
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+            <p style={labelHead}>Allergic to </p>
+            <p>
+              {' '}
+              :
+              {userProfile.allergicTo?.map(tag => {
+                const isLongTag = tag.length > 20
+                const tagElem = (
+                  <Tag
+                    className="edit-tag"
+                    key={tag}
+                    color="#F89A42"
+                    style={{ margin: '1px', fontWeight: '600' }}
+                  >
+                    <span>{isLongTag ? `${tag.slice(0, 20)}...` : tag}</span>
+                  </Tag>
+                )
+                return isLongTag ? (
+                  <Tooltip title={tag} key={tag}>
+                    {tagElem}
+                  </Tooltip>
+                ) : (
+                  tagElem
+                )
+              })}
+            </p>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>Height </p>
             <p> : {userProfile.height}</p>
           </div>

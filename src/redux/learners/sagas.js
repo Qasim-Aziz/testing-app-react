@@ -69,6 +69,7 @@ export function* GET_LEARNERS({ payload }) {
           const tempTagArr = response.data.students.edges[i].node.tags.edges.map(e => e.node.name)
           response.data.students.edges[i].node.tags = tempTagArr
         }
+
         learners.push(response.data.students.edges[i].node)
       }
     }
@@ -140,6 +141,17 @@ export function* PAGE_CHANGED({ payload }) {
           const tempTagArr = response.data.students.edges[i].node.tags.edges.map(e => e.node.name)
           response.data.students.edges[i].node.tags = tempTagArr
         }
+        if (
+          response.data.students.edges[i].node.allergicTo.edges &&
+          response.data.students.edges[i].node.allergicTo.edges.length > 0
+        ) {
+          const tempAllergyArr = response.data.students.edges[i].node.allergicTo.edges.map(
+            e => e.node.name,
+          )
+          response.data.students.edges[i].node.allergicTo = tempAllergyArr
+        } else {
+          response.data.students.edges[i].node.allergicTo = []
+        }
         oldLearners.push(response.data.students.edges[i].node)
       }
     }
@@ -208,6 +220,17 @@ export function* ROWS_CHANGED({ payload }) {
           const tempTagArr = response.data.students.edges[i].node.tags.edges.map(e => e.node.name)
           response.data.students.edges[i].node.tags = tempTagArr
         }
+        if (
+          response.data.students.edges[i].node.allergicTo.edges &&
+          response.data.students.edges[i].node.allergicTo.edges.length > 0
+        ) {
+          const tempAllergyArr = response.data.students.edges[i].node.allergicTo.edges.map(
+            e => e.node.name,
+          )
+          response.data.students.edges[i].node.allergicTo = tempAllergyArr
+        } else {
+          response.data.students.edges[i].node.allergicTo = []
+        }
         oldLearners.push(response.data.students.edges[i].node)
       }
     }
@@ -262,6 +285,20 @@ export function* EDIT_GENERAL_INFO({ payload }) {
       } else {
         updatedLearner = { ...updatedLearner, tags: [] }
       }
+
+      console.log(response.data.updateStudent.student.allergicTo)
+
+      if (
+        response.data.updateStudent.student.allergicTo.edges &&
+        response.data.updateStudent.student.allergicTo.edges.length > 0
+      ) {
+        const tempAllergyArr = response.data.updateStudent.student.allergicTo.edges.map(
+          e => e.node.name,
+        )
+        updatedLearner = { ...updatedLearner, allergicTo: tempAllergyArr }
+      } else {
+        updatedLearner = { ...updatedLearner, allergicTo: [] }
+      }
     }
 
     const obj = {
@@ -308,6 +345,15 @@ export function* EDIT_LEARNER({ payload }) {
       if (response.data.updateStudent.student.tags.edges.length > 0) {
         const tempTagArr = response.data.updateStudent.student.tags.edges.map(e => e.node.name)
         updatedLearner = { ...updatedLearner, tags: tempTagArr }
+      }
+      if (
+        response.data.updateStudent.student.allergicTo.edges &&
+        response.data.updateStudent.student.allergicTo.edges.length > 0
+      ) {
+        const tempAllergyArr = response.data.updateStudent.student.allergicTo.edges.map(
+          e => e.node.name,
+        )
+        updatedLearner = { ...updatedLearner, allergicTo: tempAllergyArr }
       }
     }
 
@@ -416,6 +462,9 @@ export function* GET_SINGLE_LEARNER({ payload }) {
       ...response.data.student,
       tags: response.data.student.tags
         ? response.data.student.tags.edges.map(item => item.node.name)
+        : [],
+      allergicTo: response.data.student.allergicTo
+        ? response.data.student.allergicTo.edges.map(item => item.node.name)
         : [],
     }
 

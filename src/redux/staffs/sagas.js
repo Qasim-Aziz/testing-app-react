@@ -78,10 +78,10 @@ export function* GET_STAFF_PROFILE({ payload }) {
 
   if (response && response.data) {
     const { staff } = response.data
-    if (staff.tags.edges.length > 0) {
+    if (staff.tags.edges && staff.tags.edges.length > 0) {
       const tempTagArr = staff.tags.edges.map(e => e.node.name)
       staff.tags = tempTagArr
-    } else {
+    } else if (!staff.tags || !staff.tags.length || staff.tags.length === 0) {
       staff.tags = []
     }
 
