@@ -119,10 +119,10 @@ function Post(props) {
         {appointmentList &&
           appointmentList.map((item, idx) => {
             return (
-              <div key={item.id} style={{ display: 'flex', height: '138px' }}>
+              <div key={item.id} style={{ display: 'flex', height: '138px', paddingRight: '16px' }}>
                 <div
                   style={{
-                    width: '10%',
+                    width: '9%',
                     alignItems: 'center',
                     display: 'flex',
                     position: 'relative',
@@ -147,7 +147,7 @@ function Post(props) {
                     <DownCircleTwoTone twoToneColor="#3399ff" style={{ fontSize: 22 }} />
                   </div>
                 </div>
-                <div style={{ paddingTop: '16px', width: '90%' }}>
+                <div style={{ paddingTop: '16px', width: '91%' }}>
                   <div
                     style={{
                       width: '100%',
@@ -242,19 +242,27 @@ function Post(props) {
                           width: 'fit-content',
                           height: '100%',
                           marginLeft: 'auto',
-                          alignSelf: 'flex-end',
+                          textAlign: 'right',
                           flexDirection: 'column',
                         }}
                       >
+                        <Button size="small" style={{ fontWeight: '700', padding: 0 }} type="link">
+                          <EditOutlined /> Edit
+                        </Button>
                         <div>
                           <Tooltip title={item.note ? item.note : 'None'} trigger="click">
-                            <Button style={{ fontWeight: '700', padding: 0 }} type="link">
+                            <Button
+                              size="small"
+                              style={{ fontWeight: '700', padding: 0 }}
+                              type="link"
+                            >
                               <FileTextOutlined /> Note
                             </Button>
                           </Tooltip>
                         </div>
                         <div>
                           <Button
+                            size="small"
                             style={{ fontWeight: '700', padding: 0 }}
                             onClick={() => showFeedback(item.id)}
                             type="link"

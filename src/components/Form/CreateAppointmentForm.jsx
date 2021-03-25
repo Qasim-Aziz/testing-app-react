@@ -32,6 +32,7 @@ const { TextArea } = Input
 const { Option } = Select
 
 const CreateAppointmentForm = ({ setNeedToReloadData, form, startDate, endDate, therapistId }) => {
+  console.log(startDate, endDate, therapistId, 'details')
   const userRole = useSelector(state => state.user.role)
   const therapistReduxId = useSelector(state => state.user.staffId)
   const [openStatus, setOpenStatus] = useState()

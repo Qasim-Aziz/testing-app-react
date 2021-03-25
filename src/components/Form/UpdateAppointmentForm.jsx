@@ -69,6 +69,7 @@ const UpdateAppointmentForm = ({
 
   useEffect(() => {
     if (editAppointmentData) {
+      console.log(editAppointmentData, 'skdjhsd')
       notification.success({
         message: 'Clinic Dashboard',
         description: 'Appointment Update Successfully',
@@ -123,6 +124,13 @@ const UpdateAppointmentForm = ({
     e.preventDefault()
     form.validateFields((error, values) => {
       if (!error) {
+        console.log(
+          values,
+          values.startDate.format('YYYY-MM-DD'),
+          values.date,
+          combineDateAndTime(values.startDate, values.startTime),
+          combineDateAndTime(values.startDate, values.endTime),
+        )
         editAppiorment({
           variables: {
             id: appointmentId,
@@ -134,12 +142,16 @@ const UpdateAppointmentForm = ({
             locationId: values.location ? values.location : '',
             purposeAssignment: values.purposeAssignment,
             note: values.note ? values.note : '',
-            start: combineDateAndTime(values.date, values.startTime),
-            end: combineDateAndTime(values.date, values.endTime),
+            start: combineDateAndTime(values.startDate, values.startTime),
+            end: combineDateAndTime(values.startDate, values.endTime),
             appointmentStatus: values.appointmentStatus,
           },
           errorPolicy: 'all',
           onError(err) {
+            notification.error({
+              message: 'Something went wrong',
+              description: 'Unable to update appointment',
+            })
             console.log(err)
           },
         })
@@ -155,6 +167,7 @@ const UpdateAppointmentForm = ({
     return <h3 style={{ color: 'red' }}>Opps! Something went wrong.</h3>
   }
 
+  console.log(getAppointmentData, 'getapp')
   return (
     <Form
       name="updateAppointment"
@@ -276,12 +289,7 @@ const UpdateAppointmentForm = ({
       {/* Date - Start time - End time */}
       <Row>
         <Col sm={24} md={8} lg={8}>
-          <Form.Item
-            label="Start Date"
-            labelCol={{ offset: 2, sm: 10 }}
-            wrapperCol={{ sm: 12 }}
-            rules={[{ required: true, message: 'Please select a start time!' }]}
-          >
+          <Form.Item label="Start Date" labelCol={{ offset: 2, sm: 10 }} wrapperCol={{ sm: 12 }}>
             {form.getFieldDecorator('startDate', {
               initialValue: moment(getAppointmentData.appointment.start),
               rules: [
@@ -299,7 +307,6 @@ const UpdateAppointmentForm = ({
                 placeholder="Date"
                 format="YYYY-MM-DD"
                 picker="date"
-                showTime={{ format: 'YYYY-MM-DD', defaultValue: moment() }}
               />,
             )}
           </Form.Item>

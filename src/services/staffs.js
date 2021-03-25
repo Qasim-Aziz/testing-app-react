@@ -416,6 +416,7 @@ export async function getStaffProfile(payload) {
         query($id: ID!) {
           staff(id: $id) {
             id
+            staffId
             employeeId
             name
             surname

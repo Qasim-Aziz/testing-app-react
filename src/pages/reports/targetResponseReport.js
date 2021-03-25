@@ -23,6 +23,7 @@ import {
 } from 'antd'
 import { useLazyQuery } from 'react-apollo'
 import { FaDownload } from 'react-icons/fa'
+import { useDispatch } from 'react-redux'
 import moment from 'moment'
 import { TargetResponsePeakBlock } from './targetResponsePeakBlock'
 import { TargetResponseEqui } from './targetResponseEqui'
@@ -62,6 +63,7 @@ function TargetResponseReport({ studentName }) {
   const [equiTrainTest, setEquiTrainTest] = useState('all')
   const [activeEquiTab, setActiveEquiTab] = useState('Class')
   const downloadCsvRef = useRef()
+  const dispatch = useDispatch()
   const [getResponseRate, { data: dt, loading: ld, error: er }] = useLazyQuery(TARGET_RESPONSE_RATE)
   const [
     getEquiResponseRate,
@@ -350,7 +352,7 @@ function TargetResponseReport({ studentName }) {
         <div style={{ marginLeft: 'auto' }}>
           <Dropdown overlay={menu} trigger={['click']}>
             <Button style={{ padding: '0 8px' }} type="link" size="large">
-              <FaDownload />{' '}
+              <FaDownload />
             </Button>
           </Dropdown>
         </div>
@@ -395,6 +397,16 @@ function TargetResponseReport({ studentName }) {
           </TabPane>
         </Tabs>
       )}
+      <Button
+        onClick={() => {
+          dispatch({
+            type: 'appointments/GET_APPOINTMENT_LIST',
+          })
+          return 0
+        }}
+      >
+        Diso
+      </Button>
     </div>
   )
 }

@@ -58,11 +58,13 @@ const er = gql`
 `
 
 function Upcoming(props) {
-  const [getApp, { data, loading, error }] = useLazyQuery(er)
+  const { updateAppointment } = props
+  const [getApp, { data, loading, error, refetch }] = useLazyQuery(er)
   const dispatch = useDispatch()
   const [selectedAppointmentId, setSelectedAppointmentId] = useState('')
   const [feedbackDrawer, setFeedbackDrawer] = useState(false)
   const [appointmentList, setAppointmentList] = useState(null)
+
   useEffect(() => {
     if (props.staff) {
       getApp({
@@ -80,13 +82,11 @@ function Upcoming(props) {
       temp = data.appointments.edges.map(item => item.node)
       temp.sort((a, b) => moment(a.start) - moment(b.start))
       setAppointmentList(temp)
-      console.log(temp, 'temp')
     }
   }, [data])
 
   const userRole = useSelector(state => state.user.role)
 
-  console.log(userRole, 'dsd')
   const showFeedback = id => {
     setFeedbackDrawer(true)
 
@@ -115,14 +115,17 @@ function Upcoming(props) {
         <SessionFeedbackForm appointmentId={selectedAppointmentId} key={selectedAppointmentId} />
       </Drawer>
       <Scrollbars autoHide style={{ height: appointmentList?.length == 0 ? 182 : 350 }}>
-        <div style={{ display: 'flex' }}>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
           {appointmentList && appointmentList.length > 0 ? (
             appointmentList.map((item, idx) => {
               return (
-                <div key={item.id} style={{ display: 'flex', height: '138px' }}>
+                <div
+                  key={item.id}
+                  style={{ display: 'flex', height: '138px', paddingRight: '16px' }}
+                >
                   <div
                     style={{
-                      width: '10%',
+                      width: '9%',
                       alignItems: 'center',
                       display: 'flex',
                       position: 'relative',
@@ -147,7 +150,7 @@ function Upcoming(props) {
                       <DownCircleTwoTone twoToneColor="#3399ff" style={{ fontSize: 22 }} />
                     </div>
                   </div>
-                  <div style={{ paddingTop: '16px', width: '90%' }}>
+                  <div style={{ paddingTop: '16px', width: '91%' }}>
                     <div
                       style={{
                         width: '100%',
@@ -245,19 +248,35 @@ function Upcoming(props) {
                             width: 'fit-content',
                             height: '100%',
                             marginLeft: 'auto',
-                            alignSelf: 'flex-end',
+                            textAlign: 'right',
                             flexDirection: 'column',
                           }}
                         >
+                          <Button
+                            size="small"
+                            style={{ fontWeight: '700', padding: 0 }}
+                            type="link"
+                            onClick={() => {
+                              updateAppointment(item.id)
+                              refetch()
+                            }}
+                          >
+                            <EditOutlined /> Edit
+                          </Button>
                           <div>
                             <Tooltip title={item.note ? item.note : 'None'} trigger="click">
-                              <Button style={{ fontWeight: '700', padding: 0 }} type="link">
+                              <Button
+                                size="small"
+                                style={{ fontWeight: '700', padding: 0 }}
+                                type="link"
+                              >
                                 <FileTextOutlined /> Note
                               </Button>
                             </Tooltip>
                           </div>
                           <div>
                             <Button
+                              size="small"
                               style={{ fontWeight: '700', padding: 0 }}
                               onClick={() => showFeedback(item.id)}
                               type="link"

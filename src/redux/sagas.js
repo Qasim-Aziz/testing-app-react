@@ -18,6 +18,7 @@ import peakequivalence from './peakequivalence/sagas'
 import sessionrecording from './sessionrecording/sagas'
 import cogniableassessment from './cogniableassessment/sagas'
 import sessiontargetallocation from './sessiontargetallocation/sagas'
+import appointments from './appointments/sagas'
 
 export default function* rootSaga() {
   yield all([
@@ -40,5 +41,6 @@ export default function* rootSaga() {
     sessionrecording(),
     cogniableassessment(),
     sessiontargetallocation(),
+    appointments(),
   ])
 }
