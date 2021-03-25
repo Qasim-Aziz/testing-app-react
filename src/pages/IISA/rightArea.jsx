@@ -52,6 +52,7 @@ import { gql } from 'apollo-boost'
 import LearnerSelect from 'components/LearnerSelect'
 import actions from 'redux/iisaassessment/actions'
 import AssessmentForm from './AssessmentForm'
+import AssessmentReport from './StartAssessment/report'
 import apolloClient from '../../apollo/config'
 
 const { Title, Text } = Typography
@@ -154,6 +155,26 @@ class RightArea extends React.Component {
     })
   }
 
+  closeReportDrawer = () => {
+    const {dispatch} = this.props
+    dispatch({
+      type: actions.SET_STATE,
+      payload: {
+        ReportDrawer: false
+      }
+    })
+  }
+
+  openReportDrawer = () => {
+    const {dispatch} = this.props
+    dispatch({
+      type: actions.SET_STATE,
+      payload: {
+        ReportDrawer: true
+      }
+    })
+  }
+
   handleMenuActions = (e, obj) => {
     const { dispatch } = this.props
 
@@ -166,14 +187,13 @@ class RightArea extends React.Component {
       }
 
       case 'seeReport': {
-        localStorage.setItem('peakId', obj.node.id)
-        localStorage.setItem('reportDate', obj.node.date)
-        localStorage.setItem('peakType', obj.node.category)
-        if (obj.node.category === 'EQUIVALANCE' || obj.node.category === 'EQUIVALENCE') {
-          history.push('/peakEquivalenceReport')
-        } else {
-          history.push('/peakReport')
-        }
+        dispatch({
+          type: actions.SET_STATE,
+          payload: {
+            SelectedAssessmentId: obj.node.id,
+            ReportDrawer: true
+          }
+        })
         break
       }
 
@@ -182,7 +202,7 @@ class RightArea extends React.Component {
         localStorage.setItem('peakType', obj.node.category)
         if (obj.node.category === 'TRANSFORMATION') {
           history.push('/classPage')
-        }  else {
+        } else {
           history.push('/peakAssign')
         }
         break
@@ -196,7 +216,7 @@ class RightArea extends React.Component {
           }
         })
         window.location.href = '/#/startIISA'
-        
+
         break
       }
 
@@ -211,7 +231,7 @@ class RightArea extends React.Component {
     const { newAssessment, suggestTarget, open } = this.state
     const {
       student: { StudentName },
-      iisaassessment: { AssessmentList, AssessmentObject, NewAssessmentForm, loading },
+      iisaassessment: { AssessmentList, ReportDrawer, NewAssessmentForm, loading },
       user,
     } = this.props
 
@@ -220,7 +240,7 @@ class RightArea extends React.Component {
         title: 'Date',
         dataIndex: 'node.date',
       },
-      
+
       {
         title: 'Title',
         dataIndex: 'node.title',
@@ -229,7 +249,7 @@ class RightArea extends React.Component {
         title: 'Note',
         dataIndex: 'node.notes',
       },
-      
+
       {
         title: 'Status',
         align: 'center',
@@ -246,80 +266,81 @@ class RightArea extends React.Component {
         minWidth: '100px',
         maxWidth: '100px',
         render: (text, obj) => {
-          
-            const seeAssesmentMenu = (
-              <Menu.Item key="seeAssesment">
-                <CheckSquareFilled /> See Assesment
+
+          const seeAssesmentMenu = (
+            <Menu.Item key="seeAssesment">
+              <CheckSquareFilled /> See Assesment
               </Menu.Item>
-            )
-  
-            const seeReportMenu = (
-              <Menu.Item key="seeReport">
-                <Icon type="snippets" /> See Report
+          )
+
+          const seeReportMenu = (
+            <Menu.Item key="seeReport">
+              <Icon type="snippets" /> See Report
               </Menu.Item>
-            )
-  
-            const suggestTargetMenu = (
-              <Menu.Item key="suggestTarget">
-                <Icon type="diff" /> Suggest Target
+          )
+
+          const suggestTargetMenu = (
+            <Menu.Item key="suggestTarget">
+              <Icon type="diff" /> Suggest Target
               </Menu.Item>
-            )
-  
-            const resumeAssesmentMenu = (
-              <Menu.Item key="resumeAssesment">
-                <PauseOutlined /> Resume Assesment
+          )
+
+          const resumeAssesmentMenu = (
+            <Menu.Item key="resumeAssesment">
+              <PauseOutlined /> Resume Assesment
               </Menu.Item>
-            )
-  
-            const startAssesmentMenu = (
-              <Menu.Item key="startAssesment">
-                <PlayCircleOutlined /> Start Assesment
+          )
+
+          const startAssesmentMenu = (
+            <Menu.Item key="startAssesment">
+              <PlayCircleOutlined /> Start Assesment
               </Menu.Item>
-            )
-  
-            const menuItems = []
-  
-            if (obj.node.status === 'COMPLETED') {
-              menuItems.push(seeAssesmentMenu)
-              menuItems.push(seeReportMenu)
-              // menuItems.push(<Menu.Divider />)
-              // menuItems.push(suggestTargetMenu)
-            } else {
-              menuItems.push(startAssesmentMenu)
-              // menuItems.push(<Menu.Divider />)
-              // menuItems.push(suggestTargetMenu)
-            }
-  
-            const menu = <Menu onClick={e => this.handleMenuActions(e, obj)}>{menuItems}</Menu>
-  
-            return (
-              <>
-                <Tooltip placement="topRight" title="Delete Assessment">
-                  <Popconfirm
-                    title="Are you sure you don't want this assessment?"
-                    onConfirm={() => this.makeInactive(obj.node.id)}
-                    okText="Yes"
-                    cancelText="No"
-                  >
-                    <Button type="link" style={{ color: 'red' }}>
-                      <DeleteOutlined /> Delete
+          )
+
+          const menuItems = []
+
+          if (obj.node.status === 'COMPLETED') {
+            menuItems.push(seeAssesmentMenu)
+            menuItems.push(seeReportMenu)
+            // menuItems.push(<Menu.Divider />)
+            // menuItems.push(suggestTargetMenu)
+          } else {
+            menuItems.push(startAssesmentMenu)
+            menuItems.push(seeReportMenu)
+            // menuItems.push(<Menu.Divider />)
+            // menuItems.push(suggestTargetMenu)
+          }
+
+          const menu = <Menu onClick={e => this.handleMenuActions(e, obj)}>{menuItems}</Menu>
+
+          return (
+            <>
+              <Tooltip placement="topRight" title="Delete Assessment">
+                <Popconfirm
+                  title="Are you sure you don't want this assessment?"
+                  onConfirm={() => this.makeInactive(obj.node.id)}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <Button type="link" style={{ color: 'red' }}>
+                    <DeleteOutlined /> Delete
                     </Button>
-                  </Popconfirm>
-                </Tooltip>
-                <span style={{ borderRight: '1px solid #ccc', margin: '0 8px' }} />
-                <Dropdown overlay={menu}>
-                  <a
-                    role="presentation"
-                    className="ant-dropdown-link"
-                    onClick={e => e.preventDefault()}
-                    style={{ color: '#1890ff' }}
-                  >
-                    More <Icon type="down" />
-                  </a>
-                </Dropdown>
-              </>
-            )
-          
+                </Popconfirm>
+              </Tooltip>
+              <span style={{ borderRight: '1px solid #ccc', margin: '0 8px' }} />
+              <Dropdown overlay={menu}>
+                <a
+                  role="presentation"
+                  className="ant-dropdown-link"
+                  onClick={e => e.preventDefault()}
+                  style={{ color: '#1890ff' }}
+                >
+                  More <Icon type="down" />
+                </a>
+              </Dropdown>
+            </>
+          )
+
         },
       },
     ]
@@ -370,7 +391,7 @@ class RightArea extends React.Component {
                 >
                   <LearnerSelect />
                 </Drawer>
-                <Button type="primary" size="large" onClick={() => this.setState({ open: true })}>
+                <Button type="primary" style={{ border: 'none', background: '#3f72af' }} size="large" onClick={() => this.setState({ open: true })}>
                   <PlusOutlined />
                   New Assessment
                 </Button>
@@ -398,7 +419,7 @@ class RightArea extends React.Component {
               onClose={() => {
                 this.setState({ open: false })
               }}
-              width={750}
+              width="80%"
               title="Create New Assessment"
             >
               <div
@@ -408,6 +429,25 @@ class RightArea extends React.Component {
               >
                 <AssessmentForm
                   onClose={() => { this.setState({ open: false }) }}
+                />
+              </div>
+            </Drawer>
+
+            <Drawer
+              visible={ReportDrawer}
+              onClose={() => {
+                this.closeReportDrawer()
+              }}
+              width="80%"
+              title="Assessment Report"
+            >
+              <div
+                style={{
+                  padding: '0px 30px',
+                }}
+              >
+                <AssessmentReport
+                  onClose={() => { this.closeReportDrawer() }}
                 />
               </div>
             </Drawer>

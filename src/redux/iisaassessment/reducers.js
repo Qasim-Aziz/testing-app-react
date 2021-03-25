@@ -5,6 +5,7 @@ const initialState = {
   createFormLoading: false,
   AssessmentLoading: false,
   responseLoading: false,
+  AssessmentReportLoading: false,
   SelectedAssessmentId: '',
 
   AssessmentObject: null,
@@ -18,13 +19,11 @@ const initialState = {
   SelectedQuestionId: '',
   SelectedDomainId: '',
   IISAQuestionsListObject: {},
-  
-  ResponseObject: {},
-  Areas: [],
-  AreasResponse: {},
+
+  ReportDrawer: false,
+  AssessmentReport: null,
 
   isEdit: false,
-  cloneQuestion: null,
 
   NewAssessmentForm: false,
 }

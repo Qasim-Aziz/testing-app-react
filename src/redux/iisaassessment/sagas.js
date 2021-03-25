@@ -8,11 +8,8 @@ import {
   createAssessment,
   getAssessmentObject,
   recordResponse,
-  recordAreaResponse,
-  endAssessment,
-  endQuestionsAssessment,
-  editQuestions,
   makeAssessmentInactive,
+  getAssessmentReport,
 } from 'services/iisaassessment'
 import actions from './actions'
 
@@ -26,13 +23,9 @@ export function* GET_DATA({ payload }) {
       responseLoading: false,
       AssessmentObject: null,
       AssessmentList: [],
-      Question: null,
       QuestionCounter: 0,
       ResponseObject: {},
-      Areas: [],
-      AreasResponse: {},
       isEdit: false,
-      cloneQuestion: null,
       NewAssessmentForm: false,
     },
   })
@@ -40,6 +33,8 @@ export function* GET_DATA({ payload }) {
   const response = yield call(getData, payload)
 
   if (response) {
+
+
 
     yield put({
       type: actions.SET_STATE,
@@ -127,7 +122,16 @@ export function* LOAD_ASSESSMENT_OBJECT({ payload }) {
       IISAObject[domains[i]?.node.id] = []
       for (let j=0; j<questions.length; j++){
         if(questions[j].node.domain.id === domains[i].node.id){
-          IISAObject[domains[i]?.node.id].push({recorded: false, response: null, question: questions[j] })
+          let objectRec = {}
+          let foundRec = false
+          for (let k=0; k<object.responses.edges.length; k++){
+            if (object.responses.edges[k].node.question?.id === questions[j].node.id){
+              objectRec = {recorded: true, response: object.responses.edges[k].node, question: questions[j]}
+              foundRec = true
+            }
+          }
+          if (foundRec) IISAObject[domains[i]?.node.id].push(objectRec)
+          else IISAObject[domains[i]?.node.id].push({recorded: false, response: null, question: questions[j] })
         }
       }
     }
@@ -157,6 +161,7 @@ export function* LOAD_ASSESSMENT_OBJECT({ payload }) {
   })
 }
 
+
 export function* RECORD_RESPONSE({ payload }) {
   yield put({
     type: actions.SET_STATE,
@@ -168,35 +173,24 @@ export function* RECORD_RESPONSE({ payload }) {
   const response = yield call(recordResponse, payload)
 
   if (response) {
-    // notification.success({
-    //   message: 'Success!!',
-    //   description: "Response Recorded Successfully!",
-    // })
+    notification.success({
+      message: 'Success!!',
+      description: "Response Recorded Successfully!",
+    })
 
-    const nextQus = response.data.recordCogQuestion.nextQuestion
-    const object = response.data.recordCogQuestion.details
+    const resObject = yield select(state => state.iisaassessment.IISAQuestionsListObject)
+    const domianId = yield select(state => state.iisaassessment.SelectedDomainId)
+    const questionIndex = yield select(state => state.iisaassessment.SelectedQuestionIndex)
 
-    const resObject = yield select(state => state.cogniableassessment.ResponseObject)
-    const edges = object.assessmentQuestions.edges
-
-    if (edges.length > 0) {
-      for (let i = 0; i < edges.length; i++) {
-        resObject[edges[i].node.question.id] = { recorded: true, response: edges[i].node }
-      }
-
-      if (nextQus) {
-        resObject[nextQus.id] = { recorded: false, response: null }
-      }
+    resObject[domianId][questionIndex] = {...resObject[domianId][questionIndex],
+      recorded: true, 
+      response: response.data.IISARecording.responses[0]
     }
-
+    
     yield put({
       type: actions.SET_STATE,
       payload: {
-        Question: nextQus,
-        cloneQuestion: nextQus,
-        ResponseObject: resObject,
-        QuestionCounter: edges.length,
-        AssessmentObject: object,
+        IISAQuestionsListObject: resObject,
       },
     })
   }
@@ -207,175 +201,6 @@ export function* RECORD_RESPONSE({ payload }) {
       responseLoading: false,
     },
   })
-}
-
-export function* RECORD_AREA_RESPONSE({ payload }) {
-  // selecting assessment object id
-  const ObjectId = yield select(state => state.cogniableassessment.AssessmentObject.id)
-  // api call for area response
-  const response = yield call(recordAreaResponse, {
-    objectId: ObjectId,
-    areaId: payload.areaId,
-    response: payload.response,
-  })
-  if (response?.data) {
-    const areaEdges = response.data.recordCogniableAssessResult.details.assessmentAreas.edges
-
-    // selection area response object
-    const areasResponse = yield select(state => state.cogniableassessment.AreasResponse)
-    if (areaEdges.length > 0) {
-      for (let i = 0; i < areaEdges.length; i++) {
-        if (areaEdges[i].node.area.id === payload.areaId) {
-          // updating recorded response to store for future edit operations
-          areasResponse[payload.areaId] = { recorded: true, response: areaEdges[i].node }
-        }
-      }
-    }
-
-    yield put({
-      type: actions.SET_STATE,
-      payload: {
-        AreasResponse: areasResponse,
-      },
-    })
-  }
-}
-
-export function* END_ASSESSMENT({ payload }) {
-  // api call for End assessment
-  const response = yield call(endAssessment, {
-    objectId: payload.objectId,
-    // score: payload.score,
-    status: 'Completed',
-  })
-  if (response?.data) {
-    notification.success({
-      message: 'Success!!',
-      description: 'Assessment Submitted Successfully!',
-    })
-    const object = response.data.updateCogAssessment.details
-
-    yield put({
-      type: actions.SET_STATE,
-      payload: {
-        AssessmentObject: object,
-        AssessmentStatus: object.status,
-      },
-    })
-  }
-}
-
-export function* END_QUESTIONS({ payload }) {
-  // api call for End Questions seagment
-  const response = yield call(endQuestionsAssessment, {
-    objectId: payload.objectId,
-    status: payload.status,
-  })
-  if (response?.data) {
-    const object = response.data.updateCogAssessment.details
-
-    // updating areas responses object
-    const areaResponse = yield select(state => state.cogniableassessment.AreasResponse)
-    const areaEdges = object.assessmentAreas.edges
-    for (let m = 0; m < areaEdges.length; m++) {
-      areaResponse[areaEdges[m].node.area.id] = { recorded: true, response: areaEdges[m].node }
-    }
-
-    yield put({
-      type: actions.SET_STATE,
-      payload: {
-        AssessmentObject: object,
-        AssessmentStatus: object.status,
-        AreasResponse: areaResponse
-      },
-    })
-  }
-}
-
-export function* CHANGE_QUESTION({ payload }) {
-  // api call for End Questions seagment
-  // const response = yield call(endQuestionsAssessment, {objectId: payload.objectId, status: payload.status})
-
-  const object = yield select(state => state.cogniableassessment.AssessmentObject)
-
-  if (object) {
-    yield put({
-      type: actions.SET_STATE,
-      payload: {
-        Question: object.assessmentQuestions.edges[payload.index - 1].node.question,
-      },
-    })
-  }
-}
-
-export function* UPDATE_QUESTION_RESPONSE({ payload }) {
-  // api call for Edit Questions response
-  const response = yield call(editQuestions, payload)
-
-  // const object = yield select(state => state.cogniableassessment.AssessmentObject)
-
-  if (response) {
-    const object = response.data.updateCogniableAssessment.details
-    const nextQus = response.data.updateCogniableAssessment.nextQuestion
-    const edges = object.assessmentQuestions.edges
-
-    const resObject = {}
-    let displayQuestion = null
-    if (object.status) {
-      console.log('phase change')
-      if (edges.length > 0) {
-        for (let i = 0; i < edges.length; i++) {
-          resObject[edges[i].node.question.id] = { recorded: true, response: edges[i].node }
-
-          // setting current question
-          if (edges[i].node.question.id === payload.qusId) {
-            displayQuestion = edges[i].node.question
-          }
-        }
-        // adding next question to response
-        if (nextQus) {
-          resObject[nextQus.id] = { recorded: false, response: null }
-        }
-      }
-
-      yield put({
-        type: actions.SET_STATE,
-        payload: {
-          Question: displayQuestion,
-          ResponseObject: resObject,
-          // isCloneQuestion: true,
-          cloneQuestion: nextQus,
-        },
-      })
-    } else {
-      console.log('not changed')
-      if (edges.length > 0) {
-        for (let i = 0; i < edges.length; i++) {
-          resObject[edges[i].node.question.id] = { recorded: true, response: edges[i].node }
-
-          // setting current question
-          // if(edges[i].node.question.id === payload.qusId ){
-          //   displayQuestion = edges[i].node.question
-          // }
-        }
-        // adding next question to response
-        if (nextQus) {
-          resObject[nextQus.id] = { recorded: false, response: null }
-        }
-      }
-
-      yield put({
-        type: actions.SET_STATE,
-        payload: {
-          ResponseObject: resObject,
-          // isCloneQuestion: true,
-          cloneQuestion: nextQus,
-        },
-      })
-    }
-
-    console.log(response)
-  }
 }
 
 export function* MAKE_INACTIVE({ payload }) {
@@ -411,6 +236,34 @@ export function* MAKE_INACTIVE({ payload }) {
   }
 }
 
+export function* LOAD_ASSESSMENT_REPORT({ payload }) {
+  yield put({
+    type: actions.SET_STATE,
+    payload: {
+      AssessmentReportLoading: true,
+    },
+  })
+
+  // api call for assessment object
+  const response = yield call(getAssessmentReport, payload)
+
+  if (response) {
+    yield put({
+      type: actions.SET_STATE,
+      payload: {
+        AssessmentReport: response.data.IISAAssessmentSummary,
+      },
+    })
+  }
+
+  yield put({
+    type: actions.SET_STATE,
+    payload: {
+      AssessmentReportLoading: false,
+    },
+  })
+}
+
 export default function* rootSaga() {
   yield all([
     // GET_DATA(), // run once on app load to fetch menu data
@@ -418,11 +271,7 @@ export default function* rootSaga() {
     takeEvery(actions.CREATE_ASSESSMENT, CREATE_ASSESSMENT),
     takeEvery(actions.LOAD_ASSESSMENT_OBJECT, LOAD_ASSESSMENT_OBJECT),
     takeEvery(actions.RECORD_RESPONSE, RECORD_RESPONSE),
-    takeEvery(actions.RECORD_AREA_RESPONSE, RECORD_AREA_RESPONSE),
-    takeEvery(actions.END_ASSESSMENT, END_ASSESSMENT),
-    takeEvery(actions.END_QUESTIONS, END_QUESTIONS),
-    takeEvery(actions.CHANGE_QUESTION, CHANGE_QUESTION),
-    takeEvery(actions.UPDATE_QUESTION_RESPONSE, UPDATE_QUESTION_RESPONSE),
     takeEvery(actions.MAKE_INACTIVE, MAKE_INACTIVE),
+    takeEvery(actions.LOAD_ASSESSMENT_REPORT, LOAD_ASSESSMENT_REPORT),
   ])
 }

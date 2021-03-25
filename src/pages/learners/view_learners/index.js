@@ -956,6 +956,7 @@ class LearnerTable extends React.Component {
                     filterName: '',
                     filterEmail: '',
                   })
+                  this.selectActiveStatus('all')
                 }}
                 style={{ marginLeft: '10px', color: '#FEBB27' }}
                 size="small"

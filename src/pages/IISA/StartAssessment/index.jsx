@@ -22,10 +22,11 @@
 
 import React from 'react'
 import { Helmet } from 'react-helmet'
-import { Layout, Row, Col, Typography, Button, Icon, Collapse, } from 'antd'
+import { Layout, Row, Col, Typography, Button, Icon, Collapse, Drawer } from 'antd'
 import { connect } from 'react-redux'
 import LoadingComponent from 'components/LoadingComponent'
 import actions from 'redux/iisaassessment/actions'
+import AssessmentReport from './report'
 
 const { Content } = Layout
 const { Title, Text } = Typography
@@ -46,7 +47,7 @@ const cardStyle = {
 }
 
 const selectedCardStyle = {
-	background: '#007acc',
+	background: '#3f72af',
 	color: '#fff',
 	boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
 	borderRadius: 7,
@@ -75,10 +76,9 @@ const selectedTitleStyle = {
 	color: '#fff'
 }
 
-const buttonDefaultStyle = { padding: '20px auto', width: '350px', height: '50px', marginRight: '20px', fontSize: '15px', border: '1px solid #4BAEA0', color: '#4BAEA0' }
-const buttonDefaultFalseStyle = { padding: '20px auto', width: '350px', height: '50px', marginRight: '20px', fontSize: '15px', border: '1px solid #FF8080', color: '#FF8080', marginTop: '15px' }
-const buttonTrueStyle = { padding: '20px auto', width: '350px', height: '50px', marginRight: '20px', fontSize: '15px', border: '1px solid #bbb', color: 'white', backgroundColor: '#4BAEA0' }
-const buttonFalseStyle = { padding: '20px auto', width: '350px', height: '50px', marginRight: '20px', fontSize: '15px', border: '1px solid #bbb', color: 'white', backgroundColor: '#FF8080', marginTop: '15px' }
+const buttonDefaultStyle = { padding: '20px auto', width: '220px', height: '50px', marginRight: '20px', fontSize: '15px', color: '#3f72af', margin: 5 }
+const buttonTrueStyle = { padding: '20px auto', width: '220px', height: '50px', marginRight: '20px', fontSize: '15px', color: 'white', backgroundColor: '#3f72af', margin: 5 }
+
 
 
 @connect(({ iisaassessment, student }) => ({
@@ -130,7 +130,7 @@ class Screeing extends React.Component {
 				payload: {
 					SelectedDomainId: domainId,
 					SelectedQuestionIndex: 0,
-					SelectedQuestionId: IISAQuestionsListObject[domainId][0]?.node.id,
+					SelectedQuestionId: IISAQuestionsListObject[domainId][0]?.question.node.id,
 				}
 			})
 		}
@@ -138,26 +138,102 @@ class Screeing extends React.Component {
 
 	changeQuestion = index => {
 		const {
-				dispatch,
-				peakequivalence: {
-						SelectedQuestionIndex,
-						AssessmentObject,
-						PEQuestionsListObject,
-						SelectedDomainId,
-						SelectedTestIndex,
-				}
+			dispatch,
+			iisaassessment: {
+				IISAQuestionsListObject,
+				SelectedDomainId,
+			}
 		} = this.props
 
 		dispatch({
-				type: 'peakequivalence/SET_STATE',
-				payload: {
-						SelectedQuestionIndex: index,
-						SelectedQuestionId: PEQuestionsListObject[SelectedDomainId][index]?.node.id,
-						SelectedTestIndex: 0,
-						SelectedTestId: PEQuestionsListObject[SelectedDomainId][index]?.node.test.edges[0]?.node.id,
-				}
+			type: actions.SET_STATE,
+			payload: {
+				SelectedQuestionIndex: index,
+				SelectedQuestionId: IISAQuestionsListObject[SelectedDomainId][index]?.question.node.id,
+			}
 		})
-}
+	}
+
+	goToPreviousQuestion = () => {
+		const {
+			dispatch,
+			iisaassessment: {
+				SelectedQuestionIndex,
+				IISAQuestionsListObject,
+				SelectedDomainId,
+			}
+		} = this.props
+
+		dispatch({
+			type: actions.SET_STATE,
+			payload: {
+				SelectedQuestionIndex: SelectedQuestionIndex - 1,
+				SelectedQuestionId: IISAQuestionsListObject[SelectedDomainId][SelectedQuestionIndex - 1]?.question.node.id,
+			}
+		})
+
+	}
+
+	goToNextQuestion = () => {
+		const {
+			dispatch,
+			iisaassessment: {
+				SelectedQuestionIndex,
+				IISAQuestionsListObject,
+				SelectedDomainId,
+			}
+		} = this.props
+
+		dispatch({
+			type: actions.SET_STATE,
+			payload: {
+				SelectedQuestionIndex: SelectedQuestionIndex + 1,
+				SelectedQuestionId: IISAQuestionsListObject[SelectedDomainId][SelectedQuestionIndex + 1]?.question.node.id,
+			}
+		})
+
+	}
+
+	recordResponse = optionObj => {
+		const {
+			dispatch,
+			iisaassessment: {
+				SelectedQuestionIndex,
+				AssessmentObject,
+				IISAQuestionsListObject,
+				SelectedDomainId,
+			}
+		} = this.props
+
+		dispatch({
+			type: actions.RECORD_RESPONSE,
+			payload: {
+				assessmentId: AssessmentObject.id,
+				questionId: IISAQuestionsListObject[SelectedDomainId][SelectedQuestionIndex]?.question.node.id,
+				optionId: optionObj.node.id
+			}
+		})
+	}
+
+	closeReportDrawer = () => {
+		const { dispatch } = this.props
+		dispatch({
+			type: actions.SET_STATE,
+			payload: {
+				ReportDrawer: false
+			}
+		})
+	}
+
+	showReport = () => {
+		const { dispatch } = this.props
+		dispatch({
+			type: actions.SET_STATE,
+			payload: {
+				ReportDrawer: true
+			}
+		})
+	}
 
 	render() {
 		const {
@@ -171,7 +247,9 @@ class Screeing extends React.Component {
 				SelectedDomainId,
 				IISAQuestionsListObject,
 				SelectedQuestionIndex,
-
+				IISAOptions,
+				responseLoading,
+				ReportDrawer,
 			},
 		} = this.props
 
@@ -202,13 +280,13 @@ class Screeing extends React.Component {
 										role="presentation"
 										style={{
 											borderRadius: 10,
-											border: '2px solid #F9F9F9',
+											border: '2px solid #dbe2ef',
 											padding: '20px 27px 20px',
 											marginBottom: '2%',
 											display: 'block',
 											width: '100%',
 											marginRight: '10px',
-											minHeight: '595px',
+											minHeight: '650px',
 											overflow: 'auto',
 										}}
 									>
@@ -217,11 +295,12 @@ class Screeing extends React.Component {
 
 										<div>
 											<Text style={{ fontSize: '18px', lineHeight: '24px' }}>
-												{IISAQuestionsListObject[SelectedDomainId][SelectedQuestionIndex]?.question.node.question}
+												Domain: {IISAQuestionsListObject[SelectedDomainId][SelectedQuestionIndex]?.question.node.domain?.name}
 											</Text>
 
+
 											<span style={{ float: 'right' }}>
-												{0 === 0 ?
+												{SelectedQuestionIndex === 0 ?
 													<Button disabled>
 														<Icon type="left" />
 													</Button>
@@ -230,8 +309,8 @@ class Screeing extends React.Component {
 														<Icon type="left" />
 													</Button>
 												}
-												&nbsp; Question 1 / 6 &nbsp;
-                        {1 + 1 === 2 ?
+												&nbsp; Question {SelectedQuestionIndex + 1} / {IISAQuestionsListObject[SelectedDomainId]?.length} &nbsp;
+                        {SelectedQuestionIndex + 1 === IISAQuestionsListObject[SelectedDomainId]?.length ?
 													<Button disabled>
 														<Icon type="right" />
 													</Button>
@@ -244,28 +323,39 @@ class Screeing extends React.Component {
 
 										</div>
 
+										<br />
+										<div style={{ textAlign: 'center', marginTop: 45 }}>
+											<Title level={3}>Q: {IISAQuestionsListObject[SelectedDomainId][SelectedQuestionIndex]?.question.node.question}</Title>
+										</div>
+
+
 
 										<div
 											style={{
-												background: '#FFFFFF',
-												border: '1px solid #E4E9F0',
-												boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
-												borderRadius: 10,
 												padding: '16px 12px',
 												alignItems: 'center',
+												textAlign: 'center',
 												display: 'block',
 												width: '100%',
 												marginBottom: '20px',
 												lineHeight: '27px',
-												marginTop: '40px',
+												marginTop: '80px',
 												minHeight: '140px'
 											}}
 										>
-
-
-											<Button onClick={() => this.recordResponse(true)} style={1 === true ? buttonTrueStyle : buttonDefaultStyle}> Response Button </Button>
-
-
+											{IISAQuestionsListObject[SelectedDomainId][SelectedQuestionIndex]?.recorded === false ?
+												<>
+													{IISAOptions.map((item, index) => (
+														<Button disabled={responseLoading} onClick={() => this.recordResponse(item)} style={buttonDefaultStyle}> {item.node.name}</Button>
+													))}
+												</>
+												:
+												<>
+													{IISAOptions.map((item, index) => (
+														<Button disabled={responseLoading} onClick={() => this.recordResponse(item)} style={IISAQuestionsListObject[SelectedDomainId][SelectedQuestionIndex]?.response?.answer.id === item.node.id ? buttonTrueStyle : buttonDefaultStyle}> {item.node.name}</Button>
+													))}
+												</>
+											}
 										</div>
 
 
@@ -277,7 +367,7 @@ class Screeing extends React.Component {
 								<Col sm={8}>
 									<div
 										style={{
-											background: '#F9F9F9',
+											background: '#dbe2ef',
 											borderRadius: 10,
 											padding: '28px 27px 20px',
 											display: 'block',
@@ -291,10 +381,10 @@ class Screeing extends React.Component {
 												{IISADomains.map((item, index) =>
 
 													<Panel header={`${item.node.name}`} key={item.node.id}>
-														{IISAQuestionsListObject[item.node.id].map((node, nodeIndex) =>
+														{IISAQuestionsListObject[item.node.id].map((objectItem, nodeIndex) =>
 															<>
-																<div onClick={() => this.changeQuestion(nodeIndex)} style={node.question.node.id === SelectedQuestionId ? selectedCardStyle : cardStyle}>
-																	<Title style={node.question.node.id === SelectedQuestionId ? selectedTitleStyle : titleStyle}>{node.question.node.question}</Title>
+																<div onClick={() => this.changeQuestion(nodeIndex)} style={objectItem.question.node.id === SelectedQuestionId ? selectedCardStyle : cardStyle}>
+																	<Title style={objectItem.question.node.id === SelectedQuestionId ? selectedTitleStyle : titleStyle}>{objectItem.question.node.question}</Title>
 																</div>
 															</>
 														)}
@@ -313,6 +403,24 @@ class Screeing extends React.Component {
 							</>
 						}
 					</Content>
+					<Drawer
+						visible={ReportDrawer}
+						onClose={() => {
+							this.closeReportDrawer()
+						}}
+						width="80%"
+						title="Assessment Report"
+					>
+						<div
+							style={{
+								padding: '0px 30px',
+							}}
+						>
+							<AssessmentReport
+								onClose={() => { this.closeReportDrawer() }}
+							/>
+						</div>
+					</Drawer>
 
 				</Layout>
 			</>

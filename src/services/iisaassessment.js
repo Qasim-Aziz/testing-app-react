@@ -182,424 +182,44 @@ export async function recordResponse(payload) {
   return apolloClient
     .mutate({
       mutation: gql`mutation RecordResponse (
-        $objectId: ID!,
+        $assessmentId: ID!,
         $questionId: ID!,
-        $answerId: ID
+        $optionId: ID!
       ) {
-        recordCogQuestion(input:{
-          pk: $objectId
-          question: $questionId
-          answer: $answerId
-        })
-        { 
-          nextQuestion{
+        IISARecording(input:{
+          pk: $assessmentId
+          record:[{question: $questionId, option: $optionId}]
+        }){
+          responses{
             id
-            age
-            question
-            area {
-              id 
+            question{
+              id
+              question
+              domain{
+                id
+                name
+              }
+            }
+            answer{
+              id
               name
-            }
-            options{
-              edges{
-                node{
-                  id
-                  name
-                  description
-                }
-              }
-            }
-          }
-          details{
-            id,
-            date,
-            score,
-            status,
-            name,
-            notes,
-            student{
-              id,
-              firstname
-            } 
-            assessmentQuestions{
-              edges{
-                node{
-                  id,
-                  question{
-                    id,
-                    age
-                    question
-                    area {
-                      id 
-                      name
-                    }
-                    options{
-                      edges{
-                        node{
-                          id
-                          name
-                          description
-                        }
-                      }
-                    }
-                  },
-                  answer{
-                    id,
-                    name,
-                    description
-                  }
-                }
-              }
+              score
             }
           }
         }
       }`,
       variables: {
-        objectId: payload.objectId,
+        assessmentId: payload.assessmentId,
         questionId: payload.questionId,
-        answerId: payload.answerId ? payload.answerId : null
+        optionId: payload.optionId,
       }
     })
     .then(result => result)
     .catch(error => {
-      if (error.graphQLErrors) {
-        error.errors.map(item => {
-          return notification.error({
-            message: 'Somthing went wrong',
-            description: item.message,
-          })
-        })
-      }
-      else {
-        error.map(item => {
-          return notification.error({
-            message: 'Somthing went wrong',
-            description: item.message,
-          })
-        })
-      }
-    })
-}
-
-
-export async function recordAreaResponse(payload) {
-  return apolloClient
-    .mutate({
-      mutation: gql`mutation RecordAreaResponse (
-        $objectId: ID!,
-        $areaId: ID!,
-        $response: String!
-      ){
-        recordCogniableAssessResult(input:{
-          pk: $objectId,
-          areas:[
-            {area: $areaId, response: $response},
-          ]
-        })
-        { 
-          details{
-            id,
-            date,
-            score,
-            status,
-            name,
-            notes,
-            student{
-              id,
-              firstname
-            } 
-            assessmentAreas{
-              edges{
-                node{
-                  id,
-                  response,
-                  age
-                  area{
-                    id,
-                    name,
-                    description
-                  }
-                }
-              }
-            }
-          }
-        }
-      }`,
-      variables: {
-        objectId: payload.objectId,
-        areaId: payload.areaId,
-        response: payload.response,
-      }
-    })
-    .then(result => result)
-    .catch(error => {
-      error.graphQLErrors.map(item => {
-        return notification.error({
-          message: 'Somthing went wrong',
-          description: item.message,
-        })
-      })
-    })
-}
-
-export async function endAssessment(payload) {
-  return apolloClient
-    .mutate({
-      mutation: gql`mutation EndAssessment (
-        $objectId: ID!,
-        $status: String!,
-      ){
-        updateCogAssessment(input:{
-          pk: $objectId
-          status: $status
-        })
-        { 
-          details{
-            id,
-            date,
-            score,
-            status,
-            name,
-            notes,
-            student{
-              id,
-              firstname
-            }
-            assessmentQuestions{
-              edges{
-                node{
-                  id,
-                  question{
-                    id,
-                    age
-                    question
-                    area {
-                      id 
-                      name
-                    }
-                    options{
-                      edges{
-                        node{
-                          id
-                          name
-                          description
-                        }
-                      }
-                    }
-                  },
-                  answer{
-                    id,
-                    name,
-                    description
-                  }
-                }
-              }
-            }
-            assessmentAreas{
-              edges{
-                node{
-                  id,
-                  response,
-                  age
-                  area{
-                    id,
-                    name,
-                    description
-                  }
-                }
-              }
-            }
-          }
-        }
-      }`,
-      variables: {
-        objectId: payload.objectId,
-        score: payload.score,
-        status: payload.status,
-      }
-    })
-    .then(result => result)
-    .catch(error => {
-      error.graphQLErrors.map(item => {
-        return notification.error({
-          message: 'Somthing went wrong',
-          description: item.message,
-        })
-      })
-    })
-}
-
-
-export async function endQuestionsAssessment(payload) {
-  return apolloClient
-    .mutate({
-      mutation: gql`mutation EndQuestionsAssessment (
-        $objectId: ID!,
-        $status: String!,
-      ){
-        updateCogAssessment(input:{
-          pk: $objectId
-          status: $status
-        })
-        { 
-          details{
-            id,
-            date,
-            score,
-            status,
-            name,
-            notes,
-            student{
-              id,
-              firstname
-            }
-            assessmentQuestions{
-              edges{
-                node{
-                  id,
-                  question{
-                    id,
-                    age
-                    question
-                    area {
-                      id 
-                      name
-                    }
-                    options{
-                      edges{
-                        node{
-                          id
-                          name
-                          description
-                        }
-                      }
-                    }
-                  },
-                  answer{
-                    id,
-                    name,
-                    description
-                  }
-                }
-              }
-            }
-            assessmentAreas{
-              edges{
-                node{
-                  id,
-                  response,
-                  age
-                  area{
-                    id,
-                    name,
-                    description
-                  }
-                }
-              }
-            }
-          }
-        }
-      }`,
-      variables: {
-        objectId: payload.objectId,
-        status: payload.status,
-      }
-    })
-    .then(result => result)
-    .catch(error => {
-      error.graphQLErrors.map(item => {
-        return notification.error({
-          message: 'Somthing went wrong',
-          description: item.message,
-        })
-      })
-    })
-}
-
-export async function editQuestions(payload) {
-  return apolloClient
-    .mutate({
-      mutation: gql`mutation EditQuestions (
-        $objectId: ID!,
-        $qusId: ID!,
-        $ansId: ID!
-      )
-      {
-        updateCogniableAssessment(input:{
-          pk: $objectId
-          question: $qusId
-          answer: $ansId
-        })
-        { 
-          status          
-          nextQuestion{
-            id
-            age
-            question
-            area {
-              id 
-              name
-            }
-            options{
-              edges{
-                node{
-                  id
-                  name
-                  description
-                }
-              }
-            }
-          }
-          details{
-            id,
-            date,
-            score,
-            assessmentQuestions{
-              edges{
-                node{
-                  id,
-                  question{
-                    id,
-                    age
-                    question
-                    area {
-                      id 
-                      name
-                    }
-                    options{
-                      edges{
-                        node{
-                          id
-                          name
-                          description
-                        }
-                      }
-                    }
-                  },
-                  answer{
-                    id,
-                    name,
-                    description
-                  }
-                }
-              }
-            }
-          }
-        }
-      }`,
-      variables: {
-        objectId: payload.resObjectId,
-        qusId: payload.qusId,
-        ansId: payload.resultId,
-      }
-    })
-    .then(result => result)
-    .catch(error => {
-      error.graphQLErrors.map(item => {
-        return notification.error({
-          message: 'Somthing went wrong',
-          description: item.message,
-        })
+      console.log("ERROR ====> ", error)
+      return notification.error({
+        message: 'Somthing went wrong recording response',
+        description: "please check console for Error message",
       })
     })
 }
@@ -642,6 +262,46 @@ export async function makeAssessmentInactive(payload) {
       console.log("ERROR ====> ", error)
       return notification.error({
         message: 'Somthing went wrong loading Data',
+        description: "please check console for Error message",
+      })
+    })
+}
+
+export async function getAssessmentReport(payload) {
+  return apolloClient
+    .mutate({
+      mutation: gql`mutation AssessmentSummary (
+      $objectId: ID!,
+    ){
+      IISAAssessmentSummary(input:{
+        pk: $objectId
+      }){
+        score
+        classification
+        details{
+          id
+          title
+          date
+          time
+          status
+          isActive
+          notes
+          student{
+            id
+            firstname
+          }
+        }
+      }
+    }`,
+      variables: {
+        objectId: payload.objectId,
+      }
+    })
+    .then(result => result)
+    .catch(error => {
+      console.log("ERROR ====> ", error)
+      return notification.error({
+        message: 'Somthing went wrong loading Summary',
         description: "please check console for Error message",
       })
     })
