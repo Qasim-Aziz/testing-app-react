@@ -433,6 +433,7 @@ export async function getStaffProfile(payload) {
             emergencyName
             emergencyContact
             emergencyRelation
+            contactRelation
             maritalStatus
             workExp
             image

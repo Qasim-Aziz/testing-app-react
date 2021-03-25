@@ -1,6 +1,6 @@
 /* eslint-disable */
-import gql from 'graphql-tag'
 
+import gql from 'graphql-tag'
 export const UPDATE_STAFF = gql`
   mutation(
     $id: ID
@@ -30,6 +30,9 @@ export const UPDATE_STAFF = gql`
     $country: String
     $zipCode: String
     $tags: [String]
+    $fatherName: String
+    $motherName: String
+    $contactRelation: String
   ) {
     updateStaff(
       input: {
@@ -61,11 +64,15 @@ export const UPDATE_STAFF = gql`
           country: $country
           zipCode: $zipCode
           tags: $tags
+          fatherName: $fatherName
+          motherName: $motherName
+          contactRelation: $contactRelation
         }
       }
     ) {
       staff {
         id
+        staffId
         employeeId
         name
         surname
@@ -82,6 +89,7 @@ export const UPDATE_STAFF = gql`
         emergencyName
         emergencyContact
         emergencyRelation
+        contactRelation
         maritalStatus
         workExp
         image

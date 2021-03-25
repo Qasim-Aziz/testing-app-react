@@ -322,7 +322,7 @@ function Profile(props) {
                   <div style={{ display: 'flex', textAlign: 'left', color: 'black' }}>
                     <p style={th2}>Date of Joining </p>
                     <p>
-                      :{' '}
+                      :
                       {staffProfile.dateOfJoining
                         ? `${moment(staffProfile.dateOfJoining).format(
                             'YYYY-MM-DD',
@@ -405,11 +405,11 @@ function Profile(props) {
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>Father Name </p>
-            <p> : {staffProfile.fatherName ? JSON.parse(staffProfile.fatherName) : ''}</p>
+            <p> : {staffProfile.fatherName}</p>
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>Mother Name </p>
-            <p> : {staffProfile.motherName ? JSON.parse(staffProfile.motherName) : ''}</p>
+            <p> : {staffProfile.motherName}</p>
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>SSN/Aadhar </p>
@@ -445,7 +445,7 @@ function Profile(props) {
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>Relation </p>
-            <p> : {staffProfile.emergencyRelation}</p>
+            <p> : {staffProfile.contactRelation}</p>
           </div>
         </div>
       </div>

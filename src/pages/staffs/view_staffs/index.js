@@ -122,6 +122,9 @@ class StaffTable extends React.Component {
     dispatch({
       type: 'staffs/GET_STAFF_DROPDOWNS',
     })
+    dispatch({
+      type: 'appointments/GET_APPOINTMENT_LIST',
+    })
 
     window.addEventListener('resize', this.handleWindowResize)
   }

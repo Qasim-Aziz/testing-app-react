@@ -54,11 +54,8 @@ function AppointmentCard(props) {
   const dispatch = useDispatch()
 
   const createAppointment = () => {
-    dispatch({
-      type: 'appointments/GET_APPOINTMENT_LIST',
-    })
-    // setUpdateAppointmentId(null)
-    // setAppointmentDrawer(true)
+    setUpdateAppointmentId(null)
+    setAppointmentDrawer(true)
   }
 
   const updateAppointment = id => {
@@ -69,6 +66,16 @@ function AppointmentCard(props) {
   const closeUpdateAppointment = () => {
     setUpdateAppointmentId(null)
     setAppointmentDrawer(false)
+  }
+
+  const setNeedToReloadData = data => {
+    console.log(data, 'repsonse data')
+    dispatch({
+      type: 'appointments/CREATE_APPOINTMENT',
+      payload: {
+        response: data,
+      },
+    })
   }
 
   const extraContent = (
@@ -94,7 +101,10 @@ function AppointmentCard(props) {
             closeUpdateAppointment={closeUpdateAppointment}
           />
         ) : (
-          <CreateAppointmentForm therapistId={props.staffs.StaffProfile.id} />
+          <CreateAppointmentForm
+            setNeedToReloadData={setNeedToReloadData}
+            therapistId={props.staffs.StaffProfile.id}
+          />
         )}
       </Drawer>
       <Tabs tabBarExtraContent={extraContent} style={{ border: '1px solid #e8e8e8' }}>

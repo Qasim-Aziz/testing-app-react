@@ -8,6 +8,7 @@ import {
   FileTextOutlined,
   DownCircleFilled,
   DownCircleTwoTone,
+  DeleteOutlined,
 } from '@ant-design/icons'
 import { Link, withRouter } from 'react-router-dom'
 import gql from 'graphql-tag'
@@ -212,7 +213,7 @@ function Upcoming(props) {
                                 color: 'black',
                               }}
                             >
-                              {item.title} with something new
+                              {item.title}
                             </div>
                           </div>
                         </div>
@@ -262,6 +263,22 @@ function Upcoming(props) {
                             }}
                           >
                             <EditOutlined /> Edit
+                          </Button>
+                          <Button
+                            size="small"
+                            style={{ fontWeight: '700', padding: 0 }}
+                            type="link"
+                            onClick={() => {
+                              dispatch({
+                                type: 'appointments/DELETE_APPOINTMENT',
+                                payload: {
+                                  response: item,
+                                },
+                              })
+                              refetch()
+                            }}
+                          >
+                            <DeleteOutlined /> Del
                           </Button>
                           <div>
                             <Tooltip title={item.note ? item.note : 'None'} trigger="click">

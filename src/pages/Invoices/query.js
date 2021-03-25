@@ -125,12 +125,52 @@ export const UPDATE_PAYMENT_DETAILS = gql`
 `
 
 export const ADVANCE_INVOICE = gql`
-  mutation($month: String!, $clinics: [ID]!, $cgst: Float, $sgst: Float, $discount: Float) {
-    createAdvanceInvoice(
-      input: { clinics: $clinics, month: $month, cgst: $cgst, sgst: $sgst, discount: $discount }
+  mutation($clinic: ID!, $month: String!) {
+    createAdvanceInvoiceByClinic(
+      input: { clinic: $clinic, month: $month, cgst: 2.0, sgst: 5.0, discount: 1.0 }
     ) {
       status
       message
+      invoice {
+        id
+        invoiceNo
+        email
+        issueDate
+        dueDate
+        amount
+        address
+        taxableSubtotal
+        discount
+        total
+        clinic {
+          id
+          schoolName
+        }
+        customer {
+          id
+          firstname
+        }
+        status {
+          id
+          statusName
+        }
+        invoiceFee {
+          edges {
+            node {
+              id
+              quantity
+              rate
+              amount
+              tax
+              schoolServices {
+                id
+                name
+                description
+              }
+            }
+          }
+        }
+      }
     }
   }
 `

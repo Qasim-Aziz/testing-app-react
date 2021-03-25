@@ -92,14 +92,14 @@ function ClinicInfo(props) {
             isActive: staffProfile.isActive,
             tags: staffProfile.tags,
 
-            // fatherName: values.fatherName,
-            // motherName: values.motherName,
+            fatherName: staffProfile.fatherName,
+            motherName: staffProfile.motherName,
             ssnAadhar: staffProfile.ssnAadhar,
             maritalStatus: staffProfile.maritalStatus,
 
             emergencyName: staffProfile.emergencyName,
             emergencyContact: staffProfile.emergencyContact,
-            // emergencyRelation: staffProfile.emergencyRelation,
+            contactRelation: staffProfile.emergencyRelation,
 
             clinicLocation: values.clinicLocation,
             workExp: values.workExp,

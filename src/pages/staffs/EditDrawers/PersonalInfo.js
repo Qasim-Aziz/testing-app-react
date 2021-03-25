@@ -87,14 +87,14 @@ function PersonalInfo(props) {
             isActive: staffProfile.isActive,
             tags: staffProfile.tags,
 
-            // fatherName: values.fatherName,
-            // motherName: values.motherName,
+            fatherName: values.fatherName,
+            motherName: values.motherName,
             ssnAadhar: values.ssnAadhar,
             maritalStatus: values.maritalStatus,
 
             emergencyName: staffProfile.emergencyName,
             emergencyContact: staffProfile.emergencyContact,
-            // emergencyRelation: staffProfile.emergencyRelation,
+            contactRelation: staffProfile.contactRelation,
 
             clinicLocation: staffProfile.clinicLocation?.id,
             workExp: staffProfile.workExp,

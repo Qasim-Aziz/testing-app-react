@@ -20,7 +20,7 @@ import sessionrecording from './sessionrecording/reducers'
 import cogniableassessment from './cogniableassessment/reducers'
 import sessiontargetallocation from './sessiontargetallocation/reducers'
 import celerationChartReducer from './celerationchart/panel.reducer'
-import appointmentReducer from './appointments/reducers'
+import appointments from './appointments/reducers'
 
 export default history =>
   combineReducers({
@@ -45,5 +45,5 @@ export default history =>
     cogniableassessment,
     sessiontargetallocation,
     celerationChartReducer,
-    appointmentReducer,
+    appointments,
   })

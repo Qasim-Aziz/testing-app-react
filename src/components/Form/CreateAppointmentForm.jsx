@@ -70,19 +70,10 @@ const CreateAppointmentForm = ({ setNeedToReloadData, form, startDate, endDate, 
       })
       form.resetFields()
       if (setNeedToReloadData) {
-        setNeedToReloadData(true)
+        setNeedToReloadData(createAppointmentData)
       }
     }
   }, [createAppointmentData])
-
-  useEffect(() => {
-    if (createAppointmentError) {
-      notification.error({
-        message: 'Something went wrong!',
-        description: createAppointmentError.message,
-      })
-    }
-  }, [createAppointmentError])
 
   if (!startDate) startDate = moment()
   if (!endDate) endDate = moment().add(1, 'hour')
@@ -119,6 +110,11 @@ const CreateAppointmentForm = ({ setNeedToReloadData, form, startDate, endDate, 
             isApproved: true,
             appointmentStatus: values.appointmentStatus,
           },
+        }).catch(er => {
+          notification.error({
+            message: 'Something went wrong!',
+            description: er.message,
+          })
         })
       }
     })

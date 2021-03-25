@@ -397,16 +397,6 @@ function TargetResponseReport({ studentName }) {
           </TabPane>
         </Tabs>
       )}
-      <Button
-        onClick={() => {
-          dispatch({
-            type: 'appointments/GET_APPOINTMENT_LIST',
-          })
-          return 0
-        }}
-      >
-        Diso
-      </Button>
     </div>
   )
 }

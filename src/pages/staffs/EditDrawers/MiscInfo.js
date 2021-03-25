@@ -88,14 +88,14 @@ function MiscInfo(props) {
             isActive: staffProfile.isActive,
             tags: staffProfile.tags,
 
-            // fatherName: values.fatherName,
-            // motherName: values.motherName,
+            fatherName: values.fatherName,
+            motherName: values.motherName,
             ssnAadhar: staffProfile.ssnAadhar,
             maritalStatus: staffProfile.maritalStatus,
 
             emergencyName: values.emergencyName,
             emergencyContact: values.emergencyContact,
-            // emergencyRelation: staffProfile.emergencyRelation,
+            contactRelation: staffProfile.contactRelation,
 
             clinicLocation: staffProfile.clinicLocation?.id,
             workExp: staffProfile.workExp,
