@@ -68,7 +68,7 @@ export function* GET_LEARNERS({ payload }) {
       console.log(response, 'in res 22')
       for (i = 0; i < response.data.students.edges.length; i++) {
         if (
-          response.data.students.edges[i].node.tags.edge &&
+          response.data.students.edges[i].node.tags.edges &&
           response.data.students.edges[i].node.tags.edges.length > 0
         ) {
           console.log(response, 'in res 33')
@@ -148,17 +148,6 @@ export function* PAGE_CHANGED({ payload }) {
           const tempTagArr = response.data.students.edges[i].node.tags.edges.map(e => e.node.name)
           response.data.students.edges[i].node.tags = tempTagArr
         }
-        if (
-          response.data.students.edges[i].node.allergicTo.edges &&
-          response.data.students.edges[i].node.allergicTo.edges.length > 0
-        ) {
-          const tempAllergyArr = response.data.students.edges[i].node.allergicTo.edges.map(
-            e => e.node.name,
-          )
-          response.data.students.edges[i].node.allergicTo = tempAllergyArr
-        } else {
-          response.data.students.edges[i].node.allergicTo = []
-        }
         oldLearners.push(response.data.students.edges[i].node)
       }
     }
@@ -212,10 +201,6 @@ export function* ROWS_CHANGED({ payload }) {
     last = totalLearners % payload.currentRowsPerPage
   }
 
-  // if (pageInfo){
-  //   after = pageInfo.endCursor
-  // }
-
   const response = yield call(getClinicLearners, { isActive: active, first, after, before, last })
 
   const oldLearners = []
@@ -223,21 +208,14 @@ export function* ROWS_CHANGED({ payload }) {
     let i = 0
     if (response.data.students.edges.length > 0) {
       for (i = 0; i < response.data.students.edges.length; i++) {
-        if (response.data.students.edges[i].node.tags.edges.length > 0) {
+        if (
+          response.data.students.edges[i].node.tags.edges &&
+          response.data.students.edges[i].node.tags.edges.length > 0
+        ) {
           const tempTagArr = response.data.students.edges[i].node.tags.edges.map(e => e.node.name)
           response.data.students.edges[i].node.tags = tempTagArr
         }
-        if (
-          response.data.students.edges[i].node.allergicTo.edges &&
-          response.data.students.edges[i].node.allergicTo.edges.length > 0
-        ) {
-          const tempAllergyArr = response.data.students.edges[i].node.allergicTo.edges.map(
-            e => e.node.name,
-          )
-          response.data.students.edges[i].node.allergicTo = tempAllergyArr
-        } else {
-          response.data.students.edges[i].node.allergicTo = []
-        }
+
         oldLearners.push(response.data.students.edges[i].node)
       }
     }
@@ -296,10 +274,10 @@ export function* EDIT_GENERAL_INFO({ payload }) {
       console.log(response.data.updateStudent.student.allergicTo)
 
       if (
-        response.data.updateStudent.student.allergicTo.edges &&
-        response.data.updateStudent.student.allergicTo.edges.length > 0
+        response.data.updateStudent.student.allergicTo?.edges &&
+        response.data.updateStudent.student.allergicTo?.edges.length > 0
       ) {
-        const tempAllergyArr = response.data.updateStudent.student.allergicTo.edges.map(
+        const tempAllergyArr = response.data.updateStudent.student.allergicTo?.edges.map(
           e => e.node.name,
         )
         updatedLearner = { ...updatedLearner, allergicTo: tempAllergyArr }
@@ -354,10 +332,10 @@ export function* EDIT_LEARNER({ payload }) {
         updatedLearner = { ...updatedLearner, tags: tempTagArr }
       }
       if (
-        response.data.updateStudent.student.allergicTo.edges &&
-        response.data.updateStudent.student.allergicTo.edges.length > 0
+        response.data.updateStudent.student.allergicTo?.edges &&
+        response.data.updateStudent.student.allergicTo?.edges.length > 0
       ) {
-        const tempAllergyArr = response.data.updateStudent.student.allergicTo.edges.map(
+        const tempAllergyArr = response.data.updateStudent.student.allergicTo?.edges.map(
           e => e.node.name,
         )
         updatedLearner = { ...updatedLearner, allergicTo: tempAllergyArr }
