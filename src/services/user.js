@@ -121,14 +121,17 @@ export async function StudentIdFromUserId(payload) {
 
 export async function clinicDetails() {
   return apolloClient
-    .query({query: gql`{
-        schoolDetail {
-          id,
-          schoolName,
-          address,
-          country {
-            id,
-            name
+    .query({
+      query: gql`
+        {
+          schoolDetail {
+            id
+            schoolName
+            address
+            country {
+              id
+              name
+            }
           }
         }
       `,

@@ -27,6 +27,7 @@ import {
   Drawer,
   Switch,
   Dropdown,
+  Popconfirm,
   Menu,
   Radio,
   Tag,
@@ -106,6 +107,7 @@ class LearnerTable extends React.Component {
 
   componentDidMount() {
     const { dispatch } = this.props
+    console.log('gotchahaha')
     // this.selectActiveStatus('active')
     dispatch({
       type: 'learners/GET_DATA',
@@ -234,12 +236,11 @@ class LearnerTable extends React.Component {
       })
   }
 
-  learnerActiveInactive = (checked,id) => {
+  learnerActiveInactive = (checked, id) => {
     const {
       dispatch,
       learners: { UserProfile },
     } = this.props
-    console.log(UserProfile.id, checked)
 
     dispatch({
       type: 'learners/LEARNER_ACTIVE_INACTIVE',
