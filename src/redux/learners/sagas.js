@@ -208,7 +208,6 @@ export function* ROWS_CHANGED({ payload }) {
     let i = 0
     if (response.data.students.edges.length > 0) {
       for (i = 0; i < response.data.students.edges.length; i++) {
-        console.log(response.data.students.edges[i].node, 'this is data')
         if (
           response.data.students.edges[i].node.tags.edges &&
           response.data.students.edges[i].node.tags.edges.length > 0
