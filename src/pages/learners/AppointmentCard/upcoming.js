@@ -23,49 +23,11 @@ import SessionFeedbackForm from '../../sessionFeedback'
 const { Meta } = Card
 const { TabPane } = Tabs
 
-const er = gql`
-  query($id: ID, $dateFrom: Date) {
-    appointments(therapist: $id, dateFrom: $dateFrom) {
-      edges {
-        node {
-          id
-          student {
-            id
-            firstname
-            lastname
-          }
-          createdBy {
-            id
-            firstName
-            lastName
-          }
-          appointmentStatus {
-            id
-            appointmentStatus
-          }
-          purposeAssignment
-          location {
-            id
-            location
-          }
-          note
-          title
-          start
-          end
-          isApproved
-        }
-      }
-    }
-  }
-`
-
 function Upcoming(props) {
-  const { appointmentList, updateAppointment } = props
-  const [getApp, { data, loading, error, refetch }] = useLazyQuery(er)
+  const { appointmentList, updateAppointment, upcoming } = props
   const dispatch = useDispatch()
   const [selectedAppointmentId, setSelectedAppointmentId] = useState('')
   const [feedbackDrawer, setFeedbackDrawer] = useState(false)
-  const staffProfile = useSelector(state => state.staffs.StaffProfile)
 
   const showFeedback = id => {
     setFeedbackDrawer(true)
@@ -213,11 +175,11 @@ function Upcoming(props) {
                             padding: '0 24px',
                           }}
                         >
-                          <div style={{ marginBottom: '6px' }}>Learner</div>
+                          <div style={{ marginBottom: '6px' }}>Therapist</div>
                           <div style={{ fontSize: '18px', fontWeight: '700', color: 'black' }}>
-                            {item.student &&
-                              `${item.student.firstname} ${
-                                item.student.lastname ? item.student.lastname : ''
+                            {item.therapist &&
+                              `${item.therapist.name} ${
+                                item.therapist.lastname ? item.therapist.lastname : ''
                               }`}
                           </div>
                         </div>
@@ -286,7 +248,7 @@ function Upcoming(props) {
             })
           ) : (
             <span style={{ fontSize: 18, margin: '24px auto', textAlign: 'center' }}>
-              No upcoming appointments
+              {upcoming ? 'No upcoming appointments' : 'No post appointments'}
             </span>
           )}
         </div>

@@ -16,6 +16,37 @@ import UpdateAppointmentForm from 'components/Form/UpdateAppointmentForm'
 const { Meta } = Card
 const { TabPane } = Tabs
 
+const er = gql`
+  query($id: ID, $dateFrom: Date, $dateTo: Date) {
+    appointments(therapist: $id, dateFrom: $dateFrom, dateTo: $dateTo) {
+      edges {
+        node {
+          id
+          student {
+            id
+            firstname
+            lastname
+          }
+          createdBy {
+            id
+            firstName
+            lastName
+          }
+          appointmentStatus {
+            id
+            appointmentStatus
+          }
+          note
+          title
+          start
+          end
+          isApproved
+        }
+      }
+    }
+  }
+`
+
 function AppointmentCard(props) {
   const [appointmentDrawer, setAppointmentDrawer] = useState(false)
   const [updateAppointmentId, setUpdateAppointmentId] = useState(null)
@@ -23,26 +54,26 @@ function AppointmentCard(props) {
   const [postAppointemntList, setPostAppointemntList] = useState(null)
   const [activeTab, setActiveTab] = useState('upcoming')
   const appt = useSelector(state => state.appointments)
-  const staffProfile = useSelector(state => state.staffs.StaffProfile)
+  const userProfile = useSelector(state => state.learners.UserProfile)
 
   const dispatch = useDispatch()
 
   useEffect(() => {
-    if (!appt.appointmentsLoading && appt.appointments.length > 0 && staffProfile) {
+    if (!appt.appointmentsLoading && appt.appointments.length > 0 && userProfile) {
       let temp = appt.appointments.filter(
-        item => new Date(item.start) > new Date() && item.therapist?.id === staffProfile.id,
+        item => new Date(item.start) > new Date() && item.student?.id === userProfile.id,
       )
-      temp.map(item => console.log(item.therapist?.name))
+      temp.map(item => console.log(item.student?.name))
       temp.reverse()
       setUpcomingAppointmentList(temp)
 
       let temp2 = appt.appointments.filter(
-        item => new Date(item.start) < new Date() && item.therapist?.id === staffProfile.id,
+        item => new Date(item.start) < new Date() && item.student?.id === userProfile.id,
       )
 
       setPostAppointemntList(temp2)
     }
-  }, [appt, staffProfile])
+  }, [appt, userProfile])
 
   const createAppointment = () => {
     setUpdateAppointmentId(null)
@@ -81,7 +112,7 @@ function AppointmentCard(props) {
 
   const extraContent = (
     <Button onClick={createAppointment} type="primary" size="small" style={{ marginRight: '16px' }}>
-      <PlusOutlined /> Add Appointment{' '}
+      <PlusOutlined /> Add Appointment
     </Button>
   )
 
@@ -104,7 +135,7 @@ function AppointmentCard(props) {
         ) : (
           <CreateAppointmentForm
             setNeedToReloadData={createAppointmentRedux}
-            therapistId={props.staffs.StaffProfile.id}
+            learnerId={userProfile.id}
             closeDrawer={() => setAppointmentDrawer(false)}
           />
         )}
@@ -117,15 +148,14 @@ function AppointmentCard(props) {
         <TabPane key="upcoming" tab="Upcoming">
           <Upcoming
             updateAppointment={updateAppointment}
-            staff={props.staffs.StaffProfile}
+            staff={userProfile}
             appointmentList={upcomingAppointmentList}
-            upcoming={true}
           />
         </TabPane>
         <TabPane key="post" tab="Post">
           <Upcoming
             updateAppointment={updateAppointment}
-            staff={props.staffs.StaffProfile}
+            staff={userProfile}
             appointmentList={postAppointemntList}
           />
         </TabPane>
@@ -133,8 +163,5 @@ function AppointmentCard(props) {
     </div>
   )
 }
-const mapStateToProps = ({ staffs }) => ({
-  staffs,
-})
 
-export default withRouter(connect(mapStateToProps)(AppointmentCard))
+export default AppointmentCard

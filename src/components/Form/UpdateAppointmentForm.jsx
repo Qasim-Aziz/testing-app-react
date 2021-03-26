@@ -15,6 +15,7 @@ import {
 import { useSelector } from 'react-redux'
 import { useMutation, useQuery } from 'react-apollo'
 import moment from 'moment'
+import LoadingComponent from 'components/LoadingComponent'
 import { combineDateAndTime } from '../../utilities'
 import {
   GET_APPOINTMENT_DETAILS,
@@ -24,11 +25,22 @@ import {
   ALL_LOCATION,
   ALL_APPOINTMENT_STATUS,
 } from './query'
-
 import './appointmentForms.scss'
 
 const { TextArea } = Input
 const { Option } = Select
+
+const submitButton = {
+  width: '160px',
+  height: 40,
+  background: '#0B35B3',
+  boxShadow: '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04)',
+  borderRadius: 0,
+  fontSize: 16,
+  fontWeight: 600,
+  marginTop: 20,
+  color: 'white',
+}
 
 const UpdateAppointmentForm = ({
   setNeedToReloadData,
@@ -56,9 +68,10 @@ const UpdateAppointmentForm = ({
     },
   })
 
-  const [editAppiorment, { data: editAppointmentData, error: editAppointmentError }] = useMutation(
-    EDIT_APPOINTMENT,
-  )
+  const [
+    editAppiorment,
+    { data: editAppointmentData, loading: editAppiormentLoading, error: editAppointmentError },
+  ] = useMutation(EDIT_APPOINTMENT)
 
   const [isParent, setIsParent] = useState(false)
 
@@ -76,7 +89,8 @@ const UpdateAppointmentForm = ({
       })
       form.resetFields()
       if (setNeedToReloadData) {
-        setNeedToReloadData(true)
+        setNeedToReloadData(editAppointmentData)
+        closeUpdateAppointment()
       }
     }
   }, [editAppointmentData])
@@ -160,14 +174,13 @@ const UpdateAppointmentForm = ({
   }
 
   if (isGetAppointmentLoading) {
-    return <h3>Loading...</h3>
+    return <LoadingComponent />
   }
 
   if (getAppointmentError) {
     return <h3 style={{ color: 'red' }}>Opps! Something went wrong.</h3>
   }
 
-  console.log(getAppointmentData, 'getapp')
   return (
     <Form
       name="updateAppointment"
@@ -467,16 +480,27 @@ const UpdateAppointmentForm = ({
       </Row>
 
       {/* Submit-Reset buttons */}
+
       <Row>
         <Col sm={24} md={24} lg={24}>
           {!isParent ? (
-            <Form.Item wrapperCol={{ offset: 5, sm: 18 }}>
-              <Button htmlType="submit" type="primary">
+            <Form.Item
+              wrapperCol={{
+                offset: 10,
+                span: 12,
+              }}
+            >
+              <Button loading={editAppiormentLoading} htmlType="submit" style={submitButton}>
                 Update
               </Button>
               <Button
                 type="danger"
-                style={{ marginLeft: '10px' }}
+                style={{
+                  ...submitButton,
+                  background: 'red',
+                  marginLeft: '15px',
+                  boxShadow: 'none',
+                }}
                 onClick={() => {
                   form.resetFields()
                   closeUpdateAppointment()

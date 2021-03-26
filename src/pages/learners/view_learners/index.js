@@ -113,6 +113,9 @@ class LearnerTable extends React.Component {
     dispatch({
       type: 'learners/GET_LEARNERS_DROPDOWNS',
     })
+    dispatch({
+      type: 'appointments/GET_APPOINTMENT_LIST',
+    })
     window.addEventListener('resize', this.handleWindowResize)
   }
 
@@ -575,7 +578,7 @@ class LearnerTable extends React.Component {
               <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                 {row.tags?.map(r => {
                   return (
-                    <Tag key={r} color="#F89A42" style={{ margin: '1px', fontWeight: '600' }}>
+                    <Tag key={r} color="#3f72af" style={{ margin: '1px', fontWeight: '600' }}>
                       {r}
                     </Tag>
                   )
@@ -894,7 +897,7 @@ class LearnerTable extends React.Component {
           closable={true}
           onClose={() => this.setState({ showProfile: false })}
           visible={this.state.showProfile}
-          width={this.state.windowWidth > 1250 ? 1140 : 650}
+          width={this.state.windowWidth > 1250 ? 1280 : 650}
         >
           <Profile />
         </Drawer>

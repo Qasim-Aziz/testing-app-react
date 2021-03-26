@@ -3,7 +3,7 @@
 /* eslint-disable array-callback-return */
 import { all, takeEvery, put, call } from 'redux-saga/effects'
 import { notification, message } from 'antd'
-import { getAppointments } from 'services/appointment'
+import { getAppointments, deleteAppointment } from 'services/appointment'
 import axios from 'axios'
 import actions from './actions'
 
@@ -11,8 +11,11 @@ export function* GET_APPOINTMENT_LIST() {
   console.log('hey i got int')
   yield put({
     type: actions.SET_STATE,
-    appointmentsLoading: true,
+    payload: {
+      appointmentsLoading: true,
+    },
   })
+
   const response = yield call(getAppointments)
   console.log(response)
   if (response && response.data) {
@@ -55,9 +58,9 @@ export function* CREATE_APPOINTMENT({ payload }) {
 }
 
 export function* DELETE_APPOINTMENT({ payload }) {
-  const { response } = payload
-
-  if (response) {
+  const response = yield call(deleteAppointment, payload)
+  console.log(response)
+  if (response.data && response.data.DeleteAppointment?.success) {
     notification.success({
       message: 'Appointment deleted successfully',
     })
@@ -66,8 +69,27 @@ export function* DELETE_APPOINTMENT({ payload }) {
     yield put({
       type: actions.UPDATE_APPOINTMENT_LIST,
       payload: {
-        object: response,
-        deleteAppointment: true,
+        object: payload.object,
+        removeItem: true,
+      },
+    })
+  }
+}
+
+export function* EDIT_APPOINTMENT({ payload }) {
+  console.log(payload)
+  const { response } = payload
+  if (response) {
+    notification.success({
+      message: 'Appointment updated successfully',
+    })
+
+    console.log(response, 'repsonse in sagfas')
+    yield put({
+      type: actions.UPDATE_APPOINTMENT_LIST,
+      payload: {
+        object: response.UpdateAppointment.appointment,
+        editItem: true,
       },
     })
   }
@@ -79,5 +101,6 @@ export default function* rootSaga() {
     takeEvery(actions.GET_APPOINTMENT_LIST, GET_APPOINTMENT_LIST),
     takeEvery(actions.CREATE_APPOINTMENT, CREATE_APPOINTMENT),
     takeEvery(actions.DELETE_APPOINTMENT, DELETE_APPOINTMENT),
+    takeEvery(actions.EDIT_APPOINTMENT, EDIT_APPOINTMENT),
   ])
 }

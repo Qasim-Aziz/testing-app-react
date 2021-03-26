@@ -2,6 +2,7 @@
 import { notification } from 'antd'
 import { gql } from 'apollo-boost'
 import moment from 'moment'
+import { func } from 'prop-types'
 import apolloClient from '../apollo/config'
 
 export async function getAppointments() {
@@ -58,5 +59,24 @@ export async function getAppointments() {
       `,
     })
     .then(res => res)
+    .catch(err => err)
+}
+
+export async function deleteAppointment(payload) {
+  console.log(payload)
+  return apolloClient
+    .mutate({
+      mutation: gql`
+        mutation($id: ID!) {
+          DeleteAppointment(id: $id) {
+            success
+          }
+        }
+      `,
+      variables: {
+        id: payload.object.id,
+      },
+    })
+    .then(response => response)
     .catch(err => err)
 }

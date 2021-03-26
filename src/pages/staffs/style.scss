@@ -156,3 +156,10 @@
     background-color: rgba(0, 0, 0, 0.6);
   }
 }
+
+.feedback-icon {
+  .ant-btn > .anticon + span,
+  .ant-btn > span + .anticon {
+    margin-left: 1px;
+  }
+}

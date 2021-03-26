@@ -12,6 +12,7 @@ import GenDetails from './EditDrawers/GeneralInfo'
 import PersonalInfo from './EditDrawers/PersonalInfo'
 import ClinicInfo from './EditDrawers/ClinicInfo'
 import ProgramInfo from './EditDrawers/ProgramInfo'
+import AppointmentCard from './AppointmentCard'
 
 const { Meta } = Card
 
@@ -138,7 +139,7 @@ function Profile(props) {
                         <Tag
                           className="edit-tag"
                           key={tag}
-                          color="#F89A42"
+                          color="#3f72af"
                           style={{ margin: '1px', fontWeight: '600' }}
                         >
                           <span>{isLongTag ? `${tag.slice(0, 20)}...` : tag}</span>
@@ -181,7 +182,7 @@ function Profile(props) {
                 </div>
               }
               description={
-                <div>
+                <div style={{ color: 'black' }}>
                   <div style={{ display: 'flex', textAlign: 'left' }}>
                     <p style={labelHead}>Enrollment Status: </p>
                     <p>
@@ -327,7 +328,7 @@ function Profile(props) {
                   <Tag
                     className="edit-tag"
                     key={tag}
-                    color="#F89A42"
+                    color="#3f72af"
                     style={{ margin: '1px', fontWeight: '600' }}
                   >
                     <span>{isLongTag ? `${tag.slice(0, 20)}...` : tag}</span>
@@ -406,7 +407,7 @@ function Profile(props) {
                   <Tag
                     className="edit-tag"
                     key={tag.node.id}
-                    color="#F25E74"
+                    color="#3f72af"
                     style={{ margin: '1px', fontWeight: '600' }}
                   >
                     <span>{isLongTag ? `${tag.node.name.slice(0, 20)}...` : tag.node.name}</span>
@@ -502,6 +503,7 @@ function Profile(props) {
           </div>
         </div>
       </div>
+      <AppointmentCard />
     </div>
   )
 }

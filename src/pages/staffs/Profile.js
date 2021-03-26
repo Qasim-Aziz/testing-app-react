@@ -122,6 +122,7 @@ function Profile(props) {
     a.add(months, 'months')
 
     var days = b.diff(a, 'days')
+    a.add(days, 'days')
 
     var hrs = b.diff(a, 'hours')
     a.add(hrs, 'hours')
@@ -144,7 +145,7 @@ function Profile(props) {
       }
     } else if (days > 0) {
       if (hrs > 0) {
-        return `${days} ${days == 1 ? 'D' : 'D'} ${hrs} ${hrs == 1 ? 'H' : 'H'}ago`
+        return `${days} ${days == 1 ? 'D' : 'D'} ${hrs} ${hrs == 1 ? 'H' : 'H'} ago`
       } else {
         return `${days} ${days == 1 ? 'D' : 'D'} ago`
       }
@@ -252,7 +253,7 @@ function Profile(props) {
                         <Tag
                           className="edit-tag"
                           key={tag}
-                          color="#F89A42"
+                          color="#3f72af"
                           style={{ margin: '1px', fontWeight: '600' }}
                         >
                           <span>{isLongTag ? `${tag.slice(0, 20)}...` : tag}</span>
@@ -322,7 +323,7 @@ function Profile(props) {
                   <div style={{ display: 'flex', textAlign: 'left', color: 'black' }}>
                     <p style={th2}>Date of Joining </p>
                     <p>
-                      :
+                      :{' '}
                       {staffProfile.dateOfJoining
                         ? `${moment(staffProfile.dateOfJoining).format(
                             'YYYY-MM-DD',
