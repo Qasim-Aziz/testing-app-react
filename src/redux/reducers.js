@@ -21,6 +21,7 @@ import iisaassessment from './iisaassessment/reducers'
 import cogniableassessment from './cogniableassessment/reducers'
 import sessiontargetallocation from './sessiontargetallocation/reducers'
 import celerationChartReducer from './celerationchart/panel.reducer'
+import appointments from './appointments/reducers'
 
 export default history =>
   combineReducers({
@@ -46,4 +47,5 @@ export default history =>
     cogniableassessment,
     sessiontargetallocation,
     celerationChartReducer,
+    appointments,
   })

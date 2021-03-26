@@ -26,10 +26,10 @@ const submitButton = {
   width: '45%',
   height: 40,
   background: '#0B35B3',
-  boxShadow: '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04) !importent',
+  boxShadow: '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04)',
   borderRadius: 0,
-  fontSize: '17 !important',
-  fontWeight: 'bold !important',
+  fontSize: 16,
+  fontWeight: 700,
   marginTop: 20,
 }
 
@@ -44,7 +44,7 @@ function GenDetails(props) {
     if (staffProfile && form) {
       setTagArray(staffProfile.tags)
       form.setFieldsValue({
-        staffId: staffProfile.staffId,
+        // staffId: staffProfile.staffId,
         designation: staffProfile.designation,
         qualification: staffProfile.qualification,
         email: staffProfile.email,
@@ -70,11 +70,11 @@ function GenDetails(props) {
   const handleSubmit = e => {
     e.preventDefault()
     form.validateFields((err, values) => {
+      console.log(err, values)
       if (!err) {
         updateInfo({
           variables: {
             id: staffProfile.id,
-
             firstname: values.firstname,
             surname: values.lastname,
             email: values.email,
@@ -92,14 +92,13 @@ function GenDetails(props) {
             isActive: staffProfile.isActive,
             tags: tagArray,
 
-            // fatherName: staffProfile.fatherName,
-            // motherName: staffProfile.motherName,
+            fatherName: staffProfile.fatherName,
+            motherName: staffProfile.motherName,
             ssnAadhar: staffProfile.ssnAadhar,
             maritalStatus: staffProfile.maritalStatus,
-
             emergencyName: staffProfile.emergencyName,
             emergencyContact: staffProfile.emergencyContact,
-            // emergencyRelation: staffProfile.emergencyRelation,
+            contactRelation: staffProfile.contactRelation,
 
             clinicLocation: staffProfile.clinicLocation?.id,
             workExp: staffProfile.workExp,
@@ -147,11 +146,11 @@ function GenDetails(props) {
           )}
         </Form.Item>
 
-        <Form.Item label="Staff Id" style={itemStyle}>
+        {/* <Form.Item label="Staff Id" style={itemStyle}>
           {form.getFieldDecorator('staffId', {
             rules: [{ required: true, message: 'Please provide ClientId!' }],
-          })(<Input style={{ borderRadius: 0 }} />)}
-        </Form.Item>
+          })(<Input type="number" style={{ borderRadius: 0 }} />)}
+        </Form.Item> */}
         <Form.Item label="Designation" style={itemStyle}>
           {form.getFieldDecorator('designation', {
             rules: [{ required: false, message: 'Please provide ClientId!' }],

@@ -27,12 +27,19 @@ export function* GET_DATA() {
   if (response) {
     const staffs = []
     let i = 0
+    // console.log(response, 'response in staff 111111111')
     if (response.data.staffs.edges.length > 0) {
+      // console.log(response, 'response in staff 22222222')
       for (i = 0; i < response.data.staffs.edges.length; i++) {
-        if (response.data.staffs.edges[i].node.tags.edges.length > 0) {
+        if (
+          response.data.staffs.edges[i].node.tags.edges &&
+          response.data.staffs.edges[i].node.tags.edges.length > 0
+        ) {
+          console.log(response, 'response in staff 33333333')
           const tempTagArr = response.data.staffs.edges[i].node.tags.edges.map(e => e.node.name)
           response.data.staffs.edges[i].node.tags = tempTagArr
         }
+
         staffs.push(response.data.staffs.edges[i].node)
       }
     }
@@ -71,10 +78,10 @@ export function* GET_STAFF_PROFILE({ payload }) {
 
   if (response && response.data) {
     const { staff } = response.data
-    if (staff.tags.edges.length > 0) {
+    if (staff.tags.edges && staff.tags.edges.length > 0) {
       const tempTagArr = staff.tags.edges.map(e => e.node.name)
       staff.tags = tempTagArr
-    } else {
+    } else if (!staff.tags || !staff.tags.length || staff.tags.length === 0) {
       staff.tags = []
     }
 

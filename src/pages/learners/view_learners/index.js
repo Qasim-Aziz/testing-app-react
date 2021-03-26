@@ -27,6 +27,7 @@ import {
   Drawer,
   Switch,
   Dropdown,
+  Popconfirm,
   Menu,
   Radio,
   Tag,
@@ -106,12 +107,16 @@ class LearnerTable extends React.Component {
 
   componentDidMount() {
     const { dispatch } = this.props
+    console.log('gotchahaha')
     // this.selectActiveStatus('active')
     dispatch({
       type: 'learners/GET_DATA',
     })
     dispatch({
       type: 'learners/GET_LEARNERS_DROPDOWNS',
+    })
+    dispatch({
+      type: 'appointments/GET_APPOINTMENT_LIST',
     })
     window.addEventListener('resize', this.handleWindowResize)
   }
@@ -231,17 +236,16 @@ class LearnerTable extends React.Component {
       })
   }
 
-  learnerActiveInactive = checked => {
+  learnerActiveInactive = (checked, id) => {
     const {
       dispatch,
       learners: { UserProfile },
     } = this.props
-    console.log(UserProfile.id, checked)
 
     dispatch({
       type: 'learners/LEARNER_ACTIVE_INACTIVE',
       payload: {
-        id: UserProfile.id,
+        id,
         checked: checked,
       },
     })
@@ -575,7 +579,7 @@ class LearnerTable extends React.Component {
               <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                 {row.tags?.map(r => {
                   return (
-                    <Tag key={r} color="#F89A42" style={{ margin: '1px', fontWeight: '600' }}>
+                    <Tag key={r} color="#3f72af" style={{ margin: '1px', fontWeight: '600' }}>
                       {r}
                     </Tag>
                   )
@@ -591,16 +595,33 @@ class LearnerTable extends React.Component {
         title: 'Status',
         dataIndex: 'isActive',
         alignItems: 'center',
-        render: text => (
+        render: (text, row) => (
           <div style={{ display: 'flex' }}>
             {text ? (
-              <CheckCircleOutlined
-                style={{ fontSize: 20, color: 'green', fontWeight: '700', margin: 'auto' }}
-              />
+              <Popconfirm
+                onConfirm={() => this.learnerActiveInactive(false, row.id)}
+                trigger="click"
+                title="Do you want to deactivate the learner ?"
+              >
+                <Button type="link">
+                  <CheckCircleOutlined
+                    style={{ fontSize: 20, color: 'green', fontWeight: '700', margin: 'auto' }}
+                  />
+                </Button>
+              </Popconfirm>
             ) : (
-              <CloseCircleOutlined
-                style={{ fontSize: 20, fontWeight: '700', margin: 'auto', color: 'red' }}
-              />
+              <Popconfirm
+                onConfirm={() => this.learnerActiveInactive(true, row.id)}
+                title="Do you want to activate the learner ?"
+                trigger="click"
+              >
+                <Button type="link">
+                  <CloseCircleOutlined
+                    type="link"
+                    style={{ fontSize: 20, fontWeight: '700', margin: 'auto', color: 'red' }}
+                  />
+                </Button>
+              </Popconfirm>
             )}
           </div>
         ),
@@ -899,7 +920,7 @@ class LearnerTable extends React.Component {
           closable={true}
           onClose={() => this.setState({ showProfile: false })}
           visible={this.state.showProfile}
-          width={this.state.windowWidth > 1250 ? 1140 : 650}
+          width={this.state.windowWidth > 1250 ? 1280 : 650}
         >
           <Profile />
         </Drawer>

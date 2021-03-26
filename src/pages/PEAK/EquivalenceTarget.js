@@ -1,8 +1,10 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-lone-blocks */
 /* eslint-disable no-shadow */
 /* eslint-disable react/jsx-boolean-value */
 import { PlusOutlined } from '@ant-design/icons'
-import { Button, Col, Drawer, Radio, Row } from 'antd'
+import { Button, Col, Drawer, notification, Radio, Row } from 'antd'
+import LoadingComponent from 'components/LoadingComponent'
 import React, { useEffect, useState } from 'react'
 import { useMutation, useQuery } from 'react-apollo'
 import TargetAllocationNew from '../../components/TargetAllocationAssessments/TargetAllocation'
@@ -36,24 +38,42 @@ export default ({ suggestTarget }) => {
     GET_EQUI_CATTEGORY,
   )
 
+  console.log(targetsData, targetsError, targetsLoading, 'kjkkhhkhk')
   useEffect(() => {
+    console.log(suggestTarget, selectedCategory, 'in')
     if (selectedCategory !== '') {
-      getTargets()
+      getTargets().catch(err => {
+        console.log(err, 'ereroier')
+        notification.error({
+          message: 'Something went wrong',
+          description: 'Unable to fetch suggested targets',
+        })
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedCategory])
 
-  // if (loading) return <h3>Loading...</h3>
-  if (targetsError) return <h4 style={{ color: 'red' }}>Opps therir are something wrong</h4>
+  useEffect(() => {
+    if (categoryData) {
+      setSelectedCategory(categoryData?.peakEquDomains[0].id)
+    }
+  }, [categoryData])
 
-  const selectCategory = text => {
-    setSelectedCategory(text)
-    console.log(text)
-  }
+  useEffect(() => {
+    if (categoryError) {
+      notification.error({
+        message: 'Something went wrong',
+        description: 'Unable to fetch equivalence categories',
+      })
+    }
+  }, [categoryError])
+
+  console.log(categoryData, 'ctcct')
 
   const Targets = targetsData?.suggestPeakTargetsForEquivalence.codes?.map(node => {
     return (
       <Row
+        key={node.id}
         style={{
           border: '1px solid #e4e9f0',
           borderRadius: 10,
@@ -63,8 +83,8 @@ export default ({ suggestTarget }) => {
           fontSize: '18px',
         }}
       >
-        <Col span="22">{node.target.targetMain.targetName}</Col>
-        <Col span="2">
+        <Col span={22}>{node.target.targetMain.targetName}</Col>
+        <Col span={2}>
           <Button
             type="primary"
             onClick={() => {
@@ -82,16 +102,15 @@ export default ({ suggestTarget }) => {
     )
   })
 
-  // if (!Targets) {
-  //   return <h3 style={{ marginTop: 30, textAlign: 'center' }}>Their is no suggest target</h3>
-  // }
-
+  console.log(Targets, 'targets')
   return (
     <>
       {categoryData && (
-        <Radio.Group onChange={e => selectCategory(e.target.value)}>
+        <Radio.Group value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
           {categoryData?.peakEquDomains?.map(item => (
-            <Radio.Button value={item.id}>{item.name}</Radio.Button>
+            <Radio.Button key={item.id} value={item.id}>
+              {item.name}
+            </Radio.Button>
           ))}
         </Radio.Group>
       )}
@@ -105,9 +124,13 @@ export default ({ suggestTarget }) => {
           borderRadius: 10,
         }}
       >
-        {selectCategory === '' && <p>Select Category</p>}
-        {targetsLoading && <p>Loading Targets..</p>}
-        {!Targets ? 'No Targets' : Targets}
+        {targetsLoading || categoryLoading ? (
+          <LoadingComponent />
+        ) : !Targets || Targets.length === 0 ? (
+          'No Targets'
+        ) : (
+          Targets
+        )}
 
         <Drawer
           visible={selectTarget}

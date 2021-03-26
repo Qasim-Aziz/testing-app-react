@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { Card, Switch, Icon, Avatar, Tag, Tooltip, Button, Drawer } from 'antd'
 import { EditOutlined } from '@ant-design/icons'
 import { Link, withRouter } from 'react-router-dom'
+import gql from 'graphql-tag'
 import LoadingComponent from 'components/VBMappReport/LoadingComponent'
 import moment from 'moment'
 import GenDetails from './EditDrawers/GenInfo'
@@ -12,8 +13,42 @@ import ClinicInfo from './EditDrawers/ClinicInfo'
 import './style.scss'
 import EmergencyInfo from './EditDrawers/EmergencyInfo'
 import MiscInfo from './EditDrawers/MiscInfo'
+import { useQuery, useLazyQuery } from 'react-apollo'
+import AppointmentCard from './AppointmentCard/index'
+import Attendance from './Attendance'
 
 const { Meta } = Card
+
+const er = gql`
+  query($id: ID, $dateFrom: Date, $dateTo: Date) {
+    appointments(therapist: $id, dateFrom: $dateFrom, dateTo: $dateTo) {
+      edges {
+        node {
+          id
+          student {
+            id
+            firstname
+            lastname
+          }
+          createdBy {
+            id
+            firstName
+            lastName
+          }
+          appointmentStatus {
+            id
+            appointmentStatus
+          }
+          note
+          title
+          start
+          end
+          isApproved
+        }
+      }
+    }
+  }
+`
 
 const customSpanStyle = {
   backgroundColor: '#52c41a',
@@ -48,6 +83,7 @@ function Profile(props) {
   const [miscInfoDrawer, setMiscInfoDrawer] = useState(false)
   const [emergencyInfoDrawer, setEmergencyInfoDrawer] = useState(false)
   const [address, setAddress] = useState('')
+
   useEffect(() => {
     if (props.staffs.StaffProfile) {
       const tt = props.staffs.StaffProfile
@@ -79,12 +115,13 @@ function Profile(props) {
 
     var years = b.diff(a, 'year')
     a.add(years, 'years')
-    console.log(b, a)
+    // console.log(b, a)
 
     var months = b.diff(a, 'months')
     a.add(months, 'months')
 
     var days = b.diff(a, 'days')
+    a.add(days, 'days')
 
     var hrs = b.diff(a, 'hours')
     a.add(hrs, 'hours')
@@ -92,7 +129,7 @@ function Profile(props) {
     var min = b.diff(a, 'minutes')
     a.add(min, 'minutes')
 
-    console.log(days, hrs, min)
+    // console.log(days, hrs, min)
     if (years > 0) {
       if (months > 0) {
         return `${years} ${years == 1 ? 'Y' : 'Y'} ${months} ${months == 1 ? 'M' : 'M'} ago`
@@ -107,7 +144,7 @@ function Profile(props) {
       }
     } else if (days > 0) {
       if (hrs > 0) {
-        return `${days} ${days == 1 ? 'D' : 'D'} ${hrs} ${hrs == 1 ? 'H' : 'H'}ago`
+        return `${days} ${days == 1 ? 'D' : 'D'} ${hrs} ${hrs == 1 ? 'H' : 'H'} ago`
       } else {
         return `${days} ${days == 1 ? 'D' : 'D'} ago`
       }
@@ -181,6 +218,7 @@ function Profile(props) {
       >
         <MiscInfo closeDrawer={setMiscInfoDrawer} staffProfile={staffProfile} />
       </Drawer>
+
       <div className="mainCard">
         <div className="mainCard-child right-border">
           <Card
@@ -214,7 +252,7 @@ function Profile(props) {
                         <Tag
                           className="edit-tag"
                           key={tag}
-                          color="#F89A42"
+                          color="#3f72af"
                           style={{ margin: '1px', fontWeight: '600' }}
                         >
                           <span>{isLongTag ? `${tag.slice(0, 20)}...` : tag}</span>
@@ -367,11 +405,11 @@ function Profile(props) {
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>Father Name </p>
-            <p> : {staffProfile.fatherName ? JSON.parse(staffProfile.fatherName) : ''}</p>
+            <p> : {staffProfile.fatherName}</p>
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>Mother Name </p>
-            <p> : {staffProfile.motherName ? JSON.parse(staffProfile.motherName) : ''}</p>
+            <p> : {staffProfile.motherName}</p>
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>SSN/Aadhar </p>
@@ -407,7 +445,7 @@ function Profile(props) {
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>Relation </p>
-            <p> : {staffProfile.emergencyRelation}</p>
+            <p> : {staffProfile.contactRelation}</p>
           </div>
         </div>
       </div>
@@ -478,6 +516,8 @@ function Profile(props) {
           </div>
         </div>
       </div>
+      <AppointmentCard />
+      <Attendance staffProfile={staffProfile} />
     </div>
   )
 }
