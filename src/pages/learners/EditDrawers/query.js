@@ -28,6 +28,7 @@ export const GEN_INFO = gql`
     $country: String
     $zipCode: String
     $tags: [String]
+    $allergicTo: [String]
     $parentName: String
     $parentMobile: String
     $ssnAadhar: String
@@ -56,6 +57,7 @@ export const GEN_INFO = gql`
           country: $country
           zipCode: $zipCode
           tags: $tags
+          allergicTo: $allergicTo
           parentName: $parentName
           parentMobile: $parentMobile
           ssnAadhar: $ssnAadhar
@@ -163,6 +165,14 @@ export const GEN_INFO = gql`
               id
               name
               surname
+            }
+          }
+        }
+        allergicTo {
+          edges {
+            node {
+              id
+              name
             }
           }
         }

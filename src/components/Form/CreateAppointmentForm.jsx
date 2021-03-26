@@ -31,7 +31,28 @@ import './appointmentForms.scss'
 const { TextArea } = Input
 const { Option } = Select
 
-const CreateAppointmentForm = ({ setNeedToReloadData, form, startDate, endDate, therapistId }) => {
+const submitButton = {
+  minWidth: '160px',
+  height: 40,
+  background: '#0B35B3',
+  boxShadow: '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04)',
+  borderRadius: 0,
+  fontSize: 16,
+  fontWeight: 600,
+  marginTop: 20,
+  color: 'white',
+}
+
+const CreateAppointmentForm = ({
+  setNeedToReloadData,
+  form,
+  startDate,
+  endDate,
+  therapistId,
+  learnerId,
+  closeDrawer,
+}) => {
+  console.log(startDate, endDate, therapistId, 'details')
   const userRole = useSelector(state => state.user.role)
   const therapistReduxId = useSelector(state => state.user.staffId)
   const [openStatus, setOpenStatus] = useState()
@@ -69,19 +90,11 @@ const CreateAppointmentForm = ({ setNeedToReloadData, form, startDate, endDate, 
       })
       form.resetFields()
       if (setNeedToReloadData) {
-        setNeedToReloadData(true)
+        setNeedToReloadData(createAppointmentData)
+        closeDrawer()
       }
     }
   }, [createAppointmentData])
-
-  useEffect(() => {
-    if (createAppointmentError) {
-      notification.error({
-        message: 'Something went wrong!',
-        description: createAppointmentError.message,
-      })
-    }
-  }, [createAppointmentError])
 
   if (!startDate) startDate = moment()
   if (!endDate) endDate = moment().add(1, 'hour')
@@ -118,6 +131,11 @@ const CreateAppointmentForm = ({ setNeedToReloadData, form, startDate, endDate, 
             isApproved: true,
             appointmentStatus: values.appointmentStatus,
           },
+        }).catch(er => {
+          notification.error({
+            message: 'Something went wrong!',
+            description: er.message,
+          })
         })
       }
     })
@@ -171,6 +189,7 @@ const CreateAppointmentForm = ({ setNeedToReloadData, form, startDate, endDate, 
         <Col sm={24} md={24} lg={24}>
           <Form.Item label="Select Learner" labelCol={{ offset: 1, sm: 4 }} wrapperCol={{ sm: 18 }}>
             {form.getFieldDecorator('student', {
+              initialValue: learnerId,
               rules: [{ required: true, message: 'Please select a Learner' }],
             })(
               <Select
@@ -496,19 +515,24 @@ const CreateAppointmentForm = ({ setNeedToReloadData, form, startDate, endDate, 
               span: 12,
             }}
           >
-            <Button
-              type="primary"
-              htmlType="submit"
-              style={{
-                width: 180,
-                height: 40,
-                background: '#0B35B3',
-                marginTop: 15,
-                marginBottom: 20,
-              }}
-              loading={isCreateAppointmentLoading}
-            >
+            <Button htmlType="submit" style={submitButton} loading={isCreateAppointmentLoading}>
               Create Appointment
+            </Button>
+            <Button
+              type="danger"
+              style={{
+                ...submitButton,
+                color: 'white',
+                background: 'red',
+                marginLeft: '15px',
+                boxShadow: 'none',
+              }}
+              onClick={() => {
+                form.resetFields()
+                closeDrawer()
+              }}
+            >
+              Cancel
             </Button>
           </Form.Item>
         </Col>

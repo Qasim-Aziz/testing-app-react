@@ -5,6 +5,7 @@ import moment from 'moment'
 import { useMutation } from 'react-apollo'
 import { Link, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
+import AntdTag from '../../staffs/antdTag'
 import { GEN_INFO } from './query'
 
 const { TextArea } = Input
@@ -42,9 +43,11 @@ function PersonalInfo(props) {
   console.log(props, languageList)
 
   const [updateInfo, { loading: updateLoading }] = useMutation(GEN_INFO)
+  const [allergicArray, setAllergicArray] = useState(userProfile.allergicTo)
 
   useEffect(() => {
     if (userProfile) {
+      setAllergicArray(userProfile.allergicTo)
       form.setFieldsValue({
         parentName: userProfile.parentName,
         parentMobile: userProfile.parentMobile,
@@ -60,12 +63,17 @@ function PersonalInfo(props) {
     }
   }, [userProfile])
 
+  const tagArrayHandler = tags => {
+    setAllergicArray(tags)
+  }
+
   const handleSubmit = e => {
     e.preventDefault()
     form.validateFields((err, values) => {
       if (!err) {
         const selectedStaffList = []
         userProfile.authStaff.edges.map(item => selectedStaffList.push(item.node.id))
+        console.log(values, allergicArray)
         updateInfo({
           variables: {
             id: userProfile.id,
@@ -91,6 +99,7 @@ function PersonalInfo(props) {
             // motherPhone: values.motherPhone,
             // height: values.height,
             // weight: values.weight,
+            allergicTo: allergicArray,
             ssnAadhar: values.ssnAadhar,
             language: values.language,
 
@@ -105,6 +114,7 @@ function PersonalInfo(props) {
           },
         })
           .then(result => {
+            console.log(result, 'result tgg')
             dispatch({
               type: 'learners/EDIT_GENERAL_INFO',
               payload: {
@@ -156,6 +166,16 @@ function PersonalInfo(props) {
           {form.getFieldDecorator('motherMobileNumber', {
             rules: [{ message: 'Please provide Mobile No!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
+        </Form.Item>
+        <Form.Item label="Allergic To" style={itemStyle}>
+          {form.getFieldDecorator('allergicTo')(
+            <AntdTag
+              style={itemStyle}
+              changeTagsHandler={tagArrayHandler}
+              closeable="true"
+              tagArray={allergicArray}
+            />,
+          )}
         </Form.Item>
         <Form.Item label="Height" style={itemStyle}>
           {form.getFieldDecorator('height', {

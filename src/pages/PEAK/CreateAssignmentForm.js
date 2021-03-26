@@ -9,6 +9,14 @@ import moment from 'moment'
 
 const { TextArea } = Input
 const { Option } = Select
+const layout = {
+  labelCol: {
+    span: 7,
+  },
+  wrapperCol: {
+    span: 16,
+  },
+}
 
 const CREATE_PEAK = gql`
   mutation($studentId: ID!, $title: String!, $category: String!, $note: String, $date: Date!) {
@@ -105,7 +113,7 @@ const CreateAssignmentForm = ({ form, setOpen, PEAK_PROGRAMS }) => {
   }
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form {...layout} onSubmit={handleSubmit}>
       <Form.Item label="Program Title">
         {form.getFieldDecorator('title', {
           rules: [{ required: true, message: 'Please give the program title' }],
@@ -159,22 +167,37 @@ const CreateAssignmentForm = ({ form, setOpen, PEAK_PROGRAMS }) => {
         )}
       </Form.Item>
 
-      <Button
-        htmlType="submit"
-        type="primary"
-        size="large"
-        style={{
-          marginLeft: 'auto',
-          marginRight: 10,
-          marginTop: 15,
-          width: '100%',
-          backgroundColor: '#0B35B3',
-          color: '#fff',
-        }}
-        loading={loading}
-      >
-        Create program
-      </Button>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Button
+          htmlType="submit"
+          type="primary"
+          size="large"
+          style={{
+            marginLeft: 'auto',
+            marginRight: 10,
+            marginTop: 15,
+            width: '100%',
+            backgroundColor: '#0B35B3',
+            color: '#fff',
+          }}
+          loading={loading}
+        >
+          Create program
+        </Button>
+        <Button
+          type="danger"
+          size="large"
+          style={{
+            marginRight: 'auto',
+            marginTop: 15,
+            width: '100%',
+            color: '#fff',
+          }}
+          onClick={() => setOpen(false)}
+        >
+          Cancel
+        </Button>
+      </div>
     </Form>
   )
 }

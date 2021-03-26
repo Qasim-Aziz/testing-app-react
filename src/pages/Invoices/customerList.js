@@ -40,7 +40,10 @@ function CustomerList() {
   const [advInvForm, setAdvInvForm] = useState(false)
   const [monthlyInvForm, setMonthlyInvForm] = useState(false)
   const [currentRow, setCurrentRow] = useState(null)
-  const [createAdvanceInvoice] = useMutation(ADVANCE_INVOICE)
+  const [
+    createAdvanceInvoice,
+    { data: advanceData, loading: advanceLoading, error: advanceError },
+  ] = useMutation(ADVANCE_INVOICE)
 
   useEffect(() => {
     if (data) {
@@ -65,6 +68,7 @@ function CustomerList() {
     }
   }, [data, error])
 
+  console.log(advanceData, advanceLoading, advanceError, 'ainvoi')
   const columns = [
     {
       title: 'Name',
@@ -90,10 +94,7 @@ function CustomerList() {
                 createAdvanceInvoice({
                   variables: {
                     month: 'April',
-                    clinics: selectedRowKeys,
-                    cgst: 8.0,
-                    sgst: 10.0,
-                    discount: 8,
+                    clinic: selectedRowKeys[0],
                   },
                 })
                   .then(res => console.log(res, 'response'))

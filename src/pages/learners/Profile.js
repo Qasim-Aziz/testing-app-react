@@ -12,6 +12,7 @@ import GenDetails from './EditDrawers/GeneralInfo'
 import PersonalInfo from './EditDrawers/PersonalInfo'
 import ClinicInfo from './EditDrawers/ClinicInfo'
 import ProgramInfo from './EditDrawers/ProgramInfo'
+import AppointmentCard from './AppointmentCard'
 
 const { Meta } = Card
 
@@ -138,7 +139,7 @@ function Profile(props) {
                         <Tag
                           className="edit-tag"
                           key={tag}
-                          color="#F89A42"
+                          color="#3f72af"
                           style={{ margin: '1px', fontWeight: '600' }}
                         >
                           <span>{isLongTag ? `${tag.slice(0, 20)}...` : tag}</span>
@@ -181,7 +182,7 @@ function Profile(props) {
                 </div>
               }
               description={
-                <div>
+                <div style={{ color: 'black' }}>
                   <div style={{ display: 'flex', textAlign: 'left' }}>
                     <p style={labelHead}>Enrollment Status: </p>
                     <p>
@@ -317,6 +318,32 @@ function Profile(props) {
         </div>
         <div className="mainCard-child">
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+            <p style={labelHead}>Allergic to </p>
+            <p>
+              :{' '}
+              {userProfile.allergicTo?.map(tag => {
+                const isLongTag = tag.length > 20
+                const tagElem = (
+                  <Tag
+                    className="edit-tag"
+                    key={tag}
+                    color="#3f72af"
+                    style={{ margin: '1px', fontWeight: '600' }}
+                  >
+                    <span>{isLongTag ? `${tag.slice(0, 20)}...` : tag}</span>
+                  </Tag>
+                )
+                return isLongTag ? (
+                  <Tooltip title={tag} key={tag}>
+                    {tagElem}
+                  </Tooltip>
+                ) : (
+                  tagElem
+                )
+              })}
+            </p>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>Height </p>
             <p> : {userProfile.height}</p>
           </div>
@@ -379,7 +406,7 @@ function Profile(props) {
                   <Tag
                     className="edit-tag"
                     key={tag.node.id}
-                    color="#F25E74"
+                    color="#3f72af"
                     style={{ margin: '1px', fontWeight: '600' }}
                   >
                     <span>{isLongTag ? `${tag.node.name.slice(0, 20)}...` : tag.node.name}</span>
@@ -475,6 +502,7 @@ function Profile(props) {
           </div>
         </div>
       </div>
+      <AppointmentCard />
     </div>
   )
 }

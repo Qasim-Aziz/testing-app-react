@@ -103,6 +103,7 @@ function ProgramInfo(props) {
 
             parentName: userProfile.parentName,
             parentMobile: userProfile.parentMobile,
+            allergicTo: userProfile.allergicTo,
             // fatherName: userProfile.fatherName,
             // fatherPhone: userProfile.fatherPhone,
             // motherName: userProfile.motherName,

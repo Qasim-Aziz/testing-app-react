@@ -2,7 +2,8 @@
 /* eslint-disable no-shadow */
 /* eslint-disable react/jsx-boolean-value */
 import { PlusOutlined } from '@ant-design/icons'
-import { Button, Col, Drawer, Row } from 'antd'
+import { Button, Col, Drawer, notification, Row } from 'antd'
+import LoadingComponent from 'components/LoadingComponent'
 import React, { useEffect, useState } from 'react'
 import { useMutation } from 'react-apollo'
 import TargetAllocationNew from '../../components/TargetAllocationAssessments/TargetAllocation'
@@ -16,25 +17,34 @@ export default ({ suggestTarget, selectedTargetCategory }) => {
   const [selectedStudent, setSelectedStudent] = useState(stdId)
 
   const [selectTarget, setSelectTarget] = useState(null)
+  const [selectTargetDrawer, setSelectTargetDrawer] = useState(false)
   const [targetName, setTargetName] = useState('')
   const [targetVideo, setTargetVideo] = useState()
   const [targetInstr, setTargetInstr] = useState()
 
-  const [getTargets, { data, error, loading }] = useMutation(GET_TARGET, {
+  const [getData, { data, error, loading }] = useMutation(GET_TARGET, {
     variables: {
       id: suggestTarget,
     },
   })
 
   useEffect(() => {
-    if (!data && !error && !loading) {
-      getTargets()
+    if (suggestTarget) {
+      getData()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, error, loading])
+  }, [suggestTarget])
 
-  if (loading) return <h3>Loading...</h3>
-  if (error) return <h4 style={{ color: 'red' }}>Opps therir are something wrong</h4>
+  useEffect(() => {
+    if (error) {
+      notification.error({
+        message: 'Something went wrong',
+        description: 'Unable to fetch suggested targets',
+      })
+    }
+  }, [error])
+
+  console.log(data, error, loading)
+  if (loading) return <LoadingComponent />
 
   const Targets = data?.suggestPeakTargets.details?.map(node => {
     return node.targets.edges?.map(({ node }) => (
@@ -49,13 +59,14 @@ export default ({ suggestTarget, selectedTargetCategory }) => {
           fontSize: '18px',
         }}
       >
-        <Col span="22">{node.targetMain.targetName}</Col>
-        <Col span="2">
+        <Col span={22}>{node.targetMain.targetName}</Col>
+        <Col span={2}>
           <Button
             type="primary"
             onClick={() => {
               setTargetName(node.targetMain.targetName)
               setSelectTarget(node.id)
+              setSelectTargetDrawer(true)
               setTargetInstr(node.targetInstr)
               setTargetVideo(node.video)
             }}
@@ -68,7 +79,7 @@ export default ({ suggestTarget, selectedTargetCategory }) => {
   })
 
   if (!Targets) {
-    return <h3 style={{ marginTop: 30, textAlign: 'center' }}>Their is no suggest target</h3>
+    return <h3 style={{ marginTop: 30, textAlign: 'center' }}>Their is no suggested target</h3>
   }
 
   return (
@@ -81,10 +92,10 @@ export default ({ suggestTarget, selectedTargetCategory }) => {
         borderRadius: 10,
       }}
     >
-      {Targets}
+      {!Targets || Targets.length === 0 ? 'No data' : Targets}
       <Drawer
-        visible={selectTarget}
-        onClose={() => setSelectTarget(null)}
+        visible={selectTargetDrawer}
+        onClose={() => setSelectTargetDrawer(false)}
         title="Target Allocation"
         width={950}
       >

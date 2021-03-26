@@ -356,6 +356,15 @@ export async function updateStaff(payload) {
               id
               location
             }
+            attendanceSet{
+              edges {
+                node {
+                  id
+                  checkIn
+                  checkOut
+                }
+              }
+            }
             userRole {
               id
               name
@@ -407,6 +416,7 @@ export async function getStaffProfile(payload) {
         query($id: ID!) {
           staff(id: $id) {
             id
+            staffId
             employeeId
             name
             surname
@@ -423,6 +433,7 @@ export async function getStaffProfile(payload) {
             emergencyName
             emergencyContact
             emergencyRelation
+            contactRelation
             maritalStatus
             workExp
             image
@@ -450,6 +461,15 @@ export async function getStaffProfile(payload) {
             clinicLocation {
               id
               location
+            }
+            attendanceSet {
+              edges {
+                node {
+                  id
+                  checkIn
+                  checkOut
+                }
+              }
             }
             userRole {
               id

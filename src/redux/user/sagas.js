@@ -40,13 +40,14 @@ export function* LOGIN({ payload }) {
 
     if (response.tokenAuth.user.groups.edges.length > 0) {
       if (response.tokenAuth.user.groups.edges[0].node.name === 'parents') {
+        console.log(response.tokenAuth.user, 'this is login bitch')
         localStorage.setItem(
           'studentId',
           JSON.stringify(response.tokenAuth.user.studentsSet.edges[0].node.id),
         )
         localStorage.setItem(
           'userId',
-          JSON.stringify(response.tokenAuth.user.studentsSet.edges[0].node.id),
+          JSON.stringify(response.tokenAuth.user.studentsSet.edges[0].node.parent.id),
         )
         yield put({
           type: 'user/SET_STATE',

@@ -241,19 +241,16 @@ export default ({ selectedQ, data, setSelectedQ, learner }) => {
                 textAlign: 'right',
               }}
             >
-              {sendResponseLoading && (
-                <div
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    background: '#f9f9f9',
-                    color: '#000',
-                    padding: '3px',
-                  }}
-                >
-                  Recording response...
-                </div>
-              )}
+              <div
+                style={{
+                  width: '100%',
+                  height: '30px',
+                  color: '#000',
+                  padding: '3px',
+                }}
+              >
+                {sendResponseLoading && 'Recording response...'}
+              </div>
               <Button
                 style={{
                   padding: '5px 20px',

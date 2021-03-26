@@ -38,10 +38,10 @@ const submitButton = {
   width: '45%',
   height: 40,
   background: '#0B35B3',
-  boxShadow: '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04) !importent',
+  boxShadow: '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04)',
   borderRadius: 0,
-  fontSize: '17 !important',
-  fontWeight: 'bold !important',
+  fontSize: 16,
+  fontWeight: 700,
   marginTop: 20,
 }
 
@@ -56,7 +56,7 @@ function PersonalInfo(props) {
       form.setFieldsValue({
         emergencyName: staffProfile.emergencyName,
         emergencyContact: staffProfile.emergencyContact,
-        emergencyRelation: staffProfile.emergencyRelation,
+        emergencyRelation: staffProfile.contactRelation,
       })
     }
   }, [staffProfile])
@@ -86,14 +86,14 @@ function PersonalInfo(props) {
             isActive: staffProfile.isActive,
             tags: staffProfile.tags,
 
-            // fatherName: values.fatherName,
-            // motherName: values.motherName,
+            fatherName: staffProfile.fatherName,
+            motherName: staffProfile.motherName,
             ssnAadhar: staffProfile.ssnAadhar,
             maritalStatus: staffProfile.maritalStatus,
 
             emergencyName: values.emergencyName,
             emergencyContact: values.emergencyContact,
-            // emergencyRelation: staffProfile.emergencyRelation,
+            contactRelation: values.emergencyRelation,
 
             clinicLocation: staffProfile.clinicLocation?.id,
             workExp: staffProfile.workExp,
