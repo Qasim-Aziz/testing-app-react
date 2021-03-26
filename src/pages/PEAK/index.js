@@ -327,8 +327,8 @@ export default () => {
       align: 'center',
       render: (text, obj) => (
         <Badge
-          count={obj.node.status.charAt(0).toUpperCase() + obj.node.status.slice(1).toLowerCase()}
-          style={{ background: obj.node.status === 'PROGRESS' ? '#52c41a' : '#faad14' }}
+          count={obj.node?.status?.charAt(0).toUpperCase() + obj.node.status?.slice(1).toLowerCase()}
+          style={{ background: obj.node?.status === 'PROGRESS' ? '#52c41a' : '#faad14' }}
         />
       ),
     },
