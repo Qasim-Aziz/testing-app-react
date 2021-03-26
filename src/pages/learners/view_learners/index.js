@@ -87,7 +87,7 @@ class LearnerTable extends React.Component {
     noOfRows: 20,
     filterName: '',
     filterEmail: '',
-    filterStatus: '',
+    filterStatus: 'all',
     filterCategory: '',
     filterTags: '',
     windowWidth: window.innerWidth,
@@ -363,7 +363,7 @@ class LearnerTable extends React.Component {
           item => item.email && item.email.toLowerCase().includes(email.toLowerCase()),
         )
     }
-    if (status) {
+    if (status !== 'all') {
       console.log(status, 'gotcha')
       tempFilterActive = true
       let tempStatus = status === 'active' ? true : false
@@ -432,7 +432,7 @@ class LearnerTable extends React.Component {
       caseMngr: '',
       address: '',
       tags: '',
-      status: '',
+      status: 'all',
       category: '',
     })
     // this.selectActiveStatus('')
@@ -601,7 +601,9 @@ class LearnerTable extends React.Component {
                 style={{ fontSize: 20, color: 'green', fontWeight: '700', margin: 'auto' }}
               />
             ) : (
-              <CloseCircleOutlined style={{ color: 'red' }} />
+              <CloseCircleOutlined
+                style={{ fontSize: 20, fontWeight: '700', margin: 'auto', color: 'red' }}
+              />
             )}
           </div>
         ),
@@ -818,12 +820,14 @@ class LearnerTable extends React.Component {
             buttonStyle="solid"
             value={this.state.filterStatus}
             onChange={e => {
+              console.log(e)
               this.filterHandler({ status: e.target.value })
               this.setState({ filterStatus: e.target.value, isFilterActive: true })
+              this.selectActiveStatus(e.target.value)
             }}
             style={tableFilterStyles}
           >
-            <Radio.Button value="">All</Radio.Button>
+            <Radio.Button value="all">All</Radio.Button>
             <Radio.Button value="active">Active</Radio.Button>
             <Radio.Button value="in-active">In-Active</Radio.Button>
           </Radio.Group>
@@ -880,10 +884,11 @@ class LearnerTable extends React.Component {
                 onSelect={value => {
                   this.setState({ filterStatus: value, isFilterActive: true })
                   this.filterHandler({ status: value })
+                  this.selectActiveStatus(value)
                 }}
                 style={inputCustom}
               >
-                <Select.Option value="">All</Select.Option>
+                <Select.Option value="all">All</Select.Option>
                 <Select.Option value="active">Active</Select.Option>
                 <Select.Option value="in-active">In-Active</Select.Option>
               </Select>
@@ -948,12 +953,13 @@ class LearnerTable extends React.Component {
                   this.filterRef.current ? this.filterRef.current.clearFilter() : this.clearFilter()
                   this.setState({
                     isFilterActive: false,
-                    filterStatus: '',
+                    filterStatus: 'all',
                     filterTags: '',
                     filterCategory: '',
                     filterName: '',
                     filterEmail: '',
                   })
+                  this.selectActiveStatus('all')
                 }}
                 style={{ marginLeft: '10px', color: '#FEBB27' }}
                 size="small"

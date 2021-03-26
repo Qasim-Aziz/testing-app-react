@@ -17,6 +17,7 @@ import learnersprogram from './learnersprogram/sagas'
 import peakequivalence from './peakequivalence/sagas'
 import sessionrecording from './sessionrecording/sagas'
 import cogniableassessment from './cogniableassessment/sagas'
+import iisaassessment from './iisaassessment/sagas'
 import sessiontargetallocation from './sessiontargetallocation/sagas'
 import appointments from './appointments/sagas'
 
@@ -39,6 +40,7 @@ export default function* rootSaga() {
     learnersprogram(),
     peakequivalence(),
     sessionrecording(),
+    iisaassessment(),
     cogniableassessment(),
     sessiontargetallocation(),
     appointments(),

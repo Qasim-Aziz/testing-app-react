@@ -36,8 +36,8 @@ export function* GET_DATA() {
   yield put({
     type: 'learners/GET_LEARNERS',
     payload: {
-      isActive: true,
-      first: 10,
+      isActive: null,
+      first: 20,
       after: null,
       before: null,
     },
@@ -63,9 +63,15 @@ export function* GET_LEARNERS({ payload }) {
   if (response) {
     const learners = []
     let i = 0
-    if (response.data.students.edges.length > 0) {
+    console.log(response, 'in res 11')
+    if (response.data.students.edges && response.data.students.edges.length > 0) {
+      console.log(response, 'in res 22')
       for (i = 0; i < response.data.students.edges.length; i++) {
-        if (response.data.students.edges[i].node.tags.edges.length > 0) {
+        if (
+          response.data.students.edges[i].node.tags.edge &&
+          response.data.students.edges[i].node.tags.edges.length > 0
+        ) {
+          console.log(response, 'in res 33')
           const tempTagArr = response.data.students.edges[i].node.tags.edges.map(e => e.node.name)
           response.data.students.edges[i].node.tags = tempTagArr
         }
@@ -130,6 +136,7 @@ export function* PAGE_CHANGED({ payload }) {
   //   after = pageInfo.endCursor
   // }
 
+  console.log(active, first, after, before, last, 'in row changes')
   const response = yield call(getClinicLearners, { isActive: active, first, after, before, last })
 
   const oldLearners = []

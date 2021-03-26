@@ -65,6 +65,9 @@ export function* LOGIN({ payload }) {
           payload: {
             staffId: response.tokenAuth.user.staffSet.edges[0].node.id,
             staffName: response.tokenAuth.user.staffSet.edges[0].node.name,
+            staffCountry: response.tokenAuth.user.staffSet.edges[0].node.country,
+            staffState: response.tokenAuth.user.staffSet.edges[0].node.state,
+            staffObject: response.tokenAuth.user.staffSet.node
           },
         })
       }
@@ -77,6 +80,7 @@ export function* LOGIN({ payload }) {
             type: 'user/SET_STATE',
             payload: {
               clinicName: result4.data.schoolDetail.schoolName,
+              clinicCountry: result4.data.schoolDetail.country?.name
             },
           })
         }
@@ -145,6 +149,9 @@ export function* LOAD_CURRENT_ACCOUNT() {
             payload: {
               staffId: result3.data.staffs.edges[0].node.id,
               staffName: result3.data.staffs.edges[0].node.name,
+              staffCountry: result3.data.staffs.edges[0].node.country,
+              staffState: result3.data.staffs.edges[0].node.state,
+              staffObject: result3.data.staffs.edges[0].node
             },
           })
         }
@@ -158,6 +165,7 @@ export function* LOAD_CURRENT_ACCOUNT() {
             type: 'user/SET_STATE',
             payload: {
               clinicName: result4.data.schoolDetail.schoolName,
+              clinicCountry: result4.data.schoolDetail.country?.name
             },
           })
         }

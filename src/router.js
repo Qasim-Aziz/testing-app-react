@@ -644,8 +644,23 @@ const routes = [
     exact: true,
   },
   {
+    path: '/prescription',
+    component: loadable(() => import('pages/Prescription')),
+    exact: true,
+  },
+  {
     path: '/staffLeave',
     component: loadable(() => import('pages/StaffLeave')),
+    exact: true,
+  },
+  {
+    path: '/iisaAssessment',
+    component: loadable(() => import('pages/IISA')),
+    exact: true,
+  },
+  {
+    path: '/startIISA',
+    component: loadable(() => import('pages/IISA/StartAssessment')),
     exact: true,
   },
 ]
