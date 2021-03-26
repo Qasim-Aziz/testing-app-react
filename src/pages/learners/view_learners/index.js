@@ -234,7 +234,7 @@ class LearnerTable extends React.Component {
       })
   }
 
-  learnerActiveInactive = checked => {
+  learnerActiveInactive = (checked,id) => {
     const {
       dispatch,
       learners: { UserProfile },
@@ -244,7 +244,7 @@ class LearnerTable extends React.Component {
     dispatch({
       type: 'learners/LEARNER_ACTIVE_INACTIVE',
       payload: {
-        id: UserProfile.id,
+        id,
         checked: checked,
       },
     })
@@ -594,16 +594,33 @@ class LearnerTable extends React.Component {
         title: 'Status',
         dataIndex: 'isActive',
         alignItems: 'center',
-        render: text => (
+        render: (text, row) => (
           <div style={{ display: 'flex' }}>
             {text ? (
-              <CheckCircleOutlined
-                style={{ fontSize: 20, color: 'green', fontWeight: '700', margin: 'auto' }}
-              />
+              <Popconfirm
+                onConfirm={() => this.learnerActiveInactive(false, row.id)}
+                trigger="click"
+                title="Do you want to deactivate the learner ?"
+              >
+                <Button type="link">
+                  <CheckCircleOutlined
+                    style={{ fontSize: 20, color: 'green', fontWeight: '700', margin: 'auto' }}
+                  />
+                </Button>
+              </Popconfirm>
             ) : (
-              <CloseCircleOutlined
-                style={{ fontSize: 20, fontWeight: '700', margin: 'auto', color: 'red' }}
-              />
+              <Popconfirm
+                onConfirm={() => this.learnerActiveInactive(true, row.id)}
+                title="Do you want to activate the learner ?"
+                trigger="click"
+              >
+                <Button type="link">
+                  <CloseCircleOutlined
+                    type="link"
+                    style={{ fontSize: 20, fontWeight: '700', margin: 'auto', color: 'red' }}
+                  />
+                </Button>
+              </Popconfirm>
             )}
           </div>
         ),
