@@ -320,8 +320,7 @@ function Profile(props) {
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>Allergic to </p>
             <p>
-              {' '}
-              :
+              :{' '}
               {userProfile.allergicTo?.map(tag => {
                 const isLongTag = tag.length > 20
                 const tagElem = (

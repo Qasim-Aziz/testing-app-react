@@ -1,51 +1,17 @@
 /* eslint-disable */
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
-import { Card, Switch, Icon, Avatar, Tag, Tooltip, Button, Drawer, Tabs } from 'antd'
+import { Card, Button, Drawer, Tabs } from 'antd'
 import { EditOutlined, PlusOutlined } from '@ant-design/icons'
-import { Link, withRouter } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import gql from 'graphql-tag'
 import moment from 'moment'
 import '../style.scss'
-import { useQuery, useLazyQuery } from 'react-apollo'
 import Upcoming from './upcoming'
 import CreateAppointmentForm from 'components/Form/CreateAppointmentForm'
 import UpdateAppointmentForm from 'components/Form/UpdateAppointmentForm'
 
 const { Meta } = Card
 const { TabPane } = Tabs
-
-const er = gql`
-  query($id: ID, $dateFrom: Date, $dateTo: Date) {
-    appointments(therapist: $id, dateFrom: $dateFrom, dateTo: $dateTo) {
-      edges {
-        node {
-          id
-          student {
-            id
-            firstname
-            lastname
-          }
-          createdBy {
-            id
-            firstName
-            lastName
-          }
-          appointmentStatus {
-            id
-            appointmentStatus
-          }
-          note
-          title
-          start
-          end
-          isApproved
-        }
-      }
-    }
-  }
-`
 
 function AppointmentCard(props) {
   const [appointmentDrawer, setAppointmentDrawer] = useState(false)
@@ -63,7 +29,6 @@ function AppointmentCard(props) {
       let temp = appt.appointments.filter(
         item => new Date(item.start) > new Date() && item.student?.id === userProfile.id,
       )
-      temp.map(item => console.log(item.student?.name))
       temp.reverse()
       setUpcomingAppointmentList(temp)
 
@@ -91,7 +56,6 @@ function AppointmentCard(props) {
   }
 
   const createAppointmentRedux = data => {
-    console.log(data, 'repsonse data')
     dispatch({
       type: 'appointments/CREATE_APPOINTMENT',
       payload: {
@@ -101,7 +65,6 @@ function AppointmentCard(props) {
   }
 
   const updateAppointmentRedux = data => {
-    console.log(data, 'repsonse data')
     dispatch({
       type: 'appointments/EDIT_APPOINTMENT',
       payload: {
@@ -131,6 +94,7 @@ function AppointmentCard(props) {
             appointmentId={updateAppointmentId}
             setNeedToReloadData={updateAppointmentRedux}
             closeUpdateAppointment={closeUpdateAppointment}
+            Upcoming={true}
           />
         ) : (
           <CreateAppointmentForm

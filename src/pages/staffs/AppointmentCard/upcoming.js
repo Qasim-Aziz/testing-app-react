@@ -20,48 +20,8 @@ import { Scrollbars } from 'react-custom-scrollbars'
 import LoadingComponent from 'components/LoadingComponent'
 import SessionFeedbackForm from '../../sessionFeedback'
 
-const { Meta } = Card
-const { TabPane } = Tabs
-
-const er = gql`
-  query($id: ID, $dateFrom: Date) {
-    appointments(therapist: $id, dateFrom: $dateFrom) {
-      edges {
-        node {
-          id
-          student {
-            id
-            firstname
-            lastname
-          }
-          createdBy {
-            id
-            firstName
-            lastName
-          }
-          appointmentStatus {
-            id
-            appointmentStatus
-          }
-          purposeAssignment
-          location {
-            id
-            location
-          }
-          note
-          title
-          start
-          end
-          isApproved
-        }
-      }
-    }
-  }
-`
-
 function Upcoming(props) {
-  const { appointmentList, updateAppointment } = props
-  const [getApp, { data, loading, error, refetch }] = useLazyQuery(er)
+  const { appointmentList, updateAppointment, upcoming } = props
   const dispatch = useDispatch()
   const [selectedAppointmentId, setSelectedAppointmentId] = useState('')
   const [feedbackDrawer, setFeedbackDrawer] = useState(false)
@@ -256,6 +216,7 @@ function Upcoming(props) {
                               <EditOutlined style={{ fontWeight: '700' }} />
                             </Button>
                             <Popconfirm
+                              placement="topLeft"
                               trigger="click"
                               title="Sure to delete this appointment"
                               onConfirm={() => deleteItem(item)}
@@ -286,7 +247,7 @@ function Upcoming(props) {
             })
           ) : (
             <span style={{ fontSize: 18, margin: '24px auto', textAlign: 'center' }}>
-              No upcoming appointments
+              {upcoming ? 'No upcoming appointments' : 'No post appointments'}
             </span>
           )}
         </div>

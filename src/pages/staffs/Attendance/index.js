@@ -48,6 +48,7 @@ function Index(props) {
           }
         }
       }
+      temp2[0].key = Math.random()
       setTt(temp2)
     }
   }, [staff])

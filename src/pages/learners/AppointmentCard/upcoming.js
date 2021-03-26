@@ -1,7 +1,7 @@
 /* eslint-disable */
 import React, { useState, useEffect } from 'react'
 import { connect, useSelector, useDispatch } from 'react-redux'
-import { Card, Switch, Icon, Avatar, Tag, Tooltip, Button, Drawer, Tabs, Popconfirm } from 'antd'
+import { Card, Tooltip, Button, Drawer, Tabs, Popconfirm } from 'antd'
 import {
   EditOutlined,
   CheckCircleTwoTone,
@@ -11,11 +11,9 @@ import {
   DeleteOutlined,
   StarOutlined,
 } from '@ant-design/icons'
-import { Link, withRouter } from 'react-router-dom'
 import gql from 'graphql-tag'
 import moment from 'moment'
 import '../style.scss'
-import { useQuery, useLazyQuery } from 'react-apollo'
 import { Scrollbars } from 'react-custom-scrollbars'
 import LoadingComponent from 'components/LoadingComponent'
 import SessionFeedbackForm from '../../sessionFeedback'
@@ -179,7 +177,7 @@ function Upcoming(props) {
                           <div style={{ fontSize: '18px', fontWeight: '700', color: 'black' }}>
                             {item.therapist &&
                               `${item.therapist.name} ${
-                                item.therapist.lastname ? item.therapist.lastname : ''
+                                item.therapist.surname ? item.therapist.surname : ''
                               }`}
                           </div>
                         </div>
@@ -219,6 +217,7 @@ function Upcoming(props) {
                             </Button>
                             <Popconfirm
                               trigger="click"
+                              placement="topLeft"
                               title="Sure to delete this appointment"
                               onConfirm={() => deleteItem(item)}
                             >

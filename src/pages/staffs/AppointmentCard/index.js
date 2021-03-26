@@ -5,10 +5,8 @@ import { Card, Switch, Icon, Avatar, Tag, Tooltip, Button, Drawer, Tabs } from '
 import { EditOutlined, PlusOutlined } from '@ant-design/icons'
 import { Link, withRouter } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import gql from 'graphql-tag'
 import moment from 'moment'
 import '../style.scss'
-import { useQuery, useLazyQuery } from 'react-apollo'
 import Upcoming from './upcoming'
 import CreateAppointmentForm from 'components/Form/CreateAppointmentForm'
 import UpdateAppointmentForm from 'components/Form/UpdateAppointmentForm'
@@ -32,7 +30,6 @@ function AppointmentCard(props) {
       let temp = appt.appointments.filter(
         item => new Date(item.start) > new Date() && item.therapist?.id === staffProfile.id,
       )
-      temp.map(item => console.log(item.therapist?.name))
       temp.reverse()
       setUpcomingAppointmentList(temp)
 
@@ -60,7 +57,6 @@ function AppointmentCard(props) {
   }
 
   const createAppointmentRedux = data => {
-    console.log(data, 'repsonse data')
     dispatch({
       type: 'appointments/CREATE_APPOINTMENT',
       payload: {
@@ -70,7 +66,6 @@ function AppointmentCard(props) {
   }
 
   const updateAppointmentRedux = data => {
-    console.log(data, 'repsonse data')
     dispatch({
       type: 'appointments/EDIT_APPOINTMENT',
       payload: {

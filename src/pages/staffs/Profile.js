@@ -83,7 +83,6 @@ function Profile(props) {
   const [miscInfoDrawer, setMiscInfoDrawer] = useState(false)
   const [emergencyInfoDrawer, setEmergencyInfoDrawer] = useState(false)
   const [address, setAddress] = useState('')
-  console.log(props.staffs.StaffProfile, 'staffproie')
 
   useEffect(() => {
     if (props.staffs.StaffProfile) {
