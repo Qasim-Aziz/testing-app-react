@@ -1,6 +1,6 @@
 /* eslint-disable no-shadow */
 import React, { useRef, useState, useEffect } from 'react'
-import { Typography } from 'antd'
+import { Typography, Avatar } from 'antd'
 import { useQuery } from 'react-apollo'
 import Websocket from 'react-websocket'
 import Scrollbars from 'react-custom-scrollbars'
@@ -10,10 +10,11 @@ import client from 'apollo/config'
 import { GET_MESSAGE } from './query'
 import MessageForm from './MessageForm'
 import ChatMess from './ChatMess'
+import { COLORS } from '../../assets/styles/globalStyles'
 
 const { Title } = Typography
 
-export default ({ secondUser, style }) => {
+export default ({ secondUser, style, selectedPeopleDetails }) => {
   const [newMessLoading, setNewMessLoading] = useState(false)
   const scrollbar = useRef(null)
   const socketRef = useRef(null)
@@ -76,6 +77,10 @@ export default ({ secondUser, style }) => {
     },
   })
 
+  console.log(selectedPeopleDetails, 'peaople details')
+  console.log(secondUser, 'second user')
+  console.log(data, 'data')
+
   useEffect(() => {
     if (data && scrollbar.current) {
       // eslint-disable-next-line no-unused-expressions
@@ -85,13 +90,40 @@ export default ({ secondUser, style }) => {
   }, [data, scrollbar])
 
   return (
-    <div style={{ ...style }}>
+    <div style={{ ...style, border: '1px solid #e8e8e8' }}>
+      <div
+        style={{
+          width: '100%',
+          height: '60px',
+          display: 'flex',
+          alignItems: 'center',
+          padding: '10px 16px',
+          backgroundColor: COLORS.grayFill,
+        }}
+      >
+        <Avatar
+          src={
+            selectedPeopleDetails.profileImg
+              ? selectedPeopleDetails.profileImg
+              : 'https://www.thewodge.com/wp-content/uploads/2019/11/avatar-icon.png'
+          }
+          style={{
+            margin: 'auto 0',
+            width: '41px',
+            height: '41px',
+            border: '1px solid #f6f7fb',
+            marginRight: '15px',
+            marginBottom: `${selectedPeopleDetails.profileImg ? '10px' : 0}`,
+          }}
+        />
+        <div style={{ fontSize: 16 }}>{selectedPeopleDetails?.name}</div>
+      </div>
       {loading && (
         <Title style={{ textAlign: 'center', marginBottom: 150, fontSize: 20 }}>Loading...</Title>
       )}
       {!loading && error && <pre>{JSON.stingify(error, null, 2)}</pre>}
-      <Scrollbars style={{ height: 'calc(100% - 75px)' }} autoHide ref={scrollbar}>
-        <div style={{ marginRight: 25 }}>
+      <Scrollbars style={{ height: 'calc(100% - 120px)' }} autoHide ref={scrollbar}>
+        <div style={{ padding: '0 36px' }}>
           {!loading &&
             data?.userthread?.chatmessageSet.edges.map(({ node }) => {
               return (
@@ -115,7 +147,6 @@ export default ({ secondUser, style }) => {
         socket={socketRef.current}
         loading={newMessLoading}
         setLoading={setNewMessLoading}
-        style={{ position: 'absolute', bottom: 0 }}
       />
     </div>
   )

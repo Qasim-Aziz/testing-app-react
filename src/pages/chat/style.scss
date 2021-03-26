@@ -1,0 +1,13 @@
+.message-view {
+  .ant-form-item {
+    margin-bottom: 0;
+  }
+}
+
+.search-msg {
+  .ant-input-affix-wrapper .ant-input:not(:last-child) {
+    padding-right: 30px;
+    border-radius: 30px;
+    border: none;
+  }
+}
