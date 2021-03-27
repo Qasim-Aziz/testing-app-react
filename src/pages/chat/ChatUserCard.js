@@ -1,6 +1,7 @@
 /* eslint-disable no-shadow */
 import React from 'react'
 import { Typography, Card } from 'antd'
+import { COLORS } from 'assets/styles/globalStyles'
 
 const { Title, Text } = Typography
 
@@ -16,7 +17,7 @@ export default ({
   return (
     <Card
       style={{
-        background: selected ? '#E58425' : '#fff',
+        background: selected ? COLORS.palleteLight : '#fff',
         borderBottom: '1px solid #F2F2F2',
         cursor: 'pointer',
       }}
@@ -37,9 +38,8 @@ export default ({
         style={{ width: 50, height: 50, borderRadius: 30, marginRight: 12 }}
       />
       <div>
-        <Title style={{ fontSize: 16, color: selected ? '#fff' : '#000' }}>
-          {name} - {role}
-        </Title>
+        <Title style={{ fontSize: 16, color: '#000' }}>{name}</Title>
+        <p>{role}</p>
       </div>
     </Card>
   )

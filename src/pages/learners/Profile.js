@@ -13,7 +13,7 @@ import PersonalInfo from './EditDrawers/PersonalInfo'
 import ClinicInfo from './EditDrawers/ClinicInfo'
 import ProgramInfo from './EditDrawers/ProgramInfo'
 import AppointmentCard from './AppointmentCard'
-import { COLORS } from 'assets/styles/globalStyles'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 
 const { Meta } = Card
 
@@ -74,7 +74,7 @@ function Profile(props) {
     <div style={{ backgroundColor: '#F7F7F7', padding: '28px' }} className="profile-css">
       <Drawer
         title="Edit Basic Information"
-        width="600px"
+        width={DRAWER.widthL3}
         closable
         destroyOnClose
         visible={genInfoDrawer}
@@ -84,7 +84,7 @@ function Profile(props) {
       </Drawer>
       <Drawer
         title="Edit Personal Information"
-        width="600px"
+        width={DRAWER.widthL3}
         closable
         destroyOnClose
         visible={personalInfoDrawer}
@@ -94,7 +94,7 @@ function Profile(props) {
       </Drawer>
       <Drawer
         title="Edit Clinical Information"
-        width="600px"
+        width={DRAWER.widthL3}
         destroyOnClose
         closable
         visible={clinicInfoDrawer}
@@ -104,7 +104,7 @@ function Profile(props) {
       </Drawer>
       <Drawer
         title="Edit Program Information"
-        width="600px"
+        width={DRAWER.widthL3}
         destroyOnClose
         closable
         visible={programInfoDrawer}
@@ -166,7 +166,8 @@ function Profile(props) {
                   }}
                 >
                   <div style={{ fontSize: '32px', width: '100%', wordWrap: 'no-wrap' }}>
-                    {userProfile ? userProfile.firstname : ''}
+                    {userProfile ? userProfile.firstname : ''}{' '}
+                    {userProfile && userProfile.lastname ? userProfile.lastname : ''}
                     <Button
                       onClick={() => setGenInfoDrawer(true)}
                       type="link"

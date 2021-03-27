@@ -31,6 +31,7 @@ import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import { LineChartOutlined } from '@ant-design/icons'
 import moment from 'moment'
+import { COLORS } from 'assets/styles/globalStyles'
 import LoadingComponent from 'components/VBMappReport/LoadingComponent'
 import { ResponseRateEqui } from './dailyResponseRateEqui'
 import ResponseRateGraph from './dailyResponseRateGraph'
@@ -49,14 +50,13 @@ const { RangePicker } = DatePicker
 const { Panel } = Collapse
 
 const filterCardStyle = {
-  background: '#F1F1F1',
+  backgroundColor: COLORS.palleteLight,
   display: 'flex',
   flexWrap: 'wrap',
   padding: '5px 10px',
   margin: 0,
   height: 'fit-content',
   overflow: 'hidden',
-  backgroundColor: 'rgb(241, 241, 241)',
 }
 
 const tableFilterCardStyle = {
@@ -460,7 +460,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
                   display: 'flex',
                   margin: 'auto 0',
                   width: '100%',
-                  color: '#2874A6',
+                  color: COLORS.target,
                   fontWeight: '600',
                 }}
               >
@@ -477,14 +477,14 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
                 justifyContent: 'space-between',
                 width: '100%',
                 fontWeight: '600',
-                color: '#2874A6',
+                color: COLORS.target,
               }}
             >
               <div style={{ margin: 'auto 0', padding: 0 }}>{text}</div>
 
               <Button type="link" onClick={() => handleSelectTarget(row)}>
                 <LineChartOutlined
-                  style={{ margin: 'auto 0', fontSize: '26px', color: 'rgb(229, 132, 37)' }}
+                  style={{ margin: 'auto 0', fontSize: '26px', color: COLORS.graph }}
                 />
               </Button>
             </div>
@@ -502,7 +502,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
               textAlign: 'center',
               fontWeight: '600',
               paddingLeft: '20px',
-              color: row.type === 'sd' ? '#F080B8' : '#F0B880',
+              color: row.type === 'sd' ? COLORS.stimulus : COLORS.steps,
             }}
           >
             <div style={{ margin: 'auto 0', padding: 0 }}>{text}</div>
@@ -783,7 +783,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
           <span style={parentLabel}>Target</span>
           <div
             style={{
-              background: '#2874A6',
+              background: COLORS.target,
               borderRadius: 10,
               width: '20px',
               margin: 'auto 0',
@@ -794,7 +794,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
           <span style={parentLabel}>Stimulus</span>
           <div
             style={{
-              background: '#f080b8',
+              background: COLORS.stimulus,
               borderRadius: 10,
               width: '20px',
               margin: 'auto 0',
@@ -805,7 +805,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
           <span style={parentLabel}>Steps</span>
           <div
             style={{
-              background: '#f0b880',
+              background: COLORS.steps,
               borderRadius: 10,
               width: '20px',
               margin: 'auto 0',
@@ -850,7 +850,6 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
                   }}
                   pagination={false}
                   defaultExpandAllRows={true}
-                  size="middle"
                   loading={loading}
                   scroll={{ x: daysList.length * 100 + 300, y: '1000px' }}
                 />

@@ -1,11 +1,12 @@
+@import '../../assets/styles/mixins.scss';
+
 .behaviorReport {
   .filterCard {
-    background: #f1f1f1;
+    background-color: $palete-light;
     padding: 5px 10px;
     margin: 0;
     height: 50px;
     overflow: hidden;
-    background-color: rgb(241, 241, 241);
 
     .label {
       font-size: 18px;
@@ -23,7 +24,7 @@
   .ant-table-thead > tr > th {
     padding: 12px 8px !important;
     font-size: 13px !important;
-    background-color: rgba(0, 0, 0, 0.04) !important;
+    background-color: $palete-light !important;
     font-weight: bold;
   }
 
@@ -40,7 +41,7 @@
     background: #f9f9f9;
     border-radius: 10;
     padding: 10px;
-    margin: 7px 10px 0 10px;
+    margin: 10px 0 0 10px;
     overflow: hidden;
 
     .panel {

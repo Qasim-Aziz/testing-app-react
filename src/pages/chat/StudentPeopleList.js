@@ -60,7 +60,6 @@ export default ({ select, setSelect, setSelectedPeopleDetails }) => {
     })
   }
 
-  console.log(viewStaff, 'thsis si staff')
   if (viewStaff && viewStaff.length > 0 && !select && gotcha) {
     setSelect(viewStaff[0].node.user?.id)
     setSelectedPeopleDetails({
@@ -77,6 +76,7 @@ export default ({ select, setSelect, setSelectedPeopleDetails }) => {
         <div className="search-msg" style={{ display: 'flex', height: '60px' }}>
           <Search
             size="large"
+            allowClear
             style={{
               margin: 'auto',
               width: '90%',

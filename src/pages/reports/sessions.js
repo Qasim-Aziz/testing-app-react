@@ -25,6 +25,7 @@ import * as XLSX from 'xlsx'
 import { LineChartOutlined } from '@ant-design/icons'
 import { FaDownload } from 'react-icons/fa'
 import moment from 'moment'
+import { COLORS } from 'assets/styles/globalStyles'
 import { SESSIONS_SUMMERY, FREQUENCY_DIS_TARGET } from './query'
 import './form.scss'
 import './table.scss'
@@ -32,14 +33,13 @@ import './table.scss'
 const { RangePicker } = DatePicker
 
 const filterCardStyle = {
-  background: '#F1F1F1',
   display: 'flex',
   flexWrap: 'wrap',
   padding: '5px 10px',
   margin: 0,
   height: 'fit-content',
   overflow: 'hidden',
-  backgroundColor: 'rgb(241, 241, 241)',
+  backgroundColor: COLORS.palleteLight,
 }
 
 const parentDiv = { display: 'flex', margin: 'auto 30px auto 0' }
@@ -146,11 +146,13 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
           }
         })
       }
+      console.log(filterData, 'filtererer')
       filterData.sort(compare)
       setTableData(filterData)
     }
   }, [data, session])
 
+  console.log(tableData, 'table')
   useEffect(() => {
     if (freDisData) {
       const newGraphData = []
@@ -406,7 +408,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     },
     {
       title: 'Peak Correct',
-      dataIndex: 'correctCount',
+      dataIndex: 'peakCorrect',
       render: (text, row) => (
         <span>
           {row.peakCorrect} Trials - &nbsp;
@@ -419,7 +421,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     },
     {
       title: 'Peak Incorrect',
-      dataIndex: 'errorCount',
+      dataIndex: 'peakError',
       render: (text, row) => (
         <span>
           {row.peakError} Trials - &nbsp;
@@ -432,7 +434,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     },
     {
       title: 'Peak Prompt',
-      dataIndex: 'promptCount',
+      dataIndex: 'peakPrompt',
       render: (text, row) => (
         <span>
           {row.peakPrompt} Trials - &nbsp;
@@ -445,7 +447,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     },
     {
       title: 'Peak Equ Correct',
-      dataIndex: 'correctCount',
+      dataIndex: 'peakEquCorrect',
       render: (text, row) => (
         <span>
           {row.peakEquCorrect} Trials - &nbsp;
@@ -458,7 +460,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     },
     {
       title: 'Peak Equ Incorrect',
-      dataIndex: 'errorCount',
+      dataIndex: 'peakEquError',
       render: (text, row) => (
         <span>
           {row.peakEquError} Trials - &nbsp;
@@ -471,7 +473,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     },
     {
       title: 'Peak Equ Prompt',
-      dataIndex: 'promptCount',
+      dataIndex: 'peakEquPrompt',
       render: (text, row) => (
         <span>
           {row.peakEquPrompt} Trials - &nbsp;
@@ -506,7 +508,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
             onClick={() => generateGraphData(row)}
             loading={freDisLoading && selectSession.id === row.id}
           >
-            <LineChartOutlined style={{ fontSize: 30, color: 'rgb(229, 132, 37)' }} />
+            <LineChartOutlined style={{ fontSize: 30, color: COLORS.graph }} />
           </Button>
         </span>
       ),

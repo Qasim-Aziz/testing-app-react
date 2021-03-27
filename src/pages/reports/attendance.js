@@ -13,29 +13,23 @@ import {
   Col,
   Button,
   Drawer,
-  Form,
   Select,
   DatePicker,
-  notification,
   Dropdown,
   Icon,
 } from 'antd'
 import { useQuery, useLazyQuery } from 'react-apollo'
 import { gql } from 'apollo-boost'
 import { useSelector } from 'react-redux'
-import filterIcon from 'icons/filter.png'
-import { ResponsiveLine } from '@nivo/line'
-import groupObj from '@hunters/group-object'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { FaDownload } from 'react-icons/fa'
 import { faUser } from '@fortawesome/free-solid-svg-icons'
 import { LineChartOutlined, FilterOutlined, CloudDownloadOutlined } from '@ant-design/icons'
 import moment from 'moment'
 import lodash from 'lodash'
+import { COLORS } from 'assets/styles/globalStyles'
 import LoadingComponent from 'components/VBMappReport/LoadingComponent'
-import { RESPONSE_RATE, RESPONSE_RATE_FILTER_OPT } from './query'
 import './form.scss'
 import './table.scss'
 
@@ -54,14 +48,13 @@ const parentCardStyle = {
 }
 
 const filterCardStyle = {
-  background: '#F1F1F1',
+  backgroundColor: COLORS.palleteLight,
   display: 'flex',
   flexWrap: 'wrap',
   padding: '5px 10px',
   margin: 0,
   height: 'fit-content',
   overflow: 'hidden',
-  backgroundColor: 'rgb(241, 241, 241)',
 }
 
 const tableFilterCardStyle = {

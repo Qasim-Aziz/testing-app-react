@@ -178,6 +178,7 @@ export default () => {
             appointmentId={updatingAppointmentId}
             setNeedToReloadData={setNeedToReloadData}
             closeUpdateAppointment={closeUpdateAppointment}
+            closeDrawer={setVisibleDraw}
           />
         ) : (
           <CreateAppointmentForm
@@ -185,6 +186,7 @@ export default () => {
             startDate={selectedStartDate}
             endDate={selectedEndDate}
             therapistId={selectedTherapist}
+            closeDrawer={setVisibleDraw}
           />
         )}
       </Drawer>

@@ -11,8 +11,7 @@ const InputCelerationChart = props => {
   return (
     <>
       <Divider orientation="left">Basic Details</Divider>
-
-      <Form.Item label="Date" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+      <Form.Item label="Date">
         <DatePicker
           format="YYYY-MM-DD"
           placeholder="Date"
@@ -21,12 +20,7 @@ const InputCelerationChart = props => {
         />
       </Form.Item>
 
-      <Form.Item
-        label="Title"
-        labelCol={{ span: 6 }}
-        wrapperCol={{ span: 18 }}
-        rules={[{ required: true, message: 'Please Title!' }]}
-      >
+      <Form.Item label="Title" rules={[{ required: true, message: 'Please Title!' }]}>
         <Input
           placeholder="Title"
           onChange={e => onCelerationChartChange(e, 'title')}
@@ -34,7 +28,7 @@ const InputCelerationChart = props => {
         />
       </Form.Item>
 
-      <Form.Item label="Category" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+      <Form.Item label="Category">
         <Select
           placeholder="Category"
           optionFilterProp="children"
@@ -49,22 +43,22 @@ const InputCelerationChart = props => {
         </Select>
       </Form.Item>
 
-      <Form.Item label="Notes" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+      <Form.Item label="Notes">
         <Input
           placeholder="Notes"
           onChange={e => onCelerationChartChange(e, 'notes')}
           value={chart.notes}
         />
       </Form.Item>
-      {/* <Form.Item label="X-Axis Label" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+      {/* <Form.Item label="X-Axis Label" >
         <Input
-          placeholder="X-Axis Label"
-          onChange={e => onCelerationChartChange(e, 'labelX')}
-          value={chart.labelX}
+        placeholder="X-Axis Label"
+        onChange={e => onCelerationChartChange(e, 'labelX')}
+        value={chart.labelX}
         />
       </Form.Item> */}
 
-      <Form.Item label="Y-Axis Label" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+      <Form.Item label="Y-Axis Label">
         <Input
           placeholder="Y-Axis Label"
           onChange={e => onCelerationChartChange(e, 'labelY')}
@@ -73,7 +67,7 @@ const InputCelerationChart = props => {
       </Form.Item>
 
       <Divider orientation="left">Recording Parameters</Divider>
-      <Form.Item label="Correct" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+      <Form.Item label="Correct">
         <Input
           type="text"
           className="form-control"
@@ -83,7 +77,7 @@ const InputCelerationChart = props => {
         />
       </Form.Item>
 
-      <Form.Item label="Incorrect" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+      <Form.Item label="Incorrect">
         <Input
           type="text"
           className="form-control"
@@ -93,7 +87,7 @@ const InputCelerationChart = props => {
         />
       </Form.Item>
 
-      <Form.Item label="Prompted" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+      <Form.Item label="Prompted">
         <Input
           type="text"
           className="form-control"

@@ -48,6 +48,7 @@ import client from '../../apollo/config'
 // import AttendanceBar from './AttendanceBar'
 import DataTable from 'react-data-table-component'
 import LoadingComponent from 'components/VBMappReport/LoadingComponent'
+import { COLORS } from 'assets/styles/globalStyles'
 
 const { Title, Text } = Typography
 const { Content } = Layout
@@ -65,28 +66,17 @@ const parentCardStyle = {
 }
 
 const filterCardStyle = {
-  background: '#F1F1F1',
   display: 'flex',
   flexWrap: 'wrap',
   padding: '5px 10px',
   margin: 0,
   height: 'fit-content',
   overflow: 'hidden',
-  backgroundColor: 'rgb(241, 241, 241)',
+  backgroundColor: COLORS.palleteLight,
 }
 
 const parentDiv = { display: 'flex', margin: '5px 40px 5px 36px' }
 const parentLabel = { fontSize: '15px', color: '#000', margin: 'auto 8px auto' }
-
-const antcol1 = {
-  display: 'block',
-  width: '6%',
-}
-
-const antcol3 = {
-  display: 'block',
-  width: '88%',
-}
 
 const generalstyle = {
   border: '1px solid #E4E9F0',
@@ -98,67 +88,6 @@ const generalstyle = {
   width: '100%',
   marginBottom: '4px',
   curser: 'pointer',
-}
-
-const behaviorCardStyle = {
-  ...generalstyle,
-  background: '#FFFFFF',
-}
-
-const selectedCardStyle = {
-  ...generalstyle,
-  background: '#E58425',
-  color: '#fff',
-}
-const customStyles = {
-  header: {
-    style: {
-      maxHeight: '50px',
-    },
-  },
-  headRow: {
-    style: {
-      borderTopStyle: 'solid',
-      borderTopWidth: '1px',
-      borderTopColor: '#ddd',
-      backgroundColor: '#f5f5f5',
-    },
-  },
-  headCells: {
-    style: {
-      '&:not(:last-of-type)': {
-        borderRightStyle: 'solid',
-        borderRightWidth: '1px',
-        borderRightColor: '#ddd',
-      },
-      fontWeight: 'bold',
-    },
-  },
-  cells: {
-    style: {
-      '&:not(:last-of-type)': {
-        borderRightStyle: 'solid',
-        borderRightWidth: '1px',
-        borderRightColor: '#ddd',
-      },
-      fontSize: '11px',
-    },
-  },
-  pagination: {
-    style: {
-      position: 'absolute',
-      top: '7px',
-      right: '0px',
-      borderTopStyle: 'none',
-      minHeight: '35px',
-    },
-  },
-  table: {
-    style: {
-      paddingBottom: '40px',
-      top: '40px',
-    },
-  },
 }
 
 const TIMESHEETS = gql`
@@ -479,47 +408,15 @@ function Att({ form, studentName, selectedStaff }) {
               </div>
             </Col>
           </Row>
-          <div style={{ display: 'flex' }}>
-            {/* {userRole === '"school_admin"' ? (
-              <div style={parentCardStyle}>
-                <div id="capture" style={behaviorCardStyle}>
-                  {therapistList.map(item => (
-                    <Button
-                      key={item.node.id}
-                      style={
-                        currentTherapistId === item.node.id ? selectedCardStyle : behaviorCardStyle
-                      }
-                      onClick={() => setCurrentTherapistId(item.node.id)}
-                    >
-                      <span
-                        style={{
-                          fontSize: '14px',
-                          fontWeight: '600',
-                          display: 'block',
-                          width: '100%',
-                        }}
-                      >
-                        {item.node.name}
-                      </span>
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            ) : null} */}
-
-            <div style={{ width: '98%', margin: '20px auto' }}>
-              <div style={{ margin: 'auto', width: '95%' }}>
-                {/* {!timeSheetData && ( */}
-                <Table
-                  columns={columns}
-                  dataSource={tableData}
-                  bordered
-                  size="middle"
-                  loading={appointmentLoading && timeSheetLoading}
-                />
-                {/* )} */}
-              </div>
-            </div>
+          <div style={{ margin: '10px 0 10px 10px' }}>
+            {/* {!timeSheetData && ( */}
+            <Table
+              columns={columns}
+              dataSource={tableData}
+              bordered
+              size="middle"
+              loading={appointmentLoading && timeSheetLoading}
+            />
           </div>
         </Col>
       </Row>

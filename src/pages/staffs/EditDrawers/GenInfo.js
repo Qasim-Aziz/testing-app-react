@@ -9,29 +9,10 @@ import AntdTag from '../antdTag'
 import LoadingComponent from 'components/LoadingComponent'
 import { UPDATE_STAFF } from './query'
 import '../style.scss'
-import { COLORS } from 'assets/styles/globalStyles'
+import { COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 
 const { Option } = Select
-const layout = {
-  labelCol: {
-    span: 7,
-  },
-  wrapperCol: {
-    span: 16,
-  },
-}
-
-const submitButton = {
-  width: '40%',
-  height: 40,
-  background: '#0B35B3',
-  boxShadow: '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04)',
-  borderRadius: 0,
-  fontSize: 16,
-  color: 'white',
-  // fontWeight: 600,
-  margin: '20px 5px',
-}
+const { layout } = FORM
 
 const itemStyle = { marginBottom: '5px', fontWeight: 'bold' }
 
@@ -225,14 +206,10 @@ function GenDetails(props) {
           )}
         </Form.Item>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <Button type="primary" loading={updateLoading} htmlType="submit" style={submitButton}>
+          <Button type="primary" loading={updateLoading} htmlType="submit" style={SUBMITT_BUTTON}>
             Submitt
           </Button>
-          <Button
-            type="default"
-            onClick={() => closeDrawer(false)}
-            style={{ ...submitButton, backgroundColor: COLORS.danger }}
-          >
+          <Button type="default" onClick={() => closeDrawer(false)} style={CANCEL_BUTTON}>
             Cancel
           </Button>
         </div>

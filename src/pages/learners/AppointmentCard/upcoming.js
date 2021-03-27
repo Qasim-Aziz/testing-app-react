@@ -17,7 +17,7 @@ import '../style.scss'
 import { Scrollbars } from 'react-custom-scrollbars'
 import LoadingComponent from 'components/LoadingComponent'
 import SessionFeedbackForm from '../../sessionFeedback'
-import { COLORS } from 'assets/styles/globalStyles'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 
 const { Meta } = Card
 const { TabPane } = Tabs
@@ -58,7 +58,7 @@ function Upcoming(props) {
       <Drawer
         title="Give Session Feedback"
         placement="right"
-        width="500px"
+        width={DRAWER.widthL3}
         closable
         onClose={() => setFeedbackDrawer(false)}
         visible={feedbackDrawer}

@@ -9,6 +9,7 @@ import '../style.scss'
 import Upcoming from './upcoming'
 import CreateAppointmentForm from 'components/Form/CreateAppointmentForm'
 import UpdateAppointmentForm from 'components/Form/UpdateAppointmentForm'
+import { DRAWER } from 'assets/styles/globalStyles'
 
 const { Meta } = Card
 const { TabPane } = Tabs
@@ -25,18 +26,20 @@ function AppointmentCard(props) {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    if (!appt.appointmentsLoading && appt.appointments.length > 0 && userProfile) {
-      let temp = appt.appointments.filter(
-        item => new Date(item.start) > new Date() && item.student?.id === userProfile.id,
-      )
-      temp.reverse()
-      setUpcomingAppointmentList(temp)
+    if (appt && userProfile) {
+      if (!appt.appointmentsLoading && appt.appointments.length > 0 && userProfile) {
+        let temp = appt.appointments.filter(
+          item => new Date(item.start) > new Date() && item.student?.id === userProfile.id,
+        )
+        temp.reverse()
+        setUpcomingAppointmentList(temp)
 
-      let temp2 = appt.appointments.filter(
-        item => new Date(item.start) < new Date() && item.student?.id === userProfile.id,
-      )
+        let temp2 = appt.appointments.filter(
+          item => new Date(item.start) < new Date() && item.student?.id === userProfile.id,
+        )
 
-      setPostAppointemntList(temp2)
+        setPostAppointemntList(temp2)
+      }
     }
   }, [appt, userProfile])
 
@@ -84,7 +87,7 @@ function AppointmentCard(props) {
       <Drawer
         title={updateAppointmentId ? 'Update Appointment' : 'Create Appointment'}
         placement="right"
-        width="65%"
+        width={DRAWER.widthL2}
         closable
         onClose={() => setAppointmentDrawer(false)}
         visible={appointmentDrawer}

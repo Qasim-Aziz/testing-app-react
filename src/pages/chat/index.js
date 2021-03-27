@@ -1,6 +1,7 @@
 /* eslint-disable no-shadow */
 import React, { useState } from 'react'
 import { Row, Col, Typography } from 'antd'
+import { COLORS } from 'assets/styles/globalStyles'
 import MessageView from './MessageView'
 import SchoolPeoplesList from './SchoolPeoplesList'
 import StudentPeoplesList from './StudentPeopleList'
@@ -18,10 +19,10 @@ export default () => {
       style={{
         maxWidth: 1300,
         border: '1px solid #e8e8e8',
-        marginLeft: 'auto',
-        marginRight: 'auto',
+        margin: '10px auto 0',
         width: '100%',
         height: 'calc(100vh - 120px)',
+        overflow: 'hidden',
       }}
     >
       <div style={{ height: '100%', display: 'flex' }}>

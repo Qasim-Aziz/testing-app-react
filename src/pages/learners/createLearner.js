@@ -8,6 +8,7 @@
 import React from 'react'
 import { Form, Input, Button, Select, DatePicker, Checkbox, Divider, message, Tag } from 'antd'
 import { connect } from 'react-redux'
+import { CANCEL_BUTTON, COLORS, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import AntdTag from '../staffs/antdTag'
 
 const { TextArea } = Input
@@ -22,21 +23,7 @@ const layout = {
   },
 }
 
-const layout1 = {
-  labelCol: {
-    span: 5,
-  },
-  wrapperCol: {
-    span: 18,
-  },
-}
-
-const tailLayout = {
-  wrapperCol: {
-    offset: 7,
-    span: 14,
-  },
-}
+const { tailLayout } = FORM
 
 @connect(({ user, learners }) => ({ user, learners }))
 class BasicInformationForm extends React.Component {
@@ -109,7 +96,7 @@ class BasicInformationForm extends React.Component {
     const itemStyle1 = { textAlign: 'center', marginBottom: '5px', fontWeight: 'bold' }
     return (
       <Form {...layout} name="control-ref" onSubmit={e => this.handleSubmit(e)}>
-        <Form.Item {...layout1} label="Profile" style={itemStyle1}>
+        <Form.Item {...layout} label="Profile" style={itemStyle1}>
           <div>
             <img
               src="https://www.thewodge.com/wp-content/uploads/2019/11/avatar-icon.png"
@@ -207,19 +194,6 @@ class BasicInformationForm extends React.Component {
             </Select>,
           )}
         </Form.Item>
-
-        {/* <Form.Item label="Address" style={itemStyle}>
-          {form.getFieldDecorator('address', {
-            rules: [{ required: true, message: 'Please provide Address!' }],
-          })(
-            <TextArea
-              placeholder="Address"
-              autoSize={{ minRows: 3 }}
-              
-              style={{ borderRadius: 0 }}
-            />,
-          )}
-        </Form.Item> */}
 
         <Divider orientation="left">Personal Details</Divider>
 
@@ -340,11 +314,11 @@ class BasicInformationForm extends React.Component {
         </Form.Item>
 
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" className="mt-4">
+          <Button type="primary" htmlType="submit" style={SUBMITT_BUTTON}>
             Submit
           </Button>
 
-          <Button type="primary" onClick={this.onReset} className="ml-4">
+          <Button type="default" onClick={this.onReset} style={CANCEL_BUTTON}>
             Reset
           </Button>
         </Form.Item>

@@ -1,3 +1,4 @@
+@import '../../assets/styles/mixins.scss';
 /* table */
 
 .peak-block-report {
@@ -5,6 +6,10 @@
   .ant-table-tbody > tr > td {
     padding: 16px 8px;
     overflow-wrap: break-word;
+  }
+
+  .ant-table-thead > tr > th {
+    background-color: $palete-light;
   }
 }
 
@@ -35,23 +40,27 @@
     background-color: #fafafa;
   }
 
+  .ant-table-tbody > tr > td,
   .ant-table-thead > tr > th {
     font-size: 12px;
     color: rgba(0, 0, 0, 0.87);
     font-weight: bold;
   }
 
-  /* row data */
-  .ant-table-tbody > tr > td {
-    color: rgba(0, 0, 0, 0.87);
+  .ant-table-thead > tr > th {
+    background-color: $palete-light;
   }
 }
 
 .goal-table {
   .ant-table-thead > tr > th,
   .ant-table-tbody > tr > td {
-    padding: 16px 8px;
+    padding: 14px 8px;
     overflow-wrap: break-word;
+  }
+
+  .ant-table-thead > tr > th {
+    background-color: $palete-light;
   }
 }
 
@@ -68,6 +77,8 @@
     padding: 5px 5px;
     text-align: center;
     font-size: 12px;
+    background-color: $palete-light;
+
     color: rgba(0, 0, 0, 0.87);
     font-weight: bold;
   }
@@ -81,7 +92,7 @@
 }
 
 .response-rate-table {
-  .ant-table-middle
+  .ant-table
     > .ant-table-content
     > .ant-table-fixed-left
     > .ant-table-body-outer
@@ -100,8 +111,10 @@
 
   .ant-table-thead > tr > th {
     font-size: 13px;
+    padding: 8px;
     color: rgba(0, 0, 0, 0.87);
     font-weight: bold;
+    background-color: $palete-light;
   }
 
   .ant-table-tbody > tr.ant-table-row-hover:not(.ant-table-expanded-row) > td {

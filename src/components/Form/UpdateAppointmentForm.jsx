@@ -14,7 +14,7 @@ import {
 } from 'antd'
 import { useSelector } from 'react-redux'
 import { useMutation, useQuery } from 'react-apollo'
-import { COLORS } from 'assets/styles/globalStyles'
+import { COLORS, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import moment from 'moment'
 import LoadingComponent from 'components/LoadingComponent'
 import { combineDateAndTime } from '../../utilities'
@@ -31,17 +31,7 @@ import './appointmentForms.scss'
 const { TextArea } = Input
 const { Option } = Select
 
-const submitButton = {
-  width: '180px',
-  height: 40,
-  background: '#0B35B3',
-  boxShadow: '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04)',
-  borderRadius: 0,
-  fontSize: 16,
-  // fontWeight: 600,
-  margin: '20px 5px',
-  color: 'white',
-}
+const { layout } = FORM
 
 const UpdateAppointmentForm = ({
   setNeedToReloadData,
@@ -147,30 +137,30 @@ const UpdateAppointmentForm = ({
           combineDateAndTime(values.startDate, values.startTime),
           combineDateAndTime(values.startDate, values.endTime),
         )
-        // editAppiorment({
-        //   variables: {
-        //     id: appointmentId,
-        //     therapistId: userRole === 'therapist' ? therapistReduxId : values.therapist,
-        //     additionalStaff: values.additionalStaff,
-        //     staffToStaff: values.student ? false : true,
-        //     studentId: values.student,
-        //     title: values.title,
-        //     locationId: values.location ? values.location : '',
-        //     purposeAssignment: values.purposeAssignment,
-        //     note: values.note ? values.note : '',
-        //     start: combineDateAndTime(values.startDate, values.startTime),
-        //     end: combineDateAndTime(values.startDate, values.endTime),
-        //     appointmentStatus: values.appointmentStatus,
-        //   },
-        //   errorPolicy: 'all',
-        //   onError(err) {
-        //     notification.error({
-        //       message: 'Something went wrong',
-        //       description: 'Unable to update appointment',
-        //     })
-        //     console.log(err)
-        //   },
-        // })
+        editAppiorment({
+          variables: {
+            id: appointmentId,
+            therapistId: userRole === 'therapist' ? therapistReduxId : values.therapist,
+            additionalStaff: values.additionalStaff,
+            staffToStaff: values.student ? false : true,
+            studentId: values.student,
+            title: values.title,
+            locationId: values.location ? values.location : '',
+            purposeAssignment: values.purposeAssignment,
+            note: values.note ? values.note : '',
+            start: combineDateAndTime(values.startDate, values.startTime),
+            end: combineDateAndTime(values.startDate, values.endTime),
+            appointmentStatus: values.appointmentStatus,
+          },
+          errorPolicy: 'all',
+          onError(err) {
+            notification.error({
+              message: 'Something went wrong',
+              description: 'Unable to update appointment',
+            })
+            console.log(err)
+          },
+        })
       }
     })
   }
@@ -190,12 +180,11 @@ const UpdateAppointmentForm = ({
 
   return (
     <Form
+      {...layout}
       name="updateAppointment"
       onSubmit={handleSubmit}
       className="appointment-form"
       size="small"
-      labelCol={{ span: 10 }}
-      wrapperCol={{ span: 12 }}
     >
       <Divider orientation="left">Basic Details</Divider>
 
@@ -497,13 +486,13 @@ const UpdateAppointmentForm = ({
                 span: 12,
               }}
             >
-              <Button loading={editAppiormentLoading} htmlType="submit" style={submitButton}>
+              <Button loading={editAppiormentLoading} htmlType="submit" style={SUBMITT_BUTTON}>
                 Update
               </Button>
               <Button
                 type="danger"
                 style={{
-                  ...submitButton,
+                  ...SUBMITT_BUTTON,
                   background: COLORS.danger,
                 }}
                 onClick={() => {

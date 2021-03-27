@@ -15,6 +15,7 @@ import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import groupObj from '@hunters/group-object'
 import LoadingComponent from 'components/VBMappReport/LoadingComponent'
+import { COLORS } from 'assets/styles/globalStyles'
 import ResponseRateGraph from './dailyResponseRateGraph'
 import './form.scss'
 import './table.scss'
@@ -200,7 +201,7 @@ export const ResponseRateEqui = forwardRef((props, ref) => {
 
               <Button type="link" onClick={() => handleSelectTarget(row)}>
                 <LineChartOutlined
-                  style={{ margin: 'auto 0', fontSize: '26px', color: 'rgb(229, 132, 37)' }}
+                  style={{ margin: 'auto 0', fontSize: '26px', color: COLORS.graph }}
                 />
               </Button>
             </div>
@@ -218,7 +219,7 @@ export const ResponseRateEqui = forwardRef((props, ref) => {
               textAlign: 'center',
               fontWeight: '600',
               paddingLeft: '20px',
-              color: row.type === 'Stimulus' ? '#F080B8' : '#F0B880',
+              color: row.type === 'Stimulus' ? COLORS.stimulus : COLORS.steps,
             }}
           >
             <div style={{ margin: 'auto 0', padding: 0 }}>{text}</div>

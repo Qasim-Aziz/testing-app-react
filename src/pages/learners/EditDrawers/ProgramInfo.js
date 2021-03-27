@@ -6,32 +6,11 @@ import { Link, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { useMutation } from 'react-apollo'
 import { GEN_INFO } from './query'
-import { COLORS } from 'assets/styles/globalStyles'
+import { COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 
-const layout = {
-  labelCol: {
-    span: 9,
-  },
-  wrapperCol: {
-    marginLeft: '10px',
-    span: 12,
-  },
-}
-
+const { layout } = FORM
 const rightCol = {
   marginLeft: '20px',
-}
-
-const submitButton = {
-  width: '40%',
-  height: 40,
-  background: '#0B35B3',
-  boxShadow: '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04)',
-  borderRadius: 0,
-  fontSize: 16,
-  color: 'white',
-  // fontWeight: 600,
-  margin: '20px 5px',
 }
 
 const itemStyle = { marginBottom: '5px', fontWeight: 'bold' }
@@ -187,14 +166,10 @@ function ProgramInfo(props) {
           })(<Checkbox style={rightCol} />)}
         </Form.Item>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <Button type="primary" htmlType="submit" loading={updateLoading} style={submitButton}>
+          <Button type="primary" htmlType="submit" loading={updateLoading} style={SUBMITT_BUTTON}>
             Submitt
           </Button>
-          <Button
-            onClick={() => closeDrawer(false)}
-            type="default"
-            style={{ ...submitButton, backgroundColor: COLORS.danger }}
-          >
+          <Button onClick={() => closeDrawer(false)} type="default" style={CANCEL_BUTTON}>
             Cancel
           </Button>
         </div>

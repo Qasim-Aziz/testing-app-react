@@ -20,6 +20,7 @@ import {
 } from 'antd'
 import { InboxOutlined } from '@ant-design/icons'
 import { connect } from 'react-redux'
+import { COLOR, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 import { gql } from 'apollo-boost'
 import client from '../../apollo/config'
 import AntdTag from './antdTag'
@@ -45,26 +46,14 @@ const props1 = {
 
 const layout = {
   labelCol: {
-    span: 5,
+    span: 6,
   },
   wrapperCol: {
-    span: 18,
+    span: 17,
   },
 }
-const layout1 = {
-  labelCol: {
-    span: 5,
-  },
-  wrapperCol: {
-    span: 18,
-  },
-}
-const tailLayout = {
-  wrapperCol: {
-    offset: 7,
-    span: 14,
-  },
-}
+
+const { tailLayout } = FORM
 const { TextArea } = Input
 
 @connect(({ staffs, learners }) => ({ staffs, learners }))
@@ -142,7 +131,7 @@ class StaffBasicInfo extends React.Component {
     const itemStyle1 = { textAlign: 'center', marginBottom: '5px', fontWeight: 'bold' }
     return (
       <Form {...layout} onSubmit={e => this.handleSubmit(e)}>
-        <Form.Item {...layout1} label="Profile" style={itemStyle1}>
+        <Form.Item label="Profile" style={itemStyle1}>
           <div>
             <img
               src="https://www.thewodge.com/wp-content/uploads/2019/11/avatar-icon.png"
@@ -325,12 +314,12 @@ class StaffBasicInfo extends React.Component {
         </Form.Item>
 
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" className="mt-4">
+          <Button type="primary" htmlType="submit" style={SUBMITT_BUTTON}>
             Submit
           </Button>
 
-          <Button type="primary" onClick={this.onReset} className="ml-4">
-            cancel
+          <Button type="default" onClick={this.onReset} style={CANCEL_BUTTON}>
+            Cancel
           </Button>
         </Form.Item>
       </Form>

@@ -8,10 +8,10 @@ import { useSelector } from 'react-redux'
 import moment from 'moment'
 import client from 'apollo/config'
 import LoadingComponent from 'components/LoadingComponent'
+import { COLORS } from 'assets/styles/globalStyles'
 import { GET_MESSAGE } from './query'
 import MessageForm from './MessageForm'
 import ChatMess from './ChatMess'
-import { COLORS } from '../../assets/styles/globalStyles'
 
 const { Title } = Typography
 
@@ -23,8 +23,6 @@ export default ({ secondUser, style, selectedPeopleDetails }) => {
 
   const handleData = data => {
     data = JSON.parse(data)
-    console.log('data', data.user_id)
-    console.log(userId)
     if (data.user_id === userId) {
       setNewMessLoading(false)
     }
@@ -78,15 +76,10 @@ export default ({ secondUser, style, selectedPeopleDetails }) => {
     },
   })
 
-  console.log(selectedPeopleDetails, 'peaople details')
-  console.log(secondUser, 'second user')
-  console.log(data, 'data')
-
   useEffect(() => {
     if (data && scrollbar.current) {
       // eslint-disable-next-line no-unused-expressions
       scrollbar.current.scrollToBottom()
-      console.log(scrollbar.current)
     }
   }, [data, scrollbar])
 
@@ -120,34 +113,39 @@ export default ({ secondUser, style, selectedPeopleDetails }) => {
         <div style={{ fontSize: 16 }}>{selectedPeopleDetails?.name}</div>
       </div>
 
-      <div style={{ maxHeight: 120 }}>{loading && <LoadingComponent />}</div>
+      <div style={{ height: 'calc(100% - 120px)' }}>
+        {loading ? (
+          <LoadingComponent />
+        ) : (
+          <Scrollbars style={{ height: 'calc(100% - 0px)' }} autoHide ref={scrollbar}>
+            <div style={{ padding: '0 36px' }}>
+              {!loading &&
+                data?.userthread?.chatmessageSet.edges.map(({ node }) => {
+                  return (
+                    <div key={node.timestamp}>
+                      <ChatMess
+                        message={node.message}
+                        time={moment(node.timestamp).format('HH:mm')}
+                        me={node.user.id === userId}
+                      />
+                    </div>
+                  )
+                })}
+            </div>
+          </Scrollbars>
+        )}
+      </div>
       {!loading && error && <pre>{JSON.stingify(error, null, 2)}</pre>}
-      <Scrollbars style={{ height: 'calc(100% - 120px)' }} autoHide ref={scrollbar}>
-        <div style={{ padding: '0 36px' }}>
-          {!loading &&
-            data?.userthread?.chatmessageSet.edges.map(({ node }) => {
-              return (
-                <div key={node.timestamp}>
-                  <ChatMess
-                    message={node.message}
-                    time={moment(node.timestamp).format('HH:mm')}
-                    me={node.user.id === userId}
-                  />
-                </div>
-              )
-            })}
-        </div>
-      </Scrollbars>
 
-      <MessageForm
-        socket={socketRef.current}
-        loading={newMessLoading}
-        setLoading={setNewMessLoading}
-      />
       <Websocket
         url={`wss://application.cogniable.us/ws/chat/${userId}/${secondUser}`}
         onMessage={handleData}
         ref={socketRef}
+      />
+      <MessageForm
+        socket={socketRef.current}
+        loading={newMessLoading}
+        setLoading={setNewMessLoading}
       />
     </div>
   )

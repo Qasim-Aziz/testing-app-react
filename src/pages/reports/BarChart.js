@@ -15,7 +15,7 @@
 /* eslint-disable prefer-template */
 
 import React from 'react'
-import { notification, Typography, Affix } from 'antd'
+import { notification, Typography, Affix, Empty } from 'antd'
 import { ResponsiveBar } from '@nivo/bar'
 import { gql } from 'apollo-boost'
 import groupObj from '@hunters/group-object'
@@ -245,22 +245,15 @@ class BarChart extends React.Component {
 
     return (
       <>
-        <div
-          role="presentation"
-          style={{
-            borderRadius: 10,
-            border: '2px solid #F9F9F9',
-            display: 'block',
-            width: '100%',
-            height: '250px',
-          }}
-        >
-          {GraphData && (
+        <div role="presentation">
+          {GraphData ? (
+            <Empty style={{ marginTop: '65px', marginLeft: '188px' }} />
+          ) : (
             <ResponsiveBar
               data={GraphData}
               keys={['Master Time']}
               indexBy="domain"
-              margin={{ top: 30, right: 20, bottom: 60, left: 60 }}
+              margin={{ top: 10, right: 30, bottom: 30, left: 30 }}
               padding={0.15}
               colors={{ scheme: 'paired' }}
               defs={[

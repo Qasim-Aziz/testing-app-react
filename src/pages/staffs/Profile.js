@@ -16,7 +16,7 @@ import MiscInfo from './EditDrawers/MiscInfo'
 import { useQuery, useLazyQuery } from 'react-apollo'
 import AppointmentCard from './AppointmentCard/index'
 import Attendance from './Attendance'
-import { COLORS } from 'assets/styles/globalStyles'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 
 const { Meta } = Card
 
@@ -136,10 +136,10 @@ function Profile(props) {
   console.log(staffProfile, 'staffProfile')
 
   return (
-    <div style={{ backgroundColor: COLORS.palleteLight, padding: '28px' }} className="profile-css">
+    <div style={{ backgroundColor: '#F7F7F7', padding: '28px' }} className="profile-css">
       <Drawer
         title="Edit Basic Information"
-        width="700px"
+        width={DRAWER.widthL3}
         closable
         destroyOnClose
         visible={genInfoDrawer}
@@ -149,7 +149,7 @@ function Profile(props) {
       </Drawer>
       <Drawer
         title="Edit Personal Information"
-        width="700px"
+        width={DRAWER.widthL3}
         closable
         destroyOnClose
         visible={personalInfoDrawer}
@@ -159,7 +159,7 @@ function Profile(props) {
       </Drawer>
       <Drawer
         title="Edit Emergency Contact Information"
-        width="700px"
+        width={DRAWER.widthL3}
         destroyOnClose
         closable
         onClose={() => setEmergencyInfoDrawer(false)}
@@ -168,7 +168,7 @@ function Profile(props) {
         <EmergencyInfo closeDrawer={setEmergencyInfoDrawer} staffProfile={staffProfile} />
       </Drawer>
       <Drawer
-        width="700px"
+        width={DRAWER.widthL3}
         title="Edit Clinical Information"
         destroyOnClose
         closable
@@ -180,7 +180,7 @@ function Profile(props) {
 
       <Drawer
         title="Edit Misc Information"
-        width="700px"
+        width={DRAWER.widthL3}
         destroyOnClose
         closable
         visible={miscInfoDrawer}

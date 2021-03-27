@@ -19,6 +19,7 @@ import { useQuery, useLazyQuery } from 'react-apollo'
 import { Scrollbars } from 'react-custom-scrollbars'
 import LoadingComponent from 'components/LoadingComponent'
 import SessionFeedbackForm from '../../sessionFeedback'
+import { DRAWER } from 'assets/styles/globalStyles'
 
 function Upcoming(props) {
   const { appointmentList, updateAppointment, upcoming } = props
@@ -57,7 +58,7 @@ function Upcoming(props) {
       <Drawer
         title="Give Session Feedback"
         placement="right"
-        width="500px"
+        width={DRAWER.widthL3}
         closable
         onClose={() => setFeedbackDrawer(false)}
         visible={feedbackDrawer}

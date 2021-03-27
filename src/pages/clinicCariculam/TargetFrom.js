@@ -18,7 +18,7 @@ import gql from 'graphql-tag'
 import { useMutation } from 'react-apollo'
 import CKEditor from 'react-ckeditor-component'
 import './targetFrom.scss'
-import { COLORS } from 'assets/styles/globalStyles'
+import { COLORS, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import { TARGET_QUERY } from './query'
 
 const CREATE_TARGET = gql`
@@ -51,27 +51,9 @@ const CREATE_TARGET = gql`
   }
 `
 
-const layout = {
-  labelCol: {
-    span: 5,
-  },
-  wrapperCol: {
-    span: 19,
-  },
-}
-const itemStyle = { marginBottom: '10px', fontWeight: 'bold' }
+const { layout } = FORM
 
-const submitButton = {
-  width: '180px',
-  height: 40,
-  background: '#0B35B3',
-  boxShadow: '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04)',
-  borderRadius: 0,
-  fontSize: 16,
-  // fontWeight: 600,
-  margin: '20px 5px',
-  color: 'white',
-}
+const itemStyle = { marginBottom: '10px', fontWeight: 'bold' }
 
 const TargetForm = ({
   domainId,
@@ -194,13 +176,13 @@ const TargetForm = ({
           })(<Input placeholder="Target Video Link" size="large" />)}
         </Form.Item>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <Button htmlType="submit" loading={loading} style={submitButton}>
+          <Button htmlType="submit" loading={loading} style={SUBMITT_BUTTON}>
             Create Target
           </Button>
 
           <Button
             onClick={() => handelNewTargetDrawer(false)}
-            style={{ ...submitButton, backgroundColor: COLORS.danger }}
+            style={{ ...SUBMITT_BUTTON, backgroundColor: COLORS.danger }}
           >
             Cancel
           </Button>
