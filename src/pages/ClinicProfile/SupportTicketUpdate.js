@@ -52,12 +52,12 @@ const UPDATE_TICKET = gql`
   mutation(
     $id: ID!
     $subject: String!
-    $description: String!
+    $description: String
     $priority: ID!
     $service: ID!
     $assign: ID!
     $status: ID!
-    $module: ID!
+    $module: ID
     $submodule: ID
   ) {
     updateTicket(
@@ -86,11 +86,8 @@ const UPDATE_TICKET = gql`
           id
           status
         }
-        __typename
       }
-      __typename
     }
-    __typename
   }
 `
 
@@ -130,9 +127,10 @@ const TICKET_ASSIGN = gql`
   }
 `
 
+const role = localStorage.getItem('role')
 const MODULE = gql`
   query {
-    menu(group_Name: "school_admin") {
+    menu(group_Name: ${role}) {
       edges {
         node {
           id
@@ -168,6 +166,39 @@ const SUBMODULE = gql`
     }
   }
 `
+
+// const UPDATE_COMMENT = gql`
+//   mutation(
+//     $id: ID!
+//     $comment: String!
+//   ) {
+//     updateTicket(
+//       input:{
+//         pk: $id
+//         comments:[$comment]
+//     }
+//     )
+//       {
+//           ticket
+//           {
+//               id
+//             comments{
+//                 edges{
+//                     node{
+//                         id
+//                         time
+//                         comment
+//                         user{
+//                             id
+//                             username
+//                         }
+//                     }
+//                 }
+//             }
+//           }
+//       }
+//   }
+// `
 
 export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpdateTicketData }) => {
   const { data, loading, error } = useQuery(TICKET_QUERY, {
@@ -216,6 +247,28 @@ export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpda
     }
   }, [updateTicketError])
 
+  // const [
+  //   updateComment,
+  //   { data: updateCommentData, error: updateCommentError, loading: updateCommentLoading},
+  // ] = useMutation(UPDATE_COMMENT)
+
+  // useEffect(() => {
+  //   if (updateCommentData) {
+  //     notification.success({
+  //       message: 'comment added successfully'
+  //     })
+  //     setUpdateTicketId(null)
+  //   }
+  // }, [updateCommentData])
+
+  // useEffect(() => {
+  //   if (updateCommentError) {
+  //     notification.success({
+  //       message: 'Failed to add comment'
+  //     })
+  //   }
+  // }, [updateCommentError])
+
   const handleSubmit = e => {
     e.preventDefault()
     // eslint-disable-next-line no-shadow
@@ -238,6 +291,21 @@ export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpda
     })
   }
 
+  // const handleCommentSubmit = e => {
+  //   e.preventDefault()
+  //   // eslint-disable-next-line no-shadow
+  //   form.validateFields((error, values) => {
+  //     if (!error) {
+  //       updateComment({
+  //         variables: {
+  //           id: updateTicketId,
+  //           comment: values.comment
+  //         },
+  //       })
+  //     }
+  //   })
+  // }
+
   if (loading) {
     return 'Loading'
   }
@@ -249,137 +317,161 @@ export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpda
   const ItemStyle = { width: '100%', display: 'flex' }
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <Form.Item label="Issue" style={ItemStyle} className="Form-field-container">
-        {form.getFieldDecorator('issue', {
-          initialValue: data.ticket.subject,
-          rules: [{ required: true, message: 'Please give the issue name!' }],
-        })(<Input placeholder="Type the issue name" size="large" />)}
-      </Form.Item>
-      <Form.Item label="Module" style={ItemStyle} className="Form-field-container">
-        {form.getFieldDecorator('module', {
-          initialValue: data.ticket.module.MenuName,
-          rules: [{ required: true, message: 'Please select one!' }],
-        })(
-          <Select
-            placeholder="Select one"
-            size="large"
-            loading={moduleLoading}
-            onChange={value => {
-              setParentID(`"${value}"`)
-            }}
-          >
-            {moduleData?.menu.edges.map(({ node: { id, MenuName } }) => (
-              <Option key={id} value={id}>
-                {MenuName}
-              </Option>
-            ))}
-          </Select>,
-        )}
-      </Form.Item>
-      <Form.Item label="Sub Module" style={ItemStyle} className="Form-field-container">
-        {form.getFieldDecorator('submodule', {
-          initialValue: data.ticket.submodule.MenuName,
-          rules: [{ message: 'Please select a sub module!' }],
-        })(
-          <Select placeholder="Select sub module" size="large" loading={submoduleLoading}>
-            {submoduleData?.submodules.edges.map(({ node: { id, MenuName } }) => (
-              <Option key={id} value={id}>
-                {MenuName}
-              </Option>
-            ))}
-          </Select>,
-        )}
-      </Form.Item>
-      <Form.Item label="Description" style={ItemStyle} className="Form-field-container">
-        {form.getFieldDecorator('description', {
-          initialValue: data.ticket.description,
-          rules: [{ required: true, message: 'Please type issue details!' }],
-        })(<TextArea placeholder="Give more details" />)}
-      </Form.Item>
-      <Form.Item label="Assign" style={ItemStyle} className="Form-field-container">
-        {form.getFieldDecorator('assign', {
-          initialValue: data.ticket.assignTo.id,
-          rules: [{ required: true, message: 'Please select one!' }],
-        })(
-          <Select placeholder="Select one" size="large" loading={ticketAssignLoading}>
-            {ticketAssignData?.ticketAssign.map(({ id, team }) => (
-              <Option key={id} value={id}>
-                {team}
-              </Option>
-            ))}
-          </Select>,
-        )}
-      </Form.Item>
-      <Form.Item label="Priority" style={ItemStyle} className="Form-field-container">
-        {form.getFieldDecorator('priority', {
-          initialValue: data.ticket.priority.id,
-          rules: [{ required: true, message: 'Please select a priority!' }],
-        })(
-          <Select placeholder="Select priority" size="large" loading={ticketPriorityLoading}>
-            {ticketPriorityData?.ticketPriority.map(({ id, priority }) => (
-              <Option key={id} value={id}>
-                {priority}
-              </Option>
-            ))}
-          </Select>,
-        )}
-      </Form.Item>
-      <Form.Item label="Service Issue" style={ItemStyle} className="Form-field-container">
-        {form.getFieldDecorator('service', {
-          initialValue: data.ticket.service.id,
-          rules: [{ required: true, message: 'Please select a service!' }],
-        })(
-          <Select placeholder="Select a service issue" size="large" loading={ticketServiceLoading}>
-            {ticketServiceData?.ticketService.map(({ id, service }) => (
-              <Option key={id} value={id}>
-                {service}
-              </Option>
-            ))}
-          </Select>,
-        )}
-      </Form.Item>
-      <Form.Item label="Status" style={ItemStyle} className="Form-field-container">
-        {form.getFieldDecorator('status', {
-          initialValue: data.ticket.status.id,
-          rules: [{ required: true, message: 'Please select a status!' }],
-        })(
-          <Select placeholder="Select a status" size="large" loading={ticketStatusLoading}>
-            {ticketStatusData?.ticketStatus.map(({ id, status }) => (
-              <Option key={id} value={id}>
-                {status}
-              </Option>
-            ))}
-          </Select>,
-        )}
-      </Form.Item>
+    <div>
+      <Form onSubmit={handleSubmit}>
+        <Form.Item label="Issue" style={ItemStyle} className="Form-field-container">
+          {form.getFieldDecorator('issue', {
+            initialValue: data.ticket.subject,
+            rules: [{ required: true, message: 'Please give the issue name!' }],
+          })(<Input placeholder="Type the issue name" size="large" />)}
+        </Form.Item>
+        <Form.Item label="Module" style={ItemStyle} className="Form-field-container">
+          {form.getFieldDecorator('module', {
+            initialValue: data.ticket.module.MenuName,
+            rules: [{ required: true, message: 'Please select one!' }],
+          })(
+            <Select
+              placeholder="Select one"
+              size="large"
+              loading={moduleLoading}
+              onChange={value => {
+                setParentID(`"${value}"`)
+              }}
+            >
+              {moduleData?.menu.edges.map(({ node: { id, MenuName } }) => (
+                <Option key={id} value={id}>
+                  {MenuName}
+                </Option>
+              ))}
+            </Select>,
+          )}
+        </Form.Item>
+        <Form.Item label="Sub Module" style={ItemStyle} className="Form-field-container">
+          {form.getFieldDecorator('submodule', {
+            initialValue: data.ticket.submodule.id,
+            rules: [{ message: 'Please select a sub module!' }],
+          })(
+            <Select placeholder="Select sub module" size="large" loading={submoduleLoading}>
+              {submoduleData?.submodules.edges.map(({ node: { id, MenuName } }) => (
+                <Option key={id} value={id}>
+                  {MenuName}
+                </Option>
+              ))}
+            </Select>,
+          )}
+        </Form.Item>
+        <Form.Item label="Description" style={ItemStyle} className="Form-field-container">
+          {form.getFieldDecorator('description', {
+            initialValue: data.ticket.description,
+            rules: [{ required: true, message: 'Please type issue details!' }],
+          })(<TextArea placeholder="Give more details" />)}
+        </Form.Item>
+        <Form.Item label="Assign" style={ItemStyle} className="Form-field-container">
+          {form.getFieldDecorator('assign', {
+            initialValue: data.ticket.assignTo.id,
+            rules: [{ required: true, message: 'Please select one!' }],
+          })(
+            <Select placeholder="Select one" size="large" loading={ticketAssignLoading}>
+              {ticketAssignData?.ticketAssign.map(({ id, team }) => (
+                <Option key={id} value={id}>
+                  {team}
+                </Option>
+              ))}
+            </Select>,
+          )}
+        </Form.Item>
+        <Form.Item label="Priority" style={ItemStyle} className="Form-field-container">
+          {form.getFieldDecorator('priority', {
+            initialValue: data.ticket.priority.id,
+            rules: [{ required: true, message: 'Please select a priority!' }],
+          })(
+            <Select placeholder="Select priority" size="large" loading={ticketPriorityLoading}>
+              {ticketPriorityData?.ticketPriority.map(({ id, priority }) => (
+                <Option key={id} value={id}>
+                  {priority}
+                </Option>
+              ))}
+            </Select>,
+          )}
+        </Form.Item>
+        <Form.Item label="Service Issue" style={ItemStyle} className="Form-field-container">
+          {form.getFieldDecorator('service', {
+            initialValue: data.ticket.service.id,
+            rules: [{ required: true, message: 'Please select a service!' }],
+          })(
+            <Select
+              placeholder="Select a service issue"
+              size="large"
+              loading={ticketServiceLoading}
+            >
+              {ticketServiceData?.ticketService.map(({ id, service }) => (
+                <Option key={id} value={id}>
+                  {service}
+                </Option>
+              ))}
+            </Select>,
+          )}
+        </Form.Item>
+        <Form.Item label="Status" style={ItemStyle} className="Form-field-container">
+          {form.getFieldDecorator('status', {
+            initialValue: data.ticket.status.id,
+            rules: [{ required: true, message: 'Please select a status!' }],
+          })(
+            <Select placeholder="Select a status" size="large" loading={ticketStatusLoading}>
+              {ticketStatusData?.ticketStatus.map(({ id, status }) => (
+                <Option key={id} value={id}>
+                  {status}
+                </Option>
+              ))}
+            </Select>,
+          )}
+        </Form.Item>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-        }}
-      >
-        <Button
-          type="primary"
-          htmlType="submit"
-          style={{ marginTop: 15, fontSize: 16, width: '46%', height: 40 }}
-          loading={updateTicketLoading}
-        >
-          Update Ticket
-        </Button>
-
-        <Button
-          type="danger"
-          style={{ marginTop: 15, fontSize: 16, width: '46%', height: 40 }}
-          onClick={() => {
-            form.resetFields()
-            setUpdateTicketId(null)
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
           }}
         >
-          Cancel
-        </Button>
-      </div>
-    </Form>
+          <Button
+            type="primary"
+            htmlType="submit"
+            style={{ marginTop: 15, fontSize: 16, width: '46%', height: 40 }}
+            loading={updateTicketLoading}
+          >
+            Update Ticket
+          </Button>
+
+          <Button
+            type="danger"
+            style={{ marginTop: 15, fontSize: 16, width: '46%', height: 40 }}
+            onClick={() => {
+              form.resetFields()
+              setUpdateTicketId(null)
+            }}
+          >
+            Cancel
+          </Button>
+        </div>
+      </Form>
+      {/* <div style={{marginTop: '4em'}}>
+        <Form onSubmit={handleCommentSubmit} style={{display: 'flex', }}>
+          <Form.Item style={{display: 'flex', width: '90%' }} className="TimeLine-Form">
+            {form.getFieldDecorator('comment', {
+            rules: [{ required: false, message: 'Please add comment!' }],
+            })(<Input placeholder="Add comment here" size="large" />)}
+          </Form.Item> 
+          
+          <Button
+            type="primary"
+            htmlType="submit"
+            style={{backgroundColor: 'white', border: '1px solid #3DBE29', color: '#3DBE29'}}
+            loading={updateTicketLoading}
+          >
+            Add Comment
+          </Button>
+        </Form>
+          </div> */}
+    </div>
   )
 })
