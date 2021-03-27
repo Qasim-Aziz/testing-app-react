@@ -13,17 +13,18 @@ import PersonalInfo from './EditDrawers/PersonalInfo'
 import ClinicInfo from './EditDrawers/ClinicInfo'
 import ProgramInfo from './EditDrawers/ProgramInfo'
 import AppointmentCard from './AppointmentCard'
+import { COLORS } from 'assets/styles/globalStyles'
 
 const { Meta } = Card
 
 const customSpanStyle = {
-  backgroundColor: '#52c41a',
+  backgroundColor: COLORS.success,
   color: 'white',
   borderRadius: '3px',
   padding: '1px 5px',
 }
 const inActiveSpanStyle = {
-  backgroundColor: 'red',
+  backgroundColor: COLORS.danger,
   color: 'white',
   borderRadius: '3px',
   padding: '1px 5px',
@@ -291,30 +292,22 @@ function Profile(props) {
               <p> : {userProfile.parentMobile}</p>
             </div>
           ) : null}
-          {userProfile.fatherName ? (
-            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-              <p style={labelHead}>Father Name </p>
-              <p> : {fatherName ? JSON.parse(fatherName) : fatherName}</p>
-            </div>
-          ) : null}
-          {userProfile.fatherPhone ? (
-            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-              <p style={labelHead}>Father Phone </p>
-              <p> : {userProfile.fatherPhone}</p>
-            </div>
-          ) : null}
-          {userProfile.motherName ? (
-            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-              <p style={labelHead}>Mother Name </p>
-              <p> : {motherName ? JSON.parse(motherName) : motherName}</p>
-            </div>
-          ) : null}
-          {userProfile.motherPhone ? (
-            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-              <p style={labelHead}>Mother Phone </p>
-              <p> : {userProfile.motherPhone}</p>
-            </div>
-          ) : null}
+          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+            <p style={labelHead}>Father Name </p>
+            <p> : {fatherName ? JSON.parse(fatherName) : fatherName}</p>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+            <p style={labelHead}>Father Phone </p>
+            <p> : {userProfile.fatherPhone}</p>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+            <p style={labelHead}>Mother Name </p>
+            <p> : {motherName ? JSON.parse(motherName) : motherName}</p>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+            <p style={labelHead}>Mother Phone </p>
+            <p> : {userProfile.motherPhone}</p>
+          </div>
         </div>
         <div className="mainCard-child">
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
@@ -443,11 +436,11 @@ function Profile(props) {
             <p style={labelHead}>Default Active</p>
             {userProfile.isDefaultActive ? (
               <CheckCircleOutlined
-                style={{ fontSize: 20, color: 'green', fontWeight: '700', margin: 'auto' }}
+                style={{ fontSize: 20, color: COLORS.success, fontWeight: '700', margin: 'auto' }}
               />
             ) : (
               <CloseCircleOutlined
-                style={{ fontSize: 20, color: 'red', fontWeight: '700', margin: 'auto' }}
+                style={{ fontSize: 20, color: COLORS.danger, fontWeight: '700', margin: 'auto' }}
               />
             )}
           </div>
@@ -455,11 +448,11 @@ function Profile(props) {
             <p style={labelHead}>VBMAPP</p>
             {userProfile.isVbmappActive ? (
               <CheckCircleOutlined
-                style={{ fontSize: 20, color: 'green', fontWeight: '700', margin: 'auto' }}
+                style={{ fontSize: 20, color: COLORS.success, fontWeight: '700', margin: 'auto' }}
               />
             ) : (
               <CloseCircleOutlined
-                style={{ fontSize: 20, color: 'red', fontWeight: '700', margin: 'auto' }}
+                style={{ fontSize: 20, color: COLORS.danger, fontWeight: '700', margin: 'auto' }}
               />
             )}
           </div>
@@ -467,11 +460,11 @@ function Profile(props) {
             <p style={labelHead}>Peak</p>
             {userProfile.isPeakActive ? (
               <CheckCircleOutlined
-                style={{ fontSize: 20, color: 'green', fontWeight: '700', margin: 'auto' }}
+                style={{ fontSize: 20, color: COLORS.success, fontWeight: '700', margin: 'auto' }}
               />
             ) : (
               <CloseCircleOutlined
-                style={{ fontSize: 20, color: 'red', fontWeight: '700', margin: 'auto' }}
+                style={{ fontSize: 20, color: COLORS.danger, fontWeight: '700', margin: 'auto' }}
               />
             )}
           </div>
@@ -480,11 +473,11 @@ function Profile(props) {
             <p style={labelHead}>Cogniable </p>
             {userProfile.isCogActive ? (
               <CheckCircleOutlined
-                style={{ fontSize: 20, color: 'green', fontWeight: '700', margin: 'auto' }}
+                style={{ fontSize: 20, color: COLORS.success, fontWeight: '700', margin: 'auto' }}
               />
             ) : (
               <CloseCircleOutlined
-                style={{ fontSize: 20, color: 'red', fontWeight: '700', margin: 'auto' }}
+                style={{ fontSize: 20, color: COLORS.danger, fontWeight: '700', margin: 'auto' }}
               />
             )}
           </div>
@@ -492,11 +485,11 @@ function Profile(props) {
             <p style={labelHead}>Research Participant </p>
             {userProfile.researchParticipant ? (
               <CheckCircleOutlined
-                style={{ fontSize: 20, color: 'green', fontWeight: '700', margin: 'auto' }}
+                style={{ fontSize: 20, color: COLORS.success, fontWeight: '700', margin: 'auto' }}
               />
             ) : (
               <CloseCircleOutlined
-                style={{ fontSize: 20, color: 'red', fontWeight: '700', margin: 'auto' }}
+                style={{ fontSize: 20, color: COLORS.danger, fontWeight: '700', margin: 'auto' }}
               />
             )}
           </div>

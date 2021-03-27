@@ -9,6 +9,7 @@ import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import { useSelector } from 'react-redux'
 import gql from 'graphql-tag'
 import { useMutation } from 'react-apollo'
+import { COLORS } from 'assets/styles/globalStyles'
 import { DISABLE_TARTET_AREA, GET_TARGET_AREAS } from './query'
 
 const { Title, Text } = Typography
@@ -26,6 +27,18 @@ const UPDATE_TARGET_AREA = gql`
     }
   }
 `
+
+const submitButton = {
+  width: 100,
+  height: 40,
+  background: '#0B35B3',
+  boxShadow: '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04)',
+  borderRadius: 0,
+  fontSize: 16,
+  // fontWeight: 600,
+  margin: '0 5px',
+  color: 'white',
+}
 
 const TargetAreaCard = ({
   style,
@@ -153,14 +166,13 @@ const TargetAreaCard = ({
         boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
         borderRadius: 10,
         ...style,
-        border: '2px solid #1c94fd'
+        border: '2px solid #1c94fd',
       }}
     >
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
-          
         }}
       >
         <Title
@@ -182,7 +194,6 @@ const TargetAreaCard = ({
               display: 'block',
               width: '50%',
             }}
-            size="large"
             disabled={updateTargetNameLoading}
           />
         ) : (
@@ -246,9 +257,8 @@ const TargetAreaCard = ({
         {editMode && (
           <div style={{ marginLeft: 'auto' }}>
             <Button
-              style={{ background: 'rgb(11, 53, 179)' }}
+              style={submitButton}
               type="primary"
-              size="large"
               onClick={() => {
                 if (newName) {
                   if (newName !== name) {
@@ -266,9 +276,8 @@ const TargetAreaCard = ({
               Save
             </Button>
             <Button
-              style={{ marginLeft: 15 }}
+              style={{ ...submitButton, backgroundColor: COLORS.danger }}
               type="danger"
-              size="large"
               disabled={updateTargetNameLoading}
               onClick={() => {
                 setNewName(null)

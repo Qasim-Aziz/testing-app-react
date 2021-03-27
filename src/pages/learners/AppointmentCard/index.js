@@ -114,6 +114,7 @@ function AppointmentCard(props) {
             updateAppointment={updateAppointment}
             staff={userProfile}
             appointmentList={upcomingAppointmentList}
+            upcoming={true}
           />
         </TabPane>
         <TabPane key="post" tab="Post">
@@ -121,6 +122,7 @@ function AppointmentCard(props) {
             updateAppointment={updateAppointment}
             staff={userProfile}
             appointmentList={postAppointemntList}
+            upcoming={false}
           />
         </TabPane>
       </Tabs>

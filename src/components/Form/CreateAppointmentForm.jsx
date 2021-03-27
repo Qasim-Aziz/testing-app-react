@@ -16,6 +16,7 @@ import {
 import { useSelector } from 'react-redux'
 import { useMutation, useQuery } from 'react-apollo'
 import moment from 'moment'
+import { COLORS } from 'assets/styles/globalStyles'
 import { timeToUtc, dateTimeToDate, combineDateAndTime } from '../../utilities'
 import {
   CREATE_APPOINTMENT,
@@ -32,14 +33,14 @@ const { TextArea } = Input
 const { Option } = Select
 
 const submitButton = {
-  minWidth: '160px',
+  minWidth: '180px',
   height: 40,
   background: '#0B35B3',
   boxShadow: '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04)',
   borderRadius: 0,
   fontSize: 16,
-  fontWeight: 600,
-  marginTop: 20,
+  // fontWeight: 600,
+  margin: '20px 5px',
   color: 'white',
 }
 
@@ -523,9 +524,7 @@ const CreateAppointmentForm = ({
               style={{
                 ...submitButton,
                 color: 'white',
-                background: 'red',
-                marginLeft: '15px',
-                boxShadow: 'none',
+                background: COLORS.danger,
               }}
               onClick={() => {
                 form.resetFields()

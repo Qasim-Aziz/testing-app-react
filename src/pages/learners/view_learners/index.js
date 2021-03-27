@@ -54,6 +54,7 @@ import CreateLearner from '../createLearner'
 import client from '../../../apollo/config'
 import '../style.scss'
 import Profile from '../Profile'
+import { COLORS } from 'assets/styles/globalStyles'
 
 const { Meta } = Card
 const inputCustom = { width: '180px', marginBottom: '8px', display: 'block' }
@@ -605,7 +606,12 @@ class LearnerTable extends React.Component {
               >
                 <Button type="link">
                   <CheckCircleOutlined
-                    style={{ fontSize: 20, color: 'green', fontWeight: '700', margin: 'auto' }}
+                    style={{
+                      fontSize: 20,
+                      color: COLORS.success,
+                      fontWeight: '700',
+                      margin: 'auto',
+                    }}
                   />
                 </Button>
               </Popconfirm>
@@ -618,7 +624,12 @@ class LearnerTable extends React.Component {
                 <Button type="link">
                   <CloseCircleOutlined
                     type="link"
-                    style={{ fontSize: 20, fontWeight: '700', margin: 'auto', color: 'red' }}
+                    style={{
+                      fontSize: 20,
+                      fontWeight: '700',
+                      margin: 'auto',
+                      color: COLORS.danger,
+                    }}
                   />
                 </Button>
               </Popconfirm>

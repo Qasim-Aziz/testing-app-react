@@ -3,15 +3,14 @@ import React, { useState, useEffect } from 'react'
 import { Form, Input, Button, Select, DatePicker, Divider, Upload, notification } from 'antd'
 import moment from 'moment'
 import { Link, withRouter } from 'react-router-dom'
-import gql from 'graphql-tag'
 import { useMutation } from 'react-apollo'
 import { connect } from 'react-redux'
 import AntdTag from '../antdTag'
 import LoadingComponent from 'components/LoadingComponent'
 import { UPDATE_STAFF } from './query'
 import '../style.scss'
+import { COLORS } from 'assets/styles/globalStyles'
 
-const { TextArea } = Input
 const { Option } = Select
 const layout = {
   labelCol: {
@@ -23,14 +22,15 @@ const layout = {
 }
 
 const submitButton = {
-  width: '45%',
+  width: '40%',
   height: 40,
   background: '#0B35B3',
   boxShadow: '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04)',
   borderRadius: 0,
   fontSize: 16,
-  fontWeight: 700,
-  marginTop: 20,
+  color: 'white',
+  // fontWeight: 600,
+  margin: '20px 5px',
 }
 
 const itemStyle = { marginBottom: '5px', fontWeight: 'bold' }
@@ -70,7 +70,6 @@ function GenDetails(props) {
   const handleSubmit = e => {
     e.preventDefault()
     form.validateFields((err, values) => {
-      console.log(err, values)
       if (!err) {
         updateInfo({
           variables: {
@@ -128,7 +127,6 @@ function GenDetails(props) {
     })
   }
 
-  console.log(staffProfile, 'ser')
   if (!form || !staffProfile) {
     return <LoadingComponent />
   }
@@ -226,14 +224,14 @@ function GenDetails(props) {
             <Input placeholder="Pincode" style={{ borderRadius: 0 }} />,
           )}
         </Form.Item>
-        <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
           <Button type="primary" loading={updateLoading} htmlType="submit" style={submitButton}>
             Submitt
           </Button>
           <Button
             type="default"
             onClick={() => closeDrawer(false)}
-            style={{ ...submitButton, color: 'white', background: 'red', boxShadow: 'none' }}
+            style={{ ...submitButton, backgroundColor: COLORS.danger }}
           >
             Cancel
           </Button>

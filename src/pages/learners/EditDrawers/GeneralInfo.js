@@ -13,6 +13,7 @@ import { GEN_INFO } from './query'
 
 const { TextArea } = Input
 const { Option } = Select
+
 const layout = {
   labelCol: {
     span: 7,

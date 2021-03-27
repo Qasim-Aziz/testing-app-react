@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Drawer } from 'antd'
+import { Drawer, notification } from 'antd'
 import { useQuery, useLazyQuery } from 'react-apollo'
 import UpdateTargetForm from './UpdateTargetForm'
 import TargetAreaCard from './TargetAreaCard'
@@ -32,6 +32,15 @@ const TargetAreaContent = ({ targetArea, domainId, programArea }) => {
     }
   }, [selectName])
 
+  useEffect(() => {
+    if (error) {
+      notification.error({
+        message: 'Something went wrong',
+        description: 'Unable to fetch targets',
+      })
+    }
+  }, [error])
+
   const handelNewTargetDrawer = () => {
     if (setNewTargetDrawer) {
       setName('')
@@ -49,11 +58,7 @@ const TargetAreaContent = ({ targetArea, domainId, programArea }) => {
   }
 
   if (!targetArea) {
-    return ''
-  }
-
-  if (error) {
-    return 'Opps their something wrong'
+    return 'No data'
   }
 
   return (
@@ -90,7 +95,7 @@ const TargetAreaContent = ({ targetArea, domainId, programArea }) => {
           )
         })}
       <Drawer
-        width="650px"
+        width="70%"
         visible={newTargetDrawer}
         placement="right"
         onClose={handelNewTargetDrawer}
@@ -115,7 +120,7 @@ const TargetAreaContent = ({ targetArea, domainId, programArea }) => {
         </div>
       </Drawer>
       <Drawer
-        width="650px"
+        width="70%"
         visible={updateTargetDrawer}
         placement="right"
         onClose={handleUpdateTargetDrawer}

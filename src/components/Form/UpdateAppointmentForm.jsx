@@ -14,6 +14,7 @@ import {
 } from 'antd'
 import { useSelector } from 'react-redux'
 import { useMutation, useQuery } from 'react-apollo'
+import { COLORS } from 'assets/styles/globalStyles'
 import moment from 'moment'
 import LoadingComponent from 'components/LoadingComponent'
 import { combineDateAndTime } from '../../utilities'
@@ -31,14 +32,14 @@ const { TextArea } = Input
 const { Option } = Select
 
 const submitButton = {
-  width: '160px',
+  width: '180px',
   height: 40,
   background: '#0B35B3',
   boxShadow: '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04)',
   borderRadius: 0,
   fontSize: 16,
-  fontWeight: 600,
-  marginTop: 20,
+  // fontWeight: 600,
+  margin: '20px 5px',
   color: 'white',
 }
 
@@ -66,6 +67,7 @@ const UpdateAppointmentForm = ({
     variables: {
       id: appointmentId,
     },
+    fetchPolicy: 'network-only',
   })
 
   const [
@@ -145,30 +147,30 @@ const UpdateAppointmentForm = ({
           combineDateAndTime(values.startDate, values.startTime),
           combineDateAndTime(values.startDate, values.endTime),
         )
-        editAppiorment({
-          variables: {
-            id: appointmentId,
-            therapistId: userRole === 'therapist' ? therapistReduxId : values.therapist,
-            additionalStaff: values.additionalStaff,
-            staffToStaff: values.student ? false : true,
-            studentId: values.student,
-            title: values.title,
-            locationId: values.location ? values.location : '',
-            purposeAssignment: values.purposeAssignment,
-            note: values.note ? values.note : '',
-            start: combineDateAndTime(values.startDate, values.startTime),
-            end: combineDateAndTime(values.startDate, values.endTime),
-            appointmentStatus: values.appointmentStatus,
-          },
-          errorPolicy: 'all',
-          onError(err) {
-            notification.error({
-              message: 'Something went wrong',
-              description: 'Unable to update appointment',
-            })
-            console.log(err)
-          },
-        })
+        // editAppiorment({
+        //   variables: {
+        //     id: appointmentId,
+        //     therapistId: userRole === 'therapist' ? therapistReduxId : values.therapist,
+        //     additionalStaff: values.additionalStaff,
+        //     staffToStaff: values.student ? false : true,
+        //     studentId: values.student,
+        //     title: values.title,
+        //     locationId: values.location ? values.location : '',
+        //     purposeAssignment: values.purposeAssignment,
+        //     note: values.note ? values.note : '',
+        //     start: combineDateAndTime(values.startDate, values.startTime),
+        //     end: combineDateAndTime(values.startDate, values.endTime),
+        //     appointmentStatus: values.appointmentStatus,
+        //   },
+        //   errorPolicy: 'all',
+        //   onError(err) {
+        //     notification.error({
+        //       message: 'Something went wrong',
+        //       description: 'Unable to update appointment',
+        //     })
+        //     console.log(err)
+        //   },
+        // })
       }
     })
   }
@@ -180,6 +182,11 @@ const UpdateAppointmentForm = ({
   if (getAppointmentError) {
     return <h3 style={{ color: 'red' }}>Opps! Something went wrong.</h3>
   }
+
+  console.log(allTherapist)
+  console.log(allSudent)
+  console.log(allLocation)
+  console.log(allAppointmentStatus)
 
   return (
     <Form
@@ -256,7 +263,7 @@ const UpdateAppointmentForm = ({
                 >
                   {allTherapist &&
                     allTherapist.staffs.edges.map(({ node }) => (
-                      <Option key={node.id} name={node.name}>
+                      <Option key={node.id} value={node.id}>
                         {node.name}
                       </Option>
                     ))}
@@ -287,7 +294,7 @@ const UpdateAppointmentForm = ({
               >
                 {allTherapist &&
                   allTherapist.staffs.edges.map(({ node }) => (
-                    <Option key={node.id} name={node.name}>
+                    <Option key={node.id} value={node.id}>
                       {node.name}
                     </Option>
                   ))}
@@ -407,7 +414,7 @@ const UpdateAppointmentForm = ({
               >
                 {allLocation &&
                   allLocation.schoolLocation.edges.map(({ node }) => (
-                    <Option key={node.id} location={node.location}>
+                    <Option key={node.id} value={node.id}>
                       {node.location}
                     </Option>
                   ))}
@@ -428,7 +435,7 @@ const UpdateAppointmentForm = ({
               <Select placeholder="Select Status" loading={allAppointmentStatusLoading}>
                 {allAppointmentStatus &&
                   allAppointmentStatus.appointmentStatuses.map(node => (
-                    <Option key={node.id} appointmentStatus={node.appointmentStatus}>
+                    <Option key={node.id} value={node.id}>
                       {node.appointmentStatus}
                     </Option>
                   ))}
@@ -497,9 +504,7 @@ const UpdateAppointmentForm = ({
                 type="danger"
                 style={{
                   ...submitButton,
-                  background: 'red',
-                  marginLeft: '15px',
-                  boxShadow: 'none',
+                  background: COLORS.danger,
                 }}
                 onClick={() => {
                   form.resetFields()

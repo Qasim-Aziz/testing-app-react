@@ -1,31 +1,13 @@
 /* eslint-disable */
 import React, { useState, useEffect } from 'react'
-import {
-  Form,
-  Input,
-  Button,
-  Select,
-  DatePicker,
-  Divider,
-  Upload,
-  Tag,
-  Checkbox,
-  Icon,
-  message,
-  Switch,
-  notification,
-  Descriptions,
-} from 'antd'
+import { Form, Input, Button, Select, Checkbox, Icon, Switch, notification } from 'antd'
 import moment from 'moment'
 import { Link, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { useMutation } from 'react-apollo'
 import { GEN_INFO } from './query'
-import axios from 'axios'
-import AntdTag from '../../staffs/antdTag'
+import { COLORS } from 'assets/styles/globalStyles'
 
-const { TextArea } = Input
-const { Option } = Select
 const layout = {
   labelCol: {
     span: 9,
@@ -41,14 +23,15 @@ const rightCol = {
 }
 
 const submitButton = {
-  width: '45%',
+  width: '40%',
   height: 40,
   background: '#0B35B3',
-  boxShadow: '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04) !importent',
+  boxShadow: '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04)',
   borderRadius: 0,
-  fontSize: '17 !important',
-  fontWeight: 'bold !important',
-  marginTop: 20,
+  fontSize: 16,
+  color: 'white',
+  // fontWeight: 600,
+  margin: '20px 5px',
 }
 
 const itemStyle = { marginBottom: '5px', fontWeight: 'bold' }
@@ -143,7 +126,6 @@ function ProgramInfo(props) {
     })
   }
 
-  console.log(userProfile, 'ser')
   return (
     <div>
       <Form {...layout} onSubmit={handleSubmit}>
@@ -204,14 +186,14 @@ function ProgramInfo(props) {
             rules: [{ required: false, message: 'Please Select parent activation if needed' }],
           })(<Checkbox style={rightCol} />)}
         </Form.Item>
-        <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
           <Button type="primary" htmlType="submit" loading={updateLoading} style={submitButton}>
             Submitt
           </Button>
           <Button
             onClick={() => closeDrawer(false)}
             type="default"
-            style={{ ...submitButton, color: 'white', background: 'red', boxShadow: 'none' }}
+            style={{ ...submitButton, backgroundColor: COLORS.danger }}
           >
             Cancel
           </Button>

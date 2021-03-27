@@ -21,15 +21,11 @@ import {
   Button,
   Collapse,
   Card,
-  Avatar,
-  Form,
   Select,
   DatePicker,
   Input,
   Icon,
   Drawer,
-  Switch,
-  Tooltip,
   Popconfirm,
   Dropdown,
   Menu,
@@ -55,6 +51,7 @@ import * as XLSX from 'xlsx'
 import JsPDF from 'jspdf'
 import 'jspdf-autotable'
 import LoadingComponent from 'components/LoadingComponent'
+import { COLORS } from 'assets/styles/globalStyles'
 import { FilterCard } from '../../../components/FilterCard/FilterTable'
 import EditStaffBasicInfo from './EditStaffBasicInfo'
 import CreateStaff from '../createStaff'
@@ -63,7 +60,6 @@ import client from '../../../apollo/config'
 import '../style.scss'
 import Profile from '../Profile'
 
-const { Panel } = Collapse
 const { Meta } = Card
 const { Option } = Select
 const { RangePicker } = DatePicker
@@ -326,7 +322,6 @@ class StaffTable extends React.Component {
   filterHandler = ({ name, email, mobile, gender, designation, tags, address, status }) => {
     let filteredList = this.state.mainData
     let tempFilterActive = false
-    console.log(status, 'stuaudrf')
     status = status !== undefined ? status : this.state.filterActive
     email = email !== undefined ? email : this.state.filterEmail
     name = name !== undefined ? name : this.state.filterName
@@ -402,8 +397,6 @@ class StaffTable extends React.Component {
       tableData: filteredList,
       isFilterActive: tempFilterActive,
     })
-
-    console.log(filteredList, 'filtere')
   }
 
   clearFilter = () => {
@@ -482,29 +475,6 @@ class StaffTable extends React.Component {
         ),
       },
       {
-        title: 'Status',
-        dataIndex: 'isActive',
-        width: '140px',
-        render: (status, row) => {
-          return (
-            <span>
-              <Popconfirm
-                title={`Sure to ${status ? 'deactivate' : 'activate'} the employee?`}
-                onConfirm={() => this.staffActiveInactive(row, status)}
-              >
-                <Button type="link">
-                  {status ? (
-                    <CheckCircleOutlined style={{ fontSize: 22, color: 'green' }} />
-                  ) : (
-                    <CloseCircleOutlined style={{ fontSize: 22, color: 'red' }} />
-                  )}
-                </Button>
-              </Popconfirm>
-            </span>
-          )
-        },
-      },
-      {
         title: 'Tags',
         dataIndex: 'tags',
         render: (text, row) => {
@@ -522,6 +492,29 @@ class StaffTable extends React.Component {
             )
           }
           return null
+        },
+      },
+      {
+        title: 'Status',
+        dataIndex: 'isActive',
+        width: '140px',
+        render: (status, row) => {
+          return (
+            <span>
+              <Popconfirm
+                title={`Sure to ${status ? 'deactivate' : 'activate'} the employee?`}
+                onConfirm={() => this.staffActiveInactive(row, status)}
+              >
+                <Button type="link">
+                  {status ? (
+                    <CheckCircleOutlined style={{ fontSize: 22, color: COLORS.success }} />
+                  ) : (
+                    <CloseCircleOutlined style={{ fontSize: 22, color: COLORS.danger }} />
+                  )}
+                </Button>
+              </Popconfirm>
+            </span>
+          )
         },
       },
       {
