@@ -48,3 +48,15 @@ export const COLORS = {
   btnPrimaryColor: '#0b35b3',
   btnWidth: '200px',
 }
+
+export const DRAWER = {
+  height: '80%',
+}
+
+export const FONT = {
+  level1: '24px',
+  level2: '20px',
+  level3: '18px',
+  level4: '14px',
+  level5: '12px',
+}
