@@ -7,6 +7,7 @@ import Scrollbars from 'react-custom-scrollbars'
 import { useSelector } from 'react-redux'
 import moment from 'moment'
 import client from 'apollo/config'
+import LoadingComponent from 'components/LoadingComponent'
 import { GET_MESSAGE } from './query'
 import MessageForm from './MessageForm'
 import ChatMess from './ChatMess'
@@ -118,9 +119,8 @@ export default ({ secondUser, style, selectedPeopleDetails }) => {
         />
         <div style={{ fontSize: 16 }}>{selectedPeopleDetails?.name}</div>
       </div>
-      {loading && (
-        <Title style={{ textAlign: 'center', marginBottom: 150, fontSize: 20 }}>Loading...</Title>
-      )}
+
+      <div style={{ maxHeight: 120 }}>{loading && <LoadingComponent />}</div>
       {!loading && error && <pre>{JSON.stingify(error, null, 2)}</pre>}
       <Scrollbars style={{ height: 'calc(100% - 120px)' }} autoHide ref={scrollbar}>
         <div style={{ padding: '0 36px' }}>
@@ -138,15 +138,16 @@ export default ({ secondUser, style, selectedPeopleDetails }) => {
             })}
         </div>
       </Scrollbars>
-      <Websocket
-        url={`wss://application.cogniable.us/ws/chat/${userId}/${secondUser}`}
-        onMessage={handleData}
-        ref={socketRef}
-      />
+
       <MessageForm
         socket={socketRef.current}
         loading={newMessLoading}
         setLoading={setNewMessLoading}
+      />
+      <Websocket
+        url={`wss://application.cogniable.us/ws/chat/${userId}/${secondUser}`}
+        onMessage={handleData}
+        ref={socketRef}
       />
     </div>
   )

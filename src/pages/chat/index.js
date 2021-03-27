@@ -79,7 +79,7 @@ export default () => {
                   height: '100%',
                 }}
               >
-                <Title style={{ fontSize: 18 }}>Select with whom you want to chat</Title>
+                <Title style={{ fontSize: 18 }}>No chat available for selected learner</Title>
               </div>
             )}
           </div>

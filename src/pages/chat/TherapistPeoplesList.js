@@ -16,6 +16,7 @@ const { TabPane } = Tabs
 
 export default ({ select, setSelect, setSelectedPeopleDetails }) => {
   const userId = useSelector(state => state.user.id)
+  const [gotcha, setGotcha] = useState(true)
   const { data: therapistDetails } = useQuery(GET_THERAPIST_ID, {
     variables: {
       id: userId,
@@ -62,7 +63,9 @@ export default ({ select, setSelect, setSelectedPeopleDetails }) => {
     })
   }
 
-  if (viewStudent && viewStudent.length > 0 && !select) {
+  console.log(select, 'this is select')
+  if (viewStudent && viewStudent.length > 0 && !select && gotcha) {
+    console.log('gotcha ')
     setSelect(viewStudent[0].node.parent?.id)
     setSelectedPeopleDetails({
       name: viewStudent[0].node.firstname,
@@ -70,6 +73,7 @@ export default ({ select, setSelect, setSelectedPeopleDetails }) => {
       id: viewStudent[0].node.parent?.id,
       role: 'Learner',
     })
+    setGotcha(false)
   }
 
   return (

@@ -19,6 +19,7 @@ export default ({ select, setSelect, setSelectedPeopleDetails }) => {
       id: useSelector(state => state.user.id),
     },
   })
+  const [gotcha, setGotcha] = useState(true)
   const { data: staff, error: staffError, loading: staffLoading } = useQuery(GET_STAFF)
   const { data: clinic, error: clinicError, loading: clinicLoading } = useQuery(
     GET_STUDENT_CLINIC,
@@ -59,14 +60,16 @@ export default ({ select, setSelect, setSelectedPeopleDetails }) => {
     })
   }
 
-  if (viewStaff && viewStaff.length > 0 && !select) {
-    setSelect(viewStaff[0].node.parent?.id)
+  console.log(viewStaff, 'thsis si staff')
+  if (viewStaff && viewStaff.length > 0 && !select && gotcha) {
+    setSelect(viewStaff[0].node.user?.id)
     setSelectedPeopleDetails({
       name: viewStaff[0].node.name,
       profileImg: viewStaff[0].node.image,
       id: viewStaff[0].node.user?.id,
-      role: 'Learner',
+      role: 'Therapist',
     })
+    setGotcha(false)
   }
   return (
     <Tabs type="card">
