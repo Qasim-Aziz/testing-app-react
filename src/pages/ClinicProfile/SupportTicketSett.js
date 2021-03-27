@@ -12,7 +12,14 @@ import {
   Dropdown,
   Menu,
 } from 'antd'
-import { PlusOutlined, CloseCircleOutlined, CloudDownloadOutlined } from '@ant-design/icons'
+import {
+  PlusOutlined,
+  CloseCircleOutlined,
+  CloudDownloadOutlined,
+  CommentOutlined,
+  DeleteOutlined,
+  EditOutlined,
+} from '@ant-design/icons'
 import gql from 'graphql-tag'
 import { useQuery, useMutation } from 'react-apollo'
 import moment from 'moment'
@@ -24,6 +31,7 @@ import 'jspdf-autotable'
 import './editTable.css'
 import SupportTicketForm from './SupportTicketForm'
 import SupportTicketUpdate from './SupportTicketUpdate'
+import SupportTicketTimeline from './SupportTicketTimeline'
 import LoadingComponent from '../staffProfile/LoadingComponent'
 
 const { Text } = Typography
@@ -134,6 +142,7 @@ export default () => {
   const [tickets, setTickets] = useState()
   const [newTicket, setNewTicket] = useState()
   const [updateTicket, setUpdateTicket] = useState()
+  // const [updateTimeline, setUpdateTimeline] = useState()
   const [updateTicketData, setUpdateTicketData] = useState()
   const deleteTicketId = useRef()
   const [filterButId, setFilterButId] = useState('1')
@@ -341,21 +350,26 @@ export default () => {
       maxWidth: '180px',
       cell: data => {
         return (
-          <div>
-            <Button onClick={() => setUpdateTicket(data.key)} type="link">
-              Edit
-            </Button>
-            <Button
+          <div style={{ display: 'flex', width: '100%', justifyContent: 'flex-start' }}>
+            {/* <CommentOutlined 
+              style={{ color: '#112d4e', fontSize: '1.4em', paddingRight: '.9em' }}
+              onClick={() => setUpdateTimeline(data.key)} 
               type="link"
-              style={{ color: 'red', marginLeft: 10 }}
+            /> */}
+            <EditOutlined
+              style={{ color: '#112d4e', fontSize: '1.4em', paddingRight: '.9em' }}
+              onClick={() => setUpdateTicket(data.key)}
+              type="link"
+            />
+            <DeleteOutlined
+              type="link"
+              style={{ color: 'red', fontSize: '1.4em', paddingRight: '.9em' }}
               onClick={() => {
                 deleteTicketId.current = data.key
                 deleteTicket({ variables: { id: data.key } })
               }}
               loading={deleteTicketLoading && data.key === deleteTicketId.current}
-            >
-              Delete
-            </Button>
+            />
           </div>
         )
       },
@@ -534,7 +548,7 @@ export default () => {
         visible={createTicketDrawer}
         onClose={() => setCreateTicketDrawer(false)}
         title="Add Support Ticket"
-        width={450}
+        width="80%"
       >
         <div
           style={{
@@ -552,7 +566,7 @@ export default () => {
         visible={updateTicket}
         onClose={() => setUpdateTicket(null)}
         title="Update Support Ticket"
-        width={450}
+        width="80%"
       >
         <div
           style={{
@@ -570,6 +584,26 @@ export default () => {
           />
         </div>
       </Drawer>
+      {/* <Drawer
+        visible={updateTimeline}
+        onClose={() => (setUpdateTimeline(null))}
+        title="Timeline"
+        width="80%"
+      >
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            background: '#fff',
+            padding: 30,
+            paddingTop: 0,
+          }}
+        >
+          <SupportTicketTimeline
+            updateTicketId={updateTimeline}
+          />
+        </div>
+        </Drawer> */}
     </div>
   )
 }
