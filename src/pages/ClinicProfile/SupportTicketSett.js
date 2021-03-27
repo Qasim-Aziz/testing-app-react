@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable import/extensions */
 import React, { useState, useEffect, useRef } from 'react'
 import {
   Typography,
@@ -31,7 +32,7 @@ import 'jspdf-autotable'
 import './editTable.css'
 import SupportTicketForm from './SupportTicketForm'
 import SupportTicketUpdate from './SupportTicketUpdate'
-import SupportTicketTimeline from './SupportTicketTimeline'
+// import SupportTicketTimeline from './SupportTicketTimeline'
 import LoadingComponent from '../staffProfile/LoadingComponent'
 
 const { Text } = Typography
