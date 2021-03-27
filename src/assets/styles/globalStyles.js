@@ -50,7 +50,7 @@ export const COLORS = {
 }
 
 export const DRAWER = {
-  height: '80%',
+  width: '80%',
 }
 
 export const FONT = {
