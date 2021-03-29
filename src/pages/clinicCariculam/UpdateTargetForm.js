@@ -17,7 +17,7 @@ import { useMutation, useQuery } from 'react-apollo'
 import CKEditor from 'react-ckeditor-component'
 import './targetFrom.scss'
 import LoadingComponent from 'components/LoadingComponent'
-import { COLORS, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
+import { COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 
 const TARGET_QUERY = gql`
   query targetGet($id: ID!) {
@@ -179,10 +179,7 @@ const TargetForm = ({ targetId, form, targetAreaId, handleUpdateTargetDrawer, do
                 <Button htmlType="submit" loading={updateTargetLoading} style={SUBMITT_BUTTON}>
                   Update Target
                 </Button>
-                <Button
-                  onClick={() => handleUpdateTargetDrawer(false)}
-                  style={{ ...SUBMITT_BUTTON, background: COLORS.danger }}
-                >
+                <Button onClick={() => handleUpdateTargetDrawer(false)} style={CANCEL_BUTTON}>
                   Cancel
                 </Button>
               </div>

@@ -6,6 +6,7 @@ import { useQuery, useMutation } from 'react-apollo'
 import { useSelector, useDispatch } from 'react-redux'
 import CreateAppointmentForm from 'components/Form/CreateAppointmentForm'
 import UpdateAppointmentForm from 'components/Form/UpdateAppointmentForm'
+import { DRAWER } from 'assets/styles/globalStyles'
 import { PlusOutlined } from '@ant-design/icons'
 import SessionFeedbackForm from '../sessionFeedback'
 import { APPOINTMENTS_FOR_RANGE, UPDATE_APPOINTMENT } from './query'
@@ -158,7 +159,7 @@ export default () => {
       <Drawer
         title="Give Session Feedback"
         placement="right"
-        width="500px"
+        width={DRAWER.widthL3}
         closable
         onClose={() => setFeedbackDrawer(false)}
         visible={feedbackDrawer}
@@ -168,7 +169,7 @@ export default () => {
       <Drawer
         title={updatingAppointmentId ? 'Update Appointment' : 'Create Appointment'}
         placement="right"
-        width="75%"
+        width={DRAWER.widthL2}
         closable
         onClose={() => setVisibleDraw(false)}
         visible={visibleDraw}

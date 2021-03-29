@@ -6,7 +6,7 @@ import { useSelector } from 'react-redux'
 import { useMutation, useQuery } from 'react-apollo'
 import moment from 'moment'
 import './appiorMentForm.scss'
-import { FORM, SUBMITT_BUTTON, COLORS } from 'assets/styles/globalStyles'
+import { FORM, SUBMITT_BUTTON, COLORS, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 import { GET_APPOINTMENT_DETAILS, EDIT_APPOINTMENT } from './query'
 import { dateTimeToUtc } from '../../utilities'
 
@@ -302,15 +302,12 @@ const EditAppiorMentForm = ({ setNewAppiormentCreated, form, id, setOpen }) => {
               Update
             </Button>
             <Button
-              type="primary"
+              type="default"
               onClick={() => {
                 form.resetFields()
                 setOpen(null)
               }}
-              style={{
-                ...SUBMITT_BUTTON,
-                backgroundColor: COLORS.danger,
-              }}
+              style={CANCEL_BUTTON}
             >
               Cancel
             </Button>

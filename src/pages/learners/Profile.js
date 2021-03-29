@@ -71,7 +71,7 @@ function Profile(props) {
   console.log(userProfile, 'userProfile')
 
   return (
-    <div style={{ backgroundColor: '#F7F7F7', padding: '28px' }} className="profile-css">
+    <div style={{ backgroundColor: COLORS.palleteLight, padding: '28px' }} className="profile-css">
       <Drawer
         title="Edit Basic Information"
         width={DRAWER.widthL3}

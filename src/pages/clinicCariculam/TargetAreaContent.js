@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Drawer, notification } from 'antd'
 import { useQuery, useLazyQuery } from 'react-apollo'
+import { DRAWER } from 'assets/styles/globalStyles'
 import UpdateTargetForm from './UpdateTargetForm'
 import TargetAreaCard from './TargetAreaCard'
 import TargetCard from './TargetCard'
@@ -95,7 +96,7 @@ const TargetAreaContent = ({ targetArea, domainId, programArea }) => {
           )
         })}
       <Drawer
-        width="70%"
+        width={DRAWER.widthL2}
         visible={newTargetDrawer}
         placement="right"
         onClose={handelNewTargetDrawer}
@@ -120,7 +121,7 @@ const TargetAreaContent = ({ targetArea, domainId, programArea }) => {
         </div>
       </Drawer>
       <Drawer
-        width="70%"
+        width={DRAWER.widthL2}
         visible={updateTargetDrawer}
         placement="right"
         onClose={handleUpdateTargetDrawer}

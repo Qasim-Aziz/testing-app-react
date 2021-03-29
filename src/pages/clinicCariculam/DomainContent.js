@@ -5,6 +5,7 @@ import { PlusOutlined } from '@ant-design/icons'
 import { useSelector } from 'react-redux'
 import gql from 'graphql-tag'
 import { useMutation, useQuery } from 'react-apollo'
+import { COLORS } from 'assets/styles/globalStyles'
 import TargetAreaContent from './TargetAreaContent'
 import { GET_TARGET_AREAS } from './query'
 
@@ -171,9 +172,9 @@ const DomainContent = ({ domainId, programArea }) => {
               style={{
                 width: 210,
                 height: 40,
-                background: '#F9F9F9',
-                border: '1px solid #E4E9F0',
                 boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
+                border: `1px solid ${COLORS.palleteLightBlue}`,
+                backgroundColor: COLORS.palleteLight,
                 borderRadius: 6,
                 marginLeft: 'auto',
               }}

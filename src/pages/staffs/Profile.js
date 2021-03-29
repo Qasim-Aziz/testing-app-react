@@ -13,7 +13,6 @@ import ClinicInfo from './EditDrawers/ClinicInfo'
 import './style.scss'
 import EmergencyInfo from './EditDrawers/EmergencyInfo'
 import MiscInfo from './EditDrawers/MiscInfo'
-import { useQuery, useLazyQuery } from 'react-apollo'
 import AppointmentCard from './AppointmentCard/index'
 import Attendance from './Attendance'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
@@ -136,7 +135,7 @@ function Profile(props) {
   console.log(staffProfile, 'staffProfile')
 
   return (
-    <div style={{ backgroundColor: '#F7F7F7', padding: '28px' }} className="profile-css">
+    <div style={{ backgroundColor: COLORS.palleteLight, padding: '28px' }} className="profile-css">
       <Drawer
         title="Edit Basic Information"
         width={DRAWER.widthL3}

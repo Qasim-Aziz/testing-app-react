@@ -14,7 +14,7 @@ import {
 } from 'antd'
 import { useSelector } from 'react-redux'
 import { useMutation, useQuery } from 'react-apollo'
-import { COLORS, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
+import { COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 import moment from 'moment'
 import LoadingComponent from 'components/LoadingComponent'
 import { combineDateAndTime } from '../../utilities'
@@ -31,7 +31,7 @@ import './appointmentForms.scss'
 const { TextArea } = Input
 const { Option } = Select
 
-const { layout } = FORM
+const { layout, tailLayout } = FORM
 
 const UpdateAppointmentForm = ({
   setNeedToReloadData,
@@ -191,7 +191,7 @@ const UpdateAppointmentForm = ({
       {/* Title */}
       <Row>
         <Col sm={24} md={24} lg={24}>
-          <Form.Item label="Title" labelCol={{ offset: 1, sm: 4 }} wrapperCol={{ sm: 18 }}>
+          <Form.Item label="Title">
             {form.getFieldDecorator('title', {
               initialValue: getAppointmentData.appointment.title,
               rules: [{ required: true, message: 'Please give a title' }],
@@ -203,7 +203,7 @@ const UpdateAppointmentForm = ({
       {/* Select Learner */}
       <Row>
         <Col sm={24} md={24} lg={24}>
-          <Form.Item label="Select Learner" labelCol={{ offset: 1, sm: 4 }} wrapperCol={{ sm: 18 }}>
+          <Form.Item label="Select Learner">
             {form.getFieldDecorator('student', {
               initialValue: getAppointmentData.appointment.student?.id,
               rules: [{ required: true, message: 'Please select a Learner' }],
@@ -230,11 +230,7 @@ const UpdateAppointmentForm = ({
       {userRole !== 'therapist' && (
         <Row>
           <Col sm={24} md={24} lg={24}>
-            <Form.Item
-              label="Select Therapist"
-              labelCol={{ offset: 1, sm: 4 }}
-              wrapperCol={{ sm: 18 }}
-            >
+            <Form.Item label="Select Therapist">
               {form.getFieldDecorator('therapist', {
                 initialValue: getAppointmentData.appointment.therapist.id,
                 rules: [
@@ -266,11 +262,7 @@ const UpdateAppointmentForm = ({
       {/* Additional Staff */}
       <Row>
         <Col sm={24} md={24} lg={24}>
-          <Form.Item
-            label="Additional Staff"
-            labelCol={{ offset: 1, sm: 4 }}
-            wrapperCol={{ sm: 18 }}
-          >
+          <Form.Item label="Additional Staff">
             {form.getFieldDecorator('additionalStaff', {
               initialValue: getAppointmentData.appointment.attendee.edges.map(x => x.node.id),
             })(
@@ -415,7 +407,7 @@ const UpdateAppointmentForm = ({
           <Form.Item
             label="Status"
             labelCol={{ sm: 10 }}
-            wrapperCol={{ sm: 12 }}
+            wrapperCol={{ sm: 14 }}
             rules={[{ required: true, message: 'Please select a status!' }]}
           >
             {form.getFieldDecorator('appointmentStatus', {
@@ -437,11 +429,7 @@ const UpdateAppointmentForm = ({
       {/* Purpose */}
       <Row>
         <Col sm={24} md={24} lg={24}>
-          <Form.Item
-            label="Appointment Reason"
-            labelCol={{ offset: 1, sm: 4 }}
-            wrapperCol={{ sm: 18 }}
-          >
+          <Form.Item label="Appointment Reason">
             {form.getFieldDecorator('purposeAssignment', {
               initialValue: getAppointmentData.appointment.purposeAssignment,
               rules: [
@@ -458,7 +446,7 @@ const UpdateAppointmentForm = ({
       {/* Notes */}
       <Row>
         <Col sm={24} md={24} lg={24}>
-          <Form.Item label="Notes" labelCol={{ offset: 1, sm: 4 }} wrapperCol={{ sm: 18 }}>
+          <Form.Item label="Notes">
             {form.getFieldDecorator('note', {
               initialValue: getAppointmentData.appointment.note,
             })(
@@ -480,12 +468,7 @@ const UpdateAppointmentForm = ({
       <Row>
         <Col sm={24} md={24} lg={24}>
           {!isParent ? (
-            <Form.Item
-              wrapperCol={{
-                offset: 10,
-                span: 12,
-              }}
-            >
+            <Form.Item {...tailLayout}>
               <Button loading={editAppiormentLoading} htmlType="submit" style={SUBMITT_BUTTON}>
                 Update
               </Button>

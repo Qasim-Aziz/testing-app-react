@@ -11,48 +11,35 @@
 /* eslint-disable no-else-return */
 /* eslint-disable import/extensions */
 import React, { Component } from 'react'
-import { Button, Dropdown, Drawer, Card, Layout, Row, Col, Typography, Tooltip, Icon, notification, Modal, Menu } from 'antd'
+import { Drawer, Layout, Typography, notification, Modal } from 'antd'
 import { connect } from 'react-redux'
 import { gql } from 'apollo-boost'
-import { ExclamationCircleOutlined } from '@ant-design/icons'
+import { DRAWER } from 'assets/styles/globalStyles'
 import EquTargetCard from './EquTargetCard'
 import UpdateTargetForm from './UpdateEquivalenceTarget'
 import apolloClient from '../../apollo/config'
 
 const { Content } = Layout
 const { Title, Text } = Typography
-const { confirm } = Modal
-const assessmentCardStyle = {
-    background: '#FFFFFF',
-    border: '1px solid #E4E9F0',
-    boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
-    borderRadius: 10,
-    width: '100%',
-    marginRight: '20px',
-    padding: '12px 12px',
-    alignItems: 'center',
-    display: 'inline-block',
-    marginTop: '20px'
-}
 
 @connect(({ user, sessionrecording }) => ({ user, sessionrecording }))
 class StudentDrawer extends Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            loading: true,
-            targetsList: [],
-            selectedTargetId: '',
-            selectedCode: '1A',
-            editTargetVisible: false
-        }
+  constructor(props) {
+    super(props)
+    this.state = {
+      loading: true,
+      targetsList: [],
+      selectedTargetId: '',
+      selectedCode: '1A',
+      editTargetVisible: false,
     }
+  }
 
-    componentDidMount() {
-
-        const { selectedCategory } = this.props
-        apolloClient.query({
-            query: gql`query{
+  componentDidMount() {
+    const { selectedCategory } = this.props
+    apolloClient
+      .query({
+        query: gql`query{
                 getPeakEquCodes(codetype:"${selectedCategory}"){
                     edges{
                         node{
@@ -88,113 +75,105 @@ class StudentDrawer extends Component {
                     }
                 }
             }`,
-            fetchPolicy: 'network-only',
-        })
-            .then(result => {
-                this.setState({
-                    targetsList: result.data.getPeakEquCodes.edges,
-                    loading: false,
-                })
-            })
-            .catch(error => {
-                error.graphQLErrors.map(item => {
-                    return notification.error({
-                        message: 'Somthing went wrong',
-                        description: item.message,
-                    })
-                })
-            })
-
-    }
-
-    showEditDrawer = (node) => {
-        // console.log("node----> ",node)
+        fetchPolicy: 'network-only',
+      })
+      .then(result => {
         this.setState({
-            editTargetVisible: true,
-            selectedCode: node.code
+          targetsList: result.data.getPeakEquCodes.edges,
+          loading: false,
         })
-    }
-
-    updateTargetList = (details) => {
-        // console.log(details)
-        const { targetsList, selectedCode } = this.state
-        let cloneTargetList = []
-        cloneTargetList = [...targetsList.map(item => {
-            if (item.node.code === selectedCode) {
-                return {
-                    node: {
-                        ...item.node, target: details.target, classes: details.classes
-                    },
-                }  
-            }
-            else{
-                return item
-            }
-        }
-        )]
-
-        this.setState({
-            targetsList: cloneTargetList
+      })
+      .catch(error => {
+        error.graphQLErrors.map(item => {
+          return notification.error({
+            message: 'Somthing went wrong',
+            description: item.message,
+          })
         })
+      })
+  }
 
+  showEditDrawer = node => {
+    // console.log("node----> ",node)
+    this.setState({
+      editTargetVisible: true,
+      selectedCode: node.code,
+    })
+  }
 
-    }
-
-
-
-    render() {
-
-        const userRole = this.props.user.role
-        const { targetsList, editTargetVisible, selectedCode, loading } = this.state
-
-        if (loading) {
-            return 'Loading...'
+  updateTargetList = details => {
+    // console.log(details)
+    const { targetsList, selectedCode } = this.state
+    let cloneTargetList = []
+    cloneTargetList = [
+      ...targetsList.map(item => {
+        if (item.node.code === selectedCode) {
+          return {
+            node: {
+              ...item.node,
+              target: details.target,
+              classes: details.classes,
+            },
+          }
+        } else {
+          return item
         }
+      }),
+    ]
 
-        return (
+    this.setState({
+      targetsList: cloneTargetList,
+    })
+  }
 
-            <div
-                style={{
-                    maxHeight: 600,
-                    overflow: 'auto'
-                }}
-            >
+  render() {
+    const userRole = this.props.user.role
+    const { targetsList, editTargetVisible, selectedCode, loading } = this.state
 
-                {targetsList.map(nodeItem => (
-                    <EquTargetCard
-                        key={nodeItem.node.id}
-                        node={nodeItem.node}
-                        showEditDrawer={this.showEditDrawer}
-                    />
-                ))}
-
-
-                <Drawer
-                    width="650px"
-                    visible={editTargetVisible}
-                    placement="right"
-                    onClose={() => this.setState({ editTargetVisible: false })}
-                    title="Update Target"
-                >
-                    <div
-                        style={{
-                            width: '100%',
-                            height: '100%',
-                            background: '#fff',
-                            padding: 30,
-                            paddingTop: 0,
-                        }}
-                    >
-                        <UpdateTargetForm
-                            key={selectedCode}
-                            updateTargetList={this.updateTargetList}
-                            selectedCode={selectedCode}
-                        />
-                    </div>
-                </Drawer>
-            </div>
-
-        )
+    if (loading) {
+      return 'Loading...'
     }
+
+    return (
+      <div
+        style={{
+          maxHeight: 600,
+          overflow: 'auto',
+        }}
+      >
+        {targetsList.map(nodeItem => (
+          <EquTargetCard
+            key={nodeItem.node.id}
+            node={nodeItem.node}
+            showEditDrawer={this.showEditDrawer}
+          />
+        ))}
+
+        <Drawer
+          width={DRAWER.widthL2}
+          visible={editTargetVisible}
+          placement="right"
+          onClose={() => this.setState({ editTargetVisible: false })}
+          title="Update Target"
+        >
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              background: '#fff',
+              padding: 30,
+              paddingTop: 0,
+            }}
+          >
+            <UpdateTargetForm
+              key={selectedCode}
+              updateTargetList={this.updateTargetList}
+              selectedCode={selectedCode}
+            />
+          </div>
+        </Drawer>
+      </div>
+    )
+  }
 }
 export default StudentDrawer

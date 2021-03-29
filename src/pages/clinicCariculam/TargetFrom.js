@@ -18,7 +18,7 @@ import gql from 'graphql-tag'
 import { useMutation } from 'react-apollo'
 import CKEditor from 'react-ckeditor-component'
 import './targetFrom.scss'
-import { COLORS, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
+import { CANCEL_BUTTON, COLORS, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import { TARGET_QUERY } from './query'
 
 const CREATE_TARGET = gql`
@@ -180,10 +180,7 @@ const TargetForm = ({
             Create Target
           </Button>
 
-          <Button
-            onClick={() => handelNewTargetDrawer(false)}
-            style={{ ...SUBMITT_BUTTON, backgroundColor: COLORS.danger }}
-          >
+          <Button onClick={() => handelNewTargetDrawer(false)} style={CANCEL_BUTTON}>
             Cancel
           </Button>
         </div>

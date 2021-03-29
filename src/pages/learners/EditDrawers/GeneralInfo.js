@@ -208,7 +208,7 @@ function GenDetails(props) {
           <Button type="primary" loading={updateLoading} htmlType="submit" style={SUBMITT_BUTTON}>
             Submitt
           </Button>
-          <Button type="default" style={CANCEL_BUTTON}>
+          <Button type="default" onClick={() => closeDrawer(false)} style={CANCEL_BUTTON}>
             Cancel
           </Button>
         </div>
