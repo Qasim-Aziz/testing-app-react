@@ -68,19 +68,6 @@ const tableFilterCardStyle = {
 const parentDiv = { display: 'flex', margin: '5px 40px 5px 0' }
 const parentLabel = { fontSize: '15px', color: '#000', margin: 'auto 8px auto' }
 
-const CLINICS = gql`
-  query {
-    allClinics {
-      edges {
-        node {
-          schoolName
-          id
-        }
-      }
-    }
-  }
-`
-
 const ATTENDANCE = gql`
   query($dateGte: Date!, $dateLte: Date!, $clinic: ID!) {
     attendanceReportByClinic(dateGte: $dateGte, dateLte: $dateLte, clinic: $clinic) {
@@ -124,17 +111,11 @@ export default () => {
   const [getAttendance, { data: attendance, loading: attLoading, error: attError }] = useLazyQuery(
     ATTENDANCE,
   )
-  const { data: clinics, loading: clinicsLoading, error: clinicsError } = useQuery(CLINICS)
 
-  const clinicName = useSelector(state => state.user.clinicName)
+  const clinicId = localStorage.getItem('userId')
 
   useEffect(() => {
-    let clinicId = null
-
-    if (clinics) {
-      clinics?.allClinics?.edges?.forEach(item => {
-        if (item.node.schoolName === clinicName) clinicId = item.node.id
-      })
+    if (clinicId) {
       getAttendance({
         variables: {
           dateGte: date[0].format('YYYY-MM-DD'),
@@ -143,7 +124,7 @@ export default () => {
         },
       })
     }
-  }, [clinics, date])
+  }, [date, clinicId])
 
   useEffect(() => {
     if (attendance) {
@@ -271,7 +252,7 @@ export default () => {
     const columns = [
       {
         title: 'Name',
-        width: 150,
+        width: 180,
         dataIndex: 'name',
         key: 'name',
         fixed: 'left',
@@ -290,20 +271,21 @@ export default () => {
 
     const columnLen = filteredDates.length
 
+    console.log(filteredDates, 'filterdates')
     filteredDates.forEach((date, index) => {
       columns.push({
-        title: date.slice(-2),
+        title: moment(date).format('DD'),
         key: index,
         dataIndex: date,
         width: 80,
-        height: 50,
+        align: 'center',
         children: [
           {
             key: index,
             title: moment(date).format('ddd'),
             dataIndex: date,
-            width: columnLen > 5 ? 60 : '',
-            height: columnLen > 5 ? 40 : '',
+            align: 'center',
+            width: columnLen > 5 ? 80 : '',
           },
         ],
       })
@@ -388,18 +370,26 @@ export default () => {
                   </Col>
                 </div>
               </Row>
-              {attLoading || clinicsLoading ? (
+              {attLoading ? (
                 <LoadingComponent />
               ) : (
-                <Table
-                  columns={columns}
-                  dataSource={filteredTableData}
-                  bordered
-                  loading={attLoading}
-                  scroll={{ x: 'fit-content', y: 400 }}
-                  pagination={{ pageSize: 50 }}
-                  size="small"
-                />
+                <div style={{ margin: '0 0 10px 10px' }}>
+                  <Table
+                    className="goal-table"
+                    columns={columns}
+                    dataSource={filteredTableData}
+                    bordered
+                    loading={attLoading}
+                    scroll={{ x: 'fit-content' }}
+                    size="middle"
+                    pagination={{
+                      defaultPageSize: 10,
+                      showSizeChanger: true,
+                      pageSizeOptions: ['10', '20', '30', '50'],
+                      position: 'top',
+                    }}
+                  />
+                </div>
               )}
             </Col>
           </Row>

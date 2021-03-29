@@ -274,7 +274,7 @@ function Att({ form, studentName, selectedStaff }) {
       newColumns.push({
         title: (
           <span style={{ fontWeight: 'bold', fontSize: '13px' }}>
-            {moment(date).format('dd, MMM DD')}
+            {moment(date).format('DD MMM, ddd')}
           </span>
         ),
         dataIndex: date,
@@ -398,13 +398,6 @@ function Att({ form, studentName, selectedStaff }) {
                     </Button>
                   </Tooltip>
                 </div>
-                {/* <div style={{ marginLeft: 'auto' }}>
-                  <Dropdown overlay={menu} trigger={['hover']}>
-                    <Button type="link" size="large">
-                      <FaDownload />{' '}
-                    </Button>
-                  </Dropdown>
-                </div> */}
               </div>
             </Col>
           </Row>
@@ -414,6 +407,7 @@ function Att({ form, studentName, selectedStaff }) {
               columns={columns}
               dataSource={tableData}
               bordered
+              className="goal-table"
               size="middle"
               loading={appointmentLoading && timeSheetLoading}
             />

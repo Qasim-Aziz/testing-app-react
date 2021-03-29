@@ -18,6 +18,7 @@ import {
   Drawer,
   Form,
   Radio,
+  Tooltip,
   Select,
   Badge,
   DatePicker,
@@ -31,7 +32,7 @@ import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import { LineChartOutlined } from '@ant-design/icons'
 import moment from 'moment'
-import { COLORS } from 'assets/styles/globalStyles'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import LoadingComponent from 'components/VBMappReport/LoadingComponent'
 import { ResponseRateEqui } from './dailyResponseRateEqui'
 import ResponseRateGraph from './dailyResponseRateGraph'
@@ -458,6 +459,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
                   height: '26px',
                   fontSize: '13px',
                   display: 'flex',
+                  justifyContent: 'flex-start',
                   margin: 'auto 0',
                   width: '100%',
                   color: COLORS.target,
@@ -509,7 +511,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
             {row.parent ? null : (
               <Button type="link" onClick={() => handleSelectTarget(row)}>
                 <LineChartOutlined
-                  style={{ fontSize: '26px', margin: 'auto 0', color: 'rgb(229, 132, 37)' }}
+                  style={{ fontSize: '26px', margin: 'auto 0', color: COLORS.graph }}
                 />
               </Button>
             )}
@@ -526,8 +528,17 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     {
       title: 'Target Type',
       dataIndex: 'targetType',
-      width: '150px',
-      render: text => <span style={{ fontWeight: 600 }}>{text}</span>,
+      width: '170px',
+      render: text => {
+        if (text && text.length > 20) {
+          return (
+            <Tooltip title={text}>
+              <span>{text.slice(0, 20)}...</span>
+            </Tooltip>
+          )
+        }
+        return <span>{text}</span>
+      },
     },
     ...daysList.map(item => {
       return {
@@ -825,7 +836,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
                 }`}
         visible={lineDrawer}
         onClose={() => setLineDrawer(false)}
-        width={900}
+        width={DRAWER.widthL2}
       >
         <ResponseRateGraph graphData={graphData} />
       </Drawer>

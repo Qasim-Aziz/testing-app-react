@@ -4,7 +4,7 @@ import { useQuery, useMutation } from 'react-apollo'
 import { Tabs, Button, notification } from 'antd'
 import JsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
-
+import { COLORS } from 'assets/styles/globalStyles'
 import MilestonesTab from './Milestones/MilestonesTab'
 import BarriersTab from './Barriers/BarriersTab'
 import TransitionAssessmentTab from './TransitionAssessment/TransitionAssessmentTab'
@@ -14,7 +14,6 @@ import LoadingComponent from './LoadingComponent'
 import AssessmentDropDown from './AssessmentDropDown'
 import { GET_VBMAPP_ASSESMENTS, GET_VBMAPP_AREAS, GET_VBMAPP_REPORT } from './queries'
 import { structurizeData } from './helperFunction'
-
 import './Style.scss'
 
 const { TabPane } = Tabs
@@ -152,7 +151,7 @@ const VBMappReport = ({ selectedStudentId, studentName, showDrawerFilter }) => {
     margin: 0,
     height: 'fit-content',
     overflow: 'hidden',
-    backgroundColor: 'rgb(241, 241, 241)',
+    backgroundColor: COLORS.palleteLight,
   }
 
   if (isVbmappAreaLoading) return <LoadingComponent />

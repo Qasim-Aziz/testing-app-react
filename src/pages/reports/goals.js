@@ -46,7 +46,6 @@ const columns = [
     title: 'Goal Name',
     dataIndex: 'goalName',
     key: 'goalName',
-    color: 'red',
     render(text, record) {
       return {
         props: {
@@ -681,6 +680,7 @@ class Goals extends React.Component {
               bordered
               style={{ margin: '10px 0 15px 10px' }}
               loading={isDataLoading}
+              size="middle"
               pagination={{
                 defaultPageSize: 10,
                 showSizeChanger: true,

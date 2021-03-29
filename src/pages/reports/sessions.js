@@ -25,7 +25,7 @@ import * as XLSX from 'xlsx'
 import { LineChartOutlined } from '@ant-design/icons'
 import { FaDownload } from 'react-icons/fa'
 import moment from 'moment'
-import { COLORS } from 'assets/styles/globalStyles'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import { SESSIONS_SUMMERY, FREQUENCY_DIS_TARGET } from './query'
 import './form.scss'
 import './table.scss'
@@ -461,6 +461,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     {
       title: 'Peak Equ Incorrect',
       dataIndex: 'peakEquError',
+      width: 140,
       render: (text, row) => (
         <span>
           {row.peakEquError} Trials - &nbsp;
@@ -497,7 +498,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
       dataIndex: 'toilet',
       render: (text, row) => <span>{row.toilet}</span>,
       align: 'center',
-      width: '80px',
+      width: 100,
     },
     {
       title: 'Actions',
@@ -508,7 +509,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
             onClick={() => generateGraphData(row)}
             loading={freDisLoading && selectSession.id === row.id}
           >
-            <LineChartOutlined style={{ fontSize: 30, color: COLORS.graph }} />
+            <LineChartOutlined style={{ fontSize: 26, color: COLORS.graph }} />
           </Button>
         </span>
       ),
@@ -565,13 +566,13 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
           </Dropdown>
         </div>
       </div>
-      <div style={{ margin: '4px 0 8px 8px' }} className="session-table">
+      <div style={{ margin: '10px 0 10px 10px' }} className="session-table">
         <Table
           columns={columns}
           dataSource={tableData}
           loading={loading}
           bordered
-          scroll={{ x: 1860 }}
+          scroll={{ x: 1950 }}
           pagination={{
             defaultPageSize: 10,
             showSizeChanger: true,
@@ -584,7 +585,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
       <Drawer
         visible={lineDrawer}
         onClose={() => setLineDrawer(false)}
-        width={900}
+        width={DRAWER.widthL2}
         title={`${currentRow?.sessionDate}: ${currentRow?.sessions.sessionName.name} Session - Response Percentage  Graph`}
       >
         <div style={{ height: 480, marginBottom: 0 }}>

@@ -1,10 +1,15 @@
+@import '../../assets/styles/mixins.scss';
+
 .vbmappReport {
   .vbmappReportTabs {
     margin: 10px;
-    border: 1px solid #dfdfdf;
+    margin-right: 0;
 
     .ant-tabs-tabpane {
-      padding: 5px;
+      padding: 12px;
+      border-right: 1px solid #dfdfdf;
+      border-bottom: 1px solid #dfdfdf;
+      border-left: 1px solid #dfdfdf;
     }
 
     .studentAndScoreDetails {

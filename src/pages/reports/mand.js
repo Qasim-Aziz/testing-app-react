@@ -30,7 +30,7 @@ import * as XLSX from 'xlsx'
 import { LineChartOutlined, FilterOutlined, CloudDownloadOutlined } from '@ant-design/icons'
 import { FaDownload } from 'react-icons/fa'
 import moment from 'moment'
-import { COLORS } from 'assets/styles/globalStyles'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import { MAND_DATA, RESPONSE_RATE, RESPONSE_RATE_FILTER_OPT } from './query'
 import './form.scss'
 import './table.scss'
@@ -196,7 +196,6 @@ export default Form.create()(({ showDrawerFilter }) => {
 
   useEffect(() => {
     if (mydata) {
-      console.log('entired')
       const myColumns = [
         {
           key: 'mandName',
@@ -209,6 +208,7 @@ export default Form.create()(({ showDrawerFilter }) => {
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
+                  alignItems: 'center',
                   width: '100%',
                   color: COLORS.mandTitle,
                 }}
@@ -239,7 +239,7 @@ export default Form.create()(({ showDrawerFilter }) => {
                   </div>
                 )}
                 <Button type="link" onClick={() => handleSelectTarget(obj)}>
-                  <LineChartOutlined style={{ fontSize: 30, color: COLORS.graph }} />
+                  <LineChartOutlined style={{ fontSize: 26, color: COLORS.graph }} />
                 </Button>
               </div>
             )
@@ -254,7 +254,7 @@ export default Form.create()(({ showDrawerFilter }) => {
             {
               title: item.day.substring(0, 3),
               dataIndex: item.date,
-              align: 'right',
+              align: 'center',
             },
           ],
         })
@@ -307,7 +307,7 @@ export default Form.create()(({ showDrawerFilter }) => {
       <Drawer
         visible={lineDrawer}
         onClose={() => setLineDrawer(false)}
-        width={900}
+        width={DRAWER.widthL2}
         title={`${currUser}'s Mand Graph for ${selectMand}`}
       >
         {graphData?.length > 0 &&
@@ -373,7 +373,7 @@ export default Form.create()(({ showDrawerFilter }) => {
         </div>
       </Row>
       <Col span={24}>
-        <div style={{ margin: '10px 0 10px 10px' }} className="peak-block-report">
+        <div style={{ margin: '10px 0 10px 10px' }} className="table-global">
           <Table
             columns={columns}
             dataSource={keyObjects}

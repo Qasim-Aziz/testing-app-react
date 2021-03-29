@@ -20,6 +20,7 @@ import { LineChartOutlined } from '@ant-design/icons'
 import LoadingComponent from 'components/VBMappReport/LoadingComponent'
 import './form.scss'
 import './table.scss'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 
 function compare(a, b) {
   if (a.date === b.date) {
@@ -374,11 +375,11 @@ export const TargetResponseEqui = forwardRef((props, ref) => {
       width: '350px',
       dataIndex: 'target',
       render: (text, row) => {
-        let tempColor = '#2874A6'
+        let tempColor = COLORS.target
         if (row.type === 'Stimulus') {
-          tempColor = '#f080b8'
+          tempColor = COLORS.stimulus
         } else if (row.type === 'Class') {
-          tempColor = '#ff8080'
+          tempColor = COLORS.class
         }
         return (
           <span style={{ color: tempColor }}>
@@ -447,7 +448,7 @@ export const TargetResponseEqui = forwardRef((props, ref) => {
         return (
           <span>
             <Button type="link" onClick={() => generateGraphData(row)}>
-              <LineChartOutlined style={{ fontSize: 30, color: 'rgb(229, 132, 37)' }} />
+              <LineChartOutlined style={{ fontSize: 28, color: COLORS.graph }} />
             </Button>
           </span>
         )
@@ -513,7 +514,7 @@ export const TargetResponseEqui = forwardRef((props, ref) => {
       <Drawer
         visible={lineDrawer}
         onClose={() => setLineDrawer(false)}
-        width={900}
+        width={DRAWER.widthL2}
         title={`${currentRow?.date}: ${
           currentRow?.type === 'target' ? 'Target' : currentRow?.type === 'sd' ? 'Stimulus' : 'Step'
         } - ${currentRow?.target}`}
@@ -581,7 +582,7 @@ export const TargetResponseEqui = forwardRef((props, ref) => {
       <Drawer
         visible={promptLineDrawer}
         onClose={() => setPromptLineDrawer(false)}
-        width={900}
+        width={DRAWER.widthL2}
         title={`${currentRow?.date} ${
           currentRow?.type === 'target'
             ? ': Target - '
@@ -730,6 +731,7 @@ export const TargetResponseEqui = forwardRef((props, ref) => {
             dataSource={tableData}
             bordered
             size="middle"
+            className="target-response-report"
             pagination={{
               defaultPageSize: 20,
               showSizeChanger: true,
