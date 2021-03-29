@@ -90,7 +90,8 @@ export const FORM = {
 }
 
 export const SUBMITT_BUTTON = {
-  width: 180,
+  minWidth: 180,
+  maxWidht: 'fit-content',
   height: 40,
   background: '#0B35B3',
   boxShadow: '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04)',

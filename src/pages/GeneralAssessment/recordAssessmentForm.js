@@ -3,9 +3,12 @@ import React, { useState, useEffect } from 'react'
 import { Form, Button, Input, Select, notification, DatePicker } from 'antd'
 import { useQuery, useLazyQuery, useMutation } from 'react-apollo'
 import { GET_GENERAL_ASSESSMENT, RECORD_GENERAL_DATA, UPDATE_GENERAL_DATA } from './query'
+import { COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 
 const { TextArea } = Input
 const { Option } = Select
+const { layout, tailLayout } = FORM
+const itemStyle = { marginBottom: '5px', fontWeight: 'bold' }
 
 function RecordAssessmentForm({
   form,
@@ -144,8 +147,8 @@ function RecordAssessmentForm({
   console.log(submodulesList, 'subModeulsr')
 
   return (
-    <div style={{ maxWidth: 400, margin: 'auto' }}>
-      <Form onSubmit={update ? handleUpdate : handleSubmitt}>
+    <div>
+      <Form {...layout} onSubmit={update ? handleUpdate : handleSubmitt}>
         <Form.Item name="module" label="Assessment Module">
           <Select
             style={{ width: '100%' }}
@@ -235,22 +238,18 @@ function RecordAssessmentForm({
             </Form.Item>
           </>
         )}
-        <Button
-          htmlType="submit"
-          type="primary"
-          size="large"
-          loading={recordedLoading || updatedLoading}
-          style={{
-            marginLeft: 'auto',
-            marginRight: 10,
-            marginTop: 15,
-            width: '100%',
-            backgroundColor: '#0B35B3',
-            color: '#fff',
-          }}
-        >
-          Submitt
-        </Button>
+        <Form.Item {...tailLayout}>
+          <Button
+            htmlType="submit"
+            loading={recordedLoading || updatedLoading}
+            style={SUBMITT_BUTTON}
+          >
+            Submitt
+          </Button>
+          <Button type="default" onClick={() => setOpen(false)} style={CANCEL_BUTTON}>
+            Cancel
+          </Button>
+        </Form.Item>
       </Form>
     </div>
   )

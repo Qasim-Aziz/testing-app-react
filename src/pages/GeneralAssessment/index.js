@@ -22,6 +22,7 @@ import React, { useEffect, useState } from 'react'
 import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
 import { useDispatch, useSelector } from 'react-redux'
 import LearnerSelect from 'components/LearnerSelect'
+import { DRAWER } from 'assets/styles/globalStyles'
 import moment from 'moment'
 import client from '../../apollo/config'
 import RecordAssessmentForm from './recordAssessmentForm'
@@ -230,14 +231,14 @@ export default () => {
   const filterHeader = (
     <div
       style={{
-        minHeight: '45px',
+        minHeight: '40px',
         height: 'fit-content',
         display: 'flex',
         flexDirection: 'row',
       }}
     >
       <div style={{ margin: 'auto 35px auto 0', display: 'flex' }}>
-        <span style={{ marginRight: '6px', marginTop: '2px' }}>Assessment: </span>
+        <span style={{ marginRight: '6px', marginTop: '2px', fontSize: 14 }}>Assessment: </span>
         <Input
           size="small"
           placeholder="Search Assessment"
@@ -248,7 +249,7 @@ export default () => {
       </div>
 
       <div style={{ margin: 'auto 35px', display: 'flex' }}>
-        <span style={{ marginRight: '6px', marginTop: '2px' }}>Sub-Module: </span>
+        <span style={{ marginRight: '6px', marginTop: '2px', fontSize: 14 }}>Sub-Module: </span>
         <Input
           size="small"
           placeholder="Search Sub-Module"
@@ -258,7 +259,7 @@ export default () => {
         />
       </div>
       <div style={{ margin: 'auto 35px', display: 'flex' }}>
-        <span style={{ marginRight: '6px', marginTop: '2px' }}>Note: </span>
+        <span style={{ marginRight: '6px', marginTop: '2px', fontSize: 14 }}>Note: </span>
         <Input
           size="small"
           placeholder="Search Note"
@@ -329,7 +330,7 @@ export default () => {
             </Button>
           </div>
         </div>
-        <div className="modify-peak-22-table">
+        <div className="gen-assess-table">
           <Table
             columns={columns}
             onChange={handleSortChange}
@@ -353,7 +354,7 @@ export default () => {
             visible={open}
             onClose={() => setOpen(false)}
             placement="right"
-            width={600}
+            width={DRAWER.widthL3}
             title="Record Assessmet"
             destroyOnClose
           >
