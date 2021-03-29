@@ -842,7 +842,7 @@ class StaffTable extends React.Component {
 
         <Drawer
           title="Employee Profile"
-          width={this.state.windowWidth > 1250 ? DRAWER.widthL1 : DRAWER.widthL4}
+          width={DRAWER.widthL1}
           closable
           className="profile-css"
           visible={this.state.profileDrawer}

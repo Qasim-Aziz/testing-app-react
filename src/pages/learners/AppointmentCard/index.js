@@ -25,6 +25,7 @@ function AppointmentCard(props) {
 
   useEffect(() => {
     if (appt && userProfile) {
+      console.log(appt, 'gotcha')
       if (!appt.appointmentsLoading && appt.appointments.length > 0 && userProfile) {
         let temp = appt.appointments.filter(
           item => new Date(item.start) > new Date() && item.student?.id === userProfile.id,
