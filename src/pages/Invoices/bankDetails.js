@@ -13,20 +13,14 @@ import {
 } from 'antd'
 import { useQuery, useLazyQuery, useMutation } from 'react-apollo'
 import { GET_PAYMENT_DETAILS, UPDATE_PAYMENT_DETAILS } from './query'
+import { COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 import './invoices.scss'
+import LoadingComponent from 'components/LoadingComponent'
 
 const { Header, Content } = Layout
 const { Text } = Typography
+const { layout, tailLayout } = FORM
 
-const itemStyle = {
-  display: 'flex',
-  marginRight: '25px',
-  justifyContent: 'flex-end',
-}
-const inputStyle = {
-  width: '295px',
-  borderRadius: 0,
-}
 function BankDetails({ form, setBankDetailsDrawer }) {
   const { data: detailsData, loading: detailsLoading, error: detailsError } = useQuery(
     GET_PAYMENT_DETAILS,
@@ -98,47 +92,47 @@ function BankDetails({ form, setBankDetailsDrawer }) {
   }
 
   if (detailsLoading || !details.institutionName) {
-    return <div>Loading...</div>
+    return <LoadingComponent />
   }
   return (
     <div>
       <Layout>
         <Content>
-          <Form className="update-bank-details">
+          <Form {...layout} className="update-bank-details">
             <Divider orientation="left">General Details</Divider>
-            <Form.Item style={itemStyle} label="Company Name">
+            <Form.Item label="Company Name">
               {form.getFieldDecorator('institutionName', {
                 initialValue: details.institutionName,
                 rules: [{ required: true, message: 'Please provide company name' }],
-              })(<Input placeholder="Name" style={inputStyle}></Input>)}
+              })(<Input placeholder="Name"></Input>)}
             </Form.Item>
 
-            <Form.Item label="Street Address" style={itemStyle}>
+            <Form.Item label="Street Address">
               {form.getFieldDecorator('street', {
                 initialValue: details.streetAddress,
-              })(<Input placeholder="Street Address" style={inputStyle} />)}
+              })(<Input placeholder="Street Address" />)}
             </Form.Item>
 
-            <Form.Item label="City" style={itemStyle}>
+            <Form.Item label="City">
               {form.getFieldDecorator('city', {
                 initialValue: details.city,
                 rules: [{ required: true, message: 'Please provide City' }],
-              })(<Input placeholder="City" style={inputStyle} />)}
+              })(<Input placeholder="City" />)}
             </Form.Item>
 
-            <Form.Item label="State" style={itemStyle}>
+            <Form.Item label="State">
               {form.getFieldDecorator('state', {
                 initialValue: details.state,
                 rules: [{ required: true, message: 'Please provide State' }],
-              })(<Input placeholder="State" style={inputStyle} />)}
+              })(<Input placeholder="State" />)}
             </Form.Item>
 
-            <Form.Item label="Country" style={itemStyle}>
+            <Form.Item label="Country">
               {form.getFieldDecorator('country', {
                 initialValue: details.country.id,
                 rules: [{ required: true, message: 'Please provide Country' }],
               })(
-                <Select style={inputStyle}>
+                <Select>
                   <Select.Option key={Math.random()} value={details.country.id}>
                     {details.country.name}
                   </Select.Option>
@@ -146,87 +140,85 @@ function BankDetails({ form, setBankDetailsDrawer }) {
               )}
             </Form.Item>
 
-            <Form.Item label="Pincode" style={itemStyle}>
+            <Form.Item label="Pincode">
               {form.getFieldDecorator('pincode', {
                 initialValue: details.pincode,
                 rules: [{ required: true, message: 'Please provide pincode' }],
-              })(<Input placeholder="Pincode" style={inputStyle} />)}
+              })(<Input placeholder="Pincode" />)}
             </Form.Item>
 
-            <Form.Item style={itemStyle} label="GSTIN">
+            <Form.Item label="GSTIN">
               {form.getFieldDecorator('gstin', {
                 initialValue: details.gstin,
                 rules: [{ required: true, message: 'Please provide gst number' }],
-              })(<Input placeholder="GST number" style={inputStyle}></Input>)}
+              })(<Input placeholder="GST number"></Input>)}
             </Form.Item>
 
             <Divider orientation="left">Bank Details</Divider>
-            <Form.Item style={itemStyle} label="Account No.">
+            <Form.Item label="Account No.">
               {form.getFieldDecorator('accountNo', {
                 initialValue: details.accountNo,
                 rules: [{ required: true, message: 'Please provide account number' }],
-              })(<Input placeholder="Account number" style={inputStyle}></Input>)}
+              })(<Input placeholder="Account number"></Input>)}
             </Form.Item>
 
-            <Form.Item style={itemStyle} label="IFSC Code">
+            <Form.Item label="IFSC Code">
               {form.getFieldDecorator('ifscCode', {
                 initialValue: details.ifscCode,
                 rules: [{ required: true, message: 'Please provide IFSC Code' }],
-              })(<Input placeholder="IFSC Code" style={inputStyle}></Input>)}
+              })(<Input placeholder="IFSC Code"></Input>)}
             </Form.Item>
-            <Form.Item style={itemStyle} label="Account Holder's Name">
+            <Form.Item label="Account Holder's Name">
               {form.getFieldDecorator('accountHolderName', {
                 initialValue: details.accountHolderName,
                 rules: [{ required: true, message: 'Please provide gst number' }],
-              })(<Input placeholder="Account Holder name" style={inputStyle}></Input>)}
+              })(<Input placeholder="Account Holder name"></Input>)}
             </Form.Item>
 
-            <Form.Item style={itemStyle} label="Bank and Branch Name">
+            <Form.Item label="Bank and Branch Name">
               {form.getFieldDecorator('bankName', {
                 initialValue: details.bankName,
                 rules: [{ required: true, message: 'Please provide gst number' }],
-              })(<Input placeholder="Bank Name" style={inputStyle}></Input>)}
+              })(<Input placeholder="Bank Name"></Input>)}
             </Form.Item>
 
             <Divider orientation="left">Other Methods</Divider>
-            <Form.Item style={itemStyle} label="UPI ">
+            <Form.Item label="UPI ">
               {form.getFieldDecorator('upi', {
                 initialValue: details.upi,
-              })(<Input placeholder="ID" style={inputStyle}></Input>)}
+              })(<Input placeholder="ID"></Input>)}
             </Form.Item>
 
-            <Form.Item style={itemStyle} label="Google Pay">
+            <Form.Item label="Google Pay">
               {form.getFieldDecorator('gpay', {
                 initialValue: details.gpay,
-              })(<Input placeholder="Gpay Mobile Number" style={inputStyle}></Input>)}
+              })(<Input placeholder="Gpay Mobile Number"></Input>)}
             </Form.Item>
 
-            <Form.Item style={itemStyle} label="Paytm">
+            <Form.Item label="Paytm">
               {form.getFieldDecorator('paytm', {
                 initialValue: details.paytm,
-              })(<Input placeholder="Paytm Mogile NUmber" style={inputStyle}></Input>)}
+              })(<Input placeholder="Paytm Mogile NUmber"></Input>)}
             </Form.Item>
 
-            <div
-              style={{ width: 535, display: 'flex', justifyContent: 'center', margin: '20px 0' }}
-            >
+            <Form.Item {...tailLayout}>
               <Popconfirm
-                title="Are you sure all the details filled are correct ?"
+                title="Are you sure, that all the details filled are correct ?"
                 onConfirm={handleSubmitt}
               >
                 <Button
                   loading={updateLoading}
                   type="primary"
                   htmlType="submit"
-                  style={{ margin: 5 }}
+                  style={SUBMITT_BUTTON}
                 >
                   Update
                 </Button>
               </Popconfirm>
-              <Button type="ghost" style={{ margin: 5 }}>
+              <Button type="ghost" style={CANCEL_BUTTON}>
                 Cancel
               </Button>
-            </div>
+            </Form.Item>
           </Form>
         </Content>
       </Layout>

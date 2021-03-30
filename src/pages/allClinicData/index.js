@@ -13,7 +13,7 @@ import moment from 'moment'
 import { FaDownload } from 'react-icons/fa'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
-import { DRAWER } from 'assets/styles/globalStyles'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import client from '../../apollo/config'
 import './allClinicData.scss'
 import AllLearners from './allLearners'
@@ -274,22 +274,21 @@ const AllClinicsData = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      width: '85px',
+      align: 'center',
+      width: '90px',
       render: (status, row) => (
-        <span>
-          <Popconfirm
-            title={`Sure to ${status === 'Active' ? 'deactivate' : 'activate'} the clinic?`}
-            onConfirm={() => closeTask(status, row)}
-          >
-            <Button type="link">
-              {status === 'Active' ? (
-                <CheckCircleOutlined style={{ color: 'green' }} />
-              ) : (
-                <CloseCircleOutlined style={{ color: 'red' }} />
-              )}
-            </Button>
-          </Popconfirm>
-        </span>
+        <Popconfirm
+          title={`Sure to ${status === 'Active' ? 'deactivate' : 'activate'} the clinic?`}
+          onConfirm={() => closeTask(status, row)}
+        >
+          <Button type="link">
+            {status === 'Active' ? (
+              <CheckCircleOutlined style={{ fontSize: 20, color: COLORS.success }} />
+            ) : (
+              <CloseCircleOutlined style={{ fontSize: 20, color: COLORS.danger }} />
+            )}
+          </Button>
+        </Popconfirm>
       ),
     },
     {
@@ -463,7 +462,7 @@ const AllClinicsData = () => {
           <TabPane tab="Inactive" key="Inactive">
             <div className="modify-table">
               <Table
-                scroll={{ x: '70vw' }}
+                scroll={{ x: '75vw' }}
                 columns={columns}
                 rowKey={record => record.details.id}
                 dataSource={clinicsList}
@@ -486,7 +485,7 @@ const AllClinicsData = () => {
           closable="true"
           onClose={() => setFilterDrawer(false)}
           visible={filterDrawer}
-          width={DRAWER.widthL4}
+          width={DRAWER.widthL3}
         >
           <FilterCard filterHandler={filterHandler} filterSet={filterSet} ref={filterRef} />
         </Drawer>

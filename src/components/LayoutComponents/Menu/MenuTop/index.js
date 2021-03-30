@@ -85,7 +85,6 @@ function MenuTop(props) {
         fetchPolicy: 'network-only',
       })
       .then(res => {
-        console.log(res, 'notification res')
         let notiList = []
         let tempCount = 0
         res.data.notification.edges.map(item => {
@@ -286,7 +285,7 @@ function MenuTop(props) {
         }
         `,
         })
-        .then(res => console.log(res, 'from read nitu'))
+        .then(res => console.log(res, 'notification read'))
         .catch(err => {
           console.log(err, 'erer')
           notification.error({
@@ -304,7 +303,6 @@ function MenuTop(props) {
     history: { goBack },
   } = props
 
-  console.log(notificationList, 'notification List')
   const menu = (
     <Menu
       className={`${styles.menu}${styles.temp} ${styles.scroll}`}

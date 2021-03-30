@@ -2,6 +2,7 @@
 /* eslint-disable array-callback-return */
 import React, { useState, useEffect, useRef } from 'react'
 import { useQuery, useLazyQuery } from 'react-apollo'
+import { useDispatch } from 'react-redux'
 import { Table, Button, Layout, Menu, Dropdown, Popconfirm, Drawer, notification } from 'antd'
 import { CheckCircleOutlined, CloseCircleOutlined, FilterFilled } from '@ant-design/icons'
 import { Helmet } from 'react-helmet'
@@ -9,9 +10,11 @@ import moment from 'moment'
 import { FaDownload } from 'react-icons/fa'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
-import { COLORS } from 'assets/styles/globalStyles'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
+import Profile from 'pages/learners/Profile'
 import client from '../../apollo/config'
 import './allClinicData.scss'
+import '../learners/style.scss'
 import { ALL_LEARNERS, UPDATE_STUDENT } from './query'
 import { FilterCard } from './filterCard'
 
@@ -24,6 +27,8 @@ function AllLearners(props) {
   const [filterDrawer, setFilterDrawer] = useState(false)
   const [isFilterActive, setIsFilterActive] = useState(false)
   const [clearFilter, setClearFilter] = useState(false)
+  const [learnerProfileDrawer, setLearnerProfileDrawer] = useState(false)
+  const dispatch = useDispatch()
 
   console.log(active, 'active')
   const { loading: loadingLearner, data: dataLearners, error: errorLearners, refetch } = useQuery(
@@ -37,6 +42,12 @@ function AllLearners(props) {
   )
   const filterRef = useRef()
   const filterSet = { name: true, email: true, mobile: true, status: true, gender: true }
+
+  useEffect(() => {
+    dispatch({
+      type: 'appointments/GET_APPOINTMENT_LIST',
+    })
+  }, [])
 
   useEffect(() => {
     if (dataLearners) {
@@ -133,14 +144,36 @@ function AllLearners(props) {
     setLearnersList(tempList)
   }
 
+  const info = e => {
+    // setting student id to local storage for further operations
+    localStorage.setItem('studentId', JSON.stringify(e.id))
+
+    dispatch({
+      type: 'learners/GET_SINGLE_LEARNER',
+      payload: {
+        UserProfile: e,
+        isUserProfile: true,
+      },
+    })
+  }
+
   const learnersColumns = [
     {
       title: 'Name',
       dataIndex: 'firstname',
       align: 'left',
-      render: (text, row) => {
-        return `${text} ${row.lastname === null ? ' ' : row.lastname}`
-      },
+      render: (text, row) => (
+        <Button
+          type="link"
+          onClick={() => {
+            info(row)
+            setLearnerProfileDrawer(true)
+          }}
+          style={{ padding: '0px', fontWeight: 'bold', fontSize: '14px' }}
+        >
+          {text} {row.lastname ? row.lastname : ''}
+        </Button>
+      ),
     },
     {
       title: 'Email',
@@ -189,6 +222,7 @@ function AllLearners(props) {
       title: 'Status',
       dataIndex: 'isActive',
       key: 'isActive',
+      align: 'center',
       width: '100px',
       render: (status, row) => (
         <span>
@@ -198,9 +232,9 @@ function AllLearners(props) {
           >
             <Button type="link">
               {status ? (
-                <CheckCircleOutlined style={{ fontSize: 22, color: COLORS.success }} />
+                <CheckCircleOutlined style={{ fontSize: 20, color: COLORS.success }} />
               ) : (
-                <CloseCircleOutlined style={{ fontSize: 22, color: COLORS.danger }} />
+                <CloseCircleOutlined style={{ fontSize: 20, color: COLORS.danger }} />
               )}
             </Button>
           </Popconfirm>
@@ -314,11 +348,22 @@ function AllLearners(props) {
           closable="true"
           onClose={() => setFilterDrawer(false)}
           visible={filterDrawer}
-          width={380}
+          width={DRAWER.widthL3}
         >
           <FilterCard filterHandler={filterHandler} filterSet={filterSet} ref={filterRef} />
         </Drawer>
 
+        <Drawer
+          title="Learner Profile"
+          className="profile-css"
+          placement="right"
+          closable="true"
+          onClose={() => setLearnerProfileDrawer(false)}
+          visible={learnerProfileDrawer}
+          width={DRAWER.widthL1}
+        >
+          <Profile filterHandler={filterHandler} filterSet={filterSet} ref={filterRef} />
+        </Drawer>
         <Table
           columns={learnersColumns}
           dataSource={learnersList}
@@ -329,9 +374,9 @@ function AllLearners(props) {
           rowKey={record => record.id}
           bordered
           pagination={{
-            defaultPageSize: 10,
+            defaultPageSize: 20,
             showSizeChanger: true,
-            pageSizeOptions: ['10', '20', '30', '50'],
+            pageSizeOptions: ['20', '30', '50', '100'],
             position: 'top',
           }}
         />

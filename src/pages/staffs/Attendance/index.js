@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react'
 import { Table } from 'antd'
 import moment, { duration } from 'moment'
-import { connect, useSelector, useDispatch } from 'react-redux'
 import LoadingComponent from 'components/LoadingComponent'
 
 function Index(props) {

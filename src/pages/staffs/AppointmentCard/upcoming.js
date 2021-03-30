@@ -1,21 +1,17 @@
 /* eslint-disable */
 import React, { useState, useEffect } from 'react'
 import { connect, useSelector, useDispatch } from 'react-redux'
-import { Card, Switch, Icon, Avatar, Tag, Tooltip, Button, Drawer, Tabs, Popconfirm } from 'antd'
+import { Tooltip, Button, Drawer, Popconfirm } from 'antd'
 import {
   EditOutlined,
   CheckCircleTwoTone,
   FileTextOutlined,
-  DownCircleFilled,
   DownCircleTwoTone,
   DeleteOutlined,
   StarOutlined,
 } from '@ant-design/icons'
-import { Link, withRouter } from 'react-router-dom'
-import gql from 'graphql-tag'
 import moment from 'moment'
 import '../style.scss'
-import { useQuery, useLazyQuery } from 'react-apollo'
 import { Scrollbars } from 'react-custom-scrollbars'
 import LoadingComponent from 'components/LoadingComponent'
 import SessionFeedbackForm from '../../sessionFeedback'

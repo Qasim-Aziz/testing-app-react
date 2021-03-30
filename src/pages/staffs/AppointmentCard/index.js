@@ -1,11 +1,10 @@
 /* eslint-disable */
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
-import { Card, Switch, Icon, Avatar, Tag, Tooltip, Button, Drawer, Tabs } from 'antd'
+import { Card, Button, Drawer, Tabs } from 'antd'
 import { EditOutlined, PlusOutlined } from '@ant-design/icons'
 import { Link, withRouter } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import moment from 'moment'
 import '../style.scss'
 import Upcoming from './upcoming'
 import CreateAppointmentForm from 'components/Form/CreateAppointmentForm'

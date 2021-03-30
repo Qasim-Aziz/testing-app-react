@@ -6,21 +6,16 @@ import {
   EditOutlined,
   CheckCircleTwoTone,
   FileTextOutlined,
-  DownCircleFilled,
   DownCircleTwoTone,
   DeleteOutlined,
   StarOutlined,
 } from '@ant-design/icons'
-import gql from 'graphql-tag'
 import moment from 'moment'
 import '../style.scss'
 import { Scrollbars } from 'react-custom-scrollbars'
 import LoadingComponent from 'components/LoadingComponent'
 import SessionFeedbackForm from '../../sessionFeedback'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
-
-const { Meta } = Card
-const { TabPane } = Tabs
 
 function Upcoming(props) {
   const { appointmentList, updateAppointment, upcoming } = props
