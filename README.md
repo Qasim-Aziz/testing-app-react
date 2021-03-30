@@ -25,11 +25,3 @@
 # for development
 
 - export default 'https://development.cogniable.us/apis/graphql'
-
-# Chinmay Dali Pull-Request [ReadMe]
-
-1. I configured my package.json with "CHOKIDAR"
-2. I configured my apolloClient for my local-django setup
-3. Added my routes to the "leads"
-4. I then went onto copying my component files/folders
-5. Copied the State-Management
