@@ -83,6 +83,13 @@ const routes = [
     // component: Learners,
     exact: true,
   },
+  // Add LEADS HERE
+  {
+    path: '/partners/viewleads',
+    component: loadable(() => import('pages/leads/view_leads')),
+    // component: LEADS,//
+    exact: true,
+  },
   {
     path: '/partners/viewstaffs',
     component: loadable(() => import('pages/staffs/view_staffs')),
