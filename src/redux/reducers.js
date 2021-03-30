@@ -11,6 +11,8 @@ import student from './student/reducers'
 import feedback from './feedback/reducers'
 import settings from './settings/reducers'
 import learners from './learners/reducers'
+// THE LEADERS REDUCER BELOW
+import leaders from './leads/reducer'
 import screening from './screening/reducers'
 import payor from './payor/reducers'
 import authorizationCode from './authorizationCodes/reducers'
@@ -36,6 +38,7 @@ export default history =>
     student,
     feedback,
     learners,
+    leaders,
     settings,
     screening,
     payor,

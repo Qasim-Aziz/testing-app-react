@@ -9,6 +9,8 @@ import staffs from './staffs/sagas'
 import student from './student/sagas'
 import feedback from './feedback/sagas'
 import learners from './learners/sagas'
+// leaders imported
+import leaders from './leads/sagas'
 import settings from './settings/sagas'
 import screening from './screening/sagas'
 import payor from './payor/sagas'
@@ -33,6 +35,8 @@ export default function* rootSaga() {
     student(),
     feedback(),
     learners(),
+    // leaders used
+    leaders(),
     settings(),
     screening(),
     payor(),
