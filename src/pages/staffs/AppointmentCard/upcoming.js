@@ -28,6 +28,7 @@ function Upcoming(props) {
   const [feedbackDrawer, setFeedbackDrawer] = useState(false)
   const staffProfile = useSelector(state => state.staffs.StaffProfile)
 
+  console.log(staffProfile, 'staffProfile')
   const showFeedback = id => {
     setFeedbackDrawer(true)
 
@@ -210,6 +211,7 @@ function Upcoming(props) {
                               </Button>
                             </Tooltip>
                             <Button
+                              disabled={!staffProfile.isActive}
                               size="small"
                               type="link"
                               onClick={() => updateAppointment(item.id)}
