@@ -28,7 +28,7 @@ import LearnerSelect from 'components/LearnerSelect'
 import React from 'react'
 import { Helmet } from 'react-helmet'
 import { connect } from 'react-redux'
-import { COLORS } from 'assets/styles/globalStyles'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import LearnerAssessments from './LearnerAssessments'
 import LearnerGoals from './LearnerGoals'
 import LearnerSession from './LearnerSession'
@@ -164,7 +164,7 @@ class PeakEqvi extends React.Component {
 
     const ActiveStyle = {
       ...BlockStyle,
-      background: COLORS.palleteBlue,
+      background: COLORS.palleteLightBlue,
     }
 
     const HeadStyle = {
@@ -238,7 +238,7 @@ class PeakEqvi extends React.Component {
                     <Drawer
                       visible={visibleFilter}
                       onClose={this.onCloseFilter}
-                      width={350}
+                      width={DRAWER.widthL4}
                       title="Select Learner"
                       placement="right"
                     >
@@ -256,7 +256,7 @@ class PeakEqvi extends React.Component {
                   <div style={{ display: 'flex' }}>
                     <Card
                       style={{
-                        backgroundColor: COLORS.palleteLightBlue,
+                        backgroundColor: COLORS.palleteLight,
                         borderRadius: 0,
                         minHeight: '100vh',
                         minWidth: '290px',

@@ -16,7 +16,7 @@ export const COLORS = {
   class: '#ff7171',
   graph: 'rgb(229, 132, 37)',
   mandTitle: '#3f72af',
-
+  
   text: '#74708d',
   textLighten: '#c0bdd0',
   textDarken: '#615d7c',
@@ -57,7 +57,6 @@ export const COLORS = {
 }
 
 export const DRAWER = {
-
   widthL1: '80%',
   widthL2: '60%',
   widthL3: '50%',
@@ -87,7 +86,7 @@ export const FORM = {
       offset: 5,
       span: 19,
     },
-  },
+  }
 }
 
 export const SUBMITT_BUTTON = {
@@ -113,4 +112,5 @@ export const CANCEL_BUTTON = {
   background: '#fb434a',
   // fontWeight: 600,
   margin: '20px 5px',
+
 }

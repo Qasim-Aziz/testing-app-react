@@ -25,7 +25,7 @@ import GoalCard from 'components/GoalCard'
 import EditTargetAllocationNewDrawer from 'components/TargetAllocation/EditTargetAllocation'
 import TargetAllocationNewDrawer from 'components/TargetAllocation/TargetAllocation'
 import { arrayNotNull, capitalize, notNull } from 'utilities'
-import { COLORS } from 'assets/styles/globalStyles'
+import { COLORS, DRAWER, FONT } from 'assets/styles/globalStyles'
 import LoadingComponent from '../../staffProfile/LoadingComponent'
 import AddLongAndShortGoal from '../AddLongAndShortGoal'
 import AllocatedTarget from './AllocatedTarget'
@@ -798,10 +798,10 @@ const TargetAllocation = () => {
       </Form>
       <div
         style={{
-          border: '2px solid #ccc',
+          // border: '2px solid #ccc',
           padding: 10,
           height: 650,
-          background: '#f9f9f9',
+          // background: '#f9f9f9',
           overflow: 'hidden',
         }}
       >
@@ -826,7 +826,7 @@ const TargetAllocation = () => {
             title={addHeading}
             placement="right"
             closable
-            width="50%"
+            width={DRAWER.widthL1}
             onClose={handleCloseAddGoal}
             visible={isAddGoalVisible}
           >
@@ -848,7 +848,7 @@ const TargetAllocation = () => {
             title="Target Allocation"
             placement="right"
             closable
-            width={850}
+            width={DRAWER.widthL1}
             style={{ zIndex: 1001 }}
             onClose={handleCloseTargetDetails}
             visible={isTargetDetailsVisible}
@@ -878,7 +878,7 @@ const TargetAllocation = () => {
             title="Target Allocation from library"
             placement="right"
             closable
-            width="80%"
+            width={DRAWER.widthL1}
             onClose={closeTargetAllocationDrawer}
             visible={targetAllocationDrawer}
           >
@@ -896,7 +896,7 @@ const TargetAllocation = () => {
             title="Equivalence Target Allocation"
             placement="right"
             closable
-            width="80%"
+            width={DRAWER.widthL1}
             onClose={closeTargetAllocationDrawer}
             visible={equivalenceTargetDrawer}
           >
@@ -914,7 +914,7 @@ const TargetAllocation = () => {
             title="Target Allocation from CogniAble Assessment"
             placement="right"
             closable
-            width="80%"
+            width={DRAWER.widthL1}
             onClose={closeTargetAllocationDrawer}
             visible={cogniableAssessmentDrawer}
           >
@@ -932,7 +932,7 @@ const TargetAllocation = () => {
             title="Edit Allocated Target Details"
             placement="right"
             closable
-            width={850}
+            width={DRAWER.widthL1}
             onClose={handleCloseEditTargetDetails}
             visible={isEditAllocatedTargetVisible}
           >

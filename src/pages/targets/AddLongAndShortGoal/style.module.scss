@@ -1,35 +1,14 @@
-@import 'assets/styles/mixins.scss';
-
-.form {
-  padding: 0 50px;
+.ant-form-item label {
+  font-size: 14px;
+  font-weight: bold;
+  color: rgba(0, 0, 0, 0.65);
+  line-height: 32px;
 }
 
-.form label {
-  font-size: 16px;
-  font-weight: 700;
+.utils__content {
+  padding: 0;
 }
 
-.form input {
-  height: 48px;
-  width: 100%;
-}
-
-.formItem {
-  width: 100%;
-}
-
-.form textarea {
-  width: 100%;
-  height: 102px !important;
-}
-
-.searchBtn {
-  min-width: $btn-width;
-  float: right;
-  background: $btn-primary-color;
-}
-
-.datepicker {
-  display: inline-block !important;
-  width: 100% !important;
+.ant-form-item-required::before {
+  content: '*';
 }

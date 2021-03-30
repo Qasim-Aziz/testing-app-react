@@ -6,7 +6,8 @@
 /* eslint-disable object-shorthand */
 import React, { useEffect, useState } from 'react'
 import { Button, Checkbox, Select, Icon, Row, Col, Input, Empty } from 'antd'
-import SessionCard from '../../../components/SessionCard'
+import { COLORS, DRAWER, FONT } from 'assets/styles/globalStyles'
+import SessionCard from 'components/SessionCard'
 import motherSon from '../motherSon.jpg'
 import {
   getDomainByProgramArea,
@@ -39,7 +40,7 @@ const cardsDivStyle = {
   overflowY: 'scroll',
   padding: '15px',
   marginTop: '30px',
-  backgroundColor: '#f9f9f9',
+  backgroundColor: COLORS.palleteLight,
   borderRadius: '10px',
 }
 

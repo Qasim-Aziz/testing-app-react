@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Form, Input, Button, DatePicker, Select, notification } from 'antd'
 import moment from 'moment'
-import style from './style.module.scss'
+import { FORM } from 'assets/styles/globalStyles'
 import {
   createLongTermGoal,
   createShortTermGoal,
@@ -152,152 +152,95 @@ const AddLongAndShortGoalForm = props => {
 
   const formRef = useRef(null)
 
-  const formItemLayout = {
-    labelCol: {
-      span: 5,
-    },
-    wrapperCol: {
-      span: 17,
-      offset: 1,
-    },
-  }
-
   return (
-    <div className={style.form}>
-      <Form ref={formRef} name="basic" {...formItemLayout} layout="horizontal">
-        <Form.Item
-          label="Goal Name"
-          name="goalName"
-          rules={[
-            {
-              required: true,
-              message: 'Please input Goal Name!',
-            },
-          ]}
-        >
-          {form.getFieldDecorator('goalName', {
-            rules: [{ required: true, message: 'Please provide goal name!' }],
-          })(<Input placeholder="Goal Name" />)}
-        </Form.Item>
 
-        <Form.Item
-          label="Description"
-          name="Description"
-          rules={[
-            {
-              required: true,
-              message: 'Please input your Description',
-            },
-          ]}
-        >
-          {form.getFieldDecorator('description', {
-            rules: [{ required: true, message: 'Please provide description!' }],
-          })(<Input.TextArea placeholder="Description" />)}
-        </Form.Item>
+    <Form ref={formRef} {...FORM.layout} layout="horizontal">
+      <Form.Item
+        label="Goal Name"
+      >
+        {form.getFieldDecorator('goalName', {
+          rules: [{ required: true, message: 'Please provide goal name!' }],
+        })(<Input placeholder="Goal Name" />)}
+      </Form.Item>
 
-        <Form.Item
-          className={style.formItem}
-          label="Date Intiated"
-          name="dateIntiated"
-          rules={[
-            {
-              required: true,
-              message: 'Please input Date Intiated',
-            },
-          ]}
-        >
-          {form.getFieldDecorator('dateIntiated', {
-            rules: [{ required: true, message: 'Please Select date intiated!' }],
-          })(
-            <DatePicker
-              className={style.datepicker}
-              format="YYYY-MM-DD"
-              placeholder="Start Date"
-            />,
-          )}
-        </Form.Item>
+      <Form.Item
+        label="Description"
+      >
+        {form.getFieldDecorator('description', {
+          rules: [{ required: true, message: 'Please provide description!' }],
+        })(<Input.TextArea placeholder="Description" />)}
+      </Form.Item>
 
-        <Form.Item
-          className={style.formItem}
-          label="End Date"
-          name="endDate"
-          rules={[
-            {
-              required: true,
-              message: 'Please input End Date',
-            },
-          ]}
-        >
-          {form.getFieldDecorator('endDate', {
-            rules: [{ required: true, message: 'Please Select end date!' }],
-          })(
-            <DatePicker className={style.datepicker} format="YYYY-MM-DD" placeholder="End Date" />,
-          )}
-        </Form.Item>
+      <Form.Item
+        label="Date Intiated"        
+      >
+        {form.getFieldDecorator('dateIntiated', {
+          rules: [{ required: true, message: 'Please Select date intiated!' }],
+        })(
+          <DatePicker
+            format="YYYY-MM-DD"
+            placeholder="Start Date"
+          />,
+        )}
+      </Form.Item>
 
-        <Form.Item
-          label="Responsible"
-          name="responsible"
-          rules={[
-            {
-              required: true,
-              message: 'Please Select Responsible',
-            },
-          ]}
-        >
-          {form.getFieldDecorator('responsible', {
-            rules: [{ required: true, message: 'Please Select responsible!' }],
-          })(
-            <Select style={selectStyle} size="large" placeholder="Responsible">
-              {goalResponsibilityList.map(gsl => {
-                return (
-                  <Select.Option value={gsl.id} key={gsl.id}>
-                    {gsl.name}
-                  </Select.Option>
-                )
-              })}
-            </Select>,
-          )}
-        </Form.Item>
+      <Form.Item
+        label="End Date"
+      >
+        {form.getFieldDecorator('endDate', {
+          rules: [{ required: true, message: 'Please Select end date!' }],
+        })(
+          <DatePicker format="YYYY-MM-DD" placeholder="End Date" />,
+        )}
+      </Form.Item>
 
-        <Form.Item
-          label="Goal Status"
-          name="Goal Status"
-          rules={[
-            {
-              required: true,
-              message: 'Please Select Goal Status',
-            },
-          ]}
-        >
-          {form.getFieldDecorator('goalStatus', {
-            rules: [{ required: true, message: 'Please Select goal status!' }],
-          })(
-            <Select style={selectStyle} size="large" placeholder="Goal Status">
-              {goalStatusList.map(gsl => {
-                return (
-                  <Select.Option value={gsl.id} key={gsl.id}>
-                    {gsl.status}
-                  </Select.Option>
-                )
-              })}
-            </Select>,
-          )}
-        </Form.Item>
+      <Form.Item
+        label="Responsible"
+      >
+        {form.getFieldDecorator('responsible', {
+          rules: [{ required: true, message: 'Please Select responsible!' }],
+        })(
+          <Select placeholder="Responsible">
+            {goalResponsibilityList.map(gsl => {
+              return (
+                <Select.Option value={gsl.id} key={gsl.id}>
+                  {gsl.name}
+                </Select.Option>
+              )
+            })}
+          </Select>,
+        )}
+      </Form.Item>
 
-        <Form.Item>
-          <Button
-            onClick={addGoal}
-            loading={goalLoading}
-            className={style.searchBtn}
-            type="primary"
-            htmlType="submit"
-          >
-            {type.includes('edit') ? 'Update' : 'Add'}
-          </Button>
-        </Form.Item>
-      </Form>
-    </div>
+      <Form.Item
+        label="Goal Status"
+      >
+        {form.getFieldDecorator('goalStatus', {
+          rules: [{ required: true, message: 'Please Select goal status!' }],
+        })(
+          <Select placeholder="Goal Status">
+            {goalStatusList.map(gsl => {
+              return (
+                <Select.Option value={gsl.id} key={gsl.id}>
+                  {gsl.status}
+                </Select.Option>
+              )
+            })}
+          </Select>,
+        )}
+      </Form.Item>
+
+      <Form.Item {...FORM.tailLayout}>
+        <Button
+          onClick={addGoal}
+          loading={goalLoading}
+          type="primary"
+          htmlType="submit"
+        >
+          {type.includes('edit') ? 'Update' : 'Submit'}
+        </Button>
+      </Form.Item>
+    </Form>
   )
 }
 

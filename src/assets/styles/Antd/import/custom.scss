@@ -1,0 +1,21 @@
+// Import mixins
+@import 'assets/styles/mixins.scss';
+
+/////////////////////////////////////////////////////////////////////////////////////////
+/*  ANT DESIGN BACKTOP */
+
+.ant-table-thead > tr > th {
+    background-color: #dbe2ef !important;
+}
+
+.ant-table-bordered .ant-table-thead > tr > th {
+    background-color: #dbe2ef !important; 
+}
+
+.ant-tabs.ant-tabs-card .ant-tabs-card-bar .ant-tabs-tab {
+    background-color: #dbe2ef !important;
+}
+
+.ant-tabs.ant-tabs-card .ant-tabs-card-bar .ant-tabs-tab-active {
+    background-color: #fff !important;
+}
