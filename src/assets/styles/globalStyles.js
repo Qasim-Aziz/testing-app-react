@@ -57,6 +57,7 @@ export const COLORS = {
 }
 
 export const DRAWER = {
+
   widthL1: '80%',
   widthL2: '60%',
   widthL3: '50%',

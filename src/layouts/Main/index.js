@@ -49,7 +49,7 @@ class MainLayout extends React.PureComponent {
           </Layout.Header> */}
           <Layout.Content style={{ height: '100%', position: 'relative' }}>
             {/* <Breadcrumbs /> */}
-            <div className="utils__content">{children}</div>
+            <div className="utils__content" style={{padding: 0}}>{children}</div>
           </Layout.Content>
           {/* <Layout.Footer>
             <Footer />

@@ -28,6 +28,7 @@ import LearnerSelect from 'components/LearnerSelect'
 import React from 'react'
 import { Helmet } from 'react-helmet'
 import { connect } from 'react-redux'
+import { COLORS } from 'assets/styles/globalStyles'
 import LearnerAssessments from './LearnerAssessments'
 import LearnerGoals from './LearnerGoals'
 import LearnerSession from './LearnerSession'
@@ -163,7 +164,7 @@ class PeakEqvi extends React.Component {
 
     const ActiveStyle = {
       ...BlockStyle,
-      background: '#a7a6a6',
+      background: COLORS.palleteBlue,
     }
 
     const HeadStyle = {
@@ -190,30 +191,32 @@ class PeakEqvi extends React.Component {
       <>
         <Helmet title="Learners Program" />
         <Layout style={{ padding: '0px' }}>
-          <div
+          <Content
             style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              margin: '20px auto',
+              padding: '0px',
               width: '100%',
-              alignItems: 'center',
-              padding: '0px 10px',
-              backgroundColor: '#FFF',
-              boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
+              margin: '0px auto',
             }}
           >
-            <Content
+            <div
               style={{
-                padding: '0px',
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+
                 width: '100%',
-                margin: '0px auto',
+                alignItems: 'center',
+                padding: '0px 10px',
+                backgroundColor: '#FFF',
+                boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
               }}
             >
-              <div style={{ padding: '5px 0px', display: 'flex', justifyContent: 'space-between' }}>
-                <div style={{ paddingTop: '5px' }}>&nbsp;</div>
+              <div style={{ margin: '0px auto', width: '100%', }}>
 
-                <div>
+                <div style={{ padding: '5px 0px', display: 'flex', justifyContent: 'space-between' }}>
+                  <div style={{ paddingTop: '5px' }}>&nbsp;</div>
+
+
                   <div
                     style={{
                       fontSize: 25,
@@ -223,159 +226,161 @@ class PeakEqvi extends React.Component {
                   >
                     {StudentName !== '' && `${StudentName}'s ${TabCheck}`}
                   </div>
-                </div>
 
-                <div>
-                  {user?.role !== 'parents' && (
-                    <Button onClick={this.showDrawerFilter} size="large">
-                      <FilterOutlined />
-                    </Button>
-                  )}
 
-                  <Drawer
-                    visible={visibleFilter}
-                    onClose={this.onCloseFilter}
-                    width={350}
-                    title="Select Learner"
-                    placement="right"
-                  >
-                    <LearnerSelect />
-                  </Drawer>
+                  <div>
+                    {user?.role !== 'parents' && (
+                      <Button onClick={this.showDrawerFilter} size="large">
+                        <FilterOutlined />
+                      </Button>
+                    )}
+
+                    <Drawer
+                      visible={visibleFilter}
+                      onClose={this.onCloseFilter}
+                      width={350}
+                      title="Select Learner"
+                      placement="right"
+                    >
+                      <LearnerSelect />
+                    </Drawer>
+                  </div>
                 </div>
               </div>
-            </Content>
-          </div>
 
-          <Col style={{ paddingRight: 0 }}>
-            <Row>
-              <Col sm={5}>
-                <div style={{ display: 'flex' }}>
-                  <Card
-                    style={{
-                      background: '#F1F1F1',
-                      borderRadius: 0,
-                      minHeight: '100vh',
-                      minWidth: '290px',
-                      maxWidth: '350px',
-                    }}
-                  >
-                    <div style={SideBarHeading}>Intervention</div>
-                    <div
-                      style={TabCheck === 'Assessments' ? ActiveStyle : BlockStyle}
-                      onClick={() => this.SetTabFunction('Assessments')}
-                    >
-                      <span style={HeadStyle}>Assessments</span>
-                    </div>
-                    <div
-                      style={TabCheck === 'Goals' ? ActiveStyle : BlockStyle}
-                      onClick={() => this.SetTabFunction('Goals')}
-                    >
-                      <span style={HeadStyle}>Goals</span>
-                    </div>
-                    <div
-                      style={TabCheck === 'Build Sessions' ? ActiveStyle : BlockStyle}
-                      onClick={() => this.SetTabFunction('Build Sessions')}
-                    >
-                      <span style={HeadStyle}>Build Sessions</span>
-                    </div>
-                    <div
-                      style={TabCheck === 'Sessions' ? ActiveStyle : BlockStyle}
-                      onClick={() => this.SetTabFunction('Sessions')}
-                    >
-                      <span style={HeadStyle}>Sessions</span>
-                    </div>
-                  </Card>
-                </div>
-              </Col>
+            </div>
 
-              <Col sm={19}>
-                {std ? (
-                  <>
-                    {TabCheck === 'Assessments' && (
-                      <>
-                        <div style={parentCardStyle}>
-                          <LearnerAssessments key={SelectedLearnerId} />
-                        </div>
-                      </>
-                    )}
-                    {TabCheck === 'Goals' && (
-                      <>
-                        <div style={parentCardStyle}>
-                          <LearnerGoals key={SelectedLearnerId} />
-                        </div>
-                      </>
-                    )}
-                    {TabCheck === 'Build Sessions' && (
-                      <>
-                        <div style={parentCardStyle}>
-                          <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-                            <tr>
-                              <td style={tdStyle}>
-                                <a href="/#/targetsAllocationToSession/">
-                                  <Button type="link">
-                                    Click here to manage targets in Sessions
+            <Col style={{ paddingRight: 0 }}>
+              <Row>
+                <Col sm={5}>
+                  <div style={{ display: 'flex' }}>
+                    <Card
+                      style={{
+                        backgroundColor: COLORS.palleteLightBlue,
+                        borderRadius: 0,
+                        minHeight: '100vh',
+                        minWidth: '290px',
+                        maxWidth: '350px',
+                      }}
+                    >
+                      <div style={SideBarHeading}>Intervention</div>
+                      <div
+                        style={TabCheck === 'Assessments' ? ActiveStyle : BlockStyle}
+                        onClick={() => this.SetTabFunction('Assessments')}
+                      >
+                        <span style={HeadStyle}>Assessments</span>
+                      </div>
+                      <div
+                        style={TabCheck === 'Goals' ? ActiveStyle : BlockStyle}
+                        onClick={() => this.SetTabFunction('Goals')}
+                      >
+                        <span style={HeadStyle}>Goals</span>
+                      </div>
+                      <div
+                        style={TabCheck === 'Build Sessions' ? ActiveStyle : BlockStyle}
+                        onClick={() => this.SetTabFunction('Build Sessions')}
+                      >
+                        <span style={HeadStyle}>Build Sessions</span>
+                      </div>
+                      <div
+                        style={TabCheck === 'Sessions' ? ActiveStyle : BlockStyle}
+                        onClick={() => this.SetTabFunction('Sessions')}
+                      >
+                        <span style={HeadStyle}>Sessions</span>
+                      </div>
+                    </Card>
+                  </div>
+                </Col>
+
+                <Col sm={19}>
+                  {std ? (
+                    <>
+                      {TabCheck === 'Assessments' && (
+                        <>
+                          <div style={parentCardStyle}>
+                            <LearnerAssessments key={SelectedLearnerId} />
+                          </div>
+                        </>
+                      )}
+                      {TabCheck === 'Goals' && (
+                        <>
+                          <div style={parentCardStyle}>
+                            <LearnerGoals key={SelectedLearnerId} />
+                          </div>
+                        </>
+                      )}
+                      {TabCheck === 'Build Sessions' && (
+                        <>
+                          <div style={parentCardStyle}>
+                            <table style={{ borderCollapse: 'collapse', width: '100%' }}>
+                              <tr>
+                                <td style={tdStyle}>
+                                  <a href="/#/targetsAllocationToSession/">
+                                    <Button type="link">
+                                      Click here to manage targets in Sessions
                                   </Button>
-                                </a>
-                              </td>
-                            </tr>
-                          </table>
-                        </div>
-                      </>
-                    )}
-                    {TabCheck === 'Sessions' && (
-                      <>
-                        {!localStorage.getItem('isOldSessionUI') ? (
-                          <SessionsTabs studentId={SelectedLearnerId} />
-                        ) : (
-                          <Row>
-                            <Col span={12}>
-                              <div style={parentCardStyle}>
-                                <Title style={{ fontSize: 20, lineHeight: '27px' }}>
-                                  Today&apos;s Sessions
+                                  </a>
+                                </td>
+                              </tr>
+                            </table>
+                          </div>
+                        </>
+                      )}
+                      {TabCheck === 'Sessions' && (
+                        <>
+                          {!localStorage.getItem('isOldSessionUI') ? (
+                            <SessionsTabs studentId={SelectedLearnerId} />
+                          ) : (
+                              <Row>
+                                <Col span={12}>
+                                  <div style={parentCardStyle}>
+                                    <Title style={{ fontSize: 20, lineHeight: '27px' }}>
+                                      Today&apos;s Sessions
                                 </Title>
-                                <LearnerSession key={SelectedLearnerId} />
-                              </div>
-                            </Col>
-                            <Col span={12}>
-                              <div style={parentCardStyle}>
-                                <Title style={{ fontSize: 20, lineHeight: '27px' }}>
-                                  Previous Sessions
-                                </Title>
-                                <a href="/#/sessionDetails">
-                                  <div style={targetMappingStyle}>
-                                    <Title
-                                      style={{
-                                        fontSize: '20px',
-                                        lineHeight: '27px',
-                                        display: 'block',
-                                      }}
-                                    >
-                                      Sessions
-                                    </Title>
-                                    <p
-                                      style={{
-                                        display: 'block',
-                                        marginTop: '5px',
-                                        marginBottom: '-5px',
-                                      }}
-                                    >
-                                      <i>Click here to see previous Sessions </i>
-                                    </p>
+                                    <LearnerSession key={SelectedLearnerId} />
                                   </div>
-                                </a>
-                              </div>
-                            </Col>
-                          </Row>
-                        )}
-                      </>
+                                </Col>
+                                <Col span={12}>
+                                  <div style={parentCardStyle}>
+                                    <Title style={{ fontSize: 20, lineHeight: '27px' }}>
+                                      Previous Sessions
+                                </Title>
+                                    <a href="/#/sessionDetails">
+                                      <div style={targetMappingStyle}>
+                                        <Title
+                                          style={{
+                                            fontSize: '20px',
+                                            lineHeight: '27px',
+                                            display: 'block',
+                                          }}
+                                        >
+                                          Sessions
+                                    </Title>
+                                        <p
+                                          style={{
+                                            display: 'block',
+                                            marginTop: '5px',
+                                            marginBottom: '-5px',
+                                          }}
+                                        >
+                                          <i>Click here to see previous Sessions </i>
+                                        </p>
+                                      </div>
+                                    </a>
+                                  </div>
+                                </Col>
+                              </Row>
+                            )}
+                        </>
+                      )}
+                    </>
+                  ) : (
+                      <>{this.noLearnerSelected()}</>
                     )}
-                  </>
-                ) : (
-                  <>{this.noLearnerSelected()}</>
-                )}
-              </Col>
-            </Row>
-          </Col>
+                </Col>
+              </Row>
+            </Col>
+          </Content>
         </Layout>
       </>
     )
