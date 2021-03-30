@@ -95,6 +95,12 @@ const routes = [
     component: loadable(() => import('pages/expenses/view_expense')),
     exact: true,
   },
+  // The assets component
+  {
+    path: '/partners/viewasset',
+    component: loadable(() => import('pages/assets_pages/view_asset')),
+    exact: true,
+  },
   {
     path: '/partners/viewstaffs',
     component: loadable(() => import('pages/staffs/view_staffs')),
