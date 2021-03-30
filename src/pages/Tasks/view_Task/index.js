@@ -45,6 +45,7 @@ import {
   CloseCircleOutlined,
   CloudDownloadOutlined,
   MinusOutlined,
+  CommentOutlined,
 } from '@ant-design/icons'
 import { RiCheckboxCircleLine, RiCheckboxBlankCircleLine } from 'react-icons/ri'
 import { connect } from 'react-redux'
@@ -55,6 +56,7 @@ import 'jspdf-autotable'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import CreateOrUpdateTask from '../CreateOrUpdateTask'
+import TaskTimeline from '../TaskTimeline'
 import './style.scss'
 
 const { Meta } = Card
@@ -83,6 +85,7 @@ class TaskTable extends React.Component {
     visible: false,
 
     selectedTaskType: 'Open',
+    taskCommentDrawer: false,
   }
 
   componentDidMount() {
@@ -116,6 +119,20 @@ class TaskTable extends React.Component {
     })
     this.setState({
       divShow: true,
+    })
+  }
+
+  commentInfo = e => {
+    const { dispatch } = this.props
+
+    dispatch({
+      type: 'tasks/SET_STATE',
+      payload: {
+        SelectedTask: e,
+      },
+    })
+    this.setState({
+      taskCommentDrawer: true,
     })
   }
 
@@ -506,13 +523,14 @@ class TaskTable extends React.Component {
         },
       },
       {
-        name: 'Complete',
+        name: 'Action',
         width: '120px',
         cell: e => (
           <span
             onClick={e => {
               e?.stopPropagation()
             }}
+            style={{ display: 'flex', alignItems: 'baseline' }}
           >
             <Popconfirm
               title={`Sure to ${
@@ -522,12 +540,17 @@ class TaskTable extends React.Component {
             >
               <Button type="link">
                 {e?.status?.taskStatus === 'Closed' ? (
-                  <RiCheckboxCircleLine style={{ color: 'green' }} />
+                  <RiCheckboxCircleLine style={{ color: 'green', fontSize: '1.4em' }} />
                 ) : (
-                  <RiCheckboxBlankCircleLine style={{ color: 'green' }} />
+                  <RiCheckboxBlankCircleLine style={{ color: 'green', fontSize: '1.4em' }} />
                 )}
               </Button>
             </Popconfirm>
+            <CommentOutlined
+              style={{ color: '#112d4e', fontSize: '1.5em' }}
+              onClick={() => this.commentInfo(e)}
+              type="link"
+            />
           </span>
         ),
       },
@@ -692,8 +715,44 @@ class TaskTable extends React.Component {
           </Drawer>
 
           <Drawer
-            title="UPDATE TASK"
+            title="TIMELINE"
             width="50%"
+            placement="right"
+            closable={true}
+            onClose={() => this.setState({ taskCommentDrawer: false })}
+            visible={this.state.taskCommentDrawer}
+          >
+            <div
+              style={{
+                width: '100%',
+                height: '100%',
+                background: '#fff',
+                padding: 30,
+                paddingTop: 0,
+              }}
+            >
+              <TaskTimeline
+                {...this.props}
+                task={SelectedTask}
+                onClose={() => this.setState({ taskCommentDrawer: false })}
+              />
+            </div>
+          </Drawer>
+
+          <Drawer
+            title="CREATE TASK"
+            width="80%"
+            placement="right"
+            closable={true}
+            onClose={this.onClose}
+            visible={this.state.visible}
+          >
+            <CreateOrUpdateTask {...this.props} onClose={() => this.setState({ divShow: false })} />
+          </Drawer>
+
+          <Drawer
+            title="UPDATE TASK"
+            width="80%"
             placement="right"
             closable={true}
             onClose={() => this.setState({ divShow: false })}
@@ -704,17 +763,6 @@ class TaskTable extends React.Component {
               task={SelectedTask}
               onClose={() => this.setState({ divShow: false })}
             />
-          </Drawer>
-
-          <Drawer
-            title="CREATE TASK"
-            width="50%"
-            placement="right"
-            closable={true}
-            onClose={this.onClose}
-            visible={this.state.visible}
-          >
-            <CreateOrUpdateTask {...this.props} onClose={() => this.setState({ divShow: false })} />
           </Drawer>
 
           <div

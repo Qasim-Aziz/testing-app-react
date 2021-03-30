@@ -318,115 +318,120 @@ class ChangePasswordForm extends React.Component {
     }
 
     return (
-      <div style={{ paddingTop: 30 }}>
-        <Row style={{ marginTop: 9, backgroundColor: '#f9f9f9', padding: 5 }}>
-          <Col span={6}>
-            <Title style={{ fontSize: 18, lineHeight: '21px' }}>Program Areas</Title>
-            <div style={divStyle}>
-              {programAreas.map(item => (
-                <div style={childDivStyle}>
-                  <div className="d-flex flex-wrap align-items-center" style={childChildDivStyle}>
-                    <div>
-                      <p className="text-uppercase font-weight-bold mb-1">{item.node.name}</p>
-                      <p className="mb-0">
-                        <Popconfirm
-                          // style={{ float: 'right', marginBottom: '10px' }}
-                          title="Are you sure you want to do this"
-                          onConfirm={() => this.activateProgramArea(item.node.id)}
-                          // onCancel={cancel}
-                          okText="Yes"
-                          cancelText="No"
-                        >
-                          <Button style={{ border: 'none' }}>Activate</Button>
-                        </Popconfirm>
-                      </p>
+      <div>
+        <div className="profileTab-heading">
+          <p>Disabled Curriculum</p>
+        </div>
+        <div style={{ paddingTop: 30 }}>
+          <Row style={{ marginTop: 9, backgroundColor: '#f9f9f9', padding: 5 }}>
+            <Col span={6}>
+              <Title style={{ fontSize: 18, lineHeight: '21px' }}>Program Areas</Title>
+              <div style={divStyle}>
+                {programAreas.map(item => (
+                  <div style={childDivStyle}>
+                    <div className="d-flex flex-wrap align-items-center" style={childChildDivStyle}>
+                      <div>
+                        <p className="text-uppercase font-weight-bold mb-1">{item.node.name}</p>
+                        <p className="mb-0">
+                          <Popconfirm
+                            // style={{ float: 'right', marginBottom: '10px' }}
+                            title="Are you sure you want to do this"
+                            onConfirm={() => this.activateProgramArea(item.node.id)}
+                            // onCancel={cancel}
+                            okText="Yes"
+                            cancelText="No"
+                          >
+                            <Button style={{ border: 'none' }}>Activate</Button>
+                          </Popconfirm>
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </Col>
-          <Col span={6}>
-            <Title style={{ fontSize: 18, lineHeight: '21px' }}>Domains</Title>
-            <div style={divStyle}>
-              {domains.map(item => (
-                <div style={childDivStyle}>
-                  <div className="d-flex flex-wrap align-items-center" style={childChildDivStyle}>
-                    <div className="mr-auto">
-                      <p className="text-uppercase font-weight-bold mb-1">{item.node.domain}</p>
-                      <p className="mb-0">
-                        <Popconfirm
-                          // style={{ float: 'right', marginBottom: '10px' }}
-                          title="Are you sure you want to do this"
-                          onConfirm={() => this.activateDomain(item.node.id)}
-                          // onCancel={cancel}
-                          okText="Yes"
-                          cancelText="No"
-                        >
-                          <Button style={{ border: 'none' }}>Activate</Button>
-                        </Popconfirm>
-                      </p>
+                ))}
+              </div>
+            </Col>
+            <Col span={6}>
+              <Title style={{ fontSize: 18, lineHeight: '21px' }}>Domains</Title>
+              <div style={divStyle}>
+                {domains.map(item => (
+                  <div style={childDivStyle}>
+                    <div className="d-flex flex-wrap align-items-center" style={childChildDivStyle}>
+                      <div className="mr-auto">
+                        <p className="text-uppercase font-weight-bold mb-1">{item.node.domain}</p>
+                        <p className="mb-0">
+                          <Popconfirm
+                            // style={{ float: 'right', marginBottom: '10px' }}
+                            title="Are you sure you want to do this"
+                            onConfirm={() => this.activateDomain(item.node.id)}
+                            // onCancel={cancel}
+                            okText="Yes"
+                            cancelText="No"
+                          >
+                            <Button style={{ border: 'none' }}>Activate</Button>
+                          </Popconfirm>
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </Col>
-          <Col span={6}>
-            <Title style={{ fontSize: 18, lineHeight: '21px' }}>Target Areas</Title>
-            <div style={divStyle}>
-              {targetAreas.map(item => (
-                <div style={childDivStyle}>
-                  <div className="d-flex flex-wrap align-items-center" style={childChildDivStyle}>
-                    <div className="mr-auto">
-                      <p className="text-uppercase font-weight-bold mb-1">{item.node.Area}</p>
-                      <p className="mb-0">
-                        <Popconfirm
-                          // style={{ float: 'right', marginBottom: '10px' }}
-                          title="Are you sure you want to do this"
-                          onConfirm={() => this.activateTargetArea(item.node.id)}
-                          // onCancel={cancel}
-                          okText="Yes"
-                          cancelText="No"
-                        >
-                          <Button style={{ border: 'none' }}>Activate</Button>
-                        </Popconfirm>
-                      </p>
+                ))}
+              </div>
+            </Col>
+            <Col span={6}>
+              <Title style={{ fontSize: 18, lineHeight: '21px' }}>Target Areas</Title>
+              <div style={divStyle}>
+                {targetAreas.map(item => (
+                  <div style={childDivStyle}>
+                    <div className="d-flex flex-wrap align-items-center" style={childChildDivStyle}>
+                      <div className="mr-auto">
+                        <p className="text-uppercase font-weight-bold mb-1">{item.node.Area}</p>
+                        <p className="mb-0">
+                          <Popconfirm
+                            // style={{ float: 'right', marginBottom: '10px' }}
+                            title="Are you sure you want to do this"
+                            onConfirm={() => this.activateTargetArea(item.node.id)}
+                            // onCancel={cancel}
+                            okText="Yes"
+                            cancelText="No"
+                          >
+                            <Button style={{ border: 'none' }}>Activate</Button>
+                          </Popconfirm>
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </Col>
-          <Col span={6}>
-            <Title style={{ fontSize: 18, lineHeight: '21px' }}>Targets</Title>
-            <div style={divStyle}>
-              {targets.map(item => (
-                <div style={childDivStyle}>
-                  <div className="d-flex flex-wrap align-items-center" style={childChildDivStyle}>
-                    <div className="mr-auto">
-                      <p className="text-uppercase font-weight-bold mb-1">
-                        {item.node.targetMain.targetName}
-                      </p>
-                      <p className="mb-0">
-                        <Popconfirm
-                          // style={{ float: 'right', marginBottom: '10px' }}
-                          title="Are you sure you want to do this"
-                          onConfirm={() => this.activateTarget(item.node.id)}
-                          // onCancel={cancel}
-                          okText="Yes"
-                          cancelText="No"
-                        >
-                          <Button style={{ border: 'none' }}>Activate</Button>
-                        </Popconfirm>
-                      </p>
+                ))}
+              </div>
+            </Col>
+            <Col span={6}>
+              <Title style={{ fontSize: 18, lineHeight: '21px' }}>Targets</Title>
+              <div style={divStyle}>
+                {targets.map(item => (
+                  <div style={childDivStyle}>
+                    <div className="d-flex flex-wrap align-items-center" style={childChildDivStyle}>
+                      <div className="mr-auto">
+                        <p className="text-uppercase font-weight-bold mb-1">
+                          {item.node.targetMain.targetName}
+                        </p>
+                        <p className="mb-0">
+                          <Popconfirm
+                            // style={{ float: 'right', marginBottom: '10px' }}
+                            title="Are you sure you want to do this"
+                            onConfirm={() => this.activateTarget(item.node.id)}
+                            // onCancel={cancel}
+                            okText="Yes"
+                            cancelText="No"
+                          >
+                            <Button style={{ border: 'none' }}>Activate</Button>
+                          </Popconfirm>
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </Col>
-        </Row>
+                ))}
+              </div>
+            </Col>
+          </Row>
+        </div>
       </div>
     )
   }

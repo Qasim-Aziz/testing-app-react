@@ -146,12 +146,16 @@ const Location = () => {
 
   return (
     <div>
+      <div className="profileTab-heading">
+        <p>Location</p>
+      </div>
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
           alignItems: 'flex-end',
+          paddingTop: '1em',
         }}
       >
         <div

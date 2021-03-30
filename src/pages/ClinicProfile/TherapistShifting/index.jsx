@@ -60,106 +60,124 @@ const TherapistShifting = () => {
   if (therapistErrors) return <h3>An error occurred to load Therapists.</h3>
 
   return (
-    <Form
-      onSubmit={handleSubmit}
-      className="therapistShiftingTab"
-      size="small"
-      labelCol={{ span: 10 }}
-      wrapperCol={{ span: 12 }}
-    >
-      <Row>
-        <Col sm={24} md={24} lg={24}>
-          <Form.Item
-            label="For all Therapist"
-            labelCol={{ offset: 1, sm: 4 }}
-            wrapperCol={{ sm: 18 }}
-          >
-            <Switch
-              checkedChildren={<Icon type="check" />}
-              unCheckedChildren={<Icon type="close" />}
-              checked={isForAllTherapist}
-              onChange={setIsForAllTherapist}
-            />
-          </Form.Item>
-        </Col>
-      </Row>
-
-      <Row>
-        <Col sm={24} md={24} lg={24}>
-          <Form.Item label="Therapist" labelCol={{ offset: 1, sm: 4 }} wrapperCol={{ sm: 18 }}>
-            <Select
-              placeholder="Select Therapist"
-              loading={allTherapistLoading}
-              showSearch
-              optionFilterProp="name"
-              value={selectedTherapists}
-              onChange={setSelectedTherapists}
-              disabled={isForAllTherapist}
-              mode="tags"
+    <div>
+      <div className="profileTab-heading">
+        <p>Therapist Shifting</p>
+      </div>
+      <Form onSubmit={handleSubmit} className="therapistShiftingTab" size="small">
+        <Row>
+          <Col>
+            <Form.Item
+              label="For all Therapist"
+              style={{ display: 'flex', justifyContent: 'flex-end' }}
             >
-              {allTherapist &&
-                allTherapist.staffs.edges.map(({ node }) => (
-                  <Select.Option key={node.id} name={node.name}>
-                    {node.name}
+              <Switch
+                checkedChildren={<Icon type="check" />}
+                unCheckedChildren={<Icon type="close" />}
+                checked={isForAllTherapist}
+                onChange={setIsForAllTherapist}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col>
+            <Form.Item
+              label="Therapist"
+              labelCol={{ span: 24 }}
+              wrapperCol={{ span: 24 }}
+              className="form-label"
+            >
+              <Select
+                placeholder="Select Therapist"
+                loading={allTherapistLoading}
+                showSearch
+                optionFilterProp="name"
+                value={selectedTherapists}
+                onChange={setSelectedTherapists}
+                disabled={isForAllTherapist}
+                mode="tags"
+              >
+                {allTherapist &&
+                  allTherapist.staffs.edges.map(({ node }) => (
+                    <Select.Option key={node.id} name={node.name}>
+                      {node.name}
+                    </Select.Option>
+                  ))}
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row style={{ display: 'flex' }}>
+          <Col>
+            <Form.Item
+              label="Start Time"
+              labelCol={{ span: 24 }}
+              wrapperCol={{ span: 24 }}
+              className="form-label"
+            >
+              <TimePicker
+                placeholder="Start Time"
+                format="HH:mm"
+                minuteStep={30}
+                value={startTime}
+                onChange={setStartTime}
+              />
+            </Form.Item>
+          </Col>
+          <Col>
+            <Form.Item
+              label="End Time"
+              labelCol={{ span: 24 }}
+              wrapperCol={{ span: 24 }}
+              className="form-label"
+            >
+              <TimePicker
+                placeholder="End Time"
+                format="HH:mm"
+                minuteStep={30}
+                value={endTime}
+                onChange={setEndTime}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col>
+            <Form.Item
+              label="Working Days"
+              labelCol={{ span: 24 }}
+              wrapperCol={{ span: 24 }}
+              className="form-label"
+            >
+              <Select
+                placeholder="Select Working Days"
+                showSearch
+                optionFilterProp="displayText"
+                mode="tags"
+                value={selectedDays}
+                onChange={setSelectedDays}
+              >
+                {days.map(day => (
+                  <Select.Option key={day} name={day}>
+                    {day}
                   </Select.Option>
                 ))}
-            </Select>
-          </Form.Item>
-        </Col>
-      </Row>
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
 
-      <Row>
-        <Col sm={12} md={12} lg={12}>
-          <Form.Item label="Start Time" labelCol={{ offset: 1, sm: 9 }} wrapperCol={{ sm: 13 }}>
-            <TimePicker
-              placeholder="Start Time"
-              format="HH:mm"
-              minuteStep={30}
-              value={startTime}
-              onChange={setStartTime}
-            />
-          </Form.Item>
-        </Col>
-        <Col sm={12} md={12} lg={12}>
-          <Form.Item label="End Time" labelCol={{ sm: 6 }} wrapperCol={{ sm: 17 }}>
-            <TimePicker
-              placeholder="End Time"
-              format="HH:mm"
-              minuteStep={30}
-              value={endTime}
-              onChange={setEndTime}
-            />
-          </Form.Item>
-        </Col>
-      </Row>
-
-      <Row>
-        <Col sm={24} md={24} lg={24}>
-          <Form.Item label="Working Days" labelCol={{ offset: 1, sm: 4 }} wrapperCol={{ sm: 18 }}>
-            <Select
-              placeholder="Select Working Days"
-              showSearch
-              optionFilterProp="displayText"
-              mode="tags"
-              value={selectedDays}
-              onChange={setSelectedDays}
-            >
-              {days.map(day => (
-                <Select.Option key={day} name={day}>
-                  {day}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-        </Col>
-      </Row>
-
-      <Form.Item style={{ textAlign: 'center' }}>
-        <Button type="primary" htmlType="submit" disabled={isUpdateShiftingLoading}>
-          Save
-        </Button>
-      </Form.Item>
-    </Form>
+        <Form.Item style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Button type="primary" htmlType="submit" disabled={isUpdateShiftingLoading}>
+            Save
+          </Button>
+        </Form.Item>
+      </Form>
+    </div>
   )
 }
 

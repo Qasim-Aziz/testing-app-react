@@ -142,7 +142,7 @@ export default () => {
   const [tickets, setTickets] = useState()
   const [newTicket, setNewTicket] = useState()
   const [updateTicket, setUpdateTicket] = useState()
-  // const [updateTimeline, setUpdateTimeline] = useState()
+  const [updateTimeline, setUpdateTimeline] = useState()
   const [updateTicketData, setUpdateTicketData] = useState()
   const deleteTicketId = useRef()
   const [filterButId, setFilterButId] = useState('1')
@@ -351,11 +351,11 @@ export default () => {
       cell: data => {
         return (
           <div style={{ display: 'flex', width: '100%', justifyContent: 'flex-start' }}>
-            {/* <CommentOutlined 
+            <CommentOutlined
               style={{ color: '#112d4e', fontSize: '1.4em', paddingRight: '.9em' }}
-              onClick={() => setUpdateTimeline(data.key)} 
+              onClick={() => setUpdateTimeline(data.key)}
               type="link"
-            /> */}
+            />
             <EditOutlined
               style={{ color: '#112d4e', fontSize: '1.4em', paddingRight: '.9em' }}
               onClick={() => setUpdateTicket(data.key)}
@@ -584,11 +584,11 @@ export default () => {
           />
         </div>
       </Drawer>
-      {/* <Drawer
+      <Drawer
         visible={updateTimeline}
-        onClose={() => (setUpdateTimeline(null))}
+        onClose={() => setUpdateTimeline(null)}
         title="Timeline"
-        width="80%"
+        width="50%"
       >
         <div
           style={{
@@ -601,9 +601,10 @@ export default () => {
         >
           <SupportTicketTimeline
             updateTicketId={updateTimeline}
+            setUpdateTicketId={setUpdateTimeline}
           />
         </div>
-        </Drawer> */}
+      </Drawer>
     </div>
   )
 }

@@ -70,40 +70,45 @@ const PeakAutomaticTab = () => {
       {loading ? (
         <span>Loading...</span>
       ) : (
-        <table>
-          <tbody>
-            <tr>
-              <td style={{ ...tdStyle, width: 200 }}>
-                <p
-                  style={{
-                    color: '#1C8FFA',
-                    fontSize: 15,
-                    display: 'block',
-                    marginTop: '5px',
-                    marginBottom: '5px',
-                  }}
-                >
-                  Peak Automatic
-                </p>
-              </td>
-              <td style={{ ...tdStyle, width: 100 }}>
-                <Switch
-                  checkedChildren={<Icon type="check" />}
-                  checked={peakAutomatic}
-                  onChange={savePeakAutomatic}
-                  unCheckedChildren={<Icon type="close" />}
-                />
-              </td>
-              <td style={tdStyle}>
-                <i>
-                  An evidence-based tool that assesses and teaches language and cognitive skills
-                  starting from basic foundational abilities to generalizing and higher-order
-                  abilities.
-                </i>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <>
+          <div className="profileTab-heading">
+            <p>Peak Automatic</p>
+          </div>
+          <table style={{ paddingTop: '2em', backgroundColor: 'white' }}>
+            <tbody>
+              <tr>
+                <td style={{ ...tdStyle, width: 200 }}>
+                  <p
+                    style={{
+                      color: '#1C8FFA',
+                      fontSize: 15,
+                      display: 'block',
+                      marginTop: '5px',
+                      marginBottom: '5px',
+                    }}
+                  >
+                    Peak Automatic
+                  </p>
+                </td>
+                <td style={{ ...tdStyle, width: 100 }}>
+                  <Switch
+                    checkedChildren={<Icon type="check" />}
+                    checked={peakAutomatic}
+                    onChange={savePeakAutomatic}
+                    unCheckedChildren={<Icon type="close" />}
+                  />
+                </td>
+                <td style={tdStyle}>
+                  <i>
+                    An evidence-based tool that assesses and teaches language and cognitive skills
+                    starting from basic foundational abilities to generalizing and higher-order
+                    abilities.
+                  </i>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </>
       )}
     </div>
   )

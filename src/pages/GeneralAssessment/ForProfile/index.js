@@ -153,33 +153,24 @@ function Assessment() {
   ]
 
   return (
-    <div>
+    <div className="profileTab-container">
+      <div className="profileTab-heading">
+        <p>Assessment</p>
+      </div>
       <Content
         style={{
-          padding: '0px 20px',
           maxWidth: '95%',
           width: '100%',
-          margin: '0px auto',
+          paddingTop: '2em',
         }}
       >
         <div
           style={{
             display: 'flex',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-end',
             alignItems: 'center',
           }}
         >
-          <Text
-            style={{
-              marginBottom: 20,
-              fontSize: 24,
-              marginTop: 15,
-              marginLeft: 5,
-              color: '#000',
-            }}
-          >
-            Assessment
-          </Text>
           <div style={{ display: 'flex', gap: '16px' }}>
             <Button
               type="primary"
@@ -201,6 +192,7 @@ function Assessment() {
           bordered
           rowKey={record => record.id}
           pagination={false}
+          style={{ marginTop: '1em', backgroundColor: 'white' }}
         />
       </Content>
 

@@ -1,0 +1,59 @@
+.TimelineTopContainer {
+  background-color: #dbe2ef;
+  margin-bottom: 35px;
+  padding: 20px;
+}
+
+.TopContainer-Row {
+  display: flex;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.TopContainer-Left {
+  display: flex;
+  font-weight: bolder;
+  color: #112d4e;
+  width: 9.5em;
+}
+.TopContainer-Left > p {
+  margin-left: 4px;
+  margin-right: 17px;
+  margin-bottom: 0;
+}
+
+.Timeline-Icon {
+  font-size: 1.5rem;
+  color: #112d4e;
+}
+
+#timeline-body {
+  font-size: 15px;
+  color: #112d4e;
+  font-weight: 600;
+}
+
+#timeline-body > p {
+  font-size: 20px;
+  color: black;
+  font-weight: bold;
+}
+
+.TimeLine-Form div.ant-col {
+  width: 97%;
+}
+
+#comment {
+  border-color: #b3babb;
+}
+
+.TimelineMiddleContainer {
+  border-bottom: 1px solid #112d4e;
+  margin-top: 5em;
+  margin-bottom: 3em;
+  p {
+    color: #112d4e;
+    font-weight: bold;
+    font-size: 1.4rem;
+  }
+}
