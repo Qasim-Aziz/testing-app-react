@@ -11,6 +11,7 @@ import { Helmet } from 'react-helmet'
 import { FaDownload } from 'react-icons/fa'
 import moment from 'moment'
 import './allClinicData.scss'
+import { COLORS } from 'assets/styles/globalStyles'
 import { FilterCard } from './filterCard'
 
 const { Content } = Layout
@@ -125,6 +126,7 @@ function ClinicStaff({ rowData }) {
       title: 'Designation',
       dataIndex: 'node.designation',
       key: 'designation',
+      width: 180,
     },
     {
       title: 'Gender',
@@ -159,9 +161,9 @@ function ClinicStaff({ rowData }) {
         <span>
           <Button type="link">
             {status ? (
-              <CheckCircleOutlined style={{ color: 'green' }} />
+              <CheckCircleOutlined style={{ fontSize: 22, color: COLORS.success }} />
             ) : (
-              <CloseCircleOutlined style={{ color: 'red' }} />
+              <CloseCircleOutlined style={{ fontSize: 22, color: COLORS.danger }} />
             )}
           </Button>
         </span>
@@ -180,9 +182,10 @@ function ClinicStaff({ rowData }) {
   const fileExtension = '.xlsx'
   const exportToCSV = () => {
     const filename = 'Staff_List_'
-    const currentTime = moment().format('YYYY-MM-DD_HH:mm')
+    const currentTime = moment().format('_YYYY-MM-DD_HH:mm_')
     const formattedData = []
     staffList.map(item => {
+      console.log(item, 'item')
       formattedData.push({
         Name: `${item.node.name} ${item.node.surname}`,
         Email: item.node.email,
@@ -192,6 +195,9 @@ function ClinicStaff({ rowData }) {
         'Date of Birth': item.node.dob,
         Address: item.node.localAddress,
         Active: item.node.isActive,
+        'Last Login': item.node?.lastLogin
+          ? moment(item.node?.lastLogin).format('YYYY-MM-DD HH:mm:ss')
+          : null,
       })
     })
 
@@ -200,9 +206,13 @@ function ClinicStaff({ rowData }) {
     const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
     const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
     const excelData = new Blob([excelBuffer], { type: fileType })
-    FileSaver.saveAs(excelData, filename + currentTime + fileExtension)
+    // FileSaver.saveAs(
+    //   excelData,
+    //   filename + rowData?.details?.schoolName + currentTime + fileExtension,
+    // )
   }
 
+  console.log(rowData, 'rowData')
   console.log(staffList, 'ss')
 
   const menu = (

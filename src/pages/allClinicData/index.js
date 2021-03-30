@@ -13,6 +13,7 @@ import moment from 'moment'
 import { FaDownload } from 'react-icons/fa'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
+import { DRAWER } from 'assets/styles/globalStyles'
 import client from '../../apollo/config'
 import './allClinicData.scss'
 import AllLearners from './allLearners'
@@ -366,6 +367,7 @@ const AllClinicsData = () => {
         Email: item.details.email,
         'Contact No 1': item.details.contactNo,
         'Contact No 2': item.details.contactNo2,
+        Staff: item.details.staffSet?.edges?.length,
         'Total Learners': item.totalLearners,
         'Active Learners': item.activeLearners,
         'Last Month Active Learners': item.lastMonthActiveLearners,
@@ -484,14 +486,14 @@ const AllClinicsData = () => {
           closable="true"
           onClose={() => setFilterDrawer(false)}
           visible={filterDrawer}
-          width={360}
+          width={DRAWER.widthL4}
         >
           <FilterCard filterHandler={filterHandler} filterSet={filterSet} ref={filterRef} />
         </Drawer>
 
         <Drawer
           title={`${drawerTitle}: Invoices`}
-          width="70vw"
+          width={DRAWER.widthL1}
           placement="right"
           closable="true"
           onClose={() => setInvoiceDrawer(false)}
@@ -500,7 +502,7 @@ const AllClinicsData = () => {
           <InvoiceTable rowData={currentClinicRow} setInvoiceDrawer={setInvoiceDrawer} />
         </Drawer>
         <Drawer
-          width="70vw"
+          width={DRAWER.widthL1}
           placement="right"
           closable="true"
           onClose={() => setStaffDrawer(false)}
@@ -512,7 +514,7 @@ const AllClinicsData = () => {
         </Drawer>
         <Drawer
           title={`${drawerTitle}: Maintain Rates`}
-          width="40%"
+          width={DRAWER.widthL3}
           placement="right"
           closable="true"
           onClose={() => setRatesDrawer(false)}
@@ -528,7 +530,7 @@ const AllClinicsData = () => {
         <Drawer
           visible={learnersTableDrawer}
           onClose={() => setLearnersTableDrawer(false)}
-          width="70vw"
+          width={DRAWER.widthL1}
           placement="right"
           closable="true"
           destroyOnClose="true"

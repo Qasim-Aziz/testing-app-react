@@ -9,6 +9,7 @@ import moment from 'moment'
 import { FaDownload } from 'react-icons/fa'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
+import { COLORS } from 'assets/styles/globalStyles'
 import client from '../../apollo/config'
 import './allClinicData.scss'
 import { ALL_LEARNERS, UPDATE_STUDENT } from './query'
@@ -197,9 +198,9 @@ function AllLearners(props) {
           >
             <Button type="link">
               {status ? (
-                <CheckCircleOutlined style={{ color: 'green' }} />
+                <CheckCircleOutlined style={{ fontSize: 22, color: COLORS.success }} />
               ) : (
-                <CloseCircleOutlined style={{ color: 'red' }} />
+                <CloseCircleOutlined style={{ fontSize: 22, color: COLORS.danger }} />
               )}
             </Button>
           </Popconfirm>
@@ -212,7 +213,7 @@ function AllLearners(props) {
   const fileExtension = '.xlsx'
   const exportToCSV = () => {
     const filename = 'Learner_List_'
-    const currentTime = moment().format('YYYY-MM-DD_HH:mm')
+    const currentTime = moment().format('_YYYY-MM-DD_HH:mm:ss_')
     const formattedData = []
     learnersList.map(item => {
       formattedData.push({
@@ -223,6 +224,12 @@ function AllLearners(props) {
         Gender: item.gender,
         'Date of Birth': item.dob,
         Active: item.isActive,
+        'Cog Active': item.isCogActive,
+        'Peak Active': item.isPeakActive,
+        'Research Participant': item.researchParticipant,
+        'Last Login': item.parent?.lastLogin
+          ? moment(item.parent.lastLogin).format('YYYY-MM-DD HH:mm:ss')
+          : null,
       })
     })
 
@@ -231,7 +238,10 @@ function AllLearners(props) {
     const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
     const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
     const excelData = new Blob([excelBuffer], { type: fileType })
-    FileSaver.saveAs(excelData, filename + currentTime + fileExtension)
+    FileSaver.saveAs(
+      excelData,
+      filename + rowData.details?.schoolName + currentTime + fileExtension,
+    )
   }
 
   console.log(learnersList, 'ss')

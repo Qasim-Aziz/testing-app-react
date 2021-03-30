@@ -24,6 +24,7 @@ import { connect } from 'react-redux'
 import { DeleteOutlined, FilterOutlined } from '@ant-design/icons'
 import Scrollbars from 'react-custom-scrollbars'
 import moment from 'moment'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import LearnerSelect from 'components/LearnerSelect'
 import client from '../../apollo/config'
 import VbMappsTargets from './VbMappsTargets'
@@ -204,8 +205,8 @@ class AssessmentsList extends Component {
                 okText="Yes"
                 cancelText="No"
               >
-                <Button type="link" style={{ color: textColor }} loading={this.state.deleteLoading}>
-                  <DeleteOutlined />
+                <Button type="link" loading={this.state.deleteLoading}>
+                  <DeleteOutlined style={{ fontSize: 22, color: COLORS.danger, fontWeight: 700 }} />
                 </Button>
               </Popconfirm>
             </Tooltip>
@@ -215,31 +216,31 @@ class AssessmentsList extends Component {
           style={{
             paddingBottom: 5,
             borderBottom: '0.5px solid rgba(0, 0, 0, 0.1)',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexDirection: 'row',
             display: 'flex',
+            flexDirection: 'column',
           }}
         >
-          <p style={{ fontSize: 12 }}>Milestones: {milestoneScore}</p>
-          <p style={{ fontSize: 12 }}>Barriers: {barrierScore}</p>
-          <p style={{ fontSize: 12 }}>EESA: {eesaScore}</p>
-          <p style={{ fontSize: 12 }}>Transitions: {transitionScore}</p>
+          <div style={{ display: 'flex' }}>
+            <p style={{ width: '50%', fontSize: 12, marginBottom: 0 }}>
+              Milestones : {milestoneScore}
+            </p>
+            <p style={{ width: '50%', fontSize: 12, marginBottom: 0 }}>Barriers : {barrierScore}</p>
+          </div>
+          <div style={{ display: 'flex' }}>
+            <p style={{ width: '50%', fontSize: 12 }}>EESA : {eesaScore}</p>
+            <p style={{ width: '50%', fontSize: 12 }}>Transitions : {transitionScore}</p>
+          </div>
         </div>
         <div
           style={{
             flexDirection: 'row',
             display: 'flex',
             justifyContent: 'space-between',
-            marginTop: 10,
+            margin: '8px auto',
           }}
         >
           <Button
-            style={{
-              marginRight: 10,
-              color: textColor,
-              padding: 0,
-            }}
+            style={{ marginRight: 10, padding: 0 }}
             type="link"
             onClick={() => {
               client
@@ -262,9 +263,7 @@ class AssessmentsList extends Component {
           >
             IEP Report
           </Button>
-          <Button type="link" style={{ marginTop: 5, color: textColor }}>
-            Notes
-          </Button>
+          <Button type="link">Notes</Button>
         </div>
         <div
           style={{
@@ -278,6 +277,7 @@ class AssessmentsList extends Component {
                 target: id,
               })
             }}
+            type="primary"
             style={{
               width: '100%',
             }}
@@ -300,14 +300,15 @@ class AssessmentsList extends Component {
       assessments[assessments.length - 1].eesa +
       assessments[assessments.length - 1].transition
     let percentage = 0
+
     if (completed > 0 && assessments[assessments.length - 1].total > 0) {
       percentage = (completed / assessments[assessments.length - 1].total) * 100
       percentage = Math.round(percentage * 10) / 10
     }
     const outputDate = moment(assessments[assessments.length - 1].node.date).format('MMMM DD, YYYY')
     if (selected === assessments[assessments.length - 1].node.testNo) {
-      bg = '#3E7BFA'
-      textColor = '#FFF'
+      bg = COLORS.palleteLightBlue
+      textColor = '#000'
     }
     const index = assessments.length - 1
     return (
@@ -341,8 +342,8 @@ class AssessmentsList extends Component {
     const AssignmentCard = this.assessmentCard
     for (let x = assessments.length - 2; x >= 0; x -= 1) {
       if (selected === assessments[x].node.testNo) {
-        bg = '#3E7BFA'
-        textColor = '#FFF'
+        bg = COLORS.palleteLightBlue
+        textColor = '#000'
       } else {
         bg = '#FFF'
         textColor = '#000'
@@ -393,7 +394,8 @@ class AssessmentsList extends Component {
         >
           <div
             style={{
-              marginTop: 20,
+              marginBottom: '15px',
+              marginTop: '5px',
               paddingBottom: 2,
               boxShadow:
                 '0px 0px 1px rgba(0, 0, 0, 0.08), 0px 0px 2px rgba(0, 0, 0, 0.12), 0px 1px 2px rgba(0, 0, 0, 0.08)',
@@ -507,19 +509,19 @@ class AssessmentsList extends Component {
   render() {
     const { assessments, areas, studentID } = this.state
     const { user } = this.props
+    console.log(this.state.selectedAssignment, 'selectedAssignment')
     return (
-      <Layout style={{ padding: '0px' }}>
+      <Layout style={{ padding: '0px', marginBottom: '40px', marginTop: '20px' }}>
         <Content
           style={{
-            padding: '0px 20px',
-            maxWidth: 1300,
-            width: '100%',
+            padding: 0,
+            width: 1360,
             margin: '0px auto',
           }}
         >
-          <Row>
+          <Row gutter={[0, 0]} style={{ height: 'calc(100vh + 100px' }}>
             <Col sm={6}>
-              <div style={leftDivStyle}>
+              <div style={{ ...leftDivStyle, height: 'calc(100vh + 100px' }}>
                 {assessments && assessments.length > 0 && (
                   <Link
                     to={{
@@ -533,18 +535,16 @@ class AssessmentsList extends Component {
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        backgroundColor: '#3E7BFA',
-                        color: '#FFFFFF',
+                        backgroundColor: COLORS.palleteLightBlue,
+                        color: '#000',
                         cursor: 'pointer',
                         boxShadow:
                           '0px 0px 1px rgba(0, 0, 0, 0.08), 0px 0px 2px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(0, 0, 0, 0.08)',
-                        paddingTop: 10,
-                        paddingBottom: 10,
-                        paddingLeft: 20,
-                        paddingRight: 20,
-                        borderRadius: 10,
+                        padding: '10px 20px',
+                        borderRadius: 4,
                         flex: 1,
                         margin: '20px 10px',
+                        marginTop: 0,
                       }}
                     >
                       <p style={{ marginBottom: 0 }}>New Assessment</p>
@@ -566,8 +566,8 @@ class AssessmentsList extends Component {
                             display: 'flex',
                             justifyContent: 'center',
                             alignItems: 'center',
-                            backgroundColor: '#3E7BFA',
-                            color: '#FFFFFF',
+                            backgroundColor: COLORS.palleteLightBlue,
+                            color: '#000',
                             cursor: 'pointer',
                             boxShadow:
                               '0px 0px 1px rgba(0, 0, 0, 0.08), 0px 0px 2px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(0, 0, 0, 0.08)',
@@ -575,7 +575,7 @@ class AssessmentsList extends Component {
                             paddingBottom: 10,
                             paddingLeft: 20,
                             paddingRight: 20,
-                            borderRadius: 10,
+                            borderRadius: 4,
                             flex: 1,
                             marginTop: 20,
                             marginBottom: 20,
@@ -585,25 +585,12 @@ class AssessmentsList extends Component {
                         </div>
                       </Link>
                     )}
-                    <p
-                      style={{
-                        fontWeight: '700',
-                        letterSpacing: 0.8,
-                        fontSize: 16,
-                        marginLeft: 10,
-                      }}
-                    >
-                      Active Assessment
-                    </p>
-                    {assessments && assessments.length > 0 && this.getActiveAssessment()}
+                    <Scrollbars style={{ height: 'calc(100vh + 20px)' }} autoHide>
+                      {assessments && assessments.length > 0 && this.getActiveAssessment()}
+                    </Scrollbars>
                   </TabPane>
                   <TabPane tab="Previous" key="2">
-                    <Scrollbars
-                      style={{
-                        height: 'calc(100vh - 180px)',
-                      }}
-                      // autoHide
-                    >
+                    <Scrollbars style={{ height: 'calc(100vh + 30px)' }} autoHide>
                       {assessments && assessments.length === 0 && (
                         <Link
                           to={{
@@ -617,8 +604,8 @@ class AssessmentsList extends Component {
                               display: 'flex',
                               justifyContent: 'center',
                               alignItems: 'center',
-                              backgroundColor: '#3E7BFA',
-                              color: '#FFFFFF',
+                              backgroundColor: COLORS.palleteLightBlue,
+                              color: '#000',
                               cursor: 'pointer',
                               boxShadow:
                                 '0px 0px 1px rgba(0, 0, 0, 0.08), 0px 0px 2px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(0, 0, 0, 0.08)',
@@ -626,7 +613,7 @@ class AssessmentsList extends Component {
                               paddingBottom: 10,
                               paddingLeft: 20,
                               paddingRight: 20,
-                              borderRadius: 10,
+                              borderRadius: 4,
                               flex: 1,
                               marginTop: 20,
                               marginBottom: 20,
@@ -636,17 +623,6 @@ class AssessmentsList extends Component {
                           </div>
                         </Link>
                       )}
-
-                      <p
-                        style={{
-                          fontWeight: '700',
-                          letterSpacing: 0.8,
-                          fontSize: 16,
-                          marginLeft: 10,
-                        }}
-                      >
-                        Previous Assessments
-                      </p>
                       {assessments && assessments.length > 0 && (
                         <div>
                           {this.getPreviousAssessments()}
@@ -658,47 +634,56 @@ class AssessmentsList extends Component {
                 </Tabs>
               </div>
             </Col>
-            <Col sm={18}>
-              <div style={rightDivStyle}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <PageHeader pageTitle="VB-MAPP Assessment" style={{ marginTop: 20 }} />
-                  <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                    {user?.role !== 'parents' && (
-                      <Button onClick={this.showDrawerFilter} size="large">
-                        <FilterOutlined />
-                      </Button>
-                    )}
-
-                    <Drawer
-                      visible={this.state.visibleFilter}
-                      onClose={this.onCloseFilter}
-                      width={350}
-                      title="Select Learner"
-                      placement="right"
-                    >
-                      <LearnerSelect />
-                    </Drawer>
-                  </div>
-                </div>
-                <div className="row" style={{ position: 'relative' }}>
-                  {this.state.selected < 1 && (
-                    <div
-                      style={{
-                        height: 'calc(100% + 22px)',
-                        background: '#31303021',
-                        zIndex: 1000,
-                      }}
-                    ></div>
+            <Col sm={18} style={{ margin: 'auto' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  padding: '5px 10px',
+                  margin: 0,
+                  width: '100%',
+                  height: 'fit-content',
+                  overflow: 'hidden',
+                  backgroundColor: COLORS.palleteLight,
+                }}
+              >
+                <PageHeader
+                  pageTitle={`VB-MAPP Assessment ${
+                    this.state.selectedAssignment?.node?.testNo
+                      ? this.state.selectedAssignment?.node?.testNo
+                      : ''
+                  }`}
+                />
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                  {user?.role !== 'parents' && (
+                    <Button onClick={this.showDrawerFilter} size="large">
+                      <FilterOutlined />
+                    </Button>
                   )}
-                  {areas && areas.length > 0 && this.getAreas()}
+
+                  <Drawer
+                    visible={this.state.visibleFilter}
+                    onClose={this.onCloseFilter}
+                    width={DRAWER.widthL3}
+                    title="Select Learner"
+                    placement="right"
+                  >
+                    <LearnerSelect />
+                  </Drawer>
                 </div>
+              </div>
+
+              <div style={{ ...rightDivStyle, padding: '10px 0 0 0' }}>
+                <Scrollbars style={{ height: 'calc(100vh + 42px)', paddingRight: '10px' }}>
+                  {areas && areas.length > 0 && this.getAreas()}
+                </Scrollbars>
               </div>
             </Col>
           </Row>
           <Drawer
             visible={this.state.target}
             onClose={() => this.setState({ target: null })}
-            width={600}
+            width={DRAWER.widthL2}
             title="Target Allocation from VB Mapps"
           >
             {this.state.target && (
