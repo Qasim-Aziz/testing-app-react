@@ -30,57 +30,26 @@ import * as XLSX from 'xlsx'
 import { LineChartOutlined, FilterOutlined, CloudDownloadOutlined } from '@ant-design/icons'
 import { FaDownload } from 'react-icons/fa'
 import moment from 'moment'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import { MAND_DATA, RESPONSE_RATE, RESPONSE_RATE_FILTER_OPT } from './query'
 import './form.scss'
 import './table.scss'
 
 const { RangePicker } = DatePicker
 
-const pstyle = { marginBottom: 0 }
-
 const filterCardStyle = {
-  background: '#F1F1F1',
+  backgroundColor: COLORS.palleteLight,
   display: 'flex',
   flexWrap: 'wrap',
   padding: '5px 10px',
   margin: 0,
   height: 'fit-content',
   overflow: 'hidden',
-  backgroundColor: 'rgb(241, 241, 241)',
 }
 
 const parentDiv = { display: 'flex', margin: '5px 30px 5px 0' }
 const parentLabel = { fontSize: '15px', color: '#000', margin: 'auto 8px auto' }
 
-const parentCardStyle = {
-  background: '#F9F9F9',
-  borderRadius: 10,
-  padding: '10px',
-  paddingTop: '0px',
-  margin: '7px 0 10px 10px',
-  height: 'fit-content',
-  overflow: 'auto',
-}
-
-const tableFilterCardStyle = {
-  borderRadius: 10,
-  padding: '10px',
-  margin: '0 0 -2px 10px',
-  height: 35,
-  overflow: 'hidden',
-}
-
-const antcol1 = {
-  display: 'flex',
-  width: '42%',
-}
-
-const antRow1 = {
-  display: 'flex',
-  justifyContent: 'space-between',
-}
-
-const dateFormat = 'YYYY-MM-DD'
 export default Form.create()(({ showDrawerFilter }) => {
   const [selectMand, setSelectMand] = useState()
   const studentId = localStorage.getItem('studentId')
@@ -227,7 +196,6 @@ export default Form.create()(({ showDrawerFilter }) => {
 
   useEffect(() => {
     if (mydata) {
-      console.log('entired')
       const myColumns = [
         {
           key: 'mandName',
@@ -240,15 +208,16 @@ export default Form.create()(({ showDrawerFilter }) => {
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
+                  alignItems: 'center',
                   width: '100%',
-                  color: '#80b8f0',
+                  color: COLORS.mandTitle,
                 }}
               >
                 {obj.isStimulusStepsAvailable === false && obj.mandName}
                 {obj.isStimulusStepsAvailable === true && obj.isStimulus === true && (
                   <div
                     style={{
-                      color: '#f080b8',
+                      color: COLORS.stimulus,
                       display: 'flex',
                       justifyContent: 'center',
                       width: '100%',
@@ -260,7 +229,7 @@ export default Form.create()(({ showDrawerFilter }) => {
                 {obj.isStimulusStepsAvailable === true && obj.isStimulus === false && (
                   <div
                     style={{
-                      color: '#f0b880',
+                      color: COLORS.steps,
                       display: 'flex',
                       justifyContent: 'center',
                       width: '100%',
@@ -269,16 +238,9 @@ export default Form.create()(({ showDrawerFilter }) => {
                     {obj.mandName}
                   </div>
                 )}
-                {obj.displayGraph === true && (
-                  <Button type="link" onClick={() => handleSelectTarget(obj)}>
-                    <LineChartOutlined style={{ fontSize: 30, color: 'rgb(229, 132, 37)' }} />
-                  </Button>
-                )}
-                {obj.displayGraph === false && (
-                  <Button type="link" onClick={() => handleSelectTarget(obj)}>
-                    <LineChartOutlined style={{ fontSize: 30, color: 'rgb(229, 132, 37)' }} />
-                  </Button>
-                )}
+                <Button type="link" onClick={() => handleSelectTarget(obj)}>
+                  <LineChartOutlined style={{ fontSize: 26, color: COLORS.graph }} />
+                </Button>
               </div>
             )
           },
@@ -292,7 +254,7 @@ export default Form.create()(({ showDrawerFilter }) => {
             {
               title: item.day.substring(0, 3),
               dataIndex: item.date,
-              align: 'right',
+              align: 'center',
             },
           ],
         })
@@ -345,7 +307,7 @@ export default Form.create()(({ showDrawerFilter }) => {
       <Drawer
         visible={lineDrawer}
         onClose={() => setLineDrawer(false)}
-        width={900}
+        width={DRAWER.widthL2}
         title={`${currUser}'s Mand Graph for ${selectMand}`}
       >
         {graphData?.length > 0 &&
@@ -411,7 +373,7 @@ export default Form.create()(({ showDrawerFilter }) => {
         </div>
       </Row>
       <Col span={24}>
-        <div style={{ margin: '4px 0 8px 8px' }} className="peak-block-report">
+        <div style={{ margin: '10px 0 10px 10px' }} className="table-global">
           <Table
             columns={columns}
             dataSource={keyObjects}

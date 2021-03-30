@@ -43,10 +43,11 @@ export function* CREATE_APPOINTMENT({ payload }) {
       message: 'Appointment Created Successfully',
     })
 
+    console.log(response.CreateAppointment.appointment.edges, 'rlnkjfnksfd ------')
     yield put({
       type: actions.APPEND_APPOINTMENT_LIST,
       payload: {
-        appointment: response.CreateAppointment.appointment.edges,
+        appointment: response.CreateAppointment.appointment,
       },
     })
   } else {

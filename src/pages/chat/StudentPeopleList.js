@@ -7,17 +7,19 @@ import { useQuery } from 'react-apollo'
 import profileImg from 'images/student.jpg'
 import ChatUserCard from './ChatUserCard'
 import { GET_STAFF, GET_STUDENT_CLINIC, STUDENT_DETAILS } from './query'
+import './style.scss'
 
 const { Search } = Input
 
 const { TabPane } = Tabs
 
-export default ({ select, setSelect }) => {
+export default ({ select, setSelect, setSelectedPeopleDetails }) => {
   const { data: studentDetails } = useQuery(STUDENT_DETAILS, {
     variables: {
       id: useSelector(state => state.user.id),
     },
   })
+  const [gotcha, setGotcha] = useState(true)
   const { data: staff, error: staffError, loading: staffLoading } = useQuery(GET_STAFF)
   const { data: clinic, error: clinicError, loading: clinicLoading } = useQuery(
     GET_STUDENT_CLINIC,
@@ -58,23 +60,39 @@ export default ({ select, setSelect }) => {
     })
   }
 
+  if (viewStaff && viewStaff.length > 0 && !select && gotcha) {
+    setSelect(viewStaff[0].node.user?.id)
+    setSelectedPeopleDetails({
+      name: viewStaff[0].node.name,
+      profileImg: viewStaff[0].node.image,
+      id: viewStaff[0].node.user?.id,
+      role: 'Therapist',
+    })
+    setGotcha(false)
+  }
   return (
     <Tabs type="card">
       <TabPane tab="Therapists" key="1">
-        <Scrollbars style={{ height: 'calc(100vh - 200px)' }} autoHide>
+        <div className="search-msg" style={{ display: 'flex', height: '60px' }}>
           <Search
             size="large"
+            allowClear
             style={{
-              marginBottom: 15,
+              margin: 'auto',
+              width: '90%',
+              borderRadius: '20px',
+              borderBottom: '1px solid #e8e8e8',
             }}
             onChange={e => handleTherapistSearch(e.target.value)}
             onSearch={handleTherapistSearch}
             placeholder="Search with therapist name"
           />
+        </div>
+        <Scrollbars style={{ height: 'calc(100vh - 243px)' }} autoHide>
           {staffLoading && <h4 style={{ textAlign: 'center', marginTop: 50 }}>Loading...</h4>}
           {viewStaff.map(({ node }) => {
             return (
-              <div key={node.id} style={{ marginTop: 18 }}>
+              <div key={node.id}>
                 <ChatUserCard
                   profileImg={profileImg}
                   name={node.name}
@@ -82,6 +100,7 @@ export default ({ select, setSelect }) => {
                   role="Therapist"
                   selected={select === node.user?.id}
                   setSelectedPeople={setSelect}
+                  setSelectedPeopleDetails={setSelectedPeopleDetails}
                   id={node.user?.id}
                 />
               </div>
@@ -90,7 +109,7 @@ export default ({ select, setSelect }) => {
         </Scrollbars>
       </TabPane>
       <TabPane tab="Clinic" key="2">
-        <Scrollbars style={{ height: 'calc(100vh - 200px)' }} autoHide>
+        <Scrollbars style={{ height: 'calc(100vh - 243px)' }} autoHide>
           {clinicLoading && <h4 style={{ textAlign: 'center', marginTop: 50 }}>Loading...</h4>}
           {clinic && (
             <div key={clinic.student.school?.user.id}>
@@ -101,6 +120,7 @@ export default ({ select, setSelect }) => {
                 role="Clinic"
                 selected={select === clinic.student.school.user.id}
                 setSelectedPeople={setSelect}
+                setSelectedPeopleDetails={setSelectedPeopleDetails}
                 id={clinic.student.school.user.id}
               />
             </div>

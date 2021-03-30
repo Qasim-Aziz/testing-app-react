@@ -26,6 +26,7 @@ import { Row, Col, Button, Typography, Form, DatePicker, Select, Dropdown, Menu 
 import html2canvas from 'html2canvas'
 import { FaDownload } from 'react-icons/fa'
 import JsPDF from 'jspdf'
+import { COLORS } from 'assets/styles/globalStyles'
 import { connect } from 'react-redux'
 import { gql } from 'apollo-boost'
 import Moment from 'moment'
@@ -33,47 +34,41 @@ import client from '../../apollo/config'
 import PieChart from './PieChart'
 import BarChart from './BarChart'
 import Report from './Report'
+import './behavior.scss'
 
 const { Title, Text } = Typography
 const { RangePicker } = DatePicker
 const { Option } = Select
 
 const parentCardStyle = {
-  background: '#F9F9F9',
+  background: COLORS.palleteLight,
   borderRadius: 10,
   padding: '10px',
-  margin: '7px 10px 0 10px',
+  margin: '10px 5px 0 10px',
   height: 300,
   overflow: 'hidden',
 }
 
-const parentTableCardStyle = {
-  background: '#F9F9F9',
-  borderRadius: 10,
-  padding: '10px',
-  margin: '7px 10px 0 10px',
-  height: 450,
-  overflow: 'hidden',
-}
-
 const filterCardStyle = {
-  background: '#F1F1F1',
+  backgroundColor: COLORS.palleteLight,
   display: 'flex',
   flexWrap: 'wrap',
   padding: '5px 10px',
   margin: 0,
   height: 'fit-content',
   overflow: 'hidden',
-  backgroundColor: 'rgb(241, 241, 241)',
 }
 
 const parentDiv = { display: 'flex', margin: '5px 30px 5px 0' }
 const parentLabel = { fontSize: '15px', color: '#000', margin: 'auto 8px auto' }
 
 const cardStyle = {
-  background: '#F9F9F9',
-  height: 400,
-  overflow: 'auto',
+  borderRadius: 10,
+  border: '2px solid #F9F9F9',
+  display: 'flex',
+  width: '100%',
+  height: '100%',
+  overflowY: 'hidden',
 }
 
 @connect(({ user, student, learnersprogram }) => ({ user, student, learnersprogram }))
@@ -407,7 +402,7 @@ class ProgressOverview extends React.Component {
               </div>
             </Col>
             <Col span={12}>
-              <div style={parentCardStyle}>
+              <div style={{ ...parentCardStyle, marginRight: 0, marginLeft: '5px' }}>
                 <div id="barChart" style={cardStyle}>
                   {selectedprogram && statusselected && (
                     <BarChart
@@ -425,7 +420,7 @@ class ProgressOverview extends React.Component {
             </Col>
           </Col>
         </Row>
-        <div style={{ margin: '20px 0 20px 10px' }}>
+        <div className="behaviorReport" style={{ margin: '20px 0 20px 10px' }}>
           {selectedprogram && statusselected && (
             <Report
               ref={instance => {

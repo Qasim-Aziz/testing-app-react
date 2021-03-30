@@ -16,19 +16,20 @@ import { PeakBlockEqui } from './peakBlockEqui'
 import { PEAK_BLOCKWISE, PEAK_EQUIVALENCE, SESSION_NAME } from './query'
 import './form.scss'
 import './table.scss'
+import './style.scss'
+import { COLORS } from 'assets/styles/globalStyles'
 
 const { RangePicker } = DatePicker
 const { TabPane } = Tabs
 
 const filterCardStyle = {
-  background: '#F1F1F1',
   display: 'flex',
   flexWrap: 'wrap',
   padding: '5px 10px',
   margin: 0,
   height: 'fit-content',
   overflow: 'hidden',
-  backgroundColor: 'rgb(241, 241, 241)',
+  backgroundColor: COLORS.palleteLight,
 }
 
 const parentDiv = { display: 'flex', margin: '5px 30px 5px 0' }
@@ -321,7 +322,7 @@ function PeakBlockReport({ selectedStudentId, studentName }) {
             <span style={parentLabel}>Block</span>
             <div
               style={{
-                background: '#2874A6',
+                background: COLORS.target,
                 borderRadius: 10,
                 width: '20px',
                 margin: 'auto 0',
@@ -332,7 +333,7 @@ function PeakBlockReport({ selectedStudentId, studentName }) {
             <span style={parentLabel}>Stimulus</span>
             <div
               style={{
-                background: '#f080b8',
+                background: COLORS.stimulus,
                 borderRadius: 10,
                 width: '20px',
                 margin: 'auto 0',
@@ -343,7 +344,7 @@ function PeakBlockReport({ selectedStudentId, studentName }) {
             <span style={parentLabel}>Class</span>
             <div
               style={{
-                background: '#ff8080',
+                background: COLORS.class,
                 borderRadius: 10,
                 width: '20px',
                 margin: 'auto 0',
@@ -365,6 +366,7 @@ function PeakBlockReport({ selectedStudentId, studentName }) {
           style={{ marginTop: 10, marginLeft: 10 }}
           defaultActiveKey={activeTab}
           type="card"
+          className="peak-report"
           onChange={setActiveTab}
         >
           <TabPane tab="Block" key="Block">
@@ -392,7 +394,7 @@ function PeakBlockReport({ selectedStudentId, studentName }) {
           style={{ marginTop: 10, marginLeft: 10 }}
           defaultActiveKey={activeEquiTab}
           type="card"
-          className="vbmappReportTabs"
+          className="peak-report"
           tabBarExtraContent={peakEquitabbarExt}
           onChange={setActiveEquiTab}
         >

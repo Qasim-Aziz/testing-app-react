@@ -14,6 +14,7 @@ import {
 } from 'antd'
 import { useSelector } from 'react-redux'
 import { useMutation, useQuery } from 'react-apollo'
+import { COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 import moment from 'moment'
 import LoadingComponent from 'components/LoadingComponent'
 import { combineDateAndTime } from '../../utilities'
@@ -30,17 +31,7 @@ import './appointmentForms.scss'
 const { TextArea } = Input
 const { Option } = Select
 
-const submitButton = {
-  width: '160px',
-  height: 40,
-  background: '#0B35B3',
-  boxShadow: '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04)',
-  borderRadius: 0,
-  fontSize: 16,
-  fontWeight: 600,
-  marginTop: 20,
-  color: 'white',
-}
+const { layout, tailLayout } = FORM
 
 const UpdateAppointmentForm = ({
   setNeedToReloadData,
@@ -66,6 +57,7 @@ const UpdateAppointmentForm = ({
     variables: {
       id: appointmentId,
     },
+    fetchPolicy: 'network-only',
   })
 
   const [
@@ -181,21 +173,25 @@ const UpdateAppointmentForm = ({
     return <h3 style={{ color: 'red' }}>Opps! Something went wrong.</h3>
   }
 
+  console.log(allTherapist)
+  console.log(allSudent)
+  console.log(allLocation)
+  console.log(allAppointmentStatus)
+
   return (
     <Form
+      {...layout}
       name="updateAppointment"
       onSubmit={handleSubmit}
       className="appointment-form"
       size="small"
-      labelCol={{ span: 10 }}
-      wrapperCol={{ span: 12 }}
     >
       <Divider orientation="left">Basic Details</Divider>
 
       {/* Title */}
       <Row>
         <Col sm={24} md={24} lg={24}>
-          <Form.Item label="Title" labelCol={{ offset: 1, sm: 4 }} wrapperCol={{ sm: 18 }}>
+          <Form.Item label="Title">
             {form.getFieldDecorator('title', {
               initialValue: getAppointmentData.appointment.title,
               rules: [{ required: true, message: 'Please give a title' }],
@@ -207,7 +203,7 @@ const UpdateAppointmentForm = ({
       {/* Select Learner */}
       <Row>
         <Col sm={24} md={24} lg={24}>
-          <Form.Item label="Select Learner" labelCol={{ offset: 1, sm: 4 }} wrapperCol={{ sm: 18 }}>
+          <Form.Item label="Select Learner">
             {form.getFieldDecorator('student', {
               initialValue: getAppointmentData.appointment.student?.id,
               rules: [{ required: true, message: 'Please select a Learner' }],
@@ -234,11 +230,7 @@ const UpdateAppointmentForm = ({
       {userRole !== 'therapist' && (
         <Row>
           <Col sm={24} md={24} lg={24}>
-            <Form.Item
-              label="Select Therapist"
-              labelCol={{ offset: 1, sm: 4 }}
-              wrapperCol={{ sm: 18 }}
-            >
+            <Form.Item label="Select Therapist">
               {form.getFieldDecorator('therapist', {
                 initialValue: getAppointmentData.appointment.therapist.id,
                 rules: [
@@ -256,7 +248,7 @@ const UpdateAppointmentForm = ({
                 >
                   {allTherapist &&
                     allTherapist.staffs.edges.map(({ node }) => (
-                      <Option key={node.id} name={node.name}>
+                      <Option key={node.id} value={node.id}>
                         {node.name}
                       </Option>
                     ))}
@@ -270,11 +262,7 @@ const UpdateAppointmentForm = ({
       {/* Additional Staff */}
       <Row>
         <Col sm={24} md={24} lg={24}>
-          <Form.Item
-            label="Additional Staff"
-            labelCol={{ offset: 1, sm: 4 }}
-            wrapperCol={{ sm: 18 }}
-          >
+          <Form.Item label="Additional Staff">
             {form.getFieldDecorator('additionalStaff', {
               initialValue: getAppointmentData.appointment.attendee.edges.map(x => x.node.id),
             })(
@@ -287,7 +275,7 @@ const UpdateAppointmentForm = ({
               >
                 {allTherapist &&
                   allTherapist.staffs.edges.map(({ node }) => (
-                    <Option key={node.id} name={node.name}>
+                    <Option key={node.id} value={node.id}>
                       {node.name}
                     </Option>
                   ))}
@@ -407,7 +395,7 @@ const UpdateAppointmentForm = ({
               >
                 {allLocation &&
                   allLocation.schoolLocation.edges.map(({ node }) => (
-                    <Option key={node.id} location={node.location}>
+                    <Option key={node.id} value={node.id}>
                       {node.location}
                     </Option>
                   ))}
@@ -419,7 +407,7 @@ const UpdateAppointmentForm = ({
           <Form.Item
             label="Status"
             labelCol={{ sm: 10 }}
-            wrapperCol={{ sm: 12 }}
+            wrapperCol={{ sm: 14 }}
             rules={[{ required: true, message: 'Please select a status!' }]}
           >
             {form.getFieldDecorator('appointmentStatus', {
@@ -428,7 +416,7 @@ const UpdateAppointmentForm = ({
               <Select placeholder="Select Status" loading={allAppointmentStatusLoading}>
                 {allAppointmentStatus &&
                   allAppointmentStatus.appointmentStatuses.map(node => (
-                    <Option key={node.id} appointmentStatus={node.appointmentStatus}>
+                    <Option key={node.id} value={node.id}>
                       {node.appointmentStatus}
                     </Option>
                   ))}
@@ -441,11 +429,7 @@ const UpdateAppointmentForm = ({
       {/* Purpose */}
       <Row>
         <Col sm={24} md={24} lg={24}>
-          <Form.Item
-            label="Appointment Reason"
-            labelCol={{ offset: 1, sm: 4 }}
-            wrapperCol={{ sm: 18 }}
-          >
+          <Form.Item label="Appointment Reason">
             {form.getFieldDecorator('purposeAssignment', {
               initialValue: getAppointmentData.appointment.purposeAssignment,
               rules: [
@@ -462,7 +446,7 @@ const UpdateAppointmentForm = ({
       {/* Notes */}
       <Row>
         <Col sm={24} md={24} lg={24}>
-          <Form.Item label="Notes" labelCol={{ offset: 1, sm: 4 }} wrapperCol={{ sm: 18 }}>
+          <Form.Item label="Notes">
             {form.getFieldDecorator('note', {
               initialValue: getAppointmentData.appointment.note,
             })(
@@ -484,22 +468,15 @@ const UpdateAppointmentForm = ({
       <Row>
         <Col sm={24} md={24} lg={24}>
           {!isParent ? (
-            <Form.Item
-              wrapperCol={{
-                offset: 10,
-                span: 12,
-              }}
-            >
-              <Button loading={editAppiormentLoading} htmlType="submit" style={submitButton}>
+            <Form.Item {...tailLayout}>
+              <Button loading={editAppiormentLoading} htmlType="submit" style={SUBMITT_BUTTON}>
                 Update
               </Button>
               <Button
                 type="danger"
                 style={{
-                  ...submitButton,
-                  background: 'red',
-                  marginLeft: '15px',
-                  boxShadow: 'none',
+                  ...SUBMITT_BUTTON,
+                  background: COLORS.danger,
                 }}
                 onClick={() => {
                   form.resetFields()

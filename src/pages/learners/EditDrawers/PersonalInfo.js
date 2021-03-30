@@ -7,28 +7,11 @@ import { Link, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import AntdTag from '../../staffs/antdTag'
 import { GEN_INFO } from './query'
+import { COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 
 const { TextArea } = Input
 const { Option } = Select
-const layout = {
-  labelCol: {
-    span: 7,
-  },
-  wrapperCol: {
-    span: 16,
-  },
-}
-
-const submitButton = {
-  width: '45%',
-  height: 40,
-  background: '#0B35B3',
-  boxShadow: '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04) !importent',
-  borderRadius: 0,
-  fontSize: '17 !important',
-  fontWeight: 'bold !important',
-  marginTop: 20,
-}
+const { layout } = FORM
 
 const itemStyle = { marginBottom: '5px', fontWeight: 'bold' }
 
@@ -40,7 +23,6 @@ function PersonalInfo(props) {
     userProfile,
     learners: { languageList },
   } = props
-  console.log(props, languageList)
 
   const [updateInfo, { loading: updateLoading }] = useMutation(GEN_INFO)
   const [allergicArray, setAllergicArray] = useState(userProfile.allergicTo)
@@ -73,7 +55,6 @@ function PersonalInfo(props) {
       if (!err) {
         const selectedStaffList = []
         userProfile.authStaff.edges.map(item => selectedStaffList.push(item.node.id))
-        console.log(values, allergicArray)
         updateInfo({
           variables: {
             id: userProfile.id,
@@ -114,7 +95,6 @@ function PersonalInfo(props) {
           },
         })
           .then(result => {
-            console.log(result, 'result tgg')
             dispatch({
               type: 'learners/EDIT_GENERAL_INFO',
               payload: {
@@ -133,7 +113,7 @@ function PersonalInfo(props) {
       }
     })
   }
-  console.log(userProfile, 'ser')
+
   return (
     <div>
       <Form {...layout} onSubmit={handleSubmit}>
@@ -206,15 +186,11 @@ function PersonalInfo(props) {
             </Select>,
           )}
         </Form.Item>
-        <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-          <Button type="primary" htmlType="submit" loading={updateLoading} style={submitButton}>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Button type="primary" htmlType="submit" loading={updateLoading} style={SUBMITT_BUTTON}>
             Submitt
           </Button>
-          <Button
-            onClick={() => closeDrawer(false)}
-            type="default"
-            style={{ ...submitButton, color: 'white', background: 'red', boxShadow: 'none' }}
-          >
+          <Button onClick={() => closeDrawer(false)} type="default" style={CANCEL_BUTTON}>
             Cancel
           </Button>
         </div>

@@ -6,6 +6,7 @@ import { CloudDownloadOutlined } from '@ant-design/icons'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import { useDispatch } from 'react-redux'
+import { DRAWER, FORM } from 'assets/styles/globalStyles'
 import SessionFeedbackForm from 'pages/sessionFeedback'
 import {
   GET_APPOINTMENTS,
@@ -181,9 +182,17 @@ const AppointmentReport = () => {
       notification.error({ message: 'An error occurred to update status.' })
   }, [updateAppointmentStatusError])
 
+  console.log(appointmentList, 'appointment slis')
   return (
     <div className="appointmentReport">
       <Form layout="inline" className="filterCard">
+        <Form.Item label="Date">
+          <RangePicker
+            value={selectedDateRange}
+            onChange={setSelectedDateRange}
+            className="datePicker"
+          />
+        </Form.Item>
         <Form.Item label="Learner">
           <Select
             placeholder="Select Learner"
@@ -193,7 +202,7 @@ const AppointmentReport = () => {
             optionFilterProp="children"
             value={selectedLearner}
             onChange={setSelectedLearner}
-            style={{ width: '150px' }}
+            style={{ width: '200px', marginRight: '10px' }}
           >
             {allLearners?.students?.edges?.map(({ node: { id, firstname, lastname } }) => (
               <Option key={id} value={id}>
@@ -211,7 +220,7 @@ const AppointmentReport = () => {
             optionFilterProp="children"
             value={selectedTherapist}
             onChange={setSelectedTherapist}
-            style={{ width: '150px' }}
+            style={{ width: '200px' }}
           >
             {allTherapist?.staffs?.edges?.map(({ node: { id, name, surname } }) => (
               <Option key={id} value={id}>
@@ -220,14 +229,7 @@ const AppointmentReport = () => {
             ))}
           </Select>
         </Form.Item>
-        <Form.Item label="Date">
-          <RangePicker
-            value={selectedDateRange}
-            onChange={setSelectedDateRange}
-            size="default"
-            className="datePicker"
-          />
-        </Form.Item>
+
         <Form.Item style={{ float: 'right', marginRight: 0 }}>
           <Button
             type="primary"
@@ -240,21 +242,19 @@ const AppointmentReport = () => {
         </Form.Item>
       </Form>
 
-      <div style={{ padding: '10px' }}>
+      <div style={{ padding: '0px 0 10px 10px' }}>
         <Table
           loading={isAppointmentLoading}
-          className="payorTable"
-          rowKey="id"
+          rowKey={record => record.id}
           columns={appointmentColumns}
           dataSource={appointmentList}
           pagination={{
-            position: 'both',
+            defaultPageSize: 20,
             showSizeChanger: true,
-            pageSizeOptions: ['25', '50', '100', '250'],
+            pageSizeOptions: ['20', '30', '50', '100'],
+            position: 'top',
           }}
-          size="small"
           bordered
-          expandRowByClick
           expandedRowRender={row => (
             <>
               <p style={{ margin: 0 }}>
@@ -281,7 +281,7 @@ const AppointmentReport = () => {
       <Drawer
         title="Give Session Feedback"
         placement="right"
-        width="500px"
+        width={DRAWER.widthL3}
         closable
         onClose={() => setFeedbackDrawer(false)}
         visible={feedbackDrawer}

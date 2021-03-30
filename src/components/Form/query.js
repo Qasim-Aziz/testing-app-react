@@ -160,6 +160,44 @@ export const CREATE_APPOINTMENT = gql`
     ) {
       appointment {
         id
+        therapist {
+          id
+          name
+          surname
+        }
+        student {
+          id
+          firstname
+          lastname
+        }
+        attendee {
+          edges {
+            node {
+              id
+              name
+              surname
+            }
+          }
+        }
+        createdBy {
+          id
+          firstName
+          lastName
+        }
+        appointmentStatus {
+          id
+          appointmentStatus
+        }
+        location {
+          id
+          location
+        }
+        purposeAssignment
+        note
+        title
+        start
+        end
+        isApproved
       }
     }
   }

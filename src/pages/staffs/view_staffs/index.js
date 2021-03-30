@@ -21,24 +21,17 @@ import {
   Button,
   Collapse,
   Card,
-  Avatar,
-  Form,
   Select,
   DatePicker,
   Input,
   Icon,
   Drawer,
-  Switch,
-  Tooltip,
   Popconfirm,
   Dropdown,
   Menu,
   Radio,
   Tag,
 } from 'antd'
-// import EditHrDetails from 'components/staff/EditHrDetails'
-// import EditCertificationDetails from 'components/staff/EditCertificationDetails'
-// import EditHealthForm from 'components/learner/EditHealthForm'
 import {
   FilterOutlined,
   PlusOutlined,
@@ -55,6 +48,7 @@ import * as XLSX from 'xlsx'
 import JsPDF from 'jspdf'
 import 'jspdf-autotable'
 import LoadingComponent from 'components/LoadingComponent'
+import { COLORS, DRAWER, FORM } from 'assets/styles/globalStyles'
 import { FilterCard } from '../../../components/FilterCard/FilterTable'
 import EditStaffBasicInfo from './EditStaffBasicInfo'
 import CreateStaff from '../createStaff'
@@ -63,7 +57,6 @@ import client from '../../../apollo/config'
 import '../style.scss'
 import Profile from '../Profile'
 
-const { Panel } = Collapse
 const { Meta } = Card
 const { Option } = Select
 const { RangePicker } = DatePicker
@@ -326,7 +319,6 @@ class StaffTable extends React.Component {
   filterHandler = ({ name, email, mobile, gender, designation, tags, address, status }) => {
     let filteredList = this.state.mainData
     let tempFilterActive = false
-    console.log(status, 'stuaudrf')
     status = status !== undefined ? status : this.state.filterActive
     email = email !== undefined ? email : this.state.filterEmail
     name = name !== undefined ? name : this.state.filterName
@@ -402,8 +394,6 @@ class StaffTable extends React.Component {
       tableData: filteredList,
       isFilterActive: tempFilterActive,
     })
-
-    console.log(filteredList, 'filtere')
   }
 
   clearFilter = () => {
@@ -482,29 +472,6 @@ class StaffTable extends React.Component {
         ),
       },
       {
-        title: 'Status',
-        dataIndex: 'isActive',
-        width: '140px',
-        render: (status, row) => {
-          return (
-            <span>
-              <Popconfirm
-                title={`Sure to ${status ? 'deactivate' : 'activate'} the employee?`}
-                onConfirm={() => this.staffActiveInactive(row, status)}
-              >
-                <Button type="link">
-                  {status ? (
-                    <CheckCircleOutlined style={{ fontSize: 22, color: 'green' }} />
-                  ) : (
-                    <CloseCircleOutlined style={{ fontSize: 22, color: 'red' }} />
-                  )}
-                </Button>
-              </Popconfirm>
-            </span>
-          )
-        },
-      },
-      {
         title: 'Tags',
         dataIndex: 'tags',
         render: (text, row) => {
@@ -522,6 +489,29 @@ class StaffTable extends React.Component {
             )
           }
           return null
+        },
+      },
+      {
+        title: 'Status',
+        dataIndex: 'isActive',
+        width: '140px',
+        render: (status, row) => {
+          return (
+            <span>
+              <Popconfirm
+                title={`Sure to ${status ? 'deactivate' : 'activate'} the employee?`}
+                onConfirm={() => this.staffActiveInactive(row, status)}
+              >
+                <Button type="link">
+                  {status ? (
+                    <CheckCircleOutlined style={{ fontSize: 22, color: COLORS.success }} />
+                  ) : (
+                    <CloseCircleOutlined style={{ fontSize: 22, color: COLORS.danger }} />
+                  )}
+                </Button>
+              </Popconfirm>
+            </span>
+          )
         },
       },
       {
@@ -805,8 +795,8 @@ class StaffTable extends React.Component {
       <Authorize roles={['school_admin']} redirect to="/dashboard/beta">
         <Helmet title="Partner" />
         <Drawer
-          title="CREATE STAFF"
-          width="65%"
+          title="Create Staff"
+          width={DRAWER.widthL2}
           placement="right"
           closable={true}
           onClose={this.onClose}
@@ -821,7 +811,7 @@ class StaffTable extends React.Component {
           closable={true}
           onClose={() => this.setState({ filterShow: false })}
           visible={filterShow}
-          width={380}
+          width={DRAWER.widthL4}
         >
           <FilterCard
             filterHandler={this.filterHandler}
@@ -852,7 +842,7 @@ class StaffTable extends React.Component {
 
         <Drawer
           title="Employee Profile"
-          width={this.state.windowWidth > 1250 ? 1280 : 650}
+          width={DRAWER.widthL1}
           closable
           className="profile-css"
           visible={this.state.profileDrawer}
@@ -862,8 +852,8 @@ class StaffTable extends React.Component {
         </Drawer>
 
         <Drawer
-          title="EDIT LEARNER"
-          width="65%"
+          title="Edit Learner"
+          width={DRAWER.widthL2}
           placement="right"
           closable={true}
           onClose={this.onCloseEdit}
@@ -882,7 +872,6 @@ class StaffTable extends React.Component {
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginTop: '20px',
             padding: '0px 10px',
             backgroundColor: '#FFF',
             boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
@@ -931,7 +920,7 @@ class StaffTable extends React.Component {
         </div>
 
         <div>
-          <div style={{ marginTop: '15px', marginBottom: '50px' }}>
+          <div style={{ marginBottom: '50px' }}>
             <div className="view-staff with-border">
               <Table
                 title={() => {

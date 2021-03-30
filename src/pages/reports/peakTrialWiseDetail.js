@@ -6,7 +6,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/jsx-closing-tag-location */
 import React, { useState, useEffect } from 'react'
-import { Table, Row } from 'antd'
+import { Table, Row, Tooltip } from 'antd'
 import './form.scss'
 import './table.scss'
 
@@ -62,6 +62,13 @@ function PeakTrialDetails({ target, block }) {
       fixed: 'left',
       render: (text, row) => {
         if (row?.target) {
+          if (text?.length > 35) {
+            return (
+              <Tooltip title={text}>
+                <span>{text.slice(0, 35)}...</span>
+              </Tooltip>
+            )
+          }
           return <span style={{ fontWeight: '600' }}>{text}</span>
         }
         return <span style={{ color: '#F080B8' }}>{text}</span>

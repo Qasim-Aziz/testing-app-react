@@ -13,51 +13,20 @@ import ClinicInfo from './EditDrawers/ClinicInfo'
 import './style.scss'
 import EmergencyInfo from './EditDrawers/EmergencyInfo'
 import MiscInfo from './EditDrawers/MiscInfo'
-import { useQuery, useLazyQuery } from 'react-apollo'
 import AppointmentCard from './AppointmentCard/index'
 import Attendance from './Attendance'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 
 const { Meta } = Card
 
-const er = gql`
-  query($id: ID, $dateFrom: Date, $dateTo: Date) {
-    appointments(therapist: $id, dateFrom: $dateFrom, dateTo: $dateTo) {
-      edges {
-        node {
-          id
-          student {
-            id
-            firstname
-            lastname
-          }
-          createdBy {
-            id
-            firstName
-            lastName
-          }
-          appointmentStatus {
-            id
-            appointmentStatus
-          }
-          note
-          title
-          start
-          end
-          isApproved
-        }
-      }
-    }
-  }
-`
-
-const customSpanStyle = {
-  backgroundColor: '#52c41a',
+const activeSpanStyle = {
+  backgroundColor: COLORS.success,
   color: 'white',
   borderRadius: '3px',
   padding: '1px 5px',
 }
 const inActiveSpanStyle = {
-  backgroundColor: 'red',
+  backgroundColor: COLORS.danger,
   color: 'white',
   borderRadius: '3px',
   padding: '1px 5px',
@@ -166,10 +135,10 @@ function Profile(props) {
   console.log(staffProfile, 'staffProfile')
 
   return (
-    <div style={{ backgroundColor: '#F7F7F7', padding: '28px' }} className="profile-css">
+    <div style={{ backgroundColor: COLORS.palleteLight, padding: '28px' }} className="profile-css">
       <Drawer
         title="Edit Basic Information"
-        width="600px"
+        width={DRAWER.widthL3}
         closable
         destroyOnClose
         visible={genInfoDrawer}
@@ -179,7 +148,7 @@ function Profile(props) {
       </Drawer>
       <Drawer
         title="Edit Personal Information"
-        width="600px"
+        width={DRAWER.widthL3}
         closable
         destroyOnClose
         visible={personalInfoDrawer}
@@ -189,7 +158,7 @@ function Profile(props) {
       </Drawer>
       <Drawer
         title="Edit Emergency Contact Information"
-        width="600px"
+        width={DRAWER.widthL3}
         destroyOnClose
         closable
         onClose={() => setEmergencyInfoDrawer(false)}
@@ -198,7 +167,7 @@ function Profile(props) {
         <EmergencyInfo closeDrawer={setEmergencyInfoDrawer} staffProfile={staffProfile} />
       </Drawer>
       <Drawer
-        width="600px"
+        width={DRAWER.widthL3}
         title="Edit Clinical Information"
         destroyOnClose
         closable
@@ -210,7 +179,7 @@ function Profile(props) {
 
       <Drawer
         title="Edit Misc Information"
-        width="600px"
+        width={DRAWER.widthL3}
         destroyOnClose
         closable
         visible={miscInfoDrawer}
@@ -309,7 +278,7 @@ function Profile(props) {
                     <p style={th2}>Status </p>
                     <p>
                       {staffProfile.isActive ? (
-                        <button style={customSpanStyle}>Active</button>
+                        <button style={activeSpanStyle}>Active</button>
                       ) : (
                         <button style={inActiveSpanStyle}>In-Active</button>
                       )}

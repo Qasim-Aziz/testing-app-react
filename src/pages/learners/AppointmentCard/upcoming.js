@@ -17,6 +17,7 @@ import '../style.scss'
 import { Scrollbars } from 'react-custom-scrollbars'
 import LoadingComponent from 'components/LoadingComponent'
 import SessionFeedbackForm from '../../sessionFeedback'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 
 const { Meta } = Card
 const { TabPane } = Tabs
@@ -57,7 +58,7 @@ function Upcoming(props) {
       <Drawer
         title="Give Session Feedback"
         placement="right"
-        width="500px"
+        width={DRAWER.widthL3}
         closable
         onClose={() => setFeedbackDrawer(false)}
         visible={feedbackDrawer}
@@ -129,7 +130,7 @@ function Upcoming(props) {
                           <div style={{ fontSize: '22px', fontWeight: '700', color: 'black' }}>
                             {moment(item.start).format('Do MMM YYYY')}{' '}
                             <CheckCircleTwoTone
-                              twoToneColor="#52c41a"
+                              twoToneColor={COLORS.success}
                               style={{ fontSize: '16px' }}
                             />
                           </div>

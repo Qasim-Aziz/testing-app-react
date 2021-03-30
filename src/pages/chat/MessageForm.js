@@ -1,6 +1,9 @@
 /* eslint-disable no-shadow */
 import React from 'react'
 import { Form, Button, Input } from 'antd'
+import { SendOutlined } from '@ant-design/icons'
+import { COLORS } from 'assets/styles/globalStyles'
+import './style.scss'
 
 export default Form.create()(({ form, socket, style, loading, setLoading }) => {
   const handleSubmit = e => {
@@ -15,41 +18,36 @@ export default Form.create()(({ form, socket, style, loading, setLoading }) => {
   }
 
   return (
-    <Form
+    <div
       style={{
-        width: 'calc(100% - 38.5px)',
+        width: '100%',
         display: 'flex',
-        justifyContent: 'space-between',
+        backgroundColor: COLORS.grayFill,
+        padding: '10px 16px',
         height: 60,
         ...style,
       }}
-      onSubmit={handleSubmit}
+      className="message-view"
     >
-      <Form.Item style={{ width: 'calc(100% - 110px)' }}>
-        {form.getFieldDecorator('message', {
-          rule: [{ required: true, message: 'Type what you want to say' }],
-        })(
-          <Input
-            placeholder="Write Something"
-            style={{ height: 60, borderRadius: '4px 0px 0px 4px' }}
-          />,
-        )}
-      </Form.Item>
-      <Button
-        type="primary"
-        htmlType="submit"
-        style={{
-          width: 110,
-          background: '#0B35B3',
-          borderRadius: '0px 4px 4px 0px',
-          fontSize: 16,
-          fontWeight: 'bold',
-          height: 60,
-        }}
-        loading={loading}
+      <Form
+        onSubmit={handleSubmit}
+        style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
       >
-        {loading ? 'Sending' : 'Send'}
-      </Button>
-    </Form>
+        <Form.Item style={{ width: '90%' }}>
+          {form.getFieldDecorator('message', {
+            rule: [{ required: true, message: 'Type what you want to say' }],
+          })(
+            <Input
+              placeholder="Type a message"
+              autoComplete="off"
+              style={{ borderRadius: '45px', height: 40, border: 'none' }}
+            />,
+          )}
+        </Form.Item>
+        <Button type="link" htmlType="submit">
+          <SendOutlined style={{ fontSize: 28, color: '#919191' }} />
+        </Button>
+      </Form>
+    </div>
   )
 })

@@ -18,6 +18,7 @@ import gql from 'graphql-tag'
 import { useMutation } from 'react-apollo'
 import CKEditor from 'react-ckeditor-component'
 import './targetFrom.scss'
+import { CANCEL_BUTTON, COLORS, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import { TARGET_QUERY } from './query'
 
 const CREATE_TARGET = gql`
@@ -49,6 +50,10 @@ const CREATE_TARGET = gql`
     }
   }
 `
+
+const { layout } = FORM
+
+const itemStyle = { marginBottom: '10px', fontWeight: 'bold' }
 
 const TargetForm = ({
   domainId,
@@ -145,39 +150,42 @@ const TargetForm = ({
   }
 
   return (
-    <Form name="targetForm" onSubmit={handleSubmit}>
-      <Form.Item label="Target Name">
-        {form.getFieldDecorator('targetname', {
-          initialValue: name,
-          rules: [{ required: true, message: 'Please enter Target Name' }],
-        })(<Input placeholder="Target Name" size="large" />)}
-      </Form.Item>
-      <Form.Item label="Target Instructions">
-        <CKEditor
-          activeClass="p10"
-          content={instrvalue}
-          events={{
-            change: onEditorChange,
-          }}
-          config={{
-            height: 450,
-          }}
-        />
-      </Form.Item>
-      <Form.Item label="Target Video Link">
-        {form.getFieldDecorator('videolink', {
-          initialValue: video,
-        })(<Input placeholder="Target Video Link" size="large" />)}
-      </Form.Item>
-      <Button
-        type="primary"
-        htmlType="submit"
-        loading={loading}
-        style={{ marginTop: 15, fontSize: 16, width: '100%', height: 40 }}
-      >
-        Create Target
-      </Button>
-    </Form>
+    <div>
+      <Form {...layout} onSubmit={handleSubmit}>
+        <Form.Item label="Target Name" style={itemStyle}>
+          {form.getFieldDecorator('targetname', {
+            initialValue: name,
+            rules: [{ required: true, message: 'Please enter Target Name' }],
+          })(<Input placeholder="Target Name" size="large" />)}
+        </Form.Item>
+        <Form.Item label="Target Instructions" style={itemStyle}>
+          <CKEditor
+            activeClass="p10"
+            content={instrvalue}
+            events={{
+              change: onEditorChange,
+            }}
+            config={{
+              height: 450,
+            }}
+          />
+        </Form.Item>
+        <Form.Item label="Target Video Link" style={itemStyle}>
+          {form.getFieldDecorator('videolink', {
+            initialValue: video,
+          })(<Input placeholder="Target Video Link" size="large" />)}
+        </Form.Item>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Button htmlType="submit" loading={loading} style={SUBMITT_BUTTON}>
+            Create Target
+          </Button>
+
+          <Button onClick={() => handelNewTargetDrawer(false)} style={CANCEL_BUTTON}>
+            Cancel
+          </Button>
+        </div>
+      </Form>
+    </div>
   )
 }
 

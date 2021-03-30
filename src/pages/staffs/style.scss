@@ -1,3 +1,5 @@
+@import '../../assets/styles/mixins.scss';
+
 .filter_sub_div {
   display: flex;
   flex-direction: row;
@@ -50,10 +52,12 @@
 .view-staff {
   .ant-table-tbody > tr > td {
     padding: 6px 10px;
+    background-color: white;
     overflow-wrap: break-word;
   }
   .ant-table-thead > tr > th {
     padding: 16px 10px;
+    background-color: $palete-light;
   }
 }
 

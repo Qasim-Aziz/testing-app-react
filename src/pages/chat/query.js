@@ -9,6 +9,7 @@ export const GET_STUDENT = gql`
           id
           firstname
           lastname
+          image
           parent {
             id
           }
@@ -25,6 +26,7 @@ export const GET_STAFF = gql`
         node {
           id
           name
+          image
           user {
             id
           }

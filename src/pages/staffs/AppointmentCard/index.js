@@ -10,6 +10,7 @@ import '../style.scss'
 import Upcoming from './upcoming'
 import CreateAppointmentForm from 'components/Form/CreateAppointmentForm'
 import UpdateAppointmentForm from 'components/Form/UpdateAppointmentForm'
+import { DRAWER } from 'assets/styles/globalStyles'
 
 const { Meta } = Card
 const { TabPane } = Tabs
@@ -85,7 +86,7 @@ function AppointmentCard(props) {
       <Drawer
         title={updateAppointmentId ? 'Update Appointment' : 'Create Appointment'}
         placement="right"
-        width="65%"
+        width={DRAWER.widthL2}
         closable
         onClose={() => setAppointmentDrawer(false)}
         visible={appointmentDrawer}

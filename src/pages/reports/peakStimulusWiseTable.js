@@ -15,6 +15,7 @@ import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import './form.scss'
 import './table.scss'
+import { COLORS } from 'assets/styles/globalStyles'
 
 export const PeakStimulusReport = forwardRef((props, ref) => {
   const { peakBlockData, peakBlockLoading, dates, studentName } = props
@@ -114,7 +115,7 @@ export const PeakStimulusReport = forwardRef((props, ref) => {
       fixed: 'left',
       render: (text, row) => {
         if (!row.parent) {
-          return <span style={{ color: '#f080b8' }}>{text}</span>
+          return <span style={{ color: COLORS.stimulus }}>{text}</span>
         }
         if (text.length > 35) {
           return (

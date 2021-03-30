@@ -54,6 +54,7 @@ import CreateLearner from '../createLearner'
 import client from '../../../apollo/config'
 import '../style.scss'
 import Profile from '../Profile'
+import { COLORS, FORM, DRAWER } from 'assets/styles/globalStyles'
 
 const { Meta } = Card
 const inputCustom = { width: '180px', marginBottom: '8px', display: 'block' }
@@ -605,7 +606,12 @@ class LearnerTable extends React.Component {
               >
                 <Button type="link">
                   <CheckCircleOutlined
-                    style={{ fontSize: 20, color: 'green', fontWeight: '700', margin: 'auto' }}
+                    style={{
+                      fontSize: 20,
+                      color: COLORS.success,
+                      fontWeight: '700',
+                      margin: 'auto',
+                    }}
                   />
                 </Button>
               </Popconfirm>
@@ -618,7 +624,12 @@ class LearnerTable extends React.Component {
                 <Button type="link">
                   <CloseCircleOutlined
                     type="link"
-                    style={{ fontSize: 20, fontWeight: '700', margin: 'auto', color: 'red' }}
+                    style={{
+                      fontSize: 20,
+                      fontWeight: '700',
+                      margin: 'auto',
+                      color: COLORS.danger,
+                    }}
                   />
                 </Button>
               </Popconfirm>
@@ -862,7 +873,7 @@ class LearnerTable extends React.Component {
           closable={true}
           onClose={this.onCloseFilter}
           visible={visibleFilter}
-          width={380}
+          width={DRAWER.widthL4}
         >
           <FilterCard
             filterHandler={this.filterHandler}
@@ -920,14 +931,14 @@ class LearnerTable extends React.Component {
           closable={true}
           onClose={() => this.setState({ showProfile: false })}
           visible={this.state.showProfile}
-          width={this.state.windowWidth > 1250 ? 1280 : 650}
+          width={this.state.windowWidth > 1250 ? DRAWER.widthL1 : DRAWER.widthL4}
         >
           <Profile />
         </Drawer>
 
         <Drawer
           title="CREATE LEARNER"
-          width="60%"
+          width={DRAWER.widthL2}
           placement="right"
           closable={true}
           onClose={this.onClose}
@@ -938,7 +949,7 @@ class LearnerTable extends React.Component {
 
         <Drawer
           title="EDIT LEARNER"
-          width="60%"
+          width={DRAWER.widthL2}
           placement="right"
           closable={true}
           onClose={this.onCloseEdit}
@@ -954,7 +965,6 @@ class LearnerTable extends React.Component {
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '0px 10px',
-            marginTop: '20px',
             backgroundColor: '#FFF',
             boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
           }}
@@ -1003,10 +1013,10 @@ class LearnerTable extends React.Component {
           </div>
         </div>
 
-        <div className={divClass}>
-          <div style={{ marginTop: '24px', marginBottom: '50px' }}>
+        <div>
+          <div style={{ marginBottom: '50px' }}>
             {/* Filters */}
-            <div className="view_learner" style={{ marginTop: '20px' }}>
+            <div className="view_learner">
               <Table
                 title={() => {
                   return tableHeader

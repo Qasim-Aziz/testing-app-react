@@ -1,6 +1,7 @@
 /* eslint-disable no-shadow */
 import React, { useState } from 'react'
 import { Row, Col, Typography } from 'antd'
+import { COLORS } from 'assets/styles/globalStyles'
 import MessageView from './MessageView'
 import SchoolPeoplesList from './SchoolPeoplesList'
 import StudentPeoplesList from './StudentPeopleList'
@@ -10,39 +11,54 @@ const { Title } = Typography
 
 export default () => {
   const [selectedPeople, setSelectedPeople] = useState()
+  const [selectedPeopleDetails, setSelectedPeopleDetails] = useState(null)
   const userRole = localStorage.getItem('role')
 
   return (
     <div
       style={{
         maxWidth: 1300,
-        marginLeft: 'auto',
-        marginRight: 'auto',
+        border: '1px solid #e8e8e8',
+        margin: '10px auto 0',
         width: '100%',
-        height: 'calc(100vh - 100px)',
+        height: 'calc(100vh - 120px)',
+        overflow: 'hidden',
       }}
     >
-      <Row gutter={[77, 0]} style={{ height: '100%' }}>
-        <Col span={8}>
-          <div
-            style={{
-              borderRadius: 10,
-              background: '#F9F9F9',
-              padding: 25,
-            }}
-          >
+      <div style={{ height: '100%', display: 'flex' }}>
+        <div
+          style={{
+            width: '400px',
+            background: '#F9F9F9',
+            paddingTop: '20px',
+            borderRight: '1px solid #e8e8e8',
+          }}
+        >
+          <div>
             {userRole === '"school_admin"' && (
-              <SchoolPeoplesList select={selectedPeople} setSelect={setSelectedPeople} />
+              <SchoolPeoplesList
+                select={selectedPeople}
+                setSelect={setSelectedPeople}
+                setSelectedPeopleDetails={setSelectedPeopleDetails}
+              />
             )}
             {userRole === '"therapist"' && (
-              <TherapistPeoplesList select={selectedPeople} setSelect={setSelectedPeople} />
+              <TherapistPeoplesList
+                select={selectedPeople}
+                setSelect={setSelectedPeople}
+                setSelectedPeopleDetails={setSelectedPeopleDetails}
+              />
             )}
             {userRole === '"parents"' && (
-              <StudentPeoplesList select={selectedPeople} setSelect={setSelectedPeople} />
+              <StudentPeoplesList
+                select={selectedPeople}
+                setSelect={setSelectedPeople}
+                setSelectedPeopleDetails={setSelectedPeopleDetails}
+              />
             )}
           </div>
-        </Col>
-        <Col span={16} style={{ position: 'relative', height: '100%' }}>
+        </div>
+        <div style={{ position: 'relative', height: '100%', width: '900px' }}>
           <div
             style={{
               height: '100%',
@@ -50,7 +66,11 @@ export default () => {
             }}
           >
             {selectedPeople ? (
-              <MessageView secondUser={selectedPeople} style={{ height: '100%' }} />
+              <MessageView
+                secondUser={selectedPeople}
+                selectedPeopleDetails={selectedPeopleDetails}
+                style={{ height: '100%' }}
+              />
             ) : (
               <div
                 style={{
@@ -60,12 +80,12 @@ export default () => {
                   height: '100%',
                 }}
               >
-                <Title style={{fontSize: 18}}>Select with whom you want to chat</Title>
+                <Title style={{ fontSize: 18 }}>No chat available for selected learner</Title>
               </div>
             )}
           </div>
-        </Col>
-      </Row>
+        </div>
+      </div>
     </div>
   )
 }

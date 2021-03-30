@@ -1,4 +1,5 @@
 /* eslint-disable react/jsx-indent-props */
+/* eslint-disable jsx-a11y/aria-role */
 /* eslint-disable react/jsx-indent */
 import React, { useEffect, useState } from 'react'
 import { notification, Tabs, Input } from 'antd'
@@ -8,12 +9,14 @@ import profileImg from 'images/student.jpg'
 import { useSelector } from 'react-redux'
 import ChatUserCard from './ChatUserCard'
 import { GET_STUDENT, GET_THERAPIST_CLINIC, GET_THERAPIST_ID } from './query'
+import './style.scss'
 
 const { Search } = Input
 const { TabPane } = Tabs
 
-export default ({ select, setSelect }) => {
+export default ({ select, setSelect, setSelectedPeopleDetails }) => {
   const userId = useSelector(state => state.user.id)
+  const [gotcha, setGotcha] = useState(true)
   const { data: therapistDetails } = useQuery(GET_THERAPIST_ID, {
     variables: {
       id: userId,
@@ -60,30 +63,48 @@ export default ({ select, setSelect }) => {
     })
   }
 
+  console.log(select, 'this is select')
+  if (viewStudent && viewStudent.length > 0 && !select && gotcha) {
+    console.log('gotcha ')
+    setSelect(viewStudent[0].node.parent?.id)
+    setSelectedPeopleDetails({
+      name: viewStudent[0].node.firstname,
+      profileImg: viewStudent[0].node.image,
+      id: viewStudent[0].node.parent?.id,
+      role: 'Learner',
+    })
+    setGotcha(false)
+  }
+
   return (
     <Tabs type="card">
       <TabPane tab="Learners" key="1">
-        <Scrollbars style={{ height: 'calc(100vh - 200px)' }} autoHide>
+        <div className="search-msg" style={{ display: 'flex', height: '60px' }}>
           <Search
             size="large"
             style={{
-              marginBottom: 15,
+              margin: 'auto',
+              width: '90%',
+              borderRadius: '20px',
+              borderBottom: '1px solid #e8e8e8',
             }}
             onChange={e => handleStudentSearch(e.target.value)}
             onSearch={handleStudentSearch}
             placeholder="Search with learner name"
           />
+        </div>
+        <Scrollbars style={{ height: 'calc(100vh - 243px)', paddingRight: '6px' }} autoHide>
           {studentLoading && <h4 style={{ textAlign: 'center', marginTop: 50 }}>Loading...</h4>}
           {viewStudent.map(({ node }, index) => {
             return (
-              <div key={node.id} style={{ marginTop: index !== 0 ? 18 : 0 }}>
+              <div key={node.id}>
                 <ChatUserCard
                   profileImg={profileImg}
                   name={node.firstname}
-                  // eslint-disable-next-line jsx-a11y/aria-role
                   role="Learner"
                   selected={select === node.parent?.id}
                   setSelectedPeople={setSelect}
+                  setSelectedPeopleDetails={setSelectedPeopleDetails}
                   id={node.parent?.id}
                 />
               </div>
@@ -93,7 +114,7 @@ export default ({ select, setSelect }) => {
       </TabPane>
       <TabPane tab="Clinic" key="2">
         {clinicLoading && <h4 style={{ textAlign: 'center', marginTop: 50 }}>Loading...</h4>}
-        <Scrollbars style={{ height: 'calc(100vh - 200px)' }} autoHide>
+        <Scrollbars style={{ height: 'calc(100vh - 243px)', paddingRight: '6px' }} autoHide>
           {clinic && (
             <div key={clinic.staff.school.user.id} style={{ marginTop: 18 }}>
               <ChatUserCard
@@ -103,6 +124,7 @@ export default ({ select, setSelect }) => {
                 role="Clinic"
                 selected={select === clinic.staff.school.user.id}
                 setSelectedPeople={setSelect}
+                setSelectedPeopleDetails={setSelectedPeopleDetails}
                 id={clinic.staff.school.user.id}
               />
             </div>

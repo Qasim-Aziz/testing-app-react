@@ -25,6 +25,7 @@ import { useLazyQuery } from 'react-apollo'
 import { FaDownload } from 'react-icons/fa'
 import { useDispatch } from 'react-redux'
 import moment from 'moment'
+import { COLORS } from 'assets/styles/globalStyles'
 import { TargetResponsePeakBlock } from './targetResponsePeakBlock'
 import { TargetResponseEqui } from './targetResponseEqui'
 import { TARGET_RESPONSE_RATE, TARGET_EQUI_RESPONSE_RATE } from './query'
@@ -35,14 +36,13 @@ const { RangePicker } = DatePicker
 const { TabPane } = Tabs
 
 const filterCardStyle = {
-  background: '#F1F1F1',
   display: 'flex',
   flexWrap: 'wrap',
   padding: '5px 10px',
   margin: 0,
   height: 'fit-content',
   overflow: 'hidden',
-  backgroundColor: 'rgb(241, 241, 241)',
+  backgroundColor: COLORS.palleteLight,
 }
 
 const dateFormat = 'YYYY-MM-DD'
@@ -337,17 +337,6 @@ function TargetResponseReport({ studentName }) {
               height: 20,
             }}
           />
-          {/* <span style={parentLabel}>Class</span>
-          <div
-            style={{
-              background: '#ff8080',
-              borderRadius: 10,
-              width: '20px',
-              margin: 'auto 0',
-              marginRight: '10px',
-              height: 20,
-            }}
-          /> */}
         </div>
         <div style={{ marginLeft: 'auto' }}>
           <Dropdown overlay={menu} trigger={['click']}>

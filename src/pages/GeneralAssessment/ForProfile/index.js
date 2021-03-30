@@ -1,42 +1,25 @@
 /* eslint-disable */
 
 import React, { useEffect, useState } from 'react'
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons'
 import {
-  CheckSquareFilled,
-  DeleteOutlined,
-  PauseOutlined,
-  PlayCircleOutlined,
-  PlusOutlined,
-  FilterOutlined,
-} from '@ant-design/icons'
-import {
-  Badge,
   Button,
   Drawer,
-  Dropdown,
-  Icon,
-  Input,
   Layout,
   Tag,
-  Menu,
   notification,
   Popconfirm,
   Radio,
   Table,
   Tabs,
-  Tooltip,
   Typography,
 } from 'antd'
-import {
-  GET_GENERAL_ASSESSMENT,
-  UPDATE_GENERAL_ASSESSMENT,
-  DELETE_GENERAL_ASSESSMENT,
-} from '../query'
+import { GET_GENERAL_ASSESSMENT, DELETE_GENERAL_ASSESSMENT } from '../query'
 import client from '../../../apollo/config'
 import { useQuery, useLazyQuery, useMutation } from 'react-apollo'
 import CreateGenAssessForm from './CreateGenAssessForm'
-
-const { TabPane } = Tabs
+import { DRAWER } from 'assets/styles/globalStyles'
+import '../index.scss'
 
 const { Content } = Layout
 const { Text } = Typography
@@ -194,14 +177,16 @@ function Assessment() {
             </Button>
           </div>
         </div>
-        <Table
-          dataSource={tableData}
-          loading={genAssessLoading}
-          columns={columns}
-          bordered
-          rowKey={record => record.id}
-          pagination={false}
-        />
+        <div style={{ width: '100%' }} className="gen-assess-table">
+          <Table
+            dataSource={tableData}
+            loading={genAssessLoading}
+            columns={columns}
+            bordered
+            rowKey={record => record.id}
+            pagination={false}
+          />
+        </div>
       </Content>
 
       <Drawer
@@ -209,7 +194,7 @@ function Assessment() {
         onClose={() => {
           setCreateAssessDrawer(false)
         }}
-        width={500}
+        width={DRAWER.widthL3}
         destroyOnClose
         title="Create New Assessment"
       >

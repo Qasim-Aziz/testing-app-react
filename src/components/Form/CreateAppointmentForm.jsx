@@ -16,6 +16,7 @@ import {
 import { useSelector } from 'react-redux'
 import { useMutation, useQuery } from 'react-apollo'
 import moment from 'moment'
+import { CANCEL_BUTTON, COLORS, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import { timeToUtc, dateTimeToDate, combineDateAndTime } from '../../utilities'
 import {
   CREATE_APPOINTMENT,
@@ -30,18 +31,7 @@ import './appointmentForms.scss'
 
 const { TextArea } = Input
 const { Option } = Select
-
-const submitButton = {
-  minWidth: '160px',
-  height: 40,
-  background: '#0B35B3',
-  boxShadow: '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04)',
-  borderRadius: 0,
-  fontSize: 16,
-  fontWeight: 600,
-  marginTop: 20,
-  color: 'white',
-}
+const { layout, tailLayout } = FORM
 
 const CreateAppointmentForm = ({
   setNeedToReloadData,
@@ -91,7 +81,9 @@ const CreateAppointmentForm = ({
       form.resetFields()
       if (setNeedToReloadData) {
         setNeedToReloadData(createAppointmentData)
-        closeDrawer()
+        if (closeDrawer) {
+          closeDrawer()
+        }
       }
     }
   }, [createAppointmentData])
@@ -165,115 +157,90 @@ const CreateAppointmentForm = ({
 
   return (
     <Form
+      {...layout}
       name="addAppointment"
       onSubmit={handleSubmit}
       className="appointment-form"
       size="small"
-      labelCol={{ span: 10 }}
-      wrapperCol={{ span: 12 }}
     >
       <Divider orientation="left">Basic Details</Divider>
       {/* Title */}
-      <Row>
-        <Col sm={24} md={24} lg={24}>
-          <Form.Item label="Title" labelCol={{ offset: 1, sm: 4 }} wrapperCol={{ sm: 18 }}>
-            {form.getFieldDecorator('title', {
-              rules: [{ required: true, message: 'Please give a title' }],
-            })(<Input placeholder="Title" />)}
-          </Form.Item>
-        </Col>
-      </Row>
+      <Form.Item label="Title">
+        {form.getFieldDecorator('title', {
+          rules: [{ required: true, message: 'Please give a title' }],
+        })(<Input placeholder="Title" />)}
+      </Form.Item>
 
       {/* Select Learner */}
-      <Row>
-        <Col sm={24} md={24} lg={24}>
-          <Form.Item label="Select Learner" labelCol={{ offset: 1, sm: 4 }} wrapperCol={{ sm: 18 }}>
-            {form.getFieldDecorator('student', {
-              initialValue: learnerId,
-              rules: [{ required: true, message: 'Please select a Learner' }],
-            })(
-              <Select
-                placeholder="Select Learner"
-                loading={allSudentLoading}
-                showSearch
-                optionFilterProp="name"
-              >
-                {allSudent &&
-                  allSudent.students.edges.map(({ node }) => (
-                    <Option key={node.id} value={node.id} name={node.firstname}>
-                      {node.firstname}
-                    </Option>
-                  ))}
-              </Select>,
-            )}
-          </Form.Item>
-        </Col>
-      </Row>
+      <Form.Item label="Select Learner">
+        {form.getFieldDecorator('student', {
+          initialValue: learnerId,
+          rules: [{ required: true, message: 'Please select a Learner' }],
+        })(
+          <Select
+            placeholder="Select Learner"
+            loading={allSudentLoading}
+            showSearch
+            optionFilterProp="name"
+          >
+            {allSudent &&
+              allSudent.students.edges.map(({ node }) => (
+                <Option key={node.id} value={node.id} name={node.firstname}>
+                  {node.firstname}
+                </Option>
+              ))}
+          </Select>,
+        )}
+      </Form.Item>
 
       {/* Therapist */}
       {userRole !== 'therapist' && (
-        <Row>
-          <Col sm={24} md={24} lg={24}>
-            <Form.Item
-              label="Select Therapist"
-              labelCol={{ offset: 1, sm: 4 }}
-              wrapperCol={{ sm: 18 }}
+        <Form.Item label="Select Therapist">
+          {form.getFieldDecorator('therapist', {
+            initialValue: therapistId,
+            rules: [
+              {
+                required: true,
+                message: 'Please select a Therapist',
+              },
+            ],
+          })(
+            <Select
+              placeholder="Select Therapist"
+              loading={allTherapistLoading}
+              showSearch
+              optionFilterProp="name"
             >
-              {form.getFieldDecorator('therapist', {
-                initialValue: therapistId,
-                rules: [
-                  {
-                    required: true,
-                    message: 'Please select a Therapist',
-                  },
-                ],
-              })(
-                <Select
-                  placeholder="Select Therapist"
-                  loading={allTherapistLoading}
-                  showSearch
-                  optionFilterProp="name"
-                >
-                  {allTherapist &&
-                    allTherapist.staffs.edges.map(({ node }) => (
-                      <Option key={node.id} name={node.name}>
-                        {node.name}
-                      </Option>
-                    ))}
-                </Select>,
-              )}
-            </Form.Item>
-          </Col>
-        </Row>
+              {allTherapist &&
+                allTherapist.staffs.edges.map(({ node }) => (
+                  <Option key={node.id} name={node.name}>
+                    {node.name}
+                  </Option>
+                ))}
+            </Select>,
+          )}
+        </Form.Item>
       )}
 
       {/* Additional Staff */}
-      <Row>
-        <Col sm={24} md={24} lg={24}>
-          <Form.Item
-            label="Additional Staff"
-            labelCol={{ offset: 1, sm: 4 }}
-            wrapperCol={{ sm: 18 }}
+      <Form.Item label="Additional Staff">
+        {form.getFieldDecorator('additionalStaff')(
+          <Select
+            placeholder="Select Additional Staff"
+            loading={allTherapistLoading}
+            showSearch
+            optionFilterProp="name"
+            mode="multiple"
           >
-            {form.getFieldDecorator('additionalStaff')(
-              <Select
-                placeholder="Select Additional Staff"
-                loading={allTherapistLoading}
-                showSearch
-                optionFilterProp="name"
-                mode="multiple"
-              >
-                {allTherapist &&
-                  allTherapist.staffs.edges.map(({ node }) => (
-                    <Option key={node.id} name={node.name}>
-                      {node.name}
-                    </Option>
-                  ))}
-              </Select>,
-            )}
-          </Form.Item>
-        </Col>
-      </Row>
+            {allTherapist &&
+              allTherapist.staffs.edges.map(({ node }) => (
+                <Option key={node.id} name={node.name}>
+                  {node.name}
+                </Option>
+              ))}
+          </Select>,
+        )}
+      </Form.Item>
 
       <Divider orientation="left">Date &amp; Time</Divider>
 
@@ -450,7 +417,7 @@ const CreateAppointmentForm = ({
           <Form.Item
             label="Status"
             labelCol={{ sm: 10 }}
-            wrapperCol={{ sm: 12 }}
+            wrapperCol={{ sm: 14 }}
             rules={[{ required: true, message: 'Please select a status!' }]}
           >
             {form.getFieldDecorator('appointmentStatus', {
@@ -470,73 +437,46 @@ const CreateAppointmentForm = ({
       </Row>
 
       {/* Purpose */}
-      <Row>
-        <Col sm={24} md={24} lg={24}>
-          <Form.Item
-            label="Appointment Reason"
-            labelCol={{ offset: 1, sm: 4 }}
-            wrapperCol={{ sm: 18 }}
-          >
-            {form.getFieldDecorator('purposeAssignment', {
-              rules: [
-                {
-                  required: true,
-                  message: 'Please give the Appointment Purpose',
-                },
-              ],
-            })(<Input placeholder="Appointment Purpose" />)}
-          </Form.Item>
-        </Col>
-      </Row>
+      <Form.Item label="Appointment Reason">
+        {form.getFieldDecorator('purposeAssignment', {
+          rules: [
+            {
+              required: true,
+              message: 'Please give the Appointment Purpose',
+            },
+          ],
+        })(<Input placeholder="Appointment Purpose" />)}
+      </Form.Item>
 
       {/* Notes */}
-      <Row>
-        <Col sm={24} md={24} lg={24}>
-          <Form.Item label="Notes" labelCol={{ offset: 1, sm: 4 }} wrapperCol={{ sm: 18 }}>
-            {form.getFieldDecorator('note')(
-              <TextArea
-                placeholder="Take a note"
-                style={{
-                  height: 150,
-                  resize: 'none',
-                }}
-              />,
-            )}
-          </Form.Item>
-        </Col>
-      </Row>
+      <Form.Item label="Notes">
+        {form.getFieldDecorator('note')(
+          <TextArea
+            placeholder="Take a note"
+            style={{
+              height: 150,
+              resize: 'none',
+            }}
+          />,
+        )}
+      </Form.Item>
 
       {/* Submit button */}
-      <Row>
-        <Col sm={24} md={24} lg={24}>
-          <Form.Item
-            wrapperCol={{
-              offset: 10,
-              span: 12,
-            }}
-          >
-            <Button htmlType="submit" style={submitButton} loading={isCreateAppointmentLoading}>
-              Create Appointment
-            </Button>
-            <Button
-              type="danger"
-              style={{
-                ...submitButton,
-                color: 'white',
-                background: 'red',
-                marginLeft: '15px',
-                boxShadow: 'none',
-              }}
-              onClick={() => {
-                form.resetFields()
-                closeDrawer()
-              }}
-            >
-              Cancel
-            </Button>
-          </Form.Item>
-        </Col>
-      </Row>
+      <Form.Item {...tailLayout}>
+        <Button htmlType="submit" style={SUBMITT_BUTTON} loading={isCreateAppointmentLoading}>
+          Create Appointment
+        </Button>
+        <Button
+          type="danger"
+          style={CANCEL_BUTTON}
+          onClick={() => {
+            form.resetFields()
+            closeDrawer()
+          }}
+        >
+          Cancel
+        </Button>
+      </Form.Item>
     </Form>
   )
 }

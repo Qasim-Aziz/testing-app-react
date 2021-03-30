@@ -1,50 +1,14 @@
 /* eslint-disable */
 import React, { useState, useEffect } from 'react'
-import {
-  Form,
-  Input,
-  Button,
-  Select,
-  DatePicker,
-  Divider,
-  Upload,
-  Tag,
-  Checkbox,
-  Icon,
-  message,
-  notification,
-} from 'antd'
+import { Form, Input, Button, Select, notification } from 'antd'
 import moment from 'moment'
 import { useMutation } from 'react-apollo'
 import { Link, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
-import axios from 'axios'
-import AntdTag from '../../staffs/antdTag'
 import { UPDATE_STAFF } from './query'
-import staffProfile from 'pages/staffProfile'
+import { COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 
-const { TextArea } = Input
-const { Option } = Select
-const layout = {
-  labelCol: {
-    span: 7,
-  },
-  wrapperCol: {
-    span: 16,
-  },
-}
-
-const submitButton = {
-  width: '45%',
-  height: 40,
-  background: '#0B35B3',
-  boxShadow: '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04)',
-  borderRadius: 0,
-  fontSize: 16,
-  fontWeight: 700,
-  marginTop: 20,
-}
-
+const { layout } = FORM
 const itemStyle = { marginBottom: '5px', fontWeight: 'bold' }
 
 function MiscInfo(props) {
@@ -126,7 +90,6 @@ function MiscInfo(props) {
     })
   }
 
-  console.log(staffProfile, 'ser')
   return (
     <div>
       <Form {...layout} onSubmit={handleSubmit}>
@@ -150,15 +113,11 @@ function MiscInfo(props) {
             rules: [{ required: false, message: 'Please provide Father Name!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
-        <div style={{ display: 'flex', justifyContent: 'space-evenly' }}>
-          <Button type="primary" htmlType="submit" loading={updateLoading} style={submitButton}>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Button type="primary" htmlType="submit" loading={updateLoading} style={SUBMITT_BUTTON}>
             Submitt
           </Button>
-          <Button
-            onClick={() => closeDrawer(false)}
-            type="default"
-            style={{ ...submitButton, color: 'white', background: 'red', boxShadow: 'none' }}
-          >
+          <Button onClick={() => closeDrawer(false)} type="default" style={CANCEL_BUTTON}>
             Cancel
           </Button>
         </div>

@@ -14,13 +14,13 @@ const AssessmentDropDown = ({ form, onSelectionChange, assessmentData, isAssessm
   }
 
   return (
-    <Form.Item label="Select an assessment" style={{ display: 'flex' }}>
+    <Form.Item label="Select an assessment" style={{ display: 'flex', marginBottom: 0 }}>
       {form.getFieldDecorator('stdId', {
         initialValue: assessmentData && assessmentData?.vbmappGetAssessments?.edges[0]?.node?.id,
       })(
         <Select
           showSearch
-          style={{ width: 200 }}
+          style={{ width: 235 }}
           optionFilterProp="testNo"
           placeholder="Select an assessment"
           loading={isAssessmentLoading}
