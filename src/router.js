@@ -87,7 +87,12 @@ const routes = [
   {
     path: '/partners/viewleads',
     component: loadable(() => import('pages/leads/view_leads')),
-    // component: LEADS,//
+    exact: true,
+  },
+  // The expense component.
+  {
+    path: '/partners/viewexpenses',
+    component: loadable(() => import('pages/expenses/view_expense')),
     exact: true,
   },
   {
