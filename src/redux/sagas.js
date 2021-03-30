@@ -13,6 +13,8 @@ import learners from './learners/sagas'
 import leaders from './leads/sagas'
 // EXPENSE IMPORTED
 import expenses from './expenses/sagas'
+// Assets imported
+import assets from './assets_redux/sagas'
 import settings from './settings/sagas'
 import screening from './screening/sagas'
 import payor from './payor/sagas'
@@ -41,6 +43,8 @@ export default function* rootSaga() {
     leaders(),
     // expenses uesd
     expenses(),
+    // assets used
+    assets(),
     settings(),
     screening(),
     payor(),
