@@ -19,6 +19,14 @@
 .ant-form-item-label {
   // text-align: left;
   white-space: normal;
+  font-size: 14px;
+  font-weight: bold;
+  color: rgba(0, 0, 0, 0.65);
+  line-height: 32px;
+}
+
+.ant-form-item-required::before {
+  content: '*';
 }
 
 .ant-form-item > .ant-form-item,

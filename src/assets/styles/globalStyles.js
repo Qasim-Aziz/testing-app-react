@@ -2,14 +2,13 @@
 
 export const COLORS = {
   //   Palette Color
-  palleteLight: '#f9f7f7',
+  palleteLight: '#edf1f7',
   palleteLightBlue: '#dbe2ef',
   palleteBlue: '#3f72af',
   palleteDarkBlue: '#112d4e',
 
   // Colors
   white: '#fff',
-
   text: '#74708d',
   textLighten: '#c0bdd0',
   textDarken: '#615d7c',
@@ -50,7 +49,10 @@ export const COLORS = {
 }
 
 export const DRAWER = {
-  width: '80%',
+  widthL1: '80%',
+  widthL2: '60%',
+  widthL3: '50%',
+  widthL4: '40%',
 }
 
 export const FONT = {
@@ -59,4 +61,23 @@ export const FONT = {
   level3: '18px',
   level4: '14px',
   level5: '12px',
+}
+
+export const FORM = {
+  layout: {
+    labelCol: {
+      span: 5,
+    },
+    wrapperCol: {
+      span: 19,
+    },
+  },
+
+  tailLayout: {
+    wrapperCol: {
+      offset: 5,
+      span: 19,
+    },
+  }
+
 }
