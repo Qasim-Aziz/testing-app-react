@@ -11,6 +11,8 @@ import feedback from './feedback/sagas'
 import learners from './learners/sagas'
 // leaders imported
 import leaders from './leads/sagas'
+// EXPENSE IMPORTED
+import expenses from './expenses/sagas'
 import settings from './settings/sagas'
 import screening from './screening/sagas'
 import payor from './payor/sagas'
@@ -37,6 +39,8 @@ export default function* rootSaga() {
     learners(),
     // leaders used
     leaders(),
+    // expenses uesd
+    expenses(),
     settings(),
     screening(),
     payor(),
