@@ -3,11 +3,12 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-shadow */
+/* eslint-disable */
 import { ApolloClient } from 'apollo-client'
 import { createHttpLink } from 'apollo-link-http'
 import { setContext } from 'apollo-link-context'
 import { InMemoryCache } from 'apollo-cache-inmemory'
-import { onError } from "apollo-link-error";
+import { onError } from 'apollo-link-error'
 import { notification } from 'antd'
 import API_END_POINT from '../env'
 
@@ -15,20 +16,18 @@ const httpLink = createHttpLink({
   uri: API_END_POINT,
 })
 
-const errorLink = onError(({ graphQLErrors, networkError,response, operation, forward }) => {
-   if(graphQLErrors)
-   {
-
+const errorLink = onError(({ graphQLErrors, networkError, response, operation, forward }) => {
+  if (graphQLErrors) {
     // graphQLErrors.forEach(({ message, locations, path }) =>
     //   notification.success({
     //     message: message,
     //     description: message,
     //   })
     // );
-   }
-});
+  }
+})
 
-const httperrorLink = errorLink.concat(httpLink);
+const httperrorLink = errorLink.concat(httpLink)
 
 const authLink = setContext((_, { headers }) => {
   // get the authentication token from local storage if it exists
@@ -48,9 +47,9 @@ const authLink = setContext((_, { headers }) => {
   }
 })
 
-const authhttperrorLink = authLink.concat(httperrorLink);
+const authhttperrorLink = authLink.concat(httperrorLink)
 
 export default new ApolloClient({
   link: authhttperrorLink,
-  cache: new InMemoryCache()
+  cache: new InMemoryCache(),
 })
