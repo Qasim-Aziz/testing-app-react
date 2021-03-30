@@ -33,6 +33,7 @@ import BehaviorGraph from './monthlyBehaviorGraph'
 import ReportPdf from './monthlyReportPdf'
 import client from '../../apollo/config'
 import { calculateAge } from '../../utilities'
+import { COLORS } from 'assets/styles/globalStyles'
 
 const { RangePicker, MonthPicker } = DatePicker
 const { TextArea } = Input
@@ -45,10 +46,15 @@ const filterCardStyle = {
   margin: 0,
   height: 'fit-content',
   overflow: 'hidden',
-  backgroundColor: 'rgb(241, 241, 241)',
+  backgroundColor: COLORS.palleteLight,
 }
 const parentLabel = { fontSize: '15px', color: '#000', marginRight: '6px' }
-
+const graphHead = {
+  textAlign: 'center',
+  padding: 5,
+  backgroundColor: COLORS.palleteLight,
+  color: 'black',
+}
 const dateFormat = 'YYYY-MM-DD'
 const monthNames = [
   'January',
@@ -516,9 +522,7 @@ function Goals({ selectedStudentId, studentName }) {
               marginRight: 'auto',
             }}
           >
-            <p style={{ textAlign: 'center', padding: 5, backgroundColor: '#f9f9f9' }}>
-              Monthly Report
-            </p>
+            <p style={graphHead}>Monthly Report</p>
 
             {learnerDetails && (
               <div>
@@ -548,9 +552,7 @@ function Goals({ selectedStudentId, studentName }) {
               </div>
             )}
 
-            <p style={{ textAlign: 'center', padding: 5, backgroundColor: '#f9f9f9' }}>
-              Progress Overview
-            </p>
+            <p style={graphHead}>Progress Overview</p>
             <TextArea
               name="progressOverview"
               defaultValue={textBoxObj['progressOverview']}
@@ -647,9 +649,7 @@ function Goals({ selectedStudentId, studentName }) {
             </div>
             <hr />
 
-            <p style={{ textAlign: 'center', padding: 5, backgroundColor: '#f9f9f9' }}>
-              Goals Graph
-            </p>
+            <p style={graphHead}>Goals Graph</p>
 
             <TextArea
               name="goals"
@@ -741,7 +741,7 @@ function Goals({ selectedStudentId, studentName }) {
             {goalsDetails &&
               goalsDetails.map((item, itemIndex) => (
                 <>
-                  <div style={{ padding: 5, backgroundColor: '#f9f9f9' }}>
+                  <div style={{ padding: 5, color: 'black', backgroundColor: COLORS.palleteLight }}>
                     <p>
                       Long Term Goals {itemIndex + 1}: {item.goal.goalName}
                     </p>
@@ -754,7 +754,7 @@ function Goals({ selectedStudentId, studentName }) {
 
                   <hr />
                   {item.goal.shorttermgoalSet.edges.map((shortItem, shortItemIdx) => (
-                    <div style={{ paddingLeft: 20 }}>
+                    <div style={{ paddingLeft: 20, color: 'black' }}>
                       <p>
                         Short Term Goals {itemIndex + 1}.{shortItemIdx + 1}:{' '}
                         {shortItem.node.goalName}
@@ -767,7 +767,7 @@ function Goals({ selectedStudentId, studentName }) {
                       <hr />
                       {shortItem.node.targetAllocateSet.edges.map(targetItem => {
                         return (
-                          <div style={{ paddingLeft: 20 }}>
+                          <div style={{ paddingLeft: 20, color: 'black' }}>
                             {targetItem.node && (
                               <div>
                                 <p>Target: {targetItem.node.targetAllcatedDetails?.targetName}</p>
@@ -884,9 +884,7 @@ function Goals({ selectedStudentId, studentName }) {
               ))}
             <hr />
 
-            <p style={{ textAlign: 'center', padding: 5, backgroundColor: '#f9f9f9' }}>
-              Behaviour Report
-            </p>
+            <p style={graphHead}>Behaviour Report</p>
             <TextArea
               name="behaviour"
               defaultValue={textBoxObj['behaviour']}
@@ -920,16 +918,7 @@ function Goals({ selectedStudentId, studentName }) {
 
             <hr />
 
-            <p
-              style={{
-                textAlign: 'center',
-                padding: 5,
-                backgroundColor: '#f9f9f9',
-                marginTop: 20,
-              }}
-            >
-              Mand Progress
-            </p>
+            <p style={graphHead}>Mand Progress</p>
             <TextArea
               name="mand"
               defaultValue={textBoxObj['mand']}

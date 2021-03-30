@@ -1,3 +1,5 @@
+@import '../../assets/styles/mixins.scss';
+
 .modify-peak-22-table {
   .ant-table-thead > tr > th,
   .ant-table-tbody > tr > td {
@@ -6,7 +8,7 @@
   }
 
   .ant-table {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
   }
   .ant-table-small > .ant-table-content > .ant-table-body {
@@ -17,8 +19,9 @@
     text-align: left;
     font-weight: bold;
     height: 52px;
+    background-color: $palete-light;
   }
   .ant-table-small > .ant-table-content > .ant-table-body > table > .ant-table-thead > tr > th {
-    background-color: #fafafa;
+    background-color: $palete-light;
   }
 }

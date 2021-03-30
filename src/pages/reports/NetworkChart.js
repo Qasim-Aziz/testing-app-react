@@ -169,7 +169,7 @@ const NetworkChart = ({
         border: '2px solid #F9F9F9',
         display: 'block',
         width: '100%',
-        height: '500px',
+        height: '100%',
       }}
     >
       {domainLoading && (
@@ -241,4 +241,4 @@ const NetworkChart = ({
   )
 }
 
-export default NetworkChart 
+export default NetworkChart

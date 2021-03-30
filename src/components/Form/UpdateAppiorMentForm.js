@@ -6,28 +6,14 @@ import { useSelector } from 'react-redux'
 import { useMutation, useQuery } from 'react-apollo'
 import moment from 'moment'
 import './appiorMentForm.scss'
+import { FORM, SUBMITT_BUTTON, COLORS, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 import { GET_APPOINTMENT_DETAILS, EDIT_APPOINTMENT } from './query'
 import { dateTimeToUtc } from '../../utilities'
 
 const { TextArea } = Input
 const { Option } = Select
 
-const layout = {
-  labelCol: {
-    span: 10,
-  },
-  wrapperCol: {
-    span: 12,
-  },
-}
-const tailLayout = {
-  wrapperCol: {
-    offset: 10,
-    span: 12,
-  },
-}
-
-
+const { layout, tailLayout } = FORM
 
 const ALL_STUDENT = gql`
   query {
@@ -264,32 +250,32 @@ const EditAppiorMentForm = ({ setNewAppiormentCreated, form, id, setOpen }) => {
         {userRole === 'therapist' ? (
           ''
         ) : (
-            <Form.Item label="Select Therapist">
-              {form.getFieldDecorator('therapist', {
-                rules: [
-                  {
-                    required: true,
-                    message: 'Please select a Therapist',
-                  },
-                ],
-              })(
-                <Select
-                  placeholder="Select Therapist"
-                  size="large"
-                  loading={allTherapistLoading}
-                  showSearch
-                  optionFilterProp="name"
-                >
-                  {allTherapist &&
-                    allTherapist.staffs.edges.map(({ node }) => (
-                      <Option key={node.id} name={node.name}>
-                        {node.name}
-                      </Option>
-                    ))}
-                </Select>,
-              )}
-            </Form.Item>
-          )}
+          <Form.Item label="Select Therapist">
+            {form.getFieldDecorator('therapist', {
+              rules: [
+                {
+                  required: true,
+                  message: 'Please select a Therapist',
+                },
+              ],
+            })(
+              <Select
+                placeholder="Select Therapist"
+                size="large"
+                loading={allTherapistLoading}
+                showSearch
+                optionFilterProp="name"
+              >
+                {allTherapist &&
+                  allTherapist.staffs.edges.map(({ node }) => (
+                    <Option key={node.id} name={node.name}>
+                      {node.name}
+                    </Option>
+                  ))}
+              </Select>,
+            )}
+          </Form.Item>
+        )}
 
         <Form.Item label="Note">
           {form.getFieldDecorator('note', {
@@ -311,40 +297,21 @@ const EditAppiorMentForm = ({ setNewAppiormentCreated, form, id, setOpen }) => {
             justifyContent: 'space-between',
           }}
         >
-          <Form.Item style={{ width: '45%' }}>
-            <Button
-              type="primary"
-              htmlType="submit"
-              style={{
-                width: '100%',
-                height: 40,
-                background: '#0B35B3',
-                marginTop: 15,
-                marginBottom: 20,
-              }}
-            >
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Button type="primary" htmlType="submit" style={SUBMITT_BUTTON}>
               Update
             </Button>
-          </Form.Item>
-          <Form.Item style={{ width: '45%' }}>
             <Button
-              type="primary"
+              type="default"
               onClick={() => {
                 form.resetFields()
                 setOpen(null)
               }}
-              style={{
-                width: '100%',
-                height: 40,
-                background: 'red',
-                color: '#fff',
-                marginTop: 15,
-                marginBottom: 20,
-              }}
+              style={CANCEL_BUTTON}
             >
-              Cancle
+              Cancel
             </Button>
-          </Form.Item>
+          </div>
         </div>
       </Form>
     </>

@@ -61,29 +61,31 @@ function MenuTop(props) {
     client
       .query({
         query: gql`
-            query {
-              notification(recipient: ${id}) {
-                edges {
-                  node {
+          query {
+            notification(recipient: ${id}) {
+              edges {
+                node {
+                  id
+                  title
+                  description
+                  timestamp
+                  read
+                  recipient {
                     id
-                    title
-                    description
-                    timestamp
-                    read
-                    recipient{
-                        id
-                        username
-                    }
-                    notifyType
-                    modelId
+                    username
                   }
+                  actorObjectId
+                  notifyType
+                  modelId
                 }
               }
             }
-          `,
+          }
+        `,
         fetchPolicy: 'network-only',
       })
       .then(res => {
+        console.log(res, 'notification res')
         let notiList = []
         let tempCount = 0
         res.data.notification.edges.map(item => {
@@ -302,17 +304,13 @@ function MenuTop(props) {
     history: { goBack },
   } = props
 
+  console.log(notificationList, 'notification List')
   const menu = (
     <Menu
-      className={styles.menu}
-      style={{
-        width: 400,
-        height: `${notificationList.length > 0 ? 320 : 180}px`,
-        paddingTop: '12px',
-        paddingBottom: '12px',
-        overflowY: 'auto',
-      }}
+      className={`${styles.menu}${styles.temp} ${styles.scroll}`}
+      style={{ height: `${notificationList.length > 0 ? 500 : 180}px` }}
     >
+      {/* <~Menu.Item style={{ height: '50px', fontSize: '17px' }}>Notifications</Menu.Item> */}
       {notificationList.length > 0 ? (
         notificationList.map((item, itemIdx) => {
           let url = '#'
@@ -322,11 +320,30 @@ function MenuTop(props) {
               url = '#/viewTask'
               break
             case 'Appointment':
-              setnotificationRedirectUrl('#/appointmentData')
+              // setnotificationRedirectUrl('#/appointmentData')
               url = '#/appointmentData'
               break
+            case 'Meal Data':
+              // setnotificationRedirectUrl('#/LearnerMeal')
+              url = '#/LearnerMeal'
+              break
+            case 'Medical Data':
+              // setnotificationRedirectUrl('#/LearnerMedical')
+              url = '#/LearnerMedical'
+              break
+            case 'Toilet Data':
+              // setnotificationRedirectUrl('#/LearnerToilet')
+              url = '#/LearnerToilet'
+              break
+            case 'Behavior Data':
+              // setnotificationRedirectUrl('#/LearnerBehavior')
+              url = '#/LearnerBehavior'
+              break
+            case 'Session':
+              // setnotificationRedirectUrl('#/LearnerSessions')
+              url = '#/LearnerSessions'
+              break
             default:
-              // setnotificationRedirectUrl('#')
               url = '#'
               break
           }
@@ -334,7 +351,7 @@ function MenuTop(props) {
             <Menu.Item
               key={Math.random()}
               style={{
-                width: 384,
+                width: '100%',
                 textOverflow: 'inherit',
                 wordWrap: 'break-word',
                 whiteSpace: 'normal',
@@ -343,7 +360,7 @@ function MenuTop(props) {
               }}
               onClick={() => handleReadNotification(item)}
             >
-              <a href={url}>
+              <a href={url} style={{ maxWidth: '100%' }}>
                 <div className={styles.temp}>
                   <Comment
                     author={item.title}
@@ -410,12 +427,16 @@ function MenuTop(props) {
         <Menu.Item
           style={{ padding: '8px 20px', textAlign: 'center', float: 'right', height: '58px' }}
         >
-          <Dropdown className={styles.menu} overlay={menu} trigger={['click']} placement="topRight">
-            <div>
-              <Badge count={unreadNotifications}>
-                <BellOutlined />
-              </Badge>
-            </div>
+          <Dropdown
+            className={`${styles.temp}`}
+            style={{ width: 'fit-content' }}
+            overlay={menu}
+            trigger={['click']}
+            placement="topRight"
+          >
+            <Badge count={unreadNotifications}>
+              <BellOutlined style={{ fontSize: 18 }} />
+            </Badge>
           </Dropdown>
         </Menu.Item>
       </Menu>

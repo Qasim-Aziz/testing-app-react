@@ -15,6 +15,7 @@ import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import groupObj from '@hunters/group-object'
 import LoadingComponent from 'components/VBMappReport/LoadingComponent'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import ResponseRateGraph from './dailyResponseRateGraph'
 import './form.scss'
 import './table.scss'
@@ -176,7 +177,7 @@ export const ResponseRateEqui = forwardRef((props, ref) => {
                   display: 'flex',
                   margin: 'auto 0',
                   width: '100%',
-                  color: '#2874A6',
+                  color: COLORS.target,
                   fontWeight: '600',
                 }}
               >
@@ -193,14 +194,14 @@ export const ResponseRateEqui = forwardRef((props, ref) => {
                 justifyContent: 'space-between',
                 width: '100%',
                 fontWeight: '600',
-                color: '#2874A6',
+                color: COLORS.target,
               }}
             >
               <div style={{ margin: 'auto 0', padding: 0 }}>{text}</div>
 
               <Button type="link" onClick={() => handleSelectTarget(row)}>
                 <LineChartOutlined
-                  style={{ margin: 'auto 0', fontSize: '26px', color: 'rgb(229, 132, 37)' }}
+                  style={{ margin: 'auto 0', fontSize: '26px', color: COLORS.graph }}
                 />
               </Button>
             </div>
@@ -218,14 +219,14 @@ export const ResponseRateEqui = forwardRef((props, ref) => {
               textAlign: 'center',
               fontWeight: '600',
               paddingLeft: '20px',
-              color: row.type === 'Stimulus' ? '#F080B8' : '#F0B880',
+              color: row.type === 'Stimulus' ? COLORS.stimulus : COLORS.steps,
             }}
           >
             <div style={{ margin: 'auto 0', padding: 0 }}>{text}</div>
             {row.parent ? null : (
               <Button type="link" onClick={() => handleSelectTarget(row)}>
                 <LineChartOutlined
-                  style={{ fontSize: '26px', margin: 'auto 0', color: 'rgb(229, 132, 37)' }}
+                  style={{ fontSize: '26px', margin: 'auto 0', color: COLORS.graph }}
                 />
               </Button>
             )}
@@ -287,12 +288,10 @@ export const ResponseRateEqui = forwardRef((props, ref) => {
   }
 
   const getGraphData = targetName => {
-    console.log(targetName, 'tr')
     const graphAxixData = []
     const groupedData = groupObj.group(daysList, 'monthYear')
     let keys = []
     keys = Object.keys(groupedData)
-    console.log(keys, 'kk')
 
     keys.map(monthYear => {
       const tempData = [
@@ -319,7 +318,6 @@ export const ResponseRateEqui = forwardRef((props, ref) => {
       })
       graphAxixData.push(tempData)
     })
-    console.log(graphAxixData, 'gr')
 
     setGraphData(graphAxixData)
     setLineDrawer(true)
@@ -429,7 +427,7 @@ export const ResponseRateEqui = forwardRef((props, ref) => {
        }`}
         visible={lineDrawer}
         onClose={() => setLineDrawer(false)}
-        width={900}
+        width={DRAWER.widthL2}
       >
         <ResponseRateGraph graphData={graphData} />
       </Drawer>

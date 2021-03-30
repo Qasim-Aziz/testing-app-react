@@ -11,6 +11,7 @@ import {
   getLearnersDropdown,
   learnerActiveInactive,
   createLearnersProgram,
+  getLearner,
 } from 'services/learners'
 import axios from 'axios'
 import actions from './actions'
@@ -35,8 +36,8 @@ export function* GET_DATA() {
   yield put({
     type: 'learners/GET_LEARNERS',
     payload: {
-      isActive: true,
-      first: 10,
+      isActive: null,
+      first: 20,
       after: null,
       before: null,
     },
@@ -62,17 +63,23 @@ export function* GET_LEARNERS({ payload }) {
   if (response) {
     const learners = []
     let i = 0
-    if (response.data.students.edges.length > 0) {
+    console.log(response, 'in res 11')
+    if (response.data.students.edges && response.data.students.edges.length > 0) {
+      console.log(response, 'in res 22')
       for (i = 0; i < response.data.students.edges.length; i++) {
-        if (response.data.students.edges[i].node.tags.edges.length > 0) {
+        if (
+          response.data.students.edges[i].node.tags.edges &&
+          response.data.students.edges[i].node.tags.edges.length > 0
+        ) {
+          console.log(response, 'in res 33')
           const tempTagArr = response.data.students.edges[i].node.tags.edges.map(e => e.node.name)
           response.data.students.edges[i].node.tags = tempTagArr
         }
+
         learners.push(response.data.students.edges[i].node)
       }
     }
 
-    console.log(learners, 'jnxckjvnkjnxck')
     yield put({
       type: 'learners/SET_STATE',
       payload: {
@@ -120,10 +127,8 @@ export function* PAGE_CHANGED({ payload }) {
     first = null
     last = payload.rows % perPage
   } else if (payload.page > currentPage) {
-    console.log('trriger after', payload.page, currentPage)
     after = pageInfo.endCursor
   } else if (payload.page < currentPage) {
-    console.log('trriger before', payload.page, currentPage)
     before = pageInfo.startCursor
   }
 
@@ -131,6 +136,7 @@ export function* PAGE_CHANGED({ payload }) {
   //   after = pageInfo.endCursor
   // }
 
+  console.log(active, first, after, before, last, 'in row changes')
   const response = yield call(getClinicLearners, { isActive: active, first, after, before, last })
 
   const oldLearners = []
@@ -146,7 +152,6 @@ export function* PAGE_CHANGED({ payload }) {
       }
     }
 
-    console.log(oldLearners, 'jnskjfnesknsdkjcnsdkcnsdkjsde')
     yield put({
       type: 'learners/SET_STATE',
       payload: {
@@ -196,10 +201,6 @@ export function* ROWS_CHANGED({ payload }) {
     last = totalLearners % payload.currentRowsPerPage
   }
 
-  // if (pageInfo){
-  //   after = pageInfo.endCursor
-  // }
-
   const response = yield call(getClinicLearners, { isActive: active, first, after, before, last })
 
   const oldLearners = []
@@ -207,15 +208,18 @@ export function* ROWS_CHANGED({ payload }) {
     let i = 0
     if (response.data.students.edges.length > 0) {
       for (i = 0; i < response.data.students.edges.length; i++) {
-        if (response.data.students.edges[i].node.tags.edges.length > 0) {
+        if (
+          response.data.students.edges[i].node.tags.edges &&
+          response.data.students.edges[i].node.tags.edges.length > 0
+        ) {
           const tempTagArr = response.data.students.edges[i].node.tags.edges.map(e => e.node.name)
           response.data.students.edges[i].node.tags = tempTagArr
         }
+
         oldLearners.push(response.data.students.edges[i].node)
       }
     }
 
-    console.log(oldLearners, 'oldLeanrernss')
     yield put({
       type: 'learners/SET_STATE',
       payload: {
@@ -251,9 +255,8 @@ export function* GET_LEARNERS_DROPDOWNS() {
   }
 }
 
-export function* EDIT_LEARNER({ payload }) {
-  const response = yield call(updateLearner, payload)
-
+export function* EDIT_GENERAL_INFO({ payload }) {
+  const { response } = payload
   if (response && response.data) {
     notification.success({
       message: 'Learner Updated Successfully',
@@ -264,6 +267,78 @@ export function* EDIT_LEARNER({ payload }) {
       if (response.data.updateStudent.student.tags.edges.length > 0) {
         const tempTagArr = response.data.updateStudent.student.tags.edges.map(e => e.node.name)
         updatedLearner = { ...updatedLearner, tags: tempTagArr }
+      } else {
+        updatedLearner = { ...updatedLearner, tags: [] }
+      }
+
+      console.log(response.data.updateStudent.student.allergicTo)
+
+      if (
+        response.data.updateStudent.student.allergicTo?.edges &&
+        response.data.updateStudent.student.allergicTo?.edges.length > 0
+      ) {
+        const tempAllergyArr = response.data.updateStudent.student.allergicTo?.edges.map(
+          e => e.node.name,
+        )
+        updatedLearner = { ...updatedLearner, allergicTo: tempAllergyArr }
+      } else {
+        updatedLearner = { ...updatedLearner, allergicTo: [] }
+      }
+    }
+
+    const obj = {
+      id: updatedLearner.id,
+      caseManager: updatedLearner.caseManager,
+      category: updatedLearner.category,
+      email: updatedLearner.email,
+      firstname: updatedLearner.firstname,
+      lastname: updatedLearner.lastname,
+      gender: updatedLearner.gender,
+      isActive: updatedLearner.isActive,
+      mobileno: updatedLearner.mobileno,
+      parentMobile: updatedLearner.parentMobile,
+      tags: updatedLearner.tags,
+    }
+
+    console.log(response, 'response')
+    console.log(updatedLearner, obj, 'updated kjfbsdf ksf')
+    yield put({
+      type: 'learners/UPDATE_LERNERS_LIST',
+      payload: {
+        object: obj,
+      },
+    })
+
+    yield put({
+      type: 'learners/SET_STATE',
+      payload: {
+        UserProfile: updatedLearner,
+      },
+    })
+  }
+}
+
+export function* EDIT_LEARNER({ payload }) {
+  const response = yield call(updateLearner, payload)
+  if (response && response.data) {
+    notification.success({
+      message: 'Learner Updated Successfully',
+    })
+
+    let updatedLearner = response.data.updateStudent.student
+    if (response.data.updateStudent.student) {
+      if (response.data.updateStudent.student.tags.edges.length > 0) {
+        const tempTagArr = response.data.updateStudent.student.tags.edges.map(e => e.node.name)
+        updatedLearner = { ...updatedLearner, tags: tempTagArr }
+      }
+      if (
+        response.data.updateStudent.student.allergicTo?.edges &&
+        response.data.updateStudent.student.allergicTo?.edges.length > 0
+      ) {
+        const tempAllergyArr = response.data.updateStudent.student.allergicTo?.edges.map(
+          e => e.node.name,
+        )
+        updatedLearner = { ...updatedLearner, allergicTo: tempAllergyArr }
       }
     }
 
@@ -292,12 +367,6 @@ export function* CREATE_LEARNER({ payload }) {
       message: 'Learner Created Successfully',
     })
 
-    console.log('CREATE_LEARNER')
-    console.log(response)
-    console.log(payload.data.get('file'))
-    console.log(response.data.createStudent)
-    console.log(response.data.createStudent.student)
-
     let token = ''
     if (!(localStorage.getItem('token') === null) && localStorage.getItem('token')) {
       token = JSON.parse(localStorage.getItem('token'))
@@ -315,7 +384,6 @@ export function* CREATE_LEARNER({ payload }) {
       })
       .then(res => {
         // then print response status
-        console.log(res.statusText)
         message.success('Upload Successfully.')
       })
       .catch(err1 => {
@@ -351,7 +419,6 @@ export function* LEARNER_ACTIVE_INACTIVE({ payload }) {
 
   if (response && response.data) {
     // generating notification
-    console.log(response.data.updateStudent.student)
     if (payload.checked === true) {
       notification.success({
         message: 'Learner Activated Successfully',
@@ -371,6 +438,31 @@ export function* LEARNER_ACTIVE_INACTIVE({ payload }) {
   }
 }
 
+export function* GET_SINGLE_LEARNER({ payload }) {
+  const response = yield call(getLearner, payload.UserProfile)
+
+  if (response && response.data) {
+    // generating notification
+    const userData = {
+      ...response.data.student,
+      tags: response.data.student.tags
+        ? response.data.student.tags.edges.map(item => item.node.name)
+        : [],
+      allergicTo: response.data.student.allergicTo
+        ? response.data.student.allergicTo.edges.map(item => item.node.name)
+        : [],
+    }
+
+    yield put({
+      type: 'learners/SET_STATE',
+      payload: {
+        UserProfile: userData,
+        isUserProfile: true,
+      },
+    })
+  }
+}
+
 export default function* rootSaga() {
   yield all([
     // GET_DATA(), // run once on app load to fetch menu data
@@ -382,5 +474,7 @@ export default function* rootSaga() {
     takeEvery(actions.LEARNER_ACTIVE_INACTIVE, LEARNER_ACTIVE_INACTIVE),
     takeEvery(actions.PAGE_CHANGED, PAGE_CHANGED),
     takeEvery(actions.ROWS_CHANGED, ROWS_CHANGED),
+    takeEvery(actions.GET_SINGLE_LEARNER, GET_SINGLE_LEARNER),
+    takeEvery(actions.EDIT_GENERAL_INFO, EDIT_GENERAL_INFO),
   ])
 }

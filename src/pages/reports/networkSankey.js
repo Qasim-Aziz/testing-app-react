@@ -28,6 +28,7 @@ import { FaDownload } from 'react-icons/fa'
 import JsPDF from 'jspdf'
 import { connect } from 'react-redux'
 import { gql } from 'apollo-boost'
+import { COLORS } from 'assets/styles/globalStyles'
 import Moment from 'moment'
 import client from '../../apollo/config'
 import NetworkChart from './NetworkChart'
@@ -39,10 +40,10 @@ const { RangePicker } = DatePicker
 const { Option } = Select
 
 const parentCardStyle = {
-  background: '#F9F9F9',
+  background: COLORS.palleteLight,
   borderRadius: 10,
   padding: '10px',
-  margin: '7px 10px 0 10px',
+  margin: '10px 0 0 10px',
   height: 500,
   overflow: 'hidden',
 }
@@ -57,22 +58,21 @@ const parentTableCardStyle = {
 }
 
 const filterCardStyle = {
-  background: '#F1F1F1',
   display: 'flex',
   flexWrap: 'wrap',
   padding: '5px 10px',
   margin: 0,
   height: 'fit-content',
   overflow: 'hidden',
-  backgroundColor: 'rgb(241, 241, 241)',
+  backgroundColor: COLORS.palleteLight,
 }
 
 const parentDiv = { display: 'flex', margin: '5px 30px 5px 0' }
 const parentLabel = { fontSize: '15px', color: '#000', margin: 'auto 8px auto' }
 
 const cardStyle = {
-  background: '#F9F9F9',
-  height: 500,
+  background: COLORS.palleteLight,
+  height: '100%',
 }
 
 @connect(({ user, student, learnersprogram }) => ({ user, student, learnersprogram }))
@@ -307,7 +307,7 @@ class NetworkSankey extends React.Component {
                 <RangePicker
                   style={{
                     marginLeft: 'auto',
-                    width: 250,
+                    width: 235,
                   }}
                   defaultValue={[
                     Moment(graphstartdate, 'YYYY-MM-DD'),
@@ -324,7 +324,7 @@ class NetworkSankey extends React.Component {
                     placeholder="All"
                     onChange={this.StatusCallback}
                     style={{
-                      width: 120,
+                      width: 170,
                       borderRadius: 4,
                     }}
                     allowClear
@@ -352,7 +352,7 @@ class NetworkSankey extends React.Component {
                     size="default"
                     defaultValue={defaultprogram}
                     style={{
-                      width: 120,
+                      width: 170,
                       borderRadius: 4,
                     }}
                   >
@@ -361,33 +361,6 @@ class NetworkSankey extends React.Component {
                   </Select>
                 )}
               </div>
-              {/* <div style={{ ...parentDiv, marginRight: 0 }}>
-                <span style={parentLabel}>Domain :</span>
-                {domainObj.length > 0 && (
-                  <Select
-                    style={{
-                      width: 120,
-                      borderRadius: 4,
-                    }}
-                    placeholder="ALL"
-                    onChange={this.DomainChange}
-                    allowClear
-                    size="default"
-                  >
-                    {domainObj &&
-                      domainObj.map(dom => (
-                        <Option value={dom.node.domain}>{dom.node.domain}</Option>
-                      ))}
-                  </Select>
-                )}
-              </div> */}
-              {/* <div style={{ marginLeft: 'auto' }}>
-                <Dropdown overlay={menu} style={{ padding: 0 }} trigger={['hover']}>
-                  <Button type="link" size="large" style={{ padding: '0 8px' }}>
-                    <FaDownload />{' '}
-                  </Button>
-                </Dropdown>
-              </div> */}
             </div>
 
             <Row align="middle" justify="center">

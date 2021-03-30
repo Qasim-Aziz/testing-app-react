@@ -28,14 +28,15 @@ import { ResponsivePie } from '@nivo/pie'
 import groupObj from '@hunters/group-object'
 import './table.scss'
 import client from '../../apollo/config'
+import { COLORS } from 'assets/styles/globalStyles'
 
 const { Option } = Select
 
 const parentCardStyle = {
-  background: '#F9F9F9',
+  background: COLORS.palleteLight,
   borderRadius: 10,
   padding: '10px',
-  margin: '7px 10px 0 10px',
+  margin: '10px 5px 0 10px',
   height: 300,
   overflow: 'hidden',
 }
@@ -45,11 +46,10 @@ const columns = [
     title: 'Goal Name',
     dataIndex: 'goalName',
     key: 'goalName',
-    color: 'red',
     render(text, record) {
       return {
         props: {
-          style: { color: record.isLongTermGoal ? '#f080b8' : 'black', display: 'flex' },
+          style: { color: record.isLongTermGoal ? COLORS.stimulus : 'black', display: 'flex' },
         },
         children: <div>{text}</div>,
       }
@@ -455,14 +455,13 @@ class Goals extends React.Component {
     )
 
     const filterCardStyle = {
-      background: '#F1F1F1',
+      background: COLORS.palleteLight,
       display: 'flex',
       flexWrap: 'wrap',
       padding: '5px 10px',
       margin: 0,
       height: 'fit-content',
       overflow: 'hidden',
-      backgroundColor: 'rgb(241, 241, 241)',
     }
 
     const parentDiv = { display: 'flex', margin: '5px 30px 5px 0' }
@@ -515,10 +514,10 @@ class Goals extends React.Component {
             <span style={parentLabel}>Long Term Goal</span>
             <div
               style={{
-                background: '#f080b8',
+                background: COLORS.stimulus,
                 margin: 'auto 0',
                 borderRadius: 10,
-                width: 50,
+                width: 20,
                 height: 18,
               }}
             />
@@ -542,14 +541,14 @@ class Goals extends React.Component {
                   border: '2px solid #F9F9F9',
                   display: 'flex',
                   width: '100%',
-                  height: '250px',
+                  height: '100%',
                   overflowY: 'hidden',
                 }}
               >
                 {graphData ? (
                   <ResponsivePie
                     data={graphData}
-                    margin={{ top: 30, right: 0, bottom: 0, left: 0 }}
+                    margin={{ top: 15, right: 0, bottom: 30, left: 0 }}
                     innerRadius={0.5}
                     padAngle={2}
                     cornerRadius={3}
@@ -621,7 +620,7 @@ class Goals extends React.Component {
             </div>
           </Col>
           <Col span={12}>
-            <div style={parentCardStyle}>
+            <div style={{ ...parentCardStyle, marginRight: 0, marginLeft: '5px' }}>
               <div
                 role="presentation"
                 style={{
@@ -637,7 +636,7 @@ class Goals extends React.Component {
                     data={barGraphData}
                     indexBy="id"
                     keys={['In Progress', 'On Hold', 'Discontinued']}
-                    margin={{ top: 50, right: 20, bottom: 50, left: 60 }}
+                    margin={{ top: 15, right: 20, bottom: 30, left: 60 }}
                     padding={0.15}
                     colors={{ scheme: 'paired' }}
                     borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
@@ -681,6 +680,7 @@ class Goals extends React.Component {
               bordered
               style={{ margin: '10px 0 15px 10px' }}
               loading={isDataLoading}
+              size="middle"
               pagination={{
                 defaultPageSize: 10,
                 showSizeChanger: true,

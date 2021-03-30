@@ -1,3 +1,6 @@
+/* eslint-disable react/jsx-closing-tag-location */
+/* eslint-disable react/jsx-indent */
+/* eslint-disable react/jsx-indent-props */
 import { EditOutlined } from '@ant-design/icons'
 import {
   Button,
@@ -12,15 +15,17 @@ import {
   Select,
   Tabs,
   Typography,
+  Layout,
 } from 'antd'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet'
 import { useDispatch, useSelector } from 'react-redux'
-import GoalCard from '../../../components/GoalCard'
-import EditTargetAllocationNewDrawer from '../../../components/TargetAllocation/EditTargetAllocation'
-import TargetAllocationNewDrawer from '../../../components/TargetAllocation/TargetAllocation'
-import { arrayNotNull, capitalize, notNull } from '../../../utilities'
+import GoalCard from 'components/GoalCard'
+import EditTargetAllocationNewDrawer from 'components/TargetAllocation/EditTargetAllocation'
+import TargetAllocationNewDrawer from 'components/TargetAllocation/TargetAllocation'
+import { arrayNotNull, capitalize, notNull } from 'utilities'
+import { COLORS, DRAWER, FONT } from 'assets/styles/globalStyles'
 import LoadingComponent from '../../staffProfile/LoadingComponent'
 import AddLongAndShortGoal from '../AddLongAndShortGoal'
 import AllocatedTarget from './AllocatedTarget'
@@ -38,10 +43,11 @@ import './style.scss'
 
 const { Title, Text } = Typography
 const { TabPane } = Tabs
+const { Content } = Layout
 
 const longGoalBtn = {
   color: '#fff',
-  backgroundColor: '#0B35B3',
+  backgroundColor: COLORS.palleteBlue,
   // border: '1px solid #0B35B3',
 }
 
@@ -223,7 +229,7 @@ const TargetAllocation = () => {
         'MMMM DD, YYYY',
       )}` +
       `, ${years > 0 ? `${years} Year` : ''} ${months > 0 ? `${months} Months` : ''} ${
-        days > 0 ? `${days} Days` : ''
+      days > 0 ? `${days} Days` : ''
       }`
     return date
   }
@@ -620,11 +626,9 @@ const TargetAllocation = () => {
         <div>
           <div
             style={{
-              border: '2px solid #ccc',
-              padding: '0px 5px',
               height: 650,
               overflow: 'auto',
-              background: '#f9f9f9',
+              background: COLORS.palleteLight,
             }}
           >
             {longTermGoals &&
@@ -635,12 +639,9 @@ const TargetAllocation = () => {
                     key={ltGoal.node.id}
                     style={{
                       background: '#fff',
-                      border: '1px solid #E4E9F0',
-                      // boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
+                      border: '1px solid #E4E9F0',                      
                       borderRadius: 5,
-                      // padding: '10px 10px',
-                      // display: 'flex',
-                      margin: 5,
+                      // margin: 5,
                       alignItems: 'center',
                     }}
                   >
@@ -722,11 +723,11 @@ const TargetAllocation = () => {
       </Col>
 
       {selectedShortTermGoal && (
-        <Col md={8} sm={24}>
+        <Col md={8} sm={24} style={{backgroundColor: COLORS.palleteLightBlue}}>
           {selectedShortTermGoal && editAble && (
             <div
               style={{
-                marginBottom: '11px',
+                fontSize: '15px',
                 fontWeight: 'bold',
                 textAlign: 'center',
               }}
@@ -744,10 +745,11 @@ const TargetAllocation = () => {
           )}
           <div
             style={{
-              border: '2px solid #ccc',
-              padding: 10,
+              // border: '2px solid #ccc',
+              marginTop: 10,
               height: 650,
-              background: '#f9f9f9',
+              padding: 10,
+              background: COLORS.palleteLightBlue,
               overflow: 'hidden',
             }}
           >
@@ -796,10 +798,10 @@ const TargetAllocation = () => {
       </Form>
       <div
         style={{
-          border: '2px solid #ccc',
+          // border: '2px solid #ccc',
           padding: 10,
           height: 650,
-          background: '#f9f9f9',
+          // background: '#f9f9f9',
           overflow: 'hidden',
         }}
       >
@@ -814,146 +816,156 @@ const TargetAllocation = () => {
   )
 
   return (
-    <div>
+    <>
       <Helmet title="Target allocation to goals" />
+      <Layout>
+        <Content>
 
-      {/* Goals Drawer */}
-      <Drawer
-        title={addHeading}
-        placement="right"
-        closable
-        width="50%"
-        onClose={handleCloseAddGoal}
-        visible={isAddGoalVisible}
-      >
-        <AddLongAndShortGoal
-          type={goalType}
-          activeLongTermGoal={activeLongTermGoal}
-          activeShortTermGoal={activeShortTermGoal}
-          student={selectedStudent}
-          program={selectedProgram}
-          goalResponsibilityList={goalResponsibilityList}
-          goalStatusList={goalStatusList}
-          onSuccess={onSuccessAddEditGoal}
-          editAble={editAble}
-        />
-      </Drawer>
+          {/* Goals Drawer */}
+          <Drawer
+            title={addHeading}
+            placement="right"
+            closable
+            width={DRAWER.widthL1}
+            onClose={handleCloseAddGoal}
+            visible={isAddGoalVisible}
+          >
+            <AddLongAndShortGoal
+              type={goalType}
+              activeLongTermGoal={activeLongTermGoal}
+              activeShortTermGoal={activeShortTermGoal}
+              student={selectedStudent}
+              program={selectedProgram}
+              goalResponsibilityList={goalResponsibilityList}
+              goalStatusList={goalStatusList}
+              onSuccess={onSuccessAddEditGoal}
+              editAble={editAble}
+            />
+          </Drawer>
 
-      {/* Target Allocation Drawer */}
-      <Drawer
-        title="Target Allocation"
-        placement="right"
-        closable
-        width={850}
-        style={{ zIndex: 1001 }}
-        onClose={handleCloseTargetDetails}
-        visible={isTargetDetailsVisible}
-      >
-        <TargetAllocationNewDrawer
-          key={Math.random()}
-          isDirectGoal={activeTabKey !== 'customGoalTab'}
-          defaultShortTermGoalForSelectedProgram={selectedDefaultShortTermGoal}
-          selectedShortTermGoal={selectedShortTermGoal}
-          studentId={selectedStudent}
-          activeSessionDetails={activeSessionDetails}
-          addTargetMode={addTargetMode}
-          onSuccessTargetAllocation={onSuccessTargetAllocation}
-          selectedTargetId={activeSessionDetails ? activeSessionDetails.node.id : null}
-          targetName={activeSessionDetails ? activeSessionDetails.node.targetMain.targetName : null}
-          targetVideo={activeSessionDetails ? activeSessionDetails.node.video : null}
-          targetInstr={activeSessionDetails ? activeSessionDetails.node.targetInstr : null}
-          peakEnable={isPeak}
-          equivalenceEnable={isEquivalence}
-          equivalenceObject={equivalenceObject}
-          // setOpen={setSelectTarget}
-        />
-      </Drawer>
+          {/* Target Allocation Drawer */}
+          <Drawer
+            title="Target Allocation"
+            placement="right"
+            closable
+            width={DRAWER.widthL1}
+            style={{ zIndex: 1001 }}
+            onClose={handleCloseTargetDetails}
+            visible={isTargetDetailsVisible}
+          >
+            <TargetAllocationNewDrawer
+              key={Math.random()}
+              isDirectGoal={activeTabKey !== 'customGoalTab'}
+              defaultShortTermGoalForSelectedProgram={selectedDefaultShortTermGoal}
+              selectedShortTermGoal={selectedShortTermGoal}
+              studentId={selectedStudent}
+              activeSessionDetails={activeSessionDetails}
+              addTargetMode={addTargetMode}
+              onSuccessTargetAllocation={onSuccessTargetAllocation}
+              selectedTargetId={activeSessionDetails ? activeSessionDetails.node.id : null}
+              targetName={activeSessionDetails ? activeSessionDetails.node.targetMain.targetName : null}
+              targetVideo={activeSessionDetails ? activeSessionDetails.node.video : null}
+              targetInstr={activeSessionDetails ? activeSessionDetails.node.targetInstr : null}
+              peakEnable={isPeak}
+              equivalenceEnable={isEquivalence}
+              equivalenceObject={equivalenceObject}
+            // setOpen={setSelectTarget}
+            />
+          </Drawer>
 
-      {/* Target Allocation from library Drawer */}
-      <Drawer
-        title="Target Allocation from library"
-        placement="right"
-        closable
-        width="80%"
-        onClose={closeTargetAllocationDrawer}
-        visible={targetAllocationDrawer}
-      >
-        <TargetAvailableDrawer
-          selectedStudent={selectedStudent}
-          selectedProgram={selectedProgram}
-          allocateSessionToTarget={allocateSessionToTarget}
-          suggestedTarget={suggestedTarget}
-          setSuggestedTarget={setSuggestedTarget}
-        />
-      </Drawer>
+          {/* Target Allocation from library Drawer */}
+          <Drawer
+            title="Target Allocation from library"
+            placement="right"
+            closable
+            width={DRAWER.widthL1}
+            onClose={closeTargetAllocationDrawer}
+            visible={targetAllocationDrawer}
+          >
+            <TargetAvailableDrawer
+              selectedStudent={selectedStudent}
+              selectedProgram={selectedProgram}
+              allocateSessionToTarget={allocateSessionToTarget}
+              suggestedTarget={suggestedTarget}
+              setSuggestedTarget={setSuggestedTarget}
+            />
+          </Drawer>
 
-      {/* Target Allocation from Equivalence Drawer */}
-      <Drawer
-        title="Equivalence Target Allocation"
-        placement="right"
-        closable
-        width="80%"
-        onClose={closeTargetAllocationDrawer}
-        visible={equivalenceTargetDrawer}
-      >
-        <EquivalenceDrawer
-          selectedStudent={selectedStudent}
-          selectedProgram={selectedProgram}
-          allocateSessionToTarget={allocateSessionToTarget}
-          suggestedTarget={suggestedTarget}
-          setSuggestedTarget={setSuggestedTarget}
-        />
-      </Drawer>
+          {/* Target Allocation from Equivalence Drawer */}
+          <Drawer
+            title="Equivalence Target Allocation"
+            placement="right"
+            closable
+            width={DRAWER.widthL1}
+            onClose={closeTargetAllocationDrawer}
+            visible={equivalenceTargetDrawer}
+          >
+            <EquivalenceDrawer
+              selectedStudent={selectedStudent}
+              selectedProgram={selectedProgram}
+              allocateSessionToTarget={allocateSessionToTarget}
+              suggestedTarget={suggestedTarget}
+              setSuggestedTarget={setSuggestedTarget}
+            />
+          </Drawer>
 
-      {/* Target Allocation from CogniAble Assessment Drawer */}
-      <Drawer
-        title="Target Allocation from CogniAble Assessment"
-        placement="right"
-        closable
-        width="80%"
-        onClose={closeTargetAllocationDrawer}
-        visible={cogniableAssessmentDrawer}
-      >
-        <CogniAbleDrawer
-          selectedStudent={selectedStudent}
-          selectedProgram={selectedProgram}
-          allocateSessionToTarget={allocateSessionToTarget}
-          suggestedTarget={suggestedTarget}
-          setSuggestedTarget={setSuggestedTarget}
-        />
-      </Drawer>
+          {/* Target Allocation from CogniAble Assessment Drawer */}
+          <Drawer
+            title="Target Allocation from CogniAble Assessment"
+            placement="right"
+            closable
+            width={DRAWER.widthL1}
+            onClose={closeTargetAllocationDrawer}
+            visible={cogniableAssessmentDrawer}
+          >
+            <CogniAbleDrawer
+              selectedStudent={selectedStudent}
+              selectedProgram={selectedProgram}
+              allocateSessionToTarget={allocateSessionToTarget}
+              suggestedTarget={suggestedTarget}
+              setSuggestedTarget={setSuggestedTarget}
+            />
+          </Drawer>
 
-      {/* Edit Allocated Target Drawer */}
-      <Drawer
-        title="Edit Allocated Target Details"
-        placement="right"
-        closable
-        width={850}
-        onClose={handleCloseEditTargetDetails}
-        visible={isEditAllocatedTargetVisible}
-      >
-        <EditTargetAllocationNewDrawer
-          key={Math.random()}
-          isDirectGoal={activeTabKey !== 'customGoalTab'}
-          defaultShortTermGoalForSelectedProgram={selectedDefaultShortTermGoal}
-          selectedShortTermGoal={selectedShortTermGoal}
-          studentId={selectedStudent}
-          activeAllocatedTarget={activeAllocatedTarget}
-          onSuccessTargetAllocation={onSuccessEditTargetAllocation}
-          editAble={editAble}
-        />
-      </Drawer>
+          {/* Edit Allocated Target Drawer */}
+          <Drawer
+            title="Edit Allocated Target Details"
+            placement="right"
+            closable
+            width={DRAWER.widthL1}
+            onClose={handleCloseEditTargetDetails}
+            visible={isEditAllocatedTargetVisible}
+          >
+            <EditTargetAllocationNewDrawer
+              key={Math.random()}
+              isDirectGoal={activeTabKey !== 'customGoalTab'}
+              defaultShortTermGoalForSelectedProgram={selectedDefaultShortTermGoal}
+              selectedShortTermGoal={selectedShortTermGoal}
+              studentId={selectedStudent}
+              activeAllocatedTarget={activeAllocatedTarget}
+              onSuccessTargetAllocation={onSuccessEditTargetAllocation}
+              editAble={editAble}
+            />
+          </Drawer>
 
-      <div className="feed">
-        <section className="card">
-          <div className="card-header" style={{ padding: 0 }}>
-            <div>
-              {studentName && !loading && (
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'center',
+              width: '100%',
+              alignItems: 'center',
+              padding: '0px 10px',
+              backgroundColor: '#FFF',
+              boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
+            }}
+          >
+            <div style={{ padding: 8 }}>              
+              {studentName && (
                 <Title
                   style={{
                     fontSize: 20,
                     lineHeight: '27px',
-                    margin: '0px 0px 20px 0px',
                   }}
                 >
                   {studentName}&apos;s Targets
@@ -962,21 +974,37 @@ const TargetAllocation = () => {
             </div>
           </div>
 
-          {loading ? (
-            <LoadingComponent />
-          ) : (
-            <Tabs type="card" className="targetTabs" onChange={setActiveTabKey}>
-              <TabPane tab="Goal(s)" key="customGoalTab">
-                {customGoalTab}
-              </TabPane>
-              <TabPane tab="Directly" key="defaultGoalTab">
-                {defaultGoalTab}
-              </TabPane>
-            </Tabs>
-          )}
-        </section>
-      </div>
-    </div>
+          <div>
+            {loading ? (
+              <LoadingComponent />
+            ) : (
+                <Tabs
+                  className="targetTabs" 
+                  style={{
+                    backgroundColor: COLORS.palleteLight,
+                    marginTop: 8,
+                    borderTop: 'none',
+                  }} 
+                  tabBarStyle={{
+                    backgroundColor: '#fff',
+                    
+                  }}
+                  onChange={setActiveTabKey}
+                >
+                  <TabPane tab="Goal(s)" key="customGoalTab">
+                    {customGoalTab}
+                  </TabPane>
+                  <TabPane tab="Directly" key="defaultGoalTab">
+                    {defaultGoalTab}
+                  </TabPane>
+                </Tabs>
+              )}
+          </div>
+
+
+        </Content>
+      </Layout>
+    </>
   )
 }
 

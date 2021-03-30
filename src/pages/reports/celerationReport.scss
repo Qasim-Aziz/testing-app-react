@@ -1,28 +1,8 @@
+@import 'assets/styles/mixins.scss';
+
 .celerationReport {
-  .filterCard {
-    background: #f1f1f1;
-    padding: 10px;
-    margin: 0;
-    height: 50px;
-    overflow: hidden;
-    background-color: rgb(241, 241, 241);
-
-    .label {
-      font-size: 18px;
-      color: #000;
-      padding-top: 2px;
-      display: block;
-    }
-
-    .datePaicker {
-      margin-left: auto;
-      margin-right: 31px;
-      width: 250px;
-    }
-  }
-
   .charts {
-    padding: 10px;
+    padding: 10px 0 10px 10px;
 
     h3 {
       font-weight: bold;
@@ -33,7 +13,7 @@
   .ant-table-thead > tr > th {
     padding: 12px 8px !important;
     font-size: 13px !important;
-    background-color: rgba(0, 0, 0, 0.04) !important;
+    background-color: $palete-light !important;
     font-weight: bold;
   }
 

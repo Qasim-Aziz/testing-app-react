@@ -16,6 +16,7 @@ import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import './form.scss'
 import './table.scss'
+import { COLORS } from 'assets/styles/globalStyles'
 
 export const PeakBlockEqui = forwardRef((props, ref) => {
   const { studentName, peakEquiData, peakEquiLoading, dates, expandType } = props
@@ -133,10 +134,10 @@ export const PeakBlockEqui = forwardRef((props, ref) => {
       fixed: 'left',
       render: (text, row) => {
         if (row.type === 'Stimulus') {
-          return <span style={{ color: '#f080b8' }}>{text}</span>
+          return <span style={{ color: COLORS.stimulus }}>{text}</span>
         }
         if (row.type === 'Class') {
-          return <span style={{ color: '#ff8080' }}>{text}</span>
+          return <span style={{ color: COLORS.class }}>{text}</span>
         }
         if (text?.length > 35) {
           return (
@@ -217,12 +218,13 @@ export const PeakBlockEqui = forwardRef((props, ref) => {
   return (
     <div>
       <Table
+        className="peak-block-report"
         columns={columns}
         dataSource={tableData}
         bordered
         expandRowByClick
         loading={peakEquiLoading}
-        scroll={{ x: 120 * dates.length }}
+        scroll={{ x: 104 * dates.length }}
         pagination={{
           defaultPageSize: 20,
           showSizeChanger: true,

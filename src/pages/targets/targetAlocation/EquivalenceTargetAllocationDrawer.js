@@ -6,43 +6,17 @@
 /* eslint-disable object-shorthand */
 import React, { useEffect, useState } from 'react'
 import { Button, Checkbox, Select, Icon, Row, Col, Input, Empty, Radio } from 'antd'
-import SessionCard from '../../../components/SessionCard'
-import EquivalenceCard from '../../../components/SessionCard/Equivalence'
-import motherSon from '../motherSon.jpg'
+import { COLORS, DRAWER, FONT } from 'assets/styles/globalStyles'
+import EquivalenceCard from 'components/SessionCard/Equivalence'
+import { notNull } from 'utilities'
 import { getEquivalenceCategory, getTargetsByCategory, getTargetsByCode } from './Equivalence.query'
-
-import {
-  getDomainByProgramArea,
-  getTargetAreaByDoimain,
-  suggestTarget,
-  getSearchTargets,
-} from './TargetAllocation.query'
-import { notNull } from '../../../utilities'
-
-const selectTargetStyle = {
-  width: '200px',
-  textDecoration: 'none',
-  marginRight: '20px',
-}
-
-const selectTargetAreaStyle = {
-  width: '300px',
-  textDecoration: 'none',
-  marginRight: '20px',
-}
-
-const searchBtnStyle = {
-  color: '#FFF',
-  backgroundColor: '#0B35B3',
-  width: '120px',
-}
 
 const cardsDivStyle = {
   height: '570px',
   overflowY: 'scroll',
   padding: '15px',
   marginTop: '30px',
-  backgroundColor: '#f9f9f9',
+  backgroundColor: COLORS.palleteLight,
   borderRadius: '10px',
 }
 

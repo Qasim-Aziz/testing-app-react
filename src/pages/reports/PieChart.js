@@ -223,23 +223,12 @@ class PieChart extends React.Component {
 
   render() {
     const { GraphData } = this.state
-    console.log('GraphData', GraphData)
     return (
       <>
-        <div
-          role="presentation"
-          style={{
-            borderRadius: 10,
-            border: '2px solid #F9F9F9',
-            display: 'block',
-            width: '100%',
-            height: '250px',
-            overflowY: 'hidden',
-          }}
-        >
+        <div>
           {GraphData.length === 0 ? (
             <>
-              <Empty style={{ marginTop: '100px' }} />
+              <Empty style={{ marginTop: '65px', marginLeft: '188px' }} />
             </>
           ) : (
             ''
@@ -247,7 +236,7 @@ class PieChart extends React.Component {
           {GraphData && (
             <ResponsivePie
               data={GraphData}
-              margin={{ top: 30, right: 0, bottom: 30, left: 0 }}
+              margin={{ top: 10, right: 0, bottom: 30, left: 0 }}
               innerRadius={0.5}
               padAngle={2}
               cornerRadius={3}

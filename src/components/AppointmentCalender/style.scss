@@ -1,3 +1,5 @@
+@import '../../assets/styles/mixins.scss';
+
 .appointmentCalendar {
   .filterCard {
     .ant-form-item {
@@ -8,5 +10,29 @@
       font-size: 14px;
       font-weight: bold;
     }
+  }
+
+  .fc .fc-button-primary {
+    color: black;
+    background-color: $palete-light;
+    border-color: $palete-light-blue;
+  }
+
+  .fc .fc-button-primary:not(:disabled):active,
+  .fc .fc-button-primary:not(:disabled).fc-button-active {
+    color: black;
+    background-color: $palete-light-blue;
+    border-color: $palete-light-blue;
+  }
+  .fc .fc-button-primary:disabled {
+    color: black;
+    background-color: $palete-light-blue;
+    border-color: $palete-light-blue;
+  }
+
+  .fc .fc-button-primary:hover {
+    background-color: $palete-light-blue;
+    color: black;
+    border-color: $palete-light-blue;
   }
 }

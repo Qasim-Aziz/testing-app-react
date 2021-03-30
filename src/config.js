@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable import/extensions */
 import { GraphQLClient } from 'graphql-request'
 import API_END_POINT from './env'
 

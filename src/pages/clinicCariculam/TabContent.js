@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import { Row, Col } from 'antd'
 import { useQuery } from 'react-apollo'
+import LoadingComponent from 'components/LoadingComponent'
 import DomainBox from './DomainBox'
 import DomainContent from './DomainContent'
 import { DOMAIN } from './query'
@@ -24,7 +25,7 @@ const TabContent = ({ programArea }) => {
   }
 
   if (loading) {
-    return 'Loading...'
+    return <LoadingComponent />
   }
 
   if (error) {

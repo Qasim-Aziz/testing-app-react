@@ -27,8 +27,11 @@ import Sortable from 'react-sortablejs'
 import { connect } from 'react-redux'
 import { PlusOutlined, FilterOutlined } from '@ant-design/icons'
 import LearnerSelect from 'components/LearnerSelect'
+import Authorize from 'components/LayoutComponents/Authorize'
+import HeaderComponent from 'components/HeaderComponent'
+import LoadingComponent from 'components/LoadingComponent'
+import { COLORS, DRAWER, FONT } from 'assets/styles/globalStyles'
 import style from './style.module.scss'
-import Authorize from '../../components/LayoutComponents/Authorize'
 import SessionDetails from './sessiondetails'
 import TargetCard from './TargetCard'
 import DeleteACard from './DeleteACard'
@@ -344,7 +347,7 @@ class TargetAllocationToSession extends React.Component {
     }
 
     if (loading) {
-      return 'loading...'
+      return <LoadingComponent />
     }
     const allocatedTargetsListDivs = []
     const morningSessionDiv = []
@@ -490,24 +493,30 @@ class TargetAllocationToSession extends React.Component {
       }
     }
 
-    const targetSortableStyle = { height: 640, overflow: 'auto' }
-    const sessionsSortableStyle = { height: 500, overflow: 'auto', marginTop: '10px' }
+    const targetSortableStyle = { height: 640, overflow: 'auto', backgroundColor: COLORS.palleteLight }
+    const sessionsSortableStyle = { height: 500, overflow: 'auto', marginTop: '10px', backgroundColor: COLORS.palleteLight  }
 
     return (
       <Authorize roles={['school_admin', 'therapist']} redirect to="/dashboard/beta">
         <div className={style.targetAllocation}>
           <Helmet title="Target Allocation To Sessions" />
+          <HeaderComponent 
+            leftContent="&nbsp;"
+            centerContent={<span>{studentName}&apos;s Sessions</span>}
+            rightContent={role !== 'parents' ? (
+              <Button onClick={this.showDrawerFilter} size="large">
+                <FilterOutlined />
+              </Button>
+            ) : <>&nbsp;</>}
+          />
 
           <div className="row">
             <div className="col-lg-4 col-md-6">
               <div className={style.heading}>
-                <span>{studentName}&apos;s Target List</span>
-              </div>
-              <div className={style.heading}>
                 <Input
-                  placeholder="input search text"
+                  placeholder="Search target by name"
                   onChange={e => this.searchTarget(e.target.value)}
-                  // style={{ width: 200 }}
+                  style={{ fontSize: FONT.level4 }}
                 />
 
                 <Select
@@ -559,16 +568,10 @@ class TargetAllocationToSession extends React.Component {
             </div>
             <div className="col-lg-8 col-md-6" style={{ position: 'relative' }}>
               <div style={{ position: 'absolute', top: '0px', right: '16px', zIndex: 2 }}>
-                {role !== 'parents' && (
-                  <Button onClick={this.showDrawerFilter} size="large">
-                    <FilterOutlined />
-                  </Button>
-                )}
-
                 <Drawer
                   visible={this.state.visibleFilter}
                   onClose={this.onCloseFilter}
-                  width={350}
+                  width={DRAWER.widthL4}
                   title="Select Learner"
                   placement="right"
                 >
@@ -584,7 +587,8 @@ class TargetAllocationToSession extends React.Component {
                           <div className="col-sm-3">
                             <Button
                               type="dashed"
-                              className={style.detailsButton}
+                              // className={style.detailsButton}
+                              style={{backgroundColor: COLORS.palleteLight, height: 56}}
                               onClick={() => this.showDrawer('Morning')}
                               block
                             >
@@ -609,7 +613,7 @@ class TargetAllocationToSession extends React.Component {
                           </div>
                         </div>
                       </div>
-                      <div className="card py-3 px-2" style={{ border: '2px solid #f4f6f8' }}>
+                      <div className="card py-3 px-2" style={{ border: '2px solid #f4f6f8', backgroundColor: COLORS.palleteLight }}>
                         <Sortable
                           key={MorningSessionRandomKey}
                           options={{
@@ -668,7 +672,8 @@ class TargetAllocationToSession extends React.Component {
                           <div className="col-sm-3">
                             <Button
                               type="dashed"
-                              className={style.detailsButton}
+                              // className={style.detailsButton}
+                              style={{backgroundColor: COLORS.palleteLight, height: 56}}
                               onClick={() => this.showDrawer('Afternoon')}
                               block
                             >
@@ -695,7 +700,7 @@ class TargetAllocationToSession extends React.Component {
                           </div>
                         </div>
                       </div>
-                      <div className="card py-3 px-2" style={{ border: '2px solid #f4f6f8' }}>
+                      <div className="card py-3 px-2" style={{ border: '2px solid #f4f6f8', backgroundColor: COLORS.palleteLight }}>
                         <Sortable
                           key={AfternoonSessionRandomKey}
                           options={{
@@ -757,7 +762,8 @@ class TargetAllocationToSession extends React.Component {
                           <div className="col-sm-3">
                             <Button
                               type="dashed"
-                              className={style.detailsButton}
+                              // className={style.detailsButton}
+                              style={{backgroundColor: COLORS.palleteLight, height: 56}}
                               onClick={() => this.showDrawer('Evening')}
                               block
                             >
@@ -782,7 +788,7 @@ class TargetAllocationToSession extends React.Component {
                           </div>
                         </div>
                       </div>
-                      <div className="card py-3 px-2" style={{ border: '2px solid #f4f6f8' }}>
+                      <div className="card py-3 px-2" style={{ border: '2px solid #f4f6f8', backgroundColor: COLORS.palleteLight }}>
                         <Sortable
                           key={EveningSessionRandomKey}
                           options={{
@@ -874,7 +880,8 @@ class TargetAllocationToSession extends React.Component {
                           <div className="col-sm-3">
                             <Button
                               type="dashed"
-                              className={style.detailsButton}
+                              // className={style.detailsButton}
+                              style={{backgroundColor: COLORS.palleteLight, height: 56}}
                               onClick={() => this.showDrawer('Default')}
                               block
                             >
@@ -899,7 +906,7 @@ class TargetAllocationToSession extends React.Component {
                           </div>
                         </div>
                       </div>
-                      <div className="card py-3 px-2" style={{ border: '2px solid #f4f6f8' }}>
+                      <div className="card py-3 px-2" style={{ border: '2px solid #f4f6f8' , backgroundColor: COLORS.palleteLight}}>
                         <Sortable
                           key={DefaultSessionRandomKey}
                           options={{
@@ -989,7 +996,7 @@ class TargetAllocationToSession extends React.Component {
           <Drawer
             title={`${CurrentSession} Session`}
             placement="right"
-            width="600px"
+            width={DRAWER.widthL4}
             closable={false}
             onClose={this.onClose}
             visible={this.state.visible}
@@ -1000,7 +1007,7 @@ class TargetAllocationToSession extends React.Component {
           <Drawer
             title="Edit Target"
             placement="right"
-            width="70%"
+            width={DRAWER.widthL1}
             closable={true}
             onClose={this.onCloseEditTarget}
             visible={this.state.visibleEditTarget}

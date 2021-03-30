@@ -79,7 +79,7 @@ const LeftSidePanel = ({ onActiveProfileTabChange }) => {
   const student = data ? data.student : null
 
   const members = student && student.family.members ? student.family.members.edges : null
-
+  console.log(student, 'student student')
   return (
     <div style={{ minWidth: '240px', width: '320px' }} className="border-right profile-details">
       <div className="profile-title">Profile</div>

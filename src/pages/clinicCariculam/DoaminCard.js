@@ -5,6 +5,7 @@ import { Typography, Button, Input, Modal, notification, Tooltip, Dropdown, Icon
 import { useMutation } from 'react-apollo'
 import { useSelector } from 'react-redux'
 import gql from 'graphql-tag'
+import { COLORS } from 'assets/styles/globalStyles'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { DISABLE_DOMAIN, DOMAIN } from './query'
 
@@ -154,7 +155,7 @@ const DoaminCard = ({
     <div
       onClick={handleSelectDomain}
       style={{
-        background: selected ? '#a7a6a6' : '#FFF',
+        background: selected ? COLORS.palleteLightBlue : '#FFF',
         borderBottom: '1px solid #bcbcbc',
         cursor: 'pointer',
         padding: 18,

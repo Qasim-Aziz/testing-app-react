@@ -51,10 +51,8 @@ import TargetResponseReport from './targetResponseReport'
 import NetworkSankey from './networkSankey'
 import client from '../../apollo/config'
 
-
-
-
 import './padding.scss'
+import { COLORS } from 'assets/styles/globalStyles'
 
 const { Title, Text } = Typography
 const { Content } = Layout
@@ -74,7 +72,7 @@ const STAFF_LIST = gql`
 `
 
 const parentCardStyle = {
-  background: '#F9F9F9',
+  background: COLORS.palleteLight,
   borderRadius: 10,
   padding: '10px',
   margin: '7px 0 0 10px',
@@ -329,7 +327,7 @@ class Reports extends React.Component {
 
     const ActiveStyle = {
       ...BlockStyle,
-      background: '#a7a6a6',
+      background: COLORS.palleteLightBlue,
     }
 
     const HeadStyle = {
@@ -367,7 +365,6 @@ class Reports extends React.Component {
               justifyContent: 'space-between',
               alignItems: 'center',
               padding: '0px 10px',
-              margin: '10px 0',
               backgroundColor: '#FFF',
               boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
             }}
@@ -387,7 +384,6 @@ class Reports extends React.Component {
                     style={{
                       fontSize: 25,
                       marginRight: '9px',
-                      marginTop: '2px',
                     }}
                   >
                     {EXCLUDE_NAMES.indexOf(TabCheck) > -1
@@ -490,7 +486,7 @@ class Reports extends React.Component {
                   <div style={{ display: 'flex' }}>
                     <div
                       style={{
-                        background: '#F1F1F1',
+                        background: COLORS.palleteLight,
                         borderRadius: 0,
                         minHeight: '100vh',
                         width: '100%',
@@ -656,7 +652,7 @@ class Reports extends React.Component {
               )}
 
               <Col sm={this.state.windowWidth > 1050 ? 19 : 24} style={{ margin: 'auto' }}>
-                <div style={{ marginTop: '1px' }}>
+                <div>
                   {(path === '/reports/progress_overview' || path === '/reports') && (
                     <ProgressOverview
                       showDrawerFilter={this.showDrawerFilter}

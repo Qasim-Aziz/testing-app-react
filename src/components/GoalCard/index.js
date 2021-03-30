@@ -1,6 +1,7 @@
 import React from 'react'
 import { Button, Progress, Card, Typography} from 'antd'
 import { EditOutlined } from '@ant-design/icons'
+import { COLORS } from 'assets/styles/globalStyles'
 import { arrayNotNull, notNull, capitalize } from '../../utilities'
 import styles from './style.module.scss'
 
@@ -17,14 +18,15 @@ const GoalCard = ({
   status
 }) => {
   let headingStyle = {}
-  let selectedCardStyle = {}
+  let selectedCardStyle = {backgroundColor: COLORS.palleteLight}
 
   if (selected) {
     headingStyle = {
       color: '#fff',
     }
     selectedCardStyle = {
-      border: '2px solid #1c94fd',
+      // border: '2px solid #1c94fd',
+      backgroundColor: COLORS.palleteLightBlue
     }
   }
   return (

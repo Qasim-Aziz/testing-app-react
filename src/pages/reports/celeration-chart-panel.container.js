@@ -2,6 +2,7 @@ import { PlusOutlined } from '@ant-design/icons'
 import { Button, Col, DatePicker, Drawer, Icon, Row, Table, Badge } from 'antd'
 import moment from 'moment'
 import React, { Component } from 'react'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import { connect } from 'react-redux'
 import AddCelerationChart from '../../components/CelerationChart/add-new-chart.component'
 import CelerationGraph from '../../components/CelerationChart/celeration-graph.component'
@@ -173,36 +174,43 @@ class CelerationChartPanel extends Component {
       resetCelerationChartAction()
     }
 
+    const filterCardStyle = {
+      display: 'flex',
+      flexWrap: 'wrap',
+      padding: '5px 10px',
+      margin: 0,
+      height: 'fit-content',
+      overflow: 'hidden',
+      backgroundColor: COLORS.palleteLight,
+    }
+
+    const parentLabel = { fontSize: '15px', color: '#000', margin: 'auto 8px auto' }
+    const parentDiv = { display: 'flex', margin: '5px 30px 5px 0' }
+
     return (
       <div className="celerationReport">
         {celerationChartIndex === -1 || editingChartId !== null ? (
           // If any chart is not selected & not in edit mode then
           <>
-            <Row className="filterCard">
-              <Col span={1}>
-                <span className="label">Date:</span>
-              </Col>
-              <Col span={4}>
+            <div style={filterCardStyle}>
+              <div style={parentDiv}>
+                <span style={parentLabel}>Date :</span>
                 <RangePicker
+                  style={{ width: 250 }}
                   value={range}
                   onChange={setRange}
                   size="default"
                   className="datePaicker"
                 />
-              </Col>
-            </Row>
+              </div>
+              <div style={{ marginLeft: 'auto', marginTop: '4px' }}>
+                <Button type="primary" onClick={openAddDrawerAction}>
+                  <PlusOutlined />
+                  New Chart
+                </Button>
+              </div>
+            </div>
             <Row className="charts">
-              <Row type="flex" justify="space-between">
-                <Col>
-                  <h3>Charts</h3>
-                </Col>
-                <Col>
-                  <Button type="primary" htmlType="button" onClick={openAddDrawerAction}>
-                    <PlusOutlined />
-                    Add New Chart
-                  </Button>
-                </Col>
-              </Row>
               <Table
                 rowKey="id"
                 style={{ paddingTop: '5px' }}
@@ -210,7 +218,7 @@ class CelerationChartPanel extends Component {
                 columns={dataColumns}
                 loading={isCelerationChartLoading}
                 bordered
-                size="small"
+                size=""
               />
             </Row>
           </>
@@ -230,7 +238,7 @@ class CelerationChartPanel extends Component {
 
         <Drawer
           placement="right"
-          width="40%"
+          width={DRAWER.widthL3}
           title={editingChartId ? celerationChart.title : 'Create a New Chart'}
           closable
           onClose={handleBack}

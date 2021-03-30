@@ -30,11 +30,12 @@ const AllocatedTarget = ({ allocatedTarget, editAllocatedTarget, editAble }) => 
         <Title
           style={{
             color: '#000',
-            fontSize: 20,
+            fontSize: 18,
             lineHeight: '25px',
             display: 'inline',
             marginTop: 15,
             fontWeight: '500',
+            textAlign: 'center'
           }}
         >
           Allocated Targets

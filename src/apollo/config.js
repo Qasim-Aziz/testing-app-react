@@ -3,7 +3,7 @@
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-shadow */
-/* eslint-disable */
+/* eslint-disable import/extensions */
 import { ApolloClient } from 'apollo-client'
 import { createHttpLink } from 'apollo-link-http'
 import { setContext } from 'apollo-link-context'
@@ -11,6 +11,7 @@ import { InMemoryCache } from 'apollo-cache-inmemory'
 import { onError } from 'apollo-link-error'
 import { notification } from 'antd'
 import API_END_POINT from '../env'
+// const API_END_POINT = 'https://application.cogniable.us/apis/graphql'
 
 const httpLink = createHttpLink({
   uri: API_END_POINT,

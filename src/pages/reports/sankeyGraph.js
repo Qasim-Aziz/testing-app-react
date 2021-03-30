@@ -131,7 +131,7 @@ const SankeyGraph = ({
   useEffect(() => {}, [finalGraphData])
 
   return (
-    <div style={{ height: '400px', width: '100%' }}>
+    <div style={{ height: '100%', border: '2px solid #F9F9F9', width: '100%' }}>
       {domainLoading && (
         <div
           style={{

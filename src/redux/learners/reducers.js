@@ -12,8 +12,8 @@ const initialState = {
   TotalLearners: 0,
   PageInfo: null,
   CurrentPage: 1,
-  ItemPerPage: 10,
-  CurrentStatus: 'active',
+  ItemPerPage: 20,
+  CurrentStatus: 'all',
   loadingLearners: false,
   LearnerCreated: false,
 }

@@ -42,6 +42,9 @@ export async function login(payload) {
             node {
               id
               parentName
+              parent {
+                id
+              }
               language{
                 id 
                 name
@@ -53,8 +56,11 @@ export async function login(payload) {
         staffSet{
           edges {
             node {
-              id
-              name
+              id,
+              name,
+              state,
+              country,
+              designation,
             }
           }
         }
@@ -115,13 +121,19 @@ export async function StudentIdFromUserId(payload) {
 
 export async function clinicDetails() {
   return apolloClient
-    .query({query: gql`{
-        schoolDetail {
-          id
-          schoolName
-          address
+    .query({
+      query: gql`
+        {
+          schoolDetail {
+            id
+            schoolName
+            address
+            country {
+              id
+              name
+            }
+          }
         }
-      }
       `,
     })
     .then(result => {
@@ -144,7 +156,11 @@ export async function StaffIdFromUserId(payload) {
           staffs (user:"${payload}")  {
             edges {
               node {
-                id, name,
+                id, 
+                name,
+                state,
+                country,
+                designation
               }
             }
           }
@@ -170,18 +186,19 @@ export async function GetUserDetailsByUsername(payload) {
         getuser(username:"${payload}") {
           edges {
             node {
-              id, username,
-                groups {
-                  edges {
-                    node {
-                      id, name
-                    }
+              id, 
+              username,
+              groups {
+                edges {
+                  node {
+                    id, name
                   }
                 }
               }
             }
           }
-        }`,
+        }
+      }`,
     })
     .then(result => {
       return result

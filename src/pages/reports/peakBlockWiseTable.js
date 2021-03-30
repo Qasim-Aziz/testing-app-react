@@ -14,6 +14,7 @@ import groupObj from '@hunters/group-object'
 import PeakTrialDetails from './peakTrialWiseDetail'
 import './form.scss'
 import './table.scss'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 
 const dateFormat = 'YYYY-MM-DD'
 
@@ -124,7 +125,7 @@ export const PeakBlockWiseTable = forwardRef((props, ref) => {
       fixed: 'left',
       render: (text, row) => {
         if (!row.parent) {
-          return <span style={{ color: '#2874A6' }}>{text}</span>
+          return <span style={{ color: COLORS.target }}>{text}</span>
         }
         if (text?.length > 35) {
           return (
@@ -240,6 +241,8 @@ export const PeakBlockWiseTable = forwardRef((props, ref) => {
     },
   }))
 
+  console.log(currentBlock, 'current block')
+
   return (
     <div className="peak-block-report">
       <Row>
@@ -247,7 +250,7 @@ export const PeakBlockWiseTable = forwardRef((props, ref) => {
           columns={col}
           bordered
           expandRowByClick
-          scroll={{ x: 125 * dates.length }}
+          scroll={{ x: 108 * dates.length }}
           loading={peakBlockLoading}
           pagination={{
             defaultPageSize: 20,
@@ -270,7 +273,7 @@ export const PeakBlockWiseTable = forwardRef((props, ref) => {
             {currentBlock?.blockName}
           </span>
         }
-        width="60vw"
+        width={DRAWER.widthL2}
         placement="right"
         closable="true"
         onClose={() => setBlockDetailsDrawer(false)}

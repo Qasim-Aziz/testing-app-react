@@ -2,30 +2,34 @@
 import React from 'react'
 import { Typography } from 'antd'
 import profileImg from 'images/student.jpg'
+import { COLORS } from 'assets/styles/globalStyles'
 
 const { Text } = Typography
 
+const s1 = {
+  width: 'fit-content',
+  fontSize: 11,
+  height: '15px',
+  marginTop: 'auto',
+}
+
+const s2 = {
+  width: 'fit-content',
+  fontSize: 11,
+  height: '15px',
+  position: 'absolute',
+  bottom: '4px',
+  right: '11px',
+}
 export default ({ message, time, me }) => {
   return (
     <div
       style={{
         display: 'flex',
         justifyContent: me ? 'flex-end' : 'flex-start',
-        marginTop: 44,
+        margin: '6px 0',
       }}
     >
-      <img
-        src={profileImg}
-        alt="profile"
-        style={{
-          height: 50,
-          width: 50,
-          borderRadius: 6,
-          marginLeft: me ? 23 : 0,
-          marginRight: me ? 0 : 23,
-          order: me ? 1 : 0,
-        }}
-      />
       <div
         style={{
           display: 'flex',
@@ -36,14 +40,18 @@ export default ({ message, time, me }) => {
         <div
           style={{
             borderRadius: me ? '10px 0px 10px 10px' : '0px 10px 10px 10px',
-            background: '#E58425',
-            padding: '6px 19px',
+            background: COLORS.palleteLightBlue,
+            position: 'relative',
+            padding: '4px 12px',
           }}
         >
-          <Text style={{ fontSize: 16, color: '#fff' }}>{message}</Text>
+          <div style={{ fontSize: 14, color: 'black', display: 'flex', maxWidth: '500px' }}>
+            <div style={{ width: '100%', marginRight: '15px' }}>{message}</div>
+            <div style={message.length < 70 ? s1 : s2}>{time}</div>
+          </div>
         </div>
-        <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#9A9A9A' }}>{time}</Text>
       </div>
     </div>
   )
 }
+// this is long message you know dude just for testing how a long msg looks

@@ -318,7 +318,6 @@ class Report extends React.Component {
           columns={columns}
           dataSource={data}
           bordered
-          size="middle"
           pagination={{
             defaultPageSize: 20,
             showSizeChanger: true,

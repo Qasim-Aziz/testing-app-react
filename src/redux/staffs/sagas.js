@@ -9,6 +9,7 @@ import {
   createStaff,
   updateStaff,
   staffActiveInactive,
+  getStaffProfile,
 } from 'services/staffs'
 import axios from 'axios'
 import actions from './actions'
@@ -22,17 +23,23 @@ export function* GET_DATA() {
   })
 
   const response = yield call(getClinicStaffs)
-  console.log('REESSSS', response)
 
   if (response) {
     const staffs = []
     let i = 0
+    // console.log(response, 'response in staff 111111111')
     if (response.data.staffs.edges.length > 0) {
+      // console.log(response, 'response in staff 22222222')
       for (i = 0; i < response.data.staffs.edges.length; i++) {
-        if (response.data.staffs.edges[i].node.tags.edges.length > 0) {
+        if (
+          response.data.staffs.edges[i].node.tags.edges &&
+          response.data.staffs.edges[i].node.tags.edges.length > 0
+        ) {
+          console.log(response, 'response in staff 33333333')
           const tempTagArr = response.data.staffs.edges[i].node.tags.edges.map(e => e.node.name)
           response.data.staffs.edges[i].node.tags = tempTagArr
         }
+
         staffs.push(response.data.staffs.edges[i].node)
       }
     }
@@ -66,6 +73,27 @@ export function* GET_STAFF_DROPDOWNS() {
   }
 }
 
+export function* GET_STAFF_PROFILE({ payload }) {
+  const response = yield call(getStaffProfile, payload)
+
+  if (response && response.data) {
+    const { staff } = response.data
+    if (staff.tags.edges && staff.tags.edges.length > 0) {
+      const tempTagArr = staff.tags.edges.map(e => e.node.name)
+      staff.tags = tempTagArr
+    } else if (!staff.tags || !staff.tags.length || staff.tags.length === 0) {
+      staff.tags = []
+    }
+
+    yield put({
+      type: 'staffs/SET_STATE',
+      payload: {
+        StaffProfile: staff,
+      },
+    })
+  }
+}
+
 export function* CREATE_STAFF({ payload }) {
   const response = yield call(createStaff, payload)
   if (response && response.data) {
@@ -73,12 +101,6 @@ export function* CREATE_STAFF({ payload }) {
     notification.success({
       message: 'Staff Created Successfully',
     })
-
-    console.log('CREATE_STAFF')
-    console.log(response)
-    console.log(payload.data.get('resume'))
-    console.log(response.data.createStaff)
-    console.log(response.data.createStaff.staff)
 
     let token = ''
     if (!(localStorage.getItem('token') === null) && localStorage.getItem('token')) {
@@ -121,17 +143,55 @@ export function* EDIT_STAFF({ payload }) {
       message: 'Staff Updated Successfully',
     })
 
+    const { staff } = response.data.updateStaff
+    if (staff.tags.edges.length > 0) {
+      const tempTagArr = staff.tags.edges.map(e => e.node.name)
+      staff.tags = tempTagArr
+    } else {
+      staff.tags = []
+    }
+
     yield put({
       type: 'staffs/UPDATE_STAFFS_LIST',
       payload: {
-        object: response.data.updateStaff.staff,
+        object: staff,
       },
     })
 
     yield put({
       type: 'staffs/SET_STATE',
       payload: {
-        StaffProfile: response.data.updateStaff.staff,
+        StaffProfile: staff,
+      },
+    })
+  }
+}
+
+export function* UPDATE_STAFF_INFO({ payload }) {
+  const result = payload.response.data.updateStaff.staff
+  if (result) {
+    notification.success({
+      message: 'Employee data updated successfullly',
+    })
+
+    if (result.tags.edges.length > 0) {
+      const tempTagArr = result.tags.edges.map(e => e.node.name)
+      result.tags = tempTagArr
+    } else {
+      result.tags = []
+    }
+
+    yield put({
+      type: 'staffs/UPDATE_STAFFS_LIST',
+      payload: {
+        object: result,
+      },
+    })
+
+    yield put({
+      type: 'staffs/SET_STATE',
+      payload: {
+        StaffProfile: result,
       },
     })
   }
@@ -140,9 +200,9 @@ export function* EDIT_STAFF({ payload }) {
 export function* STAFF_ACTIVE_INACTIVE({ payload }) {
   const response = yield call(staffActiveInactive, payload)
 
+  console.log(response, 'got in response')
   if (response && response.data) {
     // generating notification
-    // console.log(response.data.updateStaff.staff)
     if (payload.checked === true) {
       notification.success({
         message: 'Staff Activated Successfully',
@@ -170,5 +230,7 @@ export default function* rootSaga() {
     takeEvery(actions.CREATE_STAFF, CREATE_STAFF),
     takeEvery(actions.EDIT_STAFF, EDIT_STAFF),
     takeEvery(actions.STAFF_ACTIVE_INACTIVE, STAFF_ACTIVE_INACTIVE),
+    takeEvery(actions.GET_STAFF_PROFILE, GET_STAFF_PROFILE),
+    takeEvery(actions.UPDATE_STAFF_INFO, UPDATE_STAFF_INFO),
   ])
 }

@@ -7,10 +7,12 @@ import { useSelector } from 'react-redux'
 import Scrollbars from 'react-custom-scrollbars'
 import gql from 'graphql-tag'
 import { useMutation, useLazyQuery } from 'react-apollo'
+import { COLORS } from 'assets/styles/globalStyles'
 import DoaminCard from './DoaminCard'
 import { DOMAIN } from './query'
 
 const { Title, Text } = Typography
+const { Search } = Input
 
 const CREATE_DOMAIN = gql`
   mutation domainProgram($label: String!, $key: String!, $programArea: ID!) {
@@ -186,9 +188,6 @@ const DomainBox = ({ domains, selectDomain, handleSelectDomain, programArea }) =
       setNewDomainName('')
       setKey('mand1')
       setCreateDomainModel(false)
-      // setLiveDomains(state => {
-      //   return [{ node: createDomainData.domainProgram.domain }, ...state]
-      // })
     }
   }, [createDomainData])
 
@@ -204,8 +203,8 @@ const DomainBox = ({ domains, selectDomain, handleSelectDomain, programArea }) =
   return (
     <Card
       style={{
-        background: '#F1F1F1',
         borderRadius: 0,
+        background: COLORS.palleteLight,
         minHeight: '65vh',
       }}
     >
@@ -228,9 +227,8 @@ const DomainBox = ({ domains, selectDomain, handleSelectDomain, programArea }) =
           ''
         )}
       </div>
-      <Input
+      <Search
         style={{ height: 40 }}
-        suffix={<SearchOutlined style={{ fontSize: 28 }} />}
         placeholder="Search Domains"
         value={searchText}
         onChange={e => setSearchText(e.target.value)}

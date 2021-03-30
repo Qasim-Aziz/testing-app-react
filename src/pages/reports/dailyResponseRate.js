@@ -18,6 +18,7 @@ import {
   Drawer,
   Form,
   Radio,
+  Tooltip,
   Select,
   Badge,
   DatePicker,
@@ -31,6 +32,7 @@ import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import { LineChartOutlined } from '@ant-design/icons'
 import moment from 'moment'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import LoadingComponent from 'components/VBMappReport/LoadingComponent'
 import { ResponseRateEqui } from './dailyResponseRateEqui'
 import ResponseRateGraph from './dailyResponseRateGraph'
@@ -49,14 +51,13 @@ const { RangePicker } = DatePicker
 const { Panel } = Collapse
 
 const filterCardStyle = {
-  background: '#F1F1F1',
+  backgroundColor: COLORS.palleteLight,
   display: 'flex',
   flexWrap: 'wrap',
   padding: '5px 10px',
   margin: 0,
   height: 'fit-content',
   overflow: 'hidden',
-  backgroundColor: 'rgb(241, 241, 241)',
 }
 
 const tableFilterCardStyle = {
@@ -458,9 +459,10 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
                   height: '26px',
                   fontSize: '13px',
                   display: 'flex',
+                  justifyContent: 'flex-start',
                   margin: 'auto 0',
                   width: '100%',
-                  color: '#2874A6',
+                  color: COLORS.target,
                   fontWeight: '600',
                 }}
               >
@@ -477,14 +479,14 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
                 justifyContent: 'space-between',
                 width: '100%',
                 fontWeight: '600',
-                color: '#2874A6',
+                color: COLORS.target,
               }}
             >
               <div style={{ margin: 'auto 0', padding: 0 }}>{text}</div>
 
               <Button type="link" onClick={() => handleSelectTarget(row)}>
                 <LineChartOutlined
-                  style={{ margin: 'auto 0', fontSize: '26px', color: 'rgb(229, 132, 37)' }}
+                  style={{ margin: 'auto 0', fontSize: '26px', color: COLORS.graph }}
                 />
               </Button>
             </div>
@@ -502,14 +504,14 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
               textAlign: 'center',
               fontWeight: '600',
               paddingLeft: '20px',
-              color: row.type === 'sd' ? '#F080B8' : '#F0B880',
+              color: row.type === 'sd' ? COLORS.stimulus : COLORS.steps,
             }}
           >
             <div style={{ margin: 'auto 0', padding: 0 }}>{text}</div>
             {row.parent ? null : (
               <Button type="link" onClick={() => handleSelectTarget(row)}>
                 <LineChartOutlined
-                  style={{ fontSize: '26px', margin: 'auto 0', color: 'rgb(229, 132, 37)' }}
+                  style={{ fontSize: '26px', margin: 'auto 0', color: COLORS.graph }}
                 />
               </Button>
             )}
@@ -526,8 +528,17 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     {
       title: 'Target Type',
       dataIndex: 'targetType',
-      width: '150px',
-      render: text => <span style={{ fontWeight: 600 }}>{text}</span>,
+      width: '170px',
+      render: text => {
+        if (text && text.length > 20) {
+          return (
+            <Tooltip title={text}>
+              <span>{text.slice(0, 20)}...</span>
+            </Tooltip>
+          )
+        }
+        return <span>{text}</span>
+      },
     },
     ...daysList.map(item => {
       return {
@@ -783,7 +794,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
           <span style={parentLabel}>Target</span>
           <div
             style={{
-              background: '#2874A6',
+              background: COLORS.target,
               borderRadius: 10,
               width: '20px',
               margin: 'auto 0',
@@ -794,7 +805,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
           <span style={parentLabel}>Stimulus</span>
           <div
             style={{
-              background: '#f080b8',
+              background: COLORS.stimulus,
               borderRadius: 10,
               width: '20px',
               margin: 'auto 0',
@@ -805,7 +816,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
           <span style={parentLabel}>Steps</span>
           <div
             style={{
-              background: '#f0b880',
+              background: COLORS.steps,
               borderRadius: 10,
               width: '20px',
               margin: 'auto 0',
@@ -825,7 +836,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
                 }`}
         visible={lineDrawer}
         onClose={() => setLineDrawer(false)}
-        width={900}
+        width={DRAWER.widthL2}
       >
         <ResponseRateGraph graphData={graphData} />
       </Drawer>
@@ -850,7 +861,6 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
                   }}
                   pagination={false}
                   defaultExpandAllRows={true}
-                  size="middle"
                   loading={loading}
                   scroll={{ x: daysList.length * 100 + 300, y: '1000px' }}
                 />

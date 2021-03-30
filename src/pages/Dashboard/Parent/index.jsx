@@ -18,7 +18,10 @@ const TherapistDashboard = () => {
   return (
     <>
       <Helmet title="Dashboard" />
-      <div style={{ display: 'flex', flexDirection: 'row', backgroundColor: '#f4f4f4' }}>
+      <div
+        className="parent-dashboard"
+        style={{ display: 'flex', flexDirection: 'row', backgroundColor: '#f4f4f4' }}
+      >
         <LeftSidePanel onActiveProfileTabChange={updateActiveProfileTab} />
         <RightSidePanel
           activeTabKey={activeTabKey}

@@ -7,14 +7,12 @@ import { useMutation } from 'react-apollo'
 import { remove, times, update } from 'ramda'
 import moment from 'moment'
 import SubmodulesForm from './SubmodulesForm'
-import {
-  CREATE_GENERAL_ASSESSMENT,
-  GET_GENERAL_ASSESSMENT,
-  UPDATE_GENERAL_ASSESSMENT,
-} from '../query'
+import { CREATE_GENERAL_ASSESSMENT, UPDATE_GENERAL_ASSESSMENT } from '../query'
+import { COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 
 const { TextArea } = Input
 const { Option } = Select
+const { layout, tailLayout } = FORM
 
 const submodulesReducer = (state, action) => {
   switch (action.type) {
@@ -178,51 +176,39 @@ const CreateGenAssessForm = ({
     })
   }
 
-  console.log(updatedError, updatedData, updatedLoading, 'updated response')
-  console.log(update, currentRow, 'currentRw')
   return (
-    <Form onSubmit={update ? handleUpdate : handleSubmit}>
+    <Form {...layout} onSubmit={update ? handleUpdate : handleSubmit}>
       <Form.Item label="Assessment Title">
         {form.getFieldDecorator('name', {
           initialValue: currentRow?.name,
           rules: [{ required: true, message: 'Please give the assessment title' }],
-        })(<Input placeholder="Name" size="large" style={{ resize: 'none', width: '100%' }} />)}
+        })(<Input placeholder="Name" />)}
       </Form.Item>
       <Form.Item label="Date">
         {form.getFieldDecorator('date', {
           initialValue: moment(currentRow?.date),
           rules: [{ required: true, message: 'Please select a date' }],
-        })(
-          <DatePicker
-            size="large"
-            style={{
-              width: '100%',
-            }}
-          />,
-        )}
+        })(<DatePicker />)}
       </Form.Item>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Form.Item style={{ display: 'flex' }} label="Submodules">
+      <Form.Item style={{ display: 'flex' }} label="Submodules">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Checkbox
-            size="large"
-            style={{
-              width: '100%',
-            }}
+            style={{ marginTop: 10 }}
             checked={hasSubmodules}
             onChange={e => setHasSubmodules(e.target.checked)}
           />
-        </Form.Item>
-        {hasSubmodules && (
-          <PlusOutlined
-            style={{ fontSize: 22, marginTop: 10 }}
-            onClick={() => {
-              setSubmodulesCount(state => state + 1)
-              submodulesDispatch({ type: 'ADD_SUBMODULE' })
-            }}
-          />
-        )}
-      </div>
-      <Form.Item>
+          {hasSubmodules && (
+            <PlusOutlined
+              style={{ fontSize: 22 }}
+              onClick={() => {
+                setSubmodulesCount(state => state + 1)
+                submodulesDispatch({ type: 'ADD_SUBMODULE' })
+              }}
+            />
+          )}
+        </div>
+      </Form.Item>
+      <Form.Item {...tailLayout}>
         {hasSubmodules &&
           submodulesState &&
           times(n => {
@@ -238,24 +224,20 @@ const CreateGenAssessForm = ({
             )
           }, submodulesCount)}
       </Form.Item>
-
-      <Button
-        htmlType="submit"
-        type="primary"
-        size="large"
-        style={{
-          marginLeft: 'auto',
-          marginRight: 10,
-          marginTop: 15,
-          width: '100%',
-          backgroundColor: '#0B35B3',
-          color: '#fff',
-        }}
-        loading={loading || updatedLoading}
-      >
-        {update ? 'Update ' : 'Create '}
-        Assessment
-      </Button>
+      <Form.Item {...tailLayout}>
+        <Button
+          htmlType="submit"
+          type="primary"
+          style={SUBMITT_BUTTON}
+          loading={loading || updatedLoading}
+        >
+          {update ? 'Update ' : 'Create '}
+          Assessment
+        </Button>
+        <Button type="default" onClick={() => setCreateAssessDrawer(false)} style={CANCEL_BUTTON}>
+          Cancel
+        </Button>
+      </Form.Item>
     </Form>
   )
 }
