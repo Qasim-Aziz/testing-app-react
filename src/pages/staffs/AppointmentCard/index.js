@@ -26,18 +26,25 @@ function AppointmentCard(props) {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    if (!appt.appointmentsLoading && appt.appointments.length > 0 && staffProfile) {
-      let temp = appt.appointments.filter(
-        item => new Date(item.start) > new Date() && item.therapist?.id === staffProfile.id,
-      )
-      temp.reverse()
-      setUpcomingAppointmentList(temp)
+    if (appt) {
+      if (!appt.appointmentsLoading && staffProfile) {
+        if (appt.appointments.length > 0) {
+          let temp = appt.appointments.filter(
+            item => new Date(item.start) > new Date() && item.therapist?.id === staffProfile.id,
+          )
+          temp.reverse()
+          setUpcomingAppointmentList(temp)
 
-      let temp2 = appt.appointments.filter(
-        item => new Date(item.start) < new Date() && item.therapist?.id === staffProfile.id,
-      )
+          let temp2 = appt.appointments.filter(
+            item => new Date(item.start) < new Date() && item.therapist?.id === staffProfile.id,
+          )
 
-      setPostAppointemntList(temp2)
+          setPostAppointemntList(temp2)
+        } else {
+          setUpcomingAppointmentList([])
+          setPostAppointemntList([])
+        }
+      }
     }
   }, [appt, staffProfile])
 
