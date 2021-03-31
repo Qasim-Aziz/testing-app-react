@@ -469,19 +469,13 @@ class LeaderTable extends React.Component {
 
     const columns = [
       {
-        name: 'Name',
-        selector: 'name',
+        title: 'Name',
+        // selector: 'name',
         sortable: true,
-        // maxWidth: '120px',
-        cell: row => {
+
+        render: row => {
           console.log('ROW', row)
-          // console.log('ROW', row.user)
-
           row.user === null ? <span> </span> : <></>
-
-          // if (row.user.firstName === null || row.user.lastName === null) {
-          //   return <span> </span>
-          // }
 
           return (
             <Button
@@ -497,10 +491,11 @@ class LeaderTable extends React.Component {
         },
       },
       {
-        name: 'Email',
-        selector: 'email',
-        // maxWidth: '120px',
-        cell: row => {
+        title: 'Email',
+        // selector: 'email',
+
+        sortable: true,
+        render: row => {
           // console.log('ROW', row)
           if (row.user === null) {
             return <span> </span>
@@ -510,10 +505,10 @@ class LeaderTable extends React.Component {
         },
       },
       {
-        name: 'Mobile',
-        selector: 'mobile',
-        // maxWidth: '120px',
-        cell: row => {
+        title: 'Mobile',
+        // selector: 'mobile',
+
+        render: row => {
           // console.log('ROW', row)
           if (row.phone === null) {
             return <span> </span>
@@ -523,22 +518,22 @@ class LeaderTable extends React.Component {
         },
       },
       {
-        name: 'project Name',
-        selector: 'projectName',
-        // maxWidth: '120px',
-        cell: row => <span>{row.projectName ? row.projectName : ''} </span>,
+        title: 'project Name',
+        // selector: 'projectName',
+
+        render: row => <span>{row.projectName ? row.projectName : ''} </span>,
       },
       {
-        name: 'Lead Status',
-        selector: 'leadStatus',
-        // maxWidth: '120px',
-        cell: row => <span>{row.leadStatus ? row.leadStatus : ''}</span>,
+        title: 'Lead Status',
+        // selector: 'leadStatus',
+
+        render: row => <span>{row.leadStatus ? row.leadStatus : ''}</span>,
       },
       {
-        name: 'Created At',
-        selector: 'createdAt',
-        // maxWidth: '120px',
-        cell: row => {
+        title: 'Created At',
+        // selector: 'createdAt',
+
+        render: row => {
           return <span>{row.createdAt ? new Date(row.createdAt).toDateString() : ''} </span>
         },
       },
