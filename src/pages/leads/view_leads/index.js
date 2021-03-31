@@ -783,95 +783,6 @@ class LeaderTable extends React.Component {
         {/* ********************** END of DIV FOR TOP_BAR***************** */}
         <div className={divClass}>
           <div style={{ marginTop: '24px', marginBottom: '50px' }}>
-            {/* ************* DIV FOR filtering ************ */}
-            {/* <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                position: 'relative',
-                whiteSpace: 'nowrap',
-                zIndex: 2,
-                width: 'fit-content',
-                paddingTop: '4px',
-              }}
-            > */}
-            {/* Search bar for name */}
-            {/* <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span>Name :</span>
-                <Input
-                  size="small"
-                  name="name"
-                  placeholder="Search Name"
-                  value={this.state.filterName}
-                  onChange={e => {
-                    this.setState({
-                      filterName: e.target.value,
-                      isFilterActive: e.target.value && true,
-                    })
-                    this.filterHandler({ name: e.target.value })
-                  }}
-                  style={{ ...tableFilterStyles, width: '112px' }}
-                />
-              </span> */}
-            {/* Search bar for email */}
-            {/* <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span>Email :</span>
-                <Input
-                  size="small"
-                  name="name"
-                  placeholder="Search Email"
-                  value={this.state.filterEmail}
-                  onChange={e => {
-                    this.setState({
-                      filterEmail: e.target.value,
-                      isFilterActive: e.target.value && true,
-                    })
-                    this.filterHandler({ email: e.target.value })
-                  }}
-                  style={{ ...tableFilterStyles, width: '148px' }}
-                />
-              </span> */}
-            {/* Search bar for project */}
-            {/* <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span>project :</span>
-                <Input
-                  size="small"
-                  name="name"
-                  placeholder="Search Project"
-                  value={this.state.filterProject}
-                  onChange={e => {
-                    this.setState({
-                      filterProject: e.target.value,
-                      isFilterActive: e.target.value && true,
-                    })
-                    this.filterHandler({ email: e.target.value })
-                  }}
-                  style={{ ...tableFilterStyles, width: '148px' }}
-                />
-              </span> */}
-            {/* Different kinds of status */}
-            {/* <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span>STATUS :</span>
-                <Select
-                  placeholder="Status"
-                  // allowClear
-                  value={this.state.filterStatus}
-                  onChange={e => {
-                    console.log('-----------------------------------------------', e)
-                    this.selectActiveStatus(e)
-                    this.setState({ filterStatus: e, isFilterActive: true })
-                  }}
-                  style={inputCustom} // {{ width: '120px' }}
-                >
-                  <Select.Option value="NEW">NEW</Select.Option>
-                  <Select.Option value="CONTACTED">CONTACTED</Select.Option>
-                  <Select.Option value="INTRESTED">INTRESTED</Select.Option>
-                  <Select.Option value="DEMO">DEMO</Select.Option>
-                  <Select.Option value="CONVERTED">CONVERTED</Select.Option>
-                </Select>
-              </span> */}
-            {/* </div> */}
-            {/* ************* END OF DIV FOR filtering ************ */}
             {/* ************* DIV FOR DATA-TABLE ************ */}
             <div>
               <div style={{ marginBottom: '50px' }}>
@@ -885,18 +796,18 @@ class LeaderTable extends React.Component {
                     rowKey={record => record.id}
                     dataSource={filteredList}
                     loading={loadingLeaders} // this.state.loadingLeaders
-                    pagination={{
-                      defaultPageSize: 20,
-                      // onChange: (page, rows) => this.pageChanged(page, rows),
-                      // onShowSizeChange: (currentPage, currentRowsPerPage) =>
-                      // this.rowsChanged(currentRowsPerPage, currentPage),
-                      showSizeChanger: true,
-                      pageSizeOptions:
-                        TotalLeaders > 100
-                          ? ['20', '50', '80', '100', `${TotalLeaders}`]
-                          : ['20', '50', '80', '100'],
-                      position: 'bottom',
-                    }}
+                    // pagination={{
+                    //   defaultPageSize: 20,
+                    //   onChange: (page, rows) => this.pageChanged(page, rows),
+                    //   onShowSizeChange: (currentPage, currentRowsPerPage) =>
+                    //   this.rowsChanged(currentRowsPerPage, currentPage),
+                    //   showSizeChanger: true,
+                    //   pageSizeOptions:
+                    //     TotalLeaders > 100
+                    //       ? ['20', '50', '80', '100', `${TotalLeaders}`]
+                    //       : ['20', '50', '80', '100'],
+                    //   position: 'bottom',
+                    // }}
                   />
                 </div>
               </div>
