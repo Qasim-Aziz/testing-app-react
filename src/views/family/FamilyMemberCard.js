@@ -1,5 +1,6 @@
 import React from 'react'
 import { Button, Typography } from 'antd'
+import { CANCEL_BUTTON, COLORS, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 
 const FamilyMemberCard = ({ onClick, heading, text, selected }) => {
   const { Text } = Typography
@@ -22,17 +23,17 @@ const FamilyMemberCard = ({ onClick, heading, text, selected }) => {
     color: '#AAA',
   }
 
-  let textStyle = {
-    fontSize: '20px',
-    fontWeight: '500',
-    color: '#E5E5E5',
-    whiteSpace: 'pre-line',
-  }
+  // let textStyle = {
+  //   fontSize: '20px',
+  //   fontWeight: '500',
+  //   color: '#E5E5E5',
+  //   whiteSpace: 'pre-line',
+  // }
 
   if (selected) {
     buttonStyle = {
       ...buttonStyle,
-      backgroundColor: '#E58425',
+      backgroundColor: COLORS.palleteBlue, // '#E58425',
       color: '#fff',
     }
 
@@ -41,10 +42,10 @@ const FamilyMemberCard = ({ onClick, heading, text, selected }) => {
       color: '#fff',
     }
 
-    textStyle = {
-      ...textStyle,
-      color: '#fff',
-    }
+    // textStyle = {
+    //   ...textStyle,
+    //   color: '#fff',
+    // }
   }
 
   return (

@@ -60,7 +60,7 @@ class FamilyMembers extends React.Component {
   render() {
     const { family } = this.props
     const { Content, Sider } = Layout
-    const { Title } = Typography
+    const { Title, Text } = Typography
     const { relationId } = this.state
 
     const newMemberStyle = {
@@ -94,9 +94,10 @@ class FamilyMembers extends React.Component {
                   backgroundColor: '#f2f4f8',
                 }}
               >
-                <Title type="secondary" level={3} style={{ fontWeight: '500', fontSize: '22px' }}>
-                  FAMILY MEMBERS
-                </Title>
+                <h3 style={{ fontWeight: '500', fontSize: '22px' }}>
+                  {/* type="secondary" level={3} */}
+                  <Text type="secondary">FAMILY MEMBERS</Text>
+                </h3>
                 {family.relations.map(relation => {
                   return (
                     <FamilyMemberCard
@@ -108,15 +109,16 @@ class FamilyMembers extends React.Component {
                     />
                   )
                 })}
-
-                <Button
-                  key="123"
-                  type="link"
-                  style={newMemberStyle}
-                  onClick={() => this.memberClickHandler('', '', true)}
-                >
-                  New Family Member
-                </Button>
+                <Menu.Item>
+                  <Button
+                    key="123"
+                    type="link"
+                    style={newMemberStyle}
+                    onClick={() => this.memberClickHandler('', '', true)}
+                  >
+                    New Family Member
+                  </Button>
+                </Menu.Item>
               </Menu>
             </Sider>
             <Layout>

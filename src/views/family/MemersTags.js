@@ -19,6 +19,7 @@ const MemersTags = ({
             key={sib.node.id}
             checked={currentIndex === index}
             onChange={() => handleNextMember(index)}
+            style={{ backgroundColor: '#0072d6' }}
           >
             {sib.node.memberName}
             <CloseCircleOutlined onClick={() => deleteMember(sib)} />
