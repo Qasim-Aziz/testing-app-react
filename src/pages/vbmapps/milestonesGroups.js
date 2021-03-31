@@ -6,16 +6,13 @@
 /* eslint-disable no-useless-concat */
 /* eslint-disable react/jsx-boolean-value */
 import React, { Component } from 'react'
-import { Icon, Layout, Row, Col, Typography, Popover, Spin } from 'antd'
+import { Icon, Layout, Row, Col, Typography, Popover } from 'antd'
 import { gql } from 'apollo-boost'
 import Scrollbars from 'react-custom-scrollbars'
-import { COLORS } from 'assets/styles/globalStyles'
-import LoadingComponent from 'components/LoadingComponent'
 import client from '../../apollo/config'
 import PageHeader from './PageHeader'
 import LastAssignmentsResult from './LastAssignmentsResult'
 import { GET_VBMAPP_QUESTIONS } from './query'
-import { leftDivStyle, rightDivStyle } from './customStyle'
 
 const { Content } = Layout
 const { Title, Text } = Typography
@@ -79,8 +76,8 @@ class MilestonesGroups extends Component {
     const gr = []
     for (let x = 0; x < groups.length; x += 1) {
       if (selected === groups[x].node.id) {
-        bg = COLORS.palleteLightBlue
-        textColor = '#000'
+        bg = '#3E7BFA'
+        textColor = '#FFF'
       } else {
         bg = '#FFF'
         textColor = '#000'
@@ -95,12 +92,11 @@ class MilestonesGroups extends Component {
             backgroundColor: bg,
             color: textColor,
             cursor: 'pointer',
-            boxShadow:
-              '0px 0px 1px rgba(0, 0, 0, 0.08), 0px 0px 2px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(0, 0, 0, 0.08)',
+            boxShadow: '0px 0px 1px rgba(0, 0, 0, 0.08), 0px 0px 2px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(0, 0, 0, 0.08)',
             padding: '5px 20px',
             borderRadius: 0,
             flex: 1,
-            margin: '5px 0px',
+            margin: '5px 5px 0px',
           }}
         >
           <p
@@ -426,10 +422,7 @@ class MilestonesGroups extends Component {
                 case '':
                   if (quesNum === questions[y].questionNum) {
                     answers.push(
-                      <Popover
-                        content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>}
-                        title={`Question: ` + `${questions[y].questionNum}`}
-                      >
+                      <Popover content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>} title={`Question: ` + `${questions[y].questionNum}`}>
                         <div
                           style={{
                             marginVertical: 10,
@@ -456,10 +449,7 @@ class MilestonesGroups extends Component {
                     )
                   } else {
                     answers.push(
-                      <Popover
-                        content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>}
-                        title={`Question: ` + `${questions[y].questionNum}`}
-                      >
+                      <Popover content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>} title={`Question: ` + `${questions[y].questionNum}`}>
                         <div
                           style={{
                             marginVertical: 10,
@@ -491,10 +481,7 @@ class MilestonesGroups extends Component {
                 case '0.0':
                   if (quesNum === questions[y].questionNum) {
                     answers.push(
-                      <Popover
-                        content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>}
-                        title={`Question: ` + `${questions[y].questionNum}`}
-                      >
+                      <Popover content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>} title={`Question: ` + `${questions[y].questionNum}`}>
                         <div
                           style={{
                             marginVertical: 10,
@@ -521,10 +508,7 @@ class MilestonesGroups extends Component {
                     )
                   } else {
                     answers.push(
-                      <Popover
-                        content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>}
-                        title={`Question: ` + `${questions[y].questionNum}`}
-                      >
+                      <Popover content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>} title={`Question: ` + `${questions[y].questionNum}`}>
                         <div
                           key={`Question: ` + `${questions[y].questionNum}`}
                           style={{
@@ -557,10 +541,7 @@ class MilestonesGroups extends Component {
                   totalScores += 0.5
                   if (quesNum === questions[y].questionNum) {
                     answers.push(
-                      <Popover
-                        content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>}
-                        title={`Question: ` + `${questions[y].questionNum}`}
-                      >
+                      <Popover content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>} title={`Question: ` + `${questions[y].questionNum}`}>
                         <div
                           style={{
                             marginVertical: 10,
@@ -587,10 +568,7 @@ class MilestonesGroups extends Component {
                     )
                   } else {
                     answers.push(
-                      <Popover
-                        content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>}
-                        title={`Question: ` + `${questions[y].questionNum}`}
-                      >
+                      <Popover content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>} title={`Question: ` + `${questions[y].questionNum}`}>
                         <div
                           style={{
                             marginVertical: 10,
@@ -622,10 +600,7 @@ class MilestonesGroups extends Component {
                   totalScores += 1.0
                   if (quesNum === questions[y].questionNum) {
                     answers.push(
-                      <Popover
-                        content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>}
-                        title={`Question: ` + `${questions[y].questionNum}`}
-                      >
+                      <Popover content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>} title={`Question: ` + `${questions[y].questionNum}`}>
                         <div
                           style={{
                             marginVertical: 10,
@@ -652,10 +627,7 @@ class MilestonesGroups extends Component {
                     )
                   } else {
                     answers.push(
-                      <Popover
-                        content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>}
-                        title={`Question: ` + `${questions[y].questionNum}`}
-                      >
+                      <Popover content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>} title={`Question: ` + `${questions[y].questionNum}`}>
                         <div
                           style={{
                             marginVertical: 10,
@@ -736,7 +708,7 @@ class MilestonesGroups extends Component {
     this.getQuestion(groupID)
   }
 
-  handleKeyDown = () => {}
+  handleKeyDown = () => { }
 
   handleAnswer(score) {
     const { selected } = this.state
@@ -792,38 +764,50 @@ class MilestonesGroups extends Component {
       previous,
       next,
     } = this.state
-    let number = 0
+    let number = 0;
     const d = groups?.forEach(e => {
       if (selectedName === e.node.groupName) {
         number = e.node.noQuestion
       }
     })
     return (
-      <Layout style={{ padding: '0px', marginTop: '20px' }}>
+      <Layout style={{ padding: '0px' }}>
         <Content
           style={{
             padding: '0px 20px',
-            width: 1360,
+            maxWidth: 1300,
+            width: '100%',
             margin: '0px auto',
           }}
         >
           <Row>
-            <Col sm={6}>
-              <div style={leftDivStyle}>
-                <Scrollbars autoHide style={{ height: 'calc(100vh - 120px)' }}>
+            <Col sm={5}>
+              <div
+                style={{
+                  padding: 10,
+                  borderRadius: 5,
+                  background: 'rgb(249, 249, 249)',
+                }}
+              >
+                <Scrollbars style={{ height: 'calc(100vh - 120px)' }}>
                   {groups && groups.length > 0 && this.getGroups()}
                   <div style={{ height: 20 }}></div>
                 </Scrollbars>
               </div>
             </Col>
 
-            <Col sm={18}>
-              <div style={rightDivStyle}>
-                <PageHeader
-                  pageTitle="VB-MAPP Milestone Assessment"
-                  questions={questions}
-                  lastAssessment={true}
-                />
+            <Col sm={19}>
+              <div
+                style={{
+                  marginLeft: 10,
+                  height: 'calc(100vh - 100px)',
+                  overflow: 'auto',
+                  padding: 10,
+                  borderRadius: 5,
+                  border: '2px solid rgb(249, 249, 249)'
+                }}
+              >
+                <PageHeader pageTitle="VB-MAPP Milestone Assessment" questions={questions} lastAssessment={true} />
                 {/* {questions && <LastAssignmentsResult questions={questions} />} */}
                 {completed === 1 && (
                   <div
@@ -839,20 +823,13 @@ class MilestonesGroups extends Component {
                       marginTop: 10,
                       backgroundColor: '#21af16',
                       color: 'white',
-                      textAlign: 'center',
+                      textAlign: 'center'
                     }}
                   >
-                    <Text style={{ fontSize: 14, marginBottom: 0, color: 'white' }}>
-                      Assessment completed, now you can edit assessment by selecting question from
-                      the scoreboard
-                    </Text>
+                    <Text style={{ fontSize: 14, marginBottom: 0, color: 'white' }}>Assessment completed, now you can edit assessment by selecting question from the scoreboard</Text>
                   </div>
                 )}
-                {loadingQuestion && (
-                  <div style={{ width: '100%', margin: '20px auto', textAlign: 'center' }}>
-                    <Spin size="small" />
-                  </div>
-                )}
+                {loadingQuestion && <p>Loading Question...</p>}
                 {loadingQuestion === false &&
                   currentQuestion &&
                   Object.keys(currentQuestion).length > 0 && (
@@ -869,9 +846,10 @@ class MilestonesGroups extends Component {
                         marginBottom: '20px',
                         lineHeight: '27px',
                         marginTop: '10px',
-                        minHeight: '140px',
+                        minHeight: '140px'
                       }}
                     >
+
                       <div style={{}}>
                         <div
                           style={{
@@ -916,15 +894,8 @@ class MilestonesGroups extends Component {
                           </span>
                         </div>
 
-                        <Text
-                          style={{
-                            marginTop: 0,
-                            fontSize: 15,
-                            fontWeight: 700,
-                            lineHeight: '20px',
-                          }}
-                        >
-                          Question: {currentQuestion.objective}
+                        <Text style={{ marginTop: 0, fontSize: 15, fontWeight: 700, lineHeight: '20px' }}>
+                          Question:  {currentQuestion.objective}
                         </Text>
                         <div
                           style={{
@@ -947,7 +918,7 @@ class MilestonesGroups extends Component {
                                 borderRadius: 4,
                                 justifyContent: 'center',
                                 alignItems: 'center',
-                                fontSize: 20,
+                                fontSize: 20
                               }}
                               role="button"
                               onKeyDown={this.handleKeyDown}
@@ -957,11 +928,11 @@ class MilestonesGroups extends Component {
                               <p style={{ marginBottom: 0 }}>{option.score}</p>
                             </div>
                           ))}
+
                         </div>
-                        <div
-                          style={{
-                            marginLeft: 10,
-                          }}
+                        <div style={{
+                          marginLeft: 10,
+                        }}
                         >
                           <Popover
                             content={
@@ -976,14 +947,14 @@ class MilestonesGroups extends Component {
                             Scoring Criteria <Icon style={{ fontSize: 16 }} type="info-circle" />
                           </Popover>
                         </div>
+
                       </div>
                     </div>
                   )}
                 <div
                   style={{
                     cursor: 'pointer',
-                    boxShadow:
-                      '0px 0px 1px rgba(0, 0, 0, 0.08), 0px 0px 2px rgba(0, 0, 0, 0.12), 0px 1px 2px rgba(0, 0, 0, 0.08)',
+                    boxShadow: '0px 0px 1px rgba(0, 0, 0, 0.08), 0px 0px 2px rgba(0, 0, 0, 0.12), 0px 1px 2px rgba(0, 0, 0, 0.08)',
                     padding: '10px 20px',
                     borderRadius: 2,
                     flex: 1,
@@ -998,21 +969,14 @@ class MilestonesGroups extends Component {
                       alignItems: 'flex-end',
                     }}
                   >
-                    <Text style={{ fontSize: 18, fontWeight: 600, lineHeight: '20px' }}>
-                      Scoreboard
-                    </Text>
+                    <Text style={{fontSize: 18, fontWeight: 600, lineHeight: '20px' }}>Scoreboard</Text>
                     &nbsp;
-                    <Text style={{ fontSize: 18, fontWeight: 600, lineHeight: '20px' }}>
-                      {loadingQuestion === false && totalScore}
-                    </Text>
+                    <Text style={{fontSize: 18, fontWeight: 600, lineHeight: '20px' }}>{loadingQuestion === false && totalScore}</Text>                    
                   </div>
 
+
                   <div style={{}}>
-                    {loadingQuestion && (
-                      <div style={{ width: '100%', margin: '20px auto', textAlign: 'center' }}>
-                        <Spin size="medium" />
-                      </div>
-                    )}
+                    {loadingQuestion && <p>Loading Scoreboard...</p>}
                     {loadingQuestion === false && scoreboard.length > 0 && scoreboard}
                   </div>
                 </div>
@@ -1021,6 +985,7 @@ class MilestonesGroups extends Component {
           </Row>
         </Content>
       </Layout>
+
     )
   }
 }

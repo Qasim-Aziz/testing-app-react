@@ -1,11 +1,9 @@
 import React, { useEffect } from 'react'
 import { useQuery } from 'react-apollo'
 import Scrollbars from 'react-custom-scrollbars'
-import { notification } from 'antd'
-import { COLORS } from 'assets/styles/globalStyles'
 import { GET_TASK_ANALYSIS_GROUP } from './query'
 import './button.css'
-import { leftListBoxStyle } from './customStyle'
+import { leftDivStyle, rightDivStyle, assessmentCompletedBlockStyle, defaultDivStyle, leftListBoxStyle, recordResponseButtonStyle } from './customStyle'
 
 export default ({ handleGroupChange, selected, areaId }) => {
   const { data, error, loading } = useQuery(GET_TASK_ANALYSIS_GROUP, {
@@ -21,21 +19,12 @@ export default ({ handleGroupChange, selected, areaId }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
 
-  useEffect(() => {
-    if (error) {
-      notification.error({
-        message: 'Something went wrong',
-        error: 'Unable to fetch task analysis group',
-      })
-    }
-  }, [error])
-
   if (loading) {
     return 'Loading...'
   }
 
   if (error) {
-    return 'Opps their is something wrong'
+    return 'Opps their are something wrong'
   }
 
   if (data?.vbmappGroups.edges.length === 0) {
@@ -47,6 +36,7 @@ export default ({ handleGroupChange, selected, areaId }) => {
   }
 
   return (
+
     <Scrollbars
       autoHide
       style={{
@@ -59,8 +49,8 @@ export default ({ handleGroupChange, selected, areaId }) => {
         let textColor = '#000'
 
         if (selected?.id === node.id) {
-          bg = COLORS.palleteLightBlue
-          textColor = '#000'
+          bg = '#3E7BFA'
+          textColor = '#FFF'
         } else {
           bg = '#FFF'
           textColor = '#000'
@@ -80,7 +70,6 @@ export default ({ handleGroupChange, selected, areaId }) => {
               onClick={() => handleGroupChange(node)}
               style={{
                 color: textColor,
-                textAlign: 'left',
                 width: '100%',
                 height: '100%',
                 background: 'none',
@@ -103,5 +92,6 @@ export default ({ handleGroupChange, selected, areaId }) => {
         )
       })}
     </Scrollbars>
+
   )
 }

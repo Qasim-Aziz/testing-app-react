@@ -3,10 +3,28 @@
 /* eslint-disable array-callback-return */
 import React, { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet'
-import { Button, Layout, PageHeader, Table, Drawer, Tooltip, Popconfirm, notification } from 'antd'
-import { PlusOutlined, DeleteOutlined, EyeOutlined, MailOutlined } from '@ant-design/icons'
+import {
+  Button,
+  Layout,
+  PageHeader,
+  Table,
+  Drawer,
+  Tooltip,
+  Popconfirm,
+  notification,
+  Popover,
+} from 'antd'
+import {
+  PlusOutlined,
+  MoreOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  MailOutlined,
+  FolderViewOutlined,
+} from '@ant-design/icons'
 import { createUseStyles } from 'react-jss'
 import { useHistory, Link } from 'react-router-dom'
+import gql from 'graphql-tag'
 import { useQuery, useMutation } from 'react-apollo'
 import moment from 'moment'
 import client from '../../apollo/config'
@@ -38,6 +56,7 @@ function Invoice({ rowData }) {
   const classes = useStyles()
   const [tableData, setTableData] = useState()
   const [invoiceFormDrawer, setInvoiceFormDrawer] = useState(false)
+  const history = useHistory()
   const [from, setFrom] = useState()
   const [to, setTo] = useState()
   const [month, setMonth] = useState()

@@ -6,10 +6,12 @@ import {
   EditOutlined,
   CheckCircleTwoTone,
   FileTextOutlined,
+  DownCircleFilled,
   DownCircleTwoTone,
   DeleteOutlined,
   StarOutlined,
 } from '@ant-design/icons'
+import gql from 'graphql-tag'
 import moment from 'moment'
 import '../style.scss'
 import { Scrollbars } from 'react-custom-scrollbars'
@@ -17,12 +19,14 @@ import LoadingComponent from 'components/LoadingComponent'
 import SessionFeedbackForm from '../../sessionFeedback'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 
+const { Meta } = Card
+const { TabPane } = Tabs
+
 function Upcoming(props) {
   const { appointmentList, updateAppointment, upcoming } = props
   const dispatch = useDispatch()
   const [selectedAppointmentId, setSelectedAppointmentId] = useState('')
   const [feedbackDrawer, setFeedbackDrawer] = useState(false)
-  const userProfile = useSelector(state => state.learners.UserProfile)
 
   const showFeedback = id => {
     setFeedbackDrawer(true)
@@ -207,7 +211,6 @@ function Upcoming(props) {
                             </Tooltip>
                             <Button
                               size="small"
-                              disabled={!userProfile.isActive}
                               type="link"
                               onClick={() => updateAppointment(item.id)}
                             >

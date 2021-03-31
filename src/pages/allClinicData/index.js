@@ -13,7 +13,6 @@ import moment from 'moment'
 import { FaDownload } from 'react-icons/fa'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
-import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import client from '../../apollo/config'
 import './allClinicData.scss'
 import AllLearners from './allLearners'
@@ -274,21 +273,22 @@ const AllClinicsData = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      align: 'center',
-      width: '90px',
+      width: '85px',
       render: (status, row) => (
-        <Popconfirm
-          title={`Sure to ${status === 'Active' ? 'deactivate' : 'activate'} the clinic?`}
-          onConfirm={() => closeTask(status, row)}
-        >
-          <Button type="link">
-            {status === 'Active' ? (
-              <CheckCircleOutlined style={{ fontSize: 20, color: COLORS.success }} />
-            ) : (
-              <CloseCircleOutlined style={{ fontSize: 20, color: COLORS.danger }} />
-            )}
-          </Button>
-        </Popconfirm>
+        <span>
+          <Popconfirm
+            title={`Sure to ${status === 'Active' ? 'deactivate' : 'activate'} the clinic?`}
+            onConfirm={() => closeTask(status, row)}
+          >
+            <Button type="link">
+              {status === 'Active' ? (
+                <CheckCircleOutlined style={{ color: 'green' }} />
+              ) : (
+                <CloseCircleOutlined style={{ color: 'red' }} />
+              )}
+            </Button>
+          </Popconfirm>
+        </span>
       ),
     },
     {
@@ -366,7 +366,6 @@ const AllClinicsData = () => {
         Email: item.details.email,
         'Contact No 1': item.details.contactNo,
         'Contact No 2': item.details.contactNo2,
-        Staff: item.details.staffSet?.edges?.length,
         'Total Learners': item.totalLearners,
         'Active Learners': item.activeLearners,
         'Last Month Active Learners': item.lastMonthActiveLearners,
@@ -462,7 +461,7 @@ const AllClinicsData = () => {
           <TabPane tab="Inactive" key="Inactive">
             <div className="modify-table">
               <Table
-                scroll={{ x: '75vw' }}
+                scroll={{ x: '70vw' }}
                 columns={columns}
                 rowKey={record => record.details.id}
                 dataSource={clinicsList}
@@ -485,14 +484,14 @@ const AllClinicsData = () => {
           closable="true"
           onClose={() => setFilterDrawer(false)}
           visible={filterDrawer}
-          width={DRAWER.widthL3}
+          width={360}
         >
           <FilterCard filterHandler={filterHandler} filterSet={filterSet} ref={filterRef} />
         </Drawer>
 
         <Drawer
           title={`${drawerTitle}: Invoices`}
-          width={DRAWER.widthL1}
+          width="70vw"
           placement="right"
           closable="true"
           onClose={() => setInvoiceDrawer(false)}
@@ -501,7 +500,7 @@ const AllClinicsData = () => {
           <InvoiceTable rowData={currentClinicRow} setInvoiceDrawer={setInvoiceDrawer} />
         </Drawer>
         <Drawer
-          width={DRAWER.widthL1}
+          width="70vw"
           placement="right"
           closable="true"
           onClose={() => setStaffDrawer(false)}
@@ -513,7 +512,7 @@ const AllClinicsData = () => {
         </Drawer>
         <Drawer
           title={`${drawerTitle}: Maintain Rates`}
-          width={DRAWER.widthL3}
+          width="40%"
           placement="right"
           closable="true"
           onClose={() => setRatesDrawer(false)}
@@ -529,7 +528,7 @@ const AllClinicsData = () => {
         <Drawer
           visible={learnersTableDrawer}
           onClose={() => setLearnersTableDrawer(false)}
-          width={DRAWER.widthL1}
+          width="70vw"
           placement="right"
           closable="true"
           destroyOnClose="true"

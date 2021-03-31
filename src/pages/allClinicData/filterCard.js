@@ -8,10 +8,7 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable import/prefer-default-export */
 import React, { forwardRef, useImperativeHandle, useState } from 'react'
-import { Select, Input, Form } from 'antd'
-import { FORM } from 'assets/styles/globalStyles'
-
-const { layout } = FORM
+import { Select, Input } from 'antd'
 
 export const FilterCard = forwardRef((props, ref) => {
   const [name, setName] = useState('')
@@ -91,69 +88,95 @@ export const FilterCard = forwardRef((props, ref) => {
     marginBottom: '12px',
   }
 
-  const inputCustom = { width: '180px', display: 'block' }
+  const inputCustom = { width: '180px', marginBottom: '8px', display: 'block' }
 
   return (
     <div>
       {props.filterSet.name && (
-        <Form.Item {...layout} label="Name">
-          <Input name="name" placeholder="Search Name" value={name} onChange={handleFilter} />
-        </Form.Item>
+        <div className="filter_sub_div">
+          <span style={customStyle}>Name :</span>
+          <Input
+            size="default"
+            name="name"
+            placeholder="Search Name"
+            value={name}
+            onChange={handleFilter}
+            style={inputCustom}
+          />
+        </div>
       )}
       {props.filterSet.email && (
-        <Form.Item {...layout} label="Email">
-          <Input name="email" placeholder="Search Email" value={email} onChange={handleFilter} />
-        </Form.Item>
+        <div className="filter_sub_div">
+          <span style={customStyle}>Email :</span>
+          <Input
+            size="default"
+            name="email"
+            placeholder="Search Email"
+            value={email}
+            onChange={handleFilter}
+            style={inputCustom}
+          />
+        </div>
       )}
       {props.filterSet.mobile && (
-        <Form.Item {...layout} label="Mobile">
+        <div className="filter_sub_div">
+          <span style={customStyle}>Mobile :</span>
           <Input
+            size="default"
             name="mobile"
             placeholder="Search Mobile"
             type="number"
             value={mobile}
             onChange={handleFilter}
+            style={inputCustom}
           />
-        </Form.Item>
+        </div>
       )}
       {props.filterSet.designation && (
-        <Form.Item {...layout} label="Designation">
+        <div className="filter_sub_div">
+          <span style={customStyle}>Designation :</span>
           <Input
+            size="default"
             name="designation"
             placeholder="Search Designation"
             type="text"
             value={designation}
             onChange={handleFilter}
+            style={inputCustom}
           />
-        </Form.Item>
+        </div>
       )}
       {props.filterSet.status && (
-        <Form.Item {...layout} label="Status">
+        <div className="filter_sub_div">
+          <span style={customStyle}>Status :</span>
           <Select
+            size="default"
             name="status"
             value={status}
-            style={inputCustom}
             onSelect={value => handleSelect(value, 'status')}
+            style={inputCustom}
           >
             <Select.Option value="">All</Select.Option>
             <Select.Option value="true">Active</Select.Option>
             <Select.Option value="false">Inactive</Select.Option>
           </Select>
-        </Form.Item>
+        </div>
       )}
       {props.filterSet.gender && (
-        <Form.Item {...layout} label="Gender">
+        <div className="filter_sub_div">
+          <span style={customStyle}>Gender :</span>
           <Select
+            size="default"
             name="gender"
-            style={inputCustom}
             value={gender}
             onSelect={value => handleSelect(value, 'gender')}
+            style={inputCustom}
           >
             <Select.Option value="">All</Select.Option>
             <Select.Option value="male">Male</Select.Option>
             <Select.Option value="female">Female</Select.Option>
           </Select>
-        </Form.Item>
+        </div>
       )}
     </div>
   )

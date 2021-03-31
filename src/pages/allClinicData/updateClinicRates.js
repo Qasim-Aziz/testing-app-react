@@ -5,27 +5,26 @@
 /* eslint-disable react/jsx-closing-tag-location */
 import React, { useState, useEffect } from 'react'
 import { useQuery, useLazyQuery } from 'react-apollo'
-import { Table, Button, Divider, Form, Input, Select, notification } from 'antd'
-import { CANCEL_BUTTON, COLORS, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
+import gql from 'graphql-tag'
+import { Table, Button, Popconfirm, Drawer, Form, Input, Select, notification } from 'antd'
 import client from '../../apollo/config'
 import './allClinicData.scss'
 import { UPDATE_RATES, CLINIC_RATES } from './query'
 
 const { Option } = Select
 
-// let { layout, tailLayout } = FORM
 const layout = {
   labelCol: {
-    span: 7,
+    span: 10,
   },
   wrapperCol: {
-    span: 16,
+    span: 10,
   },
 }
 const tailLayout = {
   wrapperCol: {
     offset: 7,
-    span: 16,
+    span: 14,
   },
 }
 
@@ -93,9 +92,9 @@ function UpdateClinicRates({ form, rowData, ratesDrawer, setRatesDrawer }) {
 
   return (
     <>
-      <Divider orientation="left">{ratesExist ? 'Update Rates' : 'Add rates'}</Divider>
+      <div style={{ fontSize: '22px' }}>{ratesExist ? 'Update Rates' : 'Add rates'}</div>
       <Form {...layout} onSubmit={e => updateCLinicRates(e)}>
-        <Form.Item label="Country">
+        <Form.Item label="Country" style={{ marginBottom: '5px' }} size="small">
           {form.getFieldDecorator('country', {
             initialValue: rowData.details.country.name,
             rules: [{ required: true, message: 'Please select a country!' }],
@@ -104,6 +103,7 @@ function UpdateClinicRates({ form, rowData, ratesDrawer, setRatesDrawer }) {
               placeholder="Country"
               loading={ratesLoading}
               allowClear
+              size="small"
               style={{ borderRadius: 0 }}
             >
               {countryList.map((item, index) => (
@@ -114,12 +114,12 @@ function UpdateClinicRates({ form, rowData, ratesDrawer, setRatesDrawer }) {
             </Select>,
           )}
         </Form.Item>
-        <Form.Item label="Currency">
+        <Form.Item label="Currency" style={{ marginBottom: '5px' }} size="small">
           {form.getFieldDecorator('currency', {
             initialValue: rowData.details.currency ? rowData.details.currency.currency : 'USD',
             rules: [{ required: true, message: 'Please select a currency!' }],
           })(
-            <Select placeholder="Currency" allowClear style={{ borderRadius: 0 }}>
+            <Select placeholder="Currency" allowClear size="small" style={{ borderRadius: 0 }}>
               {currencyList.map(item => (
                 <Option value={item} key={item}>
                   {currencySymbol[item]} {item}
@@ -128,12 +128,13 @@ function UpdateClinicRates({ form, rowData, ratesDrawer, setRatesDrawer }) {
             </Select>,
           )}
         </Form.Item>
-        <Form.Item label="Price / Learner">
+        <Form.Item label="Price / Learner" style={{ marginBottom: '5px' }} size="small">
           {form.getFieldDecorator('learnerPrice', {
             initialValue: rates?.learnerPrice,
             rules: [{ required: true, message: 'Please enter price/learner' }],
           })(
             <Input
+              size="small"
               type="number"
               style={{ borderRadius: 0 }}
               onKeyPress={e => {
@@ -144,39 +145,36 @@ function UpdateClinicRates({ form, rowData, ratesDrawer, setRatesDrawer }) {
             />,
           )}
         </Form.Item>
-        <Form.Item label="Research Participants">
+        <Form.Item label="Research Participants" style={{ marginBottom: '5px' }} size="small">
           {form.getFieldDecorator('researchParticipantPrice', {
             initialValue: rates?.researchParticipantPrice,
             rules: [{ required: true, message: 'Please enter research participant price' }],
-          })(<Input type="number" style={{ borderRadius: 0 }} />)}
+          })(<Input size="small" type="number" style={{ borderRadius: 0 }} />)}
         </Form.Item>
-        <Form.Item label="Last Invoice Amount">
+        <Form.Item label="Last Invoice Amount" style={{ marginBottom: '5px' }} size="small">
           {form.getFieldDecorator('lastInvoicePrice', {
             initialValue: rates?.lastInvoicePrice,
             rules: [{ required: true, message: 'Please enter last invoice' }],
-          })(<Input type="number" style={{ borderRadius: 0 }} />)}
+          })(<Input size="small" type="number" style={{ borderRadius: 0 }} />)}
         </Form.Item>
-        <Form.Item label="PEAK">
+        <Form.Item label="PEAK" style={{ marginBottom: '5px' }} size="small">
           {form.getFieldDecorator('peakPrice', {
             initialValue: rates?.peakPrice,
             loading: ratesLoading,
             rules: [{ required: true, message: 'Please enter price price' }],
-          })(<Input type="number" style={{ borderRadius: 0 }} />)}
+          })(<Input size="small" type="number" style={{ borderRadius: 0 }} />)}
         </Form.Item>
 
-        <Form.Item label="VBMAPP">
+        <Form.Item label="VBMAPP" style={{ marginBottom: '5px' }} size="small">
           {form.getFieldDecorator('vbmappPrice', {
             initialValue: rates?.vbmappPrice,
             loading: ratesLoading,
             rules: [{ required: true, message: 'Please enter vbmapp price' }],
-          })(<Input type="number" style={{ borderRadius: 0 }} />)}
+          })(<Input size="small" type="number" style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item {...tailLayout}>
-          <Button type="primary" htmlType="submit" style={SUBMITT_BUTTON}>
+          <Button type="primary" htmlType="submit" size="small">
             Save
-          </Button>
-          <Button type="ghost" style={CANCEL_BUTTON} onClick={() => setRatesDrawer(false)}>
-            Cancel
           </Button>
         </Form.Item>
       </Form>
