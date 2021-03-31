@@ -784,7 +784,7 @@ class LeaderTable extends React.Component {
         <div className={divClass}>
           <div style={{ marginTop: '24px', marginBottom: '50px' }}>
             {/* ************* DIV FOR filtering ************ */}
-            <div
+            {/* <div
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -794,9 +794,9 @@ class LeaderTable extends React.Component {
                 width: 'fit-content',
                 paddingTop: '4px',
               }}
-            >
-              {/* Search bar for name */}
-              <span style={{ display: 'flex', alignItems: 'center' }}>
+            > */}
+            {/* Search bar for name */}
+            {/* <span style={{ display: 'flex', alignItems: 'center' }}>
                 <span>Name :</span>
                 <Input
                   size="small"
@@ -812,9 +812,9 @@ class LeaderTable extends React.Component {
                   }}
                   style={{ ...tableFilterStyles, width: '112px' }}
                 />
-              </span>
-              {/* Search bar for email */}
-              <span style={{ display: 'flex', alignItems: 'center' }}>
+              </span> */}
+            {/* Search bar for email */}
+            {/* <span style={{ display: 'flex', alignItems: 'center' }}>
                 <span>Email :</span>
                 <Input
                   size="small"
@@ -830,9 +830,9 @@ class LeaderTable extends React.Component {
                   }}
                   style={{ ...tableFilterStyles, width: '148px' }}
                 />
-              </span>
-              {/* Search bar for project */}
-              <span style={{ display: 'flex', alignItems: 'center' }}>
+              </span> */}
+            {/* Search bar for project */}
+            {/* <span style={{ display: 'flex', alignItems: 'center' }}>
                 <span>project :</span>
                 <Input
                   size="small"
@@ -848,9 +848,9 @@ class LeaderTable extends React.Component {
                   }}
                   style={{ ...tableFilterStyles, width: '148px' }}
                 />
-              </span>
-              {/* Different kinds of status */}
-              <span style={{ display: 'flex', alignItems: 'center' }}>
+              </span> */}
+            {/* Different kinds of status */}
+            {/* <span style={{ display: 'flex', alignItems: 'center' }}>
                 <span>STATUS :</span>
                 <Select
                   placeholder="Status"
@@ -869,8 +869,8 @@ class LeaderTable extends React.Component {
                   <Select.Option value="DEMO">DEMO</Select.Option>
                   <Select.Option value="CONVERTED">CONVERTED</Select.Option>
                 </Select>
-              </span>
-            </div>
+              </span> */}
+            {/* </div> */}
             {/* ************* END OF DIV FOR filtering ************ */}
             {/* ************* DIV FOR DATA-TABLE ************ */}
             <div>
