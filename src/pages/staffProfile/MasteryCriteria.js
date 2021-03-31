@@ -226,16 +226,18 @@ const MasteryCriteria = () => {
   }
 
   return (
-    <div>
+    <div className="profileTab-container">
+      <div className="profileTab-heading">
+        <p>Mastery Criteria</p>
+      </div>
       <div className={styles.pageWrapper}>
-        <div className="d-flex justify-content-between" style={{ alignItems: 'center' }}>
-          <div className="tabTitle">Mastery Criteria</div>
+        <div className="d-flex" style={{ justifyContent: 'flex-end', paddingBottom: '12px' }}>
           <Button key="1" size="large" onClick={() => setNewMasterDrawer(true)}>
             <PlusOutlined className="addButton" />
           </Button>
         </div>
 
-        <div>
+        <div style={{ backgroundColor: 'white' }}>
           {tableData && (
             <Table
               dataSource={tableData}

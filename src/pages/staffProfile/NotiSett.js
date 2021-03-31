@@ -159,41 +159,48 @@ const SettingForm = () => {
   }
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <div>
       <div>
-        <SwitchFrom
-          title="Session Reminders"
-          info="Reminders for everyday sessions"
-          value={sessionReminders}
-          setValue={setSessionReminders}
-        />
-        <SwitchFrom
-          title="Data Recoreding"
-          info="Reminders for everyday data recoreding"
-          editMode={editMode}
-          value={dataRecordingReminders}
-          setValue={setDataRecordingReminders}
-        />
-        <SwitchFrom
-          title="Medical Reminders"
-          info="Reminders for everyday medical reminders"
-          value={medicalReminders}
-          setValue={setMedicalReminders}
-        />
-      </div>
-      {editMode && (
-        <div
-          style={{
-            marginTop: 15,
-            display: 'flex',
-          }}
-        >
-          <Button type="primary" htmlType="submit" loading={changeSettingLoading}>
-            Save
-          </Button>
+        <div className="profileTab-heading">
+          <p>Email Notification</p>
         </div>
-      )}
-    </Form>
+      </div>
+      <Form onSubmit={handleSubmit}>
+        <div>
+          <SwitchFrom
+            title="Session Reminders"
+            info="Reminders for everyday sessions"
+            value={sessionReminders}
+            setValue={setSessionReminders}
+          />
+          <SwitchFrom
+            title="Data Recoreding"
+            info="Reminders for everyday data recoreding"
+            editMode={editMode}
+            value={dataRecordingReminders}
+            setValue={setDataRecordingReminders}
+          />
+          <SwitchFrom
+            title="Medical Reminders"
+            info="Reminders for everyday medical reminders"
+            value={medicalReminders}
+            setValue={setMedicalReminders}
+          />
+        </div>
+        {editMode && (
+          <div
+            style={{
+              marginTop: 15,
+              display: 'flex',
+            }}
+          >
+            <Button type="primary" htmlType="submit" loading={changeSettingLoading}>
+              Save
+            </Button>
+          </div>
+        )}
+      </Form>
+    </div>
   )
 }
 

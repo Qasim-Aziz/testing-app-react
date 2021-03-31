@@ -44,9 +44,15 @@ const AssessmentsTab = props => {
 
   return (
     <>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div className="profileTab-heading">
+        <p>Assessment</p>
+      </div>
+      <div
+        style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
+        className="Assessment-container"
+      >
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <span style={{ fontWeight: 'bold', fontSize: '21px', margin: '8px 0 0 5px' }}>
+          <span style={{ fontSize: '18px', margin: '8px 0 0 5px' }}>
             {student.StudentName.length === 0 ? studentName : student.StudentName}
           </span>
           {user?.role !== 'parents' && (

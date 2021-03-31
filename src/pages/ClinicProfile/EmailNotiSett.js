@@ -64,13 +64,6 @@ const EmailNotiSett = () => {
     }
   }, [updateSettData, updateSettError])
 
-  const formItemLayout = {
-    labelCol: { span: 6 },
-    wrapperCol: { span: 5 },
-  }
-  const tailLayout = {
-    wrapperCol: { offset: 6, span: 5 },
-  }
   const handelChange = userType => () => {
     setChangeData(true)
     if (userType === 'parent') {
@@ -88,32 +81,47 @@ const EmailNotiSett = () => {
         <div>
           {mailError && <pre>{JSON.stringify(mailError, null, 2)}</pre>}
           {mailData && (
-            <Form {...formItemLayout} className="profileForm">
-              <Form.Item label="Parent Email Notification">
-                <Switch checked={parentId} onChange={handelChange('parent')} />
-              </Form.Item>
-              <Form.Item label="Therapist Email Notification">
-                <Switch checked={therapistId} onChange={handelChange('staff')} />
-              </Form.Item>
-              <Form.Item {...tailLayout}>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={updateSettLoading}
-                  onClick={() =>
-                    updateSett({
-                      variables: {
-                        parentMail: parentId,
-                        staffMail: therapistId,
-                      },
-                    })
-                  }
-                  disabled={!changeData}
-                >
-                  Save
-                </Button>
-              </Form.Item>
-            </Form>
+            <div>
+              <div className="profileTab-heading">
+                <p>Email Notificaiton</p>
+              </div>
+              <Form className="profileForm">
+                <div style={{ display: 'flex' }}>
+                  <Form.Item
+                    label="Parent Email Notification"
+                    style={{ width: '50%' }}
+                    className="form-label"
+                  >
+                    <Switch checked={parentId} onChange={handelChange('parent')} />
+                  </Form.Item>
+                  <Form.Item
+                    label="Therapist Email Notification"
+                    style={{ width: '50%' }}
+                    className="form-label"
+                  >
+                    <Switch checked={therapistId} onChange={handelChange('staff')} />
+                  </Form.Item>
+                </div>
+                <Form.Item style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={updateSettLoading}
+                    onClick={() =>
+                      updateSett({
+                        variables: {
+                          parentMail: parentId,
+                          staffMail: therapistId,
+                        },
+                      })
+                    }
+                    disabled={!changeData}
+                  >
+                    Save
+                  </Button>
+                </Form.Item>
+              </Form>
+            </div>
           )}
         </div>
       )}

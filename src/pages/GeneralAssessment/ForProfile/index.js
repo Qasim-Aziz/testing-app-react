@@ -136,33 +136,24 @@ function Assessment() {
   ]
 
   return (
-    <div>
+    <div className="profileTab-container">
+      <div className="profileTab-heading">
+        <p>Assessment</p>
+      </div>
       <Content
         style={{
-          padding: '0px 20px',
           maxWidth: '95%',
           width: '100%',
-          margin: '0px auto',
+          paddingTop: '2em',
         }}
       >
         <div
           style={{
             display: 'flex',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-end',
             alignItems: 'center',
           }}
         >
-          <Text
-            style={{
-              marginBottom: 20,
-              fontSize: 24,
-              marginTop: 15,
-              marginLeft: 5,
-              color: '#000',
-            }}
-          >
-            Assessment
-          </Text>
           <div style={{ display: 'flex', gap: '16px' }}>
             <Button
               type="primary"
@@ -177,7 +168,8 @@ function Assessment() {
             </Button>
           </div>
         </div>
-        <div style={{ width: '100%' }} className="gen-assess-table">
+
+        <div style={{ width: '100%', marginTop: '1em', backgroundColor: 'white' }} className="gen-assess-table">
           <Table
             dataSource={tableData}
             loading={genAssessLoading}

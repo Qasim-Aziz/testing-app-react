@@ -6,11 +6,8 @@ import { useSelector } from 'react-redux'
 import LoadingComponent from './LoadingComponent'
 
 const formItemLayout = {
-  labelCol: { span: 5 },
-  wrapperCol: { span: 10 },
-}
-const tailLayout = {
-  wrapperCol: { offset: 5, span: 10 },
+  labelCol: { span: 24 },
+  wrapperCol: { span: 24 },
 }
 
 const CONTACT_DETAILS = gql`
@@ -85,26 +82,31 @@ const ContactDetails = ({ form }) => {
       {schoolDataLoading && <LoadingComponent />}
       {schoolDataError && 'Opps their something is wrong'}
       {schoolData && (
-        <div className="profileForm">
-          <Form.Item label="Email">
-            {form.getFieldDecorator('email', {
-              initialValue: schoolData.staffs.edges[0]?.node.email,
-              rules: [{ required: true, message: 'Please give the clinic email!' }],
-            })(<Input style={{ width: '300px' }} placeholder="Type clinic email" />)}
-          </Form.Item>
+        <div>
+          <div className="profileTab-heading">
+            <p>Contact Details</p>
+          </div>
+          <div className="profileForm">
+            <Form.Item label="Email" className="form-label">
+              {form.getFieldDecorator('email', {
+                initialValue: schoolData.staffs.edges[0]?.node.email,
+                rules: [{ required: true, message: 'Please give the clinic email!' }],
+              })(<Input style={{ width: '300px' }} placeholder="Type clinic email" />)}
+            </Form.Item>
 
-          <Form.Item label="Phone Number">
-            {form.getFieldDecorator('phone', {
-              initialValue: schoolData.staffs.edges[0]?.node.contactNo,
-              rules: [{ required: true, message: 'Please give phone number!' }],
-            })(<Input style={{ width: '300px' }} placeholder="Type clinic phone number" />)}
-          </Form.Item>
+            <Form.Item label="Phone Number" className="form-label">
+              {form.getFieldDecorator('phone', {
+                initialValue: schoolData.staffs.edges[0]?.node.contactNo,
+                rules: [{ required: true, message: 'Please give phone number!' }],
+              })(<Input style={{ width: '300px' }} placeholder="Type clinic phone number" />)}
+            </Form.Item>
 
-          <Form.Item {...tailLayout}>
-            <Button type="primary" htmlType="submit" loading={updateDetailsLoading}>
-              Save
-            </Button>
-          </Form.Item>
+            <Form.Item>
+              <Button type="primary" htmlType="submit" loading={updateDetailsLoading}>
+                Save
+              </Button>
+            </Form.Item>
+          </div>
         </div>
       )}
     </Form>

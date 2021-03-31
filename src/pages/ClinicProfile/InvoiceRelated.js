@@ -175,64 +175,96 @@ const InvoiceRelated = ({ form }) => {
 
   return (
     <div className="profileForm invoice-related">
-      <Form.Item label="Bank Name" labelCol={{ span: 8 }} wrapperCol={{ span: 15 }}>
+      <div className="profileTab-heading">
+        <p>Invoice</p>
+      </div>
+      <Form.Item
+        label="Bank Name"
+        labelCol={{ span: 24 }}
+        wrapperCol={{ span: 24 }}
+        style={{ paddingTop: '2em' }}
+      >
         {form.getFieldDecorator('bankName', {
           initialValue: data.school.bankName,
           rules: [{ required: true, message: 'Please provide bank name' }],
-        })(<Input style={{ width: 220 }} />)}
+        })(<Input style={{ width: '80%' }} />)}
       </Form.Item>
-      <Form.Item label="A/C No" labelCol={{ span: 8 }} wrapperCol={{ span: 15 }}>
-        {form.getFieldDecorator('accountNo', {
-          initialValue: data.school.bankAccountNo,
-          rules: [{ required: true, message: 'Please provide account number' }],
-        })(<Input style={{ width: 220 }} />)}
-      </Form.Item>
-      <Form.Item label="IFSC Code" labelCol={{ span: 8 }} wrapperCol={{ span: 15 }}>
-        {form.getFieldDecorator('ifscCode', {
-          initialValue: data.school.ifscCode,
-          rules: [{ required: true, message: "Please provide bank's IFSC code" }],
-        })(<Input style={{ width: 220 }} />)}
-      </Form.Item>
-      <Form.Item label="A/C Holder's Name" labelCol={{ span: 8 }} wrapperCol={{ span: 15 }}>
+      <div style={{ display: 'flex' }}>
+        <Form.Item
+          label="A/C No"
+          labelCol={{ span: 24 }}
+          wrapperCol={{ span: 24 }}
+          style={{ width: '40%', paddingRight: '1em' }}
+        >
+          {form.getFieldDecorator('accountNo', {
+            initialValue: data.school.bankAccountNo,
+            rules: [{ required: true, message: 'Please provide account number' }],
+          })(<Input style={{ width: '100%' }} />)}
+        </Form.Item>
+        <Form.Item
+          label="IFSC Code"
+          labelCol={{ span: 24 }}
+          wrapperCol={{ span: 24 }}
+          style={{ width: '40%' }}
+        >
+          {form.getFieldDecorator('ifscCode', {
+            initialValue: data.school.ifscCode,
+            rules: [{ required: true, message: "Please provide bank's IFSC code" }],
+          })(<Input style={{ width: '100%' }} />)}
+        </Form.Item>
+      </div>
+      <Form.Item label="A/C Holder's Name" labelCol={{ span: 24 }} wrapperCol={{ span: 24 }}>
         {form.getFieldDecorator('accountHolderName', {
           initialValue: data.school.accountHolderName,
           rules: [{ required: true, message: 'Please provide account holder name' }],
-        })(<Input style={{ width: 220 }} />)}
+        })(<Input style={{ width: '80%' }} />)}
       </Form.Item>
-      <Form.Item label="Billing Name" labelCol={{ span: 8 }} wrapperCol={{ span: 15 }}>
-        {form.getFieldDecorator('billingName', {
-          initialValue: data.school.billingName ? data.school.billingName : data.school.schoolName,
-          rules: [{ required: true, message: 'Please provide bank name' }],
-        })(<Input style={{ width: 220 }} />)}
-      </Form.Item>
-      <Form.Item label="Change Currency" labelCol={{ span: 8 }} wrapperCol={{ span: 15 }}>
-        {form.getFieldDecorator('invoiceCurrency', {
-          initialValue: data.school.currency.id,
-          rules: [{ required: true, message: 'Please provide invoice currency' }],
-        })(
-          <Select
-            loading={currencyLoading}
-            defaultActiveFirstOption
-            placeholder="Select a currency"
-            style={{ width: 220 }}
-          >
-            {currencyData?.currency.map(({ id, currency, symbol }) => {
-              return (
-                <Option key={id} value={id}>
-                  {`${symbol} - ${currency}`}
-                </Option>
-              )
-            })}
-          </Select>,
-        )}
-      </Form.Item>
-      <Row>
-        <Col offset={8}>
-          <Button loading={updateInvoiceDetailLoading} type="primary" onClick={handleSubmit}>
-            Save
-          </Button>
-        </Col>
-      </Row>
+      <div style={{ display: 'flex' }}>
+        <Form.Item
+          label="Billing Name"
+          labelCol={{ span: 24 }}
+          wrapperCol={{ span: 24 }}
+          style={{ width: '40%', paddingRight: '1em' }}
+        >
+          {form.getFieldDecorator('billingName', {
+            initialValue: data.school.billingName
+              ? data.school.billingName
+              : data.school.schoolName,
+            rules: [{ required: true, message: 'Please provide bank name' }],
+          })(<Input style={{ width: '100%' }} />)}
+        </Form.Item>
+        <Form.Item
+          label="Change Currency"
+          labelCol={{ span: 24 }}
+          wrapperCol={{ span: 24 }}
+          style={{ width: '40%' }}
+        >
+          {form.getFieldDecorator('invoiceCurrency', {
+            initialValue: data.school.currency.id,
+            rules: [{ required: true, message: 'Please provide invoice currency' }],
+          })(
+            <Select
+              loading={currencyLoading}
+              defaultActiveFirstOption
+              placeholder="Select a currency"
+              style={{ width: '100%' }}
+            >
+              {currencyData?.currency.map(({ id, currency, symbol }) => {
+                return (
+                  <Option key={id} value={id}>
+                    {`${symbol} - ${currency}`}
+                  </Option>
+                )
+              })}
+            </Select>,
+          )}
+        </Form.Item>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <Button loading={updateInvoiceDetailLoading} type="primary" onClick={handleSubmit}>
+          Save
+        </Button>
+      </div>
     </div>
   )
 }

@@ -146,8 +146,10 @@ const Location = () => {
 
   return (
     <div>
-      <div className="d-flex justify-content-between" style={{ alignItems: 'center' }}>
-        <div className="tabTitle">Locations</div>
+      <div className="profileTab-heading">
+        <p>Location Setting</p>
+      </div>
+      <div className="d-flex" style={{ justifyContent: 'flex-end' }}>
         <Button key="1" size="large" onClick={() => setIsAddLocationDrawerOpened(true)}>
           <PlusOutlined className="addButton" />
         </Button>

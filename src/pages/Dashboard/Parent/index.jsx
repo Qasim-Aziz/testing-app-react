@@ -8,7 +8,7 @@ import '../Style.scss'
 
 const TherapistDashboard = () => {
   const [activeTabKey, setActiveTabKey] = useState('1')
-  const [activeProfileTabKey, setActiveProfileTabKey] = useState('1')
+  const [activeProfileTabKey, setActiveProfileTabKey] = useState('contact-details')
 
   const updateActiveProfileTab = updatedKey => {
     setActiveTabKey('2') // Open Profile Tab first

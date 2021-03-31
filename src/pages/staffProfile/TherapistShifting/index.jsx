@@ -71,65 +71,86 @@ const TherapistShifting = () => {
   if (shiftErrors) return <h3>An error occurred to load shifting details.</h3>
 
   return (
-    <Form
-      onSubmit={handleSubmit}
-      className="therapistShiftingTab"
-      size="small"
-      labelCol={{ span: 10 }}
-      wrapperCol={{ span: 12 }}
-    >
-      <Row>
-        <Col sm={12} md={12} lg={12}>
-          <Form.Item label="Start Time" labelCol={{ offset: 1, sm: 9 }} wrapperCol={{ sm: 13 }}>
-            <TimePicker
-              placeholder="Start Time"
-              format="HH:mm"
-              minuteStep={30}
-              value={startTime}
-              onChange={setStartTime}
-            />
-          </Form.Item>
-        </Col>
-        <Col sm={12} md={12} lg={12}>
-          <Form.Item label="End Time" labelCol={{ sm: 6 }} wrapperCol={{ sm: 17 }}>
-            <TimePicker
-              placeholder="End Time"
-              format="HH:mm"
-              minuteStep={30}
-              value={endTime}
-              onChange={setEndTime}
-            />
-          </Form.Item>
-        </Col>
-      </Row>
-
-      <Row>
-        <Col sm={24} md={24} lg={24}>
-          <Form.Item label="Working Days" labelCol={{ offset: 1, sm: 4 }} wrapperCol={{ sm: 18 }}>
-            <Select
-              placeholder="Select Working Days"
-              showSearch
-              optionFilterProp="displayText"
-              mode="tags"
-              value={selectedDays}
-              onChange={setSelectedDays}
+    <div>
+      <div className="profileTab-heading">
+        <p>Therapist Shifting</p>
+      </div>
+      <Form
+        onSubmit={handleSubmit}
+        className="therapistShiftingTab"
+        size="small"
+        labelCol={{ span: 10 }}
+        wrapperCol={{ span: 12 }}
+        style={{ paddingTop: '1em' }}
+      >
+        <Row style={{ display: 'flex' }}>
+          <Col>
+            <Form.Item
+              label="Start Time"
+              labelCol={{ span: 24 }}
+              wrapperCol={{ span: 24 }}
+              className="form-label"
             >
-              {days.map(day => (
-                <Select.Option key={day} name={day}>
-                  {day}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-        </Col>
-      </Row>
+              <TimePicker
+                placeholder="Start Time"
+                format="HH:mm"
+                minuteStep={30}
+                value={startTime}
+                onChange={setStartTime}
+              />
+            </Form.Item>
+          </Col>
+          <Col sm={12} md={12} lg={12}>
+            <Form.Item
+              label="End Time"
+              labelCol={{ span: 24 }}
+              wrapperCol={{ span: 24 }}
+              className="form-label"
+            >
+              <TimePicker
+                placeholder="End Time"
+                format="HH:mm"
+                minuteStep={30}
+                value={endTime}
+                onChange={setEndTime}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
 
-      <Form.Item style={{ textAlign: 'center' }}>
-        <Button type="primary" htmlType="submit" disabled={isUpdateShiftingLoading}>
-          Save
-        </Button>
-      </Form.Item>
-    </Form>
+        <Row>
+          <Col>
+            <Form.Item
+              label="Working Days"
+              labelCol={{ span: 24 }}
+              wrapperCol={{ span: 24 }}
+              className="form-label"
+            >
+              <Select
+                placeholder="Select Working Days"
+                showSearch
+                optionFilterProp="displayText"
+                mode="tags"
+                value={selectedDays}
+                onChange={setSelectedDays}
+              >
+                {days.map(day => (
+                  <Select.Option key={day} name={day}>
+                    {day}
+                  </Select.Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Form.Item>
+          <Button type="primary" htmlType="submit" disabled={isUpdateShiftingLoading}>
+            Save
+          </Button>
+        </Form.Item>
+      </Form>
+    </div>
   )
 }
 

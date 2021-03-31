@@ -13,6 +13,7 @@ import {
   Col,
   Divider,
 } from 'antd'
+import gql from 'graphql-tag'
 import { useMutation } from 'react-apollo'
 import moment from 'moment'
 import { times } from 'ramda'
@@ -187,61 +188,30 @@ const CreateOrUpdateTask = ({ tasks, form, task, onClose, dispatch, user }) => {
       })
     }
   }, [createTaskData])
-
+  console.log(task)
+  console.log(tasks)
+  console.log(user)
   console.log(reminder, 'reminder')
   return (
-    <Form name="manageTasks" onSubmit={SubmitForm} className="CreateOrUpdate">
-      <Divider orientation="left">Basic Details</Divider>
+    <div>
+      <Form name="manageTasks" onSubmit={SubmitForm} className="CreateOrUpdate">
+        <Divider orientation="left">Basic Details</Divider>
 
-      {/* Task Type */}
-      <Row>
-        <Col span={24}>
-          <Form.Item label="Task Type" labelCol={{ sm: 4 }} wrapperCol={{ sm: 20 }}>
-            {form.getFieldDecorator('taskType', {
-              rules: [{ required: true, message: 'Select Task Type' }],
-            })(
-              <Select
-                placeholder="Select Task Type"
-                allowClear
-                onSelect={handleTaskTypeSelectionChange}
-              >
-                {taskType.map(item => (
-                  <Option key={item.id} value={item.id}>
-                    {item.taskType}
-                  </Option>
-                ))}
-              </Select>,
-            )}
-          </Form.Item>
-        </Col>
-      </Row>
-
-      {/* Task Name */}
-      <Row>
-        <Col span={24}>
-          <Form.Item label="Task Name" labelCol={{ sm: 4 }} wrapperCol={{ sm: 20 }}>
-            {form.getFieldDecorator('taskName', {
-              rules: [{ required: true, message: 'Enter Task Name!' }],
-            })(<Input placeholder="Task Name" />)}
-          </Form.Item>
-        </Col>
-      </Row>
-
-      {/* Therapist */}
-      {taskSelected !== 'Reminder' && (
+        {/* Task Type */}
         <Row>
           <Col span={24}>
-            <Form.Item label="Therapists" labelCol={{ sm: 4 }} wrapperCol={{ sm: 20 }}>
-              {form.getFieldDecorator('therapists')(
+            <Form.Item label="Task Type" labelCol={{ sm: 4 }} wrapperCol={{ sm: 20 }}>
+              {form.getFieldDecorator('taskType', {
+                rules: [{ required: true, message: 'Select Task Type' }],
+              })(
                 <Select
-                  mode="multiple"
-                  optionFilterProp="label"
-                  placeholder="Select Therapists"
+                  placeholder="Select Task Type"
                   allowClear
+                  onSelect={handleTaskTypeSelectionChange}
                 >
-                  {staffsList.edges.map(item => (
-                    <Option key={item.node.id} value={item.node.id} label={item.node.name}>
-                      {item.node.name}
+                  {taskType.map(item => (
+                    <Option key={item.id} value={item.id}>
+                      {item.taskType}
                     </Option>
                   ))}
                 </Select>,
@@ -249,180 +219,219 @@ const CreateOrUpdateTask = ({ tasks, form, task, onClose, dispatch, user }) => {
             </Form.Item>
           </Col>
         </Row>
-      )}
 
-      {/* Learners */}
-      {taskSelected !== 'Reminder' && user.role !== 'parents' && (
+        {/* Task Name */}
         <Row>
           <Col span={24}>
-            <Form.Item label="Learners" labelCol={{ sm: 4 }} wrapperCol={{ sm: 20 }}>
-              {form.getFieldDecorator('learners')(
-                <Select
-                  mode="multiple"
-                  optionFilterProp="label"
-                  placeholder="Select learners"
-                  allowClear
-                >
-                  {learnersList.edges.map(item => (
-                    <Option key={item.node.id} value={item.node.id} label={item.node.firstname}>
-                      {item.node.firstname}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
+            <Form.Item label="Task Name" labelCol={{ sm: 4 }} wrapperCol={{ sm: 20 }}>
+              {form.getFieldDecorator('taskName', {
+                rules: [{ required: true, message: 'Enter Task Name!' }],
+              })(<Input placeholder="Task Name" />)}
             </Form.Item>
           </Col>
         </Row>
-      )}
 
-      {/* Start Date - End Date */}
-      {taskSelected !== 'Notes' && (
-        <Row>
-          <Col sm={24} md={12}>
-            <Form.Item label="Start Date" labelCol={{ sm: 8 }} wrapperCol={{ sm: 16 }}>
-              {form.getFieldDecorator('startDate', {
-                rules: [{ required: true, message: 'Please provide Start Date!' }],
-              })(<DatePicker />)}
-            </Form.Item>
-          </Col>
-          <Col sm={24} md={12}>
-            <Form.Item label="End Date" labelCol={{ sm: 8 }} wrapperCol={{ sm: 16 }}>
-              {form.getFieldDecorator('dueDate', {
-                rules: [{ required: true, message: 'Please provide End Date!' }],
-              })(<DatePicker />)}
-            </Form.Item>
-          </Col>
-        </Row>
-      )}
-
-      {/* Status - Priority */}
-      {taskSelected !== 'Notes' && (
-        <Row>
-          <Col sm={24} md={12}>
-            <Form.Item label="Status" labelCol={{ sm: 8 }} wrapperCol={{ sm: 16 }}>
-              {form.getFieldDecorator('status', {
-                rules: [{ required: true, message: 'Select Status' }],
-              })(
-                <Select placeholder="Select Status" allowClear>
-                  {taskStatus.map(item => (
-                    <Option key={item.id} value={item.id}>
-                      {item.taskStatus}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </Form.Item>
-          </Col>
-          <Col sm={24} md={12}>
-            <Form.Item label="Priority" labelCol={{ sm: 8 }} wrapperCol={{ sm: 16 }}>
-              {form.getFieldDecorator('priority', {
-                rules: [{ required: true, message: 'Please Select Priority!' }],
-              })(
-                <Select placeholder="Select Priority" allowClear>
-                  {priority.map(item => (
-                    <Option key={item.id} value={item.id}>
-                      {item.name}
-                    </Option>
-                  ))}
-                </Select>,
-              )}
-            </Form.Item>
-          </Col>
-        </Row>
-      )}
-
-      {/* Task Summary" */}
-      <Row>
-        <Col span={24}>
-          <Form.Item label="Summary" labelCol={{ sm: 4 }} wrapperCol={{ sm: 20 }}>
-            {form.getFieldDecorator('description')(
-              <TextArea placeholder="Task Summary" autoSize={{ minRows: 3 }} />,
-            )}
-          </Form.Item>
-        </Col>
-      </Row>
-
-      {/* Reminder */}
-      {taskSelected !== 'Notes' && (
-        <>
-          <Divider orientation="left">Reminder</Divider>
+        {/* Therapist */}
+        {taskSelected !== 'Reminder' && (
           <Row>
-            <Col sm={12} md={12} lg={12}>
-              <Form.Item
-                label="Set Reminders"
-                labelCol={{ offset: 1, sm: 10 }}
-                wrapperCol={{ sm: 12 }}
-              >
-                <Switch checked={reminder} onChange={setReminder} />
+            <Col span={24}>
+              <Form.Item label="Therapists" labelCol={{ sm: 4 }} wrapperCol={{ sm: 20 }}>
+                {form.getFieldDecorator('therapists')(
+                  <Select
+                    mode="multiple"
+                    optionFilterProp="label"
+                    placeholder="Select Therapists"
+                    allowClear
+                  >
+                    {staffsList.edges.map(item => (
+                      <Option key={item.node.id} value={item.node.id} label={item.node.name}>
+                        {item.node.name}
+                      </Option>
+                    ))}
+                  </Select>,
+                )}
               </Form.Item>
             </Col>
           </Row>
+        )}
 
-          <div>
-            {times(n => {
-              return (
-                <ReminderForm
-                  key={n}
-                  reminder={reminder}
-                  dispatch={remainderDispatch}
-                  state={remainderState}
-                  index={n}
-                  setRemainderCount={setRemainderCount}
-                />
-              )
-            }, remainderCount)}
+        {/* Learners */}
+        {taskSelected !== 'Reminder' && user.role !== 'parents' && (
+          <Row>
+            <Col span={24}>
+              <Form.Item label="Learners" labelCol={{ sm: 4 }} wrapperCol={{ sm: 20 }}>
+                {form.getFieldDecorator('learners')(
+                  <Select
+                    mode="multiple"
+                    optionFilterProp="label"
+                    placeholder="Select learners"
+                    allowClear
+                  >
+                    {learnersList.edges.map(item => (
+                      <Option key={item.node.id} value={item.node.id} label={item.node.firstname}>
+                        {item.node.firstname}
+                      </Option>
+                    ))}
+                  </Select>,
+                )}
+              </Form.Item>
+            </Col>
+          </Row>
+        )}
+
+        {/* Start Date - End Date */}
+        {taskSelected !== 'Notes' && (
+          <Row>
+            <Col sm={24} md={12}>
+              <Form.Item label="Start Date" labelCol={{ sm: 8 }} wrapperCol={{ sm: 16 }}>
+                {form.getFieldDecorator('startDate', {
+                  rules: [{ required: true, message: 'Please provide Start Date!' }],
+                })(<DatePicker />)}
+              </Form.Item>
+            </Col>
+            <Col sm={24} md={12}>
+              <Form.Item label="End Date" labelCol={{ sm: 8 }} wrapperCol={{ sm: 16 }}>
+                {form.getFieldDecorator('dueDate', {
+                  rules: [{ required: true, message: 'Please provide End Date!' }],
+                })(<DatePicker />)}
+              </Form.Item>
+            </Col>
+          </Row>
+        )}
+
+        {/* Status - Priority */}
+        {taskSelected !== 'Notes' && (
+          <Row>
+            <Col sm={24} md={12}>
+              <Form.Item label="Status" labelCol={{ sm: 8 }} wrapperCol={{ sm: 16 }}>
+                {form.getFieldDecorator('status', {
+                  rules: [{ required: true, message: 'Select Status' }],
+                })(
+                  <Select placeholder="Select Status" allowClear>
+                    {taskStatus.map(item => (
+                      <Option key={item.id} value={item.id}>
+                        {item.taskStatus}
+                      </Option>
+                    ))}
+                  </Select>,
+                )}
+              </Form.Item>
+            </Col>
+            <Col sm={24} md={12}>
+              <Form.Item label="Priority" labelCol={{ sm: 8 }} wrapperCol={{ sm: 16 }}>
+                {form.getFieldDecorator('priority', {
+                  rules: [{ required: true, message: 'Please Select Priority!' }],
+                })(
+                  <Select placeholder="Select Priority" allowClear>
+                    {priority.map(item => (
+                      <Option key={item.id} value={item.id}>
+                        {item.name}
+                      </Option>
+                    ))}
+                  </Select>,
+                )}
+              </Form.Item>
+            </Col>
+          </Row>
+        )}
+
+        {/* Task Summary" */}
+        <Row>
+          <Col span={24}>
+            <Form.Item label="Summary" labelCol={{ sm: 4 }} wrapperCol={{ sm: 20 }}>
+              {form.getFieldDecorator('description')(
+                <TextArea placeholder="Task Summary" autoSize={{ minRows: 3 }} />,
+              )}
+            </Form.Item>
+          </Col>
+        </Row>
+
+        {/* Reminder */}
+        {taskSelected !== 'Notes' && (
+          <>
+            <Divider orientation="left">Reminder</Divider>
             <Row>
-              <Col offset={6} span={12}>
-                <Button
-                  type="dashed"
-                  onClick={() => {
-                    setRemainderCount(state => state + 1)
-                    remainderDispatch({ type: 'ADD_REMAINDER' })
-                  }}
-                  style={{ width: '100%', margin: '10px 0px' }}
+              <Col sm={12} md={12} lg={12}>
+                <Form.Item
+                  label="Set Reminders"
+                  labelCol={{ offset: 1, sm: 10 }}
+                  wrapperCol={{ sm: 12 }}
                 >
-                  <PlusOutlined /> Add another reminder
-                </Button>
+                  <Switch checked={reminder} onChange={setReminder} />
+                </Form.Item>
               </Col>
             </Row>
-          </div>
-        </>
-      )}
 
-      {/* Task complete */}
-      <Row>
-        <Col>
-          <Form.Item label="Task Completed" labelCol={{ sm: 6 }} wrapperCol={{ offset: 1, sm: 17 }}>
-            <Button
-              disabled={taskCompletionCount === 0}
-              onClick={() => {
-                setTaskCompletionCount(taskCompletionCount > 0 ? taskCompletionCount - 1 : 0)
-              }}
-            >
-              <MinusOutlined />
-            </Button>
-            <Text className="taskCompletionCount">{taskCompletionCount}</Text>
-            <Button
-              onClick={() => {
-                setTaskCompletionCount(taskCompletionCount + 1)
-              }}
-            >
-              <PlusOutlined />
-            </Button>
-          </Form.Item>
-        </Col>
-      </Row>
+            <div>
+              {times(n => {
+                return (
+                  <ReminderForm
+                    key={n}
+                    reminder={reminder}
+                    dispatch={remainderDispatch}
+                    state={remainderState}
+                    index={n}
+                    setRemainderCount={setRemainderCount}
+                  />
+                )
+              }, remainderCount)}
+              <Row>
+                <Col offset={6} span={12}>
+                  <Button
+                    type="dashed"
+                    onClick={() => {
+                      setRemainderCount(state => state + 1)
+                      remainderDispatch({ type: 'ADD_REMAINDER' })
+                    }}
+                    style={{ width: '100%', margin: '10px 0px' }}
+                  >
+                    <PlusOutlined /> Add another reminder
+                  </Button>
+                </Col>
+              </Row>
+            </div>
+          </>
+        )}
 
-      {/* Buttons */}
-      <Form.Item style={{ textAlign: 'center' }}>
-        <Button type="primary" loading={createTaskLoading} htmlType="submit">
-          Submit
-        </Button>
-        <Button onClick={onClose} className="ml-4">
-          Cancel
-        </Button>
-      </Form.Item>
-    </Form>
+        {/* Task complete */}
+        <Row>
+          <Col>
+            <Form.Item
+              label="Task Completed"
+              labelCol={{ sm: 6 }}
+              wrapperCol={{ offset: 1, sm: 17 }}
+            >
+              <Button
+                disabled={taskCompletionCount === 0}
+                onClick={() => {
+                  setTaskCompletionCount(taskCompletionCount > 0 ? taskCompletionCount - 1 : 0)
+                }}
+              >
+                <MinusOutlined />
+              </Button>
+              <Text className="taskCompletionCount">{taskCompletionCount}</Text>
+              <Button
+                onClick={() => {
+                  setTaskCompletionCount(taskCompletionCount + 1)
+                }}
+              >
+                <PlusOutlined />
+              </Button>
+            </Form.Item>
+          </Col>
+        </Row>
+
+        {/* Buttons */}
+        <Form.Item style={{ textAlign: 'center' }}>
+          <Button type="primary" loading={createTaskLoading} htmlType="submit">
+            Submit
+          </Button>
+          <Button onClick={onClose} className="ml-4">
+            Cancel
+          </Button>
+        </Form.Item>
+      </Form>
+    </div>
   )
 }
 

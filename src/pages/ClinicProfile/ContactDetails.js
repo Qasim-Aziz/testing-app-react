@@ -78,56 +78,73 @@ const ContactDetails = ({ form }) => {
   })
 
   return (
-    <Form {...formItemLayout} className="profileForm" onSubmit={handelSubmit}>
-      {schoolDataLoading && <LoadingComponent />}
-      {schoolDataError && 'Opps their something is wrong'}
-      {schoolData && (
-        <div>
-          <div>
-            <Form.Item
-              style={{ marginBottom: 24 }}
-              label="Address"
-              labelCol={{ lg: 5, sm: 8 }}
-              wrapperCol={{ lg: 10, sm: 16 }}
-            >
-              {form.getFieldDecorator('address', {
-                initialValue: schoolData.schoolDetail.address,
-                rules: [
-                  {
-                    required: true,
-                    message: 'Please give the clinic address!',
-                  },
-                ],
-              })(<Input.TextArea placeholder="Type clinic address" />)}
-            </Form.Item>
+    <div>
+      <div className="profileTab-heading">
+        <p>Contact Details</p>
+      </div>
+      <div>
+        <Form className="profileForm" onSubmit={handelSubmit} style={{ paddingTop: '2em' }}>
+          {schoolDataLoading && <LoadingComponent />}
+          {schoolDataError && 'Opps their something is wrong'}
+          {schoolData && (
+            <div>
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                  <Form.Item
+                    label="Email"
+                    labelCol={{ span: 24 }}
+                    wrapperCol={{ span: 24 }}
+                    style={{ paddingRight: '24px', width: '52%' }}
+                    className="form-label"
+                  >
+                    {form.getFieldDecorator('email', {
+                      initialValue: schoolData.schoolDetail.email,
+                      rules: [{ required: true, message: 'Please give the clinic email!' }],
+                    })(<Input placeholder="Type clinic email" />)}
+                  </Form.Item>
 
-            <Form.Item label="Email" labelCol={{ lg: 5, sm: 8 }} wrapperCol={{ lg: 10, sm: 16 }}>
-              {form.getFieldDecorator('email', {
-                initialValue: schoolData.schoolDetail.email,
-                rules: [{ required: true, message: 'Please give the clinic email!' }],
-              })(<Input placeholder="Type clinic email" />)}
-            </Form.Item>
+                  <Form.Item
+                    label="Phone Number"
+                    labelCol={{ span: 24 }}
+                    wrapperCol={{ span: 24 }}
+                    className="form-label"
+                    style={{ width: '48%' }}
+                  >
+                    {form.getFieldDecorator('phone', {
+                      initialValue: schoolData.schoolDetail.contactNo,
+                      rules: [{ required: true, message: 'Please give phone number!' }],
+                    })(<Input placeholder="Type clinic phone number" />)}
+                  </Form.Item>
+                </div>
+                <Form.Item
+                  style={{ marginBottom: 24 }}
+                  label="Address"
+                  labelCol={{ span: 24 }}
+                  wrapperCol={{ span: 24 }}
+                  className="form-label"
+                >
+                  {form.getFieldDecorator('address', {
+                    initialValue: schoolData.schoolDetail.address,
+                    rules: [
+                      {
+                        required: true,
+                        message: 'Please give the clinic address!',
+                      },
+                    ],
+                  })(<Input placeholder="Type clinic address" />)}
+                </Form.Item>
+              </div>
 
-            <Form.Item
-              label="Phone Number"
-              labelCol={{ lg: 5, sm: 8 }}
-              wrapperCol={{ lg: 10, sm: 16 }}
-            >
-              {form.getFieldDecorator('phone', {
-                initialValue: schoolData.schoolDetail.contactNo,
-                rules: [{ required: true, message: 'Please give phone number!' }],
-              })(<Input placeholder="Type clinic phone number" />)}
-            </Form.Item>
-          </div>
-
-          <Form.Item {...tailLayout}>
-            <Button type="primary" htmlType="submit" loading={updateDetailsLoading}>
-              Save
-            </Button>
-          </Form.Item>
-        </div>
-      )}
-    </Form>
+              <Form.Item style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Button type="primary" htmlType="submit" loading={updateDetailsLoading}>
+                  Save
+                </Button>
+              </Form.Item>
+            </div>
+          )}
+        </Form>
+      </div>
+    </div>
   )
 }
 

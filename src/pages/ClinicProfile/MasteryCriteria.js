@@ -242,13 +242,17 @@ const MasteryCriteria = () => {
 
   console.log(visible, newMasterDrawer, updateChildFormDrawer, updateMaster, 'visible')
   return (
-    <div>
+    <div className="profileTab-container">
+      <div className="profileTab-heading">
+        <p>Master Criteria</p>
+      </div>
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
           alignItems: 'flex-end',
+          paddingTop: '2em',
         }}
       >
         <div
@@ -278,6 +282,7 @@ const MasteryCriteria = () => {
             rowKey={record => record.id}
             expandedRowRender={expandedRowRender}
             expandRowByClick
+            style={{ backgroundColor: 'white' }}
           />
         )}
       </div>

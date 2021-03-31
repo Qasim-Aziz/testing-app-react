@@ -167,39 +167,6 @@ const SUBMODULE = gql`
   }
 `
 
-// const UPDATE_COMMENT = gql`
-//   mutation(
-//     $id: ID!
-//     $comment: String!
-//   ) {
-//     updateTicket(
-//       input:{
-//         pk: $id
-//         comments:[$comment]
-//     }
-//     )
-//       {
-//           ticket
-//           {
-//               id
-//             comments{
-//                 edges{
-//                     node{
-//                         id
-//                         time
-//                         comment
-//                         user{
-//                             id
-//                             username
-//                         }
-//                     }
-//                 }
-//             }
-//           }
-//       }
-//   }
-// `
-
 export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpdateTicketData }) => {
   const { data, loading, error } = useQuery(TICKET_QUERY, {
     variables: {
@@ -247,28 +214,6 @@ export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpda
     }
   }, [updateTicketError])
 
-  // const [
-  //   updateComment,
-  //   { data: updateCommentData, error: updateCommentError, loading: updateCommentLoading},
-  // ] = useMutation(UPDATE_COMMENT)
-
-  // useEffect(() => {
-  //   if (updateCommentData) {
-  //     notification.success({
-  //       message: 'comment added successfully'
-  //     })
-  //     setUpdateTicketId(null)
-  //   }
-  // }, [updateCommentData])
-
-  // useEffect(() => {
-  //   if (updateCommentError) {
-  //     notification.success({
-  //       message: 'Failed to add comment'
-  //     })
-  //   }
-  // }, [updateCommentError])
-
   const handleSubmit = e => {
     e.preventDefault()
     // eslint-disable-next-line no-shadow
@@ -290,21 +235,6 @@ export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpda
       }
     })
   }
-
-  // const handleCommentSubmit = e => {
-  //   e.preventDefault()
-  //   // eslint-disable-next-line no-shadow
-  //   form.validateFields((error, values) => {
-  //     if (!error) {
-  //       updateComment({
-  //         variables: {
-  //           id: updateTicketId,
-  //           comment: values.comment
-  //         },
-  //       })
-  //     }
-  //   })
-  // }
 
   if (loading) {
     return 'Loading'
@@ -454,24 +384,6 @@ export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpda
           </Button>
         </div>
       </Form>
-      {/* <div style={{marginTop: '4em'}}>
-        <Form onSubmit={handleCommentSubmit} style={{display: 'flex', }}>
-          <Form.Item style={{display: 'flex', width: '90%' }} className="TimeLine-Form">
-            {form.getFieldDecorator('comment', {
-            rules: [{ required: false, message: 'Please add comment!' }],
-            })(<Input placeholder="Add comment here" size="large" />)}
-          </Form.Item> 
-          
-          <Button
-            type="primary"
-            htmlType="submit"
-            style={{backgroundColor: 'white', border: '1px solid #3DBE29', color: '#3DBE29'}}
-            loading={updateTicketLoading}
-          >
-            Add Comment
-          </Button>
-        </Form>
-          </div> */}
     </div>
   )
 })

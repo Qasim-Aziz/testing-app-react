@@ -187,7 +187,10 @@ const SessionSettingTab = () => {
         <span>Loading...</span>
       ) : (
         <>
-          <table>
+          <div className="profileTab-heading">
+            <p>Session Setting</p>
+          </div>
+          <table style={{ paddingTop: '2em', backgroundColor: 'white' }}>
             <tbody>
               <tr>
                 <td style={{ ...tdStyle, width: 200 }}>

@@ -19,14 +19,6 @@ import { Button, Switch, Form, Input, Icon, notification } from 'antd'
 import gql from 'graphql-tag'
 import apolloClient from '../../apollo/config'
 
-const formItemLayout = {
-  labelCol: { span: 5 },
-  wrapperCol: { span: 10 },
-}
-const tailFormItemLayout = {
-  wrapperCol: { offset: 5, span: 10 },
-}
-
 class ChangePasswordForm extends React.Component {
   constructor(props) {
     super(props)
@@ -105,8 +97,17 @@ class ChangePasswordForm extends React.Component {
 
     return (
       <div className="profileForm">
-        <Form {...formItemLayout} onSubmit={this.handleSubmit}>
-          <Form.Item label="Current Password" hasFeedback>
+        <div className="profileTab-heading">
+          <p>Change Password</p>
+        </div>
+        <Form onSubmit={this.handleSubmit} style={{ paddingTop: '2em' }}>
+          <Form.Item
+            label="Current Password"
+            hasFeedback
+            labelCol={{ span: 24 }}
+            wrapperCol={{ span: 24 }}
+            className="form-label"
+          >
             {getFieldDecorator('oldPassword', {
               rules: [
                 {
@@ -116,7 +117,13 @@ class ChangePasswordForm extends React.Component {
               ],
             })(<Input.Password />)}
           </Form.Item>
-          <Form.Item label="New Password" hasFeedback>
+          <Form.Item
+            label="New Password"
+            hasFeedback
+            labelCol={{ span: 24 }}
+            wrapperCol={{ span: 24 }}
+            className="form-label"
+          >
             {getFieldDecorator('password', {
               rules: [
                 {
@@ -129,7 +136,13 @@ class ChangePasswordForm extends React.Component {
               ],
             })(<Input.Password />)}
           </Form.Item>
-          <Form.Item label="Confirm Password" hasFeedback>
+          <Form.Item
+            label="Confirm Password"
+            hasFeedback
+            labelCol={{ span: 24 }}
+            wrapperCol={{ span: 24 }}
+            className="form-label"
+          >
             {getFieldDecorator('confirm', {
               rules: [
                 {
@@ -142,7 +155,7 @@ class ChangePasswordForm extends React.Component {
               ],
             })(<Input.Password onBlur={this.handleConfirmBlur} />)}
           </Form.Item>
-          <Form.Item {...tailFormItemLayout}>
+          <Form.Item>
             <Button type="primary" htmlType="submit">
               Update Password
             </Button>
