@@ -29,7 +29,7 @@ export default () => {
         <div
           style={{
             width: '400px',
-            background: COLORS.palleteLight,
+            background: '#F9F9F9',
             paddingTop: '20px',
             borderRight: '1px solid #e8e8e8',
           }}

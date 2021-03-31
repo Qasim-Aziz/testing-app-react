@@ -1,7 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons'
 import { Button, Col, Drawer, Row } from 'antd'
-import { COLORS, DRAWER } from 'assets/styles/globalStyles'
-import LoadingComponent from 'components/LoadingComponent'
 import React, { useEffect, useState } from 'react'
 import { useMutation } from 'react-apollo'
 import TargetAllocationNew from '../../components/TargetAllocationAssessments/TargetAllocation'
@@ -45,11 +43,19 @@ export default ({ assessmentId }) => {
     }
   }, [data])
 
-  if (loading) return <LoadingComponent />
-  if (error) return <h4 style={{ color: 'red' }}>Opps their is something wrong</h4>
+  if (loading) return <h3>Loading...</h3>
+  if (error) return <h4 style={{ color: 'red' }}>Opps their are something wrong</h4>
 
   return (
-    <div>
+    <div
+      style={{
+        height: 'calc(100vh - 110px)',
+        overflowY: 'scroll',
+        padding: 10,
+        backgroundColor: 'rgb(249, 249, 249)',
+        borderRadius: 10,
+      }}
+    >
       {data?.suggestCogniableTargets.targets.length === 0 && (
         <h4 style={{ textAlign: 'center', marginTop: 60 }}>Their is no targets</h4>
       )}
@@ -57,13 +63,12 @@ export default ({ assessmentId }) => {
         <Row
           key={node.id}
           style={{
-            border: '1px solid #d9d9d9',
+            border: '1px solid #e4e9f0',
             borderRadius: 10,
-            background: COLORS.palleteLight,
+            background: '#fff',
             padding: '10px 20px 10px 10px',
             margin: '8px 0px',
             fontSize: '18px',
-            color: 'black',
           }}
         >
           <Col span="22">{node.targetMain.targetName}</Col>
@@ -88,16 +93,22 @@ export default ({ assessmentId }) => {
         visible={selectTarget}
         onClose={() => setSelectTarget(null)}
         title="Target Allocation"
-        width={DRAWER.widthL2}
+        width={950}
       >
-        <TargetAllocationNew
-          key={Math.random()}
-          studentId={selectedStudent}
-          selectedTargetId={selectTarget}
-          targetName={targetName}
-          targetVideo={targetVideo}
-          targetInstr={targetInstr}
-        />
+        <div
+          style={{
+            padding: '0px 23px',
+          }}
+        >
+          <TargetAllocationNew
+            key={Math.random()}
+            studentId={selectedStudent}
+            selectedTargetId={selectTarget}
+            targetName={targetName}
+            targetVideo={targetVideo}
+            targetInstr={targetInstr}
+          />
+        </div>
       </Drawer>
     </div>
   )

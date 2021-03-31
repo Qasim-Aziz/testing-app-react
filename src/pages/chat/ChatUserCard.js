@@ -17,7 +17,7 @@ export default ({
   return (
     <Card
       style={{
-        background: selected ? COLORS.palleteLightBlue : '#fff',
+        background: selected ? COLORS.palleteLight : '#fff',
         borderBottom: '1px solid #F2F2F2',
         cursor: 'pointer',
       }}

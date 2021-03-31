@@ -4,14 +4,13 @@ import React, { useState, useRef, useEffect } from 'react'
 import { Layout, Row, Col, Typography, Select, Tabs, Radio } from 'antd'
 import gql from 'graphql-tag'
 import { useQuery } from 'react-apollo'
-import { COLORS } from 'assets/styles/globalStyles'
 import PeakQuartionsList from './PeakQuartionsList'
 import PeakQuartionView from './PeakQuartionView'
 import { STUDNET_INFO, SUMMERY } from './query'
 
 const { Content } = Layout
 const { Option } = Select
-const { TabPane } = Tabs
+const { TabPane } = Tabs;
 
 const { Text } = Typography
 
@@ -44,7 +43,7 @@ export default () => {
   const scrollbarRef = useRef()
   const [load, setLoad] = useState(false)
   const [type, setType] = useState(false)
-  const [radioValue, setRadioValue] = useState('all')
+  const [radioValue, setRadioValue] = useState("all")
 
   const { data, error, loading } = useQuery(GET_PEAK_CODES, {
     variables: {
@@ -64,7 +63,7 @@ export default () => {
     },
   })
 
-  const arr = []
+  const arr = [];
   useEffect(() => {
     if (selectedQ) {
       // console.log('selectQ', selectedQ)
@@ -72,31 +71,34 @@ export default () => {
     }
     if (data && summeryData) {
       setAllData(data)
-      handleChange(selecteFilter)
+      handleChange(selecteFilter);
     }
 
+
     // setCode(data)
+
   }, [selectedQ, data, summeryData])
 
   // const getCodeAarray=()=>
   const onChange = e => {
-    console.log(e)
+    console.log(e);
     // this.setState({ size: e.target.value });
-  }
+  };
+
 
   const handelSelectQ = (id, index) => () => {
-    console.log(id, index)
+    console.log(id, index);
     setSelectedQ({ id, index })
   }
 
-  const handleChange = value => {
-    console.log(value)
+  const handleChange = (value) => {
+    console.log(value);
     setRadioValue(value)
-    if (value === 'no') {
+    if (value === "no") {
       if (data && summeryData) {
         if (summeryData?.peakDataSummary?.edges[0]?.node?.no?.edges?.length > 0) {
-          const ar = []
-          console.log(data, summeryData)
+          const ar = [];
+          console.log(data, summeryData);
           const dd = summeryData?.peakDataSummary?.edges[0]?.node.no.edges.forEach(e => {
             const d = data?.peakGetCodes?.edges.filter(el => el.node.id === e.node.id)
             if (d) {
@@ -114,13 +116,15 @@ export default () => {
           setCode(ar)
           setType(false)
         }
+
       }
     }
-    if (value === 'yes') {
+    if (value === "yes") {
+
       if (data && summeryData) {
         if (summeryData?.peakDataSummary?.edges[0]?.node?.yes?.edges?.length > 0) {
-          const ar = []
-          console.log(data, summeryData)
+          const ar = [];
+          console.log(data, summeryData);
           const dd = summeryData?.peakDataSummary?.edges[0]?.node.yes.edges.forEach(e => {
             const d = data?.peakGetCodes?.edges.filter(el => el.node.id === e.node.id)
             if (d) {
@@ -138,17 +142,18 @@ export default () => {
           setCode(ar)
           setType(false)
         }
+
       }
     }
 
-    if (value === 'all') {
+    if (value === "all") {
       if (data && summeryData) {
-        const ar = []
-        const mar = []
+        const ar = [];
+        const mar = [];
         const f = data?.peakGetCodes?.edges?.forEach(e => {
           mar.push(e)
         })
-        const marr = []
+        const marr = [];
         const tt = summeryData?.peakDataSummary?.edges[0]?.node.yes.edges?.forEach(e => {
           marr.push(e)
         })
@@ -157,7 +162,7 @@ export default () => {
         })
         marr.forEach(e => {
           const dd = mar.filter((ee, i) => ee.node.id === e.node.id)
-          console.log(dd)
+          console.log(dd);
           const index = mar.indexOf(dd[0])
           if (dd[0]) {
             mar.splice(index, 1)
@@ -176,10 +181,10 @@ export default () => {
         setType(false)
       }
     }
-    if (value === 'alll') {
+    if (value === "alll") {
       if (data && summeryData) {
-        const ar = []
-        const mar = []
+        const ar = [];
+        const mar = [];
         const f = data?.peakGetCodes?.edges?.forEach(e => {
           mar.push(e)
         })
@@ -214,10 +219,12 @@ export default () => {
         }}
       >
         <Row>
-          <Col sm={24}>
+          <Col
+            sm={24}
+          >
             <Radio.Group
               value={radioValue}
-              onChange={e => {
+              onChange={(e) => {
                 handleChange(e.target.value)
               }}
               style={{ marginBottom: 16, float: 'right' }}
@@ -228,7 +235,9 @@ export default () => {
               <Radio.Button value="alll">All</Radio.Button>
             </Radio.Group>
           </Col>
-          <Col sm={17}>
+          <Col
+            sm={17}
+          >
             <div
               style={{
                 marginLeft: 10,
@@ -236,7 +245,7 @@ export default () => {
                 overflow: 'auto',
                 padding: 20,
                 borderRadius: 5,
-                border: '2px solid rgb(249, 249, 249)',
+                border: '2px solid rgb(249, 249, 249)'
               }}
             >
               {studnetInfo && (
@@ -253,43 +262,41 @@ export default () => {
                 </Text>
               )}
 
-              {selectedQ && (
-                <PeakQuartionView
-                  selectedQ={selectedQ}
-                  data={code}
-                  //  fil={selecteFilter}
-                  learner={studnetInfo?.student?.firstname}
-                  setSelectedQ={setSelectedQ}
-                  setAnsweredQuCount={setAnsweredQuCount}
-                  answeredQuCount={answeredQuCount}
-                  scrollbarRef={scrollbarRef}
-                />
-              )}
+              {selectedQ && <PeakQuartionView
+                selectedQ={selectedQ}
+                data={code}
+                //  fil={selecteFilter}
+                learner={studnetInfo?.student?.firstname}
+                setSelectedQ={setSelectedQ}
+                setAnsweredQuCount={setAnsweredQuCount}
+                answeredQuCount={answeredQuCount}
+                scrollbarRef={scrollbarRef}
+              />}
             </div>
           </Col>
 
-          <Col span={7}>
+          <Col
+            span={7}
+          >
             <div
               style={{
                 padding: 10,
                 borderRadius: 5,
-                background: COLORS.palleteLight,
+                background: 'rgb(249, 249, 249)',
                 height: 'calc(100vh - 150px)',
                 overflow: 'auto',
-                marginLeft: 10,
+                marginLeft: 10
               }}
             >
-              {selectedQ && (
-                <PeakQuartionsList
-                  selectedQ={selectedQ}
-                  learner={studnetInfo?.student?.firstname}
-                  data={code}
-                  // fil={selecteFilter}
-                  type={type}
-                  handelSelectQ={handelSelectQ}
-                  scrollbarRef={scrollbarRef}
-                />
-              )}
+              {selectedQ && <PeakQuartionsList
+                selectedQ={selectedQ}
+                learner={studnetInfo?.student?.firstname}
+                data={code}
+                // fil={selecteFilter}
+                type={type}
+                handelSelectQ={handelSelectQ}
+                scrollbarRef={scrollbarRef}
+              />}
             </div>
           </Col>
         </Row>

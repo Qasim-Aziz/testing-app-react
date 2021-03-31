@@ -30,7 +30,6 @@ function PersonalInfo(props) {
   useEffect(() => {
     if (userProfile) {
       setAllergicArray(userProfile.allergicTo)
-      console.log(userProfile, 'userProfile')
       form.setFieldsValue({
         parentName: userProfile.parentName,
         parentMobile: userProfile.parentMobile,

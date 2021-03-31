@@ -40,7 +40,6 @@ import { gql } from 'apollo-boost'
 import DataTable from 'react-data-table-component'
 import { PlusOutlined, PlayCircleOutlined, FilterOutlined } from '@ant-design/icons'
 import LearnerSelect from 'components/LearnerSelect'
-import { DRAWER } from 'assets/styles/globalStyles'
 import AssessmentForm from './AssessmentForm'
 import CogniAbleTargets from './CogniAbleTargets'
 import apolloClient from '../../apollo/config'
@@ -49,6 +48,73 @@ const { Title, Text } = Typography
 const { Content } = Layout
 const { TabPane } = Tabs
 const { confirm } = Modal
+const customStyles = {
+  title: {
+    style: {
+      fontSize: '15px',
+    },
+  },
+  header: {
+    style: {
+      minHeight: '30px',
+    },
+  },
+  headRow: {
+    style: {
+      borderTopStyle: 'solid',
+      borderTopWidth: '1px',
+      borderTopColor: '#ddd',
+      backgroundColor: '#f5f5f5',
+      minHeight: '30px',
+    },
+  },
+  rows: {
+    style: {
+      minHeight: '30px', // override the row height
+    },
+  },
+  headCells: {
+    style: {
+      '&:not(:last-of-type)': {
+        borderRightStyle: 'solid',
+        borderRightWidth: '1px',
+        borderRightColor: '#ddd',
+        minHeight: '30px',
+      },
+      fontWeight: 'bold',
+    },
+  },
+  cells: {
+    style: {
+      '&:not(:last-of-type)': {
+        borderRightStyle: 'solid',
+        borderRightWidth: '1px',
+        borderRightColor: '#ddd',
+        minHeight: '30px',
+      },
+      '.ebCczK:not(:last-of-type)': {
+        minHeight: '30px',
+      },
+      fontSize: '11px',
+    },
+  },
+  pagination: {
+    style: {
+      position: 'absolute',
+      top: '41px',
+      right: '5px',
+      borderTopStyle: 'none',
+      minHeight: '35px',
+    },
+  },
+  table: {
+    style: {
+      paddingBottom: '40px',
+      marginTop: '30px',
+    },
+  },
+}
+
 @connect(({ user, cogniableassessment, student }) => ({ user, cogniableassessment, student }))
 class RightArea extends React.Component {
   constructor(props) {
@@ -327,7 +393,63 @@ class RightArea extends React.Component {
   }
 
   render() {
-    //
+    const cardStyle = {
+      background: '#FFFFFF',
+      border: '1px solid #E4E9F0',
+      boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
+      borderRadius: 10,
+      padding: '16px 12px',
+      alignItems: 'center',
+      display: 'block',
+      width: '100%',
+      marginBottom: '20px',
+      lineHeight: '27px',
+      curser: 'pointer',
+      minHeight: '130px',
+    }
+
+    const selectedCardStyle = {
+      background: '#007acc',
+      border: '1px solid #E4E9F0',
+      color: '#fff',
+      boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
+      borderRadius: 10,
+      padding: '16px 12px',
+      alignItems: 'center',
+      display: 'block',
+      width: '100%',
+      marginBottom: '20px',
+      lineHeight: '27px',
+      minHeight: '130px',
+    }
+
+    const textStyle = {
+      fontSize: '14px',
+      lineHeight: '19px',
+      fontWeight: 600,
+      display: 'block',
+    }
+
+    const titleStyle = {
+      fontSize: '20px',
+      lineHeight: '27px',
+      marginTop: '5px',
+    }
+
+    const selectedTextStyle = {
+      fontSize: '14px',
+      lineHeight: '19px',
+      fontWeight: 600,
+      color: '#fff',
+    }
+
+    const selectedTitleStyle = {
+      fontSize: '20px',
+      lineHeight: '27px',
+      marginTop: '5px',
+      color: '#fff',
+    }
+
     const { newAssessment, suggestTarget, open } = this.state
     const {
       student: { StudentName },
@@ -374,7 +496,7 @@ class RightArea extends React.Component {
                 <Drawer
                   visible={this.state.visibleFilter}
                   onClose={this.onCloseFilter}
-                  width={DRAWER.widthL4}
+                  width={350}
                   title="Select Learner"
                   placement="right"
                 >
@@ -401,7 +523,7 @@ class RightArea extends React.Component {
               onClose={() => {
                 this.setState({ open: false })
               }}
-              width={DRAWER.widthL2}
+              width={400}
               title="Create New Assessment"
             >
               <div
@@ -420,7 +542,7 @@ class RightArea extends React.Component {
             <Drawer
               visible={suggestTarget}
               onClose={() => this.setState({ suggestTarget: false })}
-              width={DRAWER.widthL2}
+              width={600}
               title="Target Allocation from CogniAble Assessment"
             >
               {this.state.selectedAssessment && (
@@ -624,60 +746,3 @@ class RightArea extends React.Component {
 }
 
 export default RightArea
-
-// const cardStyle = {
-//   background: '#FFFFFF',
-//   border: '1px solid #E4E9F0',
-//   boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
-//   borderRadius: 10,
-//   padding: '16px 12px',
-//   alignItems: 'center',
-//   display: 'block',
-//   width: '100%',
-//   marginBottom: '20px',
-//   lineHeight: '27px',
-//   curser: 'pointer',
-//   minHeight: '130px',
-// }
-
-// const selectedCardStyle = {
-//   background: '#007acc',
-//   border: '1px solid #E4E9F0',
-//   color: '#fff',
-//   boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
-//   borderRadius: 10,
-//   padding: '16px 12px',
-//   alignItems: 'center',
-//   display: 'block',
-//   width: '100%',
-//   marginBottom: '20px',
-//   lineHeight: '27px',
-//   minHeight: '130px',
-// }
-
-// const textStyle = {
-//   fontSize: '14px',
-//   lineHeight: '19px',
-//   fontWeight: 600,
-//   display: 'block',
-// }
-
-// const titleStyle = {
-//   fontSize: '20px',
-//   lineHeight: '27px',
-//   marginTop: '5px',
-// }
-
-// const selectedTextStyle = {
-//   fontSize: '14px',
-//   lineHeight: '19px',
-//   fontWeight: 600,
-//   color: '#fff',
-// }
-
-// const selectedTitleStyle = {
-//   fontSize: '20px',
-//   lineHeight: '27px',
-//   marginTop: '5px',
-//   color: '#fff',
-// }
