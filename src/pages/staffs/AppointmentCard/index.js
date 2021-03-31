@@ -1,10 +1,11 @@
 /* eslint-disable */
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
-import { Card, Button, Drawer, Tabs } from 'antd'
+import { Card, Switch, Icon, Avatar, Tag, Tooltip, Button, Drawer, Tabs } from 'antd'
 import { EditOutlined, PlusOutlined } from '@ant-design/icons'
 import { Link, withRouter } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+import moment from 'moment'
 import '../style.scss'
 import Upcoming from './upcoming'
 import CreateAppointmentForm from 'components/Form/CreateAppointmentForm'
@@ -26,25 +27,18 @@ function AppointmentCard(props) {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    if (appt) {
-      if (!appt.appointmentsLoading && staffProfile) {
-        if (appt.appointments.length > 0) {
-          let temp = appt.appointments.filter(
-            item => new Date(item.start) > new Date() && item.therapist?.id === staffProfile.id,
-          )
-          temp.reverse()
-          setUpcomingAppointmentList(temp)
+    if (!appt.appointmentsLoading && appt.appointments.length > 0 && staffProfile) {
+      let temp = appt.appointments.filter(
+        item => new Date(item.start) > new Date() && item.therapist?.id === staffProfile.id,
+      )
+      temp.reverse()
+      setUpcomingAppointmentList(temp)
 
-          let temp2 = appt.appointments.filter(
-            item => new Date(item.start) < new Date() && item.therapist?.id === staffProfile.id,
-          )
+      let temp2 = appt.appointments.filter(
+        item => new Date(item.start) < new Date() && item.therapist?.id === staffProfile.id,
+      )
 
-          setPostAppointemntList(temp2)
-        } else {
-          setUpcomingAppointmentList([])
-          setPostAppointemntList([])
-        }
-      }
+      setPostAppointemntList(temp2)
     }
   }, [appt, staffProfile])
 
@@ -82,19 +76,13 @@ function AppointmentCard(props) {
   }
 
   const extraContent = (
-    <Button
-      onClick={createAppointment}
-      disabled={!staffProfile.isActive}
-      type="primary"
-      size="small"
-      style={{ marginRight: '16px' }}
-    >
-      <PlusOutlined /> Add Appointment
+    <Button onClick={createAppointment} type="primary" size="small" style={{ marginRight: '16px' }}>
+      <PlusOutlined /> Add Appointment{' '}
     </Button>
   )
 
   return (
-    <div style={{ height: 'fit-content', marginBottom: '28px' }} className="appointment-card">
+    <div style={{ height: 'fit-content', marginBottom: '28px' }}>
       <Drawer
         title={updateAppointmentId ? 'Update Appointment' : 'Create Appointment'}
         placement="right"
@@ -117,23 +105,10 @@ function AppointmentCard(props) {
           />
         )}
       </Drawer>
-      <div
-        style={{
-          fontSize: '18px',
-          color: 'black',
-          fontWeight: 600,
-          padding: 16,
-          width: '100%',
-          border: '1px solid #d9d9d9',
-          borderBottom: 'none',
-        }}
-      >
-        <span>Appointments</span>
-      </div>
       <Tabs
         onChange={setActiveTab}
         tabBarExtraContent={extraContent}
-        style={{ border: '1px solid #d9d9d9' }}
+        style={{ border: '1px solid #e8e8e8' }}
       >
         <TabPane key="upcoming" tab="Upcoming">
           <Upcoming

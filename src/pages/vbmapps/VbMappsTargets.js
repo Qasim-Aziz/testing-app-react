@@ -1,7 +1,5 @@
 import { PlusOutlined } from '@ant-design/icons'
 import { Button, Col, Drawer, Row } from 'antd'
-import { COLORS, DRAWER } from 'assets/styles/globalStyles'
-import LoadingComponent from 'components/LoadingComponent'
 import React, { useEffect, useState } from 'react'
 import { useMutation } from 'react-apollo'
 import TargetAllocationNew from '../../components/TargetAllocationAssessments/TargetAllocation'
@@ -31,6 +29,7 @@ export default ({ target, milestoneId }) => {
 
   useEffect(() => {
     if (!data && !error && !loading) {
+      console.log(target, 'ttttttttttttttttttttttttt')
       getSuggestTarget()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -46,11 +45,19 @@ export default ({ target, milestoneId }) => {
     }
   }, [data])
 
-  if (loading) return <LoadingComponent />
+  if (loading) return <h3>Loading...</h3>
   if (error) return <h4 style={{ color: 'red' }}>Opps therir are something wrong</h4>
 
   return (
-    <div style={{ borderRadius: 10 }}>
+    <div
+      style={{
+        height: 'calc(100vh - 110px)',
+        overflowY: 'scroll',
+        padding: 15,
+        backgroundColor: 'rgb(249, 249, 249)',
+        borderRadius: 10,
+      }}
+    >
       {data?.vbmappTargetSuggest.targets.length === 0 && (
         <h4 style={{ textAlign: 'center', marginTop: 60 }}>Their is no targets</h4>
       )}
@@ -58,22 +65,18 @@ export default ({ target, milestoneId }) => {
         <Row
           key={node.id}
           style={{
-            border: `1px solid ${COLORS.palleteLightBlue}`,
+            border: '1px solid #e4e9f0',
             borderRadius: 10,
-            background: COLORS.palleteLight,
+            background: '#fff',
             padding: '10px 20px 10px 10px',
             margin: '8px 0px',
             fontSize: '18px',
-            color: 'black',
           }}
         >
-          <Col span="22" style={{ marginTop: '3px' }}>
-            {node.targetMain.targetName}
-          </Col>
+          <Col span="22">{node.targetMain.targetName}</Col>
           <Col span="2">
             <Button
-              type="default"
-              style={{ backgroundColor: COLORS.palleteLightBlue }}
+              type="primary"
               onClick={() => {
                 setTargetName(node.targetMain.targetName)
                 setSelectTarget(node.id)
@@ -81,9 +84,7 @@ export default ({ target, milestoneId }) => {
                 setTargetVideo(node.video)
               }}
             >
-              <PlusOutlined
-                style={{ fontSize: 22, color: '#000', fontWeight: '700', marginTop: 3 }}
-              />
+              <PlusOutlined style={{ fontSize: 20, color: '#fff', marginTop: 5 }} />
             </Button>
           </Col>
         </Row>
@@ -93,7 +94,7 @@ export default ({ target, milestoneId }) => {
         visible={selectTarget}
         onClose={() => setSelectTarget(null)}
         title="Target Allocation"
-        width={DRAWER.widthL2}
+        width={950}
       >
         <div
           style={{

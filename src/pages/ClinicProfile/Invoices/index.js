@@ -1,17 +1,8 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet'
-import {
-  Button,
-  Drawer,
-  notification,
-  Table,
-  Menu,
-  Dropdown,
-  Select,
-  Input,
-  DatePicker,
-} from 'antd'
+import { Button, Drawer, notification, Menu, Dropdown, Select, Input, DatePicker } from 'antd'
+import DataTable from 'react-data-table-component'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import JsPDF from 'jspdf'
@@ -20,12 +11,9 @@ import {
   CloudDownloadOutlined,
   CloseCircleOutlined,
   FilePdfOutlined,
-  EditOutlined,
-  DeleteOutlined,
 } from '@ant-design/icons'
 import { useQuery, useMutation } from 'react-apollo'
 import moment from 'moment'
-import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import InvoiceForm from 'components/invoice/InvoiceForm'
 import EditInvoice from 'components/invoice/EditInvoice'
 import LoadingComponent from '../../staffProfile/LoadingComponent'
@@ -38,6 +26,7 @@ export default () => {
   const [isCreateInvoice, setCreateInvoice] = useState(false)
   const [isPreviewInvoice, setPreviewInvoice] = useState(false)
   const [isEditInvoice, setEditInvoice] = useState(false)
+
   const [selectedInvoiceId, setSelectedInvoiceId] = useState()
   const [data, setData] = useState()
   const [deleteInvoiceId, setDeleteInvoiceId] = useState()
@@ -112,9 +101,6 @@ export default () => {
           client: node.customer?.parent?.username,
           status: node.status.statusName,
           date: node.issueDate,
-          name: `${node.customer?.parent?.firstName} ${
-            node.customer?.parent?.lastName ? node.customer?.parent?.lastName : ' '
-          }`,
         }
       })
       setData(arrengedData)
@@ -124,46 +110,80 @@ export default () => {
   useEffect(() => {
     if (invoiceError) {
       notification.error({
-        message: 'Something went wrong',
-        description: 'Unable to fetch invoices data',
+        message: 'Opps their are something wrong on fatching invoces data',
       })
     }
   }, [invoiceError])
+
+  const customStyles = {
+    headRow: {
+      style: {
+        borderTopStyle: 'solid',
+        borderTopWidth: '1px',
+        borderTopColor: '#ddd',
+        backgroundColor: '#f5f5f5',
+      },
+    },
+    headCells: {
+      style: {
+        '&:not(:last-of-type)': {
+          borderRightStyle: 'solid',
+          borderRightWidth: '1px',
+          borderRightColor: '#ddd',
+        },
+        fontWeight: 'bold',
+        fontSize: '14px',
+        textAlign: 'center',
+      },
+    },
+    cells: {
+      style: {
+        '&:not(:last-of-type)': {
+          borderRightStyle: 'solid',
+          borderRightWidth: '1px',
+          borderRightColor: '#ddd',
+        },
+        fontSize: '13px',
+      },
+    },
+  }
+
   const columns = [
     {
-      title: 'Invoice No',
-      dataIndex: 'invoiceNo',
-      width: 160,
-      render: text => {
-        return <span>{text}</span>
+      name: 'Invoice No',
+      selector: 'invoiceNo',
+      maxWidth: '100px',
+      cell: row => {
+        return <Button type="link">{row.invoiceNo}</Button>
       },
     },
     {
-      title: 'Date',
-      dataIndex: 'date',
-      width: 160,
+      name: 'Date',
+      selector: 'date',
+      minWidth: '100px',
+      maxWidth: '120px',
     },
     {
-      title: 'Client',
-      dataIndex: 'client',
-      render: (text, row) => (
-        <span>
-          {row.name} - {text}
-        </span>
-      ),
+      name: 'Client',
+      selector: 'client',
     },
     {
-      title: 'Amount',
-      dataIndex: 'amount',
+      name: 'Amount',
+      selector: 'amount',
+      minWidth: '70px',
+      maxWidth: '100px',
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
+      name: 'Status',
+      selector: 'status',
+      minWidth: '70px',
+      maxWidth: '100px',
     },
     {
-      title: 'Action',
-      width: 260,
-      render: row => {
+      name: 'Action',
+      minWidth: '200px',
+      maxWidth: '220px',
+      cell: row => {
         return (
           <div>
             <Button
@@ -173,7 +193,7 @@ export default () => {
               }}
               type="link"
             >
-              <FilePdfOutlined style={{ fontWeight: 600 }} />
+              <FilePdfOutlined />
             </Button>
 
             {row.status !== 'Paid' && (
@@ -185,18 +205,18 @@ export default () => {
                     setEditInvoiceId(row.key)
                   }}
                 >
-                  <EditOutlined style={{ fontWeight: 600 }} />
+                  Edit
                 </Button>
                 <Button
                   type="link"
-                  style={{ color: COLORS.danger }}
+                  style={{ color: 'red' }}
                   onClick={() => {
                     deleteInvoice({ variables: { id: row.key } })
                     setDeleteInvoiceId(row.key)
                   }}
                   loading={deleteInvoiceLoading}
                 >
-                  <DeleteOutlined style={{ color: COLORS.danger, fontWeight: 600 }} />
+                  Delete
                 </Button>
               </>
             )}
@@ -297,7 +317,8 @@ export default () => {
     </Menu>
   )
 
-  console.log(filteredList, 'filtered')
+  console.log(filteredList, 'filteredLIst')
+  console.log(editInvoiceId, 'selected')
   return (
     <div>
       <Helmet title="Dashboard Alpha" />
@@ -365,11 +386,7 @@ export default () => {
               >
                 <Select.Option value="">Select Status</Select.Option>
                 {statusGrouped.map((i, index) => {
-                  return (
-                    <Select.Option key={i} value={i}>
-                      {i}
-                    </Select.Option>
-                  )
+                  return <Select.Option value={i}>{i}</Select.Option>
                 })}
               </Select>
             </div>
@@ -395,32 +412,30 @@ export default () => {
       <div style={{ marginBottom: '50px' }}>
         {invoiceLoading && <LoadingComponent />}
         {data && (
-          <Table
+          <DataTable
             columns={columns}
-            dataSource={filteredList}
-            loading={invoiceLoading}
-            rowKey={record => record.key}
-            size="middle"
-            pagination={{
-              defaultPageSize: 20,
-              showSizeChanger: true,
-              pageSizeOptions: ['20', '30', '50', '100'],
-              position: 'top',
-            }}
+            theme="default"
+            pagination
+            data={filteredList}
+            customStyles={customStyles}
+            highlightOnHover
+            noHeader
+            style={{ border: '1px solid #ddd' }}
+            paginationRowsPerPageOptions={[10, 50, 100, 200, 500, 1000]}
           />
         )}
       </div>
 
       <Drawer
         visible={isPreviewInvoice}
-        width={DRAWER.widthL3}
+        width="50vw"
         className="change-invo-drawer"
         onClose={() => setPreviewInvoice(false)}
       >
         <PreviewInvoice invoiceId={selectedInvoiceId} />
       </Drawer>
 
-      <Drawer visible={isEditInvoice} width={DRAWER.widthL1} onClose={() => setEditInvoice(false)}>
+      <Drawer visible={isEditInvoice} width="80vw" onClose={() => setEditInvoice(false)}>
         <EditInvoice
           invoiceId={editInvoiceId}
           closeDrawer={setEditInvoice}
@@ -428,11 +443,7 @@ export default () => {
         />
       </Drawer>
 
-      <Drawer
-        visible={isCreateInvoice}
-        width={DRAWER.widthL1}
-        onClose={() => setCreateInvoice(false)}
-      >
+      <Drawer visible={isCreateInvoice} width="80vw" onClose={() => setCreateInvoice(false)}>
         <InvoiceForm setNewInvDrawer={setCreateInvoice} refetchInvoices={refetch} />
       </Drawer>
     </div>

@@ -1,10 +1,9 @@
-@import '../../assets/styles/mixins.scss';
-
 .modify-table {
   .ant-table-thead > tr > th,
   .ant-table-tbody > tr > td {
     padding: 5px 6px 5px 8px;
     overflow-wrap: break-word;
+    text-align: center;
   }
 
   .ant-table {
@@ -13,10 +12,10 @@
   }
 
   .ant-table-thead > tr > th {
+    text-align: left;
     padding-left: 10px;
     font-weight: 600;
     height: 52px;
-    background-color: $palete-light-blue;
   }
 }
 
