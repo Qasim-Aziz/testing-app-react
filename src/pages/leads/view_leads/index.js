@@ -23,6 +23,7 @@ import styled from 'styled-components'
 // END OF IMPORTS FOR STEP PROGRESS BAR COMPONENT
 import DataTable from 'react-data-table-component'
 import {
+  Table,
   Button,
   Card,
   Avatar,
@@ -845,52 +846,3 @@ class LeaderTable extends React.Component {
 }
 
 export default LeaderTable
-
-/* ********************* DISCARDED STUFF ********************
-// fetch(`http://127.0.0.1:8000/graphql/`, {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({
-    //     query: `
-    // query{
-    //   leads{
-    //     id
-    //     name
-    //     projectName,
-    //     leadStatus,
-    //     phone
-    //     user{
-    //       email
-    //     }
-    //   }
-    //         }`,
-    //   }),
-    // })
-    //   .then(res => res.json())
-    //   .then(data => {
-    //     console.log('***********************', data)
-    //   })
-
-    *****************************************************
-    // console.log('ROCKEt SCience', this.props)
-    // leadClient
-    //   .query({
-    //     query: gql`
-    //       {
-    //         leads {
-    //           id
-    //           name
-    //           projectName
-    //           leadStatus
-    //           phone
-    //           user {
-    //             email
-    //           }
-    //         }
-    //       }
-    //     `,
-    //   })
-    //   .then(result => {
-    //     console.log('MY VALUE', result.data)
-    //   })
-*/
