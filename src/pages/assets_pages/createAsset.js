@@ -10,6 +10,7 @@ import React from 'react'
 import { Form, Input, Button, Select, DatePicker, Checkbox, Divider, message, Tag } from 'antd'
 import { connect } from 'react-redux'
 import AntdTag from '../staffs/antdTag'
+import { CANCEL_BUTTON, COLORS, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles' // '../../../assets/styles/globalStyles' //
 
 const { TextArea } = Input
 const { Option } = Select
@@ -163,11 +164,11 @@ class BasicInformationForm extends React.Component {
           {/* ADD DATE FIELD BELOW */}
 
           <Form.Item {...tailLayout}>
-            <Button type="primary" htmlType="submit" className="mt-4">
+            <Button type="primary" htmlType="submit" style={SUBMITT_BUTTON}>
               Submit
             </Button>
 
-            <Button type="primary" onClick={this.onReset} className="ml-4">
+            <Button type="default" onClick={this.onReset} style={CANCEL_BUTTON}>
               Reset
             </Button>
           </Form.Item>
