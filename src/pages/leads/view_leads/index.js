@@ -469,12 +469,16 @@ class LeaderTable extends React.Component {
 
     const columns = [
       {
+        title: '#',
+        render: row => filteredList.indexOf(row) + 1,
+      },
+      {
         title: 'Name',
         // selector: 'name',
         sortable: true,
 
         render: row => {
-          console.log('ROW', row)
+          // console.log('ROW', row)
           row.user === null ? <span> </span> : <></>
 
           return (
@@ -667,6 +671,9 @@ class LeaderTable extends React.Component {
 
     return (
       <>
+        {/* 📌 Make sure to wrap the authorization 
+            component once Raj sir sends the API  
+        */}
         {console.log(`LETS SEE ALL PROPS \n `, this.props)}
         {console.log(`LETS SEE ALL state \n `, this.state)}
         <Helmet title="Leaders" />
@@ -733,7 +740,6 @@ class LeaderTable extends React.Component {
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '0px 10px',
-            marginTop: '20px',
             backgroundColor: '#FFF',
             boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
           }}
@@ -781,69 +787,36 @@ class LeaderTable extends React.Component {
           </div>
         </div>
         {/* ********************** END of DIV FOR TOP_BAR***************** */}
-        <div className={divClass}>
-          <div style={{ marginTop: '24px', marginBottom: '50px' }}>
-            {/* ************* DIV FOR DATA-TABLE ************ */}
-            <div>
-              <div style={{ marginBottom: '50px' }}>
-                {/* Filters */}
-                <div className="view_learner">
-                  <Table
-                    title={() => {
-                      return tableHeader
-                    }}
-                    columns={columns}
-                    rowKey={record => record.id}
-                    dataSource={filteredList}
-                    loading={loadingLeaders} // this.state.loadingLeaders
-                    // pagination={{
-                    //   defaultPageSize: 20,
-                    //   onChange: (page, rows) => this.pageChanged(page, rows),
-                    //   onShowSizeChange: (currentPage, currentRowsPerPage) =>
-                    //   this.rowsChanged(currentRowsPerPage, currentPage),
-                    //   showSizeChanger: true,
-                    //   pageSizeOptions:
-                    //     TotalLeaders > 100
-                    //       ? ['20', '50', '80', '100', `${TotalLeaders}`]
-                    //       : ['20', '50', '80', '100'],
-                    //   position: 'bottom',
-                    // }}
-                  />
-                </div>
-              </div>
-            </div>
-            {/* <div className="modify-data-table">
-              <DataTable
-                title="Leaders List"
-                columns={columns}
-                theme="default"
-                dense={true}
-                key="id"
-                keyField="id"
-                pagination={true}
-                data={filteredList}
-                customStyles={customStyles}
-                noHeader={true}
-                progressPending={loadingLeaders}
-                // paginationServer={true}
-                // paginationTotalRows={TotalLeaders}
-                // onChangePage={(page, rows) => this.pageChanged(page, rows)}
-                paginationServerOptions={{
-                  persistSelectedOnPageChange: false,
-                  persistSelectedOnSort: false,
+        <div>
+          <div style={{ marginBottom: '50px' }}>
+            <div className="view_leader">
+              <Table
+                title={() => {
+                  return tableHeader
                 }}
-                // onChangeRowsPerPage={(currentRowsPerPage, currentPage) =>
-                //   this.rowsChanged(currentRowsPerPage, currentPage)
-                // }
-                // paginationRowsPerPageOptions={
-                //   TotalLeaders > 100 ? [10, 20, 50, 80, 100, TotalLeaders] : [10, 20, 50, 80, 100]
-                // }
-                currentPage={2}
+                columns={columns}
+                rowKey={record => record.id}
+                dataSource={filteredList}
+                loading={loadingLeaders} // this.state.loadingLeaders
+                // ⭐ The below commented code is for pagination from server side
+                /* pagination={{
+                   defaultPageSize: 20,
+                   onChange: (page, rows) => this.pageChanged(page, rows),
+                   onShowSizeChange: (currentPage, currentRowsPerPage) =>
+                   this.rowsChanged(currentRowsPerPage, currentPage),
+                   showSizeChanger: true,
+                   pageSizeOptions:
+                     TotalLeaders > 100
+                       ? ['20', '50', '80', '100', `${TotalLeaders}`]
+                       : ['20', '50', '80', '100'],
+                   position: 'bottom',
+                  }}
+                */
               />
-            </div> */}
-            {/* ************* END OF DIV FOR DATA-TABLE ************ */}
+            </div>
           </div>
         </div>
+        {/* ************* END OF DIV FOR DATA-TABLE ************ */}
       </>
     )
   }
