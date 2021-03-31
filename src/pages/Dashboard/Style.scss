@@ -6,6 +6,7 @@
 
 .sidebar {
   margin-top: 30px;
+
   @media (min-width: 576px) {
     padding-right: 0 !important;
     margin-top: 0;
@@ -15,6 +16,7 @@
 .shadowbox {
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.12) !important;
 }
+
 .border-right {
   border-right: 1px solid #ddd;
 }
@@ -37,12 +39,15 @@
 .ant-tabs-bar {
   margin: 0;
 }
+
 .ant-card-body::-webkit-scrollbar {
   display: none;
 }
+
 .ant-empty {
   margin-top: 15px;
 }
+
 .ant-form label {
   font-size: 14px !important;
 }
@@ -50,10 +55,12 @@
 .edit_hover_class button {
   visibility: hidden;
 }
+
 .edit_hover_class:hover button {
   visibility: visible;
   bottom: 12px;
 }
+
 button {
   border-radius: 20px;
   border: none;
@@ -154,6 +161,7 @@ button {
 
       &.heading-row {
         border-top: none;
+
         th,
         td {
           padding-top: 20px;
@@ -223,6 +231,7 @@ button {
       font-weight: bold;
     }
   }
+
   .tabTitle {
     text-transform: uppercase;
     font-size: 1.38rem;
@@ -261,57 +270,58 @@ button {
   .utils__content {
     padding: 0;
     margin: 0 auto;
- }
-  
-.ant-tabs .ant-tabs-left-bar .ant-tabs-tab {
-  text-align: left;
-}
+  }
 
-.ProfileTab-container {
-  display: flex;
-  align-items: center;
-}
+  .ant-tabs .ant-tabs-left-bar .ant-tabs-tab {
+    text-align: left;
+  }
 
-.ProfileTab-icon {
-  font-size: 1.5rem;
-}
+  .ProfileTab-container {
+    display: flex;
+    align-items: center;
+  }
 
-.ProfileTab-title {
-  font-size: 1rem;
-  font-weight: bold;
-  color: black;
-}
+  .ProfileTab-icon {
+    font-size: 1.5rem;
+  }
 
-.ant-tabs-content.ant-tabs-content-animated.ant-tabs-left-content {
-  padding-left: 0;
-  height: 51em;
-  background-color: #f9f7f7;
-}
+  .ProfileTab-title {
+    font-size: 1rem;
+    font-weight: bold;
+    color: black;
+  }
 
-.profileTab-heading {
-  font-size: 2rem;
-  padding-top: 1em;
-  font-weight: 900;
-}
+  .ant-tabs-content.ant-tabs-content-animated.ant-tabs-left-content {
+    padding-left: 0;
+    height: 51em;
+    background-color: #f9f7f7;
+  }
 
-.profileTab-container .ant-table-thead {
-  background-color: #dbe2ef;
-}
+  .profileTab-heading {
+    font-size: 2rem;
+    padding-top: 1em;
+    font-weight: 900;
+  }
 
-.form-label div > label {
-  margin-bottom: 0;
-}
+  .profileTab-container .ant-table-thead {
+    background-color: #dbe2ef;
+  }
 
-.profileTabs .ant-tabs-tab-active {
-  color: #112d4e !important;
-  background-color: #dbe2ef !important;
-}
+  .form-label div>label {
+    margin-bottom: 0;
+  }
 
-.profileTabs .ant-tabs-ink-bar {
-  background: #112d4e;
-  pointer-events: none;
-}
+  .profileTabs .ant-tabs-tab-active {
+    color: #112d4e !important;
+    background-color: #dbe2ef !important;
+  }
 
-.Assessment-container > table {
-  background-color: white;
+  .profileTabs .ant-tabs-ink-bar {
+    background: #112d4e;
+    pointer-events: none;
+  }
+
+  .Assessment-container>table {
+    background-color: white;
+  }
 }
