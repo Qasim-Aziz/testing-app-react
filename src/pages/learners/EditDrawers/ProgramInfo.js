@@ -95,7 +95,7 @@ function ProgramInfo(props) {
   return (
     <div>
       <Form {...layout} onSubmit={handleSubmit}>
-        <Form.Item label="Default Active" style={itemStyle}>
+        {/* <Form.Item label="Default Active" style={itemStyle}>
           {form.getFieldDecorator('defaultProgram', {
             initialValue: userProfile.defaultProgram,
             valuePropName: 'checked',
@@ -107,7 +107,7 @@ function ProgramInfo(props) {
               unCheckedChildren={<Icon type="close" />}
             />,
           )}
-        </Form.Item>
+        </Form.Item> */}
         <Form.Item label="VBMAPP Active" style={itemStyle}>
           {form.getFieldDecorator('isVbmappActive', {
             initialValue: userProfile.isVbmappActive,

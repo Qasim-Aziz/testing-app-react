@@ -422,7 +422,7 @@ function Profile(props) {
             </Button>{' '}
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+          {/* <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>Default Active</p>
             {userProfile.isDefaultActive ? (
               <CheckCircleOutlined
@@ -433,7 +433,7 @@ function Profile(props) {
                 style={{ fontSize: 20, color: COLORS.danger, fontWeight: '700', margin: 'auto' }}
               />
             )}
-          </div>
+          </div> */}
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>VBMAPP</p>
             {userProfile.isVbmappActive ? (
