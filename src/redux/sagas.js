@@ -14,6 +14,7 @@ import leaders from './leads/sagas'
 // EXPENSE IMPORTED
 import expenses from './expenses/sagas'
 // Assets imported
+// import assets from './assets_redux/sagas'
 import assets from './assets_redux/sagas'
 import settings from './settings/sagas'
 import screening from './screening/sagas'

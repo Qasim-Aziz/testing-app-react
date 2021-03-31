@@ -16,6 +16,7 @@ import leaders from './leads/reducer'
 // THE EXPENSE REDUCER BELOW
 import expenses from './expenses/reducers'
 // THE ASSETS REDUCER BELOW
+// import assets from './assets_redux/reducers'
 import assets from './assets_redux/reducers'
 import screening from './screening/reducers'
 import payor from './payor/reducers'
