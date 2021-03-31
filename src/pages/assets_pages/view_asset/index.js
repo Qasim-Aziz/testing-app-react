@@ -19,6 +19,7 @@ import { Helmet } from 'react-helmet'
 import { connect } from 'react-redux'
 import DataTable from 'react-data-table-component'
 import {
+  Table,
   Button,
   Card,
   Avatar,
@@ -150,7 +151,7 @@ class AssetTable extends React.Component {
     noOfRows: 10,
     filterAssetName: '',
     // filterPurchaseFrom: '',
-    // filterPaidBy: 'all', // instead of tags, we have project-name
+    // filterPaidBy: 'all', // instead of tags, we have project-title
   }
 
   filterRef = React.createRef()
@@ -265,21 +266,21 @@ class AssetTable extends React.Component {
     })
   }
 
-  filterHandler = ({ name }) => {
+  filterHandler = ({ title }) => {
     let filteredList = this.state.mainData
     let tempFilterActive = false
-    console.log('Expense filter', name)
-    if (!name) {
+    console.log('Expense filter', title)
+    if (!title) {
       tempFilterActive = false
     }
-    if (name) {
+    if (title) {
       tempFilterActive = true
       console.log('THE filteredList', filteredList)
       filteredList =
         filteredList &&
         filteredList.filter(item => {
           console.log('WHAT ITEMS', item)
-          return item.assetName?.toLowerCase().includes(name.toLowerCase())
+          return item.assetName?.toLowerCase().includes(title.toLowerCase())
         })
     }
 
@@ -352,11 +353,15 @@ class AssetTable extends React.Component {
 
     const columns = [
       {
-        name: 'Asset Name',
-        selector: 'assetName',
+        title: '#',
+        render: row => filteredList.indexOf(row) + 1,
+      },
+      {
+        title: 'Asset Name',
+        // selector: 'assetName',
         sortable: true,
         // maxWidth: '120px',
-        cell: row => {
+        render: row => {
           row.assetName === null ? <span> </span> : <></>
 
           return (
@@ -371,42 +376,42 @@ class AssetTable extends React.Component {
         },
       },
       {
-        name: 'Description',
-        selector: 'description',
+        title: 'Description',
+        // selector: 'description',
         // maxWidth: '120px',
-        cell: row => {
+        render: row => {
           return <span>{row.description ? row.description : ''} </span>
         },
       },
       {
-        name: 'Asset Status',
-        selector: 'assetStatus',
+        title: 'Asset Status',
+        // selector: 'assetStatus',
         // maxWidth: '120px',
-        cell: row => {
+        render: row => {
           return <span>{row.assetStatus ? row.assetStatus : ''} </span>
         },
       },
       {
-        name: 'Created At',
-        selector: 'createdAt',
+        title: 'Created At',
+        // selector: 'createdAt',
         // maxWidth: '120px',
-        cell: row => {
+        render: row => {
           return <span>{row.createdAt ? row.createdAt : ''} </span>
         },
       },
       {
-        name: 'Updated At',
-        selector: 'updatedAt',
+        title: 'Updated At',
+        // selector: 'updatedAt',
         // maxWidth: '120px',
-        cell: row => {
+        render: row => {
           return <span>{row.updatedAt ? row.updatedAt : ''} </span>
         },
       },
       {
-        name: 'Created By',
-        selector: 'createdBy',
+        title: 'Created By',
+        // selector: 'createdBy',
         // maxWidth: '120px',
-        cell: row => {
+        render: row => {
           let object_of_assigned_by = row.createdBy
           // console.log('THE OBJ ====👉', object_of_assigned_by)
           if (object_of_assigned_by) {
@@ -422,10 +427,10 @@ class AssetTable extends React.Component {
         },
       },
       {
-        name: 'Assigned By',
-        selector: 'assignedBy',
+        title: 'Assigned By',
+        // selector: 'assignedBy',
         // maxWidth: '120px',
-        cell: row => {
+        render: row => {
           // console.log(
           //   '*******************',
           //   row.assetdesignationmodelSet,
@@ -452,10 +457,10 @@ class AssetTable extends React.Component {
         },
       },
       {
-        name: 'Assigned To',
-        selector: 'assignedTo',
+        title: 'Assigned To',
+        // selector: 'assignedTo',
         // maxWidth: '120px',
-        cell: row => {
+        render: row => {
           // console.log(
           //   'ASSIGNED TO *******************',
           //   row.assetdesignationmodelSet,
@@ -505,13 +510,66 @@ class AssetTable extends React.Component {
         </Menu.Item>
       </Menu>
     )
+
+    const tableHeader = (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          position: 'relative',
+          whiteSpace: 'nowrap',
+          zIndex: 2,
+          height: '28px',
+          width: '100%',
+          padding: '4px 12px',
+        }}
+      >
+        {/* Search bar for title */}
+        <span style={{ display: 'flex', alignItems: 'center' }}>
+          <span>Name :</span>
+          <Input
+            size="small"
+            title="title"
+            placeholder="Search Name"
+            value={this.state.filterName}
+            onChange={e => {
+              this.setState({
+                filterName: e.target.value,
+                isFilterActive: e.target.value && true,
+              })
+              this.filterHandler({ title: e.target.value })
+            }}
+            style={{ ...tableFilterStyles, width: '112px' }}
+          />
+        </span>
+        {/* Different kinds of status */}
+        <span style={{ display: 'flex', alignItems: 'center' }}>
+          <span>STATUS :</span>
+          <Radio.Group
+            size="small"
+            buttonStyle="solid"
+            value={this.state.filterStatus}
+            onChange={e => {
+              // this.selectActiveStatus(e.target.value)
+              this.setState({ filterStatus: e.target.value, isFilterActive: true })
+            }}
+            style={tableFilterStyles}
+          >
+            <Radio.Button value="all">All</Radio.Button>
+            <Radio.Button value="ASSIGNED">ASSIGNED</Radio.Button>
+            <Radio.Button value="NOT_ASSIGNED">NOT_ASSIGNED</Radio.Button>
+          </Radio.Group>
+        </span>
+      </div>
+    )
+
     // ****************************** PDF & CSV ******************************
     console.log('END OF RENDER HELLO PROPS', this.props)
     console.log('END OF RENDER ALL STATE', this.state)
     // let filteredList = this.state.
 
     return (
-      <div>
+      <>
         {console.log(`LETS SEE ALL PROPS \n `, this.props)}
         {console.log(`LETS SEE ALL state \n `, this.state)}
         <Helmet title="Assets" />
@@ -570,7 +628,6 @@ class AssetTable extends React.Component {
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '0px 10px',
-            marginTop: '20px',
             backgroundColor: '#FFF',
             boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
           }}
@@ -620,92 +677,37 @@ class AssetTable extends React.Component {
           </div>
         </div>
         {/* ********************** END of DIV FOR TOP_BAR***************** */}
-        <div className={divClass}>
-          <div style={{ marginTop: '24px', marginBottom: '50px' }}>
-            {/* ************* DIV FOR filtering ************ */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                position: 'relative',
-                whiteSpace: 'nowrap',
-                zIndex: 2,
-                width: 'fit-content',
-                paddingTop: '4px',
-              }}
-            >
-              {/* Search bar for name */}
-              <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span>Name :</span>
-                <Input
-                  size="small"
-                  name="name"
-                  placeholder="Search Name"
-                  value={this.state.filterName}
-                  onChange={e => {
-                    this.setState({
-                      filterName: e.target.value,
-                      isFilterActive: e.target.value && true,
-                    })
-                    this.filterHandler({ name: e.target.value })
-                  }}
-                  style={{ ...tableFilterStyles, width: '112px' }}
-                />
-              </span>
-              {/* Different kinds of status */}
-              <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span>STATUS :</span>
-                <Radio.Group
-                  size="small"
-                  buttonStyle="solid"
-                  value={this.state.filterStatus}
-                  onChange={e => {
-                    // this.selectActiveStatus(e.target.value)
-                    this.setState({ filterStatus: e.target.value, isFilterActive: true })
-                  }}
-                  style={tableFilterStyles}
-                >
-                  <Radio.Button value="all">All</Radio.Button>
-                  <Radio.Button value="ASSIGNED">ASSIGNED</Radio.Button>
-                  <Radio.Button value="NOT_ASSIGNED">NOT_ASSIGNED</Radio.Button>
-                </Radio.Group>
-              </span>
-            </div>
-            {/* ************* END OF DIV FOR filtering ************ */}
-            {/* ************* DIV FOR DATA-TABLE ************ */}
-            <div className="modify-data-table">
-              <DataTable
-                title="Assets List"
-                columns={columns}
-                theme="default"
-                dense={true}
-                key="id"
-                keyField="id"
-                pagination={true}
-                data={filteredList}
-                customStyles={customStyles}
-                noHeader={true}
-                progressPending={loadingAssets}
-                // paginationServer={true}
-                // paginationTotalRows={TotalAssets}
-                // onChangePage={(page, rows) => this.pageChanged(page, rows)}
-                paginationServerOptions={{
-                  persistSelectedOnPageChange: false,
-                  persistSelectedOnSort: false,
+        <div>
+          {/* ************* DIV FOR DATA-TABLE ************ */}
+          <div style={{ marginBottom: '50px' }}>
+            <div className="view_asset">
+              <Table
+                title={() => {
+                  return tableHeader
                 }}
-                // onChangeRowsPerPage={(currentRowsPerPage, currentPage) =>
-                //   this.rowsChanged(currentRowsPerPage, currentPage)
-                // }
-                // paginationRowsPerPageOptions={
-                //   TotalAssets > 100 ? [10, 20, 50, 80, 100, TotalAssets] : [10, 20, 50, 80, 100]
-                // }
-                currentPage={2}
+                columns={columns}
+                rowKey={record => record.id}
+                dataSource={filteredList}
+                loading={loadingAssets} // this.state.loadingAssets
+                // ⭐ The below commented code is for pagination from server side
+                /* pagination={{
+                   defaultPageSize: 20,
+                   onChange: (page, rows) => this.pageChanged(page, rows),
+                   onShowSizeChange: (currentPage, currentRowsPerPage) =>
+                   this.rowsChanged(currentRowsPerPage, currentPage),
+                   showSizeChanger: true,
+                   pageSizeOptions:
+                     TotalLeaders > 100
+                       ? ['20', '50', '80', '100', `${TotalLeaders}`]
+                       : ['20', '50', '80', '100'],
+                   position: 'bottom',
+                  }}
+                */
               />
             </div>
-            {/* ***** END OF DIV FOR DATA-TABLE ***** */}
           </div>
         </div>
-      </div>
+      </>
     )
   }
 }
