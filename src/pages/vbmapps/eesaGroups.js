@@ -2,15 +2,23 @@
 /* eslint-disable react/jsx-boolean-value */
 import React, { Component } from 'react'
 import Authorize from 'components/LayoutComponents/Authorize'
-import { Icon, Layout, Row, Col, Typography, Popover, Button } from 'antd'
+import { Icon, Layout, Row, Col, Typography, Popover, Button, Spin } from 'antd'
 import { gql } from 'apollo-boost'
 import Scrollbars from 'react-custom-scrollbars'
 import ReactHtmlParser from 'react-html-parser'
+import { COLORS } from 'assets/styles/globalStyles'
 import client from '../../apollo/config'
 import PageHeader from './PageHeader'
 import LastAssignmentsResult from './LastAssignmentsResult'
 import { GET_VBMAPP_QUESTIONS } from './query'
-import { leftDivStyle, rightDivStyle, assessmentCompletedBlockStyle, defaultDivStyle, leftListBoxStyle, recordResponseButtonStyle } from './customStyle'
+import {
+  leftDivStyle,
+  rightDivStyle,
+  assessmentCompletedBlockStyle,
+  defaultDivStyle,
+  leftListBoxStyle,
+  recordResponseButtonStyle,
+} from './customStyle'
 
 const { Content } = Layout
 const { Title, Text } = Typography
@@ -73,8 +81,8 @@ class EESAGroups extends Component {
     const gr = []
     for (let x = 0; x < groups.length; x += 1) {
       if (selected === groups[x].node.id) {
-        bg = '#3E7BFA'
-        textColor = '#FFF'
+        bg = COLORS.palleteLightBlue
+        textColor = '#000'
       } else {
         bg = '#FFF'
         textColor = '#000'
@@ -483,7 +491,7 @@ class EESAGroups extends Component {
                 marginBottom: 5,
                 border: '1px solid #DDD',
                 padding: '5px 20px',
-                backgroundColor: 'white'
+                backgroundColor: 'white',
               }}
             >
               <Text style={{ fontSize: 18, color: '#000' }}>
@@ -520,7 +528,7 @@ class EESAGroups extends Component {
     this.getQuestion(groupID)
   }
 
-  handleKeyDown = () => { }
+  handleKeyDown = () => {}
 
   handleAnswer(score, quesNum) {
     const { selected } = this.state
@@ -577,17 +585,17 @@ class EESAGroups extends Component {
     const { currentIndex, dbQuestionNumber } = this.state
     return (
       <Authorize roles={['parents', 'therapist', 'school_admin']} redirect to="/dashboard/beta">
-        <Layout style={{ padding: '0px' }}>
+        <Layout style={{ padding: '0px', marginTop: '20px' }}>
           <Content
             style={{
               padding: '0px 20px',
-              maxWidth: 1300,
+              maxWidth: 1360,
               width: '100%',
               margin: '0px auto',
             }}
           >
             <Row>
-              <Col sm={5}>
+              <Col sm={6}>
                 <div style={leftDivStyle}>
                   <Scrollbars style={{ height: 'calc(100vh - 120px)' }}>
                     {groups && groups.length > 0 && this.getGroups()}
@@ -595,20 +603,47 @@ class EESAGroups extends Component {
                   </Scrollbars>
                 </div>
               </Col>
-              <Col sm={19}>
+              <Col sm={18}>
                 <div style={rightDivStyle}>
-                  <PageHeader pageTitle="VB-MAPP Eesa Assessment" />
-                  <h5
-                    style={{ paddingLeft: 20, paddingRight: 20, textAlign: 'right', display: 'flex' }}
-                  >
-                    Score: {totalScore}
-                  </h5>
                   <div
-                    style={{ ...defaultDivStyle, marginBottom: 10, padding: 15, backgroundColor: '#f9f9f9' }}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-end',
+                    }}
                   >
+                    <Text style={{ fontSize: 20, color: '#000' }}>VB-MAPP Eesa Assessment</Text>
+                    &nbsp;
+                    <h5
+                      style={{
+                        paddingLeft: 20,
+                        paddingRight: 20,
+                        textAlign: 'right',
+                        display: 'flex',
+                      }}
+                    >
+                      Score: {totalScore}
+                    </h5>
+                  </div>
+                  <hr />
 
-                    {loadingQuestion && <p>Loading Question...</p>}
-                    <Scrollbars style={{ height: 'calc(100vh - 200px)' }}>
+                  <div
+                    style={{
+                      ...defaultDivStyle,
+                      marginBottom: 10,
+                      padding: '15px 10px 15px 15px',
+                      backgroundColor: COLORS.palleteLight,
+                    }}
+                  >
+                    {loadingQuestion && (
+                      <div style={{ width: '100%', margin: '20px auto', textAlign: 'center' }}>
+                        <Spin size="medium" />
+                      </div>
+                    )}
+                    <Scrollbars
+                      autoHide
+                      style={{ paddingRight: '5px', height: 'calc(100vh - 200px)' }}
+                    >
                       {loadingQuestion === false && questions.length > 0 && questions}
                     </Scrollbars>
                   </div>

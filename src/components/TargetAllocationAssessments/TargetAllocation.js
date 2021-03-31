@@ -9,6 +9,7 @@ import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import { useMutation, useQuery } from 'react-apollo'
 import CKEditor from 'react-ckeditor-component'
+import { COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 import NumberCard from './NumberCard'
 import {
   CREATE_TARGET,
@@ -23,6 +24,7 @@ let id = 0
 let stepId = 0
 let classId = 0
 const { Option } = Select
+const { layout, tailLayout } = FORM
 
 const searchableDropDownOption = {
   showSearch: true,
@@ -583,7 +585,7 @@ export default Form.create()(
 
     return (
       <div className="targetAllocationForm">
-        <Form onSubmit={handleSubmit} labelCol={{ sm: 24, md: 6 }} wrapperCol={{ sm: 24, md: 18 }}>
+        <Form {...layout} onSubmit={handleSubmit}>
           <Divider orientation="left">Basic Details</Divider>
           <Form.Item label="Allocate target directly">
             <Switch
@@ -724,7 +726,6 @@ export default Form.create()(
                   <span>Peak Blocks</span>
                 </>
               }
-              style={{ marginTop: 0, marginBottom: 0 }}
             >
               <NumberCard
                 // title="Peak Blocks"
@@ -850,12 +851,7 @@ export default Form.create()(
             </>
           )}
           <Divider orientation="left">Misc</Divider>
-          <Form.Item
-            label="Target Instructions"
-            name="Target Instructions"
-            labelCol={{ sm: 24, md: 5 }}
-            wrapperCol={{ sm: 24, md: 19 }}
-          >
+          <Form.Item label="Target Instructions" name="Target Instructions">
             <CKEditor
               name="targetInstructions"
               activeClass="p10"
@@ -865,20 +861,12 @@ export default Form.create()(
               }}
             />
           </Form.Item>
-          <Form.Item
-            label="Target Video Link"
-            labelCol={{ sm: 24, md: 5 }}
-            wrapperCol={{ sm: 24, md: 19 }}
-          >
+          <Form.Item label="Target Video Link">
             {form.getFieldDecorator('video', {
               initialValue: targetVideo,
             })(<Input placeholder="Give the video url" />)}
           </Form.Item>
-          <Form.Item
-            label="Make values default"
-            labelCol={{ sm: 24, md: 5 }}
-            wrapperCol={{ sm: 24, md: 19 }}
-          >
+          <Form.Item label="Make values default">
             <Switch
               checkedChildren={<Icon type="check" />}
               unCheckedChildren={<Icon type="close" />}
@@ -886,8 +874,13 @@ export default Form.create()(
               onChange={setMakeDefault}
             />
           </Form.Item>
-          <Form.Item style={{ textAlign: 'center' }}>
-            <Button type="primary" htmlType="submit" loading={allocateTargetLoading}>
+          <Form.Item {...tailLayout} style={{ textAlign: 'center' }}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={SUBMITT_BUTTON}
+              loading={allocateTargetLoading}
+            >
               Save
             </Button>
           </Form.Item>

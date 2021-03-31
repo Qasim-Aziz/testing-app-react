@@ -6,14 +6,22 @@
 import React, { Component } from 'react'
 import Authorize from 'components/LayoutComponents/Authorize'
 import { gql } from 'apollo-boost'
-import { Icon, Layout, Row, Col, Typography, Popover } from 'antd'
+import { Icon, Layout, Row, Col, Typography, Popover, Spin } from 'antd'
 import Scrollbars from 'react-custom-scrollbars'
 import ReactHtmlParser from 'react-html-parser'
+import { COLORS } from 'assets/styles/globalStyles'
+import LoadingComponent from 'components/LoadingComponent'
 import client from '../../apollo/config'
 import PageHeader from './PageHeader'
 import LastAssignmentsResult from './LastAssignmentsResult'
 import { GET_VBMAPP_QUESTIONS } from './query'
-import { leftDivStyle, rightDivStyle, assessmentCompletedBlockStyle, defaultDivStyle, leftListBoxStyle } from './customStyle'
+import {
+  leftDivStyle,
+  rightDivStyle,
+  assessmentCompletedBlockStyle,
+  defaultDivStyle,
+  leftListBoxStyle,
+} from './customStyle'
 
 const { Content } = Layout
 const { Title, Text } = Typography
@@ -78,8 +86,8 @@ class BarriersGroups extends Component {
     const gr = []
     for (let x = 0; x < groups.length; x += 1) {
       if (selected === groups[x].node.id) {
-        bg = '#3E7BFA'
-        textColor = '#FFF'
+        bg = COLORS.palleteLightBlue
+        textColor = '#000'
       } else {
         bg = '#FFF'
         textColor = '#000'
@@ -381,7 +389,6 @@ class BarriersGroups extends Component {
         }
 
         if (x === questionss.length) {
-          // console.log("Done");
           complete = 1
           this.setState({
             loadingQuestion: false,
@@ -410,56 +417,62 @@ class BarriersGroups extends Component {
             case '':
               if (quesNum === questions[y].questionNum) {
                 answers.push(
-                  <Popover content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>} title={`Question: `+`${questions[y].questionNum}`}>
-                  <div
-                    style={{
-                      marginVertical: 10,
-                      display: 'flex',
-                      backgroundColor: '#FFFFFF',
-                      border: '2px solid #000',
-                      width: 40,
-                      height: 40,
-                      padding: 5,
-                      borderRadius: 10,
-                      marginRight: 5,
-                      marginTop: 10,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                    role="button"
-                    onKeyDown={this.handleKeyDown}
-                    tabIndex="0"
-                    onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                  <Popover
+                    content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>}
+                    title={`Question: ` + `${questions[y].questionNum}`}
                   >
-                    <p style={{ marginBottom: 0, color: '#FFF' }}>&nbsp;</p>
-                  </div>
+                    <div
+                      style={{
+                        marginVertical: 10,
+                        display: 'flex',
+                        backgroundColor: '#FFFFFF',
+                        border: '2px solid #000',
+                        width: 40,
+                        height: 40,
+                        padding: 5,
+                        borderRadius: 10,
+                        marginRight: 5,
+                        marginTop: 10,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                      role="button"
+                      onKeyDown={this.handleKeyDown}
+                      tabIndex="0"
+                      onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                    >
+                      <p style={{ marginBottom: 0, color: '#FFF' }}>&nbsp;</p>
+                    </div>
                   </Popover>,
                 )
               } else {
                 answers.push(
-                  <Popover content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>} title={`Question: `+`${questions[y].questionNum}`}>
-                  <div
-                    style={{
-                      marginVertical: 10,
-                      display: 'flex',
-                      backgroundColor: '#FFFFFF',
-                      border: '1px solid #DDD',
-                      width: 40,
-                      height: 40,
-                      padding: 5,
-                      borderRadius: 10,
-                      marginRight: 5,
-                      marginTop: 10,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                    role="button"
-                    onKeyDown={this.handleKeyDown}
-                    tabIndex="0"
-                    onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                  <Popover
+                    content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>}
+                    title={`Question: ` + `${questions[y].questionNum}`}
                   >
-                    <p style={{ marginBottom: 0, color: '#FFF' }}>&nbsp;</p>
-                  </div>
+                    <div
+                      style={{
+                        marginVertical: 10,
+                        display: 'flex',
+                        backgroundColor: '#FFFFFF',
+                        border: '1px solid #DDD',
+                        width: 40,
+                        height: 40,
+                        padding: 5,
+                        borderRadius: 10,
+                        marginRight: 5,
+                        marginTop: 10,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                      role="button"
+                      onKeyDown={this.handleKeyDown}
+                      tabIndex="0"
+                      onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                    >
+                      <p style={{ marginBottom: 0, color: '#FFF' }}>&nbsp;</p>
+                    </div>
                   </Popover>,
                 )
               }
@@ -468,56 +481,62 @@ class BarriersGroups extends Component {
             case '0.0':
               if (quesNum === questions[y].questionNum) {
                 answers.push(
-                  <Popover content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>} title={`Question: `+`${questions[y].questionNum}`}>
-                  <div
-                    style={{
-                      marginVertical: 10,
-                      display: 'flex',
-                      backgroundColor: '#4BAEA0',
-                      border: '2px solid #000',
-                      width: 40,
-                      height: 40,
-                      padding: 5,
-                      borderRadius: 10,
-                      marginRight: 5,
-                      marginTop: 10,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                    role="button"
-                    onKeyDown={this.handleKeyDown}
-                    tabIndex="0"
-                    onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                  <Popover
+                    content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>}
+                    title={`Question: ` + `${questions[y].questionNum}`}
                   >
-                    <p style={{ marginBottom: 0, color: '#FFF' }}>0</p>
-                  </div>
+                    <div
+                      style={{
+                        marginVertical: 10,
+                        display: 'flex',
+                        backgroundColor: '#4BAEA0',
+                        border: '2px solid #000',
+                        width: 40,
+                        height: 40,
+                        padding: 5,
+                        borderRadius: 10,
+                        marginRight: 5,
+                        marginTop: 10,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                      role="button"
+                      onKeyDown={this.handleKeyDown}
+                      tabIndex="0"
+                      onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                    >
+                      <p style={{ marginBottom: 0, color: '#FFF' }}>0</p>
+                    </div>
                   </Popover>,
                 )
               } else {
                 answers.push(
-                  <Popover content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>} title={`Question: `+`${questions[y].questionNum}`}>
-                  <div
-                    style={{
-                      marginVertical: 10,
-                      display: 'flex',
-                      backgroundColor: '#4BAEA0',
-                      border: '1px solid #4BAEA0',
-                      width: 40,
-                      height: 40,
-                      padding: 5,
-                      borderRadius: 10,
-                      marginRight: 5,
-                      marginTop: 10,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                    role="button"
-                    onKeyDown={this.handleKeyDown}
-                    tabIndex="0"
-                    onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                  <Popover
+                    content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>}
+                    title={`Question: ` + `${questions[y].questionNum}`}
                   >
-                    <p style={{ marginBottom: 0, color: '#FFF' }}>0</p>
-                  </div>
+                    <div
+                      style={{
+                        marginVertical: 10,
+                        display: 'flex',
+                        backgroundColor: '#4BAEA0',
+                        border: '1px solid #4BAEA0',
+                        width: 40,
+                        height: 40,
+                        padding: 5,
+                        borderRadius: 10,
+                        marginRight: 5,
+                        marginTop: 10,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                      role="button"
+                      onKeyDown={this.handleKeyDown}
+                      tabIndex="0"
+                      onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                    >
+                      <p style={{ marginBottom: 0, color: '#FFF' }}>0</p>
+                    </div>
                   </Popover>,
                 )
               }
@@ -527,56 +546,62 @@ class BarriersGroups extends Component {
               totalScores += 1.0
               if (quesNum === questions[y].questionNum) {
                 answers.push(
-                  <Popover content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>} title={`Question: `+`${questions[y].questionNum}`}>
-                  <div
-                    style={{
-                      marginVertical: 10,
-                      display: 'flex',
-                      backgroundColor: '#FF9C52',
-                      border: '2px solid #000',
-                      width: 40,
-                      height: 40,
-                      borderRadius: 10,
-                      marginRight: 5,
-                      marginTop: 10,
-                      padding: 5,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                    role="button"
-                    onKeyDown={this.handleKeyDown}
-                    tabIndex="0"
-                    onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                  <Popover
+                    content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>}
+                    title={`Question: ` + `${questions[y].questionNum}`}
                   >
-                    <p style={{ marginBottom: 0, color: '#FFF' }}>1</p>
-                  </div>
+                    <div
+                      style={{
+                        marginVertical: 10,
+                        display: 'flex',
+                        backgroundColor: '#FF9C52',
+                        border: '2px solid #000',
+                        width: 40,
+                        height: 40,
+                        borderRadius: 10,
+                        marginRight: 5,
+                        marginTop: 10,
+                        padding: 5,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                      role="button"
+                      onKeyDown={this.handleKeyDown}
+                      tabIndex="0"
+                      onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                    >
+                      <p style={{ marginBottom: 0, color: '#FFF' }}>1</p>
+                    </div>
                   </Popover>,
                 )
               } else {
                 answers.push(
-                  <Popover content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>} title={`Question: `+`${questions[y].questionNum}`}>
-                  <div
-                    style={{
-                      marginVertical: 10,
-                      display: 'flex',
-                      backgroundColor: '#FF9C52',
-                      border: '1px solid #FF9C52',
-                      width: 40,
-                      height: 40,
-                      borderRadius: 10,
-                      marginRight: 5,
-                      marginTop: 10,
-                      padding: 5,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                    role="button"
-                    onKeyDown={this.handleKeyDown}
-                    tabIndex="0"
-                    onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                  <Popover
+                    content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>}
+                    title={`Question: ` + `${questions[y].questionNum}`}
                   >
-                    <p style={{ marginBottom: 0, color: '#FFF' }}>1</p>
-                  </div>
+                    <div
+                      style={{
+                        marginVertical: 10,
+                        display: 'flex',
+                        backgroundColor: '#FF9C52',
+                        border: '1px solid #FF9C52',
+                        width: 40,
+                        height: 40,
+                        borderRadius: 10,
+                        marginRight: 5,
+                        marginTop: 10,
+                        padding: 5,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                      role="button"
+                      onKeyDown={this.handleKeyDown}
+                      tabIndex="0"
+                      onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                    >
+                      <p style={{ marginBottom: 0, color: '#FFF' }}>1</p>
+                    </div>
                   </Popover>,
                 )
               }
@@ -586,56 +611,62 @@ class BarriersGroups extends Component {
               totalScores += 2.0
               if (quesNum === questions[y].questionNum) {
                 answers.push(
-                  <Popover content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>} title={`Question: `+`${questions[y].questionNum}`}>
-                  <div
-                    style={{
-                      marginVertical: 10,
-                      display: 'flex',
-                      backgroundColor: '#FF9C52',
-                      border: '2px solid #000',
-                      width: 40,
-                      height: 40,
-                      borderRadius: 10,
-                      marginRight: 5,
-                      marginTop: 10,
-                      padding: 5,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                    role="button"
-                    onKeyDown={this.handleKeyDown}
-                    tabIndex="0"
-                    onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                  <Popover
+                    content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>}
+                    title={`Question: ` + `${questions[y].questionNum}`}
                   >
-                    <p style={{ marginBottom: 0, color: '#FFF' }}>2</p>
-                  </div>
+                    <div
+                      style={{
+                        marginVertical: 10,
+                        display: 'flex',
+                        backgroundColor: '#FF9C52',
+                        border: '2px solid #000',
+                        width: 40,
+                        height: 40,
+                        borderRadius: 10,
+                        marginRight: 5,
+                        marginTop: 10,
+                        padding: 5,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                      role="button"
+                      onKeyDown={this.handleKeyDown}
+                      tabIndex="0"
+                      onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                    >
+                      <p style={{ marginBottom: 0, color: '#FFF' }}>2</p>
+                    </div>
                   </Popover>,
                 )
               } else {
                 answers.push(
-                  <Popover content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>} title={`Question: `+`${questions[y].questionNum}`}>
-                  <div
-                    style={{
-                      marginVertical: 10,
-                      display: 'flex',
-                      backgroundColor: '#FF9C52',
-                      border: '1px solid #FF9C52',
-                      width: 40,
-                      height: 40,
-                      borderRadius: 10,
-                      marginRight: 5,
-                      marginTop: 10,
-                      padding: 5,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                    role="button"
-                    onKeyDown={this.handleKeyDown}
-                    tabIndex="0"
-                    onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                  <Popover
+                    content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>}
+                    title={`Question: ` + `${questions[y].questionNum}`}
                   >
-                    <p style={{ marginBottom: 0, color: '#FFF' }}>2</p>
-                  </div>
+                    <div
+                      style={{
+                        marginVertical: 10,
+                        display: 'flex',
+                        backgroundColor: '#FF9C52',
+                        border: '1px solid #FF9C52',
+                        width: 40,
+                        height: 40,
+                        borderRadius: 10,
+                        marginRight: 5,
+                        marginTop: 10,
+                        padding: 5,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                      role="button"
+                      onKeyDown={this.handleKeyDown}
+                      tabIndex="0"
+                      onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                    >
+                      <p style={{ marginBottom: 0, color: '#FFF' }}>2</p>
+                    </div>
                   </Popover>,
                 )
               }
@@ -645,56 +676,62 @@ class BarriersGroups extends Component {
               totalScores += 3.0
               if (quesNum === questions[y].questionNum) {
                 answers.push(
-                  <Popover content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>} title={`Question: `+`${questions[y].questionNum}`}>
-                  <div
-                    style={{
-                      marginVertical: 10,
-                      display: 'flex',
-                      backgroundColor: '#FF9C52',
-                      border: '2px solid #000',
-                      width: 40,
-                      height: 40,
-                      borderRadius: 10,
-                      marginRight: 5,
-                      marginTop: 10,
-                      padding: 5,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                    role="button"
-                    onKeyDown={this.handleKeyDown}
-                    tabIndex="0"
-                    onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                  <Popover
+                    content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>}
+                    title={`Question: ` + `${questions[y].questionNum}`}
                   >
-                    <p style={{ marginBottom: 0, color: '#FFF' }}>3</p>
-                  </div>
+                    <div
+                      style={{
+                        marginVertical: 10,
+                        display: 'flex',
+                        backgroundColor: '#FF9C52',
+                        border: '2px solid #000',
+                        width: 40,
+                        height: 40,
+                        borderRadius: 10,
+                        marginRight: 5,
+                        marginTop: 10,
+                        padding: 5,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                      role="button"
+                      onKeyDown={this.handleKeyDown}
+                      tabIndex="0"
+                      onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                    >
+                      <p style={{ marginBottom: 0, color: '#FFF' }}>3</p>
+                    </div>
                   </Popover>,
                 )
               } else {
                 answers.push(
-                  <Popover content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>} title={`Question: `+`${questions[y].questionNum}`}>
-                  <div
-                    style={{
-                      marginVertical: 10,
-                      display: 'flex',
-                      backgroundColor: '#FF9C52',
-                      border: '1px solid #FF9C52',
-                      width: 40,
-                      height: 40,
-                      borderRadius: 10,
-                      marginRight: 5,
-                      marginTop: 10,
-                      padding: 5,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                    role="button"
-                    onKeyDown={this.handleKeyDown}
-                    tabIndex="0"
-                    onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                  <Popover
+                    content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>}
+                    title={`Question: ` + `${questions[y].questionNum}`}
                   >
-                    <p style={{ marginBottom: 0, color: '#FFF' }}>3</p>
-                  </div>
+                    <div
+                      style={{
+                        marginVertical: 10,
+                        display: 'flex',
+                        backgroundColor: '#FF9C52',
+                        border: '1px solid #FF9C52',
+                        width: 40,
+                        height: 40,
+                        borderRadius: 10,
+                        marginRight: 5,
+                        marginTop: 10,
+                        padding: 5,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                      role="button"
+                      onKeyDown={this.handleKeyDown}
+                      tabIndex="0"
+                      onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                    >
+                      <p style={{ marginBottom: 0, color: '#FFF' }}>3</p>
+                    </div>
                   </Popover>,
                 )
               }
@@ -704,56 +741,62 @@ class BarriersGroups extends Component {
               totalScores += 4.0
               if (quesNum === questions[y].questionNum) {
                 answers.push(
-                  <Popover content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>} title={`Question: `+`${questions[y].questionNum}`}>
-                  <div
-                    style={{
-                      marginVertical: 10,
-                      display: 'flex',
-                      backgroundColor: '#FF8080',
-                      border: '2px solid #000',
-                      width: 40,
-                      height: 40,
-                      borderRadius: 10,
-                      marginRight: 5,
-                      marginTop: 10,
-                      padding: 5,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                    role="button"
-                    onKeyDown={this.handleKeyDown}
-                    tabIndex="0"
-                    onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                  <Popover
+                    content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>}
+                    title={`Question: ` + `${questions[y].questionNum}`}
                   >
-                    <p style={{ marginBottom: 0, color: '#FFF' }}>4</p>
-                  </div>
+                    <div
+                      style={{
+                        marginVertical: 10,
+                        display: 'flex',
+                        backgroundColor: '#FF8080',
+                        border: '2px solid #000',
+                        width: 40,
+                        height: 40,
+                        borderRadius: 10,
+                        marginRight: 5,
+                        marginTop: 10,
+                        padding: 5,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                      role="button"
+                      onKeyDown={this.handleKeyDown}
+                      tabIndex="0"
+                      onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                    >
+                      <p style={{ marginBottom: 0, color: '#FFF' }}>4</p>
+                    </div>
                   </Popover>,
                 )
               } else {
                 answers.push(
-                  <Popover content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>} title={`Question: `+`${questions[y].questionNum}`}>
-                  <div
-                    style={{
-                      marginVertical: 10,
-                      display: 'flex',
-                      backgroundColor: '#FF8080',
-                      border: '1px solid #FF8080',
-                      width: 40,
-                      height: 40,
-                      borderRadius: 10,
-                      marginRight: 5,
-                      marginTop: 10,
-                      padding: 5,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}
-                    role="button"
-                    onKeyDown={this.handleKeyDown}
-                    tabIndex="0"
-                    onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                  <Popover
+                    content={<div style={{ maxWidth: '350px' }}>{questions[y]?.objective}</div>}
+                    title={`Question: ` + `${questions[y].questionNum}`}
                   >
-                    <p style={{ marginBottom: 0, color: '#FFF' }}>4</p>
-                  </div>
+                    <div
+                      style={{
+                        marginVertical: 10,
+                        display: 'flex',
+                        backgroundColor: '#FF8080',
+                        border: '1px solid #FF8080',
+                        width: 40,
+                        height: 40,
+                        borderRadius: 10,
+                        marginRight: 5,
+                        marginTop: 10,
+                        padding: 5,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}
+                      role="button"
+                      onKeyDown={this.handleKeyDown}
+                      tabIndex="0"
+                      onClick={() => this.getQuestionByNumber(questions[y].questionNum)}
+                    >
+                      <p style={{ marginBottom: 0, color: '#FFF' }}>4</p>
+                    </div>
                   </Popover>,
                 )
               }
@@ -801,7 +844,7 @@ class BarriersGroups extends Component {
     this.getQuestion(groupID)
   }
 
-  handleKeyDown = () => { }
+  handleKeyDown = () => {}
 
   handleAnswer(score) {
     const { selected } = this.state
@@ -862,34 +905,45 @@ class BarriersGroups extends Component {
     // console.log(currentQuestion);
     return (
       <Authorize roles={['parents', 'therapist', 'school_admin']} redirect to="/dashboard/beta">
-        <Layout style={{ padding: '0px' }}>
+        <Layout style={{ padding: '0px', marginTop: '20px' }}>
           <Content
             style={{
               padding: '0px 20px',
-              maxWidth: 1300,
+              maxWidth: 1360,
               width: '100%',
               margin: '0px auto',
             }}
           >
             <Row>
-              <Col sm={5}>
+              <Col sm={6}>
                 <div style={leftDivStyle}>
-                  <Scrollbars style={{ height: 'calc(100vh - 120px)' }}>
+                  <Scrollbars autoHide style={{ height: 'calc(100vh - 120px)' }}>
                     {groups && groups.length > 0 && this.getGroups()}
                     <div style={{ height: 20 }}></div>
                   </Scrollbars>
                 </div>
               </Col>
-              <Col sm={19}>
+              <Col sm={18}>
                 <div style={rightDivStyle}>
-                  <PageHeader pageTitle="VB-MAPP Barrier Assessment" questions={questions} lastAssessment={true} />
+                  <PageHeader
+                    pageTitle="VB-MAPP Barrier Assessment"
+                    questions={questions}
+                    lastAssessment={true}
+                  />
                   {/* {questions && <LastAssignmentsResult questions={questions} />} */}
                   {completed === 1 && (
                     <div style={assessmentCompletedBlockStyle}>
-                      <Text style={{ fontSize: 14, marginBottom: 0, color: 'white' }}>Assessment completed, now you can edit assessment by selecting question from the scoreboard</Text>
+                      <Text style={{ fontSize: 14, marginBottom: 0, color: 'white' }}>
+                        Assessment completed, now you can edit assessment by selecting question from
+                        the scoreboard
+                      </Text>
                     </div>
                   )}
-                  {loadingQuestion && <p>Loading Question...</p>}
+                  {loadingQuestion && (
+                    <div style={{ width: '100%', margin: '20px auto', textAlign: 'center' }}>
+                      <Spin size="small" />
+                    </div>
+                  )}
                   {loadingQuestion === false &&
                     currentQuestion &&
                     Object.keys(currentQuestion).length > 0 && (
@@ -979,9 +1033,7 @@ class BarriersGroups extends Component {
                         </div>
                       </div>
                     )}
-                  <div
-                    style={{...defaultDivStyle, marginBottom: 10}}
-                  >
+                  <div style={{ ...defaultDivStyle, marginBottom: 10 }}>
                     <div
                       style={{
                         display: 'flex',
@@ -996,7 +1048,11 @@ class BarriersGroups extends Component {
                       </p>
                     </div>
                     <div style={{}}>
-                      {loadingQuestion && <p>Loading Scoreboard...</p>}
+                      {loadingQuestion && (
+                        <div style={{ width: '100%', margin: '20px auto', textAlign: 'center' }}>
+                          <Spin size="medium" />
+                        </div>
+                      )}
                       {loadingQuestion === false && scoreboard.length > 0 && scoreboard}
                       {loadingQuestion === false && scoreboard.length === 0 && (
                         <p>Start answering questions to see the scoreboard</p>
