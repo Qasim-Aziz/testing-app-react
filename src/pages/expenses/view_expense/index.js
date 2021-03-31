@@ -566,7 +566,8 @@ class ExpenseTable extends React.Component {
           {SpecificExpense ? (
             <div className="card" style={{ marginTop: '5px', border: 'none' }}>
               <div className="card-body">
-                <div id="basic_form_div" style={{ marginTop: '100px' }}>
+                {/* style={{ marginTop: '100px' }} */}
+                <div id="basic_form_div">
                   {isSpecificExpense ? <EditBasicInformation key={SpecificExpense.id} /> : null}
                 </div>
               </div>
