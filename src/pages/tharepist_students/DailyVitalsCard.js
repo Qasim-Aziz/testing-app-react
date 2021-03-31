@@ -7,7 +7,6 @@
 import React, { useState } from 'react'
 import { Typography, Tabs, Button, Card } from 'antd'
 
-import { COLORS } from 'assets/styles/globalStyles'
 import MealDataPage from '../meal'
 import MandDataPage from '../mandData'
 import MedicalDataPage from '../MedicalData'
@@ -120,7 +119,7 @@ const DailyVitalsCard = props => {
   }
   const ActiveStyle = {
     ...BlockStyle,
-    background: COLORS.palleteLightBlue,
+    background: '#a7a6a6',
   }
   const HeadStyle = {
     color: '#000',
@@ -145,7 +144,7 @@ const DailyVitalsCard = props => {
     <div style={{ display: 'flex' }}>
       <Card
         style={{
-          background: COLORS.palleteLight,
+          background: '#F1F1F1',
           borderRadius: 0,
           border: 'none',
           minHeight: '100vh',

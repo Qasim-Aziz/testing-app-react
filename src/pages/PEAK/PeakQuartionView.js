@@ -6,7 +6,6 @@ import { useQuery, useMutation } from 'react-apollo'
 import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons'
 import { history } from 'index'
 import { Spinner } from 'reactstrap'
-import { COLORS } from 'assets/styles/globalStyles'
 import { SUMMERY, GET_CODE_DETAILS, SEND_RESPONSE, QUIT } from './query'
 
 const { Text } = Typography
@@ -315,9 +314,7 @@ export default ({ selectedQ, data, setSelectedQ, learner }) => {
             fontSize: 14,
             fontWeight: 'bold',
             background:
-              selectedQ?.index === summeryData?.peakDataSummary.total - 1
-                ? COLORS.success
-                : COLORS.danger,
+              selectedQ?.index === summeryData?.peakDataSummary.total - 1 ? 'green' : '#FF8080',
           }}
           loading={quitLoading}
           onClick={() => {
@@ -334,7 +331,7 @@ export default ({ selectedQ, data, setSelectedQ, learner }) => {
         {summeryData && (
           <div
             style={{
-              background: COLORS.palleteLight,
+              background: '#F0F6FF',
               padding: '7px 17px',
               borderRadius: 4,
               width: '100%',
@@ -344,14 +341,13 @@ export default ({ selectedQ, data, setSelectedQ, learner }) => {
             <Text
               style={{
                 fontSize: 12,
-                color: '#000',
+                color: '#8C98AA',
               }}
             >
               {summeryData.peakDataSummary.totalAttended}&nbsp;/&nbsp;
               {summeryData.peakDataSummary.total} answered
             </Text>
             <Progress
-              className="peak-assess-prog-bar"
               percent={
                 (summeryData.peakDataSummary.totalAttended / summeryData.peakDataSummary.total) *
                 100

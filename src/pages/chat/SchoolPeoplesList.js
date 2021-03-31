@@ -63,11 +63,11 @@ export default ({ select, setSelect, setSelectedPeopleDetails }) => {
   }
 
   if (viewStudent && viewStudent.length > 0 && !select) {
-    setSelect(viewStudent[0].node.parent?.id)
+    setSelect(viewStudent[4].node.parent?.id)
     setSelectedPeopleDetails({
-      name: viewStudent[0].node.firstname,
-      profileImg: viewStudent[0].node.image,
-      id: viewStudent[0].node.parent?.id,
+      name: viewStudent[4].node.firstname,
+      profileImg: viewStudent[4].node.image,
+      id: viewStudent[4].node.parent?.id,
       role: 'Learner',
     })
   }

@@ -92,7 +92,7 @@ export default ({ secondUser, style, selectedPeopleDetails }) => {
           display: 'flex',
           alignItems: 'center',
           padding: '10px 16px',
-          backgroundColor: COLORS.palleteLight,
+          backgroundColor: COLORS.grayFill,
         }}
       >
         <Avatar

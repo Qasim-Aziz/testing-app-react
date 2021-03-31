@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react'
 import { Tabs, DatePicker, notification, Input, Select, Button, Icon } from 'antd'
 import RecordTab from 'components/BehaviourData/RecordTab'
 import TemplateTab from 'components/BehaviourData/TemplateTab'
-import { COLORS } from 'assets/styles/globalStyles'
 import moment from 'moment'
 import { useQuery } from 'react-apollo'
 import { DANCLE_STATUS } from './query'
 import './styles.scss'
 
 const container = {
-  background: COLORS.palleteLight,
+  background: 'rgb(241 241 241)',
   position: 'relative',
   display: 'flex',
   height: '50px',
@@ -21,7 +20,6 @@ const container = {
 const Headstyle = {
   fontSize: '16px',
   paddingTop: '7px',
-  color: 'blaxk',
   marginRight: '10px',
 }
 const BehaviorDataPage = ({ openRightdrawer, openDrawer, closeDrawer }) => {

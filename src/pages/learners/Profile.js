@@ -50,6 +50,17 @@ function Profile(props) {
       const tt = props.learners.UserProfile
 
       setUserProfile(tt)
+
+      tt.family?.members.edges.map(item => {
+        if (item.node.relationship.name == 'Father' && tt.fatherName === null) {
+          setFatherName(item.node.memberName)
+        }
+        if (item.node.relationship.name == 'Mother' && tt.motherName === null) {
+          setMotherName(item.node.memberName)
+        }
+      })
+      tt?.motherName ? setMotherName(tt?.motherName) : null
+      tt?.fatherName ? setFatherName(tt?.fatherName) : null
     }
   }, [props.learners])
 
@@ -284,7 +295,7 @@ function Profile(props) {
           ) : null}
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>Father Name </p>
-            <p> : {userProfile.fatherName ? userProfile.fatherName : ''}</p>
+            <p> : {fatherName ? JSON.parse(fatherName) : fatherName}</p>
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>Father Phone </p>
@@ -292,7 +303,7 @@ function Profile(props) {
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>Mother Name </p>
-            <p> : {userProfile.motherName ? userProfile.motherName : ''}</p>
+            <p> : {motherName ? JSON.parse(motherName) : motherName}</p>
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>Mother Phone </p>
@@ -422,7 +433,7 @@ function Profile(props) {
             </Button>{' '}
           </div>
 
-          {/* <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>Default Active</p>
             {userProfile.isDefaultActive ? (
               <CheckCircleOutlined
@@ -433,7 +444,7 @@ function Profile(props) {
                 style={{ fontSize: 20, color: COLORS.danger, fontWeight: '700', margin: 'auto' }}
               />
             )}
-          </div> */}
+          </div>
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>VBMAPP</p>
             {userProfile.isVbmappActive ? (
