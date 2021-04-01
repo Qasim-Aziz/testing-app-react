@@ -11,14 +11,6 @@ import BankDetails from './bankDetails'
 const { TabPane } = Tabs
 
 export default () => {
-  const [newInvDrawer, setNewInvDrawer] = useState(false)
-  const [data, setData] = useState()
-
-  // invoice filer
-  const [form, setForm] = useState()
-  const [to, setTo] = useState()
-  const [month, setMonth] = useState()
-  const [statusSelect, setStatusSelect] = useState()
   const [bankDetailsDrawer, setBankDetailsDrawer] = useState(false)
 
   const paymentDetailsButton = (

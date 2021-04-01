@@ -3,9 +3,12 @@ import { Form, InputNumber, Button, Select, Row, Col, Divider } from 'antd'
 import { connect } from 'react-redux'
 import { times } from 'ramda'
 import { PlusOutlined } from '@ant-design/icons'
+import { FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 import actions from 'redux/authorizationCodes/actions'
 import { modifierActions, modifierDispatch } from './modifierActions'
 import ModifierForm from './ModifierForm'
+
+const { layout, tailLayout } = FORM
 
 @connect(({ authorizationCode }) => ({ authorizationCode }))
 class AddFeeSchedule extends React.Component {
@@ -57,7 +60,7 @@ class AddFeeSchedule extends React.Component {
     const { form, codeList, payorList, modifiers } = this.props
 
     return (
-      <Form className="addEditFeeScheduleRate" onSubmit={e => this.handleSubmit(e)}>
+      <Form {...layout} className="addEditFeeScheduleRate" onSubmit={e => this.handleSubmit(e)}>
         <Divider orientation="left">Basic Details</Divider>
 
         {/* Payor - Service Code */}
@@ -146,11 +149,11 @@ class AddFeeSchedule extends React.Component {
             </Button>
           </Col>
         </Row>
-        <Form.Item style={{ textAlign: 'center' }}>
-          <Button type="primary" htmlType="submit">
+        <Form.Item {...tailLayout}>
+          <Button type="primary" htmlType="submit" style={SUBMITT_BUTTON}>
             Submit
           </Button>
-          <Button onClick={this.onReset} className="ml-4">
+          <Button onClick={this.onReset} style={CANCEL_BUTTON}>
             Cancel
           </Button>
         </Form.Item>

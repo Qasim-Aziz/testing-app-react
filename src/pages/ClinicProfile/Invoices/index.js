@@ -7,6 +7,7 @@ import {
   notification,
   Table,
   Menu,
+  Popconfirm,
   Dropdown,
   Select,
   Input,
@@ -112,9 +113,12 @@ export default () => {
           client: node.customer?.parent?.username,
           status: node.status.statusName,
           date: node.issueDate,
-          name: `${node.customer?.parent?.firstName} ${
-            node.customer?.parent?.lastName ? node.customer?.parent?.lastName : ' '
-          }`,
+          name: node.customer?.parent
+            ? `${node.customer.parent.firstName} ${
+                node.customer.parent.lastName ? node.customer?.parent?.lastName : ' '
+              }`
+            : null,
+          email: node.email,
         }
       })
       setData(arrengedData)
@@ -129,6 +133,7 @@ export default () => {
       })
     }
   }, [invoiceError])
+
   const columns = [
     {
       title: 'Invoice No',
@@ -145,10 +150,10 @@ export default () => {
     },
     {
       title: 'Client',
-      dataIndex: 'client',
+      dataIndex: 'email',
       render: (text, row) => (
         <span>
-          {row.name} - {text}
+          {row.name ? `${row.name} - ` : ''} {text}
         </span>
       ),
     },
@@ -187,17 +192,19 @@ export default () => {
                 >
                   <EditOutlined style={{ fontWeight: 600 }} />
                 </Button>
-                <Button
-                  type="link"
-                  style={{ color: COLORS.danger }}
-                  onClick={() => {
+                <Popconfirm
+                  title="Are you sure to delete this invoice?"
+                  onConfirm={() => {
                     deleteInvoice({ variables: { id: row.key } })
                     setDeleteInvoiceId(row.key)
                   }}
-                  loading={deleteInvoiceLoading}
+                  okText="Yes"
+                  cancelText="No"
                 >
-                  <DeleteOutlined style={{ color: COLORS.danger, fontWeight: 600 }} />
-                </Button>
+                  <Button type="link" style={{ color: COLORS.danger }}>
+                    <DeleteOutlined style={{ color: COLORS.danger, fontWeight: 600 }} />
+                  </Button>
+                </Popconfirm>
               </>
             )}
           </div>
@@ -297,7 +304,6 @@ export default () => {
     </Menu>
   )
 
-  console.log(filteredList, 'filtered')
   return (
     <div>
       <Helmet title="Dashboard Alpha" />

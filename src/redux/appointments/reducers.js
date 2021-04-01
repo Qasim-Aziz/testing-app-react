@@ -18,7 +18,7 @@ export default function userReducer(state = initialState, action) {
     case actions.APPEND_APPOINTMENT_LIST:
       return {
         ...state,
-        appointmentList: [...state.appointmentList, action.payload.appointment],
+        appointments: [...state.appointments, action.payload.appointment],
         appointmentCreated: true,
       }
 

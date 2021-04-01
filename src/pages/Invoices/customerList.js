@@ -26,7 +26,7 @@ import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
 import moment from 'moment'
 import AdvanceInvoiceForm from './advanceInvoice'
 import MonthlyInvoiceForm from './monthlyInvoice'
-import { CLINIC_QUERY, ADVANCE_INVOICE } from './query'
+import { CLINIC_QUERY, ADVANCE_INVOICE, MONTHLY_INVOICE } from './query'
 
 const { Option } = Select
 const { Text, Title } = Typography
@@ -44,6 +44,11 @@ function CustomerList() {
     createAdvanceInvoice,
     { data: advanceData, loading: advanceLoading, error: advanceError },
   ] = useMutation(ADVANCE_INVOICE)
+
+  const [
+    createMonthlyInvoice,
+    { data: monthlyData, loading: monthlyLoading, error: monthlyError },
+  ] = useMutation(MONTHLY_INVOICE)
 
   useEffect(() => {
     if (data) {
@@ -108,7 +113,19 @@ function CustomerList() {
               type="link"
               onClick={() => {
                 setCurrentRow(text)
+                console.log(selectedRowKeys, 'clinics Id')
                 setMonthlyInvForm(true)
+                createMonthlyInvoice({
+                  variables: {
+                    month: 'March',
+                    clinics: selectedRowKeys,
+                    cgst: 10,
+                    sgst: 8,
+                    discount: 2,
+                  },
+                })
+                  .then(res => console.log(res, 'response from monthly invoice'))
+                  .catch(err => console.log(err, 'monthly error'))
               }}
             >
               Monthly Invoice +
