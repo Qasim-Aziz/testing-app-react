@@ -78,7 +78,10 @@ const LeftSidePanel = ({ onActiveProfileTabChange }) => {
   const { schooldetail } = clinicData || { schooldetail: { schoolName: '', address: '' } }
 
   return (
-    <div style={{ minWidth: '240px', width: '320px' }} className="border-right profile-details">
+    <div
+      style={{ minWidth: '240px', width: '386px', backgroundColor: '#dbe2ef' }}
+      className="border-right profile-details"
+    >
       <div className="profile-title">Profile</div>
       <div className="profile-avtar-title-block">
         <img
@@ -88,9 +91,9 @@ const LeftSidePanel = ({ onActiveProfileTabChange }) => {
           className="profile-avtar"
           src="https://www.thewodge.com/wp-content/uploads/2019/11/avatar-icon.png"
         />
-        <span>{node?.name}</span>
+        <span style={{ fontFamily: 'bolder' }}>{node?.name}</span>
       </div>
-      <div style={{ padding: 10 }}>
+      <div style={{ padding: '17px' }}>
         <table className="profile-details-grid">
           <tbody>
             <tr className="heading-row" style={{ paddingTop: 0 }}>

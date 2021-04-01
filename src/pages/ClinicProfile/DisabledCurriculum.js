@@ -308,7 +308,7 @@ class ChangePasswordForm extends React.Component {
       return 'Loading...'
     }
 
-    const divStyle = { height: 600, overflow: 'auto', backgroundColor: '#f9f9f9' }
+    const divStyle = { height: 600, overflow: 'auto', backgroundColor: '#edf1f7' }
     const childDivStyle = { padding: 4 }
     const childChildDivStyle = {
       border: '1px solid black',
@@ -323,7 +323,7 @@ class ChangePasswordForm extends React.Component {
           <p>Disabled Curriculum</p>
         </div>
         <div style={{ paddingTop: 30 }}>
-          <Row style={{ marginTop: 9, backgroundColor: '#f9f9f9', padding: 5 }}>
+          <Row style={{ marginTop: 9, padding: 5 }}>
             <Col span={6}>
               <Title style={{ fontSize: 18, lineHeight: '21px' }}>Program Areas</Title>
               <div style={divStyle}>

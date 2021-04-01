@@ -169,7 +169,7 @@ export default () => {
       <Drawer
         title={updatingAppointmentId ? 'Update Appointment' : 'Create Appointment'}
         placement="right"
-        width={DRAWER.widthL2}
+        width={DRAWER.widthL1}
         closable
         onClose={() => setVisibleDraw(false)}
         visible={visibleDraw}

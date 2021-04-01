@@ -5,6 +5,7 @@ import React, { useEffect } from 'react'
 import { Button, Form, Input, Select, notification } from 'antd'
 import gql from 'graphql-tag'
 import { useQuery, useMutation } from 'react-apollo'
+import { SUBMITT_BUTTON, CANCEL_BUTTON, FORM } from '../../assets/styles/globalStyles'
 
 const { TextArea } = Input
 const { Option } = Select
@@ -184,7 +185,7 @@ export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpda
   }
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form {...FORM.layout} onSubmit={handleSubmit}>
       <Form.Item label="Issue">
         {form.getFieldDecorator('issue', {
           initialValue: data.ticket.subject,
@@ -254,16 +255,11 @@ export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpda
         )}
       </Form.Item>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-        }}
-      >
+      <Form.Item {...FORM.tailLayout}>
         <Button
           type="primary"
           htmlType="submit"
-          style={{ marginTop: 15, fontSize: 16, width: '46%', height: 40 }}
+          style={SUBMITT_BUTTON}
           loading={updateTicketLoading}
         >
           Update Ticket
@@ -271,7 +267,7 @@ export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpda
 
         <Button
           type="danger"
-          style={{ marginTop: 15, fontSize: 16, width: '46%', height: 40 }}
+          style={CANCEL_BUTTON}
           onClick={() => {
             form.resetFields()
             setUpdateTicketId(null)
@@ -279,7 +275,7 @@ export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpda
         >
           Cancel
         </Button>
-      </div>
+      </Form.Item>
     </Form>
   )
 })

@@ -91,7 +91,7 @@ button {
 
 .card-column {
   padding: 10px;
-  background-color: #f4f4f4;
+  background-color: #f9f7f7;
 }
 
 .card-hover-button {
@@ -119,11 +119,12 @@ button {
 .profile-details {
   .profile-title {
     box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.4);
-    background-color: #fff;
+    background-color: #dbe2ef;
     text-align: center;
-    padding: 9px;
+    padding: 10px;
     font-size: 14px;
     font-weight: bold;
+    color: #112d4e;
   }
 
   .profile-avtar-title-block {
@@ -180,6 +181,7 @@ button {
     th {
       .title {
         text-align: left;
+        font-weight: bolder;
       }
 
       .edit-button {
@@ -265,63 +267,75 @@ button {
   }
 }
 
-
 .parent-dashboard {
   .utils__content {
     padding: 0;
     margin: 0 auto;
   }
+}
 
-  .ant-tabs .ant-tabs-left-bar .ant-tabs-tab {
-    text-align: left;
-  }
+.ant-tabs .ant-tabs-left-bar .ant-tabs-tab {
+  text-align: left;
+}
 
-  .ProfileTab-container {
-    display: flex;
-    align-items: center;
-  }
+.ProfileTab-container {
+  display: flex;
+  align-items: center;
+}
 
-  .ProfileTab-icon {
-    font-size: 1.5rem;
-  }
+.ProfileTab-icon {
+  font-size: 1.5rem;
+}
 
-  .ProfileTab-title {
-    font-size: 1rem;
-    font-weight: bold;
-    color: black;
-  }
+.ProfileTab-title {
+  font-size: 1rem;
+  font-weight: bold;
+  color: black;
+}
 
-  .ant-tabs-content.ant-tabs-content-animated.ant-tabs-left-content {
-    padding-left: 0;
-    height: 51em;
-    background-color: #f9f7f7;
-  }
+.ant-tabs-content.ant-tabs-content-animated.ant-tabs-left-content {
+  padding-left: 0;
+  height: 51em;
+  background-color: #f9f7f7;
+}
 
-  .profileTab-heading {
-    font-size: 2rem;
-    padding-top: 1em;
-    font-weight: 900;
-  }
+.profileTab-heading {
+  font-size: 2rem;
+  padding-top: 1em;
+  font-weight: 900;
+}
 
-  .profileTab-container .ant-table-thead {
-    background-color: #dbe2ef;
-  }
+.profileTab-container .ant-table-thead {
+  background-color: #dbe2ef;
+}
 
-  .form-label div>label {
-    margin-bottom: 0;
-  }
+.form-label div > label {
+  margin-bottom: 0;
+}
 
-  .profileTabs .ant-tabs-tab-active {
-    color: #112d4e !important;
-    background-color: #dbe2ef !important;
-  }
+.profileTabs .ant-tabs-tab-active {
+  color: #112d4e !important;
+  background-color: #dbe2ef !important;
+}
 
-  .profileTabs .ant-tabs-ink-bar {
-    background: #112d4e;
-    pointer-events: none;
-  }
+.profileTabs .ant-tabs-ink-bar {
+  background: #112d4e;
+  pointer-events: none;
+}
 
-  .Assessment-container>table {
-    background-color: white;
-  }
+.Assessment-container > table {
+  background-color: white;
+}
+
+// .RightSidePanel-nav .ant-tabs-nav-scroll {
+//   color: white;
+// }
+
+.RightSidePanel-nav .ant-tabs-tab-active {
+  color: #112d4e;
+  font-weight: bolder;
+}
+
+.shadowbox .card-column {
+  background-color: #dbe2ef;
 }

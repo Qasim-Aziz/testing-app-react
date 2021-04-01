@@ -125,23 +125,30 @@ export default () => {
           style={{
             display: 'flex',
             flexDirection: 'row',
-            justifyContent: 'space-between',
+            // justifyContent: 'space-between',
             alignItems: 'center',
-            padding: '0px 10px',
+            padding: '2px 10px',
             backgroundColor: '#FFF',
             boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
           }}
         >
-          <div>
+          <div
+            style={{
+              flex: 6,
+              display: 'flex',
+              marginLeft: '14em',
+              justifyContent: 'center',
+            }}
+          >
             <span style={{ fontSize: '25px', color: '#000' }}>Appointments</span>
           </div>
-          <div style={{ padding: '5px 0px' }}>
+          <div style={{ padding: '5px 0px', flex: 1 }}>
             <Button onClick={createAppointment} type="primary">
               <PlusOutlined /> ADD APPOINTMENT
             </Button>
           </div>
         </div>
-        <div style={{ marginTop: 10 }}>
+        <div style={{ marginTop: 10, padding: '1em' }} className="calenderTherapist-container">
           <CalendarForTherapist
             isLoading={loading}
             loadData={loadAppointments}
@@ -153,9 +160,9 @@ export default () => {
       </div>
 
       <Drawer
-        title="Update Appointment"
+        title={updatingAppointmentId ? 'Update Appointment' : 'Create Appointment'}
         placement="right"
-        width="75%"
+        width="80%"
         closable
         onClose={() => setVisibleDraw(false)}
         visible={visibleDraw}
