@@ -2,6 +2,7 @@
 import React from 'react'
 import { DatePicker, Input } from 'antd'
 import moment from 'moment'
+import { COLORS } from 'assets/styles/globalStyles'
 
 const FilterComp = props => {
   const {
@@ -15,7 +16,7 @@ const FilterComp = props => {
   } = props
 
   const continer = {
-    background: 'rgb(241 241 241)',
+    background: COLORS.palleteLight,
     position: 'relative',
     display: 'flex',
     height: '50px',
@@ -27,6 +28,7 @@ const FilterComp = props => {
   const Headstyle = {
     fontSize: '16px',
     paddingTop: '7px',
+    color: 'black',
     marginRight: '10px',
   }
 

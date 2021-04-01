@@ -20,137 +20,97 @@
 /* eslint-disable array-callback-return */
 
 import React from 'react'
-import {
-    Row,
-    Col,
-    Card,
-    Button,
-    DatePicker,
-    Form,
-    Input,
-    Select,
-    Typography,
-} from 'antd'
+import { Row, Col, Card, Button, DatePicker, Form, Input, Select, Typography } from 'antd'
 import './assessment.scss'
 import { connect } from 'react-redux'
-
+import { FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 
 const { Title, Text } = Typography
 const { TextArea } = Input
 const { Option } = Select
+const { layout, tailLayout } = FORM
 
 @connect(({ user, cogniableassessment }) => ({ user, cogniableassessment }))
 class Assessment extends React.Component {
-    constructor(props) {
-        super(props)
+  constructor(props) {
+    super(props)
 
-        this.state = {
+    this.state = {}
+  }
 
-        }
-    }
-
-    SubmitForm = e => {
-        e.preventDefault()
-        const {form, dispatch, onClose} = this.props
-        form.validateFields((error, values) => {
-            if (!error) {
-                console.log(values)
-                dispatch({
-                    type: 'cogniableassessment/CREATE_ASSESSMENT',
-                    payload: {
-                        values: values,
-                        // studentId: values.student
-                        studentId: localStorage.getItem('studentId')
-                    }
-                })
-                setTimeout(function(){ onClose(); }, 1000);
-            }
+  SubmitForm = e => {
+    e.preventDefault()
+    const { form, dispatch, onClose } = this.props
+    form.validateFields((error, values) => {
+      if (!error) {
+        console.log(values)
+        dispatch({
+          type: 'cogniableassessment/CREATE_ASSESSMENT',
+          payload: {
+            values: values,
+            // studentId: values.student
+            studentId: localStorage.getItem('studentId'),
+          },
         })
+        setTimeout(function() {
+          onClose()
+        }, 1000)
+      }
+    })
+  }
 
-    }
+  render() {
+    const {
+      form,
+      cogniableassessment: { StudentsList, createFormLoading },
+    } = this.props
+    return (
+      <>
+        <Form
+          {...layout}
+          onSubmit={e => this.SubmitForm(e)}
+          name="control-ref"
+          style={{ marginLeft: 0, position: 'relative' }}
+        >
+          <Form.Item label="Title">
+            {form.getFieldDecorator('title', {
+              rules: [{ required: true, message: 'Please Select a title!' }],
+            })(<Input placeholder="Enter Assessment Title" size="large" />)}
+          </Form.Item>
 
-    render() {
+          <Form.Item label="Note">
+            {form.getFieldDecorator('note')(
+              <TextArea
+                style={{
+                  resize: 'none',
+                  width: '100%',
+                  height: 100,
+                }}
+              />,
+            )}
+          </Form.Item>
 
-        const { form, cogniableassessment: {StudentsList, createFormLoading} } = this.props
-        return (
-            <>
-                <span style={{ marginLeft: '330px', display: 'block' }}><Button style={{ fontSize: '22px' }} type="link" onClick={() => this.props.closeAssessmentForm(false)}>X</Button></span>
-                <Form
-                    onSubmit={e => this.SubmitForm(e)}
-                    name="control-ref"
-                    style={{ marginLeft: 0, position: 'relative' }}
-                >
-                    {/* <div
-                        style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                        }}
-                    >
-                        <Form.Item label="Date">
-                            {form.getFieldDecorator('date', {
-                                rules: [{ required: true, message: 'Please Select a Date!' }],
-                            })(<DatePicker placeholder="Select Date" size="large" />)}
-                        </Form.Item>
-                    </div> */}
-
-                    {/* <Form.Item label="Student">
-                        {form.getFieldDecorator('student', {
-                            rules: [{ required: true, message: 'Please Select a student!' }],
-                        })(
-                            <Select style={{ width: '100%' }} placeholder="Select a Student" size="large">
-                                {StudentsList.map((item) => 
-                                    <Option value={item.node.id}>{item.node.firstname}</Option>
-                                )}
-                            </Select>,
-                        )}
-                    </Form.Item> */}
-
-                    <Form.Item label="Title">
-                        {form.getFieldDecorator('title', {
-                            rules: [{ required: true, message: 'Please Select a title!' }],
-                        })(
-                            <Input placeholder="Enter Assessment Title" size="large" />,
-                        )}
-                    </Form.Item>
-
-                    <Form.Item label="Note">
-                        {form.getFieldDecorator('note')(
-                            <TextArea
-                                style={{
-                                    resize: 'none',
-                                    width: '100%',
-                                    height: 100,
-                                }}
-                            />,
-                        )}
-                    </Form.Item>
-
-                    <Form.Item>
-                        <div
-                            style={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                            }}
-                        >
-                            <Button
-                                type="primary"
-                                htmlType="submit"
-                                style={{
-                                    width: 180,
-                                    height: 40,
-                                    background: '#0B35B3',
-                                }}
-                                loading={createFormLoading}
-                            >
-                                Save Data
-                            </Button>
-                        </div>
-                    </Form.Item>
-                </Form>
-            </>
-        )
-    }
+          <Form.Item {...tailLayout}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={SUBMITT_BUTTON}
+              loading={createFormLoading}
+            >
+              Save Data
+            </Button>
+            {/* <Button
+              type="ghost"
+              style={CANCEL_BUTTON}
+              onClick={() => this.props.closeAssessmentForm(false)}
+            >
+              Cancel
+            </Button> */}
+          </Form.Item>
+        </Form>
+      </>
+    )
+  }
 }
 
 export default Form.create()(Assessment)
-

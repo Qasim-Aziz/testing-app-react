@@ -4,6 +4,7 @@
 /* eslint-disable react/jsx-boolean-value */
 import { PlusOutlined } from '@ant-design/icons'
 import { Button, Col, Drawer, notification, Radio, Row } from 'antd'
+import { COLORS } from 'assets/styles/globalStyles'
 import LoadingComponent from 'components/LoadingComponent'
 import React, { useEffect, useState } from 'react'
 import { useMutation, useQuery } from 'react-apollo'
@@ -75,9 +76,9 @@ export default ({ suggestTarget }) => {
       <Row
         key={node.id}
         style={{
-          border: '1px solid #e4e9f0',
+          border: '1px solid #d9d9d9',
           borderRadius: 10,
-          background: '#fff',
+          background: COLORS.palleteLight,
           padding: '10px 20px 10px 10px',
           margin: '8px 0px',
           fontSize: '18px',
@@ -114,16 +115,7 @@ export default ({ suggestTarget }) => {
           ))}
         </Radio.Group>
       )}
-      <div
-        style={{
-          marginTop: '10px',
-          height: 'calc(100vh - 110px)',
-          overflowY: 'scroll',
-          padding: 15,
-          backgroundColor: 'rgb(249, 249, 249)',
-          borderRadius: 10,
-        }}
-      >
+      <div>
         {targetsLoading || categoryLoading ? (
           <LoadingComponent />
         ) : !Targets || Targets.length === 0 ? (

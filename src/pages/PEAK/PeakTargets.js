@@ -3,6 +3,7 @@
 /* eslint-disable react/jsx-boolean-value */
 import { PlusOutlined } from '@ant-design/icons'
 import { Button, Col, Drawer, notification, Row } from 'antd'
+import { COLORS } from 'assets/styles/globalStyles'
 import LoadingComponent from 'components/LoadingComponent'
 import React, { useEffect, useState } from 'react'
 import { useMutation } from 'react-apollo'
@@ -51,18 +52,19 @@ export default ({ suggestTarget, selectedTargetCategory }) => {
       <Row
         key={node.id}
         style={{
-          border: '1px solid #e4e9f0',
+          border: '1px solid #d9d9d9',
           borderRadius: 10,
-          background: '#fff',
+          background: COLORS.palleteLight,
           padding: '10px 20px 10px 10px',
           margin: '8px 0px',
           fontSize: '18px',
+          color: 'black',
         }}
       >
         <Col span={22}>{node.targetMain.targetName}</Col>
         <Col span={2}>
           <Button
-            type="primary"
+            style={{ backgroundColor: COLORS.palleteLightBlue }}
             onClick={() => {
               setTargetName(node.targetMain.targetName)
               setSelectTarget(node.id)
@@ -71,7 +73,13 @@ export default ({ suggestTarget, selectedTargetCategory }) => {
               setTargetVideo(node.video)
             }}
           >
-            <PlusOutlined style={{ fontSize: 20, color: '#fff', marginTop: 5 }} />
+            <PlusOutlined
+              style={{
+                fontSize: 20,
+                color: '#000',
+                marginTop: 5,
+              }}
+            />
           </Button>
         </Col>
       </Row>
@@ -83,15 +91,7 @@ export default ({ suggestTarget, selectedTargetCategory }) => {
   }
 
   return (
-    <div
-      style={{
-        height: 'calc(100vh - 110px)',
-        overflowY: 'scroll',
-        padding: 15,
-        backgroundColor: 'rgb(249, 249, 249)',
-        borderRadius: 10,
-      }}
-    >
+    <div>
       {!Targets || Targets.length === 0 ? 'No data' : Targets}
       <Drawer
         visible={selectTargetDrawer}

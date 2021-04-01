@@ -33,6 +33,7 @@ import {
   notification,
 } from 'antd'
 import { connect } from 'react-redux'
+import { SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 
 const { Title, Text } = Typography
 const { Option } = Select
@@ -203,7 +204,9 @@ class Result extends React.Component {
           </Form.Item>
         </Modal>
 
-        <Text style={textStyle}>{AssessmentObject.student.firstname}&apos;s CogniAble Assessment Result</Text>
+        <Text style={textStyle}>
+          {AssessmentObject.student.firstname}&apos;s CogniAble Assessment Result
+        </Text>
         <br />
         {/* <div
           style={{
@@ -235,7 +238,6 @@ class Result extends React.Component {
             <p>Don't let what you can't do stop you from doing what you can do.</p>
           </div>
         </div> */}
-        
 
         <Row>
           {Areas.length > 0 ? (
@@ -244,7 +246,13 @@ class Result extends React.Component {
                 <Col sm={12}>
                   <div style={contentCardStyle}>
                     <Title style={{ fontSize: '18px', lineHeight: '24px', display: 'block' }}>
-                      {item.name} <span style={{float: 'right', fontSize: '15px'}}>Age: {AreasResponse[item.id].recorded === true ? AreasResponse[item.id].response.age : '' }</span>
+                      {item.name}{' '}
+                      <span style={{ float: 'right', fontSize: '15px' }}>
+                        Age:{' '}
+                        {AreasResponse[item.id].recorded === true
+                          ? AreasResponse[item.id].response.age
+                          : ''}
+                      </span>
                     </Title>
                     {/* <Text style={{ fontSize: '15px', lineHeight: '18px', display: 'block' }}>
                       {item.description}
@@ -315,19 +323,7 @@ class Result extends React.Component {
           <Col sm={24}>
             {role !== 'parents' && AssessmentStatus === 'QUESTIONSCOMPLETED' ? (
               <Button
-                style={{
-                  float: 'right',
-                  width: '200px',
-                  height: 40,
-                  background: '#0B35B3',
-                  boxShadow:
-                    '0px 2px 4px rgba(96, 97, 112, 0.16), 0px 0px 1px rgba(40, 41, 61, 0.04) !importent',
-                  borderRadius: 8,
-                  fontSize: 17,
-                  fontWeight: 'bold',
-                  // marginTop: 10,
-                  color: 'white',
-                }}
+                style={{ ...SUBMITT_BUTTON, float: 'right' }}
                 onClick={() => this.endAssessment()}
               >
                 Submit
