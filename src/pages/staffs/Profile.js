@@ -108,7 +108,7 @@ function Profile(props) {
       if (days > 0) {
         return `${months} ${months == 1 ? 'M' : 'M'} ${days} ${days == 1 ? 'D' : 'D'} ago`
       } else {
-        return `${moths} ${months == 1 ? 'M' : 'M'} ago`
+        return `${months} ${months == 1 ? 'M' : 'M'} ago`
       }
     } else if (days > 0) {
       if (hrs > 0) {

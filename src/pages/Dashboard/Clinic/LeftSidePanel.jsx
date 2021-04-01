@@ -1,6 +1,7 @@
 import React from 'react'
 import { Button } from 'antd'
 import { EditOutlined } from '@ant-design/icons'
+import {COLORS} from 'assets/styles/globalStyles'
 import gql from 'graphql-tag'
 import { useQuery } from 'react-apollo'
 
@@ -36,7 +37,7 @@ const LeftSidePanel = ({ onActiveProfileTabChange }) => {
 
   return (
     <div
-      style={{ minWidth: '280', width: '386px', backgroundColor: '#dbe2ef' }}
+      style={{ minWidth: '280', width: '386px', backgroundColor: COLORS.palleteLight }}
       className="border-right profile-details"
     >
       <div className="profile-title">Profile</div>

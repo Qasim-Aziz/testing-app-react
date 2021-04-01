@@ -1,6 +1,6 @@
 import React from 'react'
 import { Tabs } from 'antd'
-
+import {COLORS} from 'assets/styles/globalStyles'
 import DashboardTab from './DashboardTab'
 import ProfileTab from './ProfileTab'
 
@@ -13,14 +13,14 @@ const RightSidePanel = ({
   onActiveProfileTabChange,
 }) => (
   <div
-    style={{ width: '100%', backgroundColor: '#dbe2ef', height: '100%' }}
+    style={{ width: '100%', backgroundColor: COLORS.palleteLight, height: '100%' }}
     className="RightSidePanel-nav"
   >
     <Tabs
       defaultActiveKey={activeTabKey}
       activeKey={activeTabKey}
       onChange={onActiveTabChange}
-      style={{ color: '#112d4e' }}
+      style={{ color: '#112d4e', backgroundColor: COLORS.palleteLight }}
     >
       <TabPane className="scrollClass shadowbox" tab="My Dashboard" key="1">
         <DashboardTab />
