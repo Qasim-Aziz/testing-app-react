@@ -3,22 +3,12 @@
 import React, { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet'
 import { Button, Layout, PageHeader, Table, Drawer, notification, Popover, Tabs } from 'antd'
-import { PlusOutlined, MoreOutlined } from '@ant-design/icons'
-import { createUseStyles } from 'react-jss'
-import gql from 'graphql-tag'
-import { useQuery, useMutation } from 'react-apollo'
-import moment from 'moment'
-import InvoiceForm from '../../components/invoice/InvoiceForm'
-import FilterCard from './FilterCard'
+import { DRAWER } from 'assets/styles/globalStyles'
 import InvoiceList from './invoiceList'
 import CustomerList from './customerList'
 import BankDetails from './bankDetails'
 
-const { Content } = Layout
-const { Column } = Table
 const { TabPane } = Tabs
-
-const dateFormate = 'YYYY-MM-DD'
 
 export default () => {
   const [newInvDrawer, setNewInvDrawer] = useState(false)
@@ -49,7 +39,7 @@ export default () => {
         </Tabs>
       </Layout>
       <Drawer
-        width={650}
+        width={DRAWER.widthL2}
         title="Update Payment accepting details"
         visible={bankDetailsDrawer}
         onClose={() => setBankDetailsDrawer(false)}

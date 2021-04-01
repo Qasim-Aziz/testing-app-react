@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import Scrollbars from 'react-custom-scrollbars'
 import { Card, Tag, Typography } from 'antd'
 import { useQuery, useMutation } from 'react-apollo'
+import { COLORS } from 'assets/styles/globalStyles'
 import { SUMMERY, GET_CODE_DETAILS, SEND_RESPONSE, QUIT } from './query'
 
 const { Title } = Typography
@@ -19,7 +20,7 @@ export default ({ selectedQ, data, handelSelectQ, scrollbarRef, type }) => {
       program: peakId,
     },
   })
-  console.log(summeryData);
+  console.log(summeryData)
   useEffect(() => {
     // if(type === true){
     //   setAllReadyAnswer('2px solid #1208E7')
@@ -38,13 +39,12 @@ export default ({ selectedQ, data, handelSelectQ, scrollbarRef, type }) => {
         if (no) {
           setAllReadyAnswer('2px solid #ff8080')
         } else {
-          setAllReadyAnswer('2px solid #1208E7')
+          setAllReadyAnswer(`2px solid ${COLORS.palleteBlue}`)
         }
       }
-      console.log(selectedQ, allreadyAnswere, type, 'aaaaaaaaaaaaaaaaaa');
+      console.log(selectedQ, allreadyAnswere, type, 'aaaaaaaaaaaaaaaaaa')
     }
     // }
-
   })
 
   return (
@@ -65,14 +65,15 @@ export default ({ selectedQ, data, handelSelectQ, scrollbarRef, type }) => {
               role="button"
               style={{
                 cursor: 'pointer',
-                boxShadow: '0px 0px 1px rgba(0, 0, 0, 0.08), 0px 0px 2px rgba(0, 0, 0, 0.12), 0px 1px 2px rgba(0, 0, 0, 0.08)',
+                boxShadow:
+                  '0px 0px 1px rgba(0, 0, 0, 0.08), 0px 0px 2px rgba(0, 0, 0, 0.12), 0px 1px 2px rgba(0, 0, 0, 0.08)',
                 padding: '12px 20px',
                 border: selected ? allreadyAnswere : '',
                 borderRadius: 0,
                 flex: 1,
                 margin: '5px 5px 0px',
                 backgroundColor: 'white',
-                display: 'block ruby'
+                display: 'block ruby',
               }}
               onClick={handelSelectQ(node.id, index)}
             >
@@ -88,18 +89,17 @@ export default ({ selectedQ, data, handelSelectQ, scrollbarRef, type }) => {
               <Tag
                 style={{
                   height: 25,
-                  background: selected ? '#007acc' : '#007acc',
+                  background: COLORS.palleteBlue,
                   paddingTop: 2,
                   fontSize: 14,
                   fontWeight: 600,
-                  color: selected ? '#fff' : '#fff',
-                  float: 'right'
+                  color: '#fff',
+                  float: 'right',
                 }}
               >
                 {node.peakType}
               </Tag>
             </div>
-
           )
         })}
     </Scrollbars>

@@ -36,6 +36,7 @@ import React, { useEffect, useState } from 'react'
 import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import LearnerSelect from 'components/LearnerSelect'
 import CreateAssignmentForm from './CreateAssignmentForm'
 import EquivalenceTargets from './EquivalenceTarget'
@@ -331,7 +332,9 @@ export default () => {
           count={
             obj.node?.status?.charAt(0).toUpperCase() + obj.node.status?.slice(1).toLowerCase()
           }
-          style={{ background: obj.node?.status === 'PROGRESS' ? '#52c41a' : '#faad14' }}
+
+          style={{ background: obj.node?.status === 'PROGRESS' ? COLORS.success : '#faad14' }}
+
         />
       ),
     },
@@ -501,7 +504,7 @@ export default () => {
         style={{
           padding: '0px 20px',
           width: '100%',
-          margin: '0px auto',
+          margin: '0px auto 20px',
         }}
       >
         <div
@@ -531,7 +534,7 @@ export default () => {
             <Drawer
               visible={visibleFilter}
               onClose={onCloseFilter}
-              width={350}
+              width={DRAWER.widthL4}
               title="Select Learner"
               placement="right"
             >
@@ -568,23 +571,20 @@ export default () => {
         onClose={() => {
           setOpen(false)
         }}
-        width="80%"
+
+
+        width={DRAWER.widthL2}
+
         title="Create New Assessment"
       >
-        <div
-          style={{
-            padding: '0px 30px',
-          }}
-        >
-          <CreateAssignmentForm setOpen={setOpen} PEAK_PROGRAMS={PEAK_PROGRAMS} />
-        </div>
+        <CreateAssignmentForm setOpen={setOpen} PEAK_PROGRAMS={PEAK_PROGRAMS} />
       </Drawer>
       <Drawer
         visible={suggestTarget ? true : false}
         onClose={() => {
           setSuggestTarget(null)
         }}
-        width={800}
+        width={DRAWER.widthL2}
         title="Target Allocation from PEAK Assessment"
       >
         {suggestTarget && (
@@ -600,7 +600,7 @@ export default () => {
         onClose={() => {
           setSuggestEquiTarget(null)
         }}
-        width={800}
+        width={DRAWER.widthL2}
         title="Target Allocation from PEAK Equivalence Assessment"
       >
         {suggestEquiTarget && (

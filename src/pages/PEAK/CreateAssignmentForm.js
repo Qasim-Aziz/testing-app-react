@@ -6,10 +6,14 @@ import './form.scss'
 import gql from 'graphql-tag'
 import { useMutation } from 'react-apollo'
 import moment from 'moment'
-import { FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from '../../assets/styles/globalStyles'
+
+
+import { FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 
 const { TextArea } = Input
 const { Option } = Select
+const { layout, tailLayout } = FORM
+
 
 const CREATE_PEAK = gql`
   mutation($studentId: ID!, $title: String!, $category: String!, $note: String, $date: Date!) {
@@ -110,31 +114,18 @@ const CreateAssignmentForm = ({ form, setOpen, PEAK_PROGRAMS }) => {
       <Form.Item label="Program Title">
         {form.getFieldDecorator('title', {
           rules: [{ required: true, message: 'Please give the program title' }],
-        })(
-          <Input
-            placeholder="Type the program title"
-            size="large"
-            style={{ resize: 'none', width: '100%' }}
-          />,
-        )}
+        })(<Input placeholder="Type the program title" />)}
       </Form.Item>
       <Form.Item label="Date">
         {form.getFieldDecorator('date', {
           rules: [{ required: true, message: 'Please select a date' }],
-        })(
-          <DatePicker
-            size="large"
-            style={{
-              width: '100%',
-            }}
-          />,
-        )}
+        })(<DatePicker />)}
       </Form.Item>
       <Form.Item label="Category">
         {form.getFieldDecorator('category', {
           rules: [{ required: true, message: 'Please select a category' }],
         })(
-          <Select style={{ width: '100%' }} placeholder="Select a category" size="large">
+          <Select placeholder="Select a category">
             <Option key="1" value="Direct">
               Direct
             </Option>
@@ -160,17 +151,12 @@ const CreateAssignmentForm = ({ form, setOpen, PEAK_PROGRAMS }) => {
         )}
       </Form.Item>
 
-      <Form.Item {...FORM.tailLayout}>
-        <Button
-          htmlType="submit"
-          type="primary"
-          size="large"
-          style={SUBMITT_BUTTON}
-          loading={loading}
-        >
+
+      <Form.Item {...tailLayout}>
+        <Button htmlType="submit" type="primary" style={SUBMITT_BUTTON} loading={loading}>
           Create program
         </Button>
-        <Button type="danger" size="large" style={CANCEL_BUTTON} onClick={() => setOpen(false)}>
+        <Button style={CANCEL_BUTTON} onClick={() => setOpen(false)}>
           Cancel
         </Button>
       </Form.Item>

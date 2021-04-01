@@ -22,7 +22,7 @@ export default Form.create()(({ form, socket, style, loading, setLoading }) => {
       style={{
         width: '100%',
         display: 'flex',
-        backgroundColor: COLORS.grayFill,
+        backgroundColor: COLORS.palleteLight,
         padding: '10px 16px',
         height: 60,
         ...style,
