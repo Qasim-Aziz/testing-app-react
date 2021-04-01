@@ -10,6 +10,7 @@ import {
   MessageOutlined,
 } from '@ant-design/icons'
 import '../ClinicProfile/SupportTicketTimeline.scss'
+import { COLORS, DRAWER, FONT } from '../../assets/styles/globalStyles'
 
 const COMMENT_QUERY = gql`
   query($id: ID!) {
@@ -163,11 +164,28 @@ export default Form.create()(({ task, form }) => {
           </div>
         </div>
       </div>
+      <div style={{ marginTop: '4em' }}>
+        <Form onSubmit={handleCommentSubmit} style={{ display: 'flex' }}>
+          <Form.Item style={{ display: 'flex', width: '90%' }} className="TimeLine-Form">
+            {form.getFieldDecorator('comment', {
+              rules: [{ required: false, message: 'Please add comment!' }],
+            })(<Input placeholder="Add comment here" size="large" />)}
+          </Form.Item>
+
+          <Button
+            type="primary"
+            htmlType="submit"
+            style={{ backgroundColor: 'white', border: '1px solid #112D4E', color: '#112D4E' }}
+          >
+            Add Comment
+          </Button>
+        </Form>
+      </div>
       <div className="TimelineMiddleContainer">
         <p>Comments:</p>
       </div>
       {commentQueryData?.task.comments.edges.length === 0 ? (
-        <p style={{ textAlign: 'center', fontSize: '1.5rem' }}>No Comments to show </p>
+        <p style={{ textAlign: 'center', fontSize: FONT.level3 }}>No Comments to show </p>
       ) : (
         commentQueryData?.task.comments.edges
           .slice(0)
@@ -187,23 +205,6 @@ export default Form.create()(({ task, form }) => {
             </Timeline>
           ))
       )}
-      <div style={{ marginTop: '4em' }}>
-        <Form onSubmit={handleCommentSubmit} style={{ display: 'flex' }}>
-          <Form.Item style={{ display: 'flex', width: '90%' }} className="TimeLine-Form">
-            {form.getFieldDecorator('comment', {
-              rules: [{ required: false, message: 'Please add comment!' }],
-            })(<Input placeholder="Add comment here" size="large" />)}
-          </Form.Item>
-
-          <Button
-            type="primary"
-            htmlType="submit"
-            style={{ backgroundColor: 'white', border: '1px solid #112D4E', color: '#112D4E' }}
-          >
-            Add Comment
-          </Button>
-        </Form>
-      </div>
     </div>
   )
 })

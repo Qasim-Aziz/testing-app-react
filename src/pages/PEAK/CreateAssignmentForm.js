@@ -6,17 +6,10 @@ import './form.scss'
 import gql from 'graphql-tag'
 import { useMutation } from 'react-apollo'
 import moment from 'moment'
+import { FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from '../../assets/styles/globalStyles'
 
 const { TextArea } = Input
 const { Option } = Select
-const layout = {
-  labelCol: {
-    span: 7,
-  },
-  wrapperCol: {
-    span: 16,
-  },
-}
 
 const CREATE_PEAK = gql`
   mutation($studentId: ID!, $title: String!, $category: String!, $note: String, $date: Date!) {
@@ -113,7 +106,7 @@ const CreateAssignmentForm = ({ form, setOpen, PEAK_PROGRAMS }) => {
   }
 
   return (
-    <Form {...layout} onSubmit={handleSubmit}>
+    <Form {...FORM.layout} onSubmit={handleSubmit}>
       <Form.Item label="Program Title">
         {form.getFieldDecorator('title', {
           rules: [{ required: true, message: 'Please give the program title' }],
@@ -167,37 +160,20 @@ const CreateAssignmentForm = ({ form, setOpen, PEAK_PROGRAMS }) => {
         )}
       </Form.Item>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <Form.Item {...FORM.tailLayout}>
         <Button
           htmlType="submit"
           type="primary"
           size="large"
-          style={{
-            marginLeft: 'auto',
-            marginRight: 10,
-            marginTop: 15,
-            width: '100%',
-            backgroundColor: '#0B35B3',
-            color: '#fff',
-          }}
+          style={SUBMITT_BUTTON}
           loading={loading}
         >
           Create program
         </Button>
-        <Button
-          type="danger"
-          size="large"
-          style={{
-            marginRight: 'auto',
-            marginTop: 15,
-            width: '100%',
-            color: '#fff',
-          }}
-          onClick={() => setOpen(false)}
-        >
+        <Button type="danger" size="large" style={CANCEL_BUTTON} onClick={() => setOpen(false)}>
           Cancel
         </Button>
-      </div>
+      </Form.Item>
     </Form>
   )
 }

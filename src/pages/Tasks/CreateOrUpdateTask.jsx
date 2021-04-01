@@ -23,6 +23,7 @@ import { useHistory } from 'react-router-dom'
 import ReminderForm from 'components/tasks/ReminderForm'
 import RemainderReducer from './reducer'
 import { CREATE_TASK_DATA, UPDATE_TASK_DATA } from './queries'
+import { SUBMITT_BUTTON, CANCEL_BUTTON, FORM } from '../../assets/styles/globalStyles'
 
 import './CreateOrUpdateTask.scss'
 
@@ -194,7 +195,7 @@ const CreateOrUpdateTask = ({ tasks, form, task, onClose, dispatch, user }) => {
   console.log(reminder, 'reminder')
   return (
     <div>
-      <Form name="manageTasks" onSubmit={SubmitForm} className="CreateOrUpdate">
+      <Form {...FORM.layout} name="manageTasks" onSubmit={SubmitForm} className="CreateOrUpdate">
         <Divider orientation="left">Basic Details</Divider>
 
         {/* Task Type */}
@@ -422,11 +423,16 @@ const CreateOrUpdateTask = ({ tasks, form, task, onClose, dispatch, user }) => {
         </Row>
 
         {/* Buttons */}
-        <Form.Item style={{ textAlign: 'center' }}>
-          <Button type="primary" loading={createTaskLoading} htmlType="submit">
+        <Form.Item {...FORM.tailLayout}>
+          <Button
+            type="primary"
+            loading={createTaskLoading}
+            htmlType="submit"
+            style={SUBMITT_BUTTON}
+          >
             Submit
           </Button>
-          <Button onClick={onClose} className="ml-4">
+          <Button onClick={onClose} className="ml-4" style={CANCEL_BUTTON}>
             Cancel
           </Button>
         </Form.Item>

@@ -161,7 +161,7 @@ const AppointmentCalender = ({
   //     <h5 style={{ margin: '30px 10px', textAlign: 'center' }}>Loading Appointments...</h5>
   //   ) : (
   return (
-    <div className="appointmentCalendar">
+    <div className="appointmentCalendar " style={{ padding: '1em' }}>
       <Row>
         <Col style={{ float: 'right', marginBottom: '12px' }}>
           <Form layout="inline" className="filterCard">

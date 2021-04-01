@@ -145,13 +145,13 @@ class TutorialStep1 extends React.Component {
         this.setState({
           projectVideos: res.data,
           loadingMoreVideos: false,
-          playingUrl: res.data && res.data.length > 0 && res.data[0].link
+          playingUrl: res.data && res.data.length > 0 && res.data[0].link,
         })
       })
       .catch(err => console.log(err))
   }
 
-  handleKeyDown = () => { }
+  handleKeyDown = () => {}
 
   getVideoIdFromUrl = url => {
     const res = url.substring(8)
@@ -174,14 +174,41 @@ class TutorialStep1 extends React.Component {
     }
     return (
       <Authorize roles={['parents', 'therapist', 'school_admin']} redirect to="/dashboard/beta">
-        <h2>CogniAble Tutorials</h2>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '0px 10px',
+            backgroundColor: '#FFF',
+            boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
+          }}
+        >
+          <h2>CogniAble Tutorials</h2>
+        </div>
         <div style={{ paddingHorizontal: 10 }}>
-
-          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
-            <div style={{ flex: 8, height: 350, maxHeight: 349, }}>
-              <ReactPlayer url={playingUrl || ''} controls width="100%" height='300px' />
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+            }}
+          >
+            <div style={{ flex: 8, height: 350, maxHeight: 349 }}>
+              <ReactPlayer url={playingUrl || ''} controls width="100%" height="300px" />
             </div>
-            <div style={{ flex: 4, height: 350, maxHeight: 349, overflowY: 'scroll', backgroundColor: '#f9f9f9' }} className='scrollClass'>
+            <div
+              style={{
+                flex: 4,
+                height: 350,
+                maxHeight: 349,
+                overflowY: 'scroll',
+                backgroundColor: '#f9f9f9',
+              }}
+              className="scrollClass"
+            >
               <div className="col-sm-12 col-md-12">
                 <div>
                   <span style={{ fontSize: '18px', fontWeight: '500' }}>
@@ -247,20 +274,46 @@ class TutorialStep1 extends React.Component {
             </div>
           </div>
 
-          <div className='scrollClass' style={{ marginTop: 10, padding: 10, display: 'flex', flexDirection: 'row', maxWidth: '100%', overflowX: 'scroll', }}>
+          <div
+            className="scrollClass"
+            style={{
+              marginTop: 10,
+              padding: 10,
+              display: 'flex',
+              flexDirection: 'row',
+              maxWidth: '100%',
+              overflowX: 'scroll',
+            }}
+          >
             {projects.map(project => {
               return selectedProjectId === project.node.projectId ? (
-                <div style={{ marginRight: 10, minWidth: 300, maxWidth: 300, backgroundColor: '#89b6d8', padding: 10, borderRadius: 10 }}>
-                  <p className="mb-0" style={{ fontSize: '18px', fontWeight: '400', color: '#FFF' }}>
+                <div
+                  style={{
+                    marginRight: 10,
+                    minWidth: 300,
+                    maxWidth: 300,
+                    backgroundColor: '#89b6d8',
+                    padding: 10,
+                    borderRadius: 10,
+                  }}
+                >
+                  <p
+                    className="mb-0"
+                    style={{ fontSize: '18px', fontWeight: '400', color: '#FFF' }}
+                  >
                     {project.node.name}
                   </p>
                   <p className="" style={{ fontSize: '13px', lineHeight: '1.2', color: '#FFF' }}>
                     {project.node.description}
                   </p>
                 </div>
-              ) :
+              ) : (
                 <div
-                  style={{ boxShadow: 'rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px', marginRight: '10px', borderRadius: '10px' }}
+                  style={{
+                    boxShadow: 'rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px',
+                    marginRight: '10px',
+                    borderRadius: '10px',
+                  }}
                   key={project.node.id}
                   role="button"
                   tabIndex="0"
@@ -274,19 +327,26 @@ class TutorialStep1 extends React.Component {
                   }}
                   onKeyDown={this.handleKeyDown}
                 >
-                  <div style={{ minWidth: 300, maxWidth: 300, backgroundColor: '#FFF', padding: 10, borderRadius: 10 }}>
-                    <p className="mb-0" style={{ fontSize: '18px', fontWeight: '400', }}>
+                  <div
+                    style={{
+                      minWidth: 300,
+                      maxWidth: 300,
+                      backgroundColor: '#FFF',
+                      padding: 10,
+                      borderRadius: 10,
+                    }}
+                  >
+                    <p className="mb-0" style={{ fontSize: '18px', fontWeight: '400' }}>
                       {project.node.name}
                     </p>
-                    <p className="" style={{ fontSize: '13px', lineHeight: '1.2', }}>
+                    <p className="" style={{ fontSize: '13px', lineHeight: '1.2' }}>
                       {project.node.description}
                     </p>
                   </div>
                 </div>
+              )
             })}
           </div>
-
-
         </div>
       </Authorize>
     )
