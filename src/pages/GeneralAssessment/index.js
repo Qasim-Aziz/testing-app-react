@@ -310,7 +310,7 @@ export default () => {
             <Drawer
               visible={visibleFilter}
               onClose={onCloseFilter}
-              width={350}
+              width={DRAWER.widthL4}
               title="Select Learner"
               placement="right"
             >
@@ -354,7 +354,7 @@ export default () => {
             visible={open}
             onClose={() => setOpen(false)}
             placement="right"
-            width={DRAWER.widthL3}
+            width={DRAWER.widthL2}
             title="Record Assessmet"
             destroyOnClose
           >

@@ -22,6 +22,8 @@ import React from 'react'
 import { Helmet } from 'react-helmet'
 import { Row, Col, Card, Button, Typography, Icon } from 'antd'
 import { connect } from 'react-redux'
+import { COLORS } from 'assets/styles/globalStyles'
+import { EditOutlined } from '@ant-design/icons'
 
 const { Title, Text } = Typography
 
@@ -330,7 +332,7 @@ class Questions extends React.Component {
             ))}
           </Row>
 
-          {responseLoading ? <p>Loading new question...</p> : ''}
+          <div style={{ height: 15 }}>{responseLoading ? <p>Loading new question...</p> : ''}</div>
 
           {isEdit ? (
             <div style={{ textAlign: 'right', marginTop: '40px', marginRight: '20px' }}>
@@ -367,32 +369,15 @@ class Questions extends React.Component {
           ) : (
             <>
               <div style={{ textAlign: 'right', marginTop: '40px', marginRight: '20px' }}>
-                <Button onClick={this.enableEdit}>Edit</Button>
+                <Button
+                  style={{ backgroundColor: COLORS.palleteLightBlue }}
+                  onClick={this.enableEdit}
+                >
+                  <EditOutlined /> Edit
+                </Button>
               </div>
             </>
           )}
-          {/* <div style={{ textAlign: 'right', marginTop: '10px', marginRight: '20px' }}>
-                        { ResponseObject[cloneQuestion?.id]?.recorded === false ? 
-                            <>
-                                {QuestionCounter > AssessmentObject.assessmentQuestions.edges.length ? 
-                                    <>
-                                    </>  
-                                :
-                                    <Button onClick={this.continueAssessment}>Continue Assessment</Button>    
-                                }
-                                
-                            </>
-                            :
-                            ''
-                        }
-                    </div> */}
-          {/* {QuestionsResponse[QuestionsList[QuestionsList.length -1].id].recorded === true ? 
-                        <div style={{ textAlign: 'right', marginTop: '20px', marginRight: '20px' }}>
-                            <Button onClick={this.moveToNextStep} style={{backgroundColor: 'green', color: 'white'}}>Step 2</Button>
-                        </div>
-                    :
-                        ''
-                    } */}
         </div>
       </>
     )
