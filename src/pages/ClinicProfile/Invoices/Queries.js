@@ -26,6 +26,8 @@ const GET_INVOICES = gql`
           customer {
             id
             parent {
+              firstName
+              lastName
               username
             }
           }
