@@ -11,8 +11,8 @@ import UpdateAddVideoForm from 'pages/ClinicProfile/VideoTutorial/UpdateAddVideo
 import { CLINIC_MODULES, REMOVE_VIDEO, DELETE_MODULE } from 'pages/ClinicProfile/query'
 import VideoModuleForm from '../ClinicProfile/VideoTutorial/VideoModuleForm'
 import { GET_VIDEO_LIVERY, LIBERARY_DETAILS, CLINIC_QUERY } from './query'
+import { FORM, DRAWER } from '../../assets/styles/globalStyles'
 import './style.scss'
-
 
 const { Title, Text } = Typography
 
@@ -154,20 +154,43 @@ export default () => {
 
   return (
     <div>
-      <h2>Clinic Tutorials</h2>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '3px 10px',
+          backgroundColor: '#FFF',
+          boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
+        }}
+      >
+        <h2>Clinic Tutorials</h2>
+      </div>
       <div style={{ paddingHorizontal: 10 }}>
         <div
           style={{
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'flex-start',
-            alignItems: 'flex-start',
+            alignItems: 'center',
+            paddingTop: '2px',
+            backgroundColor: '#edf1f7',
           }}
         >
-          <div style={{ flex: 8, height: 350, maxHeight: 349 }}>
-            <ReactPlayer url={playingUrl || ''} controls width="100%" height="350px" />
+          <div
+            style={{
+              flex: 8,
+              height: 350,
+              maxHeight: 349,
+              display: 'flex',
+              justifyContent: 'center',
+              backgroundColor: '#edf1f7',
+            }}
+          >
+            <ReactPlayer url={playingUrl || ''} controls width="75%" height="350px" />
           </div>
-          <div style={{ flex: 4, padding: 10, backgroundColor: '#f9f9f9', marginLeft: 5 }}>
+          <div style={{ flex: 3, padding: 10, backgroundColor: '#edf1f7', marginLeft: 5 }}>
             <div
               style={{
                 marginBottom: 5,
@@ -177,7 +200,7 @@ export default () => {
                 alignItems: 'center',
               }}
             >
-              <span style={{ fontSize: '18px', fontWeight: '500', marginLeft: 10 }}>
+              <span style={{ fontSize: '18px', fontWeight: 'bold', marginLeft: 10 }}>
                 More Videos in <b>{selectedLibraryName}</b>
               </span>
               <Button type="primary" size="small" onClick={() => showDrawer()}>
@@ -204,7 +227,11 @@ export default () => {
                         setPlayingUrl(node.url)
                       }}
                       hoverable
-                      style={{ margin: '5px 5px 5px 0', borderRadius: '10px' }}
+                      style={{
+                        margin: '5px 5px 5px 0',
+                        borderRadius: '10px',
+                        backgroundColor: '#dbe2ef',
+                      }}
                       cover={
                         <ReactPlayer
                           light
@@ -311,7 +338,7 @@ export default () => {
                   marginRight: 10,
                   minWidth: 300,
                   maxWidth: 300,
-                  backgroundColor: '#89b6d8',
+                  backgroundColor: '#3f72af',
                   padding: 10,
                   borderRadius: 10,
                 }}
@@ -324,7 +351,15 @@ export default () => {
                     justifyContent: 'space-between',
                   }}
                 >
-                  <p className="mb-0" style={{ fontSize: '18px', fontWeight: '400' }}>
+                  <p
+                    className="mb-0"
+                    style={{
+                      fontSize: '18px',
+                      fontWeight: '400',
+                      fontWeight: 'bold',
+                      color: 'white',
+                    }}
+                  >
                     {node.name}
                   </p>
                   <div>
@@ -346,7 +381,7 @@ export default () => {
                       <DeleteOutlined />
                     </Button>
                     <Button type="link" size="small">
-                      <EditOutlined />
+                      <EditOutlined style={{ color: 'white' }} />
                     </Button>
                   </div>
                 </div>
@@ -467,7 +502,7 @@ export default () => {
       <Drawer
         title="Add a video"
         placement="right"
-        width={550}
+        width={DRAWER.widthL1}
         closable={false}
         onClose={() => setVisible(false)}
         visible={visible}
