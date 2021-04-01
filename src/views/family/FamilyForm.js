@@ -482,9 +482,9 @@ class FamilyBasicForm extends React.Component {
               boxShadow: '0 0px 0px rgba(0,0,0,0.1)',
             }}
           >
-            <Col sm={6}>
+            {/* <Col sm={6}>
               <img src={fatherAndSon} alt="" className="member-image" />
-            </Col>
+            </Col> */}
             <Col sm={16}>
               <Row
                 type="flex"
