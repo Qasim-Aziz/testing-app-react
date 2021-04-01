@@ -7,7 +7,7 @@
 import { notification } from 'antd'
 import { gql } from 'apollo-boost'
 import moment from 'moment'
-import apolloClient from '../apollo/leads_config'
+import apolloClient from '../apollo/config'
 
 export async function getAssets(payload) {
   console.log('PAYLOAD', payload)
