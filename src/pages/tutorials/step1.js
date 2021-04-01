@@ -180,7 +180,7 @@ class TutorialStep1 extends React.Component {
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
-            padding: '0px 10px',
+            padding: '3px 10px',
             backgroundColor: '#FFF',
             boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
           }}
@@ -194,24 +194,34 @@ class TutorialStep1 extends React.Component {
               flexDirection: 'row',
               justifyContent: 'flex-start',
               alignItems: 'center',
+              paddingTop: '2px',
             }}
           >
-            <div style={{ flex: 8, height: 350, maxHeight: 349 }}>
+            <div
+              style={{
+                flex: 8,
+                height: 350,
+                maxHeight: 349,
+                backgroundColor: '#edf1f7',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
               <ReactPlayer url={playingUrl || ''} controls width="100%" height="300px" />
             </div>
             <div
               style={{
-                flex: 4,
+                flex: 2.5,
                 height: 350,
                 maxHeight: 349,
                 overflowY: 'scroll',
-                backgroundColor: '#f9f9f9',
+                backgroundColor: '#edf1f7',
               }}
               className="scrollClass"
             >
               <div className="col-sm-12 col-md-12">
                 <div>
-                  <span style={{ fontSize: '18px', fontWeight: '500' }}>
+                  <span style={{ fontSize: '18px', fontWeight: 'bold' }}>
                     More Videos in {selectedProjectName}
                   </span>
                 </div>
@@ -241,7 +251,11 @@ class TutorialStep1 extends React.Component {
                             this.setState({ playingUrl: video.link })
                           }}
                           hoverable
-                          style={{ margin: '5px 5px 5px 0', borderRadius: '10px' }}
+                          style={{
+                            margin: '5px 5px 5px 0',
+                            borderRadius: '10px',
+                            backgroundColor: '#dbe2ef',
+                          }}
                           cover={
                             <img
                               alt="video"
@@ -292,18 +306,18 @@ class TutorialStep1 extends React.Component {
                     marginRight: 10,
                     minWidth: 300,
                     maxWidth: 300,
-                    backgroundColor: '#89b6d8',
+                    backgroundColor: '#3f72af',
                     padding: 10,
                     borderRadius: 10,
                   }}
                 >
                   <p
                     className="mb-0"
-                    style={{ fontSize: '18px', fontWeight: '400', color: '#FFF' }}
+                    style={{ fontSize: '18px', fontWeight: 'bold', color: '#FFF' }}
                   >
                     {project.node.name}
                   </p>
-                  <p className="" style={{ fontSize: '13px', lineHeight: '1.2', color: '#FFF' }}>
+                  <p className="" style={{ fontSize: '12px', lineHeight: '1.2', color: '#FFF' }}>
                     {project.node.description}
                   </p>
                 </div>

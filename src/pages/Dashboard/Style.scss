@@ -272,66 +272,59 @@ button {
     padding: 0;
     margin: 0 auto;
   }
-
 }
 
+.ant-tabs .ant-tabs-left-bar .ant-tabs-tab {
+  text-align: left;
+}
 
+.ProfileTab-container {
+  display: flex;
+  align-items: center;
+}
 
-  .ant-tabs .ant-tabs-left-bar .ant-tabs-tab {
-    text-align: left;
-  }
+.ProfileTab-icon {
+  font-size: 1.5rem;
+}
 
-  .ProfileTab-container {
-    display: flex;
-    align-items: center;
-  }
+.ProfileTab-title {
+  font-size: 1rem;
+  font-weight: bold;
+  color: black;
+}
 
-  .ProfileTab-icon {
-    font-size: 1.5rem;
-  }
+.ant-tabs-content.ant-tabs-content-animated.ant-tabs-left-content {
+  padding-left: 0;
+  height: 51em;
+  background-color: #f9f7f7;
+}
 
+.profileTab-heading {
+  font-size: 2rem;
+  padding-top: 1em;
+  font-weight: 900;
+}
 
+.profileTab-container .ant-table-thead {
+  background-color: #dbe2ef;
+}
 
-  .ProfileTab-title {
-    font-size: 1rem;
-    font-weight: bold;
-    color: black;
-  }
+.form-label div > label {
+  margin-bottom: 0;
+}
 
+.profileTabs .ant-tabs-tab-active {
+  color: #112d4e !important;
+  background-color: #dbe2ef !important;
+}
 
-  .ant-tabs-content.ant-tabs-content-animated.ant-tabs-left-content {
-    padding-left: 0;
-    height: 51em;
-    background-color: #f9f7f7;
-  }
+.profileTabs .ant-tabs-ink-bar {
+  background: #112d4e;
+  pointer-events: none;
+}
 
-  .profileTab-heading {
-    font-size: 2rem;
-    padding-top: 1em;
-    font-weight: 900;
-  }
-
-  .profileTab-container .ant-table-thead {
-    background-color: #dbe2ef;
-  }
-
-  .form-label div>label {
-    margin-bottom: 0;
-  }
-
-  .profileTabs .ant-tabs-tab-active {
-    color: #112d4e !important;
-    background-color: #dbe2ef !important;
-  }
-
-  .profileTabs .ant-tabs-ink-bar {
-    background: #112d4e;
-    pointer-events: none;
-  }
-
-  .Assessment-container>table {
-    background-color: white;
-  }
+.Assessment-container > table {
+  background-color: white;
 }
 
 // .RightSidePanel-nav .ant-tabs-nav-scroll {
