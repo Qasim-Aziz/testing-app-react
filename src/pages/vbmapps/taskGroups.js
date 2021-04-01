@@ -1,11 +1,11 @@
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable react/self-closing-comp */
 import React, { useState } from 'react'
-import { Icon, Layout, Row, Col, Typography, Popover } from 'antd'
+import { Layout, Row, Col, Typography, Spin } from 'antd'
 import TaskAnalysisGroupList from './TaskAnalysisGroupList'
 import TaskQuartionView from './TaskQuartionView'
 import PageHeader from './PageHeader'
-import { leftDivStyle, rightDivStyle, assessmentCompletedBlockStyle, defaultDivStyle, leftListBoxStyle, recordResponseButtonStyle } from './customStyle'
+import { leftDivStyle, rightDivStyle } from './customStyle'
 
 const { Content } = Layout
 const { Title, Text } = Typography
@@ -19,17 +19,16 @@ export default () => {
     setSelectedGroup(group)
   }
   return (
-    <Layout style={{ padding: '0px' }}>
+    <Layout style={{ padding: '0px', marginTop: '20px' }}>
       <Content
         style={{
           padding: '0px 20px',
-          maxWidth: 1300,
-          width: '100%',
+          width: 1360,
           margin: '0px auto',
         }}
       >
         <Row>
-          <Col sm={5}>
+          <Col sm={6}>
             <div style={leftDivStyle}>
               <TaskAnalysisGroupList
                 areaId={areaId}
@@ -38,7 +37,7 @@ export default () => {
               />
             </div>
           </Col>
-          <Col sm={19}>
+          <Col sm={18}>
             <div style={rightDivStyle}>
               <PageHeader pageTitle="VB-MAPP Task Analysis Assessment" />
               {selectedGroup && <TaskQuartionView group={selectedGroup} masterId={masterId} />}
@@ -47,6 +46,5 @@ export default () => {
         </Row>
       </Content>
     </Layout>
-
   )
 }

@@ -4,28 +4,10 @@
 /* eslint-disable */
 import React, { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet'
-import {
-  Button,
-  Layout,
-  PageHeader,
-  Table,
-  Drawer,
-  Tooltip,
-  Popconfirm,
-  notification,
-  Popover,
-} from 'antd'
-import {
-  PlusOutlined,
-  MoreOutlined,
-  DeleteOutlined,
-  EyeOutlined,
-  MailOutlined,
-  FolderViewOutlined,
-} from '@ant-design/icons'
+import { Button, Layout, PageHeader, Table, Drawer, Tooltip, Popconfirm, notification } from 'antd'
+import { PlusOutlined, DeleteOutlined, EyeOutlined, MailOutlined } from '@ant-design/icons'
 import { createUseStyles } from 'react-jss'
 import { useHistory, Link } from 'react-router-dom'
-import gql from 'graphql-tag'
 import { useQuery, useMutation } from 'react-apollo'
 import moment from 'moment'
 import client from '../../apollo/config'
@@ -34,6 +16,7 @@ import FilterCard from '../Invoices/FilterCard'
 import ViewInvoice from './viewInvoice'
 import { NOTIFICATION, GET_INVOICES, DELETE_INVOICE, tt } from './query'
 import './allClinicData.scss'
+import { DRAWER } from 'assets/styles/globalStyles'
 
 const { Content } = Layout
 const { Column } = Table
@@ -65,8 +48,6 @@ function InvoiceTable({ rowData }) {
   const [statusSelect, setStatusSelect] = useState()
   const [viewInvoice, setViewInvoice] = useState(false)
   const [currentInvoice, setCurrentInvoice] = useState(null)
-  const [currentInvoiceId, setCurrentInvoiceId] = useState(null)
-  const [popOverVisible, setPopOverVisible] = useState(false)
   const [
     deleteAssessmentCharges,
     {
@@ -320,7 +301,7 @@ function InvoiceTable({ rowData }) {
           <Drawer
             visible={viewInvoice}
             onClose={() => setViewInvoice(false)}
-            width="50vw"
+            width={DRAWER.widthL3}
             placement="right"
             closable="true"
             destroyOnClose="true"

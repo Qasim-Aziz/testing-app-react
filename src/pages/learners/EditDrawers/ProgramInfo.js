@@ -25,19 +25,6 @@ function ProgramInfo(props) {
   } = props
 
   const [updateInfo, { loading: updateLoading }] = useMutation(GEN_INFO)
-  const [isPeakActive, setIsPeakActive] = useState(userProfile.isPeakActive)
-
-  useEffect(() => {
-    if (userProfile) {
-      form.setFieldsValue({
-        defaultProgram: userProfile.defaultProgram ? userProfile.defaultProgram : false,
-        isVbmappActive: userProfile.isVbmappActive ? userProfile.isVbmappActive : false,
-        isPeakActive: userProfile.isPeakActive,
-        isCogActive: userProfile.isCogActive,
-        researchParticipant: userProfile.researchParticipant,
-      })
-    }
-  }, [userProfile])
 
   const handleSubmit = e => {
     e.preventDefault()
@@ -110,58 +97,61 @@ function ProgramInfo(props) {
       <Form {...layout} onSubmit={handleSubmit}>
         <Form.Item label="Default Active" style={itemStyle}>
           {form.getFieldDecorator('defaultProgram', {
+            initialValue: userProfile.defaultProgram,
+            valuePropName: 'checked',
             rules: [{ required: false, message: 'Please Select parent activation if needed' }],
           })(
             <Switch
               style={rightCol}
               checkedChildren={<Icon type="check" />}
               unCheckedChildren={<Icon type="close" />}
-              defaultChecked={userProfile.defaultProgram}
-              onChange={e => setDefaultProg(e)}
             />,
           )}
         </Form.Item>
         <Form.Item label="VBMAPP Active" style={itemStyle}>
           {form.getFieldDecorator('isVbmappActive', {
+            initialValue: userProfile.isVbmappActive,
+            valuePropName: 'checked',
             rules: [{ required: false, message: 'Please Select parent activation if needed' }],
           })(
             <Switch
               style={rightCol}
               checkedChildren={<Icon type="check" />}
               unCheckedChildren={<Icon type="close" />}
-              defaultChecked={userProfile.isVbmappActive}
-              onChange={e => setIsVbmappActive(e)}
             />,
           )}
         </Form.Item>
         <Form.Item label="Peak Active" style={itemStyle}>
           {form.getFieldDecorator('isPeakActive', {
+            initialValue: userProfile.isPeakActive,
+            valuePropName: 'checked',
             rules: [{ required: false, message: 'Please Select parent activation if needed' }],
           })(
             <Switch
               style={rightCol}
               checkedChildren={<Icon type="check" />}
               unCheckedChildren={<Icon type="close" />}
-              defaultChecked={userProfile.isPeakActive}
-              onChange={e => setIsPeakActive(e)}
             />,
           )}
         </Form.Item>
 
         <Form.Item label="Cogniable Active" style={itemStyle}>
           {form.getFieldDecorator('isCogActive', {
+            initialValue: userProfile.isCogActive,
+            valuePropName: 'checked',
             rules: [{ required: false, message: 'Please Select parent activation if needed' }],
           })(
             <Switch
               style={rightCol}
               checkedChildren={<Icon type="check" />}
               unCheckedChildren={<Icon type="close" />}
-              defaultChecked={userProfile.isCogActive}
             />,
           )}
         </Form.Item>
         <Form.Item label="Research Participant" style={itemStyle}>
           {form.getFieldDecorator('researchParticipant', {
+            initialValue: userProfile.researchParticipant,
+            valuePropName: 'checked',
             rules: [{ required: false, message: 'Please Select parent activation if needed' }],
           })(<Checkbox style={rightCol} />)}
         </Form.Item>

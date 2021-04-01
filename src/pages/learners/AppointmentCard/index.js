@@ -25,19 +25,23 @@ function AppointmentCard(props) {
 
   useEffect(() => {
     if (appt && userProfile) {
-      console.log(appt, 'gotcha')
-      if (!appt.appointmentsLoading && appt.appointments.length > 0 && userProfile) {
-        let temp = appt.appointments.filter(
-          item => new Date(item.start) > new Date() && item.student?.id === userProfile.id,
-        )
-        temp.reverse()
-        setUpcomingAppointmentList(temp)
+      if (!appt.appointmentsLoading && userProfile) {
+        if (appt.appointments.length > 0) {
+          let temp = appt.appointments.filter(
+            item => new Date(item.start) > new Date() && item.student?.id === userProfile.id,
+          )
+          temp.reverse()
+          setUpcomingAppointmentList(temp)
 
-        let temp2 = appt.appointments.filter(
-          item => new Date(item.start) < new Date() && item.student?.id === userProfile.id,
-        )
+          let temp2 = appt.appointments.filter(
+            item => new Date(item.start) < new Date() && item.student?.id === userProfile.id,
+          )
 
-        setPostAppointemntList(temp2)
+          setPostAppointemntList(temp2)
+        } else {
+          setUpcomingAppointmentList([])
+          setPostAppointemntList([])
+        }
       }
     }
   }, [appt, userProfile])
@@ -76,7 +80,13 @@ function AppointmentCard(props) {
   }
 
   const extraContent = (
-    <Button onClick={createAppointment} type="primary" size="small" style={{ marginRight: '16px' }}>
+    <Button
+      onClick={createAppointment}
+      disabled={!userProfile.isActive}
+      type="primary"
+      size="small"
+      style={{ marginRight: '16px' }}
+    >
       <PlusOutlined /> Add Appointment
     </Button>
   )
@@ -106,10 +116,23 @@ function AppointmentCard(props) {
           />
         )}
       </Drawer>
+      <div
+        style={{
+          fontSize: '18px',
+          color: 'black',
+          fontWeight: 600,
+          padding: 16,
+          width: '100%',
+          border: '1px solid #d9d9d9',
+          borderBottom: 'none',
+        }}
+      >
+        <span>Appointments</span>
+      </div>
       <Tabs
         onChange={setActiveTab}
         tabBarExtraContent={extraContent}
-        style={{ border: '1px solid #e8e8e8' }}
+        style={{ border: '1px solid #d9d9d9' }}
       >
         <TabPane key="upcoming" tab="Upcoming">
           <Upcoming
