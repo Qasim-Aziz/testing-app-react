@@ -1,13 +1,35 @@
 import React, { useState, useEffect } from 'react'
-import { Form, Input, Button, Select, notification, TimePicker } from 'antd'
+import {
+  Form,
+  Input,
+  Button,
+  Select,
+  notification,
+  TimePicker,
+  Row,
+  Col,
+  Layout,
+  Typography,
+  DatePicker,
+  Timeline,
+} from 'antd'
+
+import {
+  EditOutlined,
+  ClockCircleOutlined,
+  CommentOutlined,
+  MessageOutlined,
+} from '@ant-design/icons'
 import gql from 'graphql-tag'
+import { FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import { useMutation, useQuery } from 'react-apollo'
 import './workForm.scss'
 import TextArea from 'antd/lib/input/TextArea'
 
 const { Option } = Select
+const { layout } = FORM
 
-const CREATE_TOILET_DATA = gql`
+const ADD_TIMESHEET_DATA = gql`
   mutation CreateTimesheet(
     $title: String!
     $location: ID!
@@ -49,7 +71,7 @@ export default ({ style, setNewLogCreated }) => {
 
   const { data: locationData, loading: locationLoading } = useQuery(SCHOOL_LOCATION)
 
-  const [CreateLog, { data, error }] = useMutation(CREATE_TOILET_DATA, {
+  const [CreateLog, { data, error }] = useMutation(ADD_TIMESHEET_DATA, {
     variables: {
       title,
       location,
@@ -97,8 +119,8 @@ export default ({ style, setNewLogCreated }) => {
       <Form.Item label="Titile">
         <Input
           required
-          placeholder="title"
           size="large"
+          placeholder="title"
           value={title}
           onChange={e => setTitle(e.target.value)}
         />
@@ -114,7 +136,7 @@ export default ({ style, setNewLogCreated }) => {
           <TimePicker
             size="large"
             style={{
-              width: '45%',
+              width: '47%',
             }}
             required
             onChange={newTime => setStart(newTime)}
@@ -122,7 +144,7 @@ export default ({ style, setNewLogCreated }) => {
           <TimePicker
             size="large"
             style={{
-              width: '45%',
+              width: '47%',
             }}
             required
             onChange={newTime => setEnd(newTime)}
@@ -132,8 +154,8 @@ export default ({ style, setNewLogCreated }) => {
 
       <Form.Item label="Geolocation">
         <Select
-          required
           size="large"
+          required
           showSearch
           optionFilterProp="location"
           loading={locationLoading}
@@ -151,23 +173,14 @@ export default ({ style, setNewLogCreated }) => {
       <Form.Item label="Notes">
         <TextArea
           style={{ width: '100%', resize: 'none', height: 150 }}
-          size="large"
           value={note}
           onChange={e => setNote(e.target.value)}
         />
       </Form.Item>
 
       <Form.Item>
-        <Button
-          type="primary"
-          htmlType="submit"
-          style={{
-            width: '100%',
-            height: 40,
-            background: '#0B35B3',
-          }}
-        >
-          Save Data
+        <Button type="primary" htmlType="submit" style={{ ...SUBMITT_BUTTON, width: '100%' }}>
+          Add Data
         </Button>
       </Form.Item>
     </Form>
