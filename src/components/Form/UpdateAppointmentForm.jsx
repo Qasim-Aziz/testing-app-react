@@ -82,6 +82,8 @@ const UpdateAppointmentForm = ({
       form.resetFields()
       if (setNeedToReloadData) {
         setNeedToReloadData(editAppointmentData)
+      }
+      if (closeUpdateAppointment) {
         closeUpdateAppointment()
       }
     }
@@ -480,7 +482,7 @@ const UpdateAppointmentForm = ({
                 }}
                 onClick={() => {
                   form.resetFields()
-                  closeUpdateAppointment()
+                  closeUpdateAppointment(false)
                 }}
               >
                 Cancel

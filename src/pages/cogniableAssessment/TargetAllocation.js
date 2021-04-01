@@ -4,6 +4,7 @@ import { Avatar, Form, Input, Select, Checkbox, Button, Typography, notification
 import { useQuery, useMutation } from 'react-apollo'
 import CKEditor from 'react-ckeditor-component'
 import moment from 'moment'
+import { FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 import motherAndSon from './motherSon.jpg'
 import {
   TARGET_ALLOCATIONS_OPTIONS,
@@ -16,6 +17,7 @@ import {
 import NumberCard from './NumberCard'
 
 const { Text } = Typography
+const { layout, tailLayout } = FORM
 
 const SdInput = ({ form }) => {
   const [sdText, setSdText] = useState('')
@@ -36,7 +38,7 @@ const SdInput = ({ form }) => {
   return (
     <>
       {(form.getFieldValue('steps') || !form.getFieldValue('steps')) && (
-        <Form.Item label="Sd" name="Sd" style={{ marginTop: 15 }}>
+        <Form.Item label="Sd" name="Sd">
           {form.getFieldDecorator('sd')(
             <Select
               mode="tags"
@@ -207,14 +209,14 @@ export default Form.create()(
           shape="square"
           size="large"
         />
-        <Form name="basic" onSubmit={handleSubmit}>
+        <Form {...layout} name="basic" onSubmit={handleSubmit}>
           <Form.Item label="Target Name" name="Target Name">
             {form.getFieldDecorator('name', {
               initialValue: targetName,
               rules: [{ required: true, message: 'Please give a target name' }],
             })(<Input name="targetName" size="large" />)}
           </Form.Item>
-          <Form.Item label="Target Type" name="Target Type" style={{ marginTop: 15 }}>
+          <Form.Item label="Target Type" name="Target Type">
             {form.getFieldDecorator('type', {
               initialValue:
                 targetOptions &&
@@ -233,7 +235,7 @@ export default Form.create()(
             )}
           </Form.Item>
 
-          <Form.Item label="Mastery Criteria" name="masteryCriteria" style={{ marginTop: 15 }}>
+          <Form.Item label="Mastery Criteria" name="masteryCriteria">
             {form.getFieldDecorator('masteryCriteria', {
               initialValue:
                 targetOptions &&
@@ -252,7 +254,7 @@ export default Form.create()(
             )}
           </Form.Item>
 
-          <div style={{ marginTop: 15 }}>
+          <div>
             <Text style={{ fontSize: 18, color: '#000' }}>Session</Text>
             <NumberCard
               title="Daily Trials"
@@ -277,7 +279,7 @@ export default Form.create()(
             />
           </div>
 
-          <Form.Item label="Short Term Goal" style={{ marginTop: 15 }}>
+          <Form.Item label="Short Term Goal">
             {form.getFieldDecorator('stg', {
               rules: [{ required: true, message: 'Please select a short term goal' }],
             })(
@@ -293,7 +295,7 @@ export default Form.create()(
             )}
           </Form.Item>
 
-          <Form.Item label="Status" style={{ marginTop: 15 }}>
+          <Form.Item label="Status">
             {form.getFieldDecorator('status', {
               initialValue: settingData?.getAllocateTargetSettings.edges[0]?.node.status.id,
               rules: [{ required: true, message: 'Please select a target status' }],
@@ -311,7 +313,7 @@ export default Form.create()(
           </Form.Item>
 
           {(form.getFieldValue('sd') || !form.getFieldValue('sd')) && (
-            <Form.Item label="Steps" style={{ marginTop: 15 }}>
+            <Form.Item label="Steps">
               {form.getFieldDecorator('steps')(
                 <Select
                   allowClear
@@ -341,11 +343,7 @@ export default Form.create()(
 
           <SdInput form={form} />
 
-          <Form.Item
-            label="Target Instructions"
-            name="Target Instructions"
-            style={{ marginTop: 15 }}
-          >
+          <Form.Item label="Target Instructions" name="Target Instructions">
             <CKEditor
               name="targetInstructions"
               activeClass="p10"
@@ -356,26 +354,24 @@ export default Form.create()(
             />
           </Form.Item>
 
-          <Form.Item label="Target Video Link" name="Target Video" style={{ marginTop: 15 }}>
+          <Form.Item label="Target Video Link" name="Target Video">
             {form.getFieldDecorator('video', {
               initialValue: targetVideo,
             })(<Input placeholder="Give the video url" size="large" />)}
           </Form.Item>
 
-          <Form.Item style={{ marginTop: 15 }}>
+          <Form.Item>
             <Checkbox value={makeDefault} onChange={() => setMakeDefault(state => !state)}>
               Make values default
             </Checkbox>
           </Form.Item>
 
-          <Form.Item style={{ marginTop: 20 }}>
+          <Form.Item {...tailLayout}>
             <Button
               type="primary"
               htmlType="submit"
               size="large"
-              style={{
-                width: 150,
-              }}
+              style={SUBMITT_BUTTON}
               loading={allocateTargetLoading}
             >
               Save
