@@ -83,6 +83,24 @@ const routes = [
     // component: Learners,
     exact: true,
   },
+  // Add LEADS HERE
+  {
+    path: '/partners/viewleads',
+    component: loadable(() => import('pages/leads/view_leads')),
+    exact: true,
+  },
+  // The expense component.
+  {
+    path: '/partners/viewexpenses',
+    component: loadable(() => import('pages/expenses/view_expense')),
+    exact: true,
+  },
+  // The assets component
+  {
+    path: '/partners/viewasset',
+    component: loadable(() => import('pages/assets_pages/view_asset')),
+    exact: true,
+  },
   {
     path: '/partners/viewstaffs',
     component: loadable(() => import('pages/staffs/view_staffs')),
