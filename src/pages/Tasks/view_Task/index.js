@@ -547,7 +547,7 @@ class TaskTable extends React.Component {
               </Button>
             </Popconfirm>
             <CommentOutlined
-              style={{ color: '#112d4e', fontSize: '1.5em' }}
+              style={{ color: '#3f72af', fontSize: '1.5em' }}
               onClick={() => this.commentInfo(e)}
               type="link"
             />
@@ -772,7 +772,6 @@ class TaskTable extends React.Component {
               justifyContent: 'space-between',
               alignItems: 'center',
               padding: '0px 10px',
-              margin: '20px auto 10px',
               backgroundColor: '#FFF',
               boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
             }}
@@ -820,9 +819,9 @@ class TaskTable extends React.Component {
             </div>
           </div>
 
-          <div className="row">
-            <div className={divClass}>
-              <div style={{ margin: '5px', marginBottom: '50px' }}>
+          <div className="row" style={{ width: '100%' }}>
+            <div className={divClass} style={{ paddingRight: 0 }}>
+              <div style={{ margin: '20px', marginBottom: '50px', marginRight: 0 }}>
                 <div className="filter_div">
                   <span style={{ display: 'flex', alignItems: 'center', zIndex: 45 }}>
                     <span>Name :</span>

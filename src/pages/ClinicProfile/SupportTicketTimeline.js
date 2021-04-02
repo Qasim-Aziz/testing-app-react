@@ -10,6 +10,7 @@ import {
   MessageOutlined,
 } from '@ant-design/icons'
 import './SupportTicketTimeline.scss'
+import { COLORS, FONT } from '../../assets/styles/globalStyles'
 
 const TICKET_QUERY = gql`
   query($id: ID!) {
@@ -194,12 +195,34 @@ export default Form.create()(({ updateTicketId, form, setUpdateTicketId }) => {
           </div>
         </div>
       </div>
+      <div style={{ marginTop: '4em' }}>
+        <Form onSubmit={handleCommentSubmit} style={{ display: 'flex' }}>
+          <Form.Item style={{ display: 'flex', width: '90%' }} className="TimeLine-Form">
+            {form.getFieldDecorator('comment', {
+              rules: [{ required: true, message: 'Please add comment!' }],
+            })(<Input placeholder="Add comment here" size="large" />)}
+          </Form.Item>
+
+          <Button
+            type="primary"
+            htmlType="submit"
+            style={{
+              backgroundColor: 'white',
+              border: '1px solid #0b35b3',
+              color: COLORS.palleteDarkBlue,
+            }}
+            loading={updateCommentLoading}
+          >
+            Add Comment
+          </Button>
+        </Form>
+      </div>
       <div className="TimelineMiddleContainer">
         <p>Comments:</p>
       </div>
       <div>
         {commentQueryData?.ticket.comments.edges.length === 0 ? (
-          <p style={{ textAlign: 'center', fontSize: '2rem' }}>No Comments to show </p>
+          <p style={{ textAlign: 'center', fontSize: FONT.level3 }}>No Comments to show </p>
         ) : (
           commentQueryData?.ticket.comments.edges
             .slice(0)
@@ -219,24 +242,6 @@ export default Form.create()(({ updateTicketId, form, setUpdateTicketId }) => {
               </Timeline>
             ))
         )}
-      </div>
-      <div style={{ marginTop: '4em' }}>
-        <Form onSubmit={handleCommentSubmit} style={{ display: 'flex' }}>
-          <Form.Item style={{ display: 'flex', width: '90%' }} className="TimeLine-Form">
-            {form.getFieldDecorator('comment', {
-              rules: [{ required: true, message: 'Please add comment!' }],
-            })(<Input placeholder="Add comment here" size="large" />)}
-          </Form.Item>
-
-          <Button
-            type="primary"
-            htmlType="submit"
-            style={{ backgroundColor: 'white', border: '1px solid #0b35b3', color: '#0b35b3' }}
-            loading={updateCommentLoading}
-          >
-            Add Comment
-          </Button>
-        </Form>
       </div>
     </div>
   )

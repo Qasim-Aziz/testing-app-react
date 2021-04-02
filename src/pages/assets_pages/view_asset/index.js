@@ -376,42 +376,42 @@ class AssetTable extends React.Component {
         },
       },
       {
-        title: 'Description',
-        // selector: 'description',
+        name: 'Description',
+        selector: 'description',
         // maxWidth: '120px',
-        render: row => {
+        cell: row => {
           return <span>{row.description ? row.description : ''} </span>
         },
       },
       {
-        title: 'Asset Status',
-        // selector: 'assetStatus',
+        name: 'Asset Status',
+        selector: 'assetStatus',
         // maxWidth: '120px',
-        render: row => {
+        cell: row => {
           return <span>{row.assetStatus ? row.assetStatus : ''} </span>
         },
       },
       {
-        title: 'Created At',
-        // selector: 'createdAt',
+        name: 'Created At',
+        selector: 'createdAt',
         // maxWidth: '120px',
-        render: row => {
+        cell: row => {
           return <span>{row.createdAt ? row.createdAt : ''} </span>
         },
       },
       {
-        title: 'Updated At',
-        // selector: 'updatedAt',
+        name: 'Updated At',
+        selector: 'updatedAt',
         // maxWidth: '120px',
-        render: row => {
+        cell: row => {
           return <span>{row.updatedAt ? row.updatedAt : ''} </span>
         },
       },
       {
-        title: 'Created By',
-        // selector: 'createdBy',
+        name: 'Created By',
+        selector: 'createdBy',
         // maxWidth: '120px',
-        render: row => {
+        cell: row => {
           let object_of_assigned_by = row.createdBy
           // console.log('THE OBJ ====👉', object_of_assigned_by)
           if (object_of_assigned_by) {
@@ -427,10 +427,10 @@ class AssetTable extends React.Component {
         },
       },
       {
-        title: 'Assigned By',
-        // selector: 'assignedBy',
+        name: 'Assigned By',
+        selector: 'assignedBy',
         // maxWidth: '120px',
-        render: row => {
+        cell: row => {
           // console.log(
           //   '*******************',
           //   row.assetdesignationmodelSet,
@@ -457,10 +457,10 @@ class AssetTable extends React.Component {
         },
       },
       {
-        title: 'Assigned To',
-        // selector: 'assignedTo',
+        name: 'Assigned To',
+        selector: 'assignedTo',
         // maxWidth: '120px',
-        render: row => {
+        cell: row => {
           // console.log(
           //   'ASSIGNED TO *******************',
           //   row.assetdesignationmodelSet,

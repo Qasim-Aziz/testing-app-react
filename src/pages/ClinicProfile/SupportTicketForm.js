@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react'
 import { Button, Form, Input, Select, notification } from 'antd'
 import gql from 'graphql-tag'
 import { useQuery, useMutation } from 'react-apollo'
+import { FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from '../../assets/styles/globalStyles'
 import './SupportTicketFormStyle.scss'
 
 const { TextArea } = Input
@@ -179,7 +180,7 @@ export default Form.create()(({ form, setOpen, setNewTicket }) => {
   const ItemStyle = { width: '100%', display: 'flex' }
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form {...FORM.layout} onSubmit={handleSubmit}>
       <Form.Item label="Issue" style={ItemStyle} className="Form-field-container">
         {form.getFieldDecorator('issue', {
           rules: [{ required: true, message: 'Please give the issue name!' }],
@@ -279,16 +280,11 @@ export default Form.create()(({ form, setOpen, setNewTicket }) => {
         )}
       </Form.Item>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-        }}
-      >
+      <Form.Item {...FORM.tailLayout}>
         <Button
           type="primary"
           htmlType="submit"
-          style={{ marginTop: 15, fontSize: 16, width: '46%', height: 40 }}
+          style={SUBMITT_BUTTON}
           loading={createTicketLoading}
         >
           Create Ticket
@@ -296,7 +292,7 @@ export default Form.create()(({ form, setOpen, setNewTicket }) => {
 
         <Button
           type="danger"
-          style={{ marginTop: 15, fontSize: 16, width: '46%', height: 40 }}
+          style={CANCEL_BUTTON}
           onClick={() => {
             form.resetFields()
             setOpen(false)
@@ -304,7 +300,7 @@ export default Form.create()(({ form, setOpen, setNewTicket }) => {
         >
           Cancel
         </Button>
-      </div>
+      </Form.Item>
     </Form>
   )
 })

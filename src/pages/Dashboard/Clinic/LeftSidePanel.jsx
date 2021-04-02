@@ -1,6 +1,7 @@
 import React from 'react'
 import { Button } from 'antd'
 import { EditOutlined } from '@ant-design/icons'
+import {COLORS} from 'assets/styles/globalStyles'
 import gql from 'graphql-tag'
 import { useQuery } from 'react-apollo'
 
@@ -35,7 +36,10 @@ const LeftSidePanel = ({ onActiveProfileTabChange }) => {
     : { country: null }
 
   return (
-    <div style={{ minWidth: '280', width: '320px' }} className="border-right profile-details">
+    <div
+      style={{ minWidth: '280', width: '386px', backgroundColor: COLORS.palleteLight }}
+      className="border-right profile-details"
+    >
       <div className="profile-title">Profile</div>
       <div className="profile-avtar-title-block">
         <img
@@ -45,10 +49,10 @@ const LeftSidePanel = ({ onActiveProfileTabChange }) => {
           className="profile-avtar"
           src="https://www.thewodge.com/wp-content/uploads/2019/11/avatar-icon.png"
         />
-        <span>{clinicInfo?.schooldetail?.schoolName}</span>
+        <span style={{ fontFamily: 'bolder' }}>{clinicInfo?.schooldetail?.schoolName}</span>
       </div>
 
-      <div style={{ padding: 10 }}>
+      <div style={{ padding: '17px' }}>
         <table className="profile-details-grid">
           <tbody>
             <tr className="heading-row" style={{ paddingTop: 0 }}>

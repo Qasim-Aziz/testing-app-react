@@ -12,12 +12,24 @@ const RightSidePanel = ({
   activeProfileTabKey,
   onActiveProfileTabChange,
 }) => (
-  <div style={{ width: '100%', backgroundColor: '#fff', height: '100%' }}>
-    <Tabs defaultActiveKey={activeTabKey} activeKey={activeTabKey} onChange={onActiveTabChange}>
+  <div
+    style={{ width: '100%', backgroundColor: '#dbe2ef', height: '100%' }}
+    className="RightSidePanel-nav"
+  >
+    <Tabs
+      defaultActiveKey={activeTabKey}
+      activeKey={activeTabKey}
+      onChange={onActiveTabChange}
+      style={{ color: '#112d4e' }}
+    >
       <TabPane className="scrollClass shadowbox" tab="My Dashboard" key="1">
         <DashboardTab />
       </TabPane>
-      <TabPane tab="My Profile" style={{ minHeight: 400, backgroundColor: '#f4f4f4' }} key="2">
+      <TabPane
+        tab="My Profile"
+        style={{ minHeight: 400, backgroundColor: '#f4f4f4', color: '#112d4e' }}
+        key="2"
+      >
         <ProfileTab
           activeProfileTab={activeProfileTabKey}
           onProfileTabChange={onActiveProfileTabChange}

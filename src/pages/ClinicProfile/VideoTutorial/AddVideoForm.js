@@ -3,6 +3,7 @@ import React, { useEffect } from 'react'
 import { Button, Input, Form, notification } from 'antd'
 import { useMutation } from 'react-apollo'
 import { CLINIC_MODULES, ADD_VIDEO_LIBERARY } from '../query'
+import { FORM, SUBMITT_BUTTON } from '../../../assets/styles/globalStyles'
 
 const NewVideoModuleormBasic = ({ form, setOpen, liberaryId, clinicId }) => {
   const [
@@ -69,7 +70,7 @@ const NewVideoModuleormBasic = ({ form, setOpen, liberaryId, clinicId }) => {
   }
 
   return (
-    <Form name="addVideoForm" onSubmit={handleSubmit}>
+    <Form {...FORM.layout} name="addVideoForm" onSubmit={handleSubmit}>
       <Form.Item label="Video Name" style={{ display: 'inline-block', width: '100%' }}>
         {form.getFieldDecorator('name', {
           rules: [{ required: true, message: 'Please enter video name' }],
@@ -85,14 +86,11 @@ const NewVideoModuleormBasic = ({ form, setOpen, liberaryId, clinicId }) => {
           <Input placeholder="Give the video description" size="large" />,
         )}
       </Form.Item>
-      <Button
-        type="primary"
-        htmlType="submit"
-        style={{ marginTop: 0, fontSize: 16, width: '100%', height: 40 }}
-        loading={addVideoLoading}
-      >
-        Add Video
-      </Button>
+      <Form.Item {...FORM.tailLayout}>
+        <Button type="primary" htmlType="submit" style={SUBMITT_BUTTON} loading={addVideoLoading}>
+          Add Video
+        </Button>
+      </Form.Item>
     </Form>
   )
 }

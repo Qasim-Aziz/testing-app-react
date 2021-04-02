@@ -332,7 +332,9 @@ export default () => {
           count={
             obj.node?.status?.charAt(0).toUpperCase() + obj.node.status?.slice(1).toLowerCase()
           }
+
           style={{ background: obj.node?.status === 'PROGRESS' ? COLORS.success : '#faad14' }}
+
         />
       ),
     },
@@ -501,7 +503,6 @@ export default () => {
       <Content
         style={{
           padding: '0px 20px',
-          maxWidth: '86%',
           width: '100%',
           margin: '0px auto 20px',
         }}
@@ -513,6 +514,11 @@ export default () => {
             alignItems: 'center',
           }}
         >
+          {user?.role !== 'parents' && (
+            <Button onClick={showDrawerFilter} size="large">
+              <FilterOutlined />
+            </Button>
+          )}
           <Text
             style={{
               marginBottom: 20,
@@ -525,12 +531,6 @@ export default () => {
             {`${studnetInfo?.student.firstname || ''}`} - PEAK Assessment
           </Text>
           <div style={{ display: 'flex', gap: '16px' }}>
-            {user?.role !== 'parents' && (
-              <Button onClick={showDrawerFilter} size="large">
-                <FilterOutlined />
-              </Button>
-            )}
-
             <Drawer
               visible={visibleFilter}
               onClose={onCloseFilter}
@@ -571,7 +571,10 @@ export default () => {
         onClose={() => {
           setOpen(false)
         }}
+
+
         width={DRAWER.widthL2}
+
         title="Create New Assessment"
       >
         <CreateAssignmentForm setOpen={setOpen} PEAK_PROGRAMS={PEAK_PROGRAMS} />

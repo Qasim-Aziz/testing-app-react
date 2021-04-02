@@ -33,8 +33,9 @@ import 'jspdf-autotable'
 import './editTable.css'
 import SupportTicketForm from './SupportTicketForm'
 import SupportTicketUpdate from './SupportTicketUpdate'
-// import SupportTicketTimeline from './SupportTicketTimeline'
+import SupportTicketTimeline from './SupportTicketTimeline'
 import LoadingComponent from '../staffProfile/LoadingComponent'
+import { COLORS, DRAWER, FONT } from '../../assets/styles/globalStyles'
 
 const { Text } = Typography
 
@@ -354,18 +355,18 @@ export default () => {
         return (
           <div style={{ display: 'flex', width: '100%', justifyContent: 'flex-start' }}>
             <CommentOutlined
-              style={{ color: '#112d4e', fontSize: '1.4em', paddingRight: '.9em' }}
+              style={{ color: COLORS.palleteBlue, fontSize: FONT.level3, paddingRight: '.9em' }}
               onClick={() => setUpdateTimeline(data.key)}
               type="link"
             />
             <EditOutlined
-              style={{ color: '#112d4e', fontSize: '1.4em', paddingRight: '.9em' }}
+              style={{ color: COLORS.palleteBlue, fontSize: FONT.level3, paddingRight: '.9em' }}
               onClick={() => setUpdateTicket(data.key)}
               type="link"
             />
             <DeleteOutlined
               type="link"
-              style={{ color: 'red', fontSize: '1.4em', paddingRight: '.9em' }}
+              style={{ color: COLORS.danger, fontSize: FONT.level3, paddingRight: '.9em' }}
               onClick={() => {
                 deleteTicketId.current = data.key
                 deleteTicket({ variables: { id: data.key } })
@@ -442,7 +443,7 @@ export default () => {
 
   return (
     <div>
-      <div style={{ marginBottom: 20 }}>
+      <div style={{ margin: 20 }}>
         <div
           style={{
             display: 'flex',
@@ -528,7 +529,7 @@ export default () => {
         </div>
       </div>
 
-      <div style={{ marginBottom: '50px' }}>
+      <div style={{ marginBottom: '50px', marginLeft: '20px', marginRight: '20px' }}>
         {ticketsError && 'Opps their is something wrong'}
         {ticketLoading && <LoadingComponent />}
         {ticketsData && (
@@ -550,7 +551,7 @@ export default () => {
         visible={createTicketDrawer}
         onClose={() => setCreateTicketDrawer(false)}
         title="Add Support Ticket"
-        width="80%"
+        width={DRAWER.widthL1}
       >
         <div
           style={{
@@ -568,7 +569,7 @@ export default () => {
         visible={updateTicket}
         onClose={() => setUpdateTicket(null)}
         title="Update Support Ticket"
-        width="80%"
+        width={DRAWER.widthL1}
       >
         <div
           style={{
@@ -590,7 +591,7 @@ export default () => {
         visible={updateTimeline}
         onClose={() => setUpdateTimeline(null)}
         title="Timeline"
-        width="50%"
+        width={DRAWER.widthL3}
       >
         <div
           style={{

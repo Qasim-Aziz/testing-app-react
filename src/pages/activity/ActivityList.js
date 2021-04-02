@@ -10,6 +10,7 @@ import Authorize from 'components/LayoutComponents/Authorize'
 import { PlusOutlined } from '@ant-design/icons'
 import moment from 'moment'
 import client from '../../apollo/config'
+import { FORM, SUBMITT_BUTTON } from '../../assets/styles/globalStyles'
 
 import '../../components/Calander.scss'
 
@@ -17,21 +18,6 @@ const { Option } = Select
 
 const { TextArea } = Input
 const dateFormat = 'YYYY-MM-DD'
-
-const layout = {
-  labelCol: {
-    span: 8,
-  },
-  wrapperCol: {
-    span: 12,
-  },
-}
-const tailLayout = {
-  wrapperCol: {
-    offset: 8,
-    span: 12,
-  },
-}
 
 const customStyles = {
   header: {
@@ -301,16 +287,17 @@ const ActivityList = ({ form }) => {
       <Drawer
         destroyOnClose
         title={selectedActivity ? 'Update Activity' : 'Create Activity'}
-        width="40%"
+        width="80%"
         placement="right"
         closable="true"
         onClose={() => setVisible(false)}
         visible={visible}
       >
         <Form
-          {...layout}
+          {...FORM.layout}
           name="control-ref"
           onSubmit={e => (selectedActivity ? updateActivity(e) : addActivity(e))}
+          style={{ marginRight: '6em' }}
         >
           <Form.Item required label="Type" style={{ marginBottom: '8px' }}>
             {form.getFieldDecorator('type', {
@@ -367,8 +354,8 @@ const ActivityList = ({ form }) => {
               rules: [{ required: true, message: 'Please select a customer!' }],
             })(<TextArea style={{ borderRadius: 0 }} />)}
           </Form.Item>
-          <Form.Item {...tailLayout}>
-            <Button type="primary" htmlType="submit">
+          <Form.Item {...FORM.tailLayout}>
+            <Button type="primary" htmlType="submit" style={SUBMITT_BUTTON}>
               Submit
             </Button>
           </Form.Item>
@@ -382,7 +369,6 @@ const ActivityList = ({ form }) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: '5px 10px',
-          margin: '0',
           backgroundColor: '#FFF',
           boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
         }}

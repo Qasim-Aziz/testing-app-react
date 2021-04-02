@@ -3,6 +3,7 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable camelcase */
+/* eslint-disable yoda */
 /* eslint-disable react/jsx-indent */
 /* eslint-disable array-callback-return */
 /* eslint-disable react/jsx-indent-props */
@@ -97,8 +98,8 @@ const generalizationDefaultScores = [
     second: 15,
     third: 25,
     fourth: 36,
-    fifth: 57,
-    sixth: 55,
+    fifth: 55,
+    sixth: 57,
     seventh: 58,
     eighth: 59,
   },
@@ -670,7 +671,8 @@ export default () => {
   }
 
   // working correctly
-  const getAge = (key, value) => {
+  const getAge = (key, value, peakTYPE) => {
+    console.log("get age ==============>", key, value)
     let y = ''
     // console.log(factorScores?.peakProgram?.finalAge,'000000000000000000000000000000000000');
     if (factorScores?.peakProgram?.finalAge) {
@@ -679,7 +681,7 @@ export default () => {
       setFinalAge('1-2 yrs')
     }
 
-    if (factorScores?.peakProgram?.factorScores?.edges?.length > 0) {
+    if (factorScores?.peakProgram?.factorScores.edges.length > 0) {
       console.log(factorScores)
       const arr = factorScores?.peakProgram?.factorScores?.edges?.forEach(element => {
         if (key === '1' && element?.node?.codeType === 'FLS') {
@@ -695,81 +697,79 @@ export default () => {
           y = element?.node?.age
         }
       })
-    } else {
-      if (key === '1') {
-        switch (value) {
-          case 2:
-            y = '1-2 yrs'
-            break
-          case 30:
-            y = '3-4 yrs'
-            break
-          case 34:
-            y = '5-6 yrs'
-            break
-          default:
-            y = '5-6 yrs'
-            break
-        }
+    } else if (key === '1') {
+      if (peakTYPE === 'DIRECT') {
+        if (value <= 2) y = '1-2 yrs'
+        if (2 < value && value <= 30) y = '3-4 yrs'
+        if (30 < value) y = '5-6 yrs'
       }
-      if (key === '2') {
-        switch (value) {
-          case 0:
-            y = '1-2 yrs'
-            break
-          case 18:
-            y = '3-4 yrs'
-            break
-          case 21:
-            y = '5-6 yrs'
-            break
-          case 22:
-            y = '7-8 yrs'
-            break
-          default:
-            break
-        }
+      else {
+        if (value <= 2) y = '1-2 yrs'
+        if (2 < value && value <= 20) y = '3-4 yrs'
+        if (20 < value && value <= 24) y = '5-6 yrs'
+        if (24 < value && value <= 26) y = '7-8 yrs'
+        if (26 < value && value <= 28) y = '9-10 yrs'
+        if (28 < value && value <= 29) y = '11-12 yrs'
+        if (29 < value) y = '15+ yrs'
       }
-      if (key === '3') {
-        switch (value) {
-          case 0:
-            y = '1-2 yrs'
-            break
-          case 19:
-            y = '3-4 yrs'
-            break
-          case 80:
-            y = '5-6 yrs'
-            break
-          case 94:
-            y = '7-8 yrs'
-            break
-          case 100:
-            y = '9-10 yrs'
-            break
-          default:
-            break
-        }
-      }
-      if (key === '4') {
-        switch (value) {
-          case 0:
-            y = '1-2 yrs'
-            break
-          case 10:
-            y = '5-6 yrs'
-            break
-          case 22:
-            y = '7-8 yrs'
-            break
-          case 28:
-            y = '9-10 yrs'
-            break
-          default:
-            break
-        }
-      }
+
+
     }
+    else if (key === '2') {
+      if (peakTYPE === 'DIRECT') {
+        if (value <= 17) y = '1-2 yrs'
+        if (17 < value && value < 21) y = '3-4 yrs'
+        if (20 < value && value < 22) y = '5-6 yrs'
+        if (21 < value) y = '7-8 yrs'
+      }
+      else {
+        if (value <= 1) y = '1-2 yrs'
+        if (1 < value && value <= 15) y = '3-4 yrs'
+        if (15 < value && value <= 25) y = '5-6 yrs'
+        if (25 < value && value <= 36) y = '7-8 yrs'
+        if (36 < value && value <= 55) y = '9-10 yrs'
+        if (55 < value && value <= 57) y = '11-12 yrs'
+        if (57 < value && value <= 58) y = '13-15 yrs'
+        if (58 < value) y = '15+ yrs'
+      }
+
+    }
+    else if (key === '3') {
+      if (peakTYPE === 'DIRECT') {
+        if (value <= 18) y = '1-2 yrs'
+        if (18 < value && value < 80) y = '3-4 yrs'
+        if (79 < value && value < 94) y = '5-6 yrs'
+        if (93 < value && value < 99) y = '7-8 yrs'
+        if (99 < value) y = '9-10 yrs'
+      }
+      else {
+        if (value <= 2) y = '1-2 yrs'
+        if (2 < value && value <= 4) y = '3-4 yrs'
+        if (4 < value && value <= 9) y = '5-6 yrs'
+        if (9 < value && value <= 13) y = '7-8 yrs'
+        if (13 < value && value <= 50) y = '9-10 yrs'
+        if (50 < value && value <= 52) y = '11-12 yrs'
+        if (52 < value && value <= 61) y = '13-15 yrs'
+        if (61 < value) y = '15+ yrs'
+      }
+
+    }
+    else if (key === '4') {
+      if (peakTYPE === 'DIRECT') {
+        if (value <= 9) y = '1-2 yrs'
+        if (9 < value && value < 22) y = '5-6 yrs'
+        if (21 < value && value < 28) y = '7-8 yrs'
+        if (27 < value) y = '9-10 yrs'
+      }
+      else {
+        if (value <= 16) y = '9-10 yrs'        
+        if (16 < value && value <= 20) y = '11-12 yrs'
+        if (20 < value && value <= 26) y = '13-15 yrs'
+        if (26 < value) y = '15+ yrs'
+      }
+
+    }
+
 
     return y
   }
@@ -800,6 +800,7 @@ export default () => {
 
       gettableReport({ variables: { pk: programId } })
         .then(d => {
+          console.log('api data =================================>', d)
           const tablereportdata = d?.data
           setTempTableData(tablereportdata)
 
@@ -831,7 +832,8 @@ export default () => {
                 : 0,
               age: getAge(
                 '1',
-                tablereportdata ? JSON.parse(tablereportdata?.peakReport?.fls)?.age_score : 0,
+                tablereportdata ? JSON.parse(tablereportdata?.peakReport?.fls)?.score : 0,
+                peakType,
               ),
             },
             {
@@ -846,7 +848,8 @@ export default () => {
                 : 0,
               age: getAge(
                 '2',
-                tablereportdata ? JSON.parse(tablereportdata?.peakReport?.pls)?.age_score : 0,
+                tablereportdata ? JSON.parse(tablereportdata?.peakReport?.pls)?.score : 0,
+                peakType,
               ),
             },
             {
@@ -861,7 +864,8 @@ export default () => {
                 : 0,
               age: getAge(
                 '3',
-                tablereportdata ? JSON.parse(tablereportdata?.peakReport?.vcs)?.age_score : 0,
+                tablereportdata ? JSON.parse(tablereportdata?.peakReport?.vcs)?.score : 0,
+                peakType,
               ),
             },
             {
@@ -876,7 +880,8 @@ export default () => {
                 : 0,
               age: getAge(
                 '4',
-                tablereportdata ? JSON.parse(tablereportdata?.peakReport?.vrm)?.age_score : 0,
+                tablereportdata ? JSON.parse(tablereportdata?.peakReport?.vrm)?.score : 0,
+                peakType,
               ),
             },
             {
@@ -900,6 +905,8 @@ export default () => {
               age: 'NA',
             },
           ]
+
+          console.log('manupulated data ===================> ', data)
           setTData(data)
         })
         .catch(err => {
@@ -1077,35 +1084,35 @@ export default () => {
                             <td style={moduleTfooterStyle}>&nbsp;</td>
                           </>
                         ) : (
-                          <>
-                            <td style={{ ...moduleTbodyStyle, width: 370 }}>{item.peak}</td>
-                            <td style={moduleTbodyStyle}>{item.s_score}</td>
-                            <td style={moduleTbodyStyle}>{item.t_age_score}</td>
-                            <td style={moduleTbodyStyle}>{item.difference}</td>
-                            <td style={moduleTbodyStyle}>
-                              <Select
-                                defaultValue={item.age}
-                                style={{ width: 120 }}
-                                onChange={value => handleChangeTable(JSON.stringify(item), value)}
-                              >
-                                <Option value="1-2 yrs">1 - 2:11 Yrs</Option>
-                                <Option value="3-4 yrs">3 - 4:11 Yrs</Option>
-                                <Option value="5-6 yrs">5 - 6:11 Yrs</Option>
-                                <Option value="7-8 yrs">7 - 8:11 Yrs</Option>
-                                <Option value="9-10 yrs">9 - 10:11 Yrs</Option>
-                                {peakType === 'GENERALIZATION' && (
-                                  <Option value="11-12 yrs">11 - 12:11 Yrs</Option>
-                                )}
-                                {peakType === 'GENERALIZATION' && (
-                                  <Option value="13-14 yrs">13 - 14:11 Yrs</Option>
-                                )}
-                                {peakType === 'GENERALIZATION' && (
-                                  <Option value="15+ yrs">15+ :11 Yrs</Option>
-                                )}
-                              </Select>
-                            </td>
-                          </>
-                        )}
+                            <>
+                              <td style={{ ...moduleTbodyStyle, width: 370 }}>{item.peak}</td>
+                              <td style={moduleTbodyStyle}>{item.s_score}</td>
+                              <td style={moduleTbodyStyle}>{item.t_age_score}</td>
+                              <td style={moduleTbodyStyle}>{item.difference}</td>
+                              <td style={moduleTbodyStyle}>
+                                <Select
+                                  defaultValue={item.age}
+                                  style={{ width: 120 }}
+                                  onChange={value => handleChangeTable(JSON.stringify(item), value)}
+                                >
+                                  <Option value="1-2 yrs">1 - 2:11 Yrs</Option>
+                                  <Option value="3-4 yrs">3 - 4:11 Yrs</Option>
+                                  <Option value="5-6 yrs">5 - 6:11 Yrs</Option>
+                                  <Option value="7-8 yrs">7 - 8:11 Yrs</Option>
+                                  <Option value="9-10 yrs">9 - 10:11 Yrs</Option>
+                                  {peakType === 'GENERALIZATION' && (
+                                    <Option value="11-12 yrs">11 - 12:11 Yrs</Option>
+                                  )}
+                                  {peakType === 'GENERALIZATION' && (
+                                    <Option value="13-14 yrs">13 - 14:11 Yrs</Option>
+                                  )}
+                                  {peakType === 'GENERALIZATION' && (
+                                    <Option value="15+ yrs">15+ :11 Yrs</Option>
+                                  )}
+                                </Select>
+                              </td>
+                            </>
+                          )}
                       </tr>
                     ))}
                   </table>
@@ -1166,22 +1173,22 @@ export default () => {
                             )}
                           </>
                         ) : (
-                          <>
-                            <td style={{ ...moduleTbodyStyle, width: 370 }}>{item.name}</td>
-                            <td style={moduleTbodyStyle}>{item.first}</td>
-                            <td style={moduleTbodyStyle}>{item.second}</td>
-                            <td style={moduleTbodyStyle}>{item.third}</td>
-                            <td style={moduleTbodyStyle}>{item.fourth}</td>
-                            <td style={moduleTbodyStyle}>{item.fifth}</td>
-                            {peakType === 'GENERALIZATION' && (
-                              <>
-                                <td style={moduleTbodyStyle}>{item.sixth}</td>
-                                <td style={moduleTbodyStyle}>{item.seventh}</td>
-                                <td style={moduleTbodyStyle}>{item.eighth}</td>
-                              </>
-                            )}
-                          </>
-                        )}
+                            <>
+                              <td style={{ ...moduleTbodyStyle, width: 370 }}>{item.name}</td>
+                              <td style={moduleTbodyStyle}>{item.first}</td>
+                              <td style={moduleTbodyStyle}>{item.second}</td>
+                              <td style={moduleTbodyStyle}>{item.third}</td>
+                              <td style={moduleTbodyStyle}>{item.fourth}</td>
+                              <td style={moduleTbodyStyle}>{item.fifth}</td>
+                              {peakType === 'GENERALIZATION' && (
+                                <>
+                                  <td style={moduleTbodyStyle}>{item.sixth}</td>
+                                  <td style={moduleTbodyStyle}>{item.seventh}</td>
+                                  <td style={moduleTbodyStyle}>{item.eighth}</td>
+                                </>
+                              )}
+                            </>
+                          )}
                       </tr>
                     ))}
                   </table>
