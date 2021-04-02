@@ -376,42 +376,42 @@ class AssetTable extends React.Component {
         },
       },
       {
-        name: 'Description',
+        title: 'Description',
         selector: 'description',
         // maxWidth: '120px',
-        cell: row => {
+        render: row => {
           return <span>{row.description ? row.description : ''} </span>
         },
       },
       {
-        name: 'Asset Status',
+        title: 'Asset Status',
         selector: 'assetStatus',
         // maxWidth: '120px',
-        cell: row => {
+        render: row => {
           return <span>{row.assetStatus ? row.assetStatus : ''} </span>
         },
       },
       {
-        name: 'Created At',
+        title: 'Created At',
         selector: 'createdAt',
         // maxWidth: '120px',
-        cell: row => {
+        render: row => {
           return <span>{row.createdAt ? row.createdAt : ''} </span>
         },
       },
       {
-        name: 'Updated At',
+        title: 'Updated At',
         selector: 'updatedAt',
         // maxWidth: '120px',
-        cell: row => {
+        render: row => {
           return <span>{row.updatedAt ? row.updatedAt : ''} </span>
         },
       },
       {
-        name: 'Created By',
+        title: 'Created By',
         selector: 'createdBy',
         // maxWidth: '120px',
-        cell: row => {
+        render: row => {
           let object_of_assigned_by = row.createdBy
           // console.log('THE OBJ ====👉', object_of_assigned_by)
           if (object_of_assigned_by) {
@@ -427,10 +427,10 @@ class AssetTable extends React.Component {
         },
       },
       {
-        name: 'Assigned By',
+        title: 'Assigned By',
         selector: 'assignedBy',
         // maxWidth: '120px',
-        cell: row => {
+        render: row => {
           // console.log(
           //   '*******************',
           //   row.assetdesignationmodelSet,
@@ -457,10 +457,10 @@ class AssetTable extends React.Component {
         },
       },
       {
-        name: 'Assigned To',
+        title: 'Assigned To',
         selector: 'assignedTo',
         // maxWidth: '120px',
-        cell: row => {
+        render: row => {
           // console.log(
           //   'ASSIGNED TO *******************',
           //   row.assetdesignationmodelSet,
