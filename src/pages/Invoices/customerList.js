@@ -1,38 +1,28 @@
 /* eslint-disable */
 import React, { useEffect, useState, useReducer } from 'react'
 import {
-  Form,
   Select,
   Input,
   Typography,
   Button,
   notification,
-  DatePicker,
   Table,
   Menu,
-  Popover,
   Icon,
   Dropdown,
   Drawer,
   Modal,
+  DatePicker,
 } from 'antd'
-import {
-  PlayCircleOutlined,
-  PlusCircleOutlined,
-  PlusOutlined,
-  MailOutlined,
-} from '@ant-design/icons'
-import { DRAWER } from 'assets/styles/globalStyles'
-import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
+import { PlusOutlined, MailOutlined } from '@ant-design/icons'
 import moment from 'moment'
+import { DRAWER } from 'assets/styles/globalStyles'
+import { ExclamationCircleOutlined } from '@ant-design/icons'
+import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
 import AdvanceInvoiceForm from './advanceInvoice'
 import MonthlyInvoiceForm from './monthlyInvoice'
 import BankDetails from './bankDetails'
 import { CLINIC_QUERY, ADVANCE_INVOICE, MONTHLY_INVOICE } from './query'
-
-const { Option } = Select
-const { Text, Title } = Typography
-const { TextArea } = Input
 
 function CustomerList() {
   const { data, loading, error } = useQuery(CLINIC_QUERY)
@@ -46,6 +36,9 @@ function CustomerList() {
   const [monthlyInvForm, setMonthlyInvForm] = useState(false)
   const [currentRow, setCurrentRow] = useState(null)
   const [bankDetailsDrawer, setBankDetailsDrawer] = useState(false)
+  const [selectedClinicsName, setSelectedClinicsName] = useState(null)
+  const [monthlyMonth, setMonthlyMonth] = useState(moment().subtract(1, 'M'))
+  const [advMonth, setAdvMonth] = useState(moment())
   const [
     createAdvanceInvoice,
     { data: advanceData, loading: advanceLoading, error: advanceError },
@@ -175,6 +168,12 @@ function CustomerList() {
   }
 
   const handleMenuActions = e => {
+    let names = []
+    tableData.map(item =>
+      selectedRowKeys.map(key => (key === item.key ? names.push(item.details?.schoolName) : null)),
+    )
+    console.log(names, 'names')
+    setSelectedClinicsName(names)
     if (e.key == 'advanceInvoice') {
       setAdvanceInvoiceModal(true)
     } else if (e.key == 'monthlyInvoice') {
@@ -230,21 +229,42 @@ function CustomerList() {
         }}
         okText="OK"
         cancelText="Cancel"
-        width={360}
+        width={DRAWER.widthL3}
       >
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <span style={{ marginRight: 15 }}>Months: </span>
-          <Input
-            value={advInvoiceMonth}
-            min={1}
-            type="number"
-            onChange={e => setAdvInvoiceMonth(e.target.value)}
-          ></Input>
+        <div style={{ alignItems: 'center' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              fontSize: 16,
+              color: 'black',
+            }}
+          >
+            <div>
+              Create <strong>Advance</strong> invoice for selected clinics for month of{' '}
+              <b>{advMonth.format('MMMM')}</b>.
+            </div>
+            <DatePicker.MonthPicker
+              size="small"
+              style={{ width: 120 }}
+              value={advMonth}
+              onChange={e => setAdvMonth(e)}
+            />
+          </div>
+          <div>
+            <ol style={{ display: 'grid', marginTop: 14, gridTemplateColumns: 'auto auto' }}>
+              {selectedClinicsName &&
+                selectedClinicsName.map((item, index) => (
+                  <li style={{ width: 300, marginBottom: 4 }}>{item}</li>
+                ))}
+            </ol>
+          </div>
         </div>
       </Modal>
       <Modal
         title="Create Monthly Invoice"
         visible={monthlyInvoiceModal}
+        className="ant-modals-design"
         onOk={() => {
           setMonthlyInvoiceModal(false)
         }}
@@ -253,10 +273,36 @@ function CustomerList() {
         }}
         okText="OK"
         cancelText="Cancel"
-        width={360}
+        width={DRAWER.widthL3}
       >
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          Are you sure to create monthly invoice for March for selected clinics
+        <div style={{ alignItems: 'center' }}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              fontSize: 16,
+              color: 'black',
+            }}
+          >
+            <div>
+              Create <strong>Monthly</strong> invoice for selected clinics for month of{' '}
+              <b>{monthlyMonth.format('MMMM')}</b>.
+            </div>
+            <DatePicker.MonthPicker
+              size="small"
+              style={{ width: 120 }}
+              value={monthlyMonth}
+              onChange={e => setMonthlyMonth(e)}
+            />
+          </div>
+          <div>
+            <ol style={{ display: 'grid', marginTop: 14, gridTemplateColumns: 'auto auto' }}>
+              {selectedClinicsName &&
+                selectedClinicsName.map((item, index) => (
+                  <li style={{ width: 300, marginBottom: 4 }}>{item}</li>
+                ))}
+            </ol>
+          </div>
         </div>
       </Modal>
       <Modal
