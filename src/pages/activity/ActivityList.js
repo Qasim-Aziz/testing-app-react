@@ -10,7 +10,7 @@ import Authorize from 'components/LayoutComponents/Authorize'
 import { PlusOutlined } from '@ant-design/icons'
 import moment from 'moment'
 import client from '../../apollo/config'
-import { FORM, SUBMITT_BUTTON } from '../../assets/styles/globalStyles'
+import { FORM, SUBMITT_BUTTON, COLORS, DRAWER } from '../../assets/styles/globalStyles'
 
 import '../../components/Calander.scss'
 
@@ -287,7 +287,7 @@ const ActivityList = ({ form }) => {
       <Drawer
         destroyOnClose
         title={selectedActivity ? 'Update Activity' : 'Create Activity'}
-        width="80%"
+        width={DRAWER.widthL1}
         placement="right"
         closable="true"
         onClose={() => setVisible(false)}
@@ -369,7 +369,7 @@ const ActivityList = ({ form }) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: '5px 10px',
-          backgroundColor: '#FFF',
+          backgroundColor: COLORS.white,
           boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
         }}
       >
@@ -403,7 +403,7 @@ const ActivityList = ({ form }) => {
             ) : null} */}
         </div>
         <div>
-          <span style={{ fontSize: '25px', color: '#000' }}>Activity List</span>
+          <span style={{ fontSize: '25px', color: COLORS.blackLighten }}>Activity List</span>
         </div>
         <div style={{ padding: '5px 0px' }}>
           {/* <Dropdown overlay={menu} trigger={['click']}>

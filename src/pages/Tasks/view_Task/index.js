@@ -57,6 +57,7 @@ import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import CreateOrUpdateTask from '../CreateOrUpdateTask'
 import TaskTimeline from '../TaskTimeline'
+import { COLORS, DRAWER } from '../../../assets/styles/globalStyles'
 import './style.scss'
 
 const { Meta } = Card
@@ -547,7 +548,7 @@ class TaskTable extends React.Component {
               </Button>
             </Popconfirm>
             <CommentOutlined
-              style={{ color: '#3f72af', fontSize: '1.5em' }}
+              style={{ color: COLORS.palleteBlue, fontSize: '1.5em' }}
               onClick={() => this.commentInfo(e)}
               type="link"
             />
@@ -644,11 +645,11 @@ class TaskTable extends React.Component {
             closable={true}
             onClose={() => this.filterToggle(filterShow)}
             visible={filterShow}
-            width={300}
+            width={DRAWER.widthL2}
           >
             <div>
               <div className="filter_sub_div">
-                <span style={{ fontSize: '15px', color: '#000' }}>Name :</span>
+                <span style={{ fontSize: '15px', color: COLORS.blackLighten }}>Name :</span>
                 <Input
                   size="small"
                   placeholder="Search Name"
@@ -659,7 +660,7 @@ class TaskTable extends React.Component {
               </div>
 
               <div className="filter_sub_div">
-                <span style={{ fontSize: '15px', color: '#000' }}>Status :</span>
+                <span style={{ fontSize: '15px', color: COLORS.blackLighten }}>Status :</span>
                 <Select
                   size="small"
                   value={this.state.filterStatus}
@@ -673,7 +674,7 @@ class TaskTable extends React.Component {
                 </Select>
               </div>
               <div className="filter_sub_div">
-                <span style={{ fontSize: '15px', color: '#000' }}>Type :</span>
+                <span style={{ fontSize: '15px', color: COLORS.blackLighten }}>Type :</span>
 
                 <Select
                   size="small"
@@ -693,7 +694,7 @@ class TaskTable extends React.Component {
               </div>
 
               <div className="filter_sub_div">
-                <span style={{ fontSize: '15px', color: '#000' }}>Priority :</span>
+                <span style={{ fontSize: '15px', color: COLORS.blackLighten }}>Priority :</span>
 
                 <Select
                   size="small"
@@ -716,7 +717,7 @@ class TaskTable extends React.Component {
 
           <Drawer
             title="TIMELINE"
-            width="50%"
+            width={DRAWER.widthL3}
             placement="right"
             closable={true}
             onClose={() => this.setState({ taskCommentDrawer: false })}
@@ -741,7 +742,7 @@ class TaskTable extends React.Component {
 
           <Drawer
             title="CREATE TASK"
-            width="80%"
+            width={DRAWER.widthL1}
             placement="right"
             closable={true}
             onClose={this.onClose}
@@ -752,7 +753,7 @@ class TaskTable extends React.Component {
 
           <Drawer
             title="UPDATE TASK"
-            width="80%"
+            width={DRAWER.widthL1}
             placement="right"
             closable={true}
             onClose={() => this.setState({ divShow: false })}
@@ -772,7 +773,7 @@ class TaskTable extends React.Component {
               justifyContent: 'space-between',
               alignItems: 'center',
               padding: '0px 10px',
-              backgroundColor: '#FFF',
+              backgroundColor: COLORS.grayLightenMore,
               boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
             }}
           >
@@ -804,7 +805,7 @@ class TaskTable extends React.Component {
               ) : null}
             </div>
             <div>
-              <span style={{ fontSize: '25px', color: '#000' }}>Tasks List</span>
+              <span style={{ fontSize: '25px', color: COLORS.blackLighten }}>Tasks List</span>
             </div>
             <div style={{ padding: '5px 0px' }}>
               <Dropdown overlay={menu} trigger={['click']}>

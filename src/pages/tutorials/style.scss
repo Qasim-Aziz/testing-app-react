@@ -1,3 +1,5 @@
+@import '../../assets/styles/mixins.scss';
+
 .scrollClass::-webkit-scrollbar {
   width: 6px;
 }
@@ -7,8 +9,8 @@
 }
 
 .scrollClass::-webkit-scrollbar-thumb {
-  background-color: #dbe2ef;
-  outline: #112d4e;
+  background-color: $palete-light-blue;
+  outline: $palete-dark-blue;
   border-radius: 20px;
   border: 2px solid rgba(0, 0, 0, 0.3);
 }

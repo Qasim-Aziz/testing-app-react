@@ -14,7 +14,7 @@
   }
 
   td.fc-timegrid-slot.fc-timegrid-slot-lane {
-    background-color: #112d4e;
+    background-color: $palete-dark-blue;
   }
 
   // .fc .fc-button-primary {
@@ -44,28 +44,28 @@
 
 .calenderTherapist-container {
   button.fc-prev-button {
-    background-color: #112d4e;
+    background-color: $palete-dark-blue;
   }
   button.fc-next-button {
-    background-color: #112d4e;
+    background-color: $palete-dark-blue;
   }
   button.fc-today-button {
-    background-color: #112d4e;
+    background-color: $palete-dark-blue;
   }
   button.fc-dayGridMonth-button {
-    background-color: #112d4e;
+    background-color: $palete-dark-blue;
   }
   button.fc-timeGridWeek-button {
-    background-color: #112d4e;
+    background-color: $palete-dark-blue;
   }
   button.fc-timeGridDay-button {
-    background-color: #112d4e;
+    background-color: $palete-dark-blue;
   }
 
   .fc-daygrid-day-frame.fc-scrollgrid-sync-inner {
-    background-color: white;
+    background-color: $white;
   }
   td.fc-timegrid-slot.fc-timegrid-slot-lane {
-    background-color: white;
+    background-color: $white;
   }
 }

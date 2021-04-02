@@ -1,5 +1,7 @@
+@import '../../assets/styles/mixins.scss';
+
 .TimelineTopContainer {
-  background-color: #dbe2ef;
+  background-color: $palete-light-blue;
   margin-bottom: 35px;
   padding: 20px;
 }
@@ -13,7 +15,7 @@
 .TopContainer-Left {
   display: flex;
   font-weight: bolder;
-  color: #112d4e;
+  color: $palete-dark-blue;
   width: 9.5em;
 }
 .TopContainer-Left > p {
@@ -24,18 +26,18 @@
 
 .Timeline-Icon {
   font-size: 1.5rem;
-  color: #3f72af;
+  color: $palete-blue;
 }
 
 #timeline-body {
   font-size: 15px;
-  color: #112d4e;
+  color: $palete-dark-blue;
   font-weight: 600;
 }
 
 #timeline-body > p {
   font-size: 20px;
-  color: black;
+  color: $black;
   font-weight: bold;
 }
 
@@ -48,11 +50,11 @@
 }
 
 .TimelineMiddleContainer {
-  border-bottom: 1px solid #112d4e;
+  border-bottom: 1px solid $palete-dark-blue;
   margin-top: 3em;
   margin-bottom: 3em;
   p {
-    color: #112d4e;
+    color: $palete-dark-blue;
     font-weight: bold;
     font-size: 1.4rem;
   }

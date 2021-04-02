@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 import { gql } from 'apollo-boost'
 import client from '../../apollo/config'
 import './style.scss'
+import { COLORS } from '../../assets/styles/globalStyles'
 
 const { Title, Text } = Typography
 
@@ -181,7 +182,7 @@ class TutorialStep1 extends React.Component {
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '3px 10px',
-            backgroundColor: '#FFF',
+            backgroundColor: COLORS.white,
             boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
           }}
         >
@@ -202,7 +203,7 @@ class TutorialStep1 extends React.Component {
                 flex: 8,
                 height: 350,
                 maxHeight: 349,
-                backgroundColor: '#edf1f7',
+                backgroundColor: COLORS.palleteLight,
                 display: 'flex',
                 alignItems: 'center',
               }}
@@ -215,7 +216,7 @@ class TutorialStep1 extends React.Component {
                 height: 350,
                 maxHeight: 349,
                 overflowY: 'scroll',
-                backgroundColor: '#edf1f7',
+                backgroundColor: COLORS.palleteLight,
               }}
               className="scrollClass"
             >
@@ -254,7 +255,7 @@ class TutorialStep1 extends React.Component {
                           style={{
                             margin: '5px 5px 5px 0',
                             borderRadius: '10px',
-                            backgroundColor: '#dbe2ef',
+                            backgroundColor: COLORS.palleteLightBlue,
                           }}
                           cover={
                             <img
@@ -306,7 +307,7 @@ class TutorialStep1 extends React.Component {
                     marginRight: 10,
                     minWidth: 300,
                     maxWidth: 300,
-                    backgroundColor: '#3f72af',
+                    backgroundColor: COLORS.palleteBlue,
                     padding: 10,
                     borderRadius: 10,
                   }}
@@ -317,7 +318,10 @@ class TutorialStep1 extends React.Component {
                   >
                     {project.node.name}
                   </p>
-                  <p className="" style={{ fontSize: '12px', lineHeight: '1.2', color: '#FFF' }}>
+                  <p
+                    className=""
+                    style={{ fontSize: '12px', lineHeight: '1.2', color: COLORS.white }}
+                  >
                     {project.node.description}
                   </p>
                 </div>
@@ -345,7 +349,7 @@ class TutorialStep1 extends React.Component {
                     style={{
                       minWidth: 300,
                       maxWidth: 300,
-                      backgroundColor: '#FFF',
+                      backgroundColor: COLORS.white,
                       padding: 10,
                       borderRadius: 10,
                     }}
