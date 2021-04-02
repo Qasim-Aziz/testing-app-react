@@ -11,17 +11,11 @@ import BankDetails from './bankDetails'
 const { TabPane } = Tabs
 
 export default () => {
-  const [bankDetailsDrawer, setBankDetailsDrawer] = useState(false)
-
-  const paymentDetailsButton = (
-    <Button onClick={() => setBankDetailsDrawer(true)}>Bank Details</Button>
-  )
-
   return (
     <div>
       <Helmet title="Dashboard Alpha" />
       <Layout style={{ padding: '0px' }}>
-        <Tabs tabBarExtraContent={paymentDetailsButton}>
+        <Tabs>
           <TabPane tab="Customer" key="Customer">
             <CustomerList />
           </TabPane>
@@ -30,15 +24,6 @@ export default () => {
           </TabPane>
         </Tabs>
       </Layout>
-      <Drawer
-        width={DRAWER.widthL2}
-        title="Update Payment accepting details"
-        visible={bankDetailsDrawer}
-        onClose={() => setBankDetailsDrawer(false)}
-        destroyOnClose
-      >
-        <BankDetails setBankDetailsDrawer={setBankDetailsDrawer} />
-      </Drawer>
     </div>
   )
 }

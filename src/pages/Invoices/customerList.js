@@ -22,24 +22,30 @@ import {
   PlusOutlined,
   MailOutlined,
 } from '@ant-design/icons'
+import { DRAWER } from 'assets/styles/globalStyles'
 import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
 import moment from 'moment'
 import AdvanceInvoiceForm from './advanceInvoice'
 import MonthlyInvoiceForm from './monthlyInvoice'
+import BankDetails from './bankDetails'
 import { CLINIC_QUERY, ADVANCE_INVOICE, MONTHLY_INVOICE } from './query'
 
 const { Option } = Select
 const { Text, Title } = Typography
 const { TextArea } = Input
+
 function CustomerList() {
   const { data, loading, error } = useQuery(CLINIC_QUERY)
   const [tableData, setTableData] = useState([])
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
   const [advInvoiceMonth, setAdvInvoiceMonth] = useState(1)
-  const [showModal, setShowModal] = useState(false)
+  const [advanceInvoiceModal, setAdvanceInvoiceModal] = useState(false)
+  const [monthlyInvoiceModal, setMonthlyInvoiceModal] = useState(false)
+  const [payReminderModal, setPayReminderModal] = useState(false)
   const [advInvForm, setAdvInvForm] = useState(false)
   const [monthlyInvForm, setMonthlyInvForm] = useState(false)
   const [currentRow, setCurrentRow] = useState(null)
+  const [bankDetailsDrawer, setBankDetailsDrawer] = useState(false)
   const [
     createAdvanceInvoice,
     { data: advanceData, loading: advanceLoading, error: advanceError },
@@ -74,6 +80,7 @@ function CustomerList() {
   }, [data, error])
 
   console.log(advanceData, advanceLoading, advanceError, 'ainvoi')
+
   const columns = [
     {
       title: 'Name',
@@ -100,6 +107,10 @@ function CustomerList() {
                   variables: {
                     month: 'April',
                     clinic: selectedRowKeys[0],
+                    cgst: 10,
+                    sgst: 8,
+                    discount: 2,
+                    generateLink: true,
                   },
                 })
                   .then(res => console.log(res, 'response'))
@@ -122,6 +133,7 @@ function CustomerList() {
                     cgst: 10,
                     sgst: 8,
                     discount: 2,
+                    generateLink: true,
                   },
                 })
                   .then(res => console.log(res, 'response from monthly invoice'))
@@ -164,16 +176,13 @@ function CustomerList() {
 
   const handleMenuActions = e => {
     if (e.key == 'advanceInvoice') {
-      setShowModal(true)
+      setAdvanceInvoiceModal(true)
+    } else if (e.key == 'monthlyInvoice') {
+      setMonthlyInvoiceModal(true)
+    } else if (e.key == 'payReminder') {
+      setPayReminderModal(true)
     }
   }
-
-  const content = (
-    <div>
-      <p>Content</p>
-      <p>Content</p>
-    </div>
-  )
 
   const menu = (
     <Menu onClick={e => handleMenuActions(e)}>
@@ -192,10 +201,11 @@ function CustomerList() {
   const filterHeader = (
     <div
       style={{
-        minHeight: '25px',
+        minHeight: '20px',
         height: 'fit-content',
         display: 'flex',
         flexDirection: 'row',
+        justifyContent: 'space-between',
       }}
     >
       <Dropdown overlay={menu}>
@@ -203,19 +213,20 @@ function CustomerList() {
           Actions <Icon type="down" />
         </Button>
       </Dropdown>
+      <Button onClick={() => setBankDetailsDrawer(true)}>Bank Details</Button>
     </div>
   )
 
   return (
-    <div>
+    <div style={{ marginTop: 10 }}>
       <Modal
         title="Advance Invoice Duration"
-        visible={showModal}
+        visible={advanceInvoiceModal}
         onOk={() => {
-          setShowModal(false)
+          setAdvanceInvoiceModal(false)
         }}
         onCancel={() => {
-          setShowModal(false)
+          setAdvanceInvoiceModal(false)
         }}
         okText="OK"
         cancelText="Cancel"
@@ -231,6 +242,41 @@ function CustomerList() {
           ></Input>
         </div>
       </Modal>
+      <Modal
+        title="Create Monthly Invoice"
+        visible={monthlyInvoiceModal}
+        onOk={() => {
+          setMonthlyInvoiceModal(false)
+        }}
+        onCancel={() => {
+          setMonthlyInvoiceModal(false)
+        }}
+        okText="OK"
+        cancelText="Cancel"
+        width={360}
+      >
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          Are you sure to create monthly invoice for March for selected clinics
+        </div>
+      </Modal>
+      <Modal
+        title="Send pay reminder"
+        visible={payReminderModal}
+        onOk={() => {
+          setPayReminderModal(false)
+        }}
+        onCancel={() => {
+          setPayReminderModal(false)
+        }}
+        okText="OK"
+        cancelText="Cancel"
+        width={360}
+      >
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          Send pay reminder to the selected clinics for last invoice
+        </div>
+      </Modal>
+
       <Drawer
         visible={advInvForm}
         onClose={() => setAdvInvForm(false)}
@@ -259,10 +305,20 @@ function CustomerList() {
           setInvoiceFormDrawer={setMonthlyInvForm}
         />
       </Drawer>
+      <Drawer
+        width={DRAWER.widthL2}
+        title="Update Payment accepting details"
+        visible={bankDetailsDrawer}
+        onClose={() => setBankDetailsDrawer(false)}
+        destroyOnClose
+      >
+        <BankDetails setBankDetailsDrawer={setBankDetailsDrawer} />
+      </Drawer>
       <Table
         columns={columns}
         dataSource={tableData}
         rowSelection={rowSelection}
+        loading={loading}
         bordered
         title={() => {
           return filterHeader
@@ -271,7 +327,7 @@ function CustomerList() {
           defaultPageSize: 20,
           showSizeChanger: true,
           pageSizeOptions: ['20', '30', '50', '100'],
-          position: 'top',
+          position: 'bottom',
         }}
       />
     </div>

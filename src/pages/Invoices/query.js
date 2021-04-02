@@ -125,7 +125,14 @@ export const UPDATE_PAYMENT_DETAILS = gql`
 `
 
 export const ADVANCE_INVOICE = gql`
-  mutation($clinic: [ID]!, $month: String!, $cgst: Float, $sgst: Float, $discount: Float) {
+  mutation(
+    $clinic: [ID]!
+    $month: String!
+    $cgst: Float
+    $sgst: Float
+    $discount: Float
+    $generateLink: Boolean
+  ) {
     createAdvanceInvoiceByClinic(
       input: {
         clinic: $clinic
@@ -133,7 +140,7 @@ export const ADVANCE_INVOICE = gql`
         cgst: $cgst
         sgst: $sgst
         discount: $discount
-        generateLink: true
+        generateLink: $generateLink
       }
     ) {
       status
@@ -183,7 +190,14 @@ export const ADVANCE_INVOICE = gql`
 `
 
 export const MONTHLY_INVOICE = gql`
-  mutation($month: String!, $clinics: [ID]!, $cgst: Float, $sgst: Float, $discount: Float) {
+  mutation(
+    $month: String!
+    $clinics: [ID]!
+    $cgst: Float
+    $sgst: Float
+    $discount: Float
+    $generateLink: Boolean
+  ) {
     createMonthlyInvoiceByClinic(
       input: {
         month: $month
@@ -191,7 +205,7 @@ export const MONTHLY_INVOICE = gql`
         cgst: $cgst
         sgst: $sgst
         discount: $discount
-        generateLink: true
+        generateLink: $generateLink
       }
     ) {
       status
