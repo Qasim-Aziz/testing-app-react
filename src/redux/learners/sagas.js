@@ -36,10 +36,11 @@ export function* GET_DATA() {
   yield put({
     type: 'learners/GET_LEARNERS',
     payload: {
-      isActive: null,
+      isActive: true,
       first: 20,
-      after: null,
-      before: null,
+      last: null,
+      after: '40',
+      before: '20',
     },
   })
 
@@ -63,15 +64,12 @@ export function* GET_LEARNERS({ payload }) {
   if (response) {
     const learners = []
     let i = 0
-    console.log(response, 'in res 11')
     if (response.data.students.edges && response.data.students.edges.length > 0) {
-      console.log(response, 'in res 22')
       for (i = 0; i < response.data.students.edges.length; i++) {
         if (
           response.data.students.edges[i].node.tags.edges &&
           response.data.students.edges[i].node.tags.edges.length > 0
         ) {
-          console.log(response, 'in res 33')
           const tempTagArr = response.data.students.edges[i].node.tags.edges.map(e => e.node.name)
           response.data.students.edges[i].node.tags = tempTagArr
         }
@@ -104,6 +102,7 @@ export function* PAGE_CHANGED({ payload }) {
       loadingLearners: true,
     },
   })
+  console.log(payload, 'payload')
   const pageInfo = yield select(state => state.learners.PageInfo)
   const status = yield select(state => state.learners.CurrentStatus)
   const perPage = yield select(state => state.learners.ItemPerPage)
@@ -132,19 +131,20 @@ export function* PAGE_CHANGED({ payload }) {
     before = pageInfo.startCursor
   }
 
-  // if (pageInfo){
-  //   after = pageInfo.endCursor
-  // }
-
-  console.log(active, first, after, before, last, 'in row changes')
+  console.log(active, first, after, before, last, 'in page changes')
+  // const response = null
   const response = yield call(getClinicLearners, { isActive: active, first, after, before, last })
 
   const oldLearners = []
+  console.log(response, 'thia ia respsonse')
   if (response) {
     let i = 0
     if (response.data.students.edges.length > 0) {
       for (i = 0; i < response.data.students.edges.length; i++) {
-        if (response.data.students.edges[i].node.tags.edges.length > 0) {
+        if (
+          response.data.students.edges[i].node.tags.edges &&
+          response.data.students.edges[i].node.tags.edges.length > 0
+        ) {
           const tempTagArr = response.data.students.edges[i].node.tags.edges.map(e => e.node.name)
           response.data.students.edges[i].node.tags = tempTagArr
         }
@@ -171,6 +171,7 @@ export function* PAGE_CHANGED({ payload }) {
 }
 
 export function* ROWS_CHANGED({ payload }) {
+  console.log(payload, 'payload')
   yield put({
     type: 'learners/SET_STATE',
     payload: {
@@ -178,9 +179,11 @@ export function* ROWS_CHANGED({ payload }) {
     },
   })
   const pageInfo = yield select(state => state.learners.PageInfo)
+  console.log(pageInfo, 'pageInfo')
   const status = yield select(state => state.learners.CurrentStatus)
-  // const perPage = yield select(state => state.learners.ItemPerPage)
+  console.log(status, 'status')
   const totalLearners = yield select(state => state.learners.TotalLearners)
+  console.log(totalLearners, 'totalLearners')
   let active = null
   if (status === 'all') active = null
   if (status === 'active') active = true
@@ -201,8 +204,9 @@ export function* ROWS_CHANGED({ payload }) {
     last = totalLearners % payload.currentRowsPerPage
   }
 
+  console.log(first, after, before, last, 'before alas')
   const response = yield call(getClinicLearners, { isActive: active, first, after, before, last })
-
+  // const response = null
   const oldLearners = []
   if (response) {
     let i = 0
@@ -220,6 +224,7 @@ export function* ROWS_CHANGED({ payload }) {
       }
     }
 
+    console.log(response)
     yield put({
       type: 'learners/SET_STATE',
       payload: {
@@ -300,7 +305,6 @@ export function* EDIT_GENERAL_INFO({ payload }) {
       tags: updatedLearner.tags,
     }
 
-    console.log(response, 'response')
     console.log(updatedLearner, obj, 'updated kjfbsdf ksf')
     yield put({
       type: 'learners/UPDATE_LERNERS_LIST',

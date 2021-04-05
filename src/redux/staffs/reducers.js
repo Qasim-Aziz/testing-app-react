@@ -4,6 +4,7 @@ const initialState = {
   StaffList: [],
   loading: true,
   StaffProfile: null,
+  CurrentStatus: 'active',
   isStaffProfile: false,
   UserRole: [],
   clinicLocationList: [],

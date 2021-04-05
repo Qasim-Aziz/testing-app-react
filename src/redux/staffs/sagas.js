@@ -14,7 +14,7 @@ import {
 import axios from 'axios'
 import actions from './actions'
 
-export function* GET_DATA() {
+export function* GET_DATA({ payload }) {
   yield put({
     type: 'staffs/SET_STATE',
     payload: {
@@ -22,7 +22,7 @@ export function* GET_DATA() {
     },
   })
 
-  const response = yield call(getClinicStaffs)
+  const response = yield call(getClinicStaffs, payload)
 
   if (response) {
     const staffs = []
@@ -35,7 +35,6 @@ export function* GET_DATA() {
           response.data.staffs.edges[i].node.tags.edges &&
           response.data.staffs.edges[i].node.tags.edges.length > 0
         ) {
-          console.log(response, 'response in staff 33333333')
           const tempTagArr = response.data.staffs.edges[i].node.tags.edges.map(e => e.node.name)
           response.data.staffs.edges[i].node.tags = tempTagArr
         }

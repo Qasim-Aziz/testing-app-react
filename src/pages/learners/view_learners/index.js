@@ -89,7 +89,7 @@ class LearnerTable extends React.Component {
     noOfRows: 20,
     filterName: '',
     filterEmail: '',
-    filterStatus: 'all',
+    filterStatus: 'active',
     filterCategory: '',
     filterTags: '',
     windowWidth: window.innerWidth,
@@ -108,8 +108,7 @@ class LearnerTable extends React.Component {
 
   componentDidMount() {
     const { dispatch } = this.props
-    console.log('gotchahaha')
-    // this.selectActiveStatus('active')
+
     dispatch({
       type: 'learners/GET_DATA',
     })
@@ -306,26 +305,29 @@ class LearnerTable extends React.Component {
     })
   }
 
-  pageChanged = (page, rows) => {
-    console.log(page, rows)
-
+  pageChanged = (currentPage, currentRowsPerPage) => {
     const {
       dispatch,
       learners: { ItemPerPage, CurrentStatus },
     } = this.props
+
+    console.log(currentRowsPerPage, currentPage, 'page changed')
     dispatch({
       type: 'learners/PAGE_CHANGED',
       payload: {
-        page,
-        rows,
+        page: currentPage,
+        rows: currentRowsPerPage,
       },
     })
   }
+
   rowsChanged = (currentRowsPerPage, currentPage) => {
     const {
       dispatch,
       learners: { ItemPerPage, CurrentStatus },
     } = this.props
+
+    console.log(currentRowsPerPage, currentPage, 'rows changed')
     dispatch({
       type: 'learners/ROWS_CHANGED',
       payload: {
@@ -366,7 +368,6 @@ class LearnerTable extends React.Component {
         )
     }
     if (status !== 'all') {
-      console.log(status, 'gotcha')
       tempFilterActive = true
       let tempStatus = status === 'active' ? true : false
       filteredList = filteredList && filteredList.filter(item => item.isActive === tempStatus)
@@ -419,6 +420,7 @@ class LearnerTable extends React.Component {
           item => item.gender && item.gender.toLowerCase() === gender.toLowerCase(),
         )
     }
+
     this.setState({
       tableData: filteredList,
       isFilterActive: tempFilterActive,
@@ -434,10 +436,10 @@ class LearnerTable extends React.Component {
       caseMngr: '',
       address: '',
       tags: '',
-      status: 'all',
+      status: 'active',
       category: '',
     })
-    // this.selectActiveStatus('')
+    this.selectActiveStatus('active')
   }
 
   filterToggle(toggle) {
@@ -981,13 +983,13 @@ class LearnerTable extends React.Component {
                   this.filterRef.current ? this.filterRef.current.clearFilter() : this.clearFilter()
                   this.setState({
                     isFilterActive: false,
-                    filterStatus: 'all',
+                    filterStatus: 'active',
                     filterTags: '',
                     filterCategory: '',
                     filterName: '',
                     filterEmail: '',
                   })
-                  this.selectActiveStatus('all')
+                  this.selectActiveStatus('active')
                 }}
                 style={{ marginLeft: '10px', color: '#FEBB27' }}
                 size="small"
@@ -1026,6 +1028,7 @@ class LearnerTable extends React.Component {
                 dataSource={filteredList}
                 loading={this.state.loadingLearners}
                 pagination={{
+                  total: TotalLearners,
                   defaultPageSize: 20,
                   onChange: (page, rows) => this.pageChanged(page, rows),
                   onShowSizeChange: (currentPage, currentRowsPerPage) =>
