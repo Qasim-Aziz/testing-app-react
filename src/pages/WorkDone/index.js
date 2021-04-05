@@ -49,6 +49,17 @@ export default () => {
       date: date.format('YYYY-MM-DD'),
     },
   })
+  const [cardData, setCardData] = useState(null)
+
+  useEffect(() => {
+    if (data && data?.timesheets) {
+      const temp = []
+      data.timesheets.edges.map(item => temp.push(item.node))
+      console.log(temp)
+      temp.sort((a, b) => new Date(a.start) - new Date(b.start))
+      setCardData(temp)
+    }
+  }, [data])
 
   useEffect(() => {
     if (newLogCreated) {
@@ -72,28 +83,6 @@ export default () => {
     height: 'fit-content',
     overflow: 'hidden',
   }
-
-  const tt = [
-    {
-      title: 'title',
-      location: 'gurugram',
-      startTime: moment(),
-      endTime: moment(),
-      note: 'this is note',
-      isApproved: false,
-      isBillable: false,
-    },
-    {
-      title: 'title 2',
-      location: 'gurugram 2',
-      startTime: moment(),
-      endTime: moment(),
-      note:
-        'Last node and Reversing  When the timeline is incomplete and ongoing, put a ghost node at last. Set pending as truthy value to enable displaying pending item.  reverse={true} is used for reversing nodes.',
-      isApproved: true,
-      isBillable: false,
-    },
-  ]
 
   console.log(data, 'data')
   return (
@@ -126,17 +115,18 @@ export default () => {
               <div>
                 <div style={{ margin: '10px 0 10px 10px' }}>
                   {error && <pre>{JSON.stringify(error, null, 2)}</pre>}
-                  {data &&
-                    tt.map((node, index) => {
+                  {cardData &&
+                    cardData.map(item => {
                       return (
                         <TimeCard
-                          title={node.title}
-                          location={node.location}
-                          startTime={moment(node.start).format('HH:mm a')}
-                          endTime={moment(node.end).format('HH:mm a')}
-                          note={node.note}
-                          isApproved={node.isApproved}
-                          isBillable={node.isBillable}
+                          key={item.id}
+                          title={item.title}
+                          location={item.location?.location}
+                          startTime={moment(item.start).format('hh:mm a')}
+                          endTime={moment(item.end).format('hh:mm a')}
+                          note={item.note}
+                          isApproved={item.isApproved}
+                          isBillable={item.isBillable}
                         />
                       )
                     })}
