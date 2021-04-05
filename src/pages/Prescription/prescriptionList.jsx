@@ -2,216 +2,157 @@
 /* eslint-disable react/jsx-indent */
 /* eslint-disable react/jsx-indent-props */
 /* eslint-disable react/jsx-boolean-value */
+/* eslint-disable */
 import React, { useState, useEffect } from 'react'
-import { Helmet } from 'react-helmet'
-import { Button, Layout, PageHeader, Table, Drawer, notification, Popover, Tabs } from 'antd'
-import DataTable from 'react-data-table-component'
+import { Input, Button, Table } from 'antd'
 
-const customStyles = {
-	header: {
-		style: {
-			maxHeight: '50px',
-		},
-	},
-	headRow: {
-		style: {
-			borderTopStyle: 'solid',
-			borderTopWidth: '1px',
-			borderTopColor: '#ddd',
-			backgroundColor: '#f5f5f5',
-		},
-	},
-	headCells: {
-		style: {
-			'&:not(:last-of-type)': {
-				borderRightStyle: 'solid',
-				borderRightWidth: '1px',
-				borderRightColor: '#ddd',
-			},
-			height: '40px',
-			padding: '12px 8px 12px',
-			fontWeight: 'bold',
-		},
-	},
-	cells: {
-		style: {
-			'&:not(:last-of-type)': {
-				borderRightStyle: 'solid',
-				borderRightWidth: '1px',
-				borderRightColor: '#ddd',
-			},
-			padding: '6px 8px',
-			fontSize: '12px',
-		},
-	},
-	pagination: {
-		style: {
-			position: 'absolute',
-			top: '-4px',
-			right: '5px',
-			borderTopStyle: 'none',
-			minHeight: '35px',
-		},
-	},
-	table: {
-		style: {
-			paddingBottom: '16px',
-			top: '16px',
-		},
-	},
-}
+export default props => {
+  const data = props.data
+  console.log('THE DATA', props)
 
-export default () => {
+  // const filterHandler = ({ name, email }) => {
+  //   let filteredList = learnerState.mainData
+  //   let tempFilterActive = false
 
-	const columns = [
-		{
-			name: 'Name',
-			selector: 'firstname',
-			sortable: true,
-			width: '150px',
-			cell: row => (
-				<Button
-					onClick={() => this.info(row)}
-					type="link"
-					style={{ padding: '0px', fontWeight: 'bold', fontSize: '11px' }}
-				>
-					{row.firstname} {row.lastname}
-				</Button>
-			),
-		},
-		{
-			name: 'Email',
-			selector: 'email',
-			sortable: true,
-			maxWidth: '180px',
-			minWidth: '180px',
-			cell: row => <span>{row.email ? row.email : ''}</span>,
-		},
+  //   console.log('clinic filter', name, email)
+  //   console.log(filteredList)
+  //   if (!name && !email && !mobile && !gender && !caseMngr && !address) {
+  //     tempFilterActive = false
+  //   }
+  //   if (name) {
+  //     tempFilterActive = true
+  //     filteredList =
+  //       filteredList &&
+  //       filteredList.filter(
+  //         item =>
+  //           item.firstname?.toLowerCase().includes(name.toLowerCase()) ||
+  //           item.lastname?.toLowerCase().includes(name.toLowerCase()),
+  //       )
+  //   }
+  //   if (email) {
+  //     tempFilterActive = true
+  //     filteredList =
+  //       filteredList &&
+  //       filteredList.filter(
+  //         item => item.email && item.email.toLowerCase().includes(email.toLowerCase()),
+  //       )
+  //   }
+  // }
 
-		{
-			name: 'Contact No',
-			selector: 'mobileno',
-			maxWidth: '120px',
-		},
+  const columns = [
+    {
+      title: '#',
+      render: row => data.indexOf(row) + 1,
+    },
+    {
+      title: 'Name',
+      dataIndex: 'firstname',
+      sortable: true,
+      render: (text, row) => (
+        <Button
+          type="link"
+          onClick={() => {
+            // this.setState({ showProfile: true })
+            // this.info(row)
+            console.log('CLICKED')
+          }}
+          style={{ padding: '0px', fontWeight: 'bold', fontSize: '14px' }}
+        >
+          {row.firstname} {row.lastname}
+        </Button>
+      ),
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      sortable: true,
+      render: (text, row) => <span>{row.email ? row.email : ''}</span>,
+    },
+    {
+      title: 'Contact No',
+      dataIndex: 'mobileno',
+    },
+  ]
 
-		{
-			name: 'Date of Birth',
-			selector: 'dob',
-			sortable: true,
-			width: '120px',
-			cell: row => <span>{row.dob ? row.dob : ''}</span>,
-		},
-		{
-			name: 'Language',
-			selector: 'language',
-			cell: row => <span>{row.language ? row.language.name : ''}</span>,
-			maxWidth: '90px',
-			minWidth: '90px',
-		},
-		{
-			name: 'Case Manager',
-			selector: 'caseManager',
-			cell: row => <span>{row.caseManager ? row.caseManager.name : ''}</span>,
-			maxWidth: '120px',
-		},
-		{
-			name: 'Client Id',
-			selector: 'clientId',
-			maxWidth: '90px',
-			minWidth: '90px',
-		},
-		{
-			name: 'Gender',
-			selector: 'gender',
-			maxWidth: '90px',
-			minWidth: '90px',
-			cell: row => <span style={{ textTransform: 'capitalize' }}>{row.gender}</span>,
-		},
-		{
-			name: 'Category',
-			selector: 'category',
-			maxWidth: '80px',
-			cell: row => <span>{row.category?.category}</span>,
-		},
+  // const tableHeader = (
+  //   <div
+  //     style={{
+  //       display: 'flex',
+  //       alignItems: 'center',
+  //       position: 'relative',
+  //       whiteSpace: 'nowrap',
+  //       zIndex: 2,
+  //       height: '28px',
+  //       width: '100%',
+  //       padding: '4px 12px',
+  //     }}
+  //   >
+  //     <span style={{ display: 'flex', alignItems: 'center' }}>
+  //       <span>Name :</span>
+  //       <Input
+  //         size="small"
+  //         name="name"
+  //         placeholder="Search Name"
+  //         value={learnerState.filterName}
+  //         onChange={e => {
+  //           console.log(e.target.value, 'value')
+  //           setLearnerState({
+  //             filterName: e.target.value,
+  //           })
+  //           filterHandler({ name: e.target.value })
+  //         }}
+  //         style={{ width: '112px' }} //  ...tableFilterStyles,
+  //       />
+  //     </span>
 
-		{
-			name: 'Clinic Location',
-			selector: 'clinicLocation',
-			cell: row => <span>{row.clinicLocation ? row.clinicLocation.location : ''}</span>,
-			width: '140px',
-		},
+  //     <span style={{ display: 'flex', alignItems: 'center' }}>
+  //       <span>Email :</span>
+  //       <Input
+  //         size="small"
+  //         name="name"
+  //         placeholder="Search Email"
+  //         value={learnerState.filterEmail}
+  //         onChange={e => {
+  //           setLearnerState({
+  //             filterEmail: e.target.value,
+  //           })
+  //           filterHandler({ email: e.target.value })
+  //         }}
+  //         style={{ width: '148px' }} // ...tableFilterStyles,
+  //       />
+  //     </span>
+  //   </div>
+  // )
 
-		{
-			name: 'Address',
-			selector: 'currentAddress',
-			maxWidth: '160px',
-		},
-		{
-			name: 'Assessments',
-			ignoreRowClick: true,
-			button: true,
-			width: '210px',
-			cell: obj => (
-				<div style={{ display: 'flex', justifyContent: 'space-evenly', width: '100%' }}>
-					<Button
-						onClick={() => this.showAssessments(obj)}
-						style={{
-							padding: '0px',
-							color: '#0190fe',
-							border: 'none',
-							fontSize: '11px',
-						}}
-					>
-						Assessments
-					</Button>
-					<Button
-						onClick={() => this.showProgram(obj)}
-						style={{
-							padding: '0px',
-							color: '#0190fe',
-							border: 'none',
-							fontSize: '11px',
-						}}
-					>
-						Program
-					</Button>
-					<Button
-						onClick={() => this.showSession(obj)}
-						style={{
-							padding: '0px',
-							color: '#0190fe',
-							border: 'none',
-							fontSize: '11px',
-						}}
-					>
-						Session
-					</Button>
-				</div>
-			),
-		},
-	]
-
-	return (
-		<>
-			<DataTable
-				title="Learners List"
-				columns={columns}
-				theme="default"
-				dense={true}
-				key="id"
-				keyField="id"
-				pagination={true}
-				data={[]}
-				customStyles={customStyles}
-				noHeader={true}
-				progressPending={false}
-				paginationServer={true}
-				paginationTotalRows={10}
-				paginationRowsPerPageOptions={[10, 20, 50, 80, 100]}
-
-
-			/>
-
-		</>
-	)
+  return (
+    <>
+      <div style={{ marginBottom: '50px' }}>
+        <div className="view_asset">
+          <Table
+            // title={() => {
+            //   return tableHeader
+            // }}
+            columns={columns}
+            rowKey={record => record.id}
+            dataSource={data}
+            // loading={loadingAssets} // this.state.loadingAssets
+            // ⭐ The below commented code is for pagination from server side
+            /* pagination={{
+                   defaultPageSize: 20,
+                   onChange: (page, rows) => this.pageChanged(page, rows),
+                   onShowSizeChange: (currentPage, currentRowsPerPage) =>
+                   this.rowsChanged(currentRowsPerPage, currentPage),
+                   showSizeChanger: true,
+                   pageSizeOptions:
+                     TotalLeaders > 100
+                       ? ['20', '50', '80', '100', `${TotalLeaders}`]
+                       : ['20', '50', '80', '100'],
+                   position: 'bottom',
+                  }}
+            */
+          />
+        </div>
+      </div>
+    </>
+  )
 }
