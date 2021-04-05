@@ -66,7 +66,9 @@ const layout1 = {
   },
 }
 
-const BankDetails = ({ form, setBankDetailsDrawer }) => {
+const BankDetails = props => {
+  // { form, setBankDetailsDrawer }
+  console.log('The state', props)
   const [productsState, productsDispatch] = useReducer(productReducer, [])
   const [subTotal, setSubTotal] = useState(0)
 
@@ -125,7 +127,7 @@ const BankDetails = ({ form, setBankDetailsDrawer }) => {
               </div>
               <div style={{ display: 'inline-block', float: 'right', width: '400px' }}>
                 <Form.Item style={itemStyle} label="Learner">
-                  {form.getFieldDecorator('learnerName', {
+                  {props.form.getFieldDecorator('learnerName', {
                     rules: [{ required: true, message: 'Please provide learner name' }],
                   })(<Input placeholder="Name" style={inputStyle}></Input>)}
                 </Form.Item>
@@ -136,35 +138,35 @@ const BankDetails = ({ form, setBankDetailsDrawer }) => {
             <div style={{ display: 'flow-root' }}>
               <div style={{ display: 'inline-block', float: 'left', width: '250px' }}>
                 <Form.Item style={itemStyle2} label="Height">
-                  {form.getFieldDecorator('height')(
+                  {props.form.getFieldDecorator('height')(
                     <Input placeholder="cm" style={inputStyle2}></Input>,
                   )}
                 </Form.Item>
               </div>
               <div style={{ display: 'inline-block', float: 'left', width: '250px' }}>
                 <Form.Item style={itemStyle2} label="Weight">
-                  {form.getFieldDecorator('weight')(
+                  {props.form.getFieldDecorator('weight')(
                     <Input placeholder="Kg" style={inputStyle2}></Input>,
                   )}
                 </Form.Item>
               </div>
               <div style={{ display: 'inline-block', float: 'left', width: '250px' }}>
                 <Form.Item style={itemStyle2} label="Temperature">
-                  {form.getFieldDecorator('temperature')(
+                  {props.form.getFieldDecorator('temperature')(
                     <Input placeholder="Celcious" style={inputStyle2}></Input>,
                   )}
                 </Form.Item>
               </div>
               <div style={{ display: 'inline-block', float: 'left', width: '350px' }}>
                 <Form.Item style={itemStyle2} label="Head Circumference">
-                  {form.getFieldDecorator('headCircumference')(
+                  {props.form.getFieldDecorator('headCircumference')(
                     <Input placeholder="cm" style={inputStyle2}></Input>,
                   )}
                 </Form.Item>
               </div>
             </div>
             <Form.Item {...layout1} label="Complaints">
-              {form.getFieldDecorator('complaints')(
+              {props.form.getFieldDecorator('complaints')(
                 <Select
                   mode="tags"
                   style={inputStyle3}
@@ -179,7 +181,7 @@ const BankDetails = ({ form, setBankDetailsDrawer }) => {
             </Form.Item>
 
             <Form.Item {...layout1} label="Diagnosis">
-              {form.getFieldDecorator('diagnosis')(
+              {props.form.getFieldDecorator('diagnosis')(
                 <Select
                   mode="tags"
                   style={inputStyle3}
