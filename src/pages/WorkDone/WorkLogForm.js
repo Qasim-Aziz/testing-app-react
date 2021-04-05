@@ -36,10 +36,20 @@ const ADD_TIMESHEET_DATA = gql`
     $note: String
     $start: DateTime!
     $end: DateTime!
+    $isApproved: Boolean
+    $isBillable: Boolean
   ) {
     CreateTimesheet(
       input: {
-        timesheet: { title: $title, location: $location, note: $note, start: $start, end: $end }
+        timesheet: {
+          title: $title
+          location: $location
+          note: $note
+          start: $start
+          end: $end
+          isApproved: $isApproved
+          isBillable: $isBillable
+        }
       }
     ) {
       timesheet {
@@ -78,6 +88,8 @@ export default ({ style, setNewLogCreated }) => {
       note,
       start,
       end,
+      isApproved: true,
+      isBillable: true,
     },
   })
 
