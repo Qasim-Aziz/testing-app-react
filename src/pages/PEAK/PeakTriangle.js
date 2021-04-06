@@ -438,12 +438,12 @@ export default () => {
     return (
         <>
             {allcode?.length > 0 &&
-                <div>
+                <div style={{padding: 5}}>
                     <Button style={{ float: 'right' }} onClick={() => rediretToDownload()}>Save & Download PDF</Button>
                     {showAssessmentIndex !== 'all' && <Button style={{ float: 'right', marginRight: '10px' }} onClick={() => changeAssessmentTriangle('all')}>Reset Triangle</Button>}
-                    <Text style={{ fontSize: 20, color: '#000' }}>
+                    {/* <Text style={{ fontSize: 20, color: '#000' }}>
                         {studentDetails?.node?.firstname} {studentDetails?.node?.lastname}&apos;s - Triangle Report
-                    </Text>
+                    </Text> */}
 
                     <Row>
                         <Col sm={24}>
