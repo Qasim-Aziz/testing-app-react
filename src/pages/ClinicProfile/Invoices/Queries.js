@@ -62,4 +62,25 @@ const DELETE_INVOICE = gql`
   }
 `
 
-export { GET_INVOICES, DELETE_INVOICE }
+const STUDENTS = gql`
+  query {
+    students {
+      edges {
+        node {
+          id
+          firstname
+          lastname
+          invoiceSet {
+            edges {
+              node {
+                id
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+export { GET_INVOICES, DELETE_INVOICE, STUDENTS }

@@ -4,6 +4,7 @@ import { gql } from 'apollo-boost'
 import moment from 'moment'
 import React from 'react'
 import { FaDownload } from 'react-icons/fa'
+import { COLORS } from 'assets/styles/globalStyles'
 import client from '../../apollo/config'
 import LoadingComponent from '../staffProfile/LoadingComponent'
 import { GET_TEMPLATES } from './query'
@@ -12,6 +13,19 @@ import FrequencyDurationGraph from './frequencyDuration'
 
 const { RangePicker } = DatePicker
 const { Option } = Select
+
+const filterCardStyle = {
+  backgroundColor: COLORS.palleteLight,
+  display: 'flex',
+  flexWrap: 'wrap',
+  padding: '5px 10px',
+  margin: 0,
+  height: 'fit-content',
+  overflow: 'hidden',
+}
+
+const parentDiv = { display: 'flex', margin: '5px 30px 5px 0' }
+const parentLabel = { fontSize: '15px', color: '#000', margin: 'auto 8px auto' }
 
 class BehaviorReport extends React.Component {
   constructor(props) {
@@ -129,17 +143,21 @@ class BehaviorReport extends React.Component {
 
     return (
       <div className="behaviorReport">
-        <Form layout="inline" className="filterCard">
-          <Form.Item label="Date">
+        <div style={filterCardStyle}>
+          <div style={parentDiv}>
+            <span style={parentLabel}>Date :</span>
             <RangePicker
-              className="datePicker"
-              size="default"
+              style={{
+                marginLeft: 'auto',
+                width: 240,
+              }}
               defaultValue={[moment(startDate, 'YYYY-MM-DD'), moment(endDate, 'YYYY-MM-DD')]}
+              format="YYYY-MM-DD"
               onChange={this.dateChange}
             />
-          </Form.Item>
-
-          <Form.Item label="Behavior">
+          </div>
+          <div style={parentDiv}>
+            <span style={parentLabel}>Behaviour :</span>
             <Select
               placeholder="Select Behavior"
               loading={loading}
@@ -148,7 +166,7 @@ class BehaviorReport extends React.Component {
               optionFilterProp="children"
               value={selectedBehavior}
               onChange={this.loadGraph}
-              style={{ width: '200px' }}
+              style={{ width: '240px' }}
             >
               {behaviorList?.map(({ node }) => (
                 <Option key={node.id} value={node.id}>
@@ -156,16 +174,9 @@ class BehaviorReport extends React.Component {
                 </Option>
               ))}
             </Select>
-          </Form.Item>
+          </div>
+        </div>
 
-          <Form.Item style={{ float: 'right', marginRight: 0 }}>
-            <Dropdown overlay={menu} trigger={['click']}>
-              <Button style={{ padding: '0 8px' }} type="link" size="large">
-                <FaDownload />
-              </Button>
-            </Dropdown>
-          </Form.Item>
-        </Form>
         <div>
           {loading ? (
             <LoadingComponent />

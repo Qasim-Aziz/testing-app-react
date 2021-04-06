@@ -108,7 +108,6 @@ class LearnerTable extends React.Component {
 
   componentDidMount() {
     const { dispatch } = this.props
-    console.log('gotchahaha')
     // this.selectActiveStatus('active')
     dispatch({
       type: 'learners/GET_DATA',

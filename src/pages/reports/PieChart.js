@@ -86,7 +86,6 @@ class PieChart extends React.Component {
             keys = { domainSelected }
           }
           for (let k = 0; k < keys.length; k++) {
-            // console.log(k)
             if (groupedData[keys[k]]?.length > 0) {
               data.push({
                 id: keys[k],
@@ -119,23 +118,6 @@ class PieChart extends React.Component {
       statusselected,
       studentIdSelected,
     } = this.props
-    // console.log(
-    //   start_date,
-    //   end_date,
-    //   selectedprogram,
-    //   domainSelected,
-    //   statusselected,
-    //   studentIdSelected,
-    // )
-
-    // console.log(
-    //   prevProps.start_date,
-    //   prevProps.end_date,
-    //   prevProps.selectedprogram,
-    //   prevProps.domainSelected,
-    //   prevProps.statusselected,
-    //   prevProps.studentIdSelected,
-    // )
 
     if (
       start_date != prevProps.start_date ||
@@ -148,7 +130,7 @@ class PieChart extends React.Component {
       start_date = moment(start_date).format('YYYY-MM-DD')
       end_date = moment(end_date).format('YYYY-MM-DD')
       const studentId = localStorage.getItem('studentId')
-      console.log('studentId', studentId)
+
       client
         .query({
           query: gql`{
@@ -224,86 +206,58 @@ class PieChart extends React.Component {
   render() {
     const { GraphData } = this.state
     return (
-      <>
-        <div>
-          {GraphData.length === 0 ? (
-            <>
-              <Empty style={{ marginTop: '65px', marginLeft: '188px' }} />
-            </>
-          ) : (
-            ''
-          )}
-          {GraphData && (
-            <ResponsivePie
-              data={GraphData}
-              margin={{ top: 10, right: 0, bottom: 30, left: 0 }}
-              innerRadius={0.5}
-              padAngle={2}
-              cornerRadius={3}
-              colors={{ scheme: 'paired' }}
-              borderWidth={1}
-              borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
-              radialLabel={function(e) {
-                return e.label + ' (' + e.value + ')'
-              }}
-              radialLabelsSkipAngle={10}
-              radialLabelsTextXOffset={6}
-              radialLabelsTextColor="#333333"
-              radialLabelsLinkOffset={0}
-              radialLabelsLinkDiagonalLength={16}
-              radialLabelsLinkHorizontalLength={24}
-              radialLabelsLinkStrokeWidth={1}
-              radialLabelsLinkColor={{ from: 'color' }}
-              slicesLabelsSkipAngle={10}
-              slicesLabelsTextColor="#333333"
-              animate={true}
-              motionStiffness={90}
-              motionDamping={15}
-              defs={[
-                {
-                  id: 'dots',
-                  type: 'patternDots',
-                  background: 'inherit',
-                  color: 'rgba(255, 255, 255, 0.3)',
-                  size: 4,
-                  padding: 1,
-                  stagger: true,
-                },
-                {
-                  id: 'lines',
-                  type: 'patternLines',
-                  background: 'inherit',
-                  color: 'rgba(255, 255, 255, 0.3)',
-                  rotation: -45,
-                  lineWidth: 6,
-                  spacing: 10,
-                },
-              ]}
-              // legends={[
-              //   {
-              //     anchor: 'right',
-              //     direction: 'column',
-              //     translateY: 10,
-              //     translateX: -1,
-              //     itemWidth: 100,
-              //     itemHeight: 25,
-              //     itemTextColor: '#999',
-              //     symbolSize: 18,
-              //     symbolShape: 'circle',
-              //     effects: [
-              //       {
-              //         on: 'hover',
-              //         style: {
-              //           itemTextColor: '#000',
-              //         },
-              //       },
-              //     ],
-              //   },
-              // ]}
-            />
-          )}
-        </div>
-      </>
+      <div style={{ width: '100%', height: '100%' }}>
+        {GraphData && GraphData.length === 0 ? (
+          <Empty style={{ marginTop: '100px' }} />
+        ) : (
+          <ResponsivePie
+            data={GraphData}
+            margin={{ top: 20, right: 100, bottom: 20, left: 80 }}
+            innerRadius={0.5}
+            padAngle={2}
+            cornerRadius={3}
+            colors={{ scheme: 'paired' }}
+            borderWidth={1}
+            borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
+            radialLabel={function(e) {
+              return e.label + ' (' + e.value + ')'
+            }}
+            radialLabelsSkipAngle={10}
+            radialLabelsTextXOffset={6}
+            radialLabelsTextColor="#333333"
+            radialLabelsLinkOffset={0}
+            radialLabelsLinkDiagonalLength={16}
+            radialLabelsLinkHorizontalLength={24}
+            radialLabelsLinkStrokeWidth={1}
+            radialLabelsLinkColor={{ from: 'color' }}
+            slicesLabelsSkipAngle={10}
+            slicesLabelsTextColor="#333333"
+            animate={true}
+            motionStiffness={90}
+            motionDamping={15}
+            defs={[
+              {
+                id: 'dots',
+                type: 'patternDots',
+                background: 'inherit',
+                color: 'rgba(255, 255, 255, 0.3)',
+                size: 4,
+                padding: 1,
+                stagger: true,
+              },
+              {
+                id: 'lines',
+                type: 'patternLines',
+                background: 'inherit',
+                color: 'rgba(255, 255, 255, 0.3)',
+                rotation: -45,
+                lineWidth: 6,
+                spacing: 10,
+              },
+            ]}
+          />
+        )}
+      </div>
     )
   }
 }

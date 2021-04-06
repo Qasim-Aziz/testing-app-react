@@ -26,7 +26,6 @@ const columns = [
   },
   {
     title: 'Target Name',
-    dataIndex: 'targetAllcatedDetails',
     ellipsis: true,
     width: '320px',
     render: (text, row) => (
@@ -61,7 +60,6 @@ const columns = [
   },
   {
     title: 'Baseline Date',
-    dataIndex: 'targetAllcatedDetails',
     render: (text, row) => (
       <span>
         {row.targetAllcatedDetails
@@ -317,6 +315,7 @@ class Report extends React.Component {
         <Table
           columns={columns}
           dataSource={data}
+          rowKey={record => record.id}
           bordered
           pagination={{
             defaultPageSize: 20,

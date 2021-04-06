@@ -2,8 +2,10 @@ import React from 'react'
 import { Form, Input, Button, Select, Switch, Row, Col } from 'antd'
 import { connect } from 'react-redux'
 import actions from 'redux/authorizationCodes/actions'
+import { FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 
 const { TextArea } = Input
+const { layout, tailLayout } = FORM
 
 @connect(({ authorizationCode }) => ({ authorizationCode }))
 class AddCode extends React.Component {
@@ -51,7 +53,7 @@ class AddCode extends React.Component {
     const { newCode, showSelectCode } = this.state
 
     return (
-      <Form className="addEditCode" onSubmit={e => this.handleSubmit(e)}>
+      <Form {...layout} className="addEditCode" onSubmit={e => this.handleSubmit(e)}>
         {/* Code */}
         <Row>
           <Col sm={24} md={7}>
@@ -223,11 +225,11 @@ class AddCode extends React.Component {
         </Row>
 
         {/* Buttons */}
-        <Form.Item style={{ textAlign: 'center' }}>
-          <Button type="primary" htmlType="submit">
+        <Form.Item {...tailLayout}>
+          <Button type="primary" htmlType="submit" style={SUBMITT_BUTTON}>
             Submit
           </Button>
-          <Button htmlType="primary" onClick={this.onReset} className="ml-4">
+          <Button onClick={() => this.onReset} style={CANCEL_BUTTON}>
             Cancel
           </Button>
         </Form.Item>

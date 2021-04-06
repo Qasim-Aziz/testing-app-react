@@ -16,7 +16,7 @@ export const COLORS = {
   class: '#ff7171',
   graph: 'rgb(229, 132, 37)',
   mandTitle: '#3f72af',
-  
+
   text: '#74708d',
   textLighten: '#c0bdd0',
   textDarken: '#615d7c',
@@ -86,7 +86,7 @@ export const FORM = {
       offset: 5,
       span: 19,
     },
-  }
+  },
 }
 
 export const SUBMITT_BUTTON = {
@@ -99,7 +99,7 @@ export const SUBMITT_BUTTON = {
   fontSize: 16,
   color: 'white',
   // fontWeight: 600,
-  margin: '20px 5px',
+  margin: '20px 5px 20px 0',
 }
 
 export const CANCEL_BUTTON = {
@@ -112,5 +112,4 @@ export const CANCEL_BUTTON = {
   background: '#fb434a',
   // fontWeight: 600,
   margin: '20px 5px',
-
 }

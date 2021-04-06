@@ -294,14 +294,12 @@ export default Form.create()(({ showDrawerFilter }) => {
     setGraphData(graphAxixData)
     setLineDrawer(true)
   }
-  console.log(graphData, 'graphDAta')
 
   const handleSelectTarget = obj => {
     setSelectMand(obj.mandName)
     getGraphData(obj)
   }
 
-  console.log(keyObjects, 'df')
   return (
     <div style={{ marginBottom: '100px' }}>
       <Drawer
@@ -312,9 +310,8 @@ export default Form.create()(({ showDrawerFilter }) => {
       >
         {graphData?.length > 0 &&
           graphData?.map(item => {
-            console.log(item[0]?.month, 'item')
             return (
-              <div style={{ height: 300, marginBottom: 30 }}>
+              <div key={Math.random()} style={{ height: 300, marginBottom: 30 }}>
                 <ResponsiveLine
                   data={item}
                   margin={{ top: 50, right: 50, bottom: 50, left: 50 }}

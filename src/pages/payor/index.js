@@ -5,6 +5,7 @@ import { useQuery } from 'react-apollo'
 import Highlighter from 'react-highlight-words'
 import _ from 'lodash'
 import { defaultColumnProps, getResponsibilities } from 'components/PayorsAndBilling/Common/utils'
+import { DRAWER, FORM } from 'assets/styles/globalStyles'
 import Authorize from 'components/LayoutComponents/Authorize'
 import ExportData from './ExportData'
 import EditPayor from './EditPayor'
@@ -20,6 +21,7 @@ const customLabel = {
   marginRight: '12px',
   marginBottom: '12px',
 }
+const { layout, tailLayout } = FORM
 
 const PayorTable = () => {
   const [showRightDrawer, setShowRightDrawer] = useState(false)
@@ -338,12 +340,11 @@ const PayorTable = () => {
     </div>
   )
 
-  console.log(payorList, '[ayoutlsdfnsjd')
   return (
     <Authorize roles={['school_admin']} redirect to="/dashboard/beta">
       <Drawer
         title={showForm === 'Add' ? 'ADD PAYOR' : 'EDIT PAYOR'}
-        width="60%"
+        width={DRAWER.widthL2}
         placement="right"
         onClose={handleRightDrawerClose}
         visible={showRightDrawer}
@@ -393,7 +394,6 @@ const PayorTable = () => {
                 setShowRightDrawer(true)
               }}
               type="primary"
-              size="large"
             >
               <PlusOutlined /> ADD PAYOR
             </Button>

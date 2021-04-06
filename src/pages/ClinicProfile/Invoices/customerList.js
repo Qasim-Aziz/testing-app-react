@@ -1,49 +1,33 @@
 /* eslint-disable */
-import React, { useEffect, useState, useReducer } from 'react'
-import {
-  Button,
-  notification,
-  Table,
-  Menu,
-  Icon,
-  Dropdown,
-  Drawer,
-  Modal,
-  DatePicker,
-  Form,
-} from 'antd'
+import React, { useEffect, useState } from 'react'
+import { Button, notification, Table, Menu, Icon, Dropdown, Drawer, Form } from 'antd'
 import { PlusOutlined, MailOutlined } from '@ant-design/icons'
 import { DRAWER, COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
-import AdvanceInvoiceForm from './advanceInvoiceForm'
-import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
-import MonthlyInvoiceForm from './monthlyInvoice'
-import BankDetails from './bankDetails'
-import { CLINIC_QUERY } from './query'
+import { useMutation, useQuery } from 'react-apollo'
+import { STUDENTS } from './Queries'
+import CreateInvoiceForm from './createInvoicesForm'
 
 const { layout, tailLayout } = FORM
 
 function CustomerList() {
-  const { data, loading, error } = useQuery(CLINIC_QUERY)
+  const { data, loading, error } = useQuery(STUDENTS)
   const [tableData, setTableData] = useState([])
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
-  const [advanceInvoiceModal, setAdvanceInvoiceModal] = useState(false)
+  const [createInvoiceDrawer, setCreateInvoiceDrawer] = useState(false)
   const [payReminderModal, setPayReminderModal] = useState(false)
-  const [advInvForm, setAdvInvForm] = useState(false)
-  const [monthlyInvForm, setMonthlyInvForm] = useState(false)
-  const [currentRow, setCurrentRow] = useState(null)
-  const [bankDetailsDrawer, setBankDetailsDrawer] = useState(false)
   const [selectedClinicsName, setSelectedClinicsName] = useState(null)
   const [invoiceType, setInvoiceType] = useState('advance')
 
   useEffect(() => {
     if (data) {
-      console.log(data)
+      console.log(data, 'THIS IS DATA')
       const tempTable = []
-      data.clinicAllDetails.map(item => {
+      data.students?.edges.map(item => {
         tempTable.push({
-          details: item.details,
-          key: item.details.id,
-          invoice: item.invoice,
+          key: item.node.id,
+          firstname: item.node.firstname,
+          lastname: item.node.lastname,
+          invoices: item.node.invoiceSet?.edges?.length,
         })
       })
       setTableData(tempTable)
@@ -59,14 +43,16 @@ function CustomerList() {
   const columns = [
     {
       title: 'Name',
-      dataIndex: 'details.schoolName',
-    },
-    {
-      title: 'Billing Name',
+      dataIndex: 'firstName',
+      render: (text, row) => (
+        <span>
+          {row.firstname} {row.lastname}
+        </span>
+      ),
     },
     {
       title: 'Invoices',
-      dataIndex: 'invoice',
+      dataIndex: 'invoices',
     },
     {
       title: 'Debit',
@@ -89,16 +75,20 @@ function CustomerList() {
   const handleMenuActions = e => {
     let names = []
     tableData.map(item =>
-      selectedRowKeys.map(key => (key === item.key ? names.push(item.details?.schoolName) : null)),
+      selectedRowKeys.map(key =>
+        key === item.key
+          ? names.push(`${item.firstname} ${item.lastname ? item.lastname : ''}`)
+          : null,
+      ),
     )
     console.log(names, 'names')
     setSelectedClinicsName(names)
     if (e.key == 'advanceInvoice') {
       setInvoiceType('advance')
-      setAdvanceInvoiceModal(true)
+      setCreateInvoiceDrawer(true)
     } else if (e.key == 'monthlyInvoice') {
       setInvoiceType('monthly')
-      setAdvanceInvoiceModal(true)
+      setCreateInvoiceDrawer(true)
     } else if (e.key == 'payReminder') {
       setPayReminderModal(true)
     }
@@ -125,7 +115,7 @@ function CustomerList() {
         height: 'fit-content',
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
       }}
     >
       <Dropdown overlay={menu}>
@@ -133,7 +123,6 @@ function CustomerList() {
           Actions <Icon type="down" />
         </Button>
       </Dropdown>
-      <Button onClick={() => setBankDetailsDrawer(true)}>Bank Details</Button>
     </div>
   )
 
@@ -142,16 +131,16 @@ function CustomerList() {
       <Drawer
         title={`Create ${invoiceType === 'advance' ? 'advance' : 'monthly'} invoice`}
         width={DRAWER.widthL2}
-        visible={advanceInvoiceModal}
+        visible={createInvoiceDrawer}
         closable
         destroyOnClose
-        onClose={() => setAdvanceInvoiceModal(false)}
+        onClose={() => setCreateInvoiceDrawer(false)}
       >
-        <AdvanceInvoiceForm
+        <CreateInvoiceForm
           selectedClinicsName={selectedClinicsName}
           selectedRowKeys={selectedRowKeys}
           invoiceType={invoiceType}
-          closeDrawer={() => setAdvanceInvoiceModal(false)}
+          closeDrawer={() => setCreateInvoiceDrawer(false)}
         />
       </Drawer>
 
@@ -196,44 +185,6 @@ function CustomerList() {
             </Button>
           </Form.Item>
         </div>
-      </Drawer>
-
-      <Drawer
-        visible={advInvForm}
-        onClose={() => setAdvInvForm(false)}
-        width="100vw"
-        placement="right"
-        closable="true"
-        destroyOnClose="true"
-      >
-        <AdvanceInvoiceForm
-          rowData={currentRow}
-          invoiceFormDrawer={advInvForm}
-          setInvoiceFormDrawer={setAdvInvForm}
-        />
-      </Drawer>
-      <Drawer
-        visible={monthlyInvForm}
-        onClose={() => setMonthlyInvForm(false)}
-        width="100vw"
-        placement="right"
-        closable="true"
-        destroyOnClose="true"
-      >
-        <MonthlyInvoiceForm
-          rowData={currentRow}
-          invoiceFormDrawer={monthlyInvForm}
-          setInvoiceFormDrawer={setMonthlyInvForm}
-        />
-      </Drawer>
-      <Drawer
-        width={DRAWER.widthL2}
-        title="Update Payment accepting details"
-        visible={bankDetailsDrawer}
-        onClose={() => setBankDetailsDrawer(false)}
-        destroyOnClose
-      >
-        <BankDetails setBankDetailsDrawer={setBankDetailsDrawer} />
       </Drawer>
       <Table
         columns={columns}
