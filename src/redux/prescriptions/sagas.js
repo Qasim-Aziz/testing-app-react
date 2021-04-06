@@ -63,35 +63,3 @@ export default function* rootSaga() {
     // takeEvery(actions.EDIT_LEADER, EDIT_LEADER),
   ])
 }
-
-/**
- * if (response.data.getPrescriptions.edges && response.data.getPrescriptions.edges.length > 0) {
-      let i
-      for (i = 0; i < response.data.getPrescriptions.edges.length; i++) {
-        /** Destructring the list of diagnosis * /
-        if (
-          response.data.getPrescriptions.edges.diagnosis &&
-          response.data.getPrescriptions.edges.diagnosis.edges.length > 0
-        )
-         {
-          response.data.getPrescriptions.edges.diagnosis =
-            response.data.getPrescriptions.edges.diagnosis.edges
-        }
-        /** Destructring the list of medicineItem * /
-        if (
-          response.data.getPrescriptions.edges.medicineItem &&
-          response.data.getPrescriptions.edges.medicineItem.edges.length > 0
-        ) {
-          response.data.getPrescriptions.edges.medicineItem =
-            response.data.getPrescriptions.edges.medicineItem.edges
-        }
-        if (
-          response.data.getPrescriptions.edges.diagnosis &&
-          response.data.getPrescriptions.edges.diagnosis.edges.length > 0
-        ) {
-          response.data.getPrescriptions.edges.diagnosis =
-            response.data.getPrescriptions.edges.diagnosis.edges
-        }
-      }
-    }
- */

@@ -101,129 +101,124 @@ export async function getPrescriptionFunc(payload) {
 }
 
 export async function createPrescriptionFunc(payload) {
-  console.log('🌟🌟THE PAYLOAD🌟🌟', payload)
-  const {
-    student,
-    height,
-    weight,
-    temperature,
-    headCircumference,
-    advice,
-    nextVisit,
-    nextVisitDate,
-    testDate,
-    complaints,
-    diagnosis,
-    tests,
-    medicineItems,
-  } = payload
-  console.log(
-    'ALL THE VALUES',
-    student,
-    height,
-    weight,
-    temperature,
-    headCircumference,
-    advice,
-    nextVisit,
-    nextVisitDate,
-    testDate,
-    complaints,
-    diagnosis,
-    tests,
-    medicineItems,
-  )
   return apolloClient
-    .mutate({
-      mutation: gql`mutation {
+    .query({
+      query: gql`
+        mutation createInvoiceMethod(
+          $student: ID! #"U3R1ZGVudFR5cGU6NjQ4"
+          $height: String # "175 cm"
+          $weight: String # "64 kg"
+          $temperature: String # "98.6 F"
+          $headCircumference: String # "50 cm"
+          $advice: String # "Test Advice"
+          $nextVisit: String # "2 Days"
+          $nextVisitDate: Date # "2021-04-01"
+          $testDate: Date # "2021-04-01"
+          $complaints: [ID]
+          $diagnosis: [ID]
+          $tests: [ID]
+          $medicineItems: [MedicineItemsInput]
+        ) {
           createPrescription(
-            student:"${student}",
-            height:"${height}",
-            weight:"${weight}",
-            temperature:"${temperature}",
-            headCircumference:"${headCircumference}",
-            advice:"${advice}",
-            nextVisit:"${nextVisit}",
-            nextVisitDate:"${nextVisitDate}",
-            testDate:"${testDate}",
-            complaints:"${complaints}",
-            diagnosis:"${diagnosis}",
-            tests:"${tests}",
-            medicineItems:"${medicineItems}"
-        )
-        {
-
-          details{
-            id
-            height
-            weight
-            temperature
-            headCircumference
-            advice
-            nextVisit
-            nextVisitDate
-            testDate
-            createddate
-            createdby{
+            input: {
+              student: $student # simple id field
+              height: $height
+              weight: $weight
+              temperature: $temperature
+              headCircumference: $headCircumference
+              advice: $advice
+              nextVisit: $nextVisit
+              nextVisitDate: $nextVisitDate
+              testDate: $testDate
+              complaints: $complaints # array of ids
+              diagnosis: $diagnosis # array of ids
+              tests: $tests # array of ids
+              medicineItems: $medicineItems # array of objects
+            }
+          ) {
+            details {
+              id
+              height
+              weight
+              temperature
+              headCircumference
+              advice
+              nextVisit
+              nextVisitDate
+              testDate
+              createddate
+              createdby {
                 id
                 username
-            }
-            student{
+              }
+              student {
                 id
                 firstname
-            }
-            complaints{
-                edges{
-                    node{
-                        id
-                        name
-                    }
+              }
+              complaints {
+                edges {
+                  node {
+                    id
+                    name
+                  }
                 }
-            }
-            
-            diagnosis{
-                edges{
-                    node{
-                        id
-                        name
-                    }
+              }
+
+              diagnosis {
+                edges {
+                  node {
+                    id
+                    name
+                  }
                 }
-            }
-            
-            tests{
-                edges{
-                    node{
-                        id
-                        name
-                    }
+              }
+
+              tests {
+                edges {
+                  node {
+                    id
+                    name
+                  }
                 }
-            }
-            medicineItems{
-                edges{
-                    node{
-                        id
-                        name
-                        medicineType
-                        dosage
-                        unit
-                        when
-                        frequency
-                        duration
-                        qty
-                    }
+              }
+              medicineItems {
+                edges {
+                  node {
+                    id
+                    name
+                    medicineType
+                    dosage
+                    unit
+                    when
+                    frequency
+                    duration
+                    qty
+                  }
                 }
+              }
             }
+          }
         }
-        }
-}`,
+      `,
+      variables: {
+        student: payload.values.student,
+        height: payload.values.height,
+        weight: payload.values.weight,
+        temperature: payload.values.temperature,
+        headCircumference: payload.values.headCircumference,
+        advice: payload.values.advice,
+        nextVisit: payload.values.nextVisit,
+        nextVisitDate: payload.values.nextVisitDate,
+        testDate: payload.values.testDate,
+        complaints: payload.values.complaints,
+        diagnosis: payload.values.diagnosis,
+        tests: payload.values.tests,
+        medicineItems: payload.values.medicineItems,
+      },
     })
-    .then(result => {
-      console.log('🌟🌟THE RESULT🌟🌟 ', result)
-    })
+    .then(result => result)
     .catch(error => {
-      console.log('THE ERR', error)
       error.graphQLErrors.map(item => {
-        console.log('THE ERROR', item.message)
         return notification.error({
           message: 'Something went wrong',
           description: item.message,
