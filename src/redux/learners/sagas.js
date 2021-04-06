@@ -39,8 +39,8 @@ export function* GET_DATA() {
       isActive: true,
       first: 20,
       last: null,
-      after: '40',
-      before: '20',
+      after: null,
+      before: null,
     },
   })
 
@@ -52,6 +52,26 @@ export function* GET_DATA() {
   })
 }
 
+const updateResponse = response => {
+  const learners = []
+  let i = 0
+  if (response.data.students.edges && response.data.students.edges.length > 0) {
+    for (i = 0; i < response.data.students.edges.length; i++) {
+      if (
+        response.data.students.edges[i].node.tags.edges &&
+        response.data.students.edges[i].node.tags.edges.length > 0
+      ) {
+        const tempTagArr = response.data.students.edges[i].node.tags.edges.map(e => e.node.name)
+        response.data.students.edges[i].node.tags = tempTagArr
+      }
+
+      learners.push(response.data.students.edges[i].node)
+    }
+  }
+
+  return learners
+}
+
 export function* GET_LEARNERS({ payload }) {
   yield put({
     type: 'learners/SET_STATE',
@@ -59,33 +79,39 @@ export function* GET_LEARNERS({ payload }) {
       loadingLearners: true,
     },
   })
+
   const response = yield call(getClinicLearners, payload)
-
   if (response) {
-    const learners = []
-    let i = 0
-    if (response.data.students.edges && response.data.students.edges.length > 0) {
-      for (i = 0; i < response.data.students.edges.length; i++) {
-        if (
-          response.data.students.edges[i].node.tags.edges &&
-          response.data.students.edges[i].node.tags.edges.length > 0
-        ) {
-          const tempTagArr = response.data.students.edges[i].node.tags.edges.map(e => e.node.name)
-          response.data.students.edges[i].node.tags = tempTagArr
-        }
-
-        learners.push(response.data.students.edges[i].node)
-      }
-    }
-
+    let learners = updateResponse(response)
     yield put({
       type: 'learners/SET_STATE',
       payload: {
+        loadingLearners: false,
         LearnersList: learners,
         TotalLearners: response.data.students.clinicTotal,
         PageInfo: response.data.students.pageInfo,
       },
     })
+
+    const res2 = yield call(getClinicLearners, {
+      isActive: payload.isActive,
+      first: null,
+      last: null,
+      after: null,
+      before: null,
+    })
+    if (res2) {
+      learners = updateResponse(res2)
+      yield put({
+        type: 'learners/SET_STATE',
+        payload: {
+          loadingLearners: false,
+          LearnersList: learners,
+          TotalLearners: response.data.students.clinicTotal,
+          PageInfo: response.data.students.pageInfo,
+        },
+      })
+    }
   }
   yield put({
     type: 'learners/SET_STATE',

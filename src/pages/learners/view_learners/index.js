@@ -327,7 +327,6 @@ class LearnerTable extends React.Component {
       learners: { ItemPerPage, CurrentStatus },
     } = this.props
 
-    console.log(currentRowsPerPage, currentPage, 'rows changed')
     dispatch({
       type: 'learners/ROWS_CHANGED',
       payload: {
@@ -866,6 +865,8 @@ class LearnerTable extends React.Component {
       </div>
     )
 
+    console.log(filteredList, 'filteredList')
+
     return (
       <Authorize roles={['school_admin', 'therapist']} redirect to="/dashboard/beta">
         <Helmet title="Partner" />
@@ -1028,11 +1029,7 @@ class LearnerTable extends React.Component {
                 dataSource={filteredList}
                 loading={this.state.loadingLearners}
                 pagination={{
-                  total: TotalLearners,
                   defaultPageSize: 20,
-                  onChange: (page, rows) => this.pageChanged(page, rows),
-                  onShowSizeChange: (currentPage, currentRowsPerPage) =>
-                    this.rowsChanged(currentRowsPerPage, currentPage),
                   showSizeChanger: true,
                   pageSizeOptions:
                     TotalLearners > 100

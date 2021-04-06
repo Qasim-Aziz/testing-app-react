@@ -247,6 +247,7 @@ function CustomerList() {
         dataSource={tableData}
         rowSelection={rowSelection}
         bordered
+        loading={loading}
         title={() => {
           return filterHeader
         }}
