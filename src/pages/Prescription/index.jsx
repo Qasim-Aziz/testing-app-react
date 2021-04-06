@@ -25,6 +25,7 @@ const Index = props => {
     viewPrescriptionDrawer: false,
   })
   const learners = useSelector(state => state.learners)
+  const prescription = useSelector(state => state.prescription)
   const dispatch = useDispatch()
   console.log('THE PROPS', props)
   console.log('LEARNER REDUCER', learners)
@@ -156,9 +157,7 @@ const Index = props => {
         <Button
           type="primary"
           onClick={() => {
-            // this.setState({ showProfile: true })
-            // this.info(row)
-
+            setLearnerState({ ...learnerState, specificLearner: row, addPrescriptionDrawer: true })
             console.log('CLICKED')
           }}
         >
@@ -233,7 +232,7 @@ const Index = props => {
 
       <Drawer
         width="80%"
-        title="Add Prescription"
+        title="View History Of Prescriptions"
         closable={true}
         visible={learnerState.viewPrescriptionDrawer}
         onClose={() => setLearnerState({ ...learnerState, viewPrescriptionDrawer: false })}

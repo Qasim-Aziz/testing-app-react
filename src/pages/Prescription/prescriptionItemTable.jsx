@@ -11,9 +11,9 @@ import { Table, Button, Form, Typography, notification, Input, Modal } from 'ant
 import { useQuery, useMutation } from 'react-apollo'
 import gql from 'graphql-tag'
 import PrescriptionItemCell from './prescriptionItemCell'
-import './index.css'
+import './index.scss'
 import { PrescriptionFormContext } from './context'
-import { CREATE_PRODUCT } from './query'
+// import { CREATE_PRODUCT } from './query'
 
 const { TextArea } = Input
 
@@ -35,7 +35,6 @@ const components = {
 }
 
 const PrescriptionItemTable = ({ products, dispatch, totalAmount }) => {
-
   const columnsList = [
     {
       title: '#',
@@ -46,45 +45,45 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount }) => {
       title: 'Type',
       editable: true,
       dataIndex: 'type',
-      width: 50
+      width: 50,
     },
     {
       title: 'Product/Service',
       editable: true,
       dataIndex: 'service',
-      width: 180
+      width: 180,
     },
     {
       title: 'Dose',
       dataIndex: 'dose',
       editable: true,
-      width: 70
+      width: 70,
     },
     {
       title: 'Unit',
       dataIndex: 'unit',
       editable: true,
-      width: 70
+      width: 70,
     },
     {
       title: 'When',
       dataIndex: 'when',
       editable: true,
-      width: 70
+      width: 70,
     },
     {
       title: 'Frequency',
       dataIndex: 'frequency',
       editable: true,
-      width: 70
+      width: 70,
     },
     {
       title: 'Duration',
       dataIndex: 'duration',
       editable: true,
-      width: 70
+      width: 70,
     },
-    
+
     {
       title: 'Qty',
       width: 100,
@@ -96,7 +95,7 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount }) => {
       title: 'Note',
       dataIndex: 'note',
       editable: true,
-      width: 70
+      width: 70,
     },
     {
       title: 'Operation',
@@ -162,7 +161,7 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount }) => {
         pagination={false}
         loading={false}
         footer={() => (
-          <div style={{ display: 'flex', alignItems: 'center'}}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             <Button onClick={handleAdd} type="primary">
               Add a Line
             </Button>

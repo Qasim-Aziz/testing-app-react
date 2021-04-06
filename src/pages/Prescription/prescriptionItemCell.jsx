@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useEffect, useRef, useContext, useState } from 'react'
 import 'antd/dist/antd.css'
-import './index.css'
+import './index.scss'
 
 import { Form, Select, notification, InputNumber, Input } from 'antd'
 import gql from 'graphql-tag'
@@ -57,7 +57,7 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
           <Form.Item
             style={{
               margin: 0,
-              border: 'none'
+              border: 'none',
             }}
             name={record.dataIndex}
           >
@@ -76,7 +76,7 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
                 placeholder="Please enter prescription name"
                 onPressEnter={save}
                 onBlur={save}
-                style={{border: 'none', width: '200px'}}
+                style={{ border: 'none', width: '200px' }}
               />,
             )}
           </Form.Item>
