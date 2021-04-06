@@ -1,0 +1,14 @@
+const actions = {
+  SET_STATE: 'prescriptions/SET_STATE',
+  GET_DATA: 'prescriptions/GET_DATA',
+  EDIT_PRESCRIPTION: 'prescriptions/EDIT_PRESCRIPTION',
+  CREATE_PRESCRIPTION: 'prescriptions/CREATE_PRESCRIPTION',
+  UPDATE_PRESCRIPTIONS_LIST: 'prescriptions/UPDATE_PRESCRIPTIONS_LIST',
+  APPEND_PRESCRIPTIONS_LIST: 'prescriptions/APPEND_PRESCRIPTIONS_LIST',
+
+  GET_PRESCRIPTIONS: 'prescriptions/GET_PRESCRIPTIONS',
+  PAGE_CHANGED: 'prescriptions/PAGE_CHANGED',
+  ROWS_CHANGED: 'prescriptions/ROWS_CHANGED',
+}
+
+export default actions
