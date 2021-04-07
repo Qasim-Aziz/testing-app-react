@@ -6,6 +6,7 @@ import { useMutation, useQuery } from 'react-apollo'
 import moment from 'moment'
 import { times, remove, update } from 'ramda'
 import './toiletForm.scss'
+import { FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import { PlusOutlined } from '@ant-design/icons'
 import ReminderForm from './Medicalform/ReminderForm'
 import PreseptionDrugFrom from './Medicalform/PreseptionDrugForm'
@@ -14,6 +15,7 @@ const { RangePicker } = DatePicker
 const { Option } = Select
 const { Title, Text } = Typography
 const { TextArea } = Input
+const { layout, tailLayout } = FORM
 
 const CREATE_MEDICAL_DATA = gql`
   mutation createMedical(
@@ -124,7 +126,7 @@ const remainderReducer = (state, action) => {
   }
 }
 
-const MedicalForm = ({ style, handleNewMediDate, setNewMediCreated, form }) => {
+const MedicalForm = ({ style, handleNewMediDate, closeDrawer, setNewMediCreated, form }) => {
   const [reminder, setReminder] = useState(true)
   const [preseptionDrugCount, setPreseptionDrugCount] = useState(1)
   const [remainderCount, setRemainderCount] = useState(1)
@@ -203,6 +205,9 @@ const MedicalForm = ({ style, handleNewMediDate, setNewMediCreated, form }) => {
       setRemainderCount(1)
       remainderDispatch({ type: 'RESET' })
       setNewMediCreated(true)
+      if (closeDrawer) {
+        closeDrawer()
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
@@ -229,48 +234,33 @@ const MedicalForm = ({ style, handleNewMediDate, setNewMediCreated, form }) => {
   if (error) {
     return <pre>{JSON.stringify(error, null, 2)}</pre>
   }
-  const formItemLayout = {
-    labelCol: {
-      span: 6,
-    },
-    wrapperCol: {
-      span: 17,
-      offset: 1,
-    },
-  }
-  const formTailLayout = {
-    labelCol: { span: 5 },
-    wrapperCol: { span: 8, offset: 7 },
-  }
 
   return (
     <Form
-      {...formItemLayout}
-      layout="horizontal"
+      {...layout}
       onSubmit={e => SubmitForm(e)}
       name="control-ref"
       colon={false}
       style={{ marginLeft: 0, position: 'relative', ...style }}
     >
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Medical Condition</span>}>
+      <Form.Item label="Medical Condition">
         {form.getFieldDecorator('condition', {
           rules: [{ required: true, message: 'Please give the condition name' }],
-        })(<Input size="large" placeholder="Type the condition" />)}
+        })(<Input placeholder="Type the condition" />)}
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Start & End Date</span>}>
+      <Form.Item label="Start & End Date">
         {form.getFieldDecorator('timeFrame', {
           rules: [{ required: true, message: 'Please select start and end date!' }],
-        })(<RangePicker size="large" style={{ width: '100%' }} />)}
+        })(<RangePicker />)}
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Severity</span>}>
+      <Form.Item label="Severity">
         {form.getFieldDecorator('severity', {
           rules: [{ required: true, message: 'Please select a severity' }],
         })(
           <Select
             placeholder="Select Severity"
-            size="large"
             showSearch
             loading={severityTypeLoading}
             optionFilterProp="name"
@@ -285,13 +275,13 @@ const MedicalForm = ({ style, handleNewMediDate, setNewMediCreated, form }) => {
         )}
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Note</span>}>
+      <Form.Item label="Note">
         {form.getFieldDecorator('note')(
-          <TextArea style={{ height: 120 }} size="large" placeholder="Take a note" />,
+          <TextArea style={{ height: 120 }} placeholder="Take a note" />,
         )}
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Prescription</span>}>
+      <Form.Item label="Prescription">
         {times(n => {
           return (
             <PreseptionDrugFrom
@@ -304,17 +294,16 @@ const MedicalForm = ({ style, handleNewMediDate, setNewMediCreated, form }) => {
         }, preseptionDrugCount)}
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Medical Reminders</span>}>
+      <Form.Item label="Medical Reminders">
         <Switch
           defaultChecked
           onChange={() => {
             setReminder(state => !state)
           }}
-          size="large"
         />
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Add Reminders</span>}>
+      <Form.Item label="Add Reminders">
         {times(n => {
           return (
             <ReminderForm
@@ -328,17 +317,8 @@ const MedicalForm = ({ style, handleNewMediDate, setNewMediCreated, form }) => {
         }, remainderCount)}
       </Form.Item>
 
-      <Form.Item {...formTailLayout}>
-        <Button
-          type="primary"
-          htmlType="submit"
-          style={{
-            width: 180,
-            height: 40,
-            borderRadius: 0,
-          }}
-          loading={loading}
-        >
+      <Form.Item {...tailLayout}>
+        <Button type="primary" htmlType="submit" style={SUBMITT_BUTTON} loading={loading}>
           Save Data
         </Button>
       </Form.Item>

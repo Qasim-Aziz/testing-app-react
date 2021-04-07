@@ -21,6 +21,7 @@ import { MdFilterNone, MdAddCircleOutline } from 'react-icons/md'
 import moment from 'moment'
 import { useQuery, useMutation } from 'react-apollo'
 import gql from 'graphql-tag'
+import { DRAWER } from 'assets/styles/globalStyles'
 import MealCard from './MealCard'
 import MealForm from './Mealform'
 import UpdateMealForm from './UpdateForm'
@@ -345,9 +346,9 @@ const MealDataPage = props => {
           >
             <Drawer
               title="New Meal"
-              width="52%"
+              width={DRAWER.widthL2}
               placement="right"
-              closable="true"
+              closable
               visible={showDrawerForm && TabCheck === 'Meal Data'}
               onClose={closeDrawer}
             >
@@ -368,6 +369,7 @@ const MealDataPage = props => {
                     setNewMealDate(newDate)
                   }}
                   setNewMeal={setNewMeal}
+                  closeDrawer={closeDrawer}
                 />
               )}
             </Drawer>

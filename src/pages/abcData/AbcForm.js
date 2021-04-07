@@ -22,6 +22,7 @@ import {
   MinusOutlined,
   PlusOutlined,
 } from '@ant-design/icons'
+import { FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import {
   GET_BEHAVIOR,
   GET_CONSEQUENCES,
@@ -36,10 +37,11 @@ import {
 const { Text } = Typography
 const { TextArea } = Input
 const { Option } = Select
+const { layout, tailLayout } = FORM
 
 const dateFormat = 'YYYY-MM-DD'
 
-const ABCForm = ({ style, form, refetchAbc }) => {
+const ABCForm = ({ style, form, refetchAbc, closeDrawer }) => {
   const studentId = localStorage.getItem('studentId')
   // new
   const [frequency, setFrequency] = useState(0)
@@ -212,6 +214,9 @@ const ABCForm = ({ style, form, refetchAbc }) => {
       })
       form.resetFields()
       refetchAbc()
+      if (closeDrawer) {
+        closeDrawer()
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
@@ -219,7 +224,7 @@ const ABCForm = ({ style, form, refetchAbc }) => {
   useEffect(() => {
     if (error) {
       notification.error({
-        message: 'Somthing want wrong',
+        message: 'Something went wrong',
         description: error.message,
       })
     }
@@ -267,37 +272,24 @@ const ABCForm = ({ style, form, refetchAbc }) => {
   if (error) {
     return <pre>{JSON.stringify(error, null, 2)}</pre>
   }
-  const formItemLayout = {
-    labelCol: {
-      span: 5,
-    },
-    wrapperCol: {
-      span: 17,
-      offset: 1,
-    },
-  }
-  const formTailLayout = {
-    labelCol: { span: 5 },
-    wrapperCol: { span: 8, offset: 6 },
-  }
 
   return (
     <Form
       colon={false}
-      {...formItemLayout}
+      {...layout}
       onSubmit={e => SubmitForm(e, this)}
       name="control-ref"
       style={{ marginLeft: 0, position: 'relative', ...style }}
       layout="horizontal"
     >
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Date</span>}>
+      <Form.Item label="Date">
         {form.getFieldDecorator('date', {
           initialValue: moment(),
           rules: [{ required: true, message: 'Please Select a Date!' }],
         })(<DatePicker placeholder="Select Date" style={{ width: '100%' }} />)}
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Time</span>}>
+      <Form.Item label="Time">
         {form.getFieldDecorator('time', {
           initialValue: moment(),
           rules: [{ required: true, message: 'Please Select a Time!' }],
@@ -323,14 +315,12 @@ const ABCForm = ({ style, form, refetchAbc }) => {
           }}
         />
 
-        <Form.Item label={<span style={{ fontSize: '16px' }}>Antecedent</span>}>
+        <Form.Item label="Antecedent">
           {form.getFieldDecorator('antecedents', {
             rules: [{ required: true, message: 'Please Select an Antecedent!' }],
           })(
             <Select
-              style={{}}
               placeholder="Select an Antecedent"
-              size="large"
               allowclear
               showSearch
               optionFilterProp="name"
@@ -362,14 +352,12 @@ const ABCForm = ({ style, form, refetchAbc }) => {
           }}
         />
 
-        <Form.Item label={<span style={{ fontSize: '16px' }}>Behavior</span>}>
+        <Form.Item label="Behavior">
           {form.getFieldDecorator('behaviors', {
             rules: [{ required: true, message: 'Please Select a Behavior!' }],
           })(
             <Select
-              style={{}}
               placeholder="Select a Behavior"
-              size="large"
               allowclear
               showSearch
               optionFilterProp="name"
@@ -401,14 +389,12 @@ const ABCForm = ({ style, form, refetchAbc }) => {
           }}
         />
 
-        <Form.Item label={<span style={{ fontSize: '16px' }}>Consequence</span>}>
+        <Form.Item label="Consequence">
           {form.getFieldDecorator('consequences', {
             rules: [{ required: true, message: 'Please Select a Consequence!' }],
           })(
             <Select
-              style={{}}
               placeholder="Select a Consequence"
-              size="large"
               allowclear
               showSearch
               optionFilterProp="name"
@@ -429,12 +415,10 @@ const ABCForm = ({ style, form, refetchAbc }) => {
       </div>
 
       <div style={{ position: 'relative' }}>
-        <Form.Item label={<span style={{ fontSize: '16px' }}>Environment</span>}>
+        <Form.Item label="Environment">
           {form.getFieldDecorator('environment')(
             <Select
-              style={{}}
               placeholder="Select a Environment"
-              size="large"
               allowclear
               showSearch
               optionFilterProp="name"
@@ -452,11 +436,11 @@ const ABCForm = ({ style, form, refetchAbc }) => {
         </Form.Item>
       </div>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Intensity</span>}>
+      <Form.Item label="Intensity">
         {form.getFieldDecorator('intensity', {
           rules: [{ required: true, message: 'Please Select an intensity!' }],
         })(
-          <Select style={{ width: '100%' }} placeholder="Select an Intensity" size="large">
+          <Select style={{ width: '100%' }} placeholder="Select an Intensity">
             <Option key={1} value="Severe">
               Severe
             </Option>
@@ -470,11 +454,11 @@ const ABCForm = ({ style, form, refetchAbc }) => {
         )}
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Response</span>}>
+      <Form.Item label="Response">
         {form.getFieldDecorator('response', {
           rules: [{ required: true, message: 'Please Select a response!' }],
         })(
-          <Select style={{}} placeholder="Select a Response" size="large" allowclear>
+          <Select placeholder="Select a Response" allowclear>
             <Option value="Improve" key="1">
               Improve
             </Option>
@@ -488,11 +472,11 @@ const ABCForm = ({ style, form, refetchAbc }) => {
         )}
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Frequency</span>}>
+      <Form.Item label="Frequency">
         <div style={{ display: 'flex' }}>
           <div style={{ paddingTop: '2px' }}>
             <MinusSquareOutlined
-              style={{ fontSize: '20px', marginRight: '10px' }}
+              style={{ fontSize: 24, marginRight: '10px' }}
               onClick={() =>
                 setFrequency(state => {
                   if (state > 0) {
@@ -512,17 +496,17 @@ const ABCForm = ({ style, form, refetchAbc }) => {
           <div style={{ paddingTop: '2px' }}>
             <PlusSquareOutlined
               onClick={() => setFrequency(state => state + 1)}
-              style={{ fontSize: '20px' }}
+              style={{ fontSize: 24 }}
             />
           </div>
         </div>
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Function</span>}>
+      <Form.Item label="Function">
         {form.getFieldDecorator('function', {
           rules: [{ required: true, message: 'Please Select a Function!' }],
         })(
-          <Select style={{}} placeholder="Select a function" size="large" allowclear>
+          <Select placeholder="Select a function" allowclear>
             <Option value="Escape" key="1">
               Escape
             </Option>
@@ -539,7 +523,7 @@ const ABCForm = ({ style, form, refetchAbc }) => {
         )}
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Note</span>}>
+      <Form.Item label="Note">
         {form.getFieldDecorator('note')(
           <TextArea
             style={{
@@ -551,26 +535,10 @@ const ABCForm = ({ style, form, refetchAbc }) => {
         )}
       </Form.Item>
 
-      <Form.Item {...formTailLayout}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-          }}
-        >
-          <Button
-            type="primary"
-            htmlType="submit"
-            style={{
-              width: 180,
-              height: 40,
-              borderRadius: 0,
-            }}
-            loading={loading}
-          >
-            Save Data
-          </Button>
-        </div>
+      <Form.Item {...tailLayout}>
+        <Button type="primary" htmlType="submit" style={SUBMITT_BUTTON} loading={loading}>
+          Save Data
+        </Button>
       </Form.Item>
 
       <Modal

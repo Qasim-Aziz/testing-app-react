@@ -18,6 +18,8 @@ const ToiletCard = ({
   setUpdateToilet,
   selectDate,
   openDrawer,
+  refetch,
+  setCurrentCardDate,
 }) => {
   const studentId = localStorage.getItem('studentId')
   const [deleteToilet, { data, error, loading }] = useMutation(DELETE_TOILET, {
@@ -45,6 +47,8 @@ const ToiletCard = ({
     },
   })
   const conBinefunc = () => {
+    console.log(dataObj, 'data Obj')
+    setCurrentCardDate(dataObj.date)
     setUpdateToilet(dataObj)
     openDrawer()
   }
@@ -54,6 +58,9 @@ const ToiletCard = ({
       notification.success({
         message: 'Delete toilet data sucessfully',
       })
+      if (refetch) {
+        refetch()
+      }
     }
     if (error) {
       notification.error({
@@ -92,16 +99,16 @@ const ToiletCard = ({
               type="link"
               onClick={() => conBinefunc()}
               style={{
-                padding: '2px',
+                padding: 0,
               }}
             >
-              <FaEdit style={{ fontSize: 21, color: '#584f4f' }} />
+              <FaEdit style={{ fontSize: 22, color: '#584f4f' }} />
             </Button>
             <Button
               type="link"
               loading={loading}
               style={{
-                padding: '2px',
+                width: 'fit-content',
               }}
               onClick={() => {
                 deleteToilet({
@@ -111,7 +118,7 @@ const ToiletCard = ({
                 })
               }}
             >
-              <MdDelete style={{ fontSize: 23, color: '#584f4f' }} />
+              <MdDelete style={{ fontSize: 22, color: '#584f4f' }} />
             </Button>
           </div>
         </span>

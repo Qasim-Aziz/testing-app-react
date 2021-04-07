@@ -5,11 +5,14 @@ import moment from 'moment'
 import React, { useEffect, useRef, useState } from 'react'
 import { useMutation } from 'react-apollo'
 import Timer from 'react-compound-timer'
+import { FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
+import LoadingComponent from 'components/LoadingComponent'
 import { UPDATE_RECORD, UPDATE_FREQUENCY, RECORD_DATA } from './query'
 import './AddBehaviorDrawer.scss'
 
 const { Option } = Select
 const { TabPane } = Tabs
+const { layout, tailLayout } = FORM
 
 const RecordDrawer = ({ selectTamplate, form, onRecordingData, refetchRecordData }) => {
   const [frequency, setFrequency] = useState(0)
@@ -116,8 +119,8 @@ const RecordDrawer = ({ selectTamplate, form, onRecordingData, refetchRecordData
 
   return (
     <>
-      <Form onSubmit={handleSubmit} className="addBehaviorDrawer">
-        {loading && 'Loading...'}
+      <Form {...layout} onSubmit={handleSubmit} className="addBehaviorDrawer">
+        {loading && <LoadingComponent />}
         {error && 'Opps their is something wrong'}
         {data && (
           <>
@@ -290,8 +293,13 @@ const RecordDrawer = ({ selectTamplate, form, onRecordingData, refetchRecordData
                 }
               })}
 
-            <Form.Item style={{ textAlign: 'center' }}>
-              <Button type="primary" htmlType="submit" loading={updateRecordLoading}>
+            <Form.Item {...tailLayout} style={{ textAlign: 'center' }}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                style={SUBMITT_BUTTON}
+                loading={updateRecordLoading}
+              >
                 Submit
               </Button>
             </Form.Item>

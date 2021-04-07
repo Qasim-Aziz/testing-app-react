@@ -5,7 +5,9 @@ import { PlusOutlined } from '@ant-design/icons'
 import moment from 'moment'
 import { useQuery } from 'react-apollo'
 import gql from 'graphql-tag'
+import LoadingComponent from 'components/LoadingComponent'
 import Calendar from 'components/Calander'
+import { DRAWER } from 'assets/styles/globalStyles'
 import ToiletCard from './ToiletCard'
 import ToiletForm from './Toiletform'
 import UpdateToiletForm from './UpdateToiletForm'
@@ -35,7 +37,10 @@ const ToiletDataPage = props => {
   const [updateToilet, setUpdateToilet] = useState()
   const studentId = localStorage.getItem('studentId')
   const [showDrawerForm, updateDrawerForm] = useState(false)
+  const [currentCardDate, setCurrentCardDate] = useState(null)
+
   const { openRightdrawer, closeDrawer, handleFilterToggle, filter, TabCheck, openDrawer } = props
+
   const { data, loading, error, refetch } = useQuery(TOILET_DATA, {
     fetchPolicy: 'network-only',
     variables: {
@@ -52,7 +57,7 @@ const ToiletDataPage = props => {
   })
 
   useEffect(() => {
-    if (newToiletDate === date && newToiletDataCreated) {
+    if (newToiletDate && newToiletDataCreated) {
       refetch()
       setNewToiletDataCreated(false)
     }
@@ -72,6 +77,7 @@ const ToiletDataPage = props => {
   const onClickClose = () => {
     updateDrawerForm(false)
   }
+
   useEffect(() => {
     updateDrawerForm(openRightdrawer)
   }, [openRightdrawer])
@@ -104,7 +110,7 @@ const ToiletDataPage = props => {
                   }}
                 >
                   {loading ? (
-                    'Loading...'
+                    <LoadingComponent />
                   ) : (
                     <>
                       {error && <pre>{JSON.stringify(error, null, 2)}</pre>}
@@ -124,6 +130,8 @@ const ToiletDataPage = props => {
                               setUpdateToilet={setUpdateToilet}
                               selectDate={date}
                               openDrawer={openDrawer}
+                              refetch={refetch}
+                              setCurrentCardDate={setCurrentCardDate}
                             />
                           )
                         })}
@@ -134,7 +142,7 @@ const ToiletDataPage = props => {
             </Col>
             <Drawer
               title={updateToilet ? 'Update Toilet Data' : 'Record Toilet Data'}
-              width="52%"
+              width={DRAWER.widthL2}
               placement="right"
               closable="true"
               visible={showDrawerForm && TabCheck === 'Toilet Data'}
@@ -143,7 +151,7 @@ const ToiletDataPage = props => {
               {updateToilet ? (
                 <UpdateToiletForm
                   data={updateToilet}
-                  selectDate={date}
+                  selectDate={currentCardDate}
                   setOpen={setUpdateToilet}
                   refetch={refetch}
                   closeDrawer={closeDrawer}
@@ -153,46 +161,12 @@ const ToiletDataPage = props => {
                   handleNewToiletDate={newDate => {
                     setNewToiletDate(newDate)
                   }}
-                  selectDate={date}
+                  closeDrawer={closeDrawer}
+                  selectDate={moment().format('YYYY-MM-DD')}
                   setNewToiletCreated={setNewToiletDataCreated}
                 />
               )}
             </Drawer>
-            <Col span={8} style={{ display: 'none' }}>
-              <Title
-                style={{
-                  marginLeft: '30px',
-                  fontSize: '30px',
-                  lineHeight: '41px',
-                }}
-              >
-                {updateToilet ? 'Update Toilet Data' : 'Record Toilet Data'}
-              </Title>
-              <div
-                style={{
-                  background: '#F9F9F9',
-                  borderRadius: 10,
-                  padding: '30px',
-                }}
-              >
-                {updateToilet ? (
-                  <UpdateToiletForm
-                    data={updateToilet}
-                    selectDate={date}
-                    setOpen={setUpdateToilet}
-                    refetch={refetch}
-                  />
-                ) : (
-                  <ToiletForm
-                    handleNewToiletDate={newDate => {
-                      setNewToiletDate(newDate)
-                    }}
-                    selectDate={date}
-                    setNewToiletCreated={setNewToiletDataCreated}
-                  />
-                )}
-              </div>
-            </Col>
           </Row>
         </Content>
       </Layout>

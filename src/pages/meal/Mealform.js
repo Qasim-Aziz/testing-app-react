@@ -17,10 +17,12 @@ import { times, remove, update } from 'ramda'
 import moment from 'moment'
 import './MealForm.scss'
 import ReminderForm from 'components/mealData/ReminderForm'
+import { FORM, COLORS, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 
 const { TextArea } = Input
 const { Option } = Select
 const { Text, Title } = Typography
+const { layout, tailLayout } = FORM
 
 const CREATE_MEAL = gql`
   mutation createFood(
@@ -116,7 +118,7 @@ const MealForm = ({ style, handleNewMealDate, setNewMeal, form, closeDrawer }) =
 
   const foodTypeQuery = useQuery(GET_FOOD_TYPE)
 
-  const [mutate, { data, error }] = useMutation(CREATE_MEAL)
+  const [mutate, { loading }] = useMutation(CREATE_MEAL)
 
   const SubmitForm = e => {
     e.preventDefault()
@@ -146,31 +148,25 @@ const MealForm = ({ style, handleNewMealDate, setNewMeal, form, closeDrawer }) =
             remainders: reminder ? modefiRemainderState : null,
           },
         })
+          .then(res => {
+            notification.success({
+              message: 'Meal Data',
+              description: 'Meal Data Added Successfully',
+            })
+            handleNewMealDate(res.data.createFood.details.date)
+            setNewMeal(res.data.createFood.details)
+            form.resetFields()
+            closeDrawer()
+          })
+          .catch(err => {
+            notification.error({
+              message: 'Something went wrong',
+              description: 'Unable to add meal data',
+            })
+          })
       }
     })
   }
-
-  useEffect(() => {
-    if (data) {
-      notification.success({
-        message: 'Meal Data',
-        description: 'Meal Data Added Successfully',
-      })
-      handleNewMealDate(data.createFood.details.date)
-      setNewMeal(data.createFood.details)
-      form.resetFields()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data])
-
-  useEffect(() => {
-    if (error) {
-      notification.error({
-        message: 'Somthing want wrong',
-        description: error,
-      })
-    }
-  }, [error])
 
   // update mealType based on selected time
   useEffect(() => {
@@ -203,58 +199,39 @@ const MealForm = ({ style, handleNewMealDate, setNewMeal, form, closeDrawer }) =
     form.setFieldsValue({ foodType: foodTypeQuery?.data?.getFoodType[1].id })
   }, [foodTypeQuery])
 
-  if (error) {
-    return <pre>{JSON.stringify(error, null, 2)}</pre>
-  }
-
-  const formItemLayout = {
-    labelCol: {
-      span: 5,
-    },
-    wrapperCol: {
-      span: 17,
-      offset: 1,
-    },
-  }
-  const formTailLayout = {
-    labelCol: { span: 5 },
-    wrapperCol: { span: 8, offset: 6 },
-  }
-
   return (
     <Form
       colon={false}
-      {...formItemLayout}
+      {...layout}
       onSubmit={e => SubmitForm(e, this)}
       name="control-ref"
       style={{ marginLeft: 0, position: 'relative', ...style }}
       layout="horizontal"
-      size="small"
     >
       <div>
-        <Form.Item label={<span style={{ fontSize: '16px' }}>Meal Date</span>} rule={[]}>
+        <Form.Item label="Meal Date">
           {form.getFieldDecorator('mealDate', {
             rules: [{ required: true, message: 'Please Select Date!' }],
           })(<DatePicker style={{ width: '100%' }} />)}
         </Form.Item>
-        <Form.Item label={<span style={{ fontSize: '16px' }}>Meal Time</span>}>
+        <Form.Item label="Meal Time">
           {form.getFieldDecorator('mealTime', {
             rules: [{ required: true, message: 'Please Select a time!' }],
           })(<TimePicker use12Hours format="h:mm a" style={{ width: '100%' }} />)}
         </Form.Item>
       </div>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Meal Name</span>}>
+      <Form.Item label="Meal Name">
         {form.getFieldDecorator('mealName', {
           rules: [{ required: true, message: 'Please Select meal name!' }],
         })(<Input placeholder="Enter Meal Name" name="mealName" style={{ color: '#000' }} />)}
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Meal Type</span>}>
+      <Form.Item label="Meal Type">
         {form.getFieldDecorator('mealType', {
           rules: [{ required: true, message: 'Please Select a meal type!' }],
         })(
-          <Select style={{}} placeholder="Select Meal Type" allowclear size="large" showSearch>
+          <Select placeholder="Select Meal Type" allowclear showSearch>
             <Option value="Breakfast">Breakfast</Option>
             <Option value="Lunch">Lunch</Option>
             <Option value="Dinner">Dinner</Option>
@@ -262,18 +239,11 @@ const MealForm = ({ style, handleNewMealDate, setNewMeal, form, closeDrawer }) =
         )}
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Food Type</span>}>
+      <Form.Item label="Food Type">
         {form.getFieldDecorator('foodType', {
           rules: [{ required: true, message: 'Please Select a food type!' }],
         })(
-          <Select
-            style={{}}
-            placeholder="Select Food Type"
-            size="large"
-            allowclear
-            showSearch
-            optionFilterProp="name"
-          >
+          <Select placeholder="Select Food Type" allowclear showSearch optionFilterProp="name">
             {foodTypeQuery.data &&
               foodTypeQuery.data.getFoodType.map(type => {
                 return (
@@ -286,7 +256,7 @@ const MealForm = ({ style, handleNewMealDate, setNewMeal, form, closeDrawer }) =
         )}
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Water</span>}>
+      <Form.Item label="Water">
         {form.getFieldDecorator('waterIntake', {
           rules: [
             {
@@ -297,7 +267,7 @@ const MealForm = ({ style, handleNewMealDate, setNewMeal, form, closeDrawer }) =
         })(<Input placeholder="Enter water taken" type="number" addonAfter="ml" min={0} />)}
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Note</span>}>
+      <Form.Item label="Note">
         {form.getFieldDecorator('note')(
           <TextArea
             placeholder="Meal Details"
@@ -309,7 +279,7 @@ const MealForm = ({ style, handleNewMealDate, setNewMeal, form, closeDrawer }) =
           />,
         )}
       </Form.Item>
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Meal Reminders</span>}>
+      <Form.Item label="Meal Reminders">
         <Switch
           defaultChecked
           onChange={() => {
@@ -317,7 +287,7 @@ const MealForm = ({ style, handleNewMealDate, setNewMeal, form, closeDrawer }) =
           }}
         />
       </Form.Item>
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Add Reminder</span>}>
+      <Form.Item label="Add Reminder">
         {remainderState &&
           times(n => {
             return (
@@ -333,16 +303,8 @@ const MealForm = ({ style, handleNewMealDate, setNewMeal, form, closeDrawer }) =
           }, remainderCount)}
       </Form.Item>
 
-      <Form.Item {...formTailLayout}>
-        <Button
-          type="primary"
-          htmlType="submit"
-          style={{
-            width: 180,
-            height: 40,
-            borderRadius: 0,
-          }}
-        >
+      <Form.Item {...tailLayout}>
+        <Button type="primary" htmlType="submit" loading={loading} style={SUBMITT_BUTTON}>
           Save Data
         </Button>
       </Form.Item>
