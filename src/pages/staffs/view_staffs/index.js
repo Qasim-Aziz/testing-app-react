@@ -172,7 +172,7 @@ class StaffTable extends React.Component {
     if (value === 'active') isActive = true
     if (value === 'in-active') isActive = false
 
-    console.log(isActive, value)
+    // console.log(isActive, value)
     dispatch({
       type: 'staffs/SET_STATE',
       payload: {
@@ -224,7 +224,7 @@ class StaffTable extends React.Component {
 
   staffActiveInactive = (row, checked) => {
     const { dispatch } = this.props
-    console.log(row, checked)
+    // console.log(row, checked)
 
     dispatch({
       type: 'staffs/STAFF_ACTIVE_INACTIVE',
@@ -266,7 +266,7 @@ class StaffTable extends React.Component {
     email = email !== undefined ? email : this.state.filterEmail
     name = name !== undefined ? name : this.state.filterName
 
-    console.log(status, 'status')
+    // console.log(status, 'status')
     if (name) {
       tempFilterActive = true
       filteredList =
@@ -656,7 +656,7 @@ class StaffTable extends React.Component {
             optionFilterProp="name"
             value={this.state.filterDesignation}
             onChange={e => {
-              console.log(e)
+              // console.log(e)
               this.setState({
                 filterDesignation: e,
               })
@@ -735,7 +735,7 @@ class StaffTable extends React.Component {
       </div>
     )
 
-    console.log(filteredList, 'filteredlist ')
+    // console.log(filteredList, 'filteredlist ')
 
     return (
       <Authorize roles={['school_admin']} redirect to="/dashboard/beta">

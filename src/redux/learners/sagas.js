@@ -128,7 +128,7 @@ export function* PAGE_CHANGED({ payload }) {
       loadingLearners: true,
     },
   })
-  console.log(payload, 'payload')
+  // // console.log(payload, 'payload')
   const pageInfo = yield select(state => state.learners.PageInfo)
   const status = yield select(state => state.learners.CurrentStatus)
   const perPage = yield select(state => state.learners.ItemPerPage)
@@ -157,12 +157,12 @@ export function* PAGE_CHANGED({ payload }) {
     before = pageInfo.startCursor
   }
 
-  console.log(active, first, after, before, last, 'in page changes')
+  // console.log(active, first, after, before, last, 'in page changes')
   // const response = null
   const response = yield call(getClinicLearners, { isActive: active, first, after, before, last })
 
   const oldLearners = []
-  console.log(response, 'thia ia respsonse')
+  // console.log(response, 'thia ia respsonse')
   if (response) {
     let i = 0
     if (response.data.students.edges.length > 0) {
@@ -197,7 +197,7 @@ export function* PAGE_CHANGED({ payload }) {
 }
 
 export function* ROWS_CHANGED({ payload }) {
-  console.log(payload, 'payload')
+  // console.log(payload, 'payload')
   yield put({
     type: 'learners/SET_STATE',
     payload: {
@@ -205,11 +205,11 @@ export function* ROWS_CHANGED({ payload }) {
     },
   })
   const pageInfo = yield select(state => state.learners.PageInfo)
-  console.log(pageInfo, 'pageInfo')
+  // console.log(pageInfo, 'pageInfo')
   const status = yield select(state => state.learners.CurrentStatus)
-  console.log(status, 'status')
+  // console.log(status, 'status')
   const totalLearners = yield select(state => state.learners.TotalLearners)
-  console.log(totalLearners, 'totalLearners')
+  // console.log(totalLearners, 'totalLearners')
   let active = null
   if (status === 'all') active = null
   if (status === 'active') active = true
@@ -230,7 +230,7 @@ export function* ROWS_CHANGED({ payload }) {
     last = totalLearners % payload.currentRowsPerPage
   }
 
-  console.log(first, after, before, last, 'before alas')
+  // console.log(first, after, before, last, 'before alas')
   const response = yield call(getClinicLearners, { isActive: active, first, after, before, last })
   // const response = null
   const oldLearners = []
@@ -250,7 +250,7 @@ export function* ROWS_CHANGED({ payload }) {
       }
     }
 
-    console.log(response)
+    // console.log(response)
     yield put({
       type: 'learners/SET_STATE',
       payload: {
@@ -302,7 +302,7 @@ export function* EDIT_GENERAL_INFO({ payload }) {
         updatedLearner = { ...updatedLearner, tags: [] }
       }
 
-      console.log(response.data.updateStudent.student.allergicTo)
+      // console.log(response.data.updateStudent.student.allergicTo)
 
       if (
         response.data.updateStudent.student.allergicTo?.edges &&
@@ -331,7 +331,7 @@ export function* EDIT_GENERAL_INFO({ payload }) {
       tags: updatedLearner.tags,
     }
 
-    console.log(updatedLearner, obj, 'updated kjfbsdf ksf')
+    // console.log(updatedLearner, obj, 'updated kjfbsdf ksf')
     yield put({
       type: 'learners/UPDATE_LERNERS_LIST',
       payload: {
@@ -417,7 +417,7 @@ export function* CREATE_LEARNER({ payload }) {
         message.success('Upload Successfully.')
       })
       .catch(err1 => {
-        console.error({ err1 })
+        // console.error({ err1 })
         message.error('upload Failed.')
         return false
       })

@@ -311,7 +311,7 @@ class LearnerTable extends React.Component {
       learners: { ItemPerPage, CurrentStatus },
     } = this.props
 
-    console.log(currentRowsPerPage, currentPage, 'page changed')
+    // console.log(currentRowsPerPage, currentPage, 'page changed')
     dispatch({
       type: 'learners/PAGE_CHANGED',
       payload: {
@@ -343,8 +343,8 @@ class LearnerTable extends React.Component {
     status = status ? status : this.state.filterStatus
     category = category ? category : this.state.filterCategory
 
-    console.log(name, email, status, category, tags, 'clinic filter')
-    console.log(filteredList)
+    // console.log(name, email, status, category, tags, 'clinic filter')
+    // console.log(filteredList)
     if (!name && !email && !mobile && !gender && !caseMngr && !address) {
       tempFilterActive = false
     }
@@ -777,7 +777,7 @@ class LearnerTable extends React.Component {
             placeholder="Search Name"
             value={this.state.filterName}
             onChange={e => {
-              console.log(e.target.value, 'value')
+              // console.log(e.target.value, 'value')
               this.setState({
                 filterName: e.target.value,
               })
@@ -850,7 +850,7 @@ class LearnerTable extends React.Component {
             buttonStyle="solid"
             value={this.state.filterStatus}
             onChange={e => {
-              console.log(e)
+              // console.log(e)
               this.filterHandler({ status: e.target.value })
               this.setState({ filterStatus: e.target.value, isFilterActive: true })
               this.selectActiveStatus(e.target.value)
@@ -865,7 +865,7 @@ class LearnerTable extends React.Component {
       </div>
     )
 
-    console.log(filteredList, 'filteredList')
+    // console.log(filteredList, 'filteredList')
 
     return (
       <Authorize roles={['school_admin', 'therapist']} redirect to="/dashboard/beta">
