@@ -1,6 +1,6 @@
 import React from 'react'
 import { Tabs } from 'antd'
-import {COLORS} from 'assets/styles/globalStyles'
+import { COLORS } from 'assets/styles/globalStyles'
 import DashboardTab from './DashboardTab'
 import ProfileTab from './ProfileTab'
 

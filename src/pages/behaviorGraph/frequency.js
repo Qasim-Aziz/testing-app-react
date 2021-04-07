@@ -41,114 +41,6 @@ var moment = require('moment')
 
 const { Title, Text } = Typography
 
-const data = [
-  {
-    country: 'AD',
-    'hot dog': 165,
-    'hot dogColor': 'hsl(234, 70%, 50%)',
-    burger: 180,
-    burgerColor: 'hsl(77, 70%, 50%)',
-    sandwich: 144,
-    sandwichColor: 'hsl(323, 70%, 50%)',
-    kebab: 63,
-    kebabColor: 'hsl(248, 70%, 50%)',
-    fries: 22,
-    friesColor: 'hsl(219, 70%, 50%)',
-    donut: 74,
-    donutColor: 'hsl(34, 70%, 50%)',
-  },
-  {
-    country: 'AE',
-    'hot dog': 172,
-    'hot dogColor': 'hsl(160, 70%, 50%)',
-    burger: 191,
-    burgerColor: 'hsl(211, 70%, 50%)',
-    sandwich: 180,
-    sandwichColor: 'hsl(112, 70%, 50%)',
-    kebab: 169,
-    kebabColor: 'hsl(160, 70%, 50%)',
-    fries: 196,
-    friesColor: 'hsl(193, 70%, 50%)',
-    donut: 77,
-    donutColor: 'hsl(187, 70%, 50%)',
-  },
-  {
-    country: 'AF',
-    'hot dog': 179,
-    'hot dogColor': 'hsl(208, 70%, 50%)',
-    burger: 28,
-    burgerColor: 'hsl(276, 70%, 50%)',
-    sandwich: 164,
-    sandwichColor: 'hsl(269, 70%, 50%)',
-    kebab: 58,
-    kebabColor: 'hsl(201, 70%, 50%)',
-    fries: 137,
-    friesColor: 'hsl(159, 70%, 50%)',
-    donut: 156,
-    donutColor: 'hsl(6, 70%, 50%)',
-  },
-  {
-    country: 'AG',
-    'hot dog': 128,
-    'hot dogColor': 'hsl(203, 70%, 50%)',
-    burger: 19,
-    burgerColor: 'hsl(34, 70%, 50%)',
-    sandwich: 4,
-    sandwichColor: 'hsl(69, 70%, 50%)',
-    kebab: 103,
-    kebabColor: 'hsl(316, 70%, 50%)',
-    fries: 82,
-    friesColor: 'hsl(238, 70%, 50%)',
-    donut: 112,
-    donutColor: 'hsl(136, 70%, 50%)',
-  },
-  {
-    country: 'AI',
-    'hot dog': 176,
-    'hot dogColor': 'hsl(61, 70%, 50%)',
-    burger: 4,
-    burgerColor: 'hsl(332, 70%, 50%)',
-    sandwich: 149,
-    sandwichColor: 'hsl(329, 70%, 50%)',
-    kebab: 100,
-    kebabColor: 'hsl(333, 70%, 50%)',
-    fries: 2,
-    friesColor: 'hsl(189, 70%, 50%)',
-    donut: 121,
-    donutColor: 'hsl(219, 70%, 50%)',
-  },
-  {
-    country: 'AL',
-    'hot dog': 197,
-    'hot dogColor': 'hsl(118, 70%, 50%)',
-    burger: 81,
-    burgerColor: 'hsl(51, 70%, 50%)',
-    sandwich: 198,
-    sandwichColor: 'hsl(263, 70%, 50%)',
-    kebab: 59,
-    kebabColor: 'hsl(342, 70%, 50%)',
-    fries: 85,
-    friesColor: 'hsl(147, 70%, 50%)',
-    donut: 111,
-    donutColor: 'hsl(277, 70%, 50%)',
-  },
-  {
-    country: 'AM',
-    'hot dog': 162,
-    'hot dogColor': 'hsl(24, 70%, 50%)',
-    burger: 68,
-    burgerColor: 'hsl(31, 70%, 50%)',
-    sandwich: 60,
-    sandwichColor: 'hsl(216, 70%, 50%)',
-    kebab: 6,
-    kebabColor: 'hsl(40, 70%, 50%)',
-    fries: 123,
-    friesColor: 'hsl(208, 70%, 50%)',
-    donut: 4,
-    donutColor: 'hsl(231, 70%, 50%)',
-  },
-]
-
 class LeftArea extends React.Component {
   constructor(props) {
     super(props)
@@ -216,13 +108,11 @@ class LeftArea extends React.Component {
           `,
         })
         .then(result => {
-          // console.log(result)
           const nodeLessData = []
           result.data.getDecelData.edges.map(item => {
             nodeLessData.push(item.node)
           })
           let groupedData = groupObj.group(nodeLessData, 'statusname')
-          // console.log('Grouped data', groupedData)
 
           const graphData = []
           // const baselineData = []
@@ -231,9 +121,7 @@ class LeftArea extends React.Component {
 
           if (groupedData.Baseline) {
             const dateGroupData = groupObj.group(nodeLessData, 'date')
-            // console.log(dateGroupData)
             const dates = Object.keys(dateGroupData)
-            // console.log(dates)
             for (let i = 0; i < dates.length; i++) {
               const dateData = { date: dates[i] }
               let count = 0
@@ -244,13 +132,11 @@ class LeftArea extends React.Component {
               })
               dateData['Count'] = count
               graphData.push(dateData)
-              console.log(dateData)
             }
           }
           this.setState({
             GraphData: graphData,
           })
-          // console.log(baselineData)
         })
     }
   }

@@ -291,7 +291,6 @@ export const TargetResponsePeakBlock = forwardRef((props, ref) => {
               tarIdx = i
             }
           }
-          // console.log(targetName, 'targetName')
 
           if (targetType === 'Peak' && tarExist) {
             // target already exist
@@ -551,7 +550,6 @@ export const TargetResponsePeakBlock = forwardRef((props, ref) => {
 
   useImperativeHandle(ref, () => ({
     exportToCSV(reportType) {
-      console.log(reportType)
       if (reportType === 'Block') {
         const filename = `${studentName?.trim()}_tar_resBlock_report`
         const formattedData = []
@@ -566,7 +564,6 @@ export const TargetResponsePeakBlock = forwardRef((props, ref) => {
             })
           }
         }
-        console.log(formattedData, filename, 'dt')
         const ws = XLSX.utils.json_to_sheet(formattedData)
         const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
         const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })

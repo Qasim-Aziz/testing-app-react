@@ -1,49 +1,39 @@
 /* eslint-disable */
 import React, { useEffect, useState, useReducer } from 'react'
 import {
-  Form,
-  Select,
-  Input,
-  Typography,
   Button,
   notification,
-  DatePicker,
   Table,
   Menu,
-  Popover,
   Icon,
   Dropdown,
   Drawer,
   Modal,
+  DatePicker,
+  Form,
 } from 'antd'
-import {
-  PlayCircleOutlined,
-  PlusCircleOutlined,
-  PlusOutlined,
-  MailOutlined,
-} from '@ant-design/icons'
+import { PlusOutlined, MailOutlined } from '@ant-design/icons'
+import { DRAWER, COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
+import AdvanceInvoiceForm from './advanceInvoiceForm'
 import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
-import moment from 'moment'
-import AdvanceInvoiceForm from './advanceInvoice'
 import MonthlyInvoiceForm from './monthlyInvoice'
-import { CLINIC_QUERY, ADVANCE_INVOICE } from './query'
+import BankDetails from './bankDetails'
+import { CLINIC_QUERY } from './query'
 
-const { Option } = Select
-const { Text, Title } = Typography
-const { TextArea } = Input
+const { layout, tailLayout } = FORM
+
 function CustomerList() {
   const { data, loading, error } = useQuery(CLINIC_QUERY)
   const [tableData, setTableData] = useState([])
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
-  const [advInvoiceMonth, setAdvInvoiceMonth] = useState(1)
-  const [showModal, setShowModal] = useState(false)
+  const [advanceInvoiceModal, setAdvanceInvoiceModal] = useState(false)
+  const [payReminderModal, setPayReminderModal] = useState(false)
   const [advInvForm, setAdvInvForm] = useState(false)
   const [monthlyInvForm, setMonthlyInvForm] = useState(false)
   const [currentRow, setCurrentRow] = useState(null)
-  const [
-    createAdvanceInvoice,
-    { data: advanceData, loading: advanceLoading, error: advanceError },
-  ] = useMutation(ADVANCE_INVOICE)
+  const [bankDetailsDrawer, setBankDetailsDrawer] = useState(false)
+  const [selectedClinicsName, setSelectedClinicsName] = useState(null)
+  const [invoiceType, setInvoiceType] = useState('advance')
 
   useEffect(() => {
     if (data) {
@@ -57,8 +47,6 @@ function CustomerList() {
         })
       })
       setTableData(tempTable)
-
-      console.log(tempTable, 'tempTable')
     }
     if (error) {
       notification.error({
@@ -68,7 +56,6 @@ function CustomerList() {
     }
   }, [data, error])
 
-  console.log(advanceData, advanceLoading, advanceError, 'ainvoi')
   const columns = [
     {
       title: 'Name',
@@ -82,50 +69,10 @@ function CustomerList() {
       dataIndex: 'invoice',
     },
     {
-      title: 'Actions',
-      render: text => {
-        return (
-          <div>
-            <Button
-              type="link"
-              onClick={() => {
-                setCurrentRow(text)
-                // setAdvInvForm(true)
-                createAdvanceInvoice({
-                  variables: {
-                    month: 'April',
-                    clinic: selectedRowKeys[0],
-                  },
-                })
-                  .then(res => console.log(res, 'response'))
-                  .catch(err => console.log(err, 'erroror'))
-              }}
-            >
-              Adv Invoice +
-            </Button>
-            <span style={{ borderRight: '1px solid #ccc' }} />
-            <Button
-              type="link"
-              onClick={() => {
-                setCurrentRow(text)
-                setMonthlyInvForm(true)
-              }}
-            >
-              Monthly Invoice +
-            </Button>
-            <span style={{ borderRight: '1px solid #ccc' }} />
-            <Button
-              type="link"
-              onClick={() => {
-                setCurrentRow(text)
-                setMonthlyInvForm(true)
-              }}
-            >
-              Edit <Icon type="edit" />
-            </Button>
-          </div>
-        )
-      },
+      title: 'Debit',
+    },
+    {
+      title: 'Credit',
     },
   ]
 
@@ -134,29 +81,28 @@ function CustomerList() {
     setSelectedRowKeys(selectedRowKeys)
   }
 
-  const onSelectAll = (e, a, b) => {
-    console.log(e, a, b, 'jjjjjjjjjjjkkkkkkkkkkkkkkk ')
-  }
-
   const rowSelection = {
     selectedRowKeys,
     onChange: onSelectChange,
-    // selections: true,
-    onSelectAll: onSelectAll,
   }
 
   const handleMenuActions = e => {
+    let names = []
+    tableData.map(item =>
+      selectedRowKeys.map(key => (key === item.key ? names.push(item.details?.schoolName) : null)),
+    )
+    console.log(names, 'names')
+    setSelectedClinicsName(names)
     if (e.key == 'advanceInvoice') {
-      setShowModal(true)
+      setInvoiceType('advance')
+      setAdvanceInvoiceModal(true)
+    } else if (e.key == 'monthlyInvoice') {
+      setInvoiceType('monthly')
+      setAdvanceInvoiceModal(true)
+    } else if (e.key == 'payReminder') {
+      setPayReminderModal(true)
     }
   }
-
-  const content = (
-    <div>
-      <p>Content</p>
-      <p>Content</p>
-    </div>
-  )
 
   const menu = (
     <Menu onClick={e => handleMenuActions(e)}>
@@ -175,10 +121,11 @@ function CustomerList() {
   const filterHeader = (
     <div
       style={{
-        minHeight: '25px',
+        minHeight: '20px',
         height: 'fit-content',
         display: 'flex',
         flexDirection: 'row',
+        justifyContent: 'space-between',
       }}
     >
       <Dropdown overlay={menu}>
@@ -186,34 +133,71 @@ function CustomerList() {
           Actions <Icon type="down" />
         </Button>
       </Dropdown>
+      <Button onClick={() => setBankDetailsDrawer(true)}>Bank Details</Button>
     </div>
   )
 
   return (
-    <div>
-      <Modal
-        title="Advance Invoice Duration"
-        visible={showModal}
-        onOk={() => {
-          setShowModal(false)
-        }}
-        onCancel={() => {
-          setShowModal(false)
-        }}
-        okText="OK"
-        cancelText="Cancel"
-        width={360}
+    <div style={{ marginTop: 10 }}>
+      <Drawer
+        title={`Create ${invoiceType === 'advance' ? 'advance' : 'monthly'} invoice`}
+        width={DRAWER.widthL2}
+        visible={advanceInvoiceModal}
+        closable
+        destroyOnClose
+        onClose={() => setAdvanceInvoiceModal(false)}
       >
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <span style={{ marginRight: 15 }}>Months: </span>
-          <Input
-            value={advInvoiceMonth}
-            min={1}
-            type="number"
-            onChange={e => setAdvInvoiceMonth(e.target.value)}
-          ></Input>
+        <AdvanceInvoiceForm
+          selectedClinicsName={selectedClinicsName}
+          selectedRowKeys={selectedRowKeys}
+          invoiceType={invoiceType}
+          closeDrawer={() => setAdvanceInvoiceModal(false)}
+        />
+      </Drawer>
+
+      <Drawer
+        title="Send pay reminder"
+        visible={payReminderModal}
+        closable
+        destroyOnClose
+        onClose={() => {
+          setPayReminderModal(false)
+        }}
+        width={DRAWER.widthL2}
+      >
+        <div>
+          <Form.Item {...layout} label="Selected Clinics">
+            {selectedClinicsName && selectedClinicsName?.length > 0 ? (
+              <>
+                <div>
+                  <ol style={{ display: 'grid', gridTemplateColumns: 'auto auto' }}>
+                    {selectedClinicsName &&
+                      selectedClinicsName.map((item, index) => (
+                        <li style={{ width: 340 }}>{item}</li>
+                      ))}
+                  </ol>
+                </div>
+              </>
+            ) : (
+              <b>None, Please select at least one clinic</b>
+            )}
+            <div style={{ alignItems: 'center' }}>
+              <div>
+                <b>Send Pay reminder to the selected clinics for the last invoice </b>
+              </div>
+            </div>
+          </Form.Item>
+          <Form.Item {...tailLayout}>
+            <Button type="default" style={SUBMITT_BUTTON}>
+              Send Reminder
+            </Button>
+            <Button onClick={() => setPayReminderModal(false)} type="ghost" style={CANCEL_BUTTON}>
+              Cancel
+            </Button>
+          </Form.Item>
         </div>
-      </Modal>
+      </Drawer>
+
       <Drawer
         visible={advInvForm}
         onClose={() => setAdvInvForm(false)}
@@ -242,10 +226,20 @@ function CustomerList() {
           setInvoiceFormDrawer={setMonthlyInvForm}
         />
       </Drawer>
+      <Drawer
+        width={DRAWER.widthL2}
+        title="Update Payment accepting details"
+        visible={bankDetailsDrawer}
+        onClose={() => setBankDetailsDrawer(false)}
+        destroyOnClose
+      >
+        <BankDetails setBankDetailsDrawer={setBankDetailsDrawer} />
+      </Drawer>
       <Table
         columns={columns}
         dataSource={tableData}
         rowSelection={rowSelection}
+        loading={loading}
         bordered
         loading={loading}
         title={() => {
@@ -255,7 +249,7 @@ function CustomerList() {
           defaultPageSize: 20,
           showSizeChanger: true,
           pageSizeOptions: ['20', '30', '50', '100'],
-          position: 'top',
+          position: 'bottom',
         }}
       />
     </div>

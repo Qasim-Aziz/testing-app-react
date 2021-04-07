@@ -1,23 +1,36 @@
 import React, { useState, useEffect } from 'react'
 import { Form, Input, Button, Select, notification, TimePicker } from 'antd'
+
 import gql from 'graphql-tag'
+import { FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import { useMutation, useQuery } from 'react-apollo'
 import './workForm.scss'
 import TextArea from 'antd/lib/input/TextArea'
 
 const { Option } = Select
+const { layout } = FORM
 
-const CREATE_TOILET_DATA = gql`
+const ADD_TIMESHEET_DATA = gql`
   mutation CreateTimesheet(
     $title: String!
     $location: ID!
     $note: String
     $start: DateTime!
     $end: DateTime!
+    $isApproved: Boolean
+    $isBillable: Boolean
   ) {
     CreateTimesheet(
       input: {
-        timesheet: { title: $title, location: $location, note: $note, start: $start, end: $end }
+        timesheet: {
+          title: $title
+          location: $location
+          note: $note
+          start: $start
+          end: $end
+          isApproved: $isApproved
+          isBillable: $isBillable
+        }
       }
     ) {
       timesheet {
@@ -40,136 +53,105 @@ const SCHOOL_LOCATION = gql`
   }
 `
 
-export default ({ style, setNewLogCreated }) => {
-  const [title, setTitle] = useState()
-  const [location, setLocation] = useState()
-  const [note, setNote] = useState()
-  const [start, setStart] = useState()
-  const [end, setEnd] = useState()
-
+function WorkLogForm({ form, style, setNewLogCreated }) {
   const { data: locationData, loading: locationLoading } = useQuery(SCHOOL_LOCATION)
 
-  const [CreateLog, { data, error }] = useMutation(CREATE_TOILET_DATA, {
-    variables: {
-      title,
-      location,
-      note,
-      start,
-      end,
-    },
-  })
+  const [CreateLog, { loading }] = useMutation(ADD_TIMESHEET_DATA)
 
   const SubmitForm = e => {
     e.preventDefault()
-    CreateLog()
-  }
-
-  useEffect(() => {
-    if (data) {
-      notification.success({
-        message: 'Work Data',
-        description: 'New Work Log Added Successfully',
-      })
-      setNewLogCreated(true)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data])
-
-  useEffect(() => {
-    if (error) {
-      notification.error({
-        message: 'Somthing want wrong',
-        description: error,
-      })
-    }
-  }, [error])
-
-  if (error) {
-    return <pre>{JSON.stringify(error, null, 2)}</pre>
+    form.validateFields((err, values) => {
+      if (!err) {
+        CreateLog({
+          variables: {
+            title: values.title,
+            location: values.geoLocation,
+            note: values.note,
+            start: values.startTime,
+            end: values.endTime,
+            isApproved: true,
+            isBillable: true,
+          },
+        })
+          .then(res => {
+            console.log(res)
+            notification.success({
+              message: 'Work Data',
+              description: 'New Work Log Added Successfully',
+            })
+            setNewLogCreated(true)
+          })
+          .catch(er => {
+            console.log(er)
+            notification.error({
+              message: 'Somthing went wrong',
+              description: 'Unable to create work log',
+            })
+          })
+      }
+    })
   }
 
   return (
-    <Form
-      onSubmit={e => SubmitForm(e, this)}
-      name="control-ref"
-      style={{ marginLeft: 0, ...style }}
-    >
-      <Form.Item label="Titile">
-        <Input
-          required
-          placeholder="title"
-          size="large"
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-        />
+    <Form onSubmit={SubmitForm} name="control-ref" style={{ marginLeft: 0, ...style }}>
+      <Form.Item label="Title">
+        {form.getFieldDecorator('title', {
+          rules: [{ required: true, message: 'Please provide Month!' }],
+        })(<Input required size="large" placeholder="title" />)}
       </Form.Item>
 
-      <Form.Item label="Start & End Time">
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-          }}
-        >
-          <TimePicker
-            size="large"
-            style={{
-              width: '45%',
-            }}
-            required
-            onChange={newTime => setStart(newTime)}
-          />
-          <TimePicker
-            size="large"
-            style={{
-              width: '45%',
-            }}
-            required
-            onChange={newTime => setEnd(newTime)}
-          />
-        </div>
-      </Form.Item>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          width: '100%',
+        }}
+      >
+        <Form.Item style={{ width: '47%' }} label="Start Time">
+          {form.getFieldDecorator('startTime', {
+            rules: [{ required: true, message: 'Please provide Month!' }],
+          })(<TimePicker style={{ width: '100%' }} size="large" />)}
+        </Form.Item>
+        <Form.Item label="End Time" style={{ width: '47%' }}>
+          {form.getFieldDecorator('endTime', {
+            rules: [{ required: true, message: 'Please provide Month!' }],
+          })(<TimePicker style={{ width: '100%' }} size="large" />)}
+        </Form.Item>
+      </div>
 
       <Form.Item label="Geolocation">
-        <Select
-          required
-          size="large"
-          showSearch
-          optionFilterProp="location"
-          loading={locationLoading}
-          onChange={value => setLocation(value)}
-        >
-          {locationData &&
-            locationData.schoolLocation.edges.map(({ node }) => (
-              <Option value={node.id} location={node.location}>
-                {node.location}
-              </Option>
-            ))}
-        </Select>
+        {form.getFieldDecorator('geoLocation', {
+          rules: [{ required: true, message: 'Please provide Month!' }],
+        })(
+          <Select size="large" showSearch optionFilterProp="location" loading={locationLoading}>
+            {locationData &&
+              locationData.schoolLocation.edges.map(({ node }) => (
+                <Option value={node.id} key={node.id} location={node.location}>
+                  {node.location}
+                </Option>
+              ))}
+          </Select>,
+        )}
       </Form.Item>
 
-      <Form.Item label="Notes">
-        <TextArea
-          style={{ width: '100%', resize: 'none', height: 150 }}
-          size="large"
-          value={note}
-          onChange={e => setNote(e.target.value)}
-        />
+      <Form.Item label="Note">
+        {form.getFieldDecorator('note', {
+          rules: [{ required: true, message: 'Please provide Month!' }],
+        })(<TextArea style={{ width: '100%', resize: 'none', height: 150 }} />)}
       </Form.Item>
 
       <Form.Item>
         <Button
           type="primary"
           htmlType="submit"
-          style={{
-            width: '100%',
-            height: 40,
-            background: '#0B35B3',
-          }}
+          loading={loading}
+          style={{ ...SUBMITT_BUTTON, width: '100%' }}
         >
-          Save Data
+          Add Data
         </Button>
       </Form.Item>
     </Form>
   )
 }
+
+export default Form.create()(WorkLogForm)

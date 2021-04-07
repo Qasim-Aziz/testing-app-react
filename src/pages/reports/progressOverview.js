@@ -45,7 +45,7 @@ const parentCardStyle = {
   borderRadius: 10,
   padding: '10px',
   margin: '10px 5px 0 10px',
-  height: 300,
+  height: 380,
   overflow: 'hidden',
 }
 
@@ -59,7 +59,7 @@ const filterCardStyle = {
   overflow: 'hidden',
 }
 
-const parentDiv = { display: 'flex', margin: '5px 30px 5px 0' }
+const parentDiv = { display: 'flex', margin: '5px 15px 5px 0' }
 const parentLabel = { fontSize: '15px', color: '#000', margin: 'auto 8px auto' }
 
 const cardStyle = {
@@ -114,7 +114,6 @@ class ProgressOverview extends React.Component {
         `,
       })
       .then(result => {
-        console.log(result, 'status result')
         this.setState({
           targetStatus: result.data.targetStatus,
           selectTargetArea: result.data.targetStatus[0].id,
@@ -159,7 +158,6 @@ class ProgressOverview extends React.Component {
   }
 
   onChange = current => {
-    // console.log('onChange:', current);
     this.setState({ current })
   }
 
@@ -300,7 +298,7 @@ class ProgressOverview extends React.Component {
                 <RangePicker
                   style={{
                     marginLeft: 'auto',
-                    width: 250,
+                    width: 240,
                   }}
                   defaultValue={[
                     Moment(graphstartdate, 'YYYY-MM-DD'),
@@ -317,7 +315,7 @@ class ProgressOverview extends React.Component {
                     placeholder="Status"
                     onChange={this.StatusCallback}
                     style={{
-                      width: 120,
+                      width: 160,
                       borderRadius: 4,
                     }}
                     allowClear
@@ -346,12 +344,16 @@ class ProgressOverview extends React.Component {
                     size="default"
                     defaultValue={defaultprogram}
                     style={{
-                      width: 120,
+                      width: 160,
                       borderRadius: 4,
                     }}
                   >
                     {programArea &&
-                      programArea.map(dom => <Option value={dom.node.id}>{dom.node.name}</Option>)}
+                      programArea.map(dom => (
+                        <Option key={dom.node.id} value={dom.node.id}>
+                          {dom.node.name}
+                        </Option>
+                      ))}
                   </Select>
                 )}
               </div>
@@ -360,7 +362,7 @@ class ProgressOverview extends React.Component {
                 {domainObj.length > 0 && (
                   <Select
                     style={{
-                      width: 120,
+                      width: 160,
                       borderRadius: 4,
                     }}
                     placeholder="ALL"
@@ -370,7 +372,9 @@ class ProgressOverview extends React.Component {
                   >
                     {domainObj &&
                       domainObj.map(dom => (
-                        <Option value={dom.node.domain}>{dom.node.domain}</Option>
+                        <Option key={dom.node.id} value={dom.node.domain}>
+                          {dom.node.domain}
+                        </Option>
                       ))}
                   </Select>
                 )}

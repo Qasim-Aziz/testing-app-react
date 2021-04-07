@@ -28,6 +28,7 @@ class BarChart extends React.Component {
 
     this.state = {
       GraphData: [],
+      barKeys: [],
     }
   }
 
@@ -102,7 +103,6 @@ class BarChart extends React.Component {
         fetchPolicy: 'network-only',
       })
       .then(result => {
-        console.log('result.data bar ===> ', result.data)
         const baseline = 'U3RhdHVzVHlwZTox'
         const intherapy = 'U3RhdHVzVHlwZToz'
         const mastered = 'U3RhdHVzVHlwZTo0'
@@ -145,9 +145,16 @@ class BarChart extends React.Component {
                 length += 1
               }
             }
-            gData.push({ domain: domainStr, 'Master Time': parseInt((count / length).toFixed()) })
+            gData.push({
+              id: domainStr,
+
+              [domainStr]: parseInt((count / length).toFixed()),
+            })
           }
+          let tt = []
+          tt = gData.map(item => item.id)
           this.setState({
+            barKeys: tt,
             GraphData: gData,
           })
         }
@@ -171,9 +178,17 @@ class BarChart extends React.Component {
                 length += 1
               }
             }
-            gData.push({ domain: domainStr, 'Master Time': parseInt((count / length).toFixed()) })
+            gData.push({
+              id: domainStr,
+
+              [domainStr]: parseInt((count / length).toFixed()),
+            })
           }
+          let tt = []
+          tt = gData.map(item => item.id)
+
           this.setState({
+            barKeys: tt,
             GraphData: gData,
           })
         }
@@ -197,9 +212,16 @@ class BarChart extends React.Component {
                 length += 1
               }
             }
-            gData.push({ domain: domainStr, 'Master Time': parseInt((count / length).toFixed()) })
+            gData.push({
+              id: domainStr,
+
+              [domainStr]: parseInt((count / length).toFixed()),
+            })
           }
+          let tt = []
+          tt = gData.map(item => item.id)
           this.setState({
+            barKeys: tt,
             GraphData: gData,
           })
         }
@@ -223,9 +245,16 @@ class BarChart extends React.Component {
                 length += 1
               }
             }
-            gData.push({ domain: domainStr, 'Master Time': parseInt((count / length).toFixed()) })
+            gData.push({
+              id: domainStr,
+
+              [domainStr]: parseInt((count / length).toFixed()),
+            })
           }
+          let tt = []
+          tt = gData.map(item => item.id)
           this.setState({
+            barKeys: tt,
             GraphData: gData,
           })
         }
@@ -241,84 +270,81 @@ class BarChart extends React.Component {
   }
 
   render() {
-    const { GraphData } = this.state
-
+    const { GraphData, barKeys } = this.state
     return (
-      <>
-        <div role="presentation">
-          {GraphData ? (
-            <Empty style={{ marginTop: '65px', marginLeft: '188px' }} />
-          ) : (
-            <ResponsiveBar
-              data={GraphData}
-              keys={['Master Time']}
-              indexBy="domain"
-              margin={{ top: 10, right: 30, bottom: 30, left: 30 }}
-              padding={0.15}
-              colors={{ scheme: 'paired' }}
-              defs={[
-                {
-                  id: 'dots',
-                  type: 'patternDots',
-                  background: 'inherit',
-                  color: '#38bcb2',
-                  size: 4,
-                  padding: 1,
-                  stagger: true,
+      <div style={{ width: '100%', height: '100%' }}>
+        {GraphData && GraphData.length == 0 ? (
+          <Empty style={{ marginTop: '100px' }} />
+        ) : (
+          <ResponsiveBar
+            data={GraphData}
+            keys={barKeys}
+            margin={{ top: 20, right: 10, bottom: 60, left: 60 }}
+            padding={0.15}
+            colors={{ scheme: 'paired' }}
+            borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
+            axisTop={null}
+            axisRight={null}
+            labelSkipWidth={12}
+            labelSkipHeight={12}
+            labelTextColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
+            animate={true}
+            motionStiffness={90}
+            motionDamping={15}
+            axisBottom={{
+              tickSize: 5,
+              tickPadding: 5,
+              tickRotation: -19,
+              legend: '',
+              legendPosition: 'middle',
+              legendOffset: 32,
+            }}
+            tooltip={({ id, value, color }) => (
+              <>
+                <strong style={{ color }}>
+                  {id}:{'  '}
+                </strong>
+                <span style={{ color: 'black' }}>{value}</span>
+              </>
+            )}
+            theme={{
+              tooltip: {
+                container: {
+                  background: '#fff',
                 },
-                {
-                  id: 'lines',
-                  type: 'patternLines',
-                  background: 'inherit',
-                  color: '#eed312',
-                  rotation: -45,
-                  lineWidth: 6,
-                  spacing: 10,
-                },
-              ]}
-              fill={[
-                {
-                  match: {
-                    id: 'fries',
-                  },
-                  id: 'dots',
-                },
-                {
-                  match: {
-                    id: 'sandwich',
-                  },
-                  id: 'lines',
-                },
-              ]}
-              borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
-              axisTop={null}
-              axisRight={null}
-              axisBottom={{
-                tickSize: 5,
-                tickPadding: 5,
-                tickRotation: -19,
-                legend: '',
-                legendPosition: 'middle',
-                legendOffset: 32,
-              }}
-              axisLeft={{
-                tickSize: 5,
-                tickPadding: 5,
-                tickRotation: 0,
-                legend: 'Number of days',
-                legendPosition: 'middle',
-                legendOffset: -40,
-              }}
-              labelSkipWidth={12}
-              labelSkipHeight={12}
-              labelTextColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
-              animate={true}
-              motionStiffness={90}
-              motionDamping={15}
-            />
-          )}
-        </div>
-      </>
+              },
+            }}
+            axisLeft={{
+              tickSize: 5,
+              tickPadding: 5,
+              tickRotation: 0,
+              legend: 'Number of days',
+              legendPosition: 'middle',
+              legendOffset: -40,
+            }}
+            defs={[
+              {
+                id: 'dots',
+                type: 'patternDots',
+                background: 'inherit',
+                color: '#38bcb2',
+                size: 4,
+                padding: 1,
+                stagger: true,
+              },
+              {
+                id: 'lines',
+                type: 'patternLines',
+                background: 'inherit',
+                color: '#eed312',
+                rotation: -45,
+                lineWidth: 6,
+                spacing: 10,
+              },
+            ]}
+          />
+        )}
+      </div>
     )
   }
 }

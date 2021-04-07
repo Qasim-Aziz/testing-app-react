@@ -62,7 +62,7 @@ export default ({ select, setSelect, setSelectedPeopleDetails }) => {
     })
   }
 
-  if (viewStudent && viewStudent.length > 0 && !select) {
+  if (viewStudent && viewStudent.length > 0 && select === -1) {
     setSelect(viewStudent[0].node.parent?.id)
     setSelectedPeopleDetails({
       name: viewStudent[0].node.firstname,
