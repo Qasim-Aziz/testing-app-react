@@ -52,12 +52,12 @@ import NetworkSankey from './networkSankey'
 import client from '../../apollo/config'
 
 import './padding.scss'
-import { COLORS } from 'assets/styles/globalStyles'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 
 const { Title, Text } = Typography
 const { Content } = Layout
 const { Option } = Select
-const { SubMenu } = Menu;
+const { SubMenu } = Menu
 
 const STAFF_LIST = gql`
   query {
@@ -102,7 +102,6 @@ const REPORT_MAPPING = {
 
 // list to exclude learner's names from report title
 const EXCLUDE_NAMES = ['Attendance', 'Timesheet']
-
 
 @connect(({ user, student, learnersprogram, menu }) => ({ user, student, learnersprogram, menu }))
 class Reports extends React.Component {
@@ -189,7 +188,6 @@ class Reports extends React.Component {
 
   componentDidUpdate(prevProps) {
     const { user } = this.props
-    console.log('user====>>>', user)
     if (user.staffName !== prevProps.user.staffName)
       this.setState({
         selectedStaff: { id: user.staffId, name: user.staffName },
@@ -257,15 +255,15 @@ class Reports extends React.Component {
   }
 
   onOpenChange = openKeys => {
-    const latestOpenKey = openKeys.find(key => this.state.openKeys.indexOf(key) === -1);
+    const latestOpenKey = openKeys.find(key => this.state.openKeys.indexOf(key) === -1)
     if (this.state.rootSubmenuKeys.indexOf(latestOpenKey) === -1) {
-      this.setState({ openKeys });
+      this.setState({ openKeys })
     } else {
       this.setState({
         openKeys: latestOpenKey ? [latestOpenKey] : [],
-      });
+      })
     }
-  };
+  }
 
   render() {
     const {
@@ -279,51 +277,6 @@ class Reports extends React.Component {
     const { TabCheck, visibleFilter, selectedStaff } = this.state
 
     const std = localStorage.getItem('studentId')
-
-    const pxToMm = px => {
-      return Math.floor(px / document.getElementById('capture').offsetHeight)
-    }
-
-    const exportPDF = () => {
-      const input = document.getElementById('capture')
-      const inputHeightMm = pxToMm(input.offsetHeight)
-      const a4WidthMm = 210
-      const a4HeightMm = 297
-      const numPages = inputHeightMm <= a4HeightMm ? 1 : Math.floor(inputHeightMm / a4HeightMm) + 1
-      html2canvas(input).then(canvas => {
-        const imgData = canvas.toDataURL('image/png')
-        if (inputHeightMm > a4HeightMm) {
-          // elongated a4 (system print dialog will handle page breaks)
-          const pdf = new JsPDF('p', 'mm', [inputHeightMm + 16, a4WidthMm])
-          pdf.addImage(imgData, 'PNG', 0, 0)
-          pdf.save(`test.pdf`)
-        } else {
-          // standard a4
-          const pdf = new JsPDF()
-          pdf.addImage(imgData, 'PNG', 0, 0)
-          pdf.save(`test.pdf`)
-        }
-      })
-    }
-
-    const exportToCSV = () => { }
-
-    const menu = (
-      <Menu>
-        <Menu.Item key="0">
-          <Button onClick={() => exportPDF()} type="link" size="small">
-            PDF
-          </Button>
-        </Menu.Item>
-        <Menu.Item key="1">
-          <Button onClick={() => exportToCSV()} type="link" size="small">
-            CSV/Excel
-          </Button>
-        </Menu.Item>
-      </Menu>
-    )
-
-    
 
     if (!std && Learners.length < 1) {
       return <p>No learners to display reports</p>
@@ -371,7 +324,7 @@ class Reports extends React.Component {
         TabCheck: 'Progress Overview',
       })
     }
-    console.log(TabCheck, 'tabCheck')
+
     return (
       <>
         <Helmet title="Reports" />
@@ -423,15 +376,15 @@ class Reports extends React.Component {
                   <Drawer
                     visible={visibleFilter}
                     onClose={this.onCloseFilter}
-                    width={350}
+                    width={DRAWER.widthL4}
                     title={`Select ${TabCheck === 'Timesheet' ? 'Staff' : 'Learner'}`}
                     placement="right"
                   >
                     {TabCheck === 'Timesheet' ? (
                       <StaffSelect Staffs={this.state.staffs} selectStaff={this.selectStaff} />
                     ) : (
-                        <LearnerSelect />
-                      )}
+                      <LearnerSelect />
+                    )}
                   </Drawer>
                 </div>
               </div>

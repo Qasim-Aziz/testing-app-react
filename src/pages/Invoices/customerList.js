@@ -272,6 +272,7 @@ function CustomerList() {
         rowSelection={rowSelection}
         loading={loading}
         bordered
+        loading={loading}
         title={() => {
           return filterHeader
         }}

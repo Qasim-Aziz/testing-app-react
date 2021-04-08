@@ -19,12 +19,10 @@ import { Helmet } from 'react-helmet'
 import {
   Table,
   Button,
-  Collapse,
   Card,
   Select,
   DatePicker,
   Input,
-  Icon,
   Drawer,
   Popconfirm,
   Dropdown,
@@ -91,7 +89,7 @@ class StaffTable extends React.Component {
     filterEmail: '',
     filterDesignation: [],
     filterTags: '',
-    filterActive: '',
+    filterActive: 'active',
     windowWidth: window.innerWidth,
   }
 
@@ -110,6 +108,9 @@ class StaffTable extends React.Component {
     const { dispatch } = this.props
     dispatch({
       type: 'staffs/GET_STAFFS',
+      payload: {
+        isActive: true,
+      },
     })
 
     dispatch({
@@ -118,7 +119,6 @@ class StaffTable extends React.Component {
     dispatch({
       type: 'appointments/GET_APPOINTMENT_LIST',
     })
-
     window.addEventListener('resize', this.handleWindowResize)
   }
 
@@ -164,6 +164,30 @@ class StaffTable extends React.Component {
     })
   }
 
+  selectActiveStatus = value => {
+    const { dispatch } = this.props
+    let isActive = null
+
+    if (value === '') isActive = null
+    if (value === 'active') isActive = true
+    if (value === 'in-active') isActive = false
+
+    // console.log(isActive, value)
+    dispatch({
+      type: 'staffs/SET_STATE',
+      payload: {
+        CurrentStatus: value,
+      },
+    })
+
+    dispatch({
+      type: 'staffs/GET_STAFFS',
+      payload: {
+        isActive,
+      },
+    })
+  }
+
   showEditDrawer = () => {
     this.setState({
       visibleEdit: true,
@@ -200,7 +224,7 @@ class StaffTable extends React.Component {
 
   staffActiveInactive = (row, checked) => {
     const { dispatch } = this.props
-    console.log(row, checked)
+    // console.log(row, checked)
 
     dispatch({
       type: 'staffs/STAFF_ACTIVE_INACTIVE',
@@ -209,87 +233,6 @@ class StaffTable extends React.Component {
         checked: !checked,
       },
     })
-  }
-
-  selectActiveStatus = value => {
-    if (value === 'all') {
-      client
-        .query({
-          query: gql`
-            {
-              staffs {
-                edges {
-                  node {
-                    id
-                    name
-                    email
-                    gender
-                    localAddress
-                  }
-                }
-              }
-            }
-          `,
-        })
-        .then(result => {
-          this.setState({
-            staffdata: result.data.staffs.edges,
-            realStaffList: [],
-          })
-        })
-    }
-    if (value === 'active') {
-      client
-        .query({
-          query: gql`
-            {
-              staffs(isActive: true) {
-                edges {
-                  node {
-                    id
-                    name
-                    email
-                    gender
-                    localAddress
-                  }
-                }
-              }
-            }
-          `,
-        })
-        .then(result => {
-          this.setState({
-            staffdata: result.data.staffs.edges,
-            realStaffList: [],
-          })
-        })
-    }
-    if (value === 'in-active') {
-      client
-        .query({
-          query: gql`
-            {
-              staffs(isActive: false) {
-                edges {
-                  node {
-                    id
-                    name
-                    email
-                    gender
-                    localAddress
-                  }
-                }
-              }
-            }
-          `,
-        })
-        .then(result => {
-          this.setState({
-            staffdata: result.data.staffs.edges,
-            realStaffList: [],
-          })
-        })
-    }
   }
 
   showSession = () => {
@@ -323,6 +266,7 @@ class StaffTable extends React.Component {
     email = email !== undefined ? email : this.state.filterEmail
     name = name !== undefined ? name : this.state.filterName
 
+    // console.log(status, 'status')
     if (name) {
       tempFilterActive = true
       filteredList =
@@ -404,6 +348,7 @@ class StaffTable extends React.Component {
       gender: '',
       designation: '',
       address: '',
+      status: 'active',
     })
   }
 
@@ -711,7 +656,7 @@ class StaffTable extends React.Component {
             optionFilterProp="name"
             value={this.state.filterDesignation}
             onChange={e => {
-              console.log(e)
+              // console.log(e)
               this.setState({
                 filterDesignation: e,
               })
@@ -760,6 +705,7 @@ class StaffTable extends React.Component {
             onChange={e => {
               this.setState({ filterActive: e.target.value, isFilterActive: true })
               this.filterHandler({ status: e.target.value })
+              this.selectActiveStatus(e.target.value)
             }}
             style={tableFilterStyles}
           >
@@ -789,7 +735,7 @@ class StaffTable extends React.Component {
       </div>
     )
 
-    console.log(filteredList, 'filteredlist ')
+    // console.log(filteredList, 'filteredlist ')
 
     return (
       <Authorize roles={['school_admin']} redirect to="/dashboard/beta">
@@ -895,7 +841,9 @@ class StaffTable extends React.Component {
                     filterName: '',
                     filterEmail: '',
                     filterTags: '',
+                    filterActive: 'active',
                   })
+                  this.selectActiveStatus('active')
                 }}
               >
                 Clear Filters
@@ -909,7 +857,7 @@ class StaffTable extends React.Component {
           <div style={{ padding: '5px 0px' }}>
             <Dropdown overlay={menu} trigger={['click']}>
               <Button style={{ marginRight: '10px' }} type="link" size="large">
-                <CloudDownloadOutlined />{' '}
+                <CloudDownloadOutlined />
               </Button>
             </Dropdown>
 
@@ -933,7 +881,10 @@ class StaffTable extends React.Component {
                 pagination={{
                   defaultPageSize: 20,
                   showSizeChanger: true,
-                  pageSizeOptions: ['20', '50', '80', '100'],
+                  pageSizeOptions:
+                    StaffList.length > 100
+                      ? ['20', '50', '80', '100', `${StaffList.length}`]
+                      : ['20', '50', '80', '100'],
                 }}
               />
             </div>

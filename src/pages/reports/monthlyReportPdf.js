@@ -10,6 +10,7 @@ import { Page, Text, View, Document, StyleSheet, Image, PDFViewer, Font } from '
 import { Typography, Row, Layout, Col, Tabs, Card, Table, Tag, Select, Button } from 'antd'
 import moment from 'moment'
 import { calculateAge } from '../../utilities'
+import { COLORS } from 'assets/styles/globalStyles'
 
 const dateFormat = 'YYYY-MM-DD'
 const monthNames = [
@@ -42,7 +43,14 @@ function ReportPdf({
     <PDFViewer style={{ margin: '0 auto', width: '900px', height: '750px' }}>
       <Document>
         <Page size="A4" wrap={true} style={page} scale={1}>
-          <View style={{ display: 'flex', textAlign: 'center', backgroundColor: '#ccffff' }}>
+          <View
+            style={{
+              display: 'flex',
+              textAlign: 'center',
+              backgroundColor: COLORS.palleteLight,
+              padding: '8px',
+            }}
+          >
             <Text style={{ margin: 'auto' }}>Monthly Report</Text>
           </View>
           <View style={{ fontSize: '11px', padding: '15px 0' }}>
@@ -58,10 +66,17 @@ function ReportPdf({
               Month: {monthNames[moment(start).format('MM') - 1]} {moment(start).format('YYYY')}
             </Text>
           </View>
-          <View style={{ display: 'flex', textAlign: 'center', backgroundColor: '#ccffff' }}>
+          <View
+            style={{
+              display: 'flex',
+              textAlign: 'center',
+              backgroundColor: COLORS.palleteLight,
+              padding: 8,
+            }}
+          >
             <Text style={{ margin: 'auto' }}>Progress Overview</Text>
           </View>
-          <View style={{ fontSize: '11px', padding: '15px 0', color: 'red' }}>
+          <View style={{ fontSize: '11px', padding: '15px 0', color: 'black' }}>
             <Text>{textBoxObj.progressOverview}</Text>
             <View>
               {goalsImages.progressGraph && (
@@ -82,12 +97,13 @@ function ReportPdf({
               display: 'flex',
               textAlign: 'center',
               marginTop: '10px',
-              backgroundColor: '#ccffff',
+              backgroundColor: COLORS.palleteLight,
+              padding: 8,
             }}
           >
             <Text style={{ margin: 'auto' }}>Goals</Text>
           </View>
-          <View style={{ fontSize: '11px', padding: '15px 0', color: 'red' }}>
+          <View style={{ fontSize: '11px', padding: '15px 0', color: 'black' }}>
             <Text style={{ marginBottom: '5px' }}>{textBoxObj.goals}</Text>
           </View>
           <View style={{ fontSize: '11px' }}>
@@ -165,12 +181,13 @@ function ReportPdf({
                 display: 'flex',
                 textAlign: 'center',
                 marginTop: '10px',
-                backgroundColor: '#ccffff',
+                backgroundColor: COLORS.palleteLight,
+                padding: 8,
               }}
             >
               <Text style={{ margin: 'auto' }}>Behaviour Report</Text>
             </View>
-            <View style={{ fontSize: '11px', padding: '10px 0', color: 'red' }}>
+            <View style={{ fontSize: '11px', padding: '10px 0', color: 'black' }}>
               <Text>{textBoxObj.behaviour}</Text>
             </View>
           </View>
@@ -196,12 +213,13 @@ function ReportPdf({
                 display: 'flex',
                 marginTop: '10px',
                 textAlign: 'center',
-                backgroundColor: '#ccffff',
+                backgroundColor: COLORS.palleteLight,
+                padding: 8,
               }}
             >
               <Text style={{ margin: 'auto' }}>Mand Report</Text>
             </View>
-            <View style={{ fontSize: '11px', padding: '15px 0', color: 'red' }}>
+            <View style={{ fontSize: '11px', padding: '15px 0', color: 'black' }}>
               <Text style={{ marginBottom: '5px' }}>{textBoxObj.mand}</Text>
             </View>
           </View>

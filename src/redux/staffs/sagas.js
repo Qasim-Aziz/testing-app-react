@@ -14,7 +14,7 @@ import {
 import axios from 'axios'
 import actions from './actions'
 
-export function* GET_DATA() {
+export function* GET_DATA({ payload }) {
   yield put({
     type: 'staffs/SET_STATE',
     payload: {
@@ -22,20 +22,19 @@ export function* GET_DATA() {
     },
   })
 
-  const response = yield call(getClinicStaffs)
+  const response = yield call(getClinicStaffs, payload)
 
   if (response) {
     const staffs = []
     let i = 0
-    // console.log(response, 'response in staff 111111111')
+    // // console.log(response, 'response in staff 111111111')
     if (response.data.staffs.edges.length > 0) {
-      // console.log(response, 'response in staff 22222222')
+      // // console.log(response, 'response in staff 22222222')
       for (i = 0; i < response.data.staffs.edges.length; i++) {
         if (
           response.data.staffs.edges[i].node.tags.edges &&
           response.data.staffs.edges[i].node.tags.edges.length > 0
         ) {
-          console.log(response, 'response in staff 33333333')
           const tempTagArr = response.data.staffs.edges[i].node.tags.edges.map(e => e.node.name)
           response.data.staffs.edges[i].node.tags = tempTagArr
         }
@@ -117,11 +116,11 @@ export function* CREATE_STAFF({ payload }) {
       .post('https://application.cogniable.us/apis/staff-docs/', payload.data, { headers: headers })
       .then(res => {
         // then print response status
-        console.log(res.statusText)
+        // console.log(res.statusText)
         message.success('Upload Successfully.')
       })
       .catch(err1 => {
-        console.error({ err1 })
+        // console.error({ err1 })
         message.error('upload Failed.')
         return false
       })
@@ -200,7 +199,7 @@ export function* UPDATE_STAFF_INFO({ payload }) {
 export function* STAFF_ACTIVE_INACTIVE({ payload }) {
   const response = yield call(staffActiveInactive, payload)
 
-  console.log(response, 'got in response')
+  // console.log(response, 'got in response')
   if (response && response.data) {
     // generating notification
     if (payload.checked === true) {
