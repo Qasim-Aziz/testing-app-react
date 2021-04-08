@@ -47,6 +47,10 @@ const col = {
   borderRight: '1px solid black',
 }
 
+const bg = {
+  backgroundColor: '#e8e8e8',
+}
+
 const sText = {
   fontSize: 9,
   padding: '4px 0',
@@ -77,37 +81,129 @@ const headerTextBorder = {
 }
 
 function PrintableInvoice() {
+  const ad = [
+    {
+      s1: '',
+      t1: 'Receptive lang.deficits',
+      s2: '',
+      t2: 'Deficits in adapt. skills',
+      s3: '',
+      t3: 'Differential Reinforcement',
+      s4: '',
+      t4: 'Discrete Trial Training',
+      s5: '',
+      t5: 'Positive (participatory) ',
+    },
+    {
+      s1: '',
+      t1: 'Functional comm. Defict',
+      s2: '',
+      t2: 'Deficits in safety skills',
+      s3: '',
+      t3: 'Function Based Treatments',
+      s4: '',
+      t4: 'Shaping/Chaining',
+      s5: '',
+      t5: 'Negative (problem behaviors)',
+    },
+    {
+      s1: '',
+      t1: 'Deficits in play skills ',
+      s2: '',
+      t2: 'Restricted interests',
+      s3: '',
+      t3: 'Antecedent Manipulation ',
+      s4: '',
+      t4: 'Response Blocking',
+      s5: '',
+      t5: 'Refused Participation',
+    },
+    {
+      s1: '',
+      t1: 'Social inter. deficits',
+      s2: '',
+      t2: 'Problematic behavior',
+      s3: '',
+      t3: 'Incidental Teaching',
+      s4: '',
+      t4: '',
+      s5: '',
+      t5: '',
+    },
+  ]
   const acquisitionSkills1 = [
-    { srNo: 1, objective: '6D- Abstraction: Number Concepts', RAN: '_' },
-    { srNo: 2, objective: '12O- Tact Time', RAN: '_' },
-    { srNo: 3, objective: '14B- Subtraction ', RAN: '_' },
-    { srNo: 4, objective: 'Behavior Chain- 5 steps directions', RAN: '_' },
-    { srNo: 5, objective: 'Problem solving', RAN: '_' },
-    { srNo: 6, objective: 'Fractions', RAN: '_' },
-    { srNo: 7, objective: 'Answering Wh Questions', RAN: '_' },
-    { srNo: 8, objective: 'Equivalence', RAN: '_' },
+    {
+      srNo1: 1,
+      objective1: '6D- Abstraction: Number Concepts',
+      RAN1: '_',
+      srNo2: 9,
+      objective2: 'Transformation',
+      RAN2: '_',
+    },
+    { srNo1: 2, objective1: '12O- Tact Time', RAN1: '_', srNo2: 10, objective2: '', RAN2: '_' },
+    { srNo1: 3, objective1: '14B- Subtraction ', RAN1: '_', srNo2: 11, objective2: '', RAN2: '_' },
+    {
+      srNo1: 4,
+      objective1: 'Behavior Chain- 5 steps directions',
+      RAN1: '_',
+      srNo2: 12,
+      objective2: '',
+      RAN2: '_',
+    },
+    { srNo1: 5, objective1: 'Problem solving', RAN1: '_', srNo2: 13, objective2: '', RAN2: '_' },
+    { srNo1: 6, objective1: 'Fractions', RAN1: '_', srNo2: 14, objective2: '', RAN2: '_' },
+    {
+      srNo1: 7,
+      objective1: 'Answering Wh Questions',
+      RAN1: '_',
+      srNo2: 15,
+      objective2: '',
+      RAN2: '_',
+    },
+    { srNo1: 8, objective1: 'Equivalence', RAN1: '_', srNo2: 16, objective2: '', RAN2: '_' },
   ]
-  const acquisitionSkills2 = [
-    { srNo: 9, objective: 'Transformation', RAN: '_' },
-    { srNo: 10, objective: '', RAN: '_' },
-    { srNo: 11, objective: '', RAN: '_' },
-    { srNo: 12, objective: '', RAN: '_' },
-    { srNo: 13, objective: '', RAN: '_' },
-    { srNo: 14, objective: '', RAN: '_' },
-    { srNo: 15, objective: '', RAN: '_' },
-    { srNo: 16, objective: '', RAN: '_' },
-  ]
+
   const behave1 = [
-    { srNo: 1, behaviour: 'Aggression', data: 0, progress: '_' },
-    { srNo: 2, behaviour: 'Elopement', data: 0, progress: '_' },
-    { srNo: 3, behaviour: 'Property Destruction', data: 0, progress: '_' },
-    { srNo: 4, behaviour: 'Redirection/Task Refusal', data: 4, progress: '_' },
-  ]
-  const behave2 = [
-    { srNo: 5, behaviour: '', data: 0, progress: '_' },
-    { srNo: 6, behaviour: '', data: 0, progress: '_' },
-    { srNo: 7, behaviour: '', data: 0, progress: '_' },
-    { srNo: 8, behaviour: '', data: 0, progress: '_' },
+    {
+      srNo2: 5,
+      behaviour2: '',
+      data2: 0,
+      progress2: '_',
+      srNo1: 1,
+      behaviour1: 'Aggression',
+      data1: 0,
+      progress1: '_',
+    },
+    {
+      srNo2: 6,
+      behaviour2: '',
+      data2: 0,
+      progress2: '_',
+      srNo1: 2,
+      behaviour1: 'Elopement',
+      data1: 0,
+      progress1: '_',
+    },
+    {
+      srNo2: 7,
+      behaviour2: '',
+      data2: 0,
+      progress2: '_',
+      srNo1: 3,
+      behaviour1: 'Property Destruction',
+      data1: 0,
+      progress1: '_',
+    },
+    {
+      srNo2: 8,
+      behaviour2: '',
+      data2: 0,
+      progress2: '_',
+      srNo1: 4,
+      behaviour1: 'Redirection/Task Refusal',
+      data1: 4,
+      progress1: '_',
+    },
   ]
 
   return (
@@ -164,7 +260,7 @@ function PrintableInvoice() {
                 <View style={{ ...col, width: '10%', backgroundColor: '#e8e8e8' }}>
                   <Text style={headerText}>Provider </Text>
                 </View>
-                <View style={{ ...col, width: '30%' }}>
+                <View style={{ ...col, width: '29%' }}>
                   <Text style={{ ...mText, textAlign: 'left', paddingLeft: 4 }}>
                     Allison Olmstead ha ha what do you adya dude
                   </Text>
@@ -175,503 +271,73 @@ function PrintableInvoice() {
                 <View style={{ ...col, width: '10%', backgroundColor: '#e8e8e8' }}>
                   <Text style={headerText}>Purpose </Text>
                 </View>
-                <View style={{ ...col, borderRight: 'none', width: '30%' }}>
+                <View style={{ ...col, borderRight: 'none', width: '29%' }}>
                   <Text style={{ ...mText, textAlign: 'left', paddingLeft: 4 }}>
                     Direct Service{' '}
                   </Text>
                 </View>
               </View>
+
               <View style={{ ...section }}>
-                <View style={{ width: '38%', flexDirection: 'column' }}>
-                  <View
-                    style={{
-                      ...col,
-                      width: '100%',
-                      padding: 0,
-                      backgroundColor: '#e8e8e8',
-                      height: 20,
-                      textAlign: 'center',
-                      borderBottom: '1px solid black',
-                    }}
-                  >
-                    <Text style={{ padding: 4, fontSize: 10, fontWeight: 'bold' }}>
-                      SIGNS/SYMPTOMS OBSERVED TODAY
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      ...col,
-                      width: '100%',
-                      padding: 0,
-                      height: 20,
-                      borderBottom: '1px solid black',
-                      flexDirection: 'row',
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: '8%',
-                        backgroundColor: '#e8e8e8',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text> </Text>
-                    </View>
-                    <Text
-                      style={{
-                        padding: 4,
-                        width: '42%',
-                        fontSize: 8,
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      Receptive lang.deficits
-                    </Text>
-                    <View
-                      style={{
-                        width: '8%',
-                        backgroundColor: '#e8e8e8',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text> </Text>
-                    </View>
-                    <Text style={{ padding: 4, fontSize: 8 }}> Deficits in adapt. skills</Text>
-                  </View>
-                  <View
-                    style={{
-                      ...col,
-                      width: '100%',
-                      padding: 0,
-                      height: 20,
-                      flexDirection: 'row',
-                      borderBottom: '1px solid black',
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: '8%',
-                        backgroundColor: '#e8e8e8',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text> </Text>
-                    </View>
-                    <Text
-                      style={{
-                        padding: 4,
-                        fontSize: 8,
-                        width: '42%',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      Functional comm. Defict
-                    </Text>
-                    <View
-                      style={{
-                        width: '8%',
-                        backgroundColor: '#e8e8e8',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text> </Text>
-                    </View>
-                    <Text style={{ padding: 4, fontSize: 8, letterSpacing: 0.5 }}>
-                      Deficits in safety skills
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      ...col,
-                      width: '100%',
-                      padding: 0,
-                      height: 20,
-                      borderBottom: '1px solid black',
-                      flexDirection: 'row',
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: '8%',
-                        backgroundColor: '#e8e8e8',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text> </Text>
-                    </View>
-                    <Text
-                      style={{
-                        width: '42%',
-                        padding: 4,
-                        fontSize: 8,
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      Deficits in play skills
-                    </Text>
-                    <View
-                      style={{
-                        width: '8%',
-                        backgroundColor: '#e8e8e8',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text> </Text>
-                    </View>
-                    <Text style={{ padding: 4, fontSize: 8 }}>Restricted interests</Text>
-                  </View>
-                  <View
-                    style={{
-                      ...col,
-                      width: '100%',
-                      padding: 0,
-                      height: 20,
-                      flexDirection: 'row',
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: '8%',
-                        backgroundColor: '#e8e8e8',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text> </Text>
-                    </View>
-                    <Text
-                      style={{
-                        width: '42%',
-                        padding: 4,
-                        fontSize: 8,
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      Social inter. deficits
-                    </Text>
-                    <View
-                      style={{
-                        width: '8%',
-                        backgroundColor: '#e8e8e8',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text> </Text>
-                    </View>
-                    <Text style={{ padding: 4, fontSize: 8 }}> Problematic behavior</Text>
-                  </View>
+                <View style={{ ...col, width: '38%', ...bg }}>
+                  <Text style={headerText}>SIGNS/SYMPTOMS OBSERVED TODAY</Text>
                 </View>
-                <View style={{ width: '38%', flexDirection: 'column' }}>
-                  <View
-                    style={{
-                      ...col,
-                      width: '100%',
-                      padding: 0,
-                      backgroundColor: '#e8e8e8',
-                      height: 20,
-                      textAlign: 'center',
-                      borderBottom: '1px solid black',
-                    }}
-                  >
-                    <Text style={{ padding: 4, fontSize: 8 }}>
-                      INTERVENTIONS USED THROUGHOUT SESSION{' '}
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      ...col,
-                      width: '100%',
-                      padding: 0,
-                      height: 20,
-                      borderBottom: '1px solid black',
-                      flexDirection: 'row',
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: '8%',
-                        backgroundColor: '#e8e8e8',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text> </Text>
-                    </View>
-                    <Text
-                      style={{
-                        padding: 4,
-                        width: '42%',
-                        fontSize: 8,
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      Differential Reinforcement{' '}
-                    </Text>
-                    <View
-                      style={{
-                        width: '8%',
-                        backgroundColor: '#e8e8e8',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text> </Text>
-                    </View>
-                    <Text style={{ padding: 4, fontSize: 8 }}> Discrete Trial Training</Text>
-                  </View>
-                  <View
-                    style={{
-                      ...col,
-                      width: '100%',
-                      padding: 0,
-                      height: 20,
-                      flexDirection: 'row',
-                      borderBottom: '1px solid black',
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: '8%',
-                        backgroundColor: '#e8e8e8',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text> </Text>
-                    </View>
-                    <Text
-                      style={{
-                        padding: 4,
-                        fontSize: 8,
-                        width: '42%',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      Function Based Treatments
-                    </Text>
-                    <View
-                      style={{
-                        width: '8%',
-                        backgroundColor: '#e8e8e8',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text> </Text>
-                    </View>
-                    <Text style={{ padding: 4, fontSize: 8, letterSpacing: 0.5 }}>
-                      Shaping/Chaining
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      ...col,
-                      width: '100%',
-                      padding: 0,
-                      height: 20,
-                      borderBottom: '1px solid black',
-                      flexDirection: 'row',
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: '8%',
-                        backgroundColor: '#e8e8e8',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text> </Text>
-                    </View>
-                    <Text
-                      style={{
-                        width: '42%',
-                        padding: 4,
-                        fontSize: 8,
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      Antecedent Manipulation
-                    </Text>
-                    <View
-                      style={{
-                        width: '8%',
-                        backgroundColor: '#e8e8e8',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text> </Text>
-                    </View>
-                    <Text style={{ padding: 4, fontSize: 8 }}>Response Blocking</Text>
-                  </View>
-                  <View
-                    style={{
-                      ...col,
-                      width: '100%',
-                      padding: 0,
-                      height: 20,
-                      flexDirection: 'row',
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: '8%',
-                        backgroundColor: '#e8e8e8',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text> </Text>
-                    </View>
-                    <Text
-                      style={{
-                        width: '42%',
-                        padding: 4,
-                        fontSize: 8,
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      Incidental Teaching{' '}
-                    </Text>
-                    <View
-                      style={{
-                        width: '8%',
-                        backgroundColor: '#e8e8e8',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text> </Text>
-                    </View>
-                  </View>
+                <View style={{ ...col, width: '38%', ...bg }}>
+                  <Text style={headerText}>INTERVENTIONS USED THROUGHOUT SESSION </Text>
                 </View>
-                <View style={{ width: '24%', flexDirection: 'column' }}>
-                  <View
-                    style={{
-                      ...col,
-                      borderRight: 'none',
-                      width: '100%',
-                      padding: 0,
-                      backgroundColor: '#e8e8e8',
-                      height: 20,
-                      textAlign: 'center',
-                      borderBottom: '1px solid black',
-                    }}
-                  >
-                    <Text style={{ padding: 4, fontSize: 8 }}>RESPONSE TO INTERVENTIONS</Text>
-                  </View>
-                  <View
-                    style={{
-                      ...col,
-                      width: '100%',
-                      padding: 0,
-                      height: 20,
-                      borderBottom: '1px solid black',
-                      flexDirection: 'row',
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: '10%',
-                        backgroundColor: '#e8e8e8',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text> </Text>
-                    </View>
-                    <Text
-                      style={{
-                        padding: 4,
-                        width: '90%',
-                        fontSize: 8,
-                      }}
-                    >
-                      Differential Reinforcement
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      ...col,
-                      width: '100%',
-                      padding: 0,
-                      height: 20,
-                      flexDirection: 'row',
-                      borderBottom: '1px solid black',
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: '10%',
-                        backgroundColor: '#e8e8e8',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text> </Text>
-                    </View>
-                    <Text
-                      style={{
-                        padding: 4,
-                        fontSize: 8,
-                        width: '90%',
-                      }}
-                    >
-                      Function Based Treatments
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      ...col,
-                      width: '100%',
-                      padding: 0,
-                      height: 20,
-                      borderBottom: '1px solid black',
-                      flexDirection: 'row',
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: '10%',
-                        backgroundColor: '#e8e8e8',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text> </Text>
-                    </View>
-                    <Text
-                      style={{
-                        width: '90%',
-                        padding: 4,
-                        fontSize: 8,
-                      }}
-                    >
-                      Antecedent Manipulation
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      ...col,
-                      width: '100%',
-                      padding: 0,
-                      height: 20,
-                      flexDirection: 'row',
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: '10%',
-                        backgroundColor: '#e8e8e8',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text> </Text>
-                    </View>
-                  </View>
+                <View style={{ ...col, width: '24%', ...bg, borderRight: 'none' }}>
+                  <Text style={headerText}>RESPONSE TO INTERVENTIONS</Text>
                 </View>
               </View>
+
+              {ad.map(item => {
+                return (
+                  <View style={section}>
+                    <View style={{ ...col, width: '2%', ...bg }}>
+                      <Text>{item.s1}</Text>
+                    </View>
+                    <View style={{ ...col, width: '17%' }}>
+                      <Text style={sText}>{item.t1}</Text>
+                    </View>
+                    <View style={{ ...col, width: '2%', ...bg }}>
+                      <Text>{item.s2}</Text>
+                    </View>
+                    <View style={{ ...col, width: '17%' }}>
+                      <Text style={sText}>{item.t2}</Text>
+                    </View>
+                    <View style={{ ...col, width: '2%', ...bg }}>
+                      <Text>{item.s3}</Text>
+                    </View>
+                    <View style={{ ...col, width: '17%' }}>
+                      <Text style={sText}>{item.t3}</Text>
+                    </View>
+                    <View style={{ ...col, width: '2%', ...bg }}>
+                      <Text>{item.s4}</Text>
+                    </View>
+                    <View style={{ ...col, width: '17%' }}>
+                      <Text style={sText}>{item.t4}</Text>
+                    </View>
+                    <View style={{ ...col, width: '2%', ...bg }}>
+                      <Text>{item.s5}</Text>
+                    </View>
+                    <View style={{ ...col, width: '22%', borderRight: 'none' }}>
+                      <Text style={sText}>{item.t5}</Text>
+                    </View>
+                  </View>
+                )
+              })}
+
               <View style={{ ...section, borderBottom: 'none' }}>
                 <View
                   style={{
                     ...col,
-                    width: '5%',
-                    textAlign: 'center',
-                    display: 'flex',
-                    alignItems: 'center',
+                    ...bg,
+                    ...borderBottom,
+                    justifyContent: 'center',
                     flexDirection: 'row',
-                    backgroundColor: '#e8e8e8',
-                    fontSize: 12,
-                    borderBottom: '1px solid black',
+                    width: '4%',
+                    alignItems: 'center',
+                    fontSize: 9,
                   }}
                 >
                   <View style={{ flexDirection: 'column', width: '50%', margin: 'auto 0' }}>
@@ -690,241 +356,76 @@ function PrintableInvoice() {
                     <Text>T</Text>
                   </View>
                 </View>
-                <View style={{ width: '40%', flexDirection: 'column' }}>
-                  <View style={{ width: '100%', flexDirection: 'row', backgroundColor: '#e8e8e8' }}>
-                    <View
-                      style={{
-                        ...col,
-                        width: '8%',
-                        padding: 0,
-                        backgroundColor: '#e8e8e8',
-                        height: 20,
-                        textAlign: 'center',
-                        borderBottom: '1px solid black',
-                      }}
-                    >
-                      <Text style={{ padding: '4px 0', height: '100%' }}>#</Text>
+
+                <View style={{ width: '80%', flexDirection: 'column' }}>
+                  <View style={{ ...section, backgroundColor: '#e8e8e8' }}>
+                    <View style={{ ...col, width: '3%' }}>
+                      <Text style={headerText}>#</Text>
                     </View>
-                    <View
-                      style={{
-                        ...col,
-                        width: '48%',
-                        padding: 0,
-                        backgroundColor: '#e8e8e8',
-                        height: 20,
-                        textAlign: 'center',
-                        borderBottom: '1px solid black',
-                      }}
-                    >
-                      <Text style={{ padding: '4px 0', height: '100%' }}>BEHAVIOR</Text>
+                    <View style={{ ...col, width: '28%' }}>
+                      <Text style={headerText}>BEHAVIOR</Text>
                     </View>
-                    <View
-                      style={{
-                        ...col,
-                        width: '16%',
-                        padding: 0,
-                        backgroundColor: '#e8e8e8',
-                        height: 20,
-                        textAlign: 'center',
-                        borderBottom: '1px solid black',
-                      }}
-                    >
-                      <Text style={{ padding: '4px 0', height: '100%' }}>DATA</Text>
+                    <View style={{ ...col, width: '7%' }}>
+                      <Text style={headerText}>DATA</Text>
                     </View>
-                    <View
-                      style={{
-                        ...col,
-                        width: '28%',
-                        padding: 0,
-                        backgroundColor: '#e8e8e8',
-                        height: 20,
-                        textAlign: 'center',
-                        borderBottom: '1px solid black',
-                      }}
-                    >
-                      <Text style={{ padding: '4px 0', height: '100%' }}>PROGRESS</Text>
+                    <View style={{ ...col, width: '12%' }}>
+                      <Text style={headerText}>PROGRESS</Text>
+                    </View>
+                    <View style={{ ...col, width: '3%' }}>
+                      <Text style={headerText}>#</Text>
+                    </View>
+                    <View style={{ ...col, width: '28%' }}>
+                      <Text style={headerText}>BEHAVIOR</Text>
+                    </View>
+                    <View style={{ ...col, width: '7%' }}>
+                      <Text style={headerText}>DATA</Text>
+                    </View>
+                    <View style={{ ...col, width: '12%' }}>
+                      <Text style={headerText}>PROGRESS</Text>
                     </View>
                   </View>
                   {behave1.map(item => {
                     return (
-                      <View style={{ width: '100%', flexDirection: 'row' }}>
-                        <View
-                          style={{
-                            ...col,
-                            width: '8%',
-                            padding: 0,
-                            height: 20,
-                            textAlign: 'center',
-                            borderBottom: '1px solid black',
-                          }}
-                        >
-                          <Text style={{ padding: '4px 0', height: '100%' }}>{item.srNo}</Text>
+                      <View style={{ ...section }}>
+                        <View style={{ ...col, width: '3%' }}>
+                          <Text style={sText}>{item.s1}</Text>
                         </View>
-                        <View
-                          style={{
-                            ...col,
-                            width: '48%',
-                            padding: 0,
-                            height: 20,
-                            textAlign: 'center',
-                            borderBottom: '1px solid black',
-                          }}
-                        >
-                          <Text style={{ padding: '4px 0', height: '100%' }}>{item.behaviour}</Text>
+                        <View style={{ ...col, width: '28%' }}>
+                          <Text style={sText}>{item.behaviour1}</Text>
                         </View>
-                        <View
-                          style={{
-                            ...col,
-                            width: '16%',
-                            padding: 0,
-                            height: 20,
-                            textAlign: 'center',
-                            borderBottom: '1px solid black',
-                          }}
-                        >
-                          <Text style={{ padding: '4px 0', height: '100%' }}>{item.data}</Text>
+                        <View style={{ ...col, width: '7%' }}>
+                          <Text style={sText}>{item.data1}</Text>
                         </View>
-                        <View
-                          style={{
-                            ...col,
-                            width: '28%',
-                            padding: 0,
-                            height: 20,
-                            textAlign: 'center',
-                            borderBottom: '1px solid black',
-                          }}
-                        >
-                          <Text style={{ padding: '4px 0', height: '100%' }}>{item.progress}</Text>
+                        <View style={{ ...col, width: '12%' }}>
+                          <Text style={sText}>{item.progress1}</Text>
+                        </View>
+                        <View style={{ ...col, width: '3%' }}>
+                          <Text style={sText}>{item.srNo2}</Text>
+                        </View>
+                        <View style={{ ...col, width: '28%' }}>
+                          <Text style={sText}>{item.behaviour2}</Text>
+                        </View>
+                        <View style={{ ...col, width: '7%' }}>
+                          <Text style={sText}>{item.data2}</Text>
+                        </View>
+                        <View style={{ ...col, width: '12%' }}>
+                          <Text style={sText}>{item.progress2}</Text>
                         </View>
                       </View>
                     )
                   })}
                 </View>
-                <View style={{ width: '40%', flexDirection: 'column' }}>
-                  <View style={{ width: '100%', flexDirection: 'row', backgroundColor: '#e8e8e8' }}>
-                    <View
-                      style={{
-                        ...col,
-                        width: '8%',
-                        padding: 0,
-                        backgroundColor: '#e8e8e8',
-                        height: 20,
-                        textAlign: 'center',
-                        borderBottom: '1px solid black',
-                      }}
-                    >
-                      <Text style={{ padding: '4px 0', height: '100%' }}>#</Text>
-                    </View>
-                    <View
-                      style={{
-                        ...col,
-                        width: '48%',
-                        padding: 0,
-                        backgroundColor: '#e8e8e8',
-                        height: 20,
-                        textAlign: 'center',
-                        borderBottom: '1px solid black',
-                      }}
-                    >
-                      <Text style={{ padding: '4px 0', height: '100%', fontSize: 12 }}>
-                        BEHAVIOR
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        ...col,
-                        width: '16%',
-                        padding: 0,
-                        backgroundColor: '#e8e8e8',
-                        height: 20,
-                        textAlign: 'center',
-                        borderBottom: '1px solid black',
-                      }}
-                    >
-                      <Text
-                        style={{ padding: '4px 0', height: '100%', fontSize: 9, fontWeight: 700 }}
-                      >
-                        DATA
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        ...col,
-                        width: '28%',
-                        padding: 0,
-                        backgroundColor: '#e8e8e8',
-                        height: 20,
-                        textAlign: 'center',
-                        borderBottom: '1px solid black',
-                      }}
-                    >
-                      <Text style={{ padding: '4px 0', height: '100%' }}>PROGRESS</Text>
-                    </View>
-                  </View>
-                  {behave2.map(item => {
-                    return (
-                      <View style={{ width: '100%', flexDirection: 'row' }}>
-                        <View
-                          style={{
-                            ...col,
-                            width: '8%',
-                            padding: 0,
-                            height: 20,
-                            textAlign: 'center',
-                            borderBottom: '1px solid black',
-                          }}
-                        >
-                          <Text style={{ padding: '4px 0', height: '100%' }}>{item.srNo}</Text>
-                        </View>
-                        <View
-                          style={{
-                            ...col,
-                            width: '48%',
-                            padding: 0,
-                            height: 20,
-                            textAlign: 'center',
-                            borderBottom: '1px solid black',
-                          }}
-                        >
-                          <Text style={{ padding: 4, height: '100%' }}>{item.behaviour}</Text>
-                        </View>
-                        <View
-                          style={{
-                            ...col,
-                            width: '16%',
-                            padding: 0,
-                            height: 20,
-                            textAlign: 'center',
-                            borderBottom: '1px solid black',
-                          }}
-                        >
-                          <Text style={{ padding: '4px 0', height: '100%' }}>{item.data}</Text>
-                        </View>
-                        <View
-                          style={{
-                            ...col,
-                            width: '28%',
-                            padding: 0,
-                            height: 20,
-                            textAlign: 'center',
-                            borderBottom: '1px solid black',
-                          }}
-                        >
-                          <Text style={{ padding: '4px 0', height: '100%' }}>{item.progress}</Text>
-                        </View>
-                      </View>
-                    )
-                  })}
-                </View>
+
                 <View
                   style={{
                     ...col,
+                    ...bg,
                     width: '3%',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',
                     backgroundColor: '#e8e8e8',
-                    textAlign: 'center',
+                    fontSize: 10,
                     borderBottom: '1px solid black',
                   }}
                 >
@@ -932,196 +433,90 @@ function PrintableInvoice() {
                   <Text>E</Text>
                   <Text>Y</Text>
                 </View>
+
                 <View style={{ width: '13%', flexDirection: 'column' }}>
                   <View style={{ ...section, height: 20 }}>
-                    <Text style={{ ...col, width: 20 }}>P</Text>
-                    <Text style={{ padding: '2px 4px', height: '100%' }}>Progress</Text>
+                    <View style={{ ...col, width: 20 }}>
+                      <Text style={mText}>P</Text>
+                    </View>
+                    <Text style={mText}>Progress</Text>
                   </View>
                   <View style={{ ...section, height: 20 }}>
-                    <Text style={{ ...col, width: 20 }}>M</Text>
-                    <Text style={{ padding: '2px 4px', height: '100%' }}>Maintaining</Text>
+                    <View style={{ ...col, width: 20 }}>
+                      <Text style={mText}>M</Text>
+                    </View>
+                    <Text style={mText}>Maintaining</Text>
                   </View>
                   <View style={{ ...section, height: 20 }}>
-                    <Text style={{ ...col, width: 20 }}>N</Text>
-                    <Text style={{ padding: '2px 4px', height: '100%' }}>No Progress</Text>
+                    <View style={{ ...col, width: 20 }}>
+                      <Text style={mText}>N</Text>
+                    </View>
+                    <Text style={mText}>No Progress</Text>
                   </View>
                   <View style={{ ...section, height: 20 }}>
-                    <Text style={{ ...col, width: 20 }}>N</Text>
-                    <Text style={{ padding: '2px 4px', height: '100%' }}>No Progress</Text>
+                    <View style={{ ...col, width: 20 }}>
+                      <Text style={mText}>{}</Text>
+                    </View>
+                    <Text style={mText}>{}</Text>
                   </View>
                   <View style={{ ...section, height: 20 }}>
-                    <Text style={{ ...col, width: 20 }}>{}</Text>
-                    <Text style={{ padding: '2px 4px', height: '100%' }}>{}</Text>
+                    <View style={{ ...col, width: 20 }}>
+                      <Text style={mText}>{}</Text>
+                    </View>
+                    <Text style={mText}>{}</Text>
                   </View>
                 </View>
-              </View>
-              <View style={section}>
-                <Text
-                  style={{
-                    width: '100%',
-                    textAlign: 'center',
-                    backgroundColor: '#e8e8e8',
-                    padding: '4px 0',
-                  }}
-                >
-                  ACQUISITION SKILLS
-                </Text>
               </View>
 
-              <View style={{ ...section, borderBottom: 'none' }}>
-                <View style={{ width: '50%', flexDirection: 'column' }}>
-                  <View
-                    style={{
-                      width: '100%',
-                      backgroundColor: '#e8e8e8',
-                      borderBottom: '1px solid black',
-                      flexDirection: 'row',
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: '10%',
-                        textAlign: 'center',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text style={{ padding: 4 }}>#</Text>
-                    </View>
-                    <View
-                      style={{
-                        width: '75%',
-                        textAlign: 'center',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text style={{ padding: 4 }}>Objective</Text>
-                    </View>
-                    <View
-                      style={{
-                        width: '15%',
-                        textAlign: 'center',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text style={{ padding: 4 }}>RAN</Text>
-                    </View>
-                  </View>
-                  {acquisitionSkills1.map(item => {
-                    return (
-                      <View
-                        style={{
-                          width: '100%',
-                          borderBottom: '1px solid black',
-                          flexDirection: 'row',
-                        }}
-                      >
-                        <View
-                          style={{
-                            width: '10%',
-                            textAlign: 'center',
-                            borderRight: '1px solid black',
-                          }}
-                        >
-                          <Text style={{ padding: 4 }}>{item.srNo}</Text>
-                        </View>
-                        <View
-                          style={{
-                            width: '75%',
-                            textAlign: 'center',
-                            borderRight: '1px solid black',
-                          }}
-                        >
-                          <Text style={{ padding: 4 }}>{item.objective}</Text>
-                        </View>
-                        <View
-                          style={{
-                            width: '15%',
-                            textAlign: 'center',
-                            borderRight: '1px solid black',
-                          }}
-                        >
-                          <Text style={{ padding: 4 }}>{item.ran}</Text>
-                        </View>
-                      </View>
-                    )
-                  })}
+              <View style={{ ...section, textAlign: 'center' }}>
+                <Text style={headerText}>ACQUISITION SKILLS</Text>
+              </View>
+
+              <View style={{ ...section, backgroundColor: '#e8e8e8' }}>
+                <View style={{ ...col, width: '5%' }}>
+                  <Text style={headerText}>#</Text>
                 </View>
-                <View style={{ width: '50%', flexDirection: 'column' }}>
-                  <View
-                    style={{
-                      width: '100%',
-                      backgroundColor: '#e8e8e8',
-                      borderBottom: '1px solid black',
-                      flexDirection: 'row',
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: '10%',
-                        textAlign: 'center',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text style={{ padding: 4 }}>#</Text>
-                    </View>
-                    <View
-                      style={{
-                        width: '75%',
-                        textAlign: 'center',
-                        borderRight: '1px solid black',
-                      }}
-                    >
-                      <Text style={{ padding: 4 }}>Objective</Text>
-                    </View>
-                    <View
-                      style={{
-                        width: '15%',
-                        textAlign: 'center',
-                      }}
-                    >
-                      <Text style={{ padding: 4 }}>RAN</Text>
-                    </View>
-                  </View>
-                  {acquisitionSkills2.map(item => {
-                    return (
-                      <View
-                        style={{
-                          width: '100%',
-                          borderBottom: '1px solid black',
-                          flexDirection: 'row',
-                        }}
-                      >
-                        <View
-                          style={{
-                            width: '10%',
-                            textAlign: 'center',
-                            borderRight: '1px solid black',
-                          }}
-                        >
-                          <Text style={{ padding: 4 }}>{item.srNo}</Text>
-                        </View>
-                        <View
-                          style={{
-                            width: '75%',
-                            textAlign: 'center',
-                            borderRight: '1px solid black',
-                          }}
-                        >
-                          <Text style={{ padding: 4 }}>{item.objective}</Text>
-                        </View>
-                        <View
-                          style={{
-                            width: '15%',
-                            textAlign: 'center',
-                          }}
-                        >
-                          <Text style={{ padding: 4 }}>{item.ran}</Text>
-                        </View>
-                      </View>
-                    )
-                  })}
+                <View style={{ ...col, width: '33%' }}>
+                  <Text style={headerText}>Objective</Text>
+                </View>
+                <View style={{ ...col, width: '12%' }}>
+                  <Text style={headerText}>RAN</Text>
+                </View>
+                <View style={{ ...col, width: '5%' }}>
+                  <Text style={headerText}>#</Text>
+                </View>
+                <View style={{ ...col, width: '33%' }}>
+                  <Text style={headerText}>Objective</Text>
+                </View>
+                <View style={{ ...col, width: '12%', borderRight: 'none' }}>
+                  <Text style={headerText}>RAN</Text>
                 </View>
               </View>
+              {acquisitionSkills1.map(item => {
+                return (
+                  <View style={{ ...section }}>
+                    <View style={{ ...col, width: '5%' }}>
+                      <Text style={sText}>{item.srNo1}</Text>
+                    </View>
+                    <View style={{ ...col, width: '33%' }}>
+                      <Text style={sText}>{item.objective1}</Text>
+                    </View>
+                    <View style={{ ...col, width: '12%' }}>
+                      <Text style={sText}>{item.RAN1}</Text>
+                    </View>
+                    <View style={{ ...col, width: '5%' }}>
+                      <Text style={sText}>{item.srNo2}</Text>
+                    </View>
+                    <View style={{ ...col, width: '33%' }}>
+                      <Text style={sText}>{item.objective2}</Text>
+                    </View>
+                    <View style={{ ...col, width: '12%', borderRight: 'none' }}>
+                      <Text style={sText}>{item.RAN2}</Text>
+                    </View>
+                  </View>
+                )
+              })}
+
               <View style={section}>
                 <View
                   style={{
@@ -1132,10 +527,10 @@ function PrintableInvoice() {
                     alignItems: 'center',
                     flexDirection: 'row',
                     backgroundColor: '#e8e8e8',
-                    fontSize: 12,
+                    fontSize: 11,
                   }}
                 >
-                  <View style={{ flexDirection: 'column', width: '50%', margin: 'auto 0' }}>
+                  <View style={{ flexDirection: 'column', width: '100%', margin: 'auto 0' }}>
                     <Text>N</Text>
                     <Text>O</Text>
                     <Text>T</Text>
@@ -1251,9 +646,7 @@ function PrintableInvoice() {
                 </View>
               </View>
               <View style={section}>
-                <View
-                  style={{ width: '35%', flexDirection: 'column', borderRight: '1px solid black' }}
-                >
+                <View style={{ ...col, width: '35%', flexDirection: 'column' }}>
                   <View
                     style={{
                       width: '100%',
@@ -1262,15 +655,13 @@ function PrintableInvoice() {
                       borderBottom: '1px solid black',
                     }}
                   >
-                    <Text style={{ padding: 4 }}>CAREGIVER SIGNATURE</Text>
+                    <Text style={headerText}>CAREGIVER SIGNATURE</Text>
                   </View>
                   <View style={{ width: '100%', height: 40 }}>
                     <Text style={{ padding: 4 }}>signature</Text>
                   </View>
                 </View>
-                <View
-                  style={{ width: '35%', flexDirection: 'column', borderRight: '1px solid black' }}
-                >
+                <View style={{ ...col, width: '35%', flexDirection: 'column' }}>
                   <View
                     style={{
                       width: '100%',
@@ -1279,19 +670,13 @@ function PrintableInvoice() {
                       borderBottom: '1px solid black',
                     }}
                   >
-                    <Text style={{ padding: 4 }}>PROVIDER SIGNATURE</Text>
+                    <Text style={headerText}>PROVIDER SIGNATURE</Text>
                   </View>
                   <View style={{ width: '100%', height: 40 }}>
                     <Text style={{ padding: 4 }}>signature</Text>
                   </View>
                 </View>
-                <View
-                  style={{
-                    width: '30%',
-                    flexDirection: 'column',
-                    textAlign: 'center',
-                  }}
-                >
+                <View style={{ ...col, width: '30%', flexDirection: 'column', borderLeft: 'none' }}>
                   <View
                     style={{
                       width: '100%',
@@ -1300,13 +685,13 @@ function PrintableInvoice() {
                       borderBottom: '1ps solid black',
                     }}
                   >
-                    <Text style={{ padding: 4 }}>DATE</Text>
+                    <Text style={headerTextBorder}>DATE</Text>
                   </View>
                   <View style={{ width: '100%', borderBottom: '1px solid black' }}>
-                    <Text style={{ padding: 4 }}>20/04/2021</Text>
+                    <Text style={mText}>20/04/2021</Text>
                   </View>
                   <View style={{ width: '100%' }}>
-                    <Text style={{ padding: 4 }}>
+                    <Text style={mText}>
                       {'_ '} BCBA {'_ '} RBT
                     </Text>
                   </View>
