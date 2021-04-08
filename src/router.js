@@ -17,6 +17,7 @@ import AppData from './pages/appointmentdata'
 import clinicDash from './pages/Dashboard/Clinic'
 import payorCom from './pages/payor'
 import PrintTableInvoice from './pages/allClinicData/printableInvoice'
+import DownloadReport from './pages/IISA/StartAssessment/downloadReport'
 
 const loadable = loader =>
   Loadable({
