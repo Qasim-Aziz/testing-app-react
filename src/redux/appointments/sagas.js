@@ -36,14 +36,12 @@ export function* GET_APPOINTMENT_LIST() {
 
 export function* CREATE_APPOINTMENT({ payload }) {
   const { response } = payload
-  console.log(response, payload, 'in sagas')
   if (response && response.CreateAppointment) {
     // generating notification
     notification.success({
       message: 'Appointment Created Successfully',
     })
 
-    console.log(response.CreateAppointment.appointment.edges, 'rlnkjfnksfd ------')
     yield put({
       type: actions.APPEND_APPOINTMENT_LIST,
       payload: {
@@ -60,7 +58,6 @@ export function* CREATE_APPOINTMENT({ payload }) {
 
 export function* DELETE_APPOINTMENT({ payload }) {
   const response = yield call(deleteAppointment, payload)
-  console.log(response)
   if (response.data && response.data.DeleteAppointment?.success) {
     notification.success({
       message: 'Appointment deleted successfully',

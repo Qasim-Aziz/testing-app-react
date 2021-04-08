@@ -11,15 +11,16 @@ import apolloClient from '../apollo/config'
 export async function getStudentDetails() {
   return apolloClient
     .query({
-      query: gql`query student($studentId: ID!) {
-        student(id: $studentId) {
-          firstname
+      query: gql`
+        query student($studentId: ID!) {
+          student(id: $studentId) {
+            firstname
+          }
         }
-      }
-    `,
-    variables:{
-        studentId: localStorage.getItem('studentId')
-    }
+      `,
+      variables: {
+        studentId: localStorage.getItem('studentId'),
+      },
     })
     .then(result => result)
     .catch(error => {

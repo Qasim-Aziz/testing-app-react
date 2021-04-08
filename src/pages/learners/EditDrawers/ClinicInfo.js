@@ -41,9 +41,6 @@ function ClinicInfo(props) {
     e.preventDefault()
     form.validateFields((err, values) => {
       if (!err) {
-        const selectedStaffList = []
-        userProfile.authStaff.edges.map(item => selectedStaffList.push(item.node.id))
-
         updateInfo({
           variables: {
             id: userProfile.id,
@@ -76,7 +73,7 @@ function ClinicInfo(props) {
             category: values.category,
             clinicLocation: values.clinicLocation,
             caseManager: values.caseManager,
-            authStaff: selectedStaffList,
+            authStaff: values.authStaff,
 
             isPeakActive: userProfile.isPeakActive,
             isCogActive: userProfile.isCogActive,
@@ -135,9 +132,9 @@ function ClinicInfo(props) {
         </Form.Item>
         <Form.Item label="Case Manager" style={itemStyle}>
           {form.getFieldDecorator('caseManager')(
-            <Select placeholder="Select Therapist" allowClear>
+            <Select showSearch optionFilterProp="name" placeholder="Select Therapist" allowClear>
               {staffDropdownList.map(item => (
-                <Option key={item.node.id} value={item.node.id}>
+                <Option key={item.node.id} name={item.node.name} value={item.node.id}>
                   {item.node.name} {item.node.surname}
                 </Option>
               ))}
@@ -146,9 +143,16 @@ function ClinicInfo(props) {
         </Form.Item>
         <Form.Item label="Authorized Staff" style={itemStyle}>
           {form.getFieldDecorator('authStaff')(
-            <Select mode="multiple" placeholder="Select Therapist" allowClear maxTagCount={4}>
+            <Select
+              showSearch
+              optionFilterProp="name"
+              mode="multiple"
+              placeholder="Select Therapist"
+              allowClear
+              maxTagCount={4}
+            >
               {staffDropdownList.map(item => (
-                <Option key={item.node.id} value={item.node.id}>
+                <Option key={item.node.id} name={item.node.name} value={item.node.id}>
                   {item.node.name} {item.node.surname}
                 </Option>
               ))}
@@ -157,7 +161,7 @@ function ClinicInfo(props) {
         </Form.Item>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <Button type="primary" htmlType="submit" loading={updateLoading} style={SUBMITT_BUTTON}>
-            Submitt
+            Submit
           </Button>
           <Button onClick={() => closeDrawer(false)} type="default" style={CANCEL_BUTTON}>
             Cancel

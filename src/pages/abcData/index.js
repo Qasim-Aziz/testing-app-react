@@ -6,6 +6,8 @@ import { Row, Col, Layout, Typography, Drawer, Tooltip, Button } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import moment from 'moment'
 import { useQuery } from 'react-apollo'
+import { DRAWER } from 'assets/styles/globalStyles'
+import LoadingComponent from 'components/LoadingComponent'
 import Calendar from 'components/Calander'
 import ABCCard from './ABCCard'
 import AbcForm from './AbcForm'
@@ -87,7 +89,7 @@ const AbcDataPage = props => {
                 }}
               >
                 {loading ? (
-                  'Loading...'
+                  <LoadingComponent />
                 ) : (
                   <>
                     {error && 'Opps their something wrong'}
@@ -115,7 +117,7 @@ const AbcDataPage = props => {
             </Col>
             <Drawer
               title={updateAbc ? 'Update ABC Data' : 'New ABC Data'}
-              width="52%"
+              width={DRAWER.widthL2}
               placement="right"
               closable="true"
               visible={showDrawerForm && TabCheck === 'ABC Data'}
@@ -128,33 +130,9 @@ const AbcDataPage = props => {
                   closeDrawer={closeDrawer}
                 />
               ) : (
-                <AbcForm refetchAbc={refetch} />
+                <AbcForm refetchAbc={refetch} closeDrawer={closeDrawer} />
               )}
             </Drawer>
-            <Col span={8} style={{ display: 'none' }}>
-              <Title
-                style={{
-                  marginLeft: '30px',
-                  fontSize: '30px',
-                  lineHeight: '41px',
-                }}
-              >
-                {updateAbc ? 'Update ABC Data' : 'New ABC Data'}
-              </Title>
-              <div
-                style={{
-                  background: '#F9F9F9',
-                  borderRadius: 10,
-                  padding: '30px',
-                }}
-              >
-                {updateAbc ? (
-                  <UpdateAbcForm updateAbc={updateAbc} setUpdateAbc={setUpdateAbc} />
-                ) : (
-                  <AbcForm refetchAbc={refetch} />
-                )}
-              </div>
-            </Col>
           </Row>
         </Content>
       </Layout>

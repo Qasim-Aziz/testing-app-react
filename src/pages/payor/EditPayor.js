@@ -1,10 +1,12 @@
 import React from 'react'
 import { Form, Input, Button, Select, Switch, Divider, Icon, Row, Col, Upload } from 'antd'
 import { connect } from 'react-redux'
+import { FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 import actions from 'redux/payor/actions'
 import { getResponsibilities } from 'components/PayorsAndBilling/Common/utils'
 
 const { TextArea } = Input
+const { layout, tailLayout } = FORM
 
 @connect(({ payor }) => ({ payor }))
 class EditPayor extends React.Component {
@@ -109,7 +111,7 @@ class EditPayor extends React.Component {
     if (!payorProfile) return <h3>An error occurred to load payor&apos;s details</h3>
 
     return (
-      <Form className="addOrEditPayor" onSubmit={this.handleSubmit}>
+      <Form {...layout} className="addOrEditPayor" onSubmit={this.handleSubmit}>
         <Divider orientation="left">Payor Status</Divider>
         <Row>
           <Col span={24}>
@@ -279,7 +281,7 @@ class EditPayor extends React.Component {
         {/* File Dragger */}
         <Row>
           <Col span={24}>
-            <Form.Item>
+            <Form.Item {...tailLayout}>
               <Upload.Dragger {...uploadDragerProps} showUploadList>
                 <p className="ant-upload-drag-icon">
                   <Icon type="inbox" />
@@ -292,11 +294,11 @@ class EditPayor extends React.Component {
         </Row>
 
         {/* Buttons */}
-        <Form.Item style={{ textAlign: 'center' }}>
-          <Button type="primary" htmlType="submit">
+        <Form.Item {...tailLayout}>
+          <Button type="primary" htmlType="submit" style={SUBMITT_BUTTON}>
             Save
           </Button>
-          <Button onClick={this.onReset} className="ml-4">
+          <Button onClick={this.onReset} style={CANCEL_BUTTON}>
             Cancel
           </Button>
         </Form.Item>

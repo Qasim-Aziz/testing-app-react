@@ -244,7 +244,7 @@ function RecordAssessmentForm({
             loading={recordedLoading || updatedLoading}
             style={SUBMITT_BUTTON}
           >
-            Submitt
+            Submit
           </Button>
           <Button type="default" onClick={() => setOpen(false)} style={CANCEL_BUTTON}>
             Cancel

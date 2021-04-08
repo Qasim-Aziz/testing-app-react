@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { Form, Input, Button, Popover, notification } from 'antd'
+import { COLORS } from 'assets/styles/globalStyles'
 import moment from 'moment'
 import { useMutation } from 'react-apollo'
 import { CREATE_APPOINTMENT } from './query'
 
+const True = true
+
 const Timeslot = ({
   selectedTimeSlot,
   selectedDate,
+  isAvailable,
   selectedTherapist,
   allTherapist,
   pendingStatusId,
@@ -42,7 +46,7 @@ const Timeslot = ({
 
   useEffect(() => {
     if (createAppointmentError)
-      notification.error({ message: 'An error occurred to create Appointment.' })
+      notification.error({ message: 'Error! please check your timings or you already have appointment' })
   }, [createAppointmentError])
 
   const getDateTime = momentObj => momentObj.format('YYYY-MM-DDTHH:mm:ssZ')
@@ -62,6 +66,7 @@ const Timeslot = ({
         slotTime: selectedTimeSlot,
         appointmentStatus: pendingStatusId,
       },
+      errorPolicy: 'all'
     })
     setPopoverVisible(false)
   }
@@ -144,17 +149,30 @@ const Timeslot = ({
   )
 
   return (
-    <Popover
-      content={popoverContent}
-      title="Book Appointment"
-      trigger="click"
-      visible={isPopoverVisible}
-      onVisibleChange={setPopoverVisible}
-    >
-      <Button size="large" style={{ width: '80%' }} disabled={isCreateAppointmentLoading}>
-        {selectedTimeSlot}
-      </Button>
-    </Popover>
+    <>
+      {isAvailable === True ? (
+        <Popover
+          content={popoverContent}
+          title="Book Appointment"
+          trigger="click"
+          visible={isPopoverVisible}
+          onVisibleChange={setPopoverVisible}
+        >
+
+          <Button size="large" style={{ width: '80%' }} disabled={isCreateAppointmentLoading}>
+            {selectedTimeSlot}
+          </Button>
+
+        </Popover>
+      ) :
+
+        <Button size="large" style={{ width: '80%', backgroundColor: COLORS.palleteLightBlue }} disabled>
+          {selectedTimeSlot}
+        </Button>
+
+      }
+
+    </>
   )
 }
 

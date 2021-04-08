@@ -112,7 +112,6 @@ function ResponseTimeRate({ studentName }) {
   const exportToCSV = () => {
     const filename = '_daily_response_rate_excel'
     const formattedData = []
-    console.log(daysList, 'lsi')
 
     // for (let i = 0; i < tableData.length; i += 1) {
     //   const obj = tableData[i]
@@ -125,9 +124,7 @@ function ResponseTimeRate({ studentName }) {
     //   }
     // }
 
-    // console.log(formattedData, 'formatted')
     // const ws = XLSX.utils.json_to_sheet(formattedData)
-    // console.log(ws, 'ws')
     // const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
     // const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
     // const excelData = new Blob([excelBuffer], { type: fileType })
@@ -182,7 +179,6 @@ function ResponseTimeRate({ studentName }) {
         end = dateRange[0].format(dateFormat)
       }
 
-      console.log(sessionName, 'sessionName')
       getResponseRate({
         variables: {
           student: studentId,
@@ -194,18 +190,10 @@ function ResponseTimeRate({ studentName }) {
     }
   }, [dateRange, studentId, sessionName])
 
-  // function formatDuration(ms) {
-  //   console.log(ms, (ms / 1000).toFixed(0))
-  //   const duration = moment.duration(ms)
-  //   console.log(duration)
-  // }
-
   useEffect(() => {
     if (dt) {
-      console.log(dt, 'sdkshdfdhfs')
       let tempData = []
       const tempBlockId = []
-      console.log(dt)
       tempData = dt.targetWiseReportDatewise.filter(item => {
         if (item.trials?.length > 0) {
           for (let i = 0; i < tempBlockId.length; i += 1) {
@@ -217,7 +205,7 @@ function ResponseTimeRate({ studentName }) {
         tempBlockId.push(item.trials[0]?.id)
         return true
       })
-      console.log(tempData)
+
       setTargetResponseData(tempData)
       loadData(tempData)
     }
@@ -288,7 +276,7 @@ function ResponseTimeRate({ studentName }) {
           }
           lastDate = item.date
         }
-        console.log(item.date, 'item date')
+
         if (tarExist) {
           tempTable[tarIdx].durationStart +=
             item.trials.length > 0 ? item.trials[0].durationStart : null
@@ -532,7 +520,6 @@ function ResponseTimeRate({ studentName }) {
         }
         count += 1
       }
-      console.log(tempTable, 'tempTable')
       setTableData(tempTable)
     }
   }
@@ -603,7 +590,6 @@ function ResponseTimeRate({ studentName }) {
         ? 0
         : row.promptCodesCount['Textual Prompt'],
     })
-    console.log(gData, 'gData in graph')
     setPromptBarGraphData(gData)
     setCurrentRow(row)
     setPromptLineDrawer(true)
@@ -684,7 +670,6 @@ function ResponseTimeRate({ studentName }) {
     },
   ]
 
-  console.log(dt, 'api data')
   return (
     <div>
       <div style={filterCardStyle}>

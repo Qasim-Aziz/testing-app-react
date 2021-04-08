@@ -121,6 +121,7 @@ const BookAppointment = () => {
                   <Col sm={8} style={{ textAlign: 'center', marginBottom: '10px' }}>
                     <Timeslot
                       selectedTimeSlot={item.time}
+                      isAvailable={item.isAvailable}
                       selectedDate={selectedDate}
                       selectedTherapist={selectedTherapist}
                       allTherapist={allTherapist}

@@ -579,7 +579,7 @@ class TargetAllocationToSession extends React.Component {
                 </Drawer>
               </div>
               <Tabs defaultActiveKey="1">
-                <TabPane tab="Morning" key="1">
+                <TabPane tab={MorningSession?.name ? MorningSession.name : 'Morning'} key="1">
                   {MorningSession ? (
                     <>
                       <div className={style.targetListHeding}>
@@ -664,7 +664,7 @@ class TargetAllocationToSession extends React.Component {
                     ''
                   )}
                 </TabPane>
-                <TabPane tab="Afternoon" key="2">
+                <TabPane tab={AfternoonSession?.name ? AfternoonSession.name : 'Afternoon'} key="2">
                   {AfternoonSession ? (
                     <>
                       <div className={style.targetListHeding}>
@@ -754,7 +754,7 @@ class TargetAllocationToSession extends React.Component {
                     ''
                   )}
                 </TabPane>
-                <TabPane tab="Evening" key="3">
+                <TabPane tab={EveningSession?.name ? EveningSession.name : 'Evening'} key="3">
                   {EveningSession ? (
                     <>
                       <div className={style.targetListHeding}>
@@ -872,7 +872,7 @@ class TargetAllocationToSession extends React.Component {
                     ''
                   )}
                 </TabPane>
-                <TabPane tab="Default" key="4">
+                <TabPane tab={DefaultSession?.name ? DefaultSession.name : 'Default'} key="4">
                   {DefaultSession ? (
                     <>
                       <div className={style.targetListHeding}>

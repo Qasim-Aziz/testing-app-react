@@ -6,13 +6,16 @@ import { Button, Form, Input, Modal, notification, Select, Switch } from 'antd'
 import ReminderForm from 'components/Behavior/ReminderForm'
 import gql from 'graphql-tag'
 import moment from 'moment'
+import { CANCEL_BUTTON, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import { remove, times, update } from 'ramda'
 import React, { useEffect, useReducer, useState } from 'react'
 import { useMutation, useQuery } from 'react-apollo'
 import './templateform.scss'
+import LoadingComponent from 'components/LoadingComponent'
 
 const { Option } = Select
 const { TextArea } = Input
+const { layout, tailLayout } = FORM
 
 const DANCLE_STATUS = gql`
   query {
@@ -456,30 +459,20 @@ const UpdateTemplateForm = ({ style, tempId, form, closeUpdateDrawer }) => {
       }
     })
   }
-  const formItemLayout = {
-    labelCol: {
-      span: 7,
-    },
-    wrapperCol: {
-      span: 15,
-      offset: 1,
-    },
-  }
-  const formTailLayout = {
-    labelCol: { span: 5 },
-    wrapperCol: { span: 8, offset: 8 },
+
+  if (getTemDetailsLoading) {
+    return <LoadingComponent />
   }
 
   return (
     <Form
       className="templateForm"
-      {...formItemLayout}
+      {...layout}
       onSubmit={SubmitForm}
       name="control-update"
       style={{ marginLeft: 0, position: 'relative', ...style }}
       layout="horizontal"
     >
-      {getTemDetailsLoading && <div style={{ minHeight: '90vh' }}>Loading...</div>}
       {getTemDetailsError && <div style={{ minHeight: '90vh' }}>Opps their something wrong</div>}
       {getTemDetailsData && (
         <div>
@@ -498,7 +491,7 @@ const UpdateTemplateForm = ({ style, tempId, form, closeUpdateDrawer }) => {
                 fontSize: '20px',
               }}
             />
-            <Form.Item label={<span style={{ fontSize: '16px' }}>Behavior Name</span>}>
+            <Form.Item label="Behavior Name">
               {form.getFieldDecorator('name', {
                 initialValue:
                   getTemDetailsData &&
@@ -513,14 +506,13 @@ const UpdateTemplateForm = ({ style, tempId, form, closeUpdateDrawer }) => {
               })(
                 <Select
                   placeholder="Select Behavior Name"
-                  size="large"
                   loading={behaviorLoading}
                   showSearch
                   optionFilterProp="name"
                 >
                   {behNameList?.map(({ node }) => {
                     return (
-                      <Option key={node.id} vlaue={node.id} name={node.behaviorName}>
+                      <Option key={node.id} value={node.id} name={node.behaviorName}>
                         {node.behaviorName}
                       </Option>
                     )
@@ -530,7 +522,7 @@ const UpdateTemplateForm = ({ style, tempId, form, closeUpdateDrawer }) => {
             </Form.Item>
           </div>
 
-          <Form.Item label={<span style={{ fontSize: '16px' }}>Status</span>}>
+          <Form.Item label="Status">
             {form.getFieldDecorator('status', {
               initialValue:
                 !dancleStatusLoading &&
@@ -538,11 +530,7 @@ const UpdateTemplateForm = ({ style, tempId, form, closeUpdateDrawer }) => {
                 getTemDetailsData.getTemplateDetails.status.id,
               rules: [{ required: true, message: 'Please select a status' }],
             })(
-              <Select
-                placeholder="Select Behavior Status"
-                size="large"
-                loading={dancleStatusLoading}
-              >
+              <Select placeholder="Select Behavior Status" loading={dancleStatusLoading}>
                 {dancleStatusData &&
                   dancleStatusData.getDecelStatus.map(dancleStatus => (
                     <Option value={dancleStatus.id} key={dancleStatus.id}>
@@ -564,7 +552,7 @@ const UpdateTemplateForm = ({ style, tempId, form, closeUpdateDrawer }) => {
               }}
               onClick={() => setAddEnvNameModal(true)}
             />
-            <Form.Item label={<span style={{ fontSize: '16px' }}>Environments</span>}>
+            <Form.Item label="Environments">
               {form.getFieldDecorator('envs', {
                 initialValue: !dancleEnvLoading && initialEnv && initialEnv,
                 rules: [{ required: true, message: 'Please select a Environments' }],
@@ -573,7 +561,6 @@ const UpdateTemplateForm = ({ style, tempId, form, closeUpdateDrawer }) => {
                   mode="multiple"
                   style={{ width: '100%' }}
                   placeholder="Please select"
-                  size="large"
                   loading={dancleEnvLoading}
                 >
                   {envList?.map(envData => (
@@ -586,7 +573,7 @@ const UpdateTemplateForm = ({ style, tempId, form, closeUpdateDrawer }) => {
             </Form.Item>
           </div>
 
-          <Form.Item label={<span style={{ fontSize: '16px' }}>Measurements</span>}>
+          <Form.Item label="Measurements">
             {form.getFieldDecorator('measurements', {
               initialValue: !dancleMeasurementLoading && initialMeasu && initialMeasu,
               rules: [{ required: true, message: 'Please select a Environments' }],
@@ -595,7 +582,6 @@ const UpdateTemplateForm = ({ style, tempId, form, closeUpdateDrawer }) => {
                 mode="multiple"
                 style={{ width: '100%' }}
                 placeholder="Please select"
-                size="large"
                 loading={dancleMeasurementLoading}
               >
                 {dancleMeasurementData &&
@@ -612,33 +598,38 @@ const UpdateTemplateForm = ({ style, tempId, form, closeUpdateDrawer }) => {
             )}
           </Form.Item>
 
-          <Form.Item label={<span style={{ fontSize: '16px' }}>Behavior description</span>}>
+          <Form.Item label="Behavior description">
             {form.getFieldDecorator('description', {
-              initialValue: getTemDetailsData.getTemplateDetails.behaviorDescription,
+              initialValue: getTemDetailsData.getTemplateDetails.behaviorDescription
+                ? getTemDetailsData.getTemplateDetails.behaviorDescription
+                : '',
             })(<TextArea className="small-textarea" placeholder="Describe the behavior" />)}
           </Form.Item>
 
-          <Form.Item label={<span style={{ fontSize: '16px' }}>Reactive Procedure</span>}>
+          <Form.Item label="Reactive Procedure">
             {form.getFieldDecorator('procedure', {
-              initialValue: getTemDetailsData.getTemplateDetails.reactiveProcedures,
+              initialValue: getTemDetailsData.getTemplateDetails.reactiveProcedures
+                ? getTemDetailsData.getTemplateDetails.reactiveProcedures
+                : '',
             })(<TextArea className="small-textarea" placeholder="Give reactive procedure" />)}
           </Form.Item>
 
-          <Form.Item label={<span style={{ fontSize: '16px' }}>Antecedent Manipulation</span>}>
+          <Form.Item label="Antecedent Manipulation">
             {form.getFieldDecorator('manipulation', {
-              initialValue: getTemDetailsData.getTemplateDetails.antecedentManipulations,
+              initialValue: getTemDetailsData.getTemplateDetails.antecedentManipulations
+                ? getTemDetailsData.getTemplateDetails.antecedentManipulations
+                : '',
             })(<TextArea className="small-textarea" placeholder="Give antecedent manipulation" />)}
           </Form.Item>
-          <Form.Item label={<span style={{ fontSize: '16px' }}>Behavior Reminders</span>}>
+          <Form.Item label="Behavior Reminders">
             <Switch
               defaultChecked
               onChange={() => {
                 setReminder(state => !state)
               }}
-              size="large"
             />
           </Form.Item>
-          <Form.Item label={<span style={{ fontSize: '16px' }}>Add Reminder</span>}>
+          <Form.Item label="Add Reminder">
             {remainderState &&
               times(n => {
                 return (
@@ -663,45 +654,26 @@ const UpdateTemplateForm = ({ style, tempId, form, closeUpdateDrawer }) => {
             )}
           </Form.Item>
 
-          <Form.Item {...formTailLayout}>
-            <div
-              style={{
-                marginTop: 15,
-                display: 'flex',
-                justifyContent: 'space-between',
+          <Form.Item {...tailLayout}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={SUBMITT_BUTTON}
+              loading={updateTempLoading}
+            >
+              Update
+            </Button>
+            <Button
+              type="danger"
+              style={CANCEL_BUTTON}
+              disabled={updateTempLoading}
+              onClick={() => {
+                form.resetFields()
+                closeUpdateDrawer()
               }}
             >
-              <Button
-                type="primary"
-                htmlType="submit"
-                style={{
-                  width: 120,
-                  height: 40,
-                  marginLeft: 10,
-                  borderRadius: 0,
-                }}
-                loading={updateTempLoading}
-              >
-                Update
-              </Button>
-              <Button
-                type="danger"
-                style={{
-                  width: 120,
-                  height: 40,
-                  marginLeft: 10,
-                  borderRadius: 0,
-                  border: '0px solid',
-                }}
-                disabled={updateTempLoading}
-                onClick={() => {
-                  form.resetFields()
-                  closeUpdateDrawer()
-                }}
-              >
-                Cancel
-              </Button>
-            </div>
+              Cancel
+            </Button>
           </Form.Item>
         </div>
       )}
@@ -731,7 +703,6 @@ const UpdateTemplateForm = ({ style, tempId, form, closeUpdateDrawer }) => {
           <Input
             value={newBehName}
             onChange={e => setNewBahName(e.target.value)}
-            size="large"
             placeholder="Type the new modal name"
             autoFocus
           />
@@ -763,7 +734,6 @@ const UpdateTemplateForm = ({ style, tempId, form, closeUpdateDrawer }) => {
           <Input
             value={newEnvName}
             onChange={e => setNewEnvName(e.target.value)}
-            size="large"
             placeholder="Type the new environment name"
             autoFocus
           />

@@ -9,7 +9,7 @@ const { Option } = Select
 
 export default ({ reminder, index, setRemainderCount, dispatch, state }) => {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
       <Form.Item style={{ marginBottom: 0 }}>
         <TimePicker
           disabled={!reminder}
@@ -17,7 +17,6 @@ export default ({ reminder, index, setRemainderCount, dispatch, state }) => {
           onChange={value => {
             dispatch({ type: 'UPDATE_TIME', index, time: value })
           }}
-          size="large"
           allowClear={false}
           use12Hours
           format="h:mm a"
@@ -36,7 +35,6 @@ export default ({ reminder, index, setRemainderCount, dispatch, state }) => {
           style={{
             width: 320,
           }}
-          size="large"
           optionLabelProp="label"
         >
           <Option label="Mon" value="Monday">

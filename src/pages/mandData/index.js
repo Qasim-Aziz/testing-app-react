@@ -20,12 +20,15 @@ import { useQuery, useMutation } from 'react-apollo'
 import gql from 'graphql-tag'
 import Calendar from 'components/Calander'
 import './index.scss'
+import { DRAWER, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import { ResponsiveLine } from '@nivo/line'
+import LoadingComponent from 'components/LoadingComponent'
 import FilterComp from '../../components/FilterCard/FilterComp'
 import GraphComponent from './graphComponent'
 
 const { Content } = Layout
 const { Title, Text } = Typography
+const { layout, tailLayout } = FORM
 
 const MAND_DATA = gql`
   query getMandData($studentId: ID!, $dateGte: Date!, $dateLte: Date!) {
@@ -153,6 +156,7 @@ const MandDataPage = props => {
       })
       setMandTitle('')
       setNewMandCreated(true)
+      closeDrawer()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newMandRes])
@@ -221,36 +225,6 @@ const MandDataPage = props => {
     } else setMandData(data)
   }, [data, searchVal])
 
-  // const [
-  //   getSelectedMand,
-  //   { data: selectedStaffData, error: selectedStaffError, loading: selectedStaffLoading },
-  // ] = useLazyQuery(MAND_INFO)
-
-  // useEffect(() => {
-  //   if(newGraphDrawer){
-  //     getSelectedMand({
-  //       variables: {
-  //         mandId: activeMand,
-  //         date: date
-  //       },
-  //     })
-  //     // alert('True');
-  //   }
-  // }, [newGraphDrawer, activeMand, date, getSelectedMand])
-  const formItemLayout = {
-    labelCol: {
-      span: 5,
-    },
-    wrapperCol: {
-      span: 17,
-      offset: 1,
-    },
-  }
-  const formTailLayout = {
-    labelCol: { span: 5 },
-    wrapperCol: { span: 8, offset: 6 },
-  }
-
   return (
     <Authorize roles={['school_admin', 'therapist', 'parents']} redirect to="/dashboard/beta">
       <Helmet title="Dashboard Alpha" />
@@ -274,17 +248,9 @@ const MandDataPage = props => {
           <Row gutter={[46, 0]}>
             <Col span={24}>
               <div>
-                <div
-                  style={{
-                    marginTop: 17,
-                  }}
-                >
-                  {/* {data &&
-                    <pre>
-                      {JSON.stringify(data.getClickData.edges, null, 2)}
-                    </pre>} */}
+                <div style={{ marginTop: 17 }}>
                   {loading ? (
-                    'Loading...'
+                    <LoadingComponent />
                   ) : (
                     <>
                       {error && <pre>{JSON.stringify(error, null, 2)}</pre>}
@@ -394,19 +360,14 @@ const MandDataPage = props => {
             </Col>
             <Drawer
               title="New Mand Data"
-              width="50%"
+              width={DRAWER.widthL2}
               placement="right"
-              closable="true"
+              closable
               visible={showDrawerForm && TabCheck === 'Mand Data'}
               onClose={closeDrawer}
             >
-              <Form
-                onSubmit={e => SubmitForm(e)}
-                name="control-ref"
-                {...formItemLayout}
-                colon={false}
-              >
-                <Form.Item label={<span style={{ fontSize: '16px' }}>Enter Item Name</span>}>
+              <Form onSubmit={e => SubmitForm(e)} name="control-ref" {...layout} colon={false}>
+                <Form.Item label="Enter Item Name">
                   <Input
                     value={mandTitle}
                     onChange={e => setMandTitle(e.target.value)}
@@ -416,15 +377,11 @@ const MandDataPage = props => {
                   />
                 </Form.Item>
 
-                <Form.Item {...formTailLayout}>
+                <Form.Item {...tailLayout}>
                   <Button
                     type="primary"
                     htmlType="submit"
-                    style={{
-                      width: 180,
-                      height: 40,
-                      borderRadius: 0,
-                    }}
+                    style={SUBMITT_BUTTON}
                     loading={newMandLoading}
                   >
                     Save Mand
@@ -449,7 +406,7 @@ const MandDataPage = props => {
                   padding: '30px',
                 }}
               >
-                <Form onSubmit={e => SubmitForm(e)} name="control-ref" style={{ marginLeft: 0 }}>
+                <Form {...layout} onSubmit={e => SubmitForm(e)} name="control-ref">
                   <Form.Item label="Enter Item Name">
                     <Input
                       value={mandTitle}
@@ -464,13 +421,7 @@ const MandDataPage = props => {
                     <Button
                       type="primary"
                       htmlType="submit"
-                      style={{
-                        width: '100%',
-                        height: 40,
-                        marginTop: 0,
-                        fontSize: 14,
-                        background: '#0B35B3',
-                      }}
+                      style={SUBMITT_BUTTON}
                       loading={newMandLoading}
                     >
                       Save Mand

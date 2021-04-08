@@ -215,7 +215,11 @@ function BankDetails({ form, setBankDetailsDrawer }) {
                   Update
                 </Button>
               </Popconfirm>
-              <Button type="ghost" style={CANCEL_BUTTON}>
+              <Button
+                type="ghost"
+                style={CANCEL_BUTTON}
+                onClick={() => setBankDetailsDrawer(false)}
+              >
                 Cancel
               </Button>
             </Form.Item>

@@ -76,8 +76,8 @@ const generalizationDefaultScores = [
     second: 15,
     third: 25,
     fourth: 36,
-    fifth: 57,
-    sixth: 55,
+    fifth: 55,
+    sixth: 57,
     seventh: 58,
     eighth: 59,
   },
@@ -252,9 +252,9 @@ const MyDocument = ({ peakType, defaultScores, data, student }) => {
               <Text style={{ ...textStyle, fontWeight: 'bold' }}>9-10 yrs</Text>
               {peakType === 'GENERALIZATION' && (
                 <>
-                  <Text style={{ ...textStyle, fontWeight: 'bold' }}>5-6 yrs</Text>
-                  <Text style={{ ...textStyle, fontWeight: 'bold' }}>7-8 yrs</Text>
-                  <Text style={{ ...textStyle, fontWeight: 'bold' }}>9-10 yrs</Text>
+                  <Text style={{ ...textStyle, fontWeight: 'bold' }}>11-12 yrs</Text>
+                  <Text style={{ ...textStyle, fontWeight: 'bold' }}>13-14 yrs</Text>
+                  <Text style={{ ...textStyle, fontWeight: 'bold' }}>15+ yrs</Text>
                 </>
               )}
             </View>
@@ -295,7 +295,6 @@ export default () => {
   const [student, setStudent] = useState(null)
   const [
     gettableReport,
-    { data: tableData, error: tableError, loading: tableLoading },
   ] = useMutation(getTableDataQuery, { errorPolicy: 'all' })
 
   const { data: sdata, loading, error } = useQuery(getStudentDetails, {
@@ -306,6 +305,7 @@ export default () => {
   })
 
   let defaultScores = []
+
   if (peakType === 'DIRECT') {
     defaultScores = directDefaultScores
   }
@@ -395,25 +395,24 @@ export default () => {
     if (sdata) {
       gettableReport({ variables: { pk: programId } })
         .then(d => {
-          // console.log(d,'ddddddddddddddddddddd');
+          
           // studentData()
 
           const tablereportdata = d?.data
+          console.log("tablereportdata ===> ",tablereportdata)
           const data = [
             {
               key: '1',
               peak: 'Foundational Learning Skills',
               s_score: tablereportdata ? JSON.parse(tablereportdata?.peakReport?.fls)?.score : 0,
+              // t_age_score: fls['1-2 Years'],
               t_age_score: tablereportdata
                 ? JSON.parse(tablereportdata?.peakReport?.fls)?.age_score
                 : 0,
               difference: tablereportdata
                 ? JSON.parse(tablereportdata?.peakReport?.fls)?.difference
                 : 0,
-              age: getAge(
-                '1',
-                tablereportdata ? JSON.parse(tablereportdata?.peakReport?.fls)?.age_score : 0,
-              ),
+              age: tablereportdata ? JSON.parse(tablereportdata?.peakReport?.fls)?.age : '',              
             },
             {
               key: '2',
@@ -425,10 +424,7 @@ export default () => {
               difference: tablereportdata
                 ? JSON.parse(tablereportdata?.peakReport?.pls)?.difference
                 : 0,
-              age: getAge(
-                '2',
-                tablereportdata ? JSON.parse(tablereportdata?.peakReport?.pls)?.age_score : 0,
-              ),
+              age: tablereportdata ? JSON.parse(tablereportdata?.peakReport?.pls)?.age : '',
             },
             {
               key: '3',
@@ -440,10 +436,7 @@ export default () => {
               difference: tablereportdata
                 ? JSON.parse(tablereportdata?.peakReport?.vcs)?.difference
                 : 0,
-              age: getAge(
-                '3',
-                tablereportdata ? JSON.parse(tablereportdata?.peakReport?.vcs)?.age_score : 0,
-              ),
+              age: tablereportdata ? JSON.parse(tablereportdata?.peakReport?.vcs)?.age : '', 
             },
             {
               key: '4',
@@ -455,10 +448,7 @@ export default () => {
               difference: tablereportdata
                 ? JSON.parse(tablereportdata?.peakReport?.vrm)?.difference
                 : 0,
-              age: getAge(
-                '4',
-                tablereportdata ? JSON.parse(tablereportdata?.peakReport?.vrm)?.age_score : 0,
-              ),
+              age: tablereportdata ? JSON.parse(tablereportdata?.peakReport?.vrm)?.age : '',
             },
             {
               key: '5',

@@ -33,7 +33,7 @@ import BehaviorGraph from './monthlyBehaviorGraph'
 import ReportPdf from './monthlyReportPdf'
 import client from '../../apollo/config'
 import { calculateAge } from '../../utilities'
-import { COLORS } from 'assets/styles/globalStyles'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 
 const { RangePicker, MonthPicker } = DatePicker
 const { TextArea } = Input
@@ -178,7 +178,6 @@ function Goals({ selectedStudentId, studentName }) {
         .then(result => {
           if (result && result.data) {
             let gData = []
-            console.log(result.data, 'result goals Data')
             let targetGraphResponse = {}
             result.data.goalsLongProgressReport.map(item => {
               gData.push({ goal: item.goal.goalName, count: item.masteryDays })
@@ -461,7 +460,7 @@ function Goals({ selectedStudentId, studentName }) {
     setTextBoxObj(tempTextBox)
   }
 
-  console.log(overViewGraphData, 'goalsdetails')
+  console.log(goalsDetails, 'goalsDetails')
   return (
     <div style={{ marginBottom: '100px' }}>
       <Row>
@@ -499,7 +498,7 @@ function Goals({ selectedStudentId, studentName }) {
             setPdfDrawer(false)
           }}
           visible={pdfDrawer}
-          width={1000}
+          width={DRAWER.widthL2}
         >
           <ReportPdf
             textBoxObj={textBoxObj}
@@ -740,7 +739,7 @@ function Goals({ selectedStudentId, studentName }) {
 
             {goalsDetails &&
               goalsDetails.map((item, itemIndex) => (
-                <>
+                <div key={Math.random()}>
                   <div style={{ padding: 5, color: 'black', backgroundColor: COLORS.palleteLight }}>
                     <p>
                       Long Term Goals {itemIndex + 1}: {item.goal.goalName}
@@ -880,7 +879,7 @@ function Goals({ selectedStudentId, studentName }) {
                       })}
                     </div>
                   ))}
-                </>
+                </div>
               ))}
             <hr />
 
