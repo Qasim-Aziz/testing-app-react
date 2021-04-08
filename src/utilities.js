@@ -69,6 +69,13 @@ function calculateAge(birthday) { // birthday is a date
   return years + ' years ' + months + ' months'
 }
 
+function getSessionName(object) { 
+  if (object.name){
+    return object.name
+  }
+  else return object.sessionName.name
+}
+
 export {
   arrayNotNull,
   notNull,
@@ -78,4 +85,5 @@ export {
   dateTimeToDate,
   combineDateAndTime,
   calculateAge,
+  getSessionName,
 }

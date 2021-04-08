@@ -1,5 +1,6 @@
 /* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable no-nested-ternary */
+/* eslint-disable no-undef */
 import React, { useState, useEffect } from 'react'
 import Authorize from 'components/LayoutComponents/Authorize'
 import { Helmet } from 'react-helmet'

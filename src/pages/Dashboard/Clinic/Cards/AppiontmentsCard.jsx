@@ -48,7 +48,7 @@ const SingleRecord = ({ title, studentName, startDate, endDate }) => {
 }
 
 const AppiontmentsCard = ({ style, status }) => {
-  const { loading, data, error } = useQuery(APPIONTMENTS)
+  const { loading, data, error } = useQuery(APPIONTMENTS, {fetchPolicy: 'network-only'})
 
   const filtered =
     data &&

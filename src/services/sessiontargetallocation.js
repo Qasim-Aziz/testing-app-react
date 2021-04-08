@@ -78,6 +78,7 @@ export async function getAllocatedTargets(payload) {
                 edges {
                     node {
                         id
+                        name
                         itemRequired,
                         duration,
                         sessionName {
@@ -212,6 +213,7 @@ export async function updateSessionTargets(payload) {
                 status
                 session {
                     id
+                    name
                     itemRequired,
                     duration,
                     sessionName {
@@ -324,6 +326,7 @@ export async function updateSessionDetails(objects) {
       mutation: gql`
         mutation UpdateSessioDetails(
           $id: ID!
+          $name: String
           $duration: String!
           $items: String!
           $instruction: [String]
@@ -334,6 +337,7 @@ export async function updateSessionDetails(objects) {
           updateMasterSession(
             input: {
               pk: $id
+              name: $name
               duration: $duration
               itemRequired: $items
               instruction: $instruction
@@ -344,6 +348,7 @@ export async function updateSessionDetails(objects) {
           ) {
             details {
               id
+              name
               itemRequired
               duration
               sessionName {
@@ -418,6 +423,7 @@ export async function updateSessionDetails(objects) {
       `,
       variables: {
         id: sessionObject.id,
+        name: payload.values.sessionName,
         duration: payload.values.duration,
         items: payload.values.items,
         instruction: payload.values.names,
