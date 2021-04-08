@@ -207,7 +207,7 @@ function GenDetails(props) {
         </Form.Item>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <Button type="primary" loading={updateLoading} htmlType="submit" style={SUBMITT_BUTTON}>
-            Submitt
+            Submit
           </Button>
           <Button type="default" onClick={() => closeDrawer(false)} style={CANCEL_BUTTON}>
             Cancel

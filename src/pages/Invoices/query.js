@@ -254,3 +254,12 @@ export const MONTHLY_INVOICE = gql`
     }
   }
 `
+
+export const PAYMENT_REMINDER = gql`
+  mutation($invoices: [ID], $clinics: [ID]) {
+    sendPaymentReminders(input: { invoices: $invoices, clinics: $clinics }) {
+      status
+      message
+    }
+  }
+`

@@ -26,7 +26,6 @@ export default ({ reminder, index, setRemainderCount, dispatch, state }) => {
           onChange={value => {
             dispatch({ type: 'UPDATE_TIME', index, time: value })
           }}
-          size="large"
           allowClear={false}
         />
       </Form.Item>
@@ -43,7 +42,6 @@ export default ({ reminder, index, setRemainderCount, dispatch, state }) => {
             width: 320,
             marginLeft: 10,
           }}
-          size="large"
           mode="multiple"
           optionLabelProp="label"
         >

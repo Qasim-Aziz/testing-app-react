@@ -157,7 +157,7 @@ function ProgramInfo(props) {
         </Form.Item>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <Button type="primary" htmlType="submit" loading={updateLoading} style={SUBMITT_BUTTON}>
-            Submitt
+            Submit
           </Button>
           <Button onClick={() => closeDrawer(false)} type="default" style={CANCEL_BUTTON}>
             Cancel

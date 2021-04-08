@@ -11,6 +11,7 @@ import {
 } from 'antd'
 import { PlusOutlined, PlusCircleOutlined } from '@ant-design/icons'
 import { useMutation } from 'react-apollo'
+import { CANCEL_BUTTON, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import moment from 'moment'
 import { times, remove, update } from 'ramda'
 import UrinationForm from 'components/ToiletData/UrinationForm'
@@ -19,6 +20,7 @@ import './toiletForm.scss'
 import { UPDATE_TOILET } from './query'
 
 const { Title, Text } = Typography
+const { layout, tailLayout } = FORM
 
 const TimeFormat = 'HH:mm'
 
@@ -138,6 +140,9 @@ const UpdateToiletForm = ({
       setRemainderCount(1)
       refetch()
       setOpen(false)
+      if (closeDrawer) {
+        closeDrawer()
+      }
     }
     if (error) {
       notification.error({
@@ -188,19 +193,6 @@ const UpdateToiletForm = ({
       },
     })
   }
-  const formItemLayout = {
-    labelCol: {
-      span: 6,
-    },
-    wrapperCol: {
-      span: 17,
-      offset: 1,
-    },
-  }
-  const formTailLayout = {
-    labelCol: { span: 5 },
-    wrapperCol: { span: 8, offset: 7 },
-  }
 
   const btnStle = {
     height: '40px',
@@ -212,7 +204,7 @@ const UpdateToiletForm = ({
   return (
     <Form
       colon={false}
-      {...formItemLayout}
+      {...layout}
       onSubmit={e => submitForm(e, this)}
       name="control-ref"
       style={{ marginLeft: 0, ...style }}
@@ -240,7 +232,7 @@ const UpdateToiletForm = ({
         </Radio.Group>
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Bowel Movement</span>}>
+      <Form.Item label="Bowel Movement">
         <Radio.Group
           className="radioGroup"
           defaultValue={toiletData.bowel ? 'y' : 'n'}
@@ -262,7 +254,7 @@ const UpdateToiletForm = ({
         </Radio.Group>
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Prompted to Request</span>}>
+      <Form.Item label="Prompted to Request">
         <Radio.Group
           className="radioGroup"
           defaultValue={toiletData.prompted ? 'y' : 'n'}
@@ -284,7 +276,7 @@ const UpdateToiletForm = ({
         </Radio.Group>
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Water Intake (ml)</span>}>
+      <Form.Item label="Water Intake (ml)">
         <InputNumber
           placeholder="Type water Intake in ml"
           style={{ width: '100%', borderRadius: '0px' }}
@@ -293,18 +285,17 @@ const UpdateToiletForm = ({
         />
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Water Intake Time</span>}>
+      <Form.Item label="Water Intake Time">
         <TimePicker
           value={waterIntakeTime}
           onChange={value => setwaterIntakeTime(value)}
           name="toiletTime"
           style={{ width: '100%' }}
-          size="large"
           use12Hours
           format="h:mm a"
         />
       </Form.Item>
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Urination</span>}>
+      <Form.Item label="Urination">
         {urinationState &&
           times(n => {
             return (
@@ -334,17 +325,16 @@ const UpdateToiletForm = ({
           />
         )}
       </Form.Item>
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Toilet Reminders</span>}>
+      <Form.Item label="Toilet Reminders">
         <Switch
           defaultChecked
           onChange={() => {
             setReminder(state => !state)
           }}
-          size="large"
         />
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Add Reminder</span>}>
+      <Form.Item label="Add Reminder">
         {times(n => {
           return (
             <ReminderForm
@@ -359,39 +349,20 @@ const UpdateToiletForm = ({
         }, remainderCount)}
       </Form.Item>
 
-      <Form.Item {...formTailLayout}>
-        <div style={{ display: 'flex' }}>
-          <Button
-            type="primary"
-            htmlType="submit"
-            style={{
-              width: 180,
-              height: 40,
-              borderRadius: 0,
-            }}
-            loading={loading}
-          >
-            Update Data
-          </Button>
-          <Button
-            type="primary"
-            style={{
-              width: 180,
-              height: 40,
-              borderRadius: 0,
-              background: 'red',
-              color: '#fff',
-              marginLeft: 10,
-              border: '0px solid',
-            }}
-            onClick={() => {
-              setOpen(null)
-              closeDrawer()
-            }}
-          >
-            Cancel
-          </Button>
-        </div>
+      <Form.Item {...tailLayout}>
+        <Button type="primary" htmlType="submit" style={SUBMITT_BUTTON} loading={loading}>
+          Update Data
+        </Button>
+        <Button
+          type="ghost"
+          style={CANCEL_BUTTON}
+          onClick={() => {
+            setOpen(null)
+            closeDrawer()
+          }}
+        >
+          Cancel
+        </Button>
       </Form.Item>
     </Form>
   )

@@ -1,21 +1,8 @@
-import {
-  Col,
-  DatePicker,
-  Dropdown,
-  Form,
-  Icon,
-  Input,
-  Menu,
-  notification,
-  Row,
-  Table,
-  Drawer,
-  Modal,
-} from 'antd'
-import moment from 'moment'
+import { Dropdown, Icon, Input, Menu, notification, Table, Drawer, Modal } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { useMutation, useQuery } from 'react-apollo'
 import Highlighter from 'react-highlight-words'
+import { DRAWER } from 'assets/styles/globalStyles'
 import EditRecordDrawer from 'pages/BehaviourData/EditRecordDrawer'
 import BehaviorChartDrildown from 'pages/BehaviourData/BehaviorChartDrildown'
 import { BEHAVIOR_RECORD_DATA, DELETE_BEHAVIOR_RECORD } from './queries'
@@ -145,6 +132,7 @@ const RecordTab = ({ studentId, activeTab, date, searchText, searchStatus }) => 
       align: 'center',
       width: 120,
       render: (text, record) => {
+        console.log(record, 'record')
         const menu = (
           <Menu onClick={e => handleMenuActions(e, record)}>
             <Menu.Item key="editBehaviorRecord">
@@ -172,7 +160,8 @@ const RecordTab = ({ studentId, activeTab, date, searchText, searchStatus }) => 
   ]
 
   const handleMenuActions = (e, obj) => {
-    switch (e.key) {
+    console.log(e, obj)
+    switch (e) {
       case 'editBehaviorRecord':
         setEditRecordingFor(obj.decelObject)
         break
@@ -232,7 +221,7 @@ const RecordTab = ({ studentId, activeTab, date, searchText, searchStatus }) => 
       />
 
       <Drawer
-        width={600}
+        width={DRAWER.widthL2}
         title="Edit Recording"
         placement="right"
         visible={editRecordingFor}

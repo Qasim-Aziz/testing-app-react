@@ -20,10 +20,13 @@ import './MealForm.scss'
 import { usePrevious } from 'react-delta'
 import ReminderForm from 'components/mealData/ReminderForm'
 import { PlusOutlined } from '@ant-design/icons'
+import { CANCEL_BUTTON, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
+import LoadingComponent from 'components/LoadingComponent'
 
 const { TextArea } = Input
 const { Option } = Select
 const { Title, Text } = Typography
+const { layout, tailLayout } = FORM
 
 const CREATE_MEAL = gql`
   mutation createFood(
@@ -208,7 +211,10 @@ const MealForm = ({
 
   const foodTypeQuery = useQuery(GET_FOOD_TYPE)
 
-  const [updateMeal, { data: updateMealData, error: updateMealError }] = useMutation(UPDATE_MEAL, {
+  const [
+    updateMeal,
+    { data: updateMealData, loading: updateMealLoading, error: updateMealError },
+  ] = useMutation(UPDATE_MEAL, {
     userId: studentId,
     mealId: updateMealId,
   })
@@ -282,6 +288,7 @@ const MealForm = ({
       handleNewMealDate(updateMealData.updateFood.details.date)
       setUpdateMeal(updateMealData.updateFood.details)
       form.resetFields()
+      closeDrawer()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updateMealData])
@@ -340,32 +347,28 @@ const MealForm = ({
   return (
     <Form
       colon={false}
-      {...formItemLayout}
+      {...layout}
       onSubmit={e => SubmitForm(e, this)}
       name="control-ref"
       style={{ marginLeft: 0, position: 'relative', ...style }}
       layout="horizontal"
     >
       {aMealLoading && (
-        <div
-          style={{
-            minHeight: '100vh',
-          }}
-        >
-          Loading...
+        <div style={{ minHeight: '100vh' }}>
+          <LoadingComponent />
         </div>
       )}
       {aMealData && (
         <div>
           <div>
-            <Form.Item label={<span style={{ fontSize: '16px' }}>Meal Date</span>}>
+            <Form.Item label="Meal Date">
               {form.getFieldDecorator('mealDate', {
                 initialValue: date,
                 rules: [{ required: true, message: 'Please Select Name!' }],
               })(<DatePicker style={{ width: '100%' }} />)}
             </Form.Item>
 
-            <Form.Item label={<span style={{ fontSize: '16px' }}>Meal Time</span>}>
+            <Form.Item label="Meal Time">
               {form.getFieldDecorator('mealTime', {
                 initialValue: mealTime,
                 rules: [{ required: true, message: 'Please Select a time!' }],
@@ -373,19 +376,19 @@ const MealForm = ({
             </Form.Item>
           </div>
 
-          <Form.Item label={<span style={{ fontSize: '16px' }}>Meal Name</span>}>
+          <Form.Item label="Meal Name">
             {form.getFieldDecorator('mealName', {
               initialValue: aMealData?.getFoodDetails.mealName,
               rules: [{ required: true, message: 'Please Select meal name!' }],
             })(<Input placeholder="Enter Meal Name" name="mealName" style={{ color: '#000' }} />)}
           </Form.Item>
 
-          <Form.Item label={<span style={{ fontSize: '16px' }}>Meal Type</span>}>
+          <Form.Item label="Meal Type">
             {form.getFieldDecorator('mealType', {
               initialValue: aMealData?.getFoodDetails.mealType,
               rules: [{ required: true, message: 'Please Select a meal type!' }],
             })(
-              <Select style={{}} placeholder="Select Meal Type" allowclear showSearch>
+              <Select placeholder="Select Meal Type" allowclear showSearch>
                 <Option value="Breakfast">Breakfast</Option>
                 <Option value="Lunch">Lunch</Option>
                 <Option value="Dinner">Dinner</Option>
@@ -393,7 +396,7 @@ const MealForm = ({
             )}
           </Form.Item>
 
-          <Form.Item label={<span style={{ fontSize: '16px' }}>Food Type</span>}>
+          <Form.Item label="Food Type">
             {form.getFieldDecorator('foodType', {
               initialValue: aMealData?.getFoodDetails.foodType.id,
               rules: [{ required: true, message: 'Please Select a food type!' }],
@@ -411,7 +414,7 @@ const MealForm = ({
             )}
           </Form.Item>
 
-          <Form.Item label={<span style={{ fontSize: '16px' }}>Water</span>}>
+          <Form.Item label="Water">
             {form.getFieldDecorator('waterIntake', {
               initialValue: aMealData
                 ? parseInt(aMealData.getFoodDetails.waterIntake.split(' ')[0], 10)
@@ -425,7 +428,7 @@ const MealForm = ({
             })(<Input placeholder="Enter water taken" type="number" addonAfter="ml" min={0} />)}
           </Form.Item>
 
-          <Form.Item label={<span style={{ fontSize: '16px' }}>Note</span>}>
+          <Form.Item label="Note">
             {form.getFieldDecorator('note', {
               initialValue: aMealData?.getFoodDetails.note,
             })(
@@ -443,16 +446,15 @@ const MealForm = ({
           </Form.Item>
 
           <div>
-            <Form.Item label={<span style={{ fontSize: '16px' }}>Meal Reminders</span>}>
+            <Form.Item label="Meal Reminders">
               <Switch
                 defaultChecked
                 onChange={() => {
                   setReminder(state => !state)
                 }}
-                size="large"
               />
             </Form.Item>
-            <Form.Item label={<span style={{ fontSize: '16px' }}>Add Reminder</span>}>
+            <Form.Item label="Add Reminder">
               {remainderState &&
                 times(n => {
                   return (
@@ -467,67 +469,31 @@ const MealForm = ({
                   )
                 }, remainderCount)}
             </Form.Item>
-
-            {/* <Form.Item
-            {...formTailLayout}
-            >
-              <Text style={{ color: '#000', fontSize: 16 }}>Add Another Remainder</Text>
-              <Button
-                style={{
-                  height: 40,
-                  marginLeft: 'auto',
-                }}
-                onClick={() => {
-                  setRemainderCount(state => state + 1)
-                  remainderDispatch({ type: 'ADD_REMAINDER' })
-                }}
-              >
-                <PlusOutlined style={{ fontSize: 24, marginTop: 5 }} />
-              </Button>
-            </Form.Item> */}
           </div>
 
-          <Form.Item {...formTailLayout}>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-              }}
+          <Form.Item {...tailLayout}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={updateMealLoading}
+              style={SUBMITT_BUTTON}
             >
+              Save {updateMealId ? 'update' : 'Data'}
+            </Button>
+            {updateMealId && (
               <Button
-                type="primary"
-                htmlType="submit"
-                style={{
-                  width: 180,
-                  height: 40,
-                  borderRadius: 0,
+                onClick={() => {
+                  setUpdateMealId()
+                  setMealTime(moment())
+                  setDate(moment())
+                  setNote()
+                  closeDrawer()
                 }}
+                style={CANCEL_BUTTON}
               >
-                Save {updateMealId ? 'update' : 'Data'}
+                Cancel Update
               </Button>
-              {updateMealId && (
-                <Button
-                  onClick={() => {
-                    setUpdateMealId()
-                    setMealTime(moment())
-                    setDate(moment())
-                    setNote()
-                    closeDrawer()
-                  }}
-                  style={{
-                    width: 150,
-                    marginLeft: 20,
-                    height: 40,
-                    background: '#ff4444',
-                    color: '#fff',
-                    border: '0px solid',
-                    borderRadius: 0,
-                  }}
-                >
-                  Cancel Update
-                </Button>
-              )}
-            </div>
+            )}
           </Form.Item>
         </div>
       )}

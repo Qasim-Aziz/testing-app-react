@@ -13,12 +13,14 @@ import { PlusOutlined } from '@ant-design/icons'
 import gql from 'graphql-tag'
 import { useMutation } from 'react-apollo'
 import moment from 'moment'
+import { FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import { times, remove, update } from 'ramda'
 import ReminderForm from 'components/ToiletData/ReminderForm'
 import './toiletForm.scss'
 import UrinationForm from 'components/ToiletData/UrinationForm'
 
 const { Title, Text } = Typography
+const { layout, tailLayout } = FORM
 
 const CREATE_TOILET_DATA = gql`
   mutation recordToiletdata(
@@ -122,7 +124,13 @@ const urinationReducer = (state, action) => {
   }
 }
 
-const ToiletForm = ({ style, handleNewToiletDate, setNewToiletCreated, selectDate }) => {
+const ToiletForm = ({
+  style,
+  handleNewToiletDate,
+  closeDrawer,
+  setNewToiletCreated,
+  selectDate,
+}) => {
   const [waterIntake, setWaterIntake] = useState()
   const [waterIntakeTime, setwaterIntakeTime] = useState(moment())
   const [urination, setUrination] = useState(true)
@@ -140,6 +148,7 @@ const ToiletForm = ({ style, handleNewToiletDate, setNewToiletCreated, selectDat
     { time: moment(), status: undefined },
   ])
 
+  console.log(selectDate, 'select date')
   const [mutate, { data, error, loading }] = useMutation(CREATE_TOILET_DATA, {
     variables: {
       student: studentId,
@@ -178,6 +187,8 @@ const ToiletForm = ({ style, handleNewToiletDate, setNewToiletCreated, selectDat
         })
       }
     })
+
+    console.log(studentId, modefiRemainderState, modefiUrinationState, 'states')
     mutate({
       variables: {
         remainders: reminder ? modefiRemainderState : null,
@@ -196,6 +207,9 @@ const ToiletForm = ({ style, handleNewToiletDate, setNewToiletCreated, selectDat
       setWaterIntake('')
       setRemainderCount(1)
       setNewToiletCreated(true)
+      if (closeDrawer) {
+        closeDrawer()
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
@@ -213,19 +227,6 @@ const ToiletForm = ({ style, handleNewToiletDate, setNewToiletCreated, selectDat
     return <pre>{JSON.stringify(error, null, 2)}</pre>
   }
 
-  const formItemLayout = {
-    labelCol: {
-      span: 6,
-    },
-    wrapperCol: {
-      span: 17,
-      offset: 1,
-    },
-  }
-  const formTailLayout = {
-    labelCol: { span: 5 },
-    wrapperCol: { span: 8, offset: 7 },
-  }
   const btnStle = {
     height: '40px',
     width: '230px',
@@ -234,14 +235,13 @@ const ToiletForm = ({ style, handleNewToiletDate, setNewToiletCreated, selectDat
   }
   return (
     <Form
-      colon={false}
-      {...formItemLayout}
+      {...layout}
       onSubmit={e => SubmitForm(e, this)}
       name="control-ref"
       style={{ marginLeft: 0, position: 'relative', ...style }}
       layout="horizontal"
     >
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Urination</span>}>
+      <Form.Item label="Urination">
         <Radio.Group
           className="radioGroup"
           defaultValue="y"
@@ -263,7 +263,7 @@ const ToiletForm = ({ style, handleNewToiletDate, setNewToiletCreated, selectDat
         </Radio.Group>
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Bowel Movement</span>}>
+      <Form.Item label="Bowel Movement">
         <Radio.Group
           className="radioGroup"
           defaultValue="y"
@@ -285,7 +285,7 @@ const ToiletForm = ({ style, handleNewToiletDate, setNewToiletCreated, selectDat
         </Radio.Group>
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Prompted to Request</span>}>
+      <Form.Item label="Prompted to Request">
         <Radio.Group
           className="radioGroup"
           defaultValue="y"
@@ -307,7 +307,7 @@ const ToiletForm = ({ style, handleNewToiletDate, setNewToiletCreated, selectDat
         </Radio.Group>
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Water Intake (ml)</span>}>
+      <Form.Item label="Water Intake (ml)">
         <InputNumber
           placeholder="Type water Intake in ml"
           style={{ width: '100%', borderRadius: '0px' }}
@@ -316,7 +316,7 @@ const ToiletForm = ({ style, handleNewToiletDate, setNewToiletCreated, selectDat
         />
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Water Intake Time</span>}>
+      <Form.Item label="Water Intake Time">
         <TimePicker
           value={waterIntakeTime}
           onChange={value => setwaterIntakeTime(value)}
@@ -328,7 +328,7 @@ const ToiletForm = ({ style, handleNewToiletDate, setNewToiletCreated, selectDat
         />
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Urination</span>}>
+      <Form.Item label="Urination">
         {urinationState &&
           times(n => {
             return (
@@ -342,7 +342,7 @@ const ToiletForm = ({ style, handleNewToiletDate, setNewToiletCreated, selectDat
             )
           }, urinationCount)}
       </Form.Item>
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Toilet Reminders</span>}>
+      <Form.Item label="Toilet Reminders">
         <Switch
           defaultChecked
           onChange={() => {
@@ -352,7 +352,7 @@ const ToiletForm = ({ style, handleNewToiletDate, setNewToiletCreated, selectDat
         />
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Add Reminder</span>}>
+      <Form.Item label="Add Reminder">
         {remainderState &&
           times(n => {
             return (
@@ -368,17 +368,8 @@ const ToiletForm = ({ style, handleNewToiletDate, setNewToiletCreated, selectDat
           }, remainderCount)}
       </Form.Item>
 
-      <Form.Item {...formTailLayout}>
-        <Button
-          type="primary"
-          htmlType="submit"
-          style={{
-            width: 180,
-            height: 40,
-            borderRadius: 0,
-          }}
-          loading={loading}
-        >
+      <Form.Item {...tailLayout}>
+        <Button type="primary" htmlType="submit" style={SUBMITT_BUTTON} loading={loading}>
           Save Data
         </Button>
       </Form.Item>

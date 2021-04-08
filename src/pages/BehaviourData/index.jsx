@@ -53,8 +53,6 @@ const BehaviorDataPage = ({ openRightdrawer, openDrawer, closeDrawer }) => {
     })
   }
 
-  console.log(searchText, 'jgh')
-
   return (
     <div>
       <div style={container}>
