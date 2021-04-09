@@ -1,4 +1,9 @@
+# The following component I have made but I don't want to track as of now
+src/pages/prescription/PrescriptionTableComponent.jsx
 # MY PERSONAL FILES
+.dockerignore
+Dockerfile
+docker-compose.yml
 ReadMe_Personal.md
 src/apollo/leads_config.js
 # dependencies
