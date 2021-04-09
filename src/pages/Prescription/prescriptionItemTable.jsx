@@ -35,61 +35,73 @@ const components = {
 }
 
 const PrescriptionItemTable = ({ products, dispatch, totalAmount }) => {
+  console.log('THE PRODUCTS', products)
+  console.log('THE Dispatch', dispatch)
+  console.log('THE TOTAL AMOUNT', totalAmount)
+  // "name":"ENCORATE 100ML",
+  //   "medicineType":"SYP",
+  //   "dosage":"1-1-1",
+  //   "unit":"ml",
+  //   "when":"Before Breakfast",
+  //   "frequency":"Daily",
+  //   "duration":"30 days"
   const columnsList = [
     {
       title: '#',
       dataIndex: 'key',
-      width: 10,
+      // width: 5,
     },
     {
       title: 'Type',
       editable: true,
       dataIndex: 'type',
-      width: 50,
+      // width: 20,
     },
     {
       title: 'Product/Service',
       editable: true,
       dataIndex: 'service',
-      width: 180,
+      // width: 180,
     },
     {
       title: 'Dose',
       dataIndex: 'dose',
       editable: true,
-      width: 70,
+      // width: 70,
     },
     {
       title: 'Unit',
       dataIndex: 'unit',
       editable: true,
-      width: 70,
+      // width: 70,
     },
     {
       title: 'When',
       dataIndex: 'when',
       editable: true,
-      width: 70,
+      // width: 70,
     },
     {
       title: 'Frequency',
       dataIndex: 'frequency',
       editable: true,
-      width: 70,
+      // width: 70,
     },
     {
       title: 'Duration',
       dataIndex: 'duration',
       editable: true,
-      width: 70,
+      // width: 100,
     },
 
     {
       title: 'Qty',
-      width: 100,
-      render: (text, record) => {
-        return parseFloat(record.qty) * parseFloat(record.rate)
-      },
+      dataIndex: 'qty',
+      // width: 10,
+      editable: true,
+      // render: (text, record) => {
+      //   return parseFloat(record.qty) * parseFloat(record.rate)
+      // },
     },
     {
       title: 'Note',
@@ -132,6 +144,7 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount }) => {
   }
 
   const columns = columnsList.map(col => {
+    console.log('THE COL', col)
     if (!col.editable) {
       return col
     }
@@ -147,8 +160,8 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount }) => {
     }
   })
 
-  console.log(products, 'tableData')
-
+  console.log('tableData ⏩', products)
+  console.log('THE COMPONENT', components)
   return (
     <div>
       <Table

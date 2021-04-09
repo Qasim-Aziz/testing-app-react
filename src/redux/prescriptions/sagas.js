@@ -33,6 +33,13 @@ export function* GET_PRESCRIPTIONS({ payload }) {
 }
 
 export function* CREATE_PRESCRIPTIONS({ payload }) {
+  console.log('PAYLOAD =====>', payload)
+  /* [Explaination]
+   * Here we will remove all the elements inside the meds array object 
+      -   
+
+  */
+
   yield put({
     type: 'leaders/SET_STATE',
     payload: {

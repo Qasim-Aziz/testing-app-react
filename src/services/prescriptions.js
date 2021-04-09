@@ -101,6 +101,7 @@ export async function getPrescriptionFunc(payload) {
 }
 
 export async function createPrescriptionFunc(payload) {
+  console.log('THE VALUE IN THE PAYLOAD ---------------------> ', payload)
   return apolloClient
     .query({
       query: gql`

@@ -220,7 +220,7 @@ const Index = props => {
       <Helmet title="Prescription" />
 
       <Drawer
-        width="80%"
+        width="90%"
         title="Add Prescription"
         closable={true}
         visible={learnerState.addPrescriptionDrawer}
