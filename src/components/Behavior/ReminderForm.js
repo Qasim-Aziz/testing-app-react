@@ -23,7 +23,6 @@ export default ({ reminder, index, setRemainderCount, dispatch, state }) => {
           onChange={value => {
             dispatch({ type: 'UPDATE_TIME', index, time: value })
           }}
-          size="large"
           allowClear={false}
           use12Hours
           format="h:mm a"
@@ -42,7 +41,6 @@ export default ({ reminder, index, setRemainderCount, dispatch, state }) => {
           style={{
             width: 270,
           }}
-          size="large"
           optionLabelProp="label"
         >
           <Option label="Mon" value="Monday">

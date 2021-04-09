@@ -31,7 +31,7 @@ function AdvanceInvoiceForm({
           if (invoiceType === 'advance') {
             createAdvanceInvoice({
               variables: {
-                month: values.month?.format('YYYY'),
+                month: values.month?.format('MMMM'),
                 clinics: selectedRowKeys,
                 cgst: values.cgst,
                 sgst: values.sgst,
@@ -41,6 +41,7 @@ function AdvanceInvoiceForm({
             })
               .then(res => {
                 if (res) {
+                  console.log(res, 'res')
                   notification.success({
                     message: 'Request sent successsfully',
                     description: 'Invoices are generating, wait for some time',
@@ -54,17 +55,19 @@ function AdvanceInvoiceForm({
                 })
               })
           } else if (invoiceType === 'monthly') {
+            console.log(values.month?.format('MMMM'))
             createMonthlyInvoice({
               variables: {
-                month: values.month?.format('YYYY'),
+                month: values.month?.format('MMMM'),
                 clinics: selectedRowKeys,
-                cgst: values.cgst,
-                sgst: values.sgst,
-                discount: values.discount,
+                cgst: Number(values.cgst),
+                sgst: Number(values.sgst),
+                discount: Number(values.discount),
                 generateLink: true,
               },
             })
               .then(res => {
+                console.log(res, 'res')
                 if (res) {
                   notification.success({
                     message: 'Request sent successsfully',

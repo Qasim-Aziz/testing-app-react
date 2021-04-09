@@ -3,6 +3,7 @@ import { Button, Table, Drawer } from 'antd'
 import { useQuery } from '@apollo/react-hooks'
 import { useDispatch } from 'react-redux'
 import moment from 'moment'
+import {getSessionName} from 'utilities'
 import SessionInstructionDrawer from 'pages/parent/ParentDashboard/SessionInstructionDrawer'
 import { GET_TODAYS_SESSION } from './SessionsTabsQuery'
 
@@ -32,8 +33,7 @@ const ActiveSessions = ({ studentId }) => {
   const sessionColumns = [
     {
       title: 'Session Name',
-      dataIndex: 'sessionName.name',
-      render: text => `${text} Session`,
+      render: obj =>  getSessionName(obj),
     },
     {
       title: 'Duration',

@@ -6,6 +6,7 @@ import { Button, Form, Input, Modal, notification, Select, Switch } from 'antd'
 import ReminderForm from 'components/Behavior/ReminderForm'
 import moment from 'moment'
 import { remove, times, update } from 'ramda'
+import { CANCEL_BUTTON, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import React, { useEffect, useReducer, useState } from 'react'
 import { useMutation, useQuery } from 'react-apollo'
 import {
@@ -21,6 +22,7 @@ import './templateform.scss'
 
 const { Option } = Select
 const { TextArea } = Input
+const { layout, tailLayout } = FORM
 
 const remainderReducer = (state, action) => {
   switch (action.type) {
@@ -53,6 +55,7 @@ const CreateTemplateForm = ({
   isBehaviorAlreadyExist,
   cancel,
   form,
+  closeDrawer,
 }) => {
   const studentId = localStorage.getItem('studentId')
   const [defaultMeasurement, setDefaultMeasurement] = useState([])
@@ -254,6 +257,9 @@ const CreateTemplateForm = ({
               description: 'New Behavior Templete Added Successfully',
             })
             onCreatingTemplate()
+            if (closeDrawer) {
+              closeDrawer()
+            }
           })
           .catch(err => {
             console.log(err, 'ereroero')
@@ -265,25 +271,12 @@ const CreateTemplateForm = ({
       }
     })
   }
-  const formItemLayout = {
-    labelCol: {
-      span: 7,
-    },
-    wrapperCol: {
-      span: 15,
-      offset: 1,
-    },
-  }
-  const formTailLayout = {
-    labelCol: { span: 5 },
-    wrapperCol: { span: 8, offset: 8 },
-  }
 
   return (
     <Form
       className="templateForm"
       colon={false}
-      {...formItemLayout}
+      {...layout}
       onSubmit={SubmitForm}
       name="control-ref"
       style={{ marginLeft: 0, position: 'relative', ...style }}
@@ -305,7 +298,7 @@ const CreateTemplateForm = ({
         />
 
         <Form.Item
-          label={<span style={{ fontSize: '16px' }}>Behavior Name</span>}
+          label="Behavior Name"
           validateStatus={behaviourExists ? 'error' : 'success'}
           help={behaviourExists ? 'Behaviour already exists' : ''}
         >
@@ -314,7 +307,6 @@ const CreateTemplateForm = ({
           })(
             <Select
               placeholder="Select Behavior Name"
-              size="large"
               loading={behaviorLoading}
               showSearch
               optionFilterProp="name"
@@ -337,11 +329,11 @@ const CreateTemplateForm = ({
         </Form.Item>
       </div>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Status</span>}>
+      <Form.Item label="Status">
         {form.getFieldDecorator('status', {
           rules: [{ required: true, message: 'Please select a status' }],
         })(
-          <Select placeholder="Select Behavior Status" size="large" loading={dancleStatusLoading}>
+          <Select placeholder="Select Behavior Status" loading={dancleStatusLoading}>
             {dancleStatusData &&
               dancleStatusData.getDecelStatus.map(dancleStatus => (
                 <Option value={dancleStatus.id} key={dancleStatus.id}>
@@ -363,17 +355,11 @@ const CreateTemplateForm = ({
           }}
           onClick={() => setAddEnvNameModal(true)}
         />
-        <Form.Item label={<span style={{ fontSize: '16px' }}>Environments</span>}>
+        <Form.Item label="Environments">
           {form.getFieldDecorator('envs', {
             rules: [{ required: true, message: 'Please select a Environments' }],
           })(
-            <Select
-              mode="multiple"
-              style={{ width: '100%' }}
-              placeholder="Please select"
-              size="large"
-              loading={dancleEnvLoading}
-            >
+            <Select mode="multiple" placeholder="Please select" loading={dancleEnvLoading}>
               {envList?.map(envData => (
                 <Option value={envData.id} key={envData.id}>
                   {envData.name}
@@ -384,33 +370,32 @@ const CreateTemplateForm = ({
         </Form.Item>
       </div>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Behavior description</span>}>
-        {form.getFieldDecorator('description', { initialValue: '' })(
+      <Form.Item label="Behavior description">
+        {form.getFieldDecorator('description')(
           <TextArea className="small-textarea" placeholder="Describe the behavior" />,
         )}
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Reactive Procedure</span>}>
-        {form.getFieldDecorator('procedure', { initialValue: '' })(
+      <Form.Item label="Reactive Procedure">
+        {form.getFieldDecorator('procedure')(
           <TextArea className="small-textarea" placeholder="Give reactive procedure" />,
         )}
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Antecedent Manipulation</span>}>
-        {form.getFieldDecorator('manipulation', { initialValue: '' })(
+      <Form.Item label="Antecedent Manipulation">
+        {form.getFieldDecorator('manipulation')(
           <TextArea className="small-textarea" placeholder="Give antecedent manipulation" />,
         )}
       </Form.Item>
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Behavior Reminders</span>}>
+      <Form.Item label="Behavior Reminders">
         <Switch
           defaultChecked
           onChange={() => {
             setReminder(state => !state)
           }}
-          size="large"
         />
       </Form.Item>
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Add Reminder</span>}>
+      <Form.Item label="Add Reminder">
         {remainderState &&
           times(n => {
             return (
@@ -426,38 +411,20 @@ const CreateTemplateForm = ({
           }, remainderCount)}
       </Form.Item>
 
-      <div style={{ display: 'flex', width: '90%', margin: 'auto', justifyContent: 'center' }}>
-        <Form.Item>
-          <Button
-            type="primary"
-            htmlType="submit"
-            style={{
-              width: 140,
-              height: 40,
-              marginTop: 10,
-              marginRight: 10,
-            }}
-            loading={newTempleteLoading}
-          >
-            Save Template
-          </Button>
-        </Form.Item>
+      <Form.Item {...tailLayout}>
+        <Button
+          type="primary"
+          htmlType="submit"
+          style={SUBMITT_BUTTON}
+          loading={newTempleteLoading}
+        >
+          Save Template
+        </Button>
 
-        <Form.Item>
-          <Button
-            type="danger"
-            onClick={() => cancel(false)}
-            style={{
-              width: 140,
-              height: 40,
-              marginTop: 10,
-              marginLeft: 10,
-            }}
-          >
-            Cancel
-          </Button>
-        </Form.Item>
-      </div>
+        <Button type="ghost" onClick={() => cancel(false)} style={CANCEL_BUTTON}>
+          Cancel
+        </Button>
+      </Form.Item>
       <Modal
         visible={addBehNameModal}
         title="Add New Behavior Name"
@@ -483,7 +450,6 @@ const CreateTemplateForm = ({
           <Input
             value={newBehName}
             onChange={e => setNewBahName(e.target.value)}
-            size="large"
             placeholder="Type the new modal name"
             autoFocus
           />
@@ -515,7 +481,6 @@ const CreateTemplateForm = ({
           <Input
             value={newEnvName}
             onChange={e => setNewEnvName(e.target.value)}
-            size="large"
             placeholder="Type the new environment name"
             autoFocus
           />

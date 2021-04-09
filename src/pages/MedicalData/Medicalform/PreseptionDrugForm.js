@@ -18,17 +18,12 @@ export default ({ index, setPreseptionDrugCount, state, dispatch }) => {
       }}
     >
       <div style={{ display: 'flex', paddingTop: '2px', marginBottom: '5px' }}>
-        <Form.Item
-          colon={false}
-          label={<span style={{ fontSize: '16px' }}>Drug Name</span>}
-          style={{ marginBottom: '0px', display: 'flex' }}
-        >
+        <Form.Item colon={false} label="Drug Name" style={{ marginBottom: '0px', display: 'flex' }}>
           <Input
             value={state[index].drugName}
             onChange={e => {
               dispatch({ type: 'UPDATE_DRUG', drugName: e.target.value, index })
             }}
-            size="large"
             style={{ color: '#000', width: '365px', marginRight: '10px' }}
           />
         </Form.Item>
@@ -59,11 +54,7 @@ export default ({ index, setPreseptionDrugCount, state, dispatch }) => {
           display: 'flex',
         }}
       >
-        <Form.Item
-          colon={false}
-          label={<span style={{ fontSize: '16px' }}>Dosage</span>}
-          style={{ marginBottom: 0, display: 'flex' }}
-        >
+        <Form.Item colon={false} label="Dosage" style={{ marginBottom: 0, display: 'flex' }}>
           <Input
             value={state[index].dosage}
             type="number"
@@ -72,7 +63,6 @@ export default ({ index, setPreseptionDrugCount, state, dispatch }) => {
             }}
             style={{ marginLeft: '28px', width: 178 }}
             addonAfter="mg"
-            size="large"
             min={1}
           />
         </Form.Item>
@@ -86,7 +76,6 @@ export default ({ index, setPreseptionDrugCount, state, dispatch }) => {
             }}
             style={{ marginLeft: '10px', width: 178 }}
             addonAfter="Times a day"
-            size="large"
             min={1}
           />
         </Form.Item>

@@ -18,7 +18,7 @@ import AdvanceInvoiceForm from './advanceInvoiceForm'
 import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
 import MonthlyInvoiceForm from './monthlyInvoice'
 import BankDetails from './bankDetails'
-import { CLINIC_QUERY } from './query'
+import { CLINIC_QUERY, PAYMENT_REMINDER } from './query'
 
 const { layout, tailLayout } = FORM
 
@@ -26,14 +26,15 @@ function CustomerList() {
   const { data, loading, error } = useQuery(CLINIC_QUERY)
   const [tableData, setTableData] = useState([])
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
-  const [advanceInvoiceModal, setAdvanceInvoiceModal] = useState(false)
-  const [payReminderModal, setPayReminderModal] = useState(false)
+  const [invoiceCreateDrawer, setInvoiceCreateDrawer] = useState(false)
+  const [payReminderDrawer, setPayReminderDrawer] = useState(false)
   const [advInvForm, setAdvInvForm] = useState(false)
   const [monthlyInvForm, setMonthlyInvForm] = useState(false)
   const [currentRow, setCurrentRow] = useState(null)
   const [bankDetailsDrawer, setBankDetailsDrawer] = useState(false)
   const [selectedClinicsName, setSelectedClinicsName] = useState(null)
   const [invoiceType, setInvoiceType] = useState('advance')
+  const [sendPaymentReminder, { loading: paymentReminderLoading }] = useMutation(PAYMENT_REMINDER)
 
   useEffect(() => {
     if (data) {
@@ -95,12 +96,12 @@ function CustomerList() {
     setSelectedClinicsName(names)
     if (e.key == 'advanceInvoice') {
       setInvoiceType('advance')
-      setAdvanceInvoiceModal(true)
+      setInvoiceCreateDrawer(true)
     } else if (e.key == 'monthlyInvoice') {
       setInvoiceType('monthly')
-      setAdvanceInvoiceModal(true)
+      setInvoiceCreateDrawer(true)
     } else if (e.key == 'payReminder') {
-      setPayReminderModal(true)
+      setPayReminderDrawer(true)
     }
   }
 
@@ -137,31 +138,54 @@ function CustomerList() {
     </div>
   )
 
+  const handlePaymentReminder = () => {
+    if (selectedRowKeys && selectedRowKeys.length > 0) {
+      sendPaymentReminder({
+        variables: {
+          clinics: selectedRowKeys,
+        },
+      })
+        .then(
+          res =>
+            notification.success({
+              message: 'Payment reminder sent successfully!',
+            }),
+          setPayReminderDrawer(false),
+        )
+        .catch(err =>
+          notification.error({
+            message: 'Something went wrong!',
+            description: 'Unable to send payment reminder',
+          }),
+        )
+    }
+  }
+
   return (
     <div style={{ marginTop: 10 }}>
       <Drawer
         title={`Create ${invoiceType === 'advance' ? 'advance' : 'monthly'} invoice`}
         width={DRAWER.widthL2}
-        visible={advanceInvoiceModal}
+        visible={invoiceCreateDrawer}
         closable
         destroyOnClose
-        onClose={() => setAdvanceInvoiceModal(false)}
+        onClose={() => setInvoiceCreateDrawer(false)}
       >
         <AdvanceInvoiceForm
           selectedClinicsName={selectedClinicsName}
           selectedRowKeys={selectedRowKeys}
           invoiceType={invoiceType}
-          closeDrawer={() => setAdvanceInvoiceModal(false)}
+          closeDrawer={() => setInvoiceCreateDrawer(false)}
         />
       </Drawer>
 
       <Drawer
         title="Send pay reminder"
-        visible={payReminderModal}
+        visible={payReminderDrawer}
         closable
         destroyOnClose
         onClose={() => {
-          setPayReminderModal(false)
+          setPayReminderDrawer(false)
         }}
         width={DRAWER.widthL2}
       >
@@ -173,7 +197,9 @@ function CustomerList() {
                   <ol style={{ display: 'grid', gridTemplateColumns: 'auto auto' }}>
                     {selectedClinicsName &&
                       selectedClinicsName.map((item, index) => (
-                        <li style={{ width: 340 }}>{item}</li>
+                        <li key={item} style={{ width: 340 }}>
+                          {item}
+                        </li>
                       ))}
                   </ol>
                 </div>
@@ -188,10 +214,15 @@ function CustomerList() {
             </div>
           </Form.Item>
           <Form.Item {...tailLayout}>
-            <Button type="default" style={SUBMITT_BUTTON}>
+            <Button
+              type="default"
+              loading={paymentReminderLoading}
+              onClick={() => handlePaymentReminder()}
+              style={SUBMITT_BUTTON}
+            >
               Send Reminder
             </Button>
-            <Button onClick={() => setPayReminderModal(false)} type="ghost" style={CANCEL_BUTTON}>
+            <Button onClick={() => setPayReminderDrawer(false)} type="ghost" style={CANCEL_BUTTON}>
               Cancel
             </Button>
           </Form.Item>
@@ -241,6 +272,7 @@ function CustomerList() {
         rowSelection={rowSelection}
         loading={loading}
         bordered
+        loading={loading}
         title={() => {
           return filterHeader
         }}

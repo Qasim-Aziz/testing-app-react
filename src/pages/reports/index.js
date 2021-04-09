@@ -55,6 +55,7 @@ import './padding.scss'
 import { COLORS } from 'assets/styles/globalStyles'
 import { BiReplyAll } from 'react-icons/bi'
 
+
 const { Title, Text } = Typography
 const { Content } = Layout
 const { Option } = Select
@@ -189,7 +190,6 @@ class Reports extends React.Component {
 
   componentDidUpdate(prevProps) {
     const { user } = this.props
-    console.log('user====>>>', user)
     if (user.staffName !== prevProps.user.staffName)
       this.setState({
         selectedStaff: { id: user.staffId, name: user.staffName },
@@ -420,7 +420,7 @@ class Reports extends React.Component {
         TabCheck: 'Progress Overview',
       })
     }
-    console.log(TabCheck, 'tabCheck')
+
     return (
       <>
         <Helmet title="Reports" />
@@ -472,7 +472,7 @@ class Reports extends React.Component {
                   <Drawer
                     visible={visibleFilter}
                     onClose={this.onCloseFilter}
-                    width={350}
+                    width={DRAWER.widthL4}
                     title={`Select ${TabCheck === 'Timesheet' ? 'Staff' : 'Learner'}`}
                     placement="right"
                   >

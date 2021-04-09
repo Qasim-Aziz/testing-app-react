@@ -125,10 +125,10 @@ const ABCCard = ({
               onClick={() => conBinefunc()}
               style={{
                 color: '#584f4f',
-                padding: '2px',
+                padding: 0,
               }}
             >
-              <FaEdit style={{ fontSize: 21 }} />
+              <FaEdit style={{ fontSize: 22 }} />
             </Button>
             <Button
               type="link"
@@ -136,22 +136,16 @@ const ABCCard = ({
                 deleteAbc()
               }}
               style={{
+                minWidth: 'fit-content',
                 color: '#584f4f',
-                padding: '2px',
               }}
               loading={deleteLoading}
             >
-              <MdDelete style={{ fontSize: 23 }} />
+              <MdDelete style={{ fontSize: 22 }} />
             </Button>
           </div>
         </div>
-        <Text
-          style={{
-            fontSize: 14,
-          }}
-        >
-          {time}
-        </Text>
+        <Text style={{ fontSize: 14 }}>{time}</Text>
       </div>
     </div>
   )

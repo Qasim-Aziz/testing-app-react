@@ -70,6 +70,7 @@ export const GET_TODAYS_SESSION = gql`
       edges {
         node {
           id
+          name
           itemRequired
           duration
           sessionName {
@@ -153,6 +154,7 @@ export const GET_SESSION_BY_DATE = gql`
   query getSessionsByDate($studentId: ID!, $date: Date!) {
     getDateSessions(student: $studentId, date: $date) {
       id
+      name
       createdAt
       itemRequired
       student {

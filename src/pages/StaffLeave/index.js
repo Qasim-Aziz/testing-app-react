@@ -82,7 +82,7 @@ function index({ form }) {
           placeholder="description"
         ></Input>
         <Button htmlType="submit" type="primary">
-          Submitt
+          Submit
         </Button>
       </Form>
     </div>

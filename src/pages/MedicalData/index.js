@@ -20,6 +20,7 @@ import moment from 'moment'
 import { useQuery, useMutation } from 'react-apollo'
 import gql from 'graphql-tag'
 import Calendar from 'components/Calander'
+import { DRAWER } from 'assets/styles/globalStyles'
 import MedicalCard from './MedicalCard'
 import MedicalForm from './Medicalform'
 import { MEDICAL_DATA, DELETE_MEDICAL } from './query'
@@ -256,7 +257,7 @@ const MedicalDataPage = props => {
           </div>
           <Drawer
             title={updateMed ? 'Update Medical Data' : 'New Medical Data'}
-            width="52%"
+            width={DRAWER.widthL2}
             placement="right"
             closable="true"
             visible={showDrawerForm && TabCheck === 'Medical Data'}
@@ -274,6 +275,7 @@ const MedicalDataPage = props => {
                 handleNewMediDate={newDate => {
                   setNewMediDate(newDate)
                 }}
+                closeDrawer={closeDrawer}
                 setNewMediCreated={setNewMediCreated}
               />
             )}
