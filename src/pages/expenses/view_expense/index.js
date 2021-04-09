@@ -46,6 +46,8 @@ import {
   FileExcelOutlined,
   DownOutlined,
   CloudDownloadOutlined,
+  DeleteOutlined,
+  EditOutlined,
 } from '@ant-design/icons'
 import moment from 'moment'
 // imports for supporting files
@@ -423,6 +425,25 @@ class ExpenseTable extends React.Component {
         // maxWidth: '120px',
         render: row => <span>{row.status ? row.status : ''}</span>,
       },
+      /*{
+        title: 'Actions',
+        // selector: 'status',
+        // maxWidth: '120px',
+        render: row => {
+          console.log('THE ROW', row)
+          return (
+            <>
+              <Button>
+                <EditOutlined />
+                Comment
+              </Button>
+              <Button>
+                <DeleteOutlined />
+              </Button>
+            </>
+          )
+        },
+      },*/
     ]
 
     const exportPDF = () => {
@@ -673,35 +694,3 @@ class ExpenseTable extends React.Component {
 }
 
 export default ExpenseTable
-
-/**
- <div className="modify-data-table">
-  <DataTable
-    title="Expense Table"
-    columns={columns}
-    theme="default"
-    dense={true}
-    key="id"
-    keyField="id"
-    pagination={true}
-    data={filteredList}
-    customStyles={customStyles}
-    noHeader={true}
-    progressPending={loadingExpenses}
-    // paginationServer={true}
-    // paginationTotalRows={TotalExpenses}
-    // onChangePage={(page, rows) => this.pageChanged(page, rows)}
-    paginationServerOptions={{
-      persistSelectedOnPageChange: false,
-      persistSelectedOnSort: false,
-    }}
-    // onChangeRowsPerPage={(currentRowsPerPage, currentPage) =>
-    //   this.rowsChanged(currentRowsPerPage, currentPage)
-    // }
-    // paginationRowsPerPageOptions={
-    //   TotalExpenses > 100 ? [10, 20, 50, 80, 100, TotalExpenses] : [10, 20, 50, 80, 100]
-    // }
-    currentPage={2}
-  />
-</div> 
- */
