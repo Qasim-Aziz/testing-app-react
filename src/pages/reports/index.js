@@ -52,9 +52,8 @@ import NetworkSankey from './networkSankey'
 import client from '../../apollo/config'
 
 import './padding.scss'
-import { COLORS } from 'assets/styles/globalStyles'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import { BiReplyAll } from 'react-icons/bi'
-
 
 const { Title, Text } = Typography
 const { Content } = Layout
