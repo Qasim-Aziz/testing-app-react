@@ -6,6 +6,7 @@
 /* eslint-disable array-callback-return */
 import React, { useState, useEffect, useRef } from 'react'
 import { useQuery, useLazyQuery } from 'react-apollo'
+import { useHistory } from 'react-router-dom'
 import { Table, Button, Popconfirm, Dropdown, Drawer, Menu, notification, Tabs } from 'antd'
 import Authorize from 'components/LayoutComponents/Authorize'
 import { CheckCircleOutlined, CloseCircleOutlined, FilterFilled } from '@ant-design/icons'
@@ -40,6 +41,7 @@ const AllClinicsData = () => {
   const [currentClinicRow, setCurrentClinicRow] = useState()
   const [activeLearners, setActiveLearners] = useState(true)
   const filterRef = useRef()
+  const history = useHistory()
   const filterSet = { name: true, email: true, mobile: true, status: true }
   const { data, loading, error, refetch } = useQuery(CLINIC_QUERY, {
     variables: {
@@ -424,6 +426,9 @@ const AllClinicsData = () => {
             <FaDownload style={{ fontSize: '22px' }} />{' '}
           </Button>
         </Dropdown>
+      </div>
+      <div>
+        <Button onClick={() => history.push('invoices/')}>Add invoices</Button>
       </div>
     </div>
   )

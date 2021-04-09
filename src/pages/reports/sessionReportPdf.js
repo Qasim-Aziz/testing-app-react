@@ -294,7 +294,7 @@ function PrintableInvoice() {
                 return (
                   <View style={section}>
                     <View style={{ ...col, width: '2%', ...bg }}>
-                      <Text>{item.s1}</Text>
+                      <Text>{item.srNo1}</Text>
                     </View>
                     <View style={{ ...col, width: '17%' }}>
                       <Text style={sText}>{item.t1}</Text>
@@ -388,7 +388,7 @@ function PrintableInvoice() {
                     return (
                       <View style={{ ...section }}>
                         <View style={{ ...col, width: '3%' }}>
-                          <Text style={sText}>{item.s1}</Text>
+                          <Text style={mText}>{item.srNo1}</Text>
                         </View>
                         <View style={{ ...col, width: '28%' }}>
                           <Text style={sText}>{item.behaviour1}</Text>
@@ -400,7 +400,7 @@ function PrintableInvoice() {
                           <Text style={sText}>{item.progress1}</Text>
                         </View>
                         <View style={{ ...col, width: '3%' }}>
-                          <Text style={sText}>{item.srNo2}</Text>
+                          <Text style={mText}>{item.srNo2}</Text>
                         </View>
                         <View style={{ ...col, width: '28%' }}>
                           <Text style={sText}>{item.behaviour2}</Text>

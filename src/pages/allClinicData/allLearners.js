@@ -208,6 +208,22 @@ function AllLearners(props) {
       },
     },
     {
+      title: 'Research Participant',
+      dataIndex: 'researchParticipant',
+      width: '110px',
+      render: status => {
+        return (
+          <Button type="link">
+            {status ? (
+              <CheckCircleOutlined style={{ fontSize: 20, color: COLORS.success }} />
+            ) : (
+              <CloseCircleOutlined style={{ fontSize: 20, color: COLORS.danger }} />
+            )}
+          </Button>
+        )
+      },
+    },
+    {
       title: 'Last Login',
       dataIndex: 'parent.lastLogin',
       width: '110px',
@@ -242,7 +258,7 @@ function AllLearners(props) {
       ),
     },
   ]
-
+  // flat fee and per hour fee
   const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
   const fileExtension = '.xlsx'
   const exportToCSV = () => {
@@ -261,6 +277,9 @@ function AllLearners(props) {
         'Cog Active': item.isCogActive,
         'Peak Active': item.isPeakActive,
         'Research Participant': item.researchParticipant,
+        'Created At': item.parent?.dateJoined
+          ? moment(item.parent.dateJoined).format('YYYY-MM-DD HH:mm:ss')
+          : null,
         'Last Login': item.parent?.lastLogin
           ? moment(item.parent.lastLogin).format('YYYY-MM-DD HH:mm:ss')
           : null,

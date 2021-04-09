@@ -135,7 +135,7 @@ export default ({ secondUser, style, selectedPeopleDetails }) => {
           </Scrollbars>
         )}
       </div>
-      {!loading && error && <pre>{JSON.stingify(error, null, 2)}</pre>}
+      {!loading && error && <pre>{JSON.stringify(error, null, 2)}</pre>}
 
       <Websocket
         url={`wss://application.cogniable.us/ws/chat/${userId}/${secondUser}`}

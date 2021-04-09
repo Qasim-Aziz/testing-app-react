@@ -181,7 +181,7 @@ export default () => {
             margin: '0px auto',
           }}
         >
-          <PageHeader
+          {/* <PageHeader
             className="site-page-header"
             title="INVOICES"
             extra={[
@@ -195,7 +195,7 @@ export default () => {
                 <PlusOutlined className={classes.headIcon} style={{ marginLeft: -3.5 }} />
               </Button>,
             ]}
-          />
+          /> */}
           <FilterCard
             statusSelect={statusSelect}
             setStatusSelect={setStatusSelect}

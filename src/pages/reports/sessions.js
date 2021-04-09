@@ -56,7 +56,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
   const [tableData, setTableData] = useState([])
   const [barGraphData, setBarGraphData] = useState([])
   const [currentRow, setCurrentRow] = useState(null)
-  const [reportPdfDrawer, setReportPdfDrawer] = useState(true)
+  const [reportPdfDrawer, setReportPdfDrawer] = useState(false)
 
   function compare(a, b) {
     if (a.sessionDate < b.sessionDate) {
@@ -148,13 +148,11 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
           }
         })
       }
-      console.log(filterData, 'filtererer')
       filterData.sort(compare)
       setTableData(filterData)
     }
   }, [data, session])
 
-  console.log(tableData, 'table')
   useEffect(() => {
     if (freDisData) {
       const newGraphData = []
@@ -568,7 +566,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
           </Dropdown>
         </div>
       </div>
-      <Button onClick={() => setReportPdfDrawer(true)}>Click me</Button>
+      {/* <Button onClick={() => setReportPdfDrawer(true)}>Click me</Button> */}
       <div style={{ margin: '10px 0 10px 10px' }} className="session-table">
         <Table
           columns={columns}

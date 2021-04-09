@@ -53,11 +53,12 @@ import client from '../../apollo/config'
 
 import './padding.scss'
 import { COLORS } from 'assets/styles/globalStyles'
+import { BiReplyAll } from 'react-icons/bi'
 
 const { Title, Text } = Typography
 const { Content } = Layout
 const { Option } = Select
-const { SubMenu } = Menu;
+const { SubMenu } = Menu
 
 const STAFF_LIST = gql`
   query {
@@ -102,7 +103,6 @@ const REPORT_MAPPING = {
 
 // list to exclude learner's names from report title
 const EXCLUDE_NAMES = ['Attendance', 'Timesheet']
-
 
 @connect(({ user, student, learnersprogram, menu }) => ({ user, student, learnersprogram, menu }))
 class Reports extends React.Component {
@@ -256,16 +256,67 @@ class Reports extends React.Component {
     this.setState({ selectedStaff: staff })
   }
 
+  setRoute = e => {
+    switch (e) {
+      case 'Progress Overview':
+        this.changeReportRoute('reports/progress_overview')
+        break
+      case 'Daily Response Rate':
+        this.changeReportRoute('reports/daily_res_rate')
+        break
+      case 'Behavior':
+        this.changeReportRoute('reports/behavior')
+        break
+      case 'Mand':
+        this.changeReportRoute('reports/mand')
+        break
+      case 'Sessions':
+        this.changeReportRoute('reports/sessions')
+        break
+      case 'Goals':
+        this.changeReportRoute('reports/goals')
+        break
+      case 'Celeration Chart':
+        this.changeReportRoute('reports/celer_chart')
+        break
+      case 'Appointment Report':
+        this.changeReportRoute('reports/appointment_report')
+        break
+      case 'Attendance':
+        this.changeReportRoute('reports/attendance')
+        break
+      case 'Timesheet':
+        this.changeReportRoute('reports/timesheet')
+        break
+      case 'Monthly Report':
+        this.changeReportRoute('reports/monthly_report')
+        break
+      case 'VBMAPP':
+        this.changeReportRoute('reports/vbmapp')
+        break
+      case 'Peak Block Report':
+        this.changeReportRoute('reports/peak_block_report')
+        break
+      case 'Target Response Report':
+        this.changeReportRoute('reports/target_res_report')
+      case 'Network & Sankey Graph':
+        this.changeReportRoute('reports/network_graph')
+        break
+      default:
+        this.changeReportRoute('reports/progress_overview')
+    }
+  }
+
   onOpenChange = openKeys => {
-    const latestOpenKey = openKeys.find(key => this.state.openKeys.indexOf(key) === -1);
+    const latestOpenKey = openKeys.find(key => this.state.openKeys.indexOf(key) === -1)
     if (this.state.rootSubmenuKeys.indexOf(latestOpenKey) === -1) {
-      this.setState({ openKeys });
+      this.setState({ openKeys })
     } else {
       this.setState({
         openKeys: latestOpenKey ? [latestOpenKey] : [],
-      });
+      })
     }
-  };
+  }
 
   render() {
     const {
@@ -306,7 +357,7 @@ class Reports extends React.Component {
       })
     }
 
-    const exportToCSV = () => { }
+    const exportToCSV = () => {}
 
     const menu = (
       <Menu>
@@ -322,8 +373,6 @@ class Reports extends React.Component {
         </Menu.Item>
       </Menu>
     )
-
-    
 
     if (!std && Learners.length < 1) {
       return <p>No learners to display reports</p>
@@ -430,8 +479,8 @@ class Reports extends React.Component {
                     {TabCheck === 'Timesheet' ? (
                       <StaffSelect Staffs={this.state.staffs} selectStaff={this.selectStaff} />
                     ) : (
-                        <LearnerSelect />
-                      )}
+                      <LearnerSelect />
+                    )}
                   </Drawer>
                 </div>
               </div>
@@ -443,7 +492,10 @@ class Reports extends React.Component {
               <Select
                 style={{ width: 200, margin: '20px 0' }}
                 defaultValue={this.state.TabCheck}
-                onSelect={e => this.SetTabFunction(e)}
+                onSelect={e => {
+                  this.setRoute(e)
+                  this.SetTabFunction(e)
+                }}
               >
                 <Option key="1" value="Progress Overview">
                   Progress Overview
@@ -501,57 +553,6 @@ class Reports extends React.Component {
             <Row gutter={[0, 0]}>
               {this.state.windowWidth > 1050 && (
                 <Col sm={5}>
-                  {/* <Menu
-                    mode="inline"
-                    openKeys={this.state.openKeys}
-                    onOpenChange={this.onOpenChange}
-                    style={{ width: 256 }}
-                  >
-                    <SubMenu
-                      key="sub1"
-                      title={
-                        <span>
-                          <Icon type="mail" />
-                          <span>Navigation One</span>
-                        </span>
-                      }
-                    >
-                      <Menu.Item key="1">Option 1</Menu.Item>
-                      <Menu.Item key="2">Option 2</Menu.Item>
-                      <Menu.Item key="3">Option 3</Menu.Item>
-                      <Menu.Item key="4">Option 4</Menu.Item>
-                    </SubMenu>
-                    <SubMenu
-                      key="sub2"
-                      title={
-                        <span>
-                          <Icon type="appstore" />
-                          <span>Navigation Two</span>
-                        </span>
-                      }
-                    >
-                      <Menu.Item key="5">Option 5</Menu.Item>
-                      <Menu.Item key="6">Option 6</Menu.Item>
-                      <SubMenu key="sub3" title="Submenu">
-                        <Menu.Item key="7">Option 7</Menu.Item>
-                        <Menu.Item key="8">Option 8</Menu.Item>
-                      </SubMenu>
-                    </SubMenu>
-                    <SubMenu
-                      key="sub4"
-                      title={
-                        <span>
-                          <Icon type="setting" />
-                          <span>Navigation Three</span>
-                        </span>
-                      }
-                    >
-                      <Menu.Item key="9">Option 9</Menu.Item>
-                      <Menu.Item key="10">Option 10</Menu.Item>
-                      <Menu.Item key="11">Option 11</Menu.Item>
-                      <Menu.Item key="12">Option 12</Menu.Item>
-                    </SubMenu>
-                  </Menu> */}
                   <div style={{ display: 'flex' }}>
                     <div
                       style={{
