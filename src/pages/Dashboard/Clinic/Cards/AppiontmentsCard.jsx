@@ -9,7 +9,7 @@ const { Text } = Typography
 
 const APPIONTMENTS = gql`
   query {
-    upcoming_appointment: appointments {
+    upcoming_appointment: appointments(first: 100) {
       edges {
         node {
           id
@@ -17,6 +17,7 @@ const APPIONTMENTS = gql`
           end
           title
           therapist {
+            id
             name
           }
           student {
@@ -55,6 +56,8 @@ const AppiontmentsCard = ({ style, status }) => {
     data.upcoming_appointment.edges.filter(({ node }) => {
       return moment(node.start).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD') ? node : null
     })
+
+  console.log("Error ========> ", error)
 
   return (
     <div>

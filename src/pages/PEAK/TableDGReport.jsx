@@ -12,15 +12,12 @@
 import React, { useEffect, useState } from 'react'
 import gql from 'graphql-tag'
 import './table.scss'
-import { useHistory, Link } from 'react-router-dom'
 import { useQuery, useMutation } from 'react-apollo'
+import moment from 'moment'
 import { Typography, Row, Col, Button, Select, Drawer } from 'antd'
-import {DRAWER} from 'assets/styles/globalStyles'
-import Triangle from './Triangle'
+import { DRAWER } from 'assets/styles/globalStyles'
 import NewTableReportPdf from './NewTableReportPdf'
-import apolloClient from '../../apollo/config'
 
-const { Title, Text } = Typography
 const { Option } = Select
 
 const colorGray = '#d9d9d9'
@@ -161,56 +158,6 @@ const directDefaultScores = [
   },
 ]
 
-const SUMMERY = gql`
-  query($program: ID!) {
-    peakDataSummary(program: $program) {
-      total
-      totalAttended
-      totalCorrect
-      totalIncorrect
-      totalNoResponse
-      totalSkipped
-      totalSuggested
-      edges {
-        node {
-          id
-          yes {
-            edges {
-              node {
-                id
-                code
-              }
-            }
-          }
-          no {
-            edges {
-              node {
-                id
-                code
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`
-const getAllQuestionsCode = gql`
-  query($type: String!) {
-    peakGetCodes(peakType: $type) {
-      edges {
-        node {
-          id
-          peakType
-          code
-          description
-          instructions
-          expRes
-        }
-      }
-    }
-  }
-`
 const getTableDataQuery = gql`
   mutation peakReport($pk: ID!) {
     peakReport(input: { pk: $pk }) {
@@ -231,6 +178,7 @@ const factorAgeQuery = gql`
       student {
         id
         firstname
+        dob
       }
       finalAge
       factorScores {
@@ -244,43 +192,7 @@ const factorAgeQuery = gql`
     }
   }
 `
-const lastAssesmentQuery = gql`
-  mutation lastFourRecords($pk: ID!) {
-    lastFourRecords(input: { pk: $pk }) {
-      programs {
-        id
-        date
-        user {
-          id
-          firstName
-          lastName
-        }
-        student {
-          id
-          caseManager {
-            id
-            name
-          }
-        }
-        submitpeakresponsesSet {
-          edges {
-            node {
-              id
-              yes {
-                edges {
-                  node {
-                    id
-                    code
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`
+
 const finageSubmissionQuery = gql`
   mutation updatePeakProgram($program: ID!, $finalAge: String!) {
     updatePeakProgram(input: { program: $program, finalAge: $finalAge }) {
@@ -350,13 +262,106 @@ export default () => {
     },
   )
 
+  const calculateFactorAge = birthday => {
+    // birthday is a date
+    const a = moment()
+    const b = moment(birthday)
+    const years = a.diff(b, 'year')
+    b.add(years, 'years')
+
+    const months = a.diff(b, 'months')
+    b.add(months, 'months')
+
+    let fAge = `1-2 yrs`
+    let fAgeLocal = `1-2:11 yrs`
+
+    if (years <= 2) {
+      fAge = '1-2 yrs'
+      fAgeLocal = '1-2:11 yrs'
+    }
+    if (2 < years && years <= 4) {
+      fAge = '3-4 yrs'
+      fAgeLocal = '3-4:11 yrs'
+    }
+    if (4 < years && years <= 6) {
+      fAge = '5-6 yrs'
+      fAgeLocal = '5-6:11 yrs'
+    }
+    if (6 < years && years <= 8) {
+      fAge = '7-8 yrs'
+      fAgeLocal = '7-8:11 yrs'
+    }
+    if (8 < years && years <= 10) {
+      fAge = '9-10 yrs'
+      fAgeLocal = '9-10:11 yrs'
+    }
+    if (10 < years && years <= 12) {
+      fAge = '11-12 yrs'
+      fAgeLocal = '11-12:11 yrs'
+    }
+    if (12 < years && years <= 14) {
+      fAge = '13-14 yrs'
+      fAgeLocal = '13-14:11 yrs'
+    }
+    if (14 < years) {
+      fAge = '15+ yrs'
+      fAgeLocal = '15+ yrs'
+    }
+
+    setFinalAge(fAge)
+    localStorage.setItem('PeakFactorAge', fAgeLocal)
+  }
+
+  const convertDateFormat = rawAge => {
+    let fAgeLocal = `1-2:11 yrs`
+
+    if (rawAge === '1-2 yrs'){      
+      fAgeLocal = '1-2:11 yrs'
+    }
+    if (rawAge === '3-4 yrs'){
+      fAgeLocal = '3-4:11 yrs'
+    }
+    if (rawAge === '5-6 yrs'){
+      fAgeLocal = '5-6:11 yrs'
+    }
+    if (rawAge === '7-8 yrs'){
+      fAgeLocal = '7-8:11 yrs'
+    }
+    if (rawAge === '9-10 yrs'){    
+      fAgeLocal = '9-10:11 yrs'
+    }
+    if (rawAge === '11-12 yrs'){
+      fAgeLocal = '11-12:11 yrs'
+    }
+    if (rawAge === '13-14 yrs'){
+      fAgeLocal = '13-14:11 yrs'
+    }
+    if (rawAge === '15+ yrs'){
+      fAgeLocal = '15+ yrs'
+    }
+
+    localStorage.setItem('PeakFactorAge', fAgeLocal)
+  }
+
   // updating local factor response object
   useEffect(() => {
     if (factorScores) {
       console.log("Initial Factor score data ====> ", factorScores);
-      setFinalAge(factorScores?.peakProgram?.finalAge)
+      if (factorScores?.peakProgram?.finalAge) {
+        setFinalAge(factorScores?.peakProgram?.finalAge)
+        convertDateFormat(factorScores?.peakProgram?.finalAge)
+        // localStorage.setItem('PeakFactorAge', factorScores?.peakProgram?.finalAge)
+      }
+      else {
+
+        const birthday = factorScores?.peakProgram?.student.dob
+        if (birthday) {
+          calculateFactorAge(birthday)
+        }
+
+      }
+
       const copyFactorsAgeResponse = factorsAgeResponse
-      localStorage.setItem('PeakFactorAge', factorScores?.peakProgram?.finalAge)
 
       if (factorScores?.peakProgram?.factorScores?.edges.length > 0) {
         factorScores.peakProgram.factorScores.edges.map(nodeItem => {
@@ -425,6 +430,7 @@ export default () => {
 
   function handleChange(value) {
     setFinalAge(value)
+    convertDateFormat(value)
   }
 
   const [
@@ -446,8 +452,12 @@ export default () => {
     let y = ''
     if (factorScores?.peakProgram?.finalAge) {
       setFinalAge(factorScores?.peakProgram?.finalAge)
+      convertDateFormat(factorScores?.peakProgram?.finalAge)
     } else {
-      setFinalAge('1-2 yrs')
+      const birthday = factorScores?.peakProgram?.student.dob
+      if (birthday) {
+        calculateFactorAge(birthday)
+      }
     }
 
     if (factorScores?.peakProgram?.factorScores.edges.length > 0) {
@@ -698,7 +708,6 @@ export default () => {
       })
   }
 
-  const history = useHistory()
   const [visible, setVisible] = useState(false)
 
   const showDrawer = () => {
@@ -720,7 +729,7 @@ export default () => {
           onClose={onClose}
           visible={visible}
         >
-          <NewTableReportPdf 
+          <NewTableReportPdf
             tdata={tdata}
             defaultScores={defaultScores}
             peakType={peakType}
