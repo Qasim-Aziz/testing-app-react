@@ -18,7 +18,8 @@ import AdvanceInvoiceForm from './advanceInvoiceForm'
 import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
 import MonthlyInvoiceForm from './monthlyInvoice'
 import BankDetails from './bankDetails'
-import { CLINIC_QUERY, PAYMENT_REMINDER } from './query'
+import { CLINIC_QUERY } from './query'
+import InvoiceTable from '../allClinicData/invoiceTable'
 
 const { layout, tailLayout } = FORM
 
@@ -26,15 +27,16 @@ function CustomerList() {
   const { data, loading, error } = useQuery(CLINIC_QUERY)
   const [tableData, setTableData] = useState([])
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
-  const [invoiceCreateDrawer, setInvoiceCreateDrawer] = useState(false)
-  const [payReminderDrawer, setPayReminderDrawer] = useState(false)
+  const [advanceInvoiceModal, setAdvanceInvoiceModal] = useState(false)
+  const [payReminderModal, setPayReminderModal] = useState(false)
   const [advInvForm, setAdvInvForm] = useState(false)
   const [monthlyInvForm, setMonthlyInvForm] = useState(false)
+  const [invoiceDrawer, setInvoiceDrawer] = useState(false)
   const [currentRow, setCurrentRow] = useState(null)
+  const [drawerTitle, setDrawerTitle] = useState(null)
   const [bankDetailsDrawer, setBankDetailsDrawer] = useState(false)
   const [selectedClinicsName, setSelectedClinicsName] = useState(null)
   const [invoiceType, setInvoiceType] = useState('advance')
-  const [sendPaymentReminder, { loading: paymentReminderLoading }] = useMutation(PAYMENT_REMINDER)
 
   useEffect(() => {
     if (data) {
@@ -68,6 +70,19 @@ function CustomerList() {
     {
       title: 'Invoices',
       dataIndex: 'invoice',
+      render: (e, row) => (
+        <Button
+          onClick={() => {
+            setCurrentRow(row)
+            setDrawerTitle(row.details.schoolName)
+            setInvoiceDrawer(true)
+          }}
+          type="link"
+          style={{ padding: '0px', fontWeight: 'bold', fontSize: '13px' }}
+        >
+          {e}
+        </Button>
+      ),
     },
     {
       title: 'Debit',
@@ -96,12 +111,12 @@ function CustomerList() {
     setSelectedClinicsName(names)
     if (e.key == 'advanceInvoice') {
       setInvoiceType('advance')
-      setInvoiceCreateDrawer(true)
+      setAdvanceInvoiceModal(true)
     } else if (e.key == 'monthlyInvoice') {
       setInvoiceType('monthly')
-      setInvoiceCreateDrawer(true)
+      setAdvanceInvoiceModal(true)
     } else if (e.key == 'payReminder') {
-      setPayReminderDrawer(true)
+      setPayReminderModal(true)
     }
   }
 
@@ -138,54 +153,31 @@ function CustomerList() {
     </div>
   )
 
-  const handlePaymentReminder = () => {
-    if (selectedRowKeys && selectedRowKeys.length > 0) {
-      sendPaymentReminder({
-        variables: {
-          clinics: selectedRowKeys,
-        },
-      })
-        .then(
-          res =>
-            notification.success({
-              message: 'Payment reminder sent successfully!',
-            }),
-          setPayReminderDrawer(false),
-        )
-        .catch(err =>
-          notification.error({
-            message: 'Something went wrong!',
-            description: 'Unable to send payment reminder',
-          }),
-        )
-    }
-  }
-
   return (
     <div style={{ marginTop: 10 }}>
       <Drawer
         title={`Create ${invoiceType === 'advance' ? 'advance' : 'monthly'} invoice`}
         width={DRAWER.widthL2}
-        visible={invoiceCreateDrawer}
+        visible={advanceInvoiceModal}
         closable
         destroyOnClose
-        onClose={() => setInvoiceCreateDrawer(false)}
+        onClose={() => setAdvanceInvoiceModal(false)}
       >
         <AdvanceInvoiceForm
           selectedClinicsName={selectedClinicsName}
           selectedRowKeys={selectedRowKeys}
           invoiceType={invoiceType}
-          closeDrawer={() => setInvoiceCreateDrawer(false)}
+          closeDrawer={() => setAdvanceInvoiceModal(false)}
         />
       </Drawer>
 
       <Drawer
         title="Send pay reminder"
-        visible={payReminderDrawer}
+        visible={payReminderModal}
         closable
         destroyOnClose
         onClose={() => {
-          setPayReminderDrawer(false)
+          setPayReminderModal(false)
         }}
         width={DRAWER.widthL2}
       >
@@ -197,9 +189,7 @@ function CustomerList() {
                   <ol style={{ display: 'grid', gridTemplateColumns: 'auto auto' }}>
                     {selectedClinicsName &&
                       selectedClinicsName.map((item, index) => (
-                        <li key={item} style={{ width: 340 }}>
-                          {item}
-                        </li>
+                        <li style={{ width: 340 }}>{item}</li>
                       ))}
                   </ol>
                 </div>
@@ -214,15 +204,10 @@ function CustomerList() {
             </div>
           </Form.Item>
           <Form.Item {...tailLayout}>
-            <Button
-              type="default"
-              loading={paymentReminderLoading}
-              onClick={() => handlePaymentReminder()}
-              style={SUBMITT_BUTTON}
-            >
+            <Button type="default" style={SUBMITT_BUTTON}>
               Send Reminder
             </Button>
-            <Button onClick={() => setPayReminderDrawer(false)} type="ghost" style={CANCEL_BUTTON}>
+            <Button onClick={() => setPayReminderModal(false)} type="ghost" style={CANCEL_BUTTON}>
               Cancel
             </Button>
           </Form.Item>
@@ -258,6 +243,21 @@ function CustomerList() {
         />
       </Drawer>
       <Drawer
+        title={`${drawerTitle}: Invoices`}
+        width={DRAWER.widthL1}
+        visible={invoiceDrawer}
+        onClose={() => setInvoiceDrawer(false)}
+        placement="right"
+        closable="true"
+        destroyOnClose="true"
+      >
+        <InvoiceTable
+          rowData={currentRow}
+          invoiceFormDrawer={invoiceDrawer}
+          setInvoiceFormDrawer={setInvoiceDrawer}
+        />
+      </Drawer>
+      <Drawer
         width={DRAWER.widthL2}
         title="Update Payment accepting details"
         visible={bankDetailsDrawer}
@@ -272,7 +272,6 @@ function CustomerList() {
         rowSelection={rowSelection}
         loading={loading}
         bordered
-        loading={loading}
         title={() => {
           return filterHeader
         }}
