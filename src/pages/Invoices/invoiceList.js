@@ -30,7 +30,7 @@ import moment from 'moment'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import InvoiceForm from 'components/invoice/InvoiceForm'
 import EditInvoice from 'components/invoice/EditInvoice'
-import PreviewInvoice from '../../components/invoice/PreviewInvoice'
+import PreviewInvoice from '../allClinicData/viewInvoice'
 import './invoices.scss'
 
 const GET_INVOICES = gql`
@@ -97,6 +97,7 @@ export default () => {
   const [data, setData] = useState()
   const [deleteInvoiceId, setDeleteInvoiceId] = useState()
   const [editInvoiceId, setEditInvoiceId] = useState()
+  const [currentInvoice, setCurrentInvoice] = useState(null)
 
   // invoice filer
   const [from, setFrom] = useState()
@@ -138,11 +139,7 @@ export default () => {
       notification.success({
         message: 'Delete invoice sucessfully',
       })
-      setData(state => {
-        return state.filter(invoice => {
-          return invoice.key !== deleteInvoiceId
-        })
-      })
+      refetch()
       setDeleteInvoiceId(null)
     }
   }, [deleteInvoiceData])
@@ -160,21 +157,7 @@ export default () => {
     if (invoiceData) {
       const dataList = [...invoiceData.getInvoices.edges]
       const arrengedData = dataList.map(({ node }) => {
-        return {
-          key: node.id,
-          invoiceNo: node.invoiceNo,
-          amount: node.amount,
-          clinic: node.clinic.schoolName,
-          status: node.status.statusName,
-          date: node.issueDate,
-          dueDate: node.dueDate,
-          name: node.customer?.parent
-            ? `${node.customer.parent.firstName} ${
-                node.customer.parent.lastName ? node.customer?.parent?.lastName : ' '
-              }`
-            : null,
-          email: node.email,
-        }
+        return node
       })
       arrengedData.reverse()
       setData(arrengedData)
@@ -195,17 +178,14 @@ export default () => {
       title: 'Invoice No',
       dataIndex: 'invoiceNo',
       width: 160,
-      render: text => {
-        return <span>{text}</span>
-      },
     },
     {
       title: 'Clinic',
-      dataIndex: 'clinic',
+      dataIndex: 'clinic.schoolName',
     },
     {
       title: 'Issue Date',
-      dataIndex: 'date',
+      dataIndex: 'issueDate',
       width: 160,
     },
     {
@@ -219,16 +199,18 @@ export default () => {
     },
     {
       title: 'Status',
-      dataIndex: 'status',
+      dataIndex: 'status.statusName',
     },
     {
       title: 'Action',
       width: 260,
       render: row => {
+        console.log(row)
         return (
           <div>
             <Button
               onClick={() => {
+                setCurrentInvoice(row)
                 setSelectedInvoiceId(row.key)
                 setPreviewInvoice(true)
               }}
@@ -239,7 +221,7 @@ export default () => {
 
             {row.status !== 'Paid' && (
               <>
-                <Button
+                {/* <Button
                   type="link"
                   onClick={() => {
                     setEditInvoice(true)
@@ -247,12 +229,12 @@ export default () => {
                   }}
                 >
                   <EditOutlined style={{ fontWeight: 600 }} />
-                </Button>
+                </Button> */}
                 <Popconfirm
                   title="Are you sure to delete this invoice?"
                   onConfirm={() => {
-                    deleteInvoice({ variables: { id: row.key } })
-                    setDeleteInvoiceId(row.key)
+                    deleteInvoice({ variables: { id: row.id } })
+                    setDeleteInvoiceId(row.id)
                   }}
                   okText="Yes"
                   cancelText="No"
@@ -271,19 +253,23 @@ export default () => {
 
   let filteredList = data || []
   filteredList = filteredList.filter(
-    item => item.status && item.status.toLowerCase().includes(filterStatus.toLowerCase()),
+    item =>
+      item.status?.statusName &&
+      item.status?.statusName.toLowerCase().includes(filterStatus.toLowerCase()),
   )
 
   if (filterCustomer) {
     filteredList = filteredList.filter(
-      item => item.clinic && item.clinic.toLowerCase().includes(filterCustomer.toLowerCase()),
+      item =>
+        item.clinic?.schoolName &&
+        item.clinic.schoolName.toLowerCase().includes(filterCustomer.toLowerCase()),
     )
   }
 
   const status =
     data && data.length > 0
       ? data.reduce(function(sum, current) {
-          return sum.concat(current.status ? current.status : [])
+          return sum.concat(current.status.statusName ? current.status.statusName : [])
         }, [])
       : null
 
@@ -446,6 +432,7 @@ export default () => {
     </div>
   )
 
+  console.log(data, 'data')
   console.log(invoiceData)
   return (
     <div style={{ marginTop: 10 }}>
@@ -493,24 +480,24 @@ export default () => {
         className="change-invo-drawer"
         onClose={() => setPreviewInvoice(false)}
       >
-        <PreviewInvoice invoiceId={selectedInvoiceId} />
+        <PreviewInvoice invoice={currentInvoice} />
       </Drawer>
 
-      <Drawer visible={isEditInvoice} width={DRAWER.widthL1} onClose={() => setEditInvoice(false)}>
+      {/* <Drawer visible={isEditInvoice} width={DRAWER.widthL1} onClose={() => setEditInvoice(false)}>
         <EditInvoice
           invoiceId={editInvoiceId}
           closeDrawer={setEditInvoice}
           refetchInvoices={refetch}
         />
-      </Drawer>
+      </Drawer> */}
 
-      <Drawer
+      {/* <Drawer
         visible={isCreateInvoice}
         width={DRAWER.widthL1}
         onClose={() => setCreateInvoice(false)}
       >
         <InvoiceForm setNewInvDrawer={setCreateInvoice} refetchInvoices={refetch} />
-      </Drawer>
+      </Drawer> */}
     </div>
   )
 }
