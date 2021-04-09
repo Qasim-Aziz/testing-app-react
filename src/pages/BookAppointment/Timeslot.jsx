@@ -32,7 +32,7 @@ const Timeslot = ({
   ] = useMutation(CREATE_APPOINTMENT)
 
   useEffect(() => {
-    if (createAppointmentData) {
+    if (createAppointmentData && createAppointmentData.CreateAppointment) {
       notification.success({ message: 'Appointment created successfully.' })
       if (refetchAvailableSlotTime)
         refetchAvailableSlotTime({
@@ -45,8 +45,14 @@ const Timeslot = ({
   }, [createAppointmentData])
 
   useEffect(() => {
-    if (createAppointmentError)
-      notification.error({ message: 'Error! please check your timings or you already have appointment' })
+    if (createAppointmentError){
+      console.log(createAppointmentError)
+      notification.error({ 
+        message: 'Error! please check your timings or you already have appointment',
+        // message: createAppointmentError[0]?.message, 
+        duration: 10
+      })
+    }
   }, [createAppointmentError])
 
   const getDateTime = momentObj => momentObj.format('YYYY-MM-DDTHH:mm:ssZ')
