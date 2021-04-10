@@ -37,10 +37,10 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
 
   useEffect(() => {
     if (editing) {
-      console.log('THE inputRef inside useEffect', inputRef)
+      // console.log('THE inputRef inside useEffect', inputRef)
 
       if (inputRef.current) {
-        console.log('THE inputRef inside useEffect >>>>>>', inputRef.current.focus())
+        // console.log('THE inputRef inside useEffect >>>>>>', inputRef.current.focus())
         inputRef.current.focus()
       }
     }
@@ -59,7 +59,7 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
       toggleEdit()
       handleSave({ ...record, ...values })
     } catch (errInfo) {
-      console.log('Save failed:', errInfo)
+      // console.log('Save failed:', errInfo)
     }
   }
 

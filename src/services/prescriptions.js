@@ -202,16 +202,17 @@ export async function createPrescriptionFunc(payload) {
     console.log('THE XXX', x)
     delete x.key
     delete x.rate
+    delete x.note
     console.log('THE XXX', x)
     if (x.qty === null) {
       delete x.qty
     }
     array_of_meds.push(x)
   }
-  console.log('THE ========================>', array_of_meds)
+  console.log('THE array-of-meds ========================>', array_of_meds)
   return apolloClient
-    .query({
-      query: gql`
+    .mutate({
+      mutation: gql`
         mutation createInvoiceMethod(
           $student: ID! #"U3R1ZGVudFR5cGU6NjQ4"
           $height: String # "175 cm"
@@ -314,23 +315,124 @@ export async function createPrescriptionFunc(payload) {
         weight: payload.values.weight,
         temperature: payload.values.temperature,
         headCircumference: payload.values.headCircumference,
-        advice: payload.values.advice,
+        advice: payload.values.advice ? payload.values.advice : '',
         nextVisit:
           payload.values.nextVisitNumber && payload.values.nextVisitVal
             ? `${payload.values.nextVisitNumber} ${payload.values.nextVisitVal}`
             : '',
-        nextVisitDate: payload.values.nextVisitDate,
-        testDate: payload.values.testDate ? payload.values.testDate : [],
-        complaints: [], // payload.values.complaints ? payload.values.complaints : [],
-        diagnosis: [], // payload.values.diagnosis ? payload.values.diagnosis : [],
-        tests: [], // payload.values.tests ? payload.values.tests : [],
-        medicineItems: payload.data ? array_of_meds : [],
+        //this has to be date with correct format
+        nextVisitDate: payload.values.nextVisitDate
+          ? moment(payload.values.nextVisitDate).format('YYYY-MM-DD')
+          : null,
+        //this has to be data with correct format
+        testDate: payload.values.testDate
+          ? moment(payload.values.testDate).format('YYYY-MM-DD')
+          : null,
+        complaints: payload.values.complaints ? payload.values.complaints : [],
+        diagnosis: payload.values.diagnosis ? payload.values.diagnosis : [],
+        tests: payload.values.tests ? payload.values.tests : [],
+        medicineItems: array_of_meds,
       },
     })
     .then(result => result)
     .catch(error => {
       console.log('THE ERROR', JSON.stringify(error))
+      if (error.graphQLError) {
+        error.graphQLErrors.map(item => {
+          return notification.error({
+            message: 'Something went wrong',
+            description: item.message,
+          })
+        })
+      } else {
+        return notification.error({
+          message: `Something went wrong`,
+          description: `${error}`,
+        })
+      }
+    })
+}
+
+export async function getDetailPrescription(payload) {
+  console.log('THE VALUE IN THE PAYLOAD ---------------------> ', payload)
+  // ID OF A PARTICULAR PRESCRIPTION
+  const idVal = payload.value
+  return apolloClient
+    .query({
+      query: gql`
+        query getDetailPrescriptionDef($detail_id: ID) {
+          getPrescriptionDetail(id: $detail_id) {
+            id
+            height
+            weight
+            temperature
+            headCircumference
+            advice
+            nextVisit
+            nextVisitDate
+            testDate
+            createddate
+            createdby {
+              id
+              username
+            }
+            student {
+              id
+              firstname
+            }
+            complaints {
+              edges {
+                node {
+                  id
+                  name
+                }
+              }
+            }
+
+            diagnosis {
+              edges {
+                node {
+                  id
+                  name
+                }
+              }
+            }
+
+            tests {
+              edges {
+                node {
+                  id
+                  name
+                }
+              }
+            }
+            medicineItems {
+              edges {
+                node {
+                  id
+                  name
+                  medicineType
+                  dosage
+                  unit
+                  when
+                  frequency
+                  duration
+                  qty
+                }
+              }
+            }
+          }
+        }
+      `,
+      variables: {
+        detail_id: idVal, // "UHJlc2NyaXB0aW9uVHlwZTox"
+      },
+    })
+    .then(result => result)
+    .catch(error => {
+      console.log('THE ERROR💣💣💣🔥🔥', JSON.stringify(error))
       error.graphQLErrors.map(item => {
+        console.log('THE ERROR💣💣💣🔥🔥', item)
         return notification.error({
           message: 'Something went wrong',
           description: item.message,

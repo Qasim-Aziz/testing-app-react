@@ -1,18 +1,4 @@
 /* eslint-disable */
-
-/**[Explaination]
- * This component is a part of the "Prescription" component wherein
- *  - Only the authenticated & allowed users which are doctors/therapist can have access
- *  - The Parent of a particular learner can view their child's prescription and take a printout of it in a pdf formart
- * How is component structured
- *  - In antD we already have Editable-Row & Editable-Cell Table component
- *    • wherein we can edit every row
- *    • and delete each row
- *    • Once all values in the prescription table are set we will send save & dispatch that the entire array of objects
- *      to the API for CRUD application
- *  - NOTE:
- */
-
 import React, { useEffect, useState, useReducer } from 'react'
 import {
   Form,
@@ -31,9 +17,7 @@ import {
   Popconfirm,
   Card,
   Avatar,
-  Spin,
 } from 'antd'
-import { useQuery } from 'react-apollo'
 import { connect, useSelector, useDispatch } from 'react-redux'
 import PrescriptionTable from './PrescriptionTableComponent'
 /*The below imports are commented because we don't use those anymore */
@@ -41,71 +25,13 @@ import actionPrescription from '../../redux/prescriptions/actions'
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 import { PrescriptionItemContext } from './context'
 import productReducer from './reducer'
-import { GET_COMPLAINT_QUERY, GET_DIAGNOSIS_QUERY, GET_TESTS_QUERY } from './query'
+import { getComplaints, getDiagnosis, getTests, request } from './query'
 import PrescriptionItemTable from './prescriptionItemTable'
 
 const { Header, Content } = Layout
 const { Text, Title } = Typography
 const { Meta } = Card
 const { TextArea } = Input
-
-/* Some static css */
-const itemStyle = {
-  display: 'flex',
-  marginRight: '25px',
-  justifyContent: 'flex-end',
-  marginTop: -15,
-}
-const itemStyle2 = {
-  display: 'flex',
-  marginRight: '25px',
-  // justifyContent: 'flex-end',
-  marginTop: -15,
-}
-const itemStyle3 = {
-  display: 'flex',
-  marginRight: '25px',
-  // justifyContent: 'flex-end',
-  marginTop: -15,
-}
-
-const inputStyle = {
-  width: '200px',
-  borderRadius: 0,
-  border: 'none',
-  borderBottom: '2px solid',
-}
-const inputStyle2 = {
-  width: '160px',
-  borderRadius: 0,
-  border: 'none',
-  borderBottom: '2px solid',
-}
-const inputStyle3 = {
-  borderRadius: 0,
-}
-
-const layout1 = {
-  labelCol: {
-    span: 5,
-  },
-  wrapperCol: {
-    span: 18,
-  },
-}
-
-const customSpanStyle = {
-  backgroundColor: '#52c41a',
-  color: 'white',
-  borderRadius: '3px',
-  padding: '1px 5px',
-}
-const inActiveSpanStyle = {
-  backgroundColor: 'red',
-  color: 'white',
-  borderRadius: '3px',
-  padding: '1px 5px',
-}
 
 /* The below function is a helper function */
 function addNevObject(val) {
@@ -130,154 +56,7 @@ function addNevObject(val) {
   return theMainArray
 }
 
-const GetComplaints = ({ form }) => {
-  const [sdText, setSdText] = useState('')
-  const { data: sdData, error: sdError, loading: sdLoading } = useQuery(GET_COMPLAINT_QUERY, {
-    variables: {
-      val: sdText,
-    },
-  })
-
-  useEffect(() => {
-    if (sdError) {
-      notification.error({
-        message: 'Failed to load sd list',
-      })
-    }
-  }, [sdError])
-
-  return (
-    <>
-      {(form.getFieldValue('complaints') || !form.getFieldValue('complaints')) && (
-        <Form.Item {...layout1} label="MAIN Complaints">
-          {form.getFieldDecorator('complaints')(
-            <Select
-              mode="tags"
-              allowClear
-              size="large"
-              notFoundContent={sdLoading ? <Spin size="small" /> : null}
-              filterOption={false}
-              onSearch={v => {
-                setSdText(v)
-              }}
-              loading={sdLoading}
-              // disabled={form.getFieldValue('complaints')?.length > 0}
-              placeholder="Search for find more sd"
-            >
-              {sdData?.getPrescriptionComplaints.edges.map(({ node }) => {
-                return (
-                  <Select.Option key={node.id} value={node.id}>
-                    {node.name}
-                  </Select.Option>
-                )
-              })}
-            </Select>,
-          )}
-        </Form.Item>
-      )}
-    </>
-  )
-}
-
-const GetDiagnosis = ({ form }) => {
-  const [sdText, setSdText] = useState('')
-  const { data: sdData, error: sdError, loading: sdLoading } = useQuery(GET_DIAGNOSIS_QUERY, {
-    variables: {
-      val: sdText,
-    },
-  })
-
-  useEffect(() => {
-    if (sdError) {
-      notification.error({
-        message: 'Failed to load sd list',
-      })
-    }
-  }, [sdError])
-
-  return (
-    <>
-      {(form.getFieldValue('diagnosis') || !form.getFieldValue('diagnosis')) && (
-        <Form.Item {...layout1} label="MAIN diagnosis">
-          {form.getFieldDecorator('diagnosis')(
-            <Select
-              mode="tags"
-              allowClear
-              size="large"
-              notFoundContent={sdLoading ? <Spin size="small" /> : null}
-              filterOption={false}
-              onSearch={v => {
-                setSdText(v)
-              }}
-              loading={sdLoading}
-              // disabled={form.getFieldValue('complaints')?.length > 0}
-              placeholder="Search for find more sd"
-            >
-              {sdData?.getPrescriptionDiagnosis.edges.map(({ node }) => {
-                return (
-                  <Select.Option key={node.id} value={node.id}>
-                    {node.name}
-                  </Select.Option>
-                )
-              })}
-            </Select>,
-          )}
-        </Form.Item>
-      )}
-    </>
-  )
-}
-
-const GetTest = ({ form }) => {
-  const [sdText, setSdText] = useState('')
-  const { data: sdData, error: sdError, loading: sdLoading } = useQuery(GET_TESTS_QUERY, {
-    variables: {
-      val: sdText,
-    },
-  })
-
-  useEffect(() => {
-    if (sdError) {
-      notification.error({
-        message: 'Failed to load sd list',
-      })
-    }
-  }, [sdError])
-
-  return (
-    <>
-      {(form.getFieldValue('tests') || !form.getFieldValue('tests')) && (
-        <Form.Item {...layout1} label="MAIN tests">
-          {form.getFieldDecorator('tests')(
-            <Select
-              mode="tags"
-              allowClear
-              size="large"
-              notFoundContent={sdLoading ? <Spin size="small" /> : null}
-              filterOption={false}
-              onSearch={v => {
-                setSdText(v)
-              }}
-              loading={sdLoading}
-              // disabled={form.getFieldValue('complaints')?.length > 0}
-              placeholder="Search for find more sd"
-            >
-              {sdData?.getPrescriptionTests.edges.map(({ node }) => {
-                return (
-                  <Select.Option key={node.id} value={node.id}>
-                    {node.name}
-                  </Select.Option>
-                )
-              })}
-            </Select>,
-          )}
-        </Form.Item>
-      )}
-    </>
-  )
-}
-
-const BankDetails = props => {
+const EditPrescriptionDetails = props => {
   const { form, details } = props
   console.log('The state', props)
   const prescriptions = useSelector(state => state.prescriptions)
@@ -296,10 +75,11 @@ const BankDetails = props => {
 
   useEffect(() => {
     console.log('******************* THE COMPONENT Did mount method ie it will run only once ')
+    // Dispatching the details of a particular prescription
     dispatchOfPrescription({
-      type: actionPrescription.GET_LASTEST_PRESCRIPTIONS,
+      type: actionPrescription.GET_DETAILS_PRESCRIPTIONS,
       payload: {
-        /**Sending student's ID */
+        /**Sending prescription id */
         value: details.id,
       },
     })
@@ -316,27 +96,85 @@ const BankDetails = props => {
   useEffect(() => {
     console.log('THE PRESCRIPTION VALUE', prescriptions)
     if (prescriptions.SpecificPrescription) {
-      let listOfMedicineObject = prescriptions.SpecificPrescription.medicineItems.edges
+      let listOfMedicineObject = prescriptions.SpecificPrescription.node.medicineItems.edges
       console.log('THE LIST OF MEDS 💊💊💊💊💊', listOfMedicineObject)
       /**Add key in the product_state */
       let x = addNevObject(listOfMedicineObject)
       productsDispatch({ type: 'SET_PRODUCTS', payload: x })
-      // Once the meds are imported we fill all those values
+      const newArray = prescriptions.SpecificPrescription.node.complaints.edges.map(
+        element => element.node.name,
+      )
+      console.log('THE NEW ARRAY', newArray)
       form.setFieldsValue({
-        height: prescriptions.SpecificPrescription.height,
-        weight: prescriptions.SpecificPrescription.weight,
-        temperature: prescriptions.SpecificPrescription.temperature,
-        headCircumference: prescriptions.SpecificPrescription.headCircumference,
-        complaints: prescriptions.SpecificPrescription.complaints.edges.map(
-          element => element.node.id,
+        height: prescriptions.SpecificPrescription.node.height,
+        weight: prescriptions.SpecificPrescription.node.weight,
+        temperature: prescriptions.SpecificPrescription.node.temperature,
+        headCircumference: prescriptions.SpecificPrescription.node.headCircumference,
+        complaints: newArray,
+        diagnosis: prescriptions.SpecificPrescription.node.diagnosis.edges.map(
+          element => element.node.name,
         ),
-        diagnosis: prescriptions.SpecificPrescription.diagnosis.edges.map(
-          element => element.node.id,
-        ),
-        tests: prescriptions.SpecificPrescription.tests.edges.map(element => element.node.id),
       })
     }
   }, [prescriptions.SpecificPrescription])
+
+  /* Some static css */
+  const itemStyle = {
+    display: 'flex',
+    marginRight: '25px',
+    justifyContent: 'flex-end',
+    marginTop: -15,
+  }
+  const itemStyle2 = {
+    display: 'flex',
+    marginRight: '25px',
+    // justifyContent: 'flex-end',
+    marginTop: -15,
+  }
+  const itemStyle3 = {
+    display: 'flex',
+    marginRight: '25px',
+    // justifyContent: 'flex-end',
+    marginTop: -15,
+  }
+
+  const inputStyle = {
+    width: '200px',
+    borderRadius: 0,
+    border: 'none',
+    borderBottom: '2px solid',
+  }
+  const inputStyle2 = {
+    width: '160px',
+    borderRadius: 0,
+    border: 'none',
+    borderBottom: '2px solid',
+  }
+  const inputStyle3 = {
+    borderRadius: 0,
+  }
+
+  const layout1 = {
+    labelCol: {
+      span: 5,
+    },
+    wrapperCol: {
+      span: 18,
+    },
+  }
+
+  const customSpanStyle = {
+    backgroundColor: '#52c41a',
+    color: 'white',
+    borderRadius: '3px',
+    padding: '1px 5px',
+  }
+  const inActiveSpanStyle = {
+    backgroundColor: 'red',
+    color: 'white',
+    borderRadius: '3px',
+    padding: '1px 5px',
+  }
 
   function onChangeInputNumber(value) {
     console.log('changed', value)
@@ -368,12 +206,31 @@ const BankDetails = props => {
 
   const arrayOfOptions = []
 
+  //  async getUser = () => {
+  //  const response = await request(apolloclient);
+  //  console.log(await response);
+  // }
+  // async getVals = (val) => {
+  //   const response = await getComplaints(val);
+  //   console.log('THE IMPORTANT 🔴🔴🔴🔴🔴🔴🔴🔴',await response)
+  // }
   const handleChange = value => {
     console.log(`Selected: `, value)
     console.log('THE TYPE OF val', typeof value)
     const lastItem = value[value.length - 1]
 
     console.log('THE VALUESSSSSS ', lastItem)
+    // getVals(lastItem)
+    // let list_of_stuff = async lastItem => {
+    //   console.log('THE IMPORTANT 🔴🔴🔴🔴🔴🔴🔴🔴', lastItem)
+    //   await getComplaints(lastItem)
+    //     .then(res => {
+    //       console.log(`The function recieved with value ${res}`, res)
+    //     })
+    //     .catch(error => {
+    //       console.log(`Handling error as we received ${error}`)
+    //     })
+    // }
   }
 
   const EachSearchSelect = val => {
@@ -530,12 +387,37 @@ const BankDetails = props => {
                 </Form.Item>
               </div>
             </div>
-            {/* The complaints list */}
-            <GetComplaints form={form} />
-            {/* The diagnosis list */}
-            <GetDiagnosis form={form} />
-            {/* The test list */}
-            <GetTest form={form} />
+            {/* There will be a predefined list of complaints which the user will select  */}
+            <Form.Item {...layout1} label="Complaints">
+              {form.getFieldDecorator('complaints')(
+                <Select
+                  mode="tags"
+                  style={inputStyle3}
+                  placeholder="Please select Complaints"
+                  // initialValue={['a10', 'c12']}
+                  onChange={handleChange}
+                  style={{ width: '100%' }}
+                >
+                  {/* {arrayOfOptions} */}
+                  {children}
+                </Select>,
+              )}
+            </Form.Item>
+
+            <Form.Item {...layout1} label="Diagnosis">
+              {form.getFieldDecorator('diagnosis')(
+                <Select
+                  mode="tags"
+                  style={inputStyle3}
+                  placeholder="Please select"
+                  initialValue={['a10', 'c12']}
+                  onChange={handleChange}
+                  style={{ width: '100%' }}
+                >
+                  {children}
+                </Select>,
+              )}
+            </Form.Item>
             {prescriptions.loadingPrescriptions !== true &&
             prescriptions.isSpecificPrescription !== false ? (
               <>
@@ -557,6 +439,7 @@ const BankDetails = props => {
             ) : (
               <>Display Loading</>
             )}
+
             {/* advice:"Test Advice"
             nextVisit:"2 Days"
             nextVisitDate:"2021-04-01"
@@ -566,11 +449,13 @@ const BankDetails = props => {
                 <TextArea placeholder="Advice" autoSize={{ minRows: 2, maxRows: 5 }} allowClear />,
               )}
             </Form.Item>
+
             <Form.Item {...layout1} label="Next Visit">
               {form.getFieldDecorator('nextVisitNumber')(
                 <InputNumber min={0} max={1000} onChange={onChangeInputNumber} />,
               )}
             </Form.Item>
+
             <Form.Item>
               {form.getFieldDecorator('nextVisitVal')(
                 <Radio.Group onChange={onChangeNextVisitVal}>
@@ -580,6 +465,7 @@ const BankDetails = props => {
                 </Radio.Group>,
               )}
             </Form.Item>
+
             <Form.Item {...layout1} label="Next Visit Date">
               {form.getFieldDecorator('nextVisitDate')(<DatePicker />)}
             </Form.Item>
@@ -615,4 +501,4 @@ const BankDetails = props => {
   )
 }
 
-export default Form.create()(BankDetails)
+export default Form.create()(EditPrescriptionDetails)

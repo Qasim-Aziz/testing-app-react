@@ -29,9 +29,9 @@ const components = {
 }
 
 const PrescriptionItemTable = ({ products, dispatch, totalAmount }) => {
-  console.log('THE PRODUCTS', products)
-  console.log('THE Dispatch', dispatch)
-  console.log('THE TOTAL AMOUNT', totalAmount)
+  // console.log('THE PRODUCTS', products)
+  // console.log('THE Dispatch', dispatch)
+  // console.log('THE TOTAL AMOUNT', totalAmount)
   const columnsList = [
     {
       title: '#',
