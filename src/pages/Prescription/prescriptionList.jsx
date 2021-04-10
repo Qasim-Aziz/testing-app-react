@@ -5,20 +5,32 @@
 /* eslint-disable */
 import React, { useState, useEffect, useCallback } from 'react'
 import { connect, useSelector, useDispatch } from 'react-redux'
-import { Table, Card, Col, Row, List, Typography, Divider, Button, Tag } from 'antd'
+import {
+  Button,
+  Table,
+  Layout,
+  Drawer,
+  Tabs,
+  Input,
+  Card,
+  Col,
+  Row,
+  List,
+  Typography,
+  Divider,
+  Tag,
+} from 'antd'
 import { CloseCircleOutlined, CheckCircleOutlined, EditOutlined } from '@ant-design/icons'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import actionPrescription from '../../redux/prescriptions/actions'
 import './index.scss'
+import EditPrescription from './editPrescriptionComponent'
 
-// const TagComponent = val => {
-//   console.log('THE TTTAAAGGG', val)
-//   return val.map((item, index) => <Tag key={item.node.id}>{item.node.name}</Tag>)
-// }
-
+// Every individual prescription
 export const History = props => {
   console.log('EACH HISTORY PROP', props)
-
+  const [editPrescription, setEditPrescription] = useState(false)
+  const [deletePrescription, setDeletePrescription] = useState(false)
   const customSpanStyle = {
     backgroundColor: COLORS.success,
     color: 'white',
@@ -89,93 +101,95 @@ export const History = props => {
   ]
   return (
     <>
-      <div className="mainCard" style={{ marginBottom: '28px' }}>
-        <div className="mainCard-child right-border">
-          <div style={{ fontSize: '22px', color: 'black', marginBottom: '12px' }}>
-            Personal Information
-            <Button
-              type="link"
-              onClick={() => {
-                console.log('PERSONAL INFO CLICKED EDIT BUTTON CLICK')
-              }}
-              style={{
-                paddingRight: 0,
-                fontSize: '16px',
-                float: 'right',
-              }}
-            >
-              <EditOutlined />
-            </Button>
-          </div>
-          {props.data.node ? (
-            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-              <p style={labelHead}>HEIGHT </p>
-              <p> : {props.data.node.height}</p>
+      <div>
+        <div className="mainCard" style={{ marginBottom: '28px' }}>
+          <div className="mainCard-child right-border">
+            <div style={{ fontSize: '22px', color: 'black', marginBottom: '12px' }}>
+              Personal Information
+              <Button
+                type="link"
+                onClick={() => {
+                  console.log('PERSONAL INFO CLICKED EDIT BUTTON CLICK')
+                  setEditPrescription(true)
+                }}
+                style={{
+                  paddingRight: 0,
+                  fontSize: '16px',
+                  float: 'right',
+                }}
+              >
+                <EditOutlined />
+              </Button>
             </div>
-          ) : null}
-          {props.data.node ? (
+            {props.data.node ? (
+              <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                <p style={labelHead}>HEIGHT </p>
+                <p> : {props.data.node.height}</p>
+              </div>
+            ) : null}
+            {props.data.node ? (
+              <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                <p style={labelHead}>WEIGHT </p>
+                <p> : {props.data.node.weight}</p>
+              </div>
+            ) : null}
             <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-              <p style={labelHead}>WEIGHT </p>
-              <p> : {props.data.node.weight}</p>
+              <p style={labelHead}>TEMPERATURE </p>
+              <p> : {props.data.node.temperature ? props.data.node.temperature : ''}</p>
             </div>
-          ) : null}
-          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-            <p style={labelHead}>TEMPERATURE </p>
-            <p> : {props.data.node.temperature ? props.data.node.temperature : ''}</p>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-            <p style={labelHead}>HEAD CIRCUMFERENCE </p>
-            <p> : {props.data.node.headCircumference}</p>
-          </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+              <p style={labelHead}>HEAD CIRCUMFERENCE </p>
+              <p> : {props.data.node.headCircumference}</p>
+            </div>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-            <p style={labelHead}>advice</p>
-            <p> : {props.data.node.advice ? props.data.node.advice : ''}</p>
+            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+              <p style={labelHead}>advice</p>
+              <p> : {props.data.node.advice ? props.data.node.advice : ''}</p>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+              <p style={labelHead}>nextVisit</p>
+              <p> : {props.data.node.nextVisit}</p>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+              <p style={labelHead}>nextVisitDate</p>
+              <p> : {props.data.node.nextVisitDate}</p>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+              <p style={labelHead}>testDate</p>
+              <p> : {props.data.node.testDate}</p>
+            </div>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-            <p style={labelHead}>nextVisit</p>
-            <p> : {props.data.node.nextVisit}</p>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-            <p style={labelHead}>nextVisitDate</p>
-            <p> : {props.data.node.nextVisitDate}</p>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-            <p style={labelHead}>testDate</p>
-            <p> : {props.data.node.testDate}</p>
-          </div>
-        </div>
-        <div className="mainCard-child">
-          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-            <p style={labelHead}>Diagnosis </p>
-            <p>
-              :{' '}
-              {props.data.node.diagnosis.edges.map((item, index) => (
-                <Tag key={item.node.id}>{item.node.name}</Tag>
-              ))}
-              {/* <TagComponent diagnosisList={props.data.node.diagnosis.edges} /> */}
-              {/* 🔴 NOTE: create a list of tags for diagnosis */}
-            </p>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-            <p style={labelHead}>Tests </p>
-            <p>
-              :{' '}
-              {props.data.node.tests.edges.map((item, index) => (
-                <Tag key={item.node.id}>{item.node.name}</Tag>
-              ))}
-            </p>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-            <p style={labelHead}>Complaints </p>
-            <p>
-              :{' '}
-              {props.data.node.complaints.edges.map((item, index) => (
-                <Tag key={item.node.id}>{item.node.name}</Tag>
-              ))}
-            </p>
-          </div>
-          {/* <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+          <div className="mainCard-child">
+            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+              <p style={labelHead}>Diagnosis </p>
+              <p>
+                :{' '}
+                {props.data.node.diagnosis.edges.map((item, index) => (
+                  <Tag key={item.node.id}>{item.node.name}</Tag>
+                ))}
+                {/* <TagComponent diagnosisList={props.data.node.diagnosis.edges} /> */}
+                {/* 🔴 NOTE: create a list of tags for diagnosis */}
+              </p>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+              <p style={labelHead}>Tests </p>
+              <p>
+                :{' '}
+                {props.data.node.tests.edges.map((item, index) => (
+                  <Tag key={item.node.id}>{item.node.name}</Tag>
+                ))}
+              </p>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+              <p style={labelHead}>Complaints </p>
+              <p>
+                :{' '}
+                {props.data.node.complaints.edges.map((item, index) => (
+                  <Tag key={item.node.id}>{item.node.name}</Tag>
+                ))}
+              </p>
+            </div>
+            {/* <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>SSN/Adhaar </p>
             <p> : {'whatever'}</p>
           </div>
@@ -183,10 +197,21 @@ export const History = props => {
             <p style={labelHead}>Language </p>
             <p> : {'whatever'}</p>
           </div> */}
+          </div>
         </div>
+        {/* Table of medicines */}
+        <Table columns={columns} dataSource={medicineTableData} />
       </div>
-      {/* Table of medicines */}
-      <Table columns={columns} dataSource={medicineTableData} />
+      <Drawer
+        width="90%"
+        title="Edit Prescription"
+        closable={true}
+        visible={editPrescription}
+        onClose={() => setEditPrescription(false)}
+        destroyOnClose
+      >
+        <EditPrescription details={props.data.node} learners={props.learners} />
+      </Drawer>
     </>
   )
 }
@@ -218,7 +243,7 @@ export default props => {
             return (
               <div key={index}>
                 <Divider orientation="left">Prescription No.{index + 1}</Divider>
-                <History number={index + 1} data={item} />
+                <History number={index + 1} data={item} learners={props.details} />
               </div>
             )
           })}

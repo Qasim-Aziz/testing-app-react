@@ -5,6 +5,8 @@ import {
   getPrescriptionFunc,
   createPrescriptionFunc,
   getLatestPrescription,
+  getDetailPrescription,
+  editAndSavePrescription,
 } from 'services/prescriptions'
 import actions from './actions'
 
@@ -99,10 +101,80 @@ export function* CREATE_PRESCRIPTIONS({ payload }) {
   })
 }
 
+export function* GET_DETAILS_PRESCRIPTIONS({ payload }) {
+  console.log('PAYLOAD =====>', payload)
+  yield put({
+    type: actions.SET_STATE,
+    payload: {
+      loadingPrescription: true,
+    },
+  })
+  console.log('THE PAYLOAD VALUES RUNNING JUST BEFORE QUERY', payload)
+  const response = yield call(getDetailPrescription, payload)
+  console.log('THE RESPONSE', response)
+  if (response && response.data) {
+    notification.success({
+      message: 'PRESCRIPTION FETCHED',
+    })
+    console.log('response data inside sagas', response.data)
+    console.log('SINCE IT EXPECTS OBJs', typeof response.data)
+    const prescriptions = response.data.getPrescriptionDetail
+    console.log('THE PRESCRIPTIONS', prescriptions)
+    yield put({
+      type: actions.SET_STATE,
+      payload: {
+        SpecificPrescription: prescriptions,
+        isSpecificPrescription: true,
+      },
+    })
+  }
+  yield put({
+    type: actions.SET_STATE,
+    payload: {
+      loadingPrescription: false,
+    },
+  })
+}
+export function* EDIT_PRESCRIPTION({ payload }) {
+  console.log('PAYLOAD =====>', payload)
+  yield put({
+    type: actions.SET_STATE,
+    payload: {
+      loadingPrescription: true,
+    },
+  })
+  console.log('THE EDIT PRESCRIPTION COMPONENT', payload)
+  const response = yield call(editAndSavePrescription, payload)
+  console.log('THE RESPONSE', response)
+  if (response && response.data) {
+    notification.success({
+      message: 'PRESCRIPTION UPDATED SUCCESSFULLY',
+    })
+    console.log('response data inside sagas', response.data)
+    console.log('SINCE IT EXPECTS OBJs', typeof response.data)
+    const prescriptions = response.data.updatePrescription.details
+    console.log('THE PRESCRIPTIONS', prescriptions)
+    yield put({
+      type: actions.SET_STATE,
+      payload: {
+        SpecificPrescription: prescriptions,
+        isSpecificPrescription: true,
+      },
+    })
+  }
+  yield put({
+    type: actions.SET_STATE,
+    payload: {
+      loadingPrescription: false,
+    },
+  })
+}
 export default function* rootSaga() {
   yield all([
     takeEvery(actions.GET_PRESCRIPTIONS, GET_PRESCRIPTIONS),
     takeEvery(actions.CREATE_PRESCRIPTION, CREATE_PRESCRIPTIONS),
     takeEvery(actions.GET_LASTEST_PRESCRIPTIONS, GET_LASTEST_PRESCRIPTIONS),
+    takeEvery(actions.GET_DETAILS_PRESCRIPTIONS, GET_DETAILS_PRESCRIPTIONS),
+    takeEvery(actions.EDIT_PRESCRIPTION, EDIT_PRESCRIPTION),
   ])
 }
