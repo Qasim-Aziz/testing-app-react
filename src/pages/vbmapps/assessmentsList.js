@@ -5,6 +5,7 @@
 /* eslint-disable no-loop-func */
 /* eslint-disable jsx-a11y/interactive-supports-focus */
 /* eslint-disable react/self-closing-comp */
+/* eslint-disable react/jsx-boolean-value */
 import React, { Component } from 'react'
 import { gql } from 'apollo-boost'
 import { Link } from 'react-router-dom'
@@ -26,6 +27,8 @@ import Scrollbars from 'react-custom-scrollbars'
 import moment from 'moment'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import LearnerSelect from 'components/LearnerSelect'
+import HeaderComponent from 'components/HeaderComponent'
+import LoadingComponent from 'components/LoadingComponent'
 import client from '../../apollo/config'
 import VbMappsTargets from './VbMappsTargets'
 import PageHeader from './PageHeader'
@@ -46,6 +49,7 @@ class AssessmentsList extends Component {
       master: '',
       studentID: JSON.parse(localStorage.getItem('studentId')),
       deleteLoading: false,
+      loading: false
     }
   }
 
@@ -66,12 +70,10 @@ class AssessmentsList extends Component {
   }
 
   getVbmappData(id) {
-    this.setState({ studentID: id })
+    this.setState({ studentID: id, loading: true })
     client
       .query({
-        fetchPolicy: 'no-cache',
-        query: gql`
-        query{
+        query: gql`query{
           vbmappGetAssessments(student:"${id}"){
               edges{
                   total
@@ -93,8 +95,15 @@ class AssessmentsList extends Component {
           }
         }
         `,
+        fetchPolicy: 'network-only'
       })
       .then(result => {
+        if (result.data.vbmappGetAssessments) {
+          this.setState({
+            assessments: result.data.vbmappGetAssessments.edges,
+            loading: false
+          })
+        }
         if (result.data.vbmappGetAssessments.edges.length > 0) {
           const selectAssignmentIndex = result.data.vbmappGetAssessments.edges.length - 1
           this.setState({
@@ -131,7 +140,7 @@ class AssessmentsList extends Component {
       })
   }
 
-  handleKeyDown = () => {}
+  handleKeyDown = () => { }
 
   deleteAssessment = id => {
     this.setState({ deleteLoading: true })
@@ -507,179 +516,126 @@ class AssessmentsList extends Component {
   }
 
   render() {
-    const { assessments, areas, studentID } = this.state
+    const { assessments, areas, studentID, loading } = this.state
     const { user } = this.props
     console.log(this.state.selectedAssignment, 'selectedAssignment')
     return (
-      <Layout style={{ padding: '0px', marginBottom: '40px', marginTop: '20px' }}>
-        <Content
-          style={{
-            padding: 0,
-            width: 1360,
-            margin: '0px auto',
-          }}
-        >
-          <Row gutter={[0, 0]} style={{ height: 'calc(100vh + 100px' }}>
-            <Col sm={6}>
-              <div style={{ ...leftDivStyle, height: 'calc(100vh + 100px' }}>
-                {assessments && assessments.length > 0 && (
-                  <Link
-                    to={{
-                      pathname: '/therapy/vbmapps/new',
-                      test: assessments[assessments.length - 1].node.testNo + 1,
-                      student: studentID,
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        backgroundColor: COLORS.palleteLightBlue,
-                        color: '#000',
-                        cursor: 'pointer',
-                        boxShadow:
-                          '0px 0px 1px rgba(0, 0, 0, 0.08), 0px 0px 2px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(0, 0, 0, 0.08)',
-                        padding: '10px 20px',
-                        borderRadius: 4,
-                        flex: 1,
-                        margin: '20px 10px',
-                        marginTop: 0,
-                      }}
-                    >
-                      <p style={{ marginBottom: 0 }}>New Assessment</p>
-                    </div>
-                  </Link>
-                )}
-                <Tabs type="card">
-                  <TabPane tab="Active" key="1">
-                    {assessments && assessments.length === 0 && (
-                      <Link
-                        to={{
-                          pathname: '/therapy/vbmapps/new',
-                          test: 1,
-                          student: studentID,
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            backgroundColor: COLORS.palleteLightBlue,
-                            color: '#000',
-                            cursor: 'pointer',
-                            boxShadow:
-                              '0px 0px 1px rgba(0, 0, 0, 0.08), 0px 0px 2px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(0, 0, 0, 0.08)',
-                            paddingTop: 10,
-                            paddingBottom: 10,
-                            paddingLeft: 20,
-                            paddingRight: 20,
-                            borderRadius: 4,
-                            flex: 1,
-                            marginTop: 20,
-                            marginBottom: 20,
-                          }}
-                        >
-                          <p style={{ marginBottom: 0 }}>New Assessment</p>
-                        </div>
-                      </Link>
-                    )}
-                    <Scrollbars style={{ height: 'calc(100vh + 20px)' }} autoHide>
-                      {assessments && assessments.length > 0 && this.getActiveAssessment()}
-                    </Scrollbars>
-                  </TabPane>
-                  <TabPane tab="Previous" key="2">
-                    <Scrollbars style={{ height: 'calc(100vh + 30px)' }} autoHide>
-                      {assessments && assessments.length === 0 && (
-                        <Link
-                          to={{
-                            pathname: '/therapy/vbmapps/new',
-                            test: 1,
-                            student: studentID,
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: 'flex',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              backgroundColor: COLORS.palleteLightBlue,
-                              color: '#000',
-                              cursor: 'pointer',
-                              boxShadow:
-                                '0px 0px 1px rgba(0, 0, 0, 0.08), 0px 0px 2px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(0, 0, 0, 0.08)',
-                              paddingTop: 10,
-                              paddingBottom: 10,
-                              paddingLeft: 20,
-                              paddingRight: 20,
-                              borderRadius: 4,
-                              flex: 1,
-                              marginTop: 20,
-                              marginBottom: 20,
-                            }}
-                          >
-                            <p style={{ marginBottom: 0 }}>New Assessment</p>
-                          </div>
-                        </Link>
-                      )}
-                      {assessments && assessments.length > 0 && (
-                        <div>
-                          {this.getPreviousAssessments()}
-                          <div style={{ height: 10 }}></div>
-                        </div>
-                      )}
-                    </Scrollbars>
-                  </TabPane>
-                </Tabs>
-              </div>
-            </Col>
-            <Col sm={18} style={{ margin: 'auto' }}>
-              <div
-                style={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  padding: '5px 10px',
-                  margin: 0,
-                  width: '100%',
-                  height: 'fit-content',
-                  overflow: 'hidden',
-                  backgroundColor: COLORS.palleteLight,
+      <Layout>
+        <Content>
+          <HeaderComponent
+            leftContent={user?.role !== 'parents' && (
+              <Button onClick={this.showDrawerFilter} size="large">
+                <FilterOutlined />
+              </Button>
+            )}
+            centerContent={
+              <PageHeader
+                pageTitle={`VB-MAPP Assessment ${
+                  this.state.selectedAssignment?.node?.testNo
+                    ? this.state.selectedAssignment?.node?.testNo
+                    : ''
+                  }`}
+                noLine={true}
+              />
+            }
+            rightContent={
+              <Link
+                to={{
+                  pathname: '/therapy/vbmapps/new',
+                  test: assessments.length > 0 ? assessments[assessments.length - 1].node.testNo + 1 : 1,
+                  student: studentID,
                 }}
               >
-                <PageHeader
-                  pageTitle={`VB-MAPP Assessment ${
-                    this.state.selectedAssignment?.node?.testNo
-                      ? this.state.selectedAssignment?.node?.testNo
-                      : ''
-                  }`}
-                />
-                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                  {user?.role !== 'parents' && (
-                    <Button onClick={this.showDrawerFilter} size="large">
-                      <FilterOutlined />
-                    </Button>
-                  )}
-
-                  <Drawer
-                    visible={this.state.visibleFilter}
-                    onClose={this.onCloseFilter}
-                    width={DRAWER.widthL3}
-                    title="Select Learner"
-                    placement="right"
-                  >
-                    <LearnerSelect />
-                  </Drawer>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    backgroundColor: COLORS.palleteLightBlue,
+                    color: '#000',
+                    cursor: 'pointer',
+                    // boxShadow: '0px 0px 1px rgba(0, 0, 0, 0.08), 0px 0px 2px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(0, 0, 0, 0.08)',
+                    padding: '10px 20px',
+                    borderRadius: 4,
+                    flex: 1,
+                    // margin: '20px 10px',
+                    // marginTop: 0,
+                    
+                  }}
+                >
+                  <p style={{ marginBottom: 0, textAlign: 'center' }}>New Assessment</p>
                 </div>
-              </div>
+              </Link>
+            }
+          />
+          {loading === true ?
+            <>
+              <LoadingComponent />
+            </>
+            :
+            <>
+              {assessments.length > 0 ?
+                <Row gutter={[0, 0]} style={{ height: 'calc(100vh + 100px' }}>
+                  <Col sm={6}>
+                    <div style={{ ...leftDivStyle, height: 'calc(100vh + 100px' }}>
+                      <Tabs type="card">
+                        <TabPane tab="Active" key="1">
+                          <Scrollbars style={{ height: 'calc(100vh + 20px)' }} autoHide>
+                            {assessments && assessments.length > 0 && this.getActiveAssessment()}
+                          </Scrollbars>
+                        </TabPane>
+                        <TabPane tab="Previous" key="2">
+                          <Scrollbars style={{ height: 'calc(100vh + 30px)' }} autoHide>
+                            {assessments && assessments.length > 0 && (
+                              <div>
+                                {this.getPreviousAssessments()}
+                                <div style={{ height: 10 }}></div>
+                              </div>
+                            )}
+                          </Scrollbars>
+                        </TabPane>
+                      </Tabs>
+                    </div>
+                  </Col>
+                  <Col sm={18} style={{ margin: 'auto' }}>
+                    <div style={{ ...rightDivStyle, padding: '10px 0 0 0' }}>
+                      <Scrollbars style={{ height: 'calc(100vh + 42px)', paddingRight: '10px' }}>
+                        {areas && areas.length > 0 && this.getAreas()}
+                      </Scrollbars>
+                    </div>
+                  </Col>
+                </Row>
+                :
 
-              <div style={{ ...rightDivStyle, padding: '10px 0 0 0' }}>
-                <Scrollbars style={{ height: 'calc(100vh + 42px)', paddingRight: '10px' }}>
-                  {areas && areas.length > 0 && this.getAreas()}
-                </Scrollbars>
-              </div>
-            </Col>
-          </Row>
+                <Link
+                  to={{
+                    pathname: '/therapy/vbmapps/new',
+                    test: 1,
+                    student: studentID,
+                  }}
+                >
+                  <div
+                    style={{
+                      backgroundColor: COLORS.palleteLightBlue,
+                      marginTop: 100,
+                      width: 450,
+                      color: '#000',
+                      cursor: 'pointer',                      
+                      padding: '10px 20px',
+                      borderRadius: 4,
+                      marginLeft: 'auto',
+                      marginRight: 'auto',
+                      textAlign: 'center',
+                      boxShadow: '0px 0px 1px rgba(0, 0, 0, 0.08), 0px 0px 2px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(0, 0, 0, 0.08)',
+                    }}
+                  >
+                    Create first Assessment
+                  </div>
+                </Link>
+              }
+
+            </>
+          }
           <Drawer
             visible={this.state.target}
             onClose={() => this.setState({ target: null })}
@@ -689,6 +645,15 @@ class AssessmentsList extends Component {
             {this.state.target && (
               <VbMappsTargets target={this.state.target} milestoneId={this.state.areas[0]?.id} />
             )}
+          </Drawer>
+          <Drawer
+            visible={this.state.visibleFilter}
+            onClose={this.onCloseFilter}
+            width={DRAWER.widthL3}
+            title="Select Learner"
+            placement="right"
+          >
+            <LearnerSelect />
           </Drawer>
         </Content>
       </Layout>
