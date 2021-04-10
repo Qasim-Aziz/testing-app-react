@@ -197,3 +197,9 @@ footer {
   padding: 8px 0;
   text-align: center;
 }
+
+.table-outer-border {
+  .ant-table {
+    border: 1px solid #e8e8e8;
+  }
+}

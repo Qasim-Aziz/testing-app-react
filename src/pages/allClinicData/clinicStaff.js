@@ -162,6 +162,17 @@ function ClinicStaff({ rowData }) {
       width: '120px',
     },
     {
+      title: 'Date of Joining',
+      dataIndex: 'node.dateOfJoining',
+      width: '100px',
+      render: text => {
+        if (text === null || text === undefined) {
+          return text
+        }
+        return text === 'None' ? 'None' : `${moment(text).format('YYYY-MM-DD')}`
+      },
+    },
+    {
       title: 'Last Login',
       dataIndex: 'node.user.lastLogin',
       width: '100px',
@@ -214,6 +225,9 @@ function ClinicStaff({ rowData }) {
         'Date of Birth': item.node.dob,
         Address: item.node.localAddress,
         Active: item.node.isActive,
+        'Date of Joining': item.node?.dateOfJoining
+          ? moment(item.node?.dateOfJoining).format('YYYY-MM-DD HH:mm:ss')
+          : null,
         'Last Login': item.node?.lastLogin
           ? moment(item.node?.lastLogin).format('YYYY-MM-DD HH:mm:ss')
           : null,

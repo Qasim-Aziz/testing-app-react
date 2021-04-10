@@ -93,7 +93,7 @@ function PersonalInfo(props) {
       <Form {...layout} onSubmit={handleSubmit}>
         <Form.Item label="Name" style={itemStyle}>
           {form.getFieldDecorator('emergencyName', {
-            rules: [{ required: false, message: 'Please provide Parent Name!' }],
+            rules: [{ required: false, message: 'Please provide a Name!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="Contact no" style={itemStyle}>
@@ -103,7 +103,7 @@ function PersonalInfo(props) {
         </Form.Item>
         <Form.Item label="Relation Name" style={itemStyle}>
           {form.getFieldDecorator('emergencyRelation', {
-            rules: [{ required: false, message: 'Please provide Father Name!' }],
+            rules: [{ required: false, message: 'Please provide relation!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <div style={{ display: 'flex', justifyContent: 'center' }}>

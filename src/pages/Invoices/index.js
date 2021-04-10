@@ -18,7 +18,7 @@ export default () => {
       <Authorize roles={['superUser']} redirect to="/404">
         <Helmet title="Dashboard Alpha" />
         <Layout style={{ padding: '0px' }}>
-          <Tabs tabBarExtraContent={paymentDetailsButton}>
+          <Tabs>
             <TabPane tab="Customer" key="Customer">
               <CustomerList />
             </TabPane>
@@ -27,17 +27,7 @@ export default () => {
             </TabPane>
           </Tabs>
         </Layout>
-        <Drawer
-          width={DRAWER.widthL2}
-          title="Update Payment accepting details"
-          visible={bankDetailsDrawer}
-          onClose={() => setBankDetailsDrawer(false)}
-          destroyOnClose
-        >
-          <BankDetails setBankDetailsDrawer={setBankDetailsDrawer} />
-        </Drawer>
       </Authorize>
-
     </div>
   )
 }

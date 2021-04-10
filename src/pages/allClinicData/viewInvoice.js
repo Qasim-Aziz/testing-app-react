@@ -109,6 +109,7 @@ function ViewInvoice({ invoice }) {
   const currentCurrencyName = invoice.clinic.currency ? invoice.clinic.currency.currency : 'USD'
   const { data, loading, error } = useQuery(GET_PAYMENT_DETAILS)
 
+  console.log(invoice, 'invoice')
   useEffect(() => {
     if (error) {
       notification.error({

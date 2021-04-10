@@ -119,7 +119,7 @@ function ClinicInfo(props) {
 
         <Form.Item label="Location Category" style={itemStyle}>
           {form.getFieldDecorator('category', {
-            rules: [{ required: true, message: 'Please provide Location!' }],
+            rules: [{ required: true, message: 'Please provide Location category!' }],
           })(
             <Select placeholder="Select category" allowClear>
               {categoryList.map(item => (

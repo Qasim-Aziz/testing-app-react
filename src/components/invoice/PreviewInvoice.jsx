@@ -7,7 +7,7 @@
 /* eslint-disable */
 import React, { useState, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
-import { Button, Tooltip } from 'antd'
+import { Button, notification, Tooltip } from 'antd'
 import { PrinterOutlined, FilePdfOutlined } from '@ant-design/icons'
 import moment from 'moment'
 import { ToWords } from 'to-words'
@@ -118,7 +118,8 @@ const PreviewInvoice = ({ invoiceId }) => {
     GET_PAYMENT_RECIEVING_DETIAILS,
   )
 
-  console.log(detailsData, detailsLoading, detailsError, 'details')
+  // console.log(invoiceData, isInvoiceDataLoading, invoiceDataErrors, 'invoice Data')
+  // console.log(detailsData, detailsLoading, detailsError, 'details')
   const [invoice, setInvoice] = useState(null)
   const [currencyName, setCurrencyName] = useState(null)
   const [subTotal, setSubtotal] = useState(0)
@@ -143,8 +144,6 @@ const PreviewInvoice = ({ invoiceId }) => {
     }
   }, [invoiceData])
 
-  console.log(currencyName, 'cirrecn anme')
-
   const toWords = new ToWords({
     localeCode: currencyName === 'INR' ? 'en-IN' : 'en-US',
     converterOptions: {
@@ -161,11 +160,24 @@ const PreviewInvoice = ({ invoiceId }) => {
     history.push('/printInvoice')
   }
 
-  console.log(invoice, 'invoiceDAta')
+  useEffect(() => {
+    if (detailsError || invoiceDataErrors) {
+      return notification.error({
+        message: 'Something went wrong',
+        description: 'Unable to fetch invoice data',
+      })
+    }
+  }, [detailsError, invoiceDataErrors])
 
-  if (isInvoiceDataLoading || !invoice || detailsLoading) return <LoadingComponent />
+  if (isInvoiceDataLoading || detailsLoading) return <LoadingComponent />
+  if (detailsError || invoiceDataErrors || !invoiceData || !detailsData)
+    return (
+      <div style={{ marginTop: 80, marginLeft: 60, fontWeight: 700, fontSize: 18 }}>
+        Opps, something went wrong
+      </div>
+    )
 
-  const { ifscCode, bankName, accountHolderName, bankAccountNo } = detailsData.schoolDetail
+  const { ifscCode, bankName, accountHolderName, bankAccountNo } = detailsData?.schoolDetail
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
