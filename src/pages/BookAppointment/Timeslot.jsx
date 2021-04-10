@@ -61,26 +61,22 @@ const Timeslot = ({
   const bookAppointment = e => {
     e.preventDefault()
     console.log("slot time asdhahsjdhas =======> ",getDateTime(selectedDate))
-    console.log(selectedDate.utc().local().format('YYYY-MM-DDTHH:mm:ssZ'))
-    console.log(selectedDate.utc().local().utc().format('YYYY-MM-DDTHH:mm:ssZ'))
-    console.log(selectedDate.utc().local().format('YYYY-MM-DDTHH:mm:ssZ'))
-    console.log(selectedDate.format('YYYY-MM-DDTHH:mm:ssZ'))
-    // createAppointment({
-    //   variables: {
-    //     title: titleText,
-    //     studentId,
-    //     therapistId: selectedTherapist,
-    //     note: noteText,
-    //     purposeAssignment: purposeText,
-    //     startDateAndTime: getDateTime(selectedDate),
-    //     endDateAndTime: getDateTime(selectedDate),
-    //     slotDate: selectedDate.format('YYYY-MM-DD'),
-    //     slotTime: selectedTimeSlot,
-    //     appointmentStatus: pendingStatusId,
-    //   },
-    //   errorPolicy: 'all'
-    // })
-    // setPopoverVisible(false)
+    createAppointment({
+      variables: {
+        title: titleText,
+        studentId,
+        therapistId: selectedTherapist,
+        note: noteText,
+        purposeAssignment: purposeText,
+        startDateAndTime: getDateTime(selectedDate),
+        endDateAndTime: getDateTime(selectedDate),
+        slotDate: selectedDate.format('YYYY-MM-DD'),
+        slotTime: selectedTimeSlot,
+        appointmentStatus: pendingStatusId,
+      },
+      errorPolicy: 'all'
+    })
+    setPopoverVisible(false)
   }
 
   const popoverContent = (
