@@ -24,11 +24,13 @@ import {
   Divider,
   Switch,
   Icon,
+  InputNumber,
+  Radio,
   notification,
+  DatePicker,
   Popconfirm,
   Card,
   Avatar,
-  Table,
 } from 'antd'
 import { connect, useSelector, useDispatch } from 'react-redux'
 import PrescriptionTable from './PrescriptionTableComponent'
@@ -37,116 +39,40 @@ import actionPrescription from '../../redux/prescriptions/actions'
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 import { PrescriptionItemContext } from './context'
 import productReducer from './reducer'
+import { getComplaints, getDiagnosis, getTests, request } from './query'
 import PrescriptionItemTable from './prescriptionItemTable'
 
 const { Header, Content } = Layout
 const { Text, Title } = Typography
 const { Meta } = Card
+const { TextArea } = Input
 
-const MedicineTable = props => {
-  /* inputFields 👉 array of objects */
+/* The below function is a helper function */
+function addNevObject(val) {
+  let theMainArray = []
+  val.map((item, index) => {
+    let some_random = {}
+    console.log('THE ITEM', item)
+    some_random.key = index + 1 // item.node.id
+    some_random.name = item.node.name
+    some_random.medicineType = item.node.medicineType
+    some_random.unit = item.node.unit
+    some_random.when = item.node.when
+    some_random.frequency = item.node.frequency
+    some_random.duration = item.node.duration
+    some_random.dosage = item.node.dosage
+    some_random.qty = item.node.qty
 
-  const [inputFields, setInputFields] = useState([
-    {
-      name: '', // ENCORATE 100ML
-      medicineType: '', // SYP
-      dosage: '', // 1-1-1
-      unit: '', // ml
-      when: '', // Before Breakfast
-      frequency: '', // Daily
-      duration: '', // 30 days
-    },
-  ])
+    theMainArray.push(some_random)
+  })
+  console.log('THE VAL', val)
+  console.log('THE MAIN ARRAY', theMainArray)
+  return theMainArray
+}
 
-  const handleSubmit = e => {
-    e.preventDefault()
-    console.log('InputFields', inputFields)
-  }
-
-  const handleChangeInput = (id, event) => {
-    const newInputFields = inputFields.map(i => {
-      if (id === i.id) {
-        i[event.target.name] = event.target.value
-      }
-      return i
-    })
-    setInputFields(newInputFields)
-  }
-  const handleAddFields = () => {
-    setInputFields([
-      ...inputFields,
-      { name: '', medicineType: '', dosage: '', unit: '', when: '', frequency: '', duration: '' },
-    ])
-  }
-
-  const handleRemoveFields = id => {
-    const values = [...inputFields]
-    values.splice(
-      values.findIndex(value => value.id === id),
-      1,
-    )
-    setInputFields(values)
-  }
-
-  const columns = [
-    {
-      title: '#',
-      dataIndex: 'key',
-      width: 5,
-    },
-    {
-      title: 'Name',
-      editable: true,
-      dataIndex: 'type',
-      width: 50,
-    },
-    {
-      title: 'Medicine Type',
-      editable: true,
-      dataIndex: 'type',
-      width: 10,
-    },
-    {
-      title: 'Dosage',
-      editable: true,
-      dataIndex: 'type',
-      width: 10,
-    },
-    {
-      title: 'Unit',
-      editable: true,
-      dataIndex: 'type',
-      width: 5,
-    },
-    {
-      title: 'When',
-      editable: true,
-      dataIndex: 'type',
-      width: 50,
-    },
-    {
-      title: 'Frequency',
-      editable: true,
-      dataIndex: 'type',
-      width: 50,
-    },
-    {
-      title: 'Duration',
-      editable: true,
-      dataIndex: 'type',
-      width: 50,
-    },
-    {
-      title: 'Duration',
-      width: 50,
-      render: row => {
-        console.log('THE ROW VALUE', row)
-        return <Button onClick={handleRemoveFields(index)}>DELETE</Button>
-      },
-    },
-  ]
-
-  return <div></div>
+const GetAttribute = props => {
+  const [attribute, setAttribute] = useState({ data: null, loading: true })
+  return <></>
 }
 
 const BankDetails = props => {
@@ -154,21 +80,62 @@ const BankDetails = props => {
   console.log('The state', props)
   const prescriptions = useSelector(state => state.prescriptions)
   const dispatchOfPrescription = useDispatch()
-  console.log('THE LOCAL STATE for getting prescription', prescriptions, dispatchOfPrescription)
+  console.log('THE LOCAL STATE for getting prescription', prescriptions)
   /* productsState ==> holds the array of all the medicines in the list 
      productsDispatch ==> The local "Reducer" for updating the reducer which will hold each row items 
      ⭐ NOTE: Here we have defined the initialState of the reducer to an empty array but 
               we need to pass the latest prescription details.
   */
-  useEffect(() => {
-    console.log(
-      '******************* THE COMPONENT Did mount method ie it will run only once ******************* ',
-    )
-  }, [])
 
   const [productsState, productsDispatch] = useReducer(productReducer, [])
+
   const [subTotal, setSubTotal] = useState(0)
   const role = useSelector(state => state.user.role)
+
+  useEffect(() => {
+    console.log('******************* THE COMPONENT Did mount method ie it will run only once ')
+    dispatchOfPrescription({
+      type: actionPrescription.GET_LASTEST_PRESCRIPTIONS,
+      payload: {
+        /**Sending student's ID */
+        value: details.id,
+      },
+    })
+    console.log('THE VALUES')
+  }, [])
+
+  /*[Explaination]
+    This effect will only run if the prescription values are set.
+    When this run what it does you may think???
+    1. It sets the productState (aka list-of-meds-objects) with the latest prescriptions
+    2. It will then, fill the form page with the latest prescription details
+  */
+
+  useEffect(() => {
+    console.log('THE PRESCRIPTION VALUE', prescriptions)
+    if (prescriptions.SpecificPrescription) {
+      let listOfMedicineObject = prescriptions.SpecificPrescription.node.medicineItems.edges
+      console.log('THE LIST OF MEDS 💊💊💊💊💊', listOfMedicineObject)
+      /**Add key in the product_state */
+      let x = addNevObject(listOfMedicineObject)
+      productsDispatch({ type: 'SET_PRODUCTS', payload: x })
+      const newArray = prescriptions.SpecificPrescription.node.complaints.edges.map(
+        element => element.node.name,
+      )
+      console.log('THE NEW ARRAY', newArray)
+      form.setFieldsValue({
+        height: prescriptions.SpecificPrescription.node.height,
+        weight: prescriptions.SpecificPrescription.node.weight,
+        temperature: prescriptions.SpecificPrescription.node.temperature,
+        headCircumference: prescriptions.SpecificPrescription.node.headCircumference,
+        complaints: newArray,
+        diagnosis: prescriptions.SpecificPrescription.node.diagnosis.edges.map(
+          element => element.node.name,
+        ),
+      })
+    }
+  }, [prescriptions.SpecificPrescription])
+
   /* Some static css */
   const itemStyle = {
     display: 'flex',
@@ -227,6 +194,14 @@ const BankDetails = props => {
     padding: '1px 5px',
   }
 
+  function onChangeInputNumber(value) {
+    console.log('changed', value)
+  }
+
+  function onChangeNextVisitVal(e) {
+    console.log(`radio checked:${e.target.value}`)
+  }
+
   const handleSubmitt = e => {
     e.preventDefault()
     console.log('submit✌✌✌✌✌✌✌✌✌')
@@ -236,27 +211,48 @@ const BankDetails = props => {
       dispatchOfPrescription({
         type: actionPrescription.CREATE_PRESCRIPTION,
         payload: {
+          // Student's ID
           id: details.id,
-          value: values,
+          // vitals' values & array of complaints/tests/diagnosis
+          values: values,
+          // medicines array
           data: productsState,
         },
       })
     })
   }
 
-  const handleFormSubmit = e => {
-    e.preventDefault()
-    console.log('submitedddd')
-    // const data = new
+  const arrayOfOptions = []
 
-    form.validateFields((err, values) => {
-      console.log('THE LIST OF PRESCRIPTION', productsState)
-      console.log('THE SUBMIT 🎉✨', err, values)
-    })
+  //  async getUser = () => {
+  //  const response = await request(apolloclient);
+  //  console.log(await response);
+  // }
+  // async getVals = (val) => {
+  //   const response = await getComplaints(val);
+  //   console.log('THE IMPORTANT 🔴🔴🔴🔴🔴🔴🔴🔴',await response)
+  // }
+  const handleChange = value => {
+    console.log(`Selected: `, value)
+    console.log('THE TYPE OF val', typeof value)
+    const lastItem = value[value.length - 1]
+
+    console.log('THE VALUESSSSSS ', lastItem)
+    // getVals(lastItem)
+    // let list_of_stuff = async lastItem => {
+    //   console.log('THE IMPORTANT 🔴🔴🔴🔴🔴🔴🔴🔴', lastItem)
+    //   await getComplaints(lastItem)
+    //     .then(res => {
+    //       console.log(`The function recieved with value ${res}`, res)
+    //     })
+    //     .catch(error => {
+    //       console.log(`Handling error as we received ${error}`)
+    //     })
+    // }
   }
 
-  const handleChange = value => {
-    console.log(`Selected: ${value}`)
+  const EachSearchSelect = val => {
+    console.log(`Selected ====>: ${val}`)
   }
 
   const children = []
@@ -264,7 +260,8 @@ const BankDetails = props => {
     <div>
       <Layout>
         <Content>
-          <Form className="update-bank-details" onSubmit={e => handleFormSubmit(e)}>
+          {/* onSubmit={e => handleFormSubmit(e)} */}
+          <Form className="update-bank-details">
             <Divider orientation="left">General Details</Divider>
             <div>
               <Card
@@ -317,7 +314,12 @@ const BankDetails = props => {
                   description={
                     <div>
                       <div>
-                        <p style={{ fontSize: '13px', marginBottom: '4px' }}>
+                        <p
+                          style={{
+                            fontSize: '13px',
+                            marginBottom: '4px',
+                          }}
+                        >
                           Enrollment Status &nbsp;{' '}
                           {details.isActive ? (
                             <span style={customSpanStyle}>Active</span>
@@ -327,7 +329,12 @@ const BankDetails = props => {
                         </p>
                       </div>
                       <div>
-                        <p style={{ fontSize: '13px', marginBottom: '4px' }}>
+                        <p
+                          style={{
+                            fontSize: '13px',
+                            marginBottom: '4px',
+                          }}
+                        >
                           <span>{details ? details.email : ''}</span>
                         </p>
                       </div>
@@ -337,23 +344,44 @@ const BankDetails = props => {
               </Card>
             </div>
             <br />
+            {/* <Button type="primary" onClick={getComplaints('adhd')}>
+              Click me
+            </Button> */}
             <Divider orientation="left">Vitals</Divider>
             <div style={{ display: 'flow-root' }}>
-              <div style={{ display: 'inline-block', float: 'left', width: '250px' }}>
+              <div
+                style={{
+                  display: 'inline-block',
+                  float: 'left',
+                  width: '250px',
+                }}
+              >
                 <Form.Item style={itemStyle2} label="Height">
                   {form.getFieldDecorator('height')(
                     <Input placeholder="cm" style={inputStyle2}></Input>,
                   )}
                 </Form.Item>
               </div>
-              <div style={{ display: 'inline-block', float: 'left', width: '250px' }}>
+              <div
+                style={{
+                  display: 'inline-block',
+                  float: 'left',
+                  width: '250px',
+                }}
+              >
                 <Form.Item style={itemStyle2} label="Weight">
                   {form.getFieldDecorator('weight')(
                     <Input placeholder="Kg" style={inputStyle2}></Input>,
                   )}
                 </Form.Item>
               </div>
-              <div style={{ display: 'inline-block', float: 'left', width: '250px' }}>
+              <div
+                style={{
+                  display: 'inline-block',
+                  float: 'left',
+                  width: '300px',
+                }}
+              >
                 <Form.Item style={itemStyle2} label="Temperature">
                   {form.getFieldDecorator('temperature')(
                     <Input
@@ -363,7 +391,13 @@ const BankDetails = props => {
                   )}
                 </Form.Item>
               </div>
-              <div style={{ display: 'inline-block', float: 'left', width: '350px' }}>
+              <div
+                style={{
+                  display: 'inline-block',
+                  float: 'left',
+                  width: '350px',
+                }}
+              >
                 <Form.Item style={itemStyle2} label="Head Circumference">
                   {form.getFieldDecorator('headCircumference')(
                     <Input placeholder="cm" style={inputStyle2}></Input>,
@@ -377,11 +411,12 @@ const BankDetails = props => {
                 <Select
                   mode="tags"
                   style={inputStyle3}
-                  placeholder="Please select"
-                  initialValue={['a10', 'c12']}
+                  placeholder="Please select Complaints"
+                  // initialValue={['a10', 'c12']}
                   onChange={handleChange}
                   style={{ width: '100%' }}
                 >
+                  {/* {arrayOfOptions} */}
                   {children}
                 </Select>,
               )}
@@ -401,43 +436,70 @@ const BankDetails = props => {
                 </Select>,
               )}
             </Form.Item>
-            {
-              /*[Explaination]
-               *  The "Global-State" for "PrescriptionItemTable" component is the "productState"
-               * @productDispatch ==> The setter function of product state
-               * @totalAmount ==> The count of list item which is initially set to zero
-                   (Further understanding would be mentioned inside the "PrescriptionItemTable")
-               */
+            {prescriptions.loadingPrescriptions !== true &&
+            prescriptions.isSpecificPrescription !== false ? (
+              <>
+                {/*[Explaination]
+                  *  The "Global-State" for "PrescriptionItemTable" component is the "productState"
+                  * @productDispatch ==> The setter function of product state
+                  * @totalAmount ==> The count of list item which is initially set to zero
+                      (Further understanding would be mentioned inside the "PrescriptionItemTable")
+                  */}
+                <PrescriptionItemContext.Provider value={productsDispatch}>
+                  <PrescriptionItemTable
+                    style={{ marginTop: 25 }}
+                    totalAmount={subTotal}
+                    products={productsState}
+                    dispatch={productsDispatch}
+                  />
+                </PrescriptionItemContext.Provider>
+              </>
+            ) : (
+              <>Display Loading</>
+            )}
 
-              <PrescriptionItemContext.Provider value={productsDispatch}>
-                <PrescriptionItemTable
-                  style={{ marginTop: 25 }}
-                  totalAmount={subTotal}
-                  products={productsState}
-                  dispatch={productsDispatch}
-                />
-              </PrescriptionItemContext.Provider>
-            }
-            {/* ********************* I was trying my own stuff but this didn't workout ********************* */}
-            {/* <div style={{ display: 'block', marginTop: 40 }}>
-              <PrescriptionTable />
-              {/* <MedicineTable
-                data={() => (
-                  <Form.Item>
-                    <Button style={{ width: '100%' }} type="primary" htmlType="submit">
-                      Save
-                    </Button>
-                  </Form.Item>
-                )}
-              /> * /}
-            </div> */}
-            {/* ****************************************** END ****************************************** */}
-            <div style={{ display: 'flex', justifyContent: 'center', margin: '20px 0' }}>
+            {/* advice:"Test Advice"
+            nextVisit:"2 Days"
+            nextVisitDate:"2021-04-01"
+            testDate:"2021-04-01" */}
+            <Form.Item {...layout1} label="Advice">
+              {form.getFieldDecorator('advice')(
+                <TextArea placeholder="Advice" autoSize={{ minRows: 2, maxRows: 5 }} allowClear />,
+              )}
+            </Form.Item>
+
+            <Form.Item {...layout1} label="Next Visit">
+              {form.getFieldDecorator('nextVisitNumber')(
+                <InputNumber min={0} max={1000} onChange={onChangeInputNumber} />,
+              )}
+            </Form.Item>
+
+            <Form.Item>
+              {form.getFieldDecorator('nextVisitVal')(
+                <Radio.Group onChange={onChangeNextVisitVal}>
+                  <Radio.Button value="days">days</Radio.Button>
+                  <Radio.Button value="weeks">weeks</Radio.Button>
+                  <Radio.Button value="months">months</Radio.Button>
+                </Radio.Group>,
+              )}
+            </Form.Item>
+
+            <Form.Item {...layout1} label="Next Visit Date">
+              {form.getFieldDecorator('nextVisitDate')(<DatePicker />)}
+            </Form.Item>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                margin: '20px 0',
+              }}
+            >
               <Popconfirm
                 title="Are you sure all the details filled are correct ?"
                 onConfirm={handleSubmitt}
               >
-                <Button loading={false} type="primary" htmlType="submit" style={{ margin: 5 }}>
+                <Button loading={false} type="primary" style={{ margin: 5 }}>
+                  {/* htmlType="submit" */}
                   Update
                 </Button>
               </Popconfirm>
@@ -451,19 +513,6 @@ const BankDetails = props => {
               </Button>
             </Form.Item> */}
           </Form>
-          {/* ************************************************************************************** */}
-          {/* <Divider orientation="left">Meds</Divider>
-          <div style={{ display: 'block', marginTop: 40 }}>
-            <MedicineTable />
-            {/* <PrescriptionItemContext.Provider value={productsDispatch}>
-                <PrescriptionItemTable
-                  style={{ marginTop: 25 }}
-                  totalAmount={subTotal}
-                  products={productsState}
-                  dispatch={productsDispatch}
-                />
-              </PrescriptionItemContext.Provider> * /}
-          </div> */}
         </Content>
       </Layout>
     </div>
@@ -471,89 +520,3 @@ const BankDetails = props => {
 }
 
 export default Form.create()(BankDetails)
-
-/*
-  <PrescriptionItemContext.Provider value={productsDispatch}>
-    <PrescriptionItemTable
-      style={{ marginTop: 25 }}
-      totalAmount={subTotal}
-      products={productsState}
-      dispatch={productsDispatch}
-    />
-  </PrescriptionItemContext.Provider>
-*/
-
-/*
-    let countryState = ''
-  let country = ''
-  let DrName = ''
-  let designation = ''
-  if (role === 'school_admin') {
-    const reduxCountry = useSelector(state => state.user.clinicCountry)
-    if (reduxCountry) country = reduxCountry
-    DrName = useSelector(state => state.user.clinicName)
-    designation = 'Clinic Head'
-  }
-  if (role === 'therapist') {
-    const reduxCountry = useSelector(state => state.user.staffCountry)
-    const reduxState = useSelector(state => state.user.staffState)
-    if (reduxCountry) country = reduxCountry
-    if (reduxState) countryState = reduxState
-    DrName = useSelector(state => state.user.staffName)
-    designation = useSelector(state => state.user.staffName.designation)
-  }
-
-
-*/
-
-/*
-<form className="table-form" onSubmit={handleSubmit}>
-        <table border="1" cellSpacing="10">
-          <thead>
-            <tr bgcolor="tomato">
-              <th>Name</th>
-              <th>Med Type</th>
-              <th>Dosage</th>
-              <th>Unit</th>
-              <th>When</th>
-              <th>Frequency</th>
-              <th>Duration</th>
-              <th>Function</th>
-            </tr>
-          </thead>
-          <tbody>
-            {inputFields.map((inputField, index) => (
-              <tr key={index}>
-                {console.log('THE INPUT FIELDs 🚩', inputField)}
-                <td>{inputField.name}</td>
-                <td>{inputField.medicineType}</td>
-                <td>{inputField.dosage}</td>
-                <td>{inputField.unit}</td>
-                <td>{inputField.when}</td>
-                <td>{inputField.frequency}</td>
-                <td>{inputField.duration}</td>
-                <td>
-                  {
-                    <>
-                      <PlusOutlined />
-                      <DeleteOutlined />
-                    </>
-                  }
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {/* <Button
-          className="button-class"
-          // variant="contained"
-          // color="primary"
-          type="submit"
-          // endIcon={<Icon>send</Icon>}
-          onClick={handleSubmit}
-        >
-          Send
-        </Button> * /}
-        {props.data()}
-      </form>
-*/

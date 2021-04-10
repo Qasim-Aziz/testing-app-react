@@ -5,11 +5,17 @@
 /* eslint-disable */
 import React, { useState, useEffect, useCallback } from 'react'
 import { connect, useSelector, useDispatch } from 'react-redux'
-import { Table, Card, Col, Row, List, Typography, Divider, Button } from 'antd'
+import { Table, Card, Col, Row, List, Typography, Divider, Button, Tag } from 'antd'
 import { CloseCircleOutlined, CheckCircleOutlined, EditOutlined } from '@ant-design/icons'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import actionPrescription from '../../redux/prescriptions/actions'
 import './index.scss'
+
+// const TagComponent = val => {
+//   console.log('THE TTTAAAGGG', val)
+//   return val.map((item, index) => <Tag key={item.node.id}>{item.node.name}</Tag>)
+// }
+
 export const History = props => {
   console.log('EACH HISTORY PROP', props)
 
@@ -32,12 +38,12 @@ export const History = props => {
     color: 'black',
   }
   const medicineTableData = props.data.node.medicineItems.edges
-  console.log('🔥🔥🔥🔥🧨🧨🧨🧯🧯🧯', medicineTableData)
+  // console.log('🔥🔥🔥🔥🧨🧨🧨🧯🧯🧯', medicineTableData)
   const columns = [
     {
       title: '#',
       render: row => {
-        console.log('THE ROW', row)
+        // console.log('THE ROW', row)
         return medicineTableData.indexOf(row) + 1
       },
     },
@@ -46,7 +52,7 @@ export const History = props => {
 
       title: 'name',
       render: row => {
-        console.log('THE ROW ITEM', row)
+        // console.log('THE ROW ITEM', row)
         return <span>{row.node.name ? row.node.name : ''}</span>
       },
     },
@@ -143,36 +149,31 @@ export const History = props => {
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>Diagnosis </p>
             <p>
-              : {/* 🔴 NOTE: create a list of tags for diagnosis/tests/complaints */}
-              {/* {userProfile.allergicTo?.map(tag => {
-                const isLongTag = tag.length > 20
-                const tagElem = (
-                  <Tag
-                    className="edit-tag"
-                    key={tag}
-                    color="#3f72af"
-                    style={{ margin: '1px', fontWeight: '600' }}
-                  >
-                    <span>{isLongTag ? `${tag.slice(0, 20)}...` : tag}</span>
-                  </Tag>
-                )
-                return isLongTag ? (
-                  <Tooltip title={tag} key={tag}>
-                    {tagElem}
-                  </Tooltip>
-                ) : (
-                  tagElem
-                )
-              })} */}
+              :{' '}
+              {props.data.node.diagnosis.edges.map((item, index) => (
+                <Tag key={item.node.id}>{item.node.name}</Tag>
+              ))}
+              {/* <TagComponent diagnosisList={props.data.node.diagnosis.edges} /> */}
+              {/* 🔴 NOTE: create a list of tags for diagnosis */}
             </p>
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>Tests </p>
-            <p> : {'Whatever'}</p>
+            <p>
+              :{' '}
+              {props.data.node.tests.edges.map((item, index) => (
+                <Tag key={item.node.id}>{item.node.name}</Tag>
+              ))}
+            </p>
           </div>
           <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>Complaints </p>
-            <p> : {'whatever'}</p>
+            <p>
+              :{' '}
+              {props.data.node.complaints.edges.map((item, index) => (
+                <Tag key={item.node.id}>{item.node.name}</Tag>
+              ))}
+            </p>
           </div>
           {/* <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
             <p style={labelHead}>SSN/Adhaar </p>

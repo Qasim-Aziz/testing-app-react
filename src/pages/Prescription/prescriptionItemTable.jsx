@@ -7,20 +7,14 @@
 /* eslint-disable react/destructuring-assignment */
 import React, { useEffect, useState } from 'react'
 import 'antd/dist/antd.css'
-import { Table, Button, Form, Typography, notification, Input, Modal } from 'antd'
-import { useQuery, useMutation } from 'react-apollo'
-import gql from 'graphql-tag'
+import { Table, Button, Form } from 'antd'
 import PrescriptionItemCell from './prescriptionItemCell'
 import './index.scss'
 import { PrescriptionFormContext } from './context'
-// import { CREATE_PRODUCT } from './query'
-
-const { TextArea } = Input
-
-const { Text } = Typography
 
 const EditableRow = ({ form, index, ...props }) => (
   <PrescriptionFormContext.Provider value={form} key={index}>
+    {/* {console.log('THE FORM⏩⏩⏩⏩', form, index, props)} */}
     <tr {...props} />
   </PrescriptionFormContext.Provider>
 )
@@ -38,13 +32,6 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount }) => {
   console.log('THE PRODUCTS', products)
   console.log('THE Dispatch', dispatch)
   console.log('THE TOTAL AMOUNT', totalAmount)
-  // "name":"ENCORATE 100ML",
-  //   "medicineType":"SYP",
-  //   "dosage":"1-1-1",
-  //   "unit":"ml",
-  //   "when":"Before Breakfast",
-  //   "frequency":"Daily",
-  //   "duration":"30 days"
   const columnsList = [
     {
       title: '#',
@@ -52,20 +39,20 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount }) => {
       // width: 5,
     },
     {
-      title: 'Type',
+      title: 'Type', // MedicineType
       editable: true,
-      dataIndex: 'type',
+      dataIndex: 'medicineType', // ::before 'type',
       // width: 20,
     },
     {
-      title: 'Product/Service',
+      title: 'Product/Service', // Name
       editable: true,
-      dataIndex: 'service',
+      dataIndex: 'name', // name // ::before service
       // width: 180,
     },
     {
-      title: 'Dose',
-      dataIndex: 'dose',
+      title: 'Dosage',
+      dataIndex: 'dosage',
       editable: true,
       // width: 70,
     },
@@ -132,8 +119,8 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount }) => {
   const handleAdd = () => {
     const newProductData = {
       key: products.length + 1,
-      service: '',
-      qty: 1,
+      name: '', // ::before service: '',
+      // qty: 1,
       rate: 0,
     }
     dispatch({ type: 'ADD_PRODUCT', payload: newProductData })
@@ -144,7 +131,7 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount }) => {
   }
 
   const columns = columnsList.map(col => {
-    console.log('THE COL', col)
+    // console.log('THE COL', col)
     if (!col.editable) {
       return col
     }
@@ -160,8 +147,6 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount }) => {
     }
   })
 
-  console.log('tableData ⏩', products)
-  console.log('THE COMPONENT', components)
   return (
     <div>
       <Table
