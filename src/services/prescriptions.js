@@ -1,7 +1,7 @@
 // import { GraphQLClient } from 'graphql-request'
 /* eslint-disable no-else-return */
 /* eslint-disable import/prefer-default-export */
-/* eslint-disable no-underscore-dangle */
+/* eslint-disable */
 
 import { notification } from 'antd'
 import { gql } from 'apollo-boost'
@@ -100,8 +100,115 @@ export async function getPrescriptionFunc(payload) {
     })
 }
 
+export async function getLatestPrescription(payload) {
+  console.log('THE PAYLOAD IS --------------------->', payload)
+  const idVal = payload.value
+  return apolloClient
+    .query({
+      query: gql`
+        query getLatestPrescriptionDef($student: ID) {
+          getPrescriptions(student: $student, last: 1) {
+            edges {
+              node {
+                id
+                height
+                weight
+                temperature
+                headCircumference
+                advice
+                nextVisit
+                nextVisitDate
+                testDate
+                createddate
+                createdby {
+                  id
+                  username
+                }
+                student {
+                  id
+                  firstname
+                  lastname
+                }
+                complaints {
+                  edges {
+                    node {
+                      id
+                      name
+                    }
+                  }
+                }
+
+                diagnosis {
+                  edges {
+                    node {
+                      id
+                      name
+                    }
+                  }
+                }
+
+                tests {
+                  edges {
+                    node {
+                      id
+                      name
+                    }
+                  }
+                }
+                medicineItems {
+                  edges {
+                    node {
+                      id
+                      name
+                      medicineType
+                      dosage
+                      unit
+                      when
+                      frequency
+                      duration
+                      qty
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      `,
+      variables: {
+        student: idVal,
+      },
+    })
+    .then(result => result)
+    .catch(error => {
+      console.log('THE ERROR💣💣💣🔥🔥', JSON.stringify(error))
+      error.graphQLErrors.map(item => {
+        console.log('THE ERROR💣💣💣🔥🔥', item)
+        return notification.error({
+          message: 'Something went wrong',
+          description: item.message,
+        })
+      })
+    })
+}
+
 export async function createPrescriptionFunc(payload) {
   console.log('THE VALUE IN THE PAYLOAD ---------------------> ', payload)
+  let array_of_meds = []
+  let i
+  for (i = 0; i < payload.data.length; i++) {
+    let x = payload.data[i]
+    console.log('THE ARRAY', payload.data[i])
+    console.log('THE XXX', x)
+    delete x.key
+    delete x.rate
+    console.log('THE XXX', x)
+    if (x.qty === null) {
+      delete x.qty
+    }
+    array_of_meds.push(x)
+  }
+  console.log('THE ========================>', array_of_meds)
   return apolloClient
     .query({
       query: gql`
@@ -202,23 +309,27 @@ export async function createPrescriptionFunc(payload) {
         }
       `,
       variables: {
-        student: payload.values.student,
+        student: payload.id,
         height: payload.values.height,
         weight: payload.values.weight,
         temperature: payload.values.temperature,
         headCircumference: payload.values.headCircumference,
         advice: payload.values.advice,
-        nextVisit: payload.values.nextVisit,
+        nextVisit:
+          payload.values.nextVisitNumber && payload.values.nextVisitVal
+            ? `${payload.values.nextVisitNumber} ${payload.values.nextVisitVal}`
+            : '',
         nextVisitDate: payload.values.nextVisitDate,
-        testDate: payload.values.testDate,
-        complaints: payload.values.complaints,
-        diagnosis: payload.values.diagnosis,
-        tests: payload.values.tests,
-        medicineItems: payload.values.medicineItems,
+        testDate: payload.values.testDate ? payload.values.testDate : [],
+        complaints: [], // payload.values.complaints ? payload.values.complaints : [],
+        diagnosis: [], // payload.values.diagnosis ? payload.values.diagnosis : [],
+        tests: [], // payload.values.tests ? payload.values.tests : [],
+        medicineItems: payload.data ? array_of_meds : [],
       },
     })
     .then(result => result)
     .catch(error => {
+      console.log('THE ERROR', JSON.stringify(error))
       error.graphQLErrors.map(item => {
         return notification.error({
           message: 'Something went wrong',

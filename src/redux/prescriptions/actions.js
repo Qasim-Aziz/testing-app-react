@@ -9,6 +9,7 @@ const actions = {
   GET_PRESCRIPTIONS: 'prescriptions/GET_PRESCRIPTIONS',
   PAGE_CHANGED: 'prescriptions/PAGE_CHANGED',
   ROWS_CHANGED: 'prescriptions/ROWS_CHANGED',
+  GET_LASTEST_PRESCRIPTIONS: 'prescriptions/GET_LASTEST_PRESCRIPTIONS',
 }
 
 export default actions
