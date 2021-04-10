@@ -1,19 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Form, Input, Button, DatePicker, Select, notification } from 'antd'
 import moment from 'moment'
-import { FORM } from 'assets/styles/globalStyles'
+import { FORM, COLORS, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import {
   createLongTermGoal,
   createShortTermGoal,
   updateLongTermGoal,
   updateShortTermGoal,
 } from '../targetAlocation/TargetAllocation.query'
-
-const selectStyle = {
-  width: '100%',
-  height: '48px',
-  zIndex: '1000',
-}
 
 const AddLongAndShortGoalForm = props => {
   const {
@@ -153,50 +147,32 @@ const AddLongAndShortGoalForm = props => {
   const formRef = useRef(null)
 
   return (
-
     <Form ref={formRef} {...FORM.layout} layout="horizontal">
-      <Form.Item
-        label="Goal Name"
-      >
+      <Form.Item label="Goal Name">
         {form.getFieldDecorator('goalName', {
           rules: [{ required: true, message: 'Please provide goal name!' }],
         })(<Input placeholder="Goal Name" />)}
       </Form.Item>
 
-      <Form.Item
-        label="Description"
-      >
+      <Form.Item label="Description">
         {form.getFieldDecorator('description', {
           rules: [{ required: true, message: 'Please provide description!' }],
         })(<Input.TextArea placeholder="Description" />)}
       </Form.Item>
 
-      <Form.Item
-        label="Date Intiated"        
-      >
+      <Form.Item label="Date Intiated">
         {form.getFieldDecorator('dateIntiated', {
           rules: [{ required: true, message: 'Please Select date intiated!' }],
-        })(
-          <DatePicker
-            format="YYYY-MM-DD"
-            placeholder="Start Date"
-          />,
-        )}
+        })(<DatePicker format="YYYY-MM-DD" placeholder="Start Date" />)}
       </Form.Item>
 
-      <Form.Item
-        label="End Date"
-      >
+      <Form.Item label="End Date">
         {form.getFieldDecorator('endDate', {
           rules: [{ required: true, message: 'Please Select end date!' }],
-        })(
-          <DatePicker format="YYYY-MM-DD" placeholder="End Date" />,
-        )}
+        })(<DatePicker format="YYYY-MM-DD" placeholder="End Date" />)}
       </Form.Item>
 
-      <Form.Item
-        label="Responsible"
-      >
+      <Form.Item label="Responsible">
         {form.getFieldDecorator('responsible', {
           rules: [{ required: true, message: 'Please Select responsible!' }],
         })(
@@ -212,9 +188,7 @@ const AddLongAndShortGoalForm = props => {
         )}
       </Form.Item>
 
-      <Form.Item
-        label="Goal Status"
-      >
+      <Form.Item label="Goal Status">
         {form.getFieldDecorator('goalStatus', {
           rules: [{ required: true, message: 'Please Select goal status!' }],
         })(
@@ -236,6 +210,7 @@ const AddLongAndShortGoalForm = props => {
           loading={goalLoading}
           type="primary"
           htmlType="submit"
+          style={SUBMITT_BUTTON}
         >
           {type.includes('edit') ? 'Update' : 'Submit'}
         </Button>

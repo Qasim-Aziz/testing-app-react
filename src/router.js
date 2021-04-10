@@ -608,6 +608,7 @@ const routes = [
       '/reports/peak_block_report',
       '/reports/target_res_report',
       '/reports/network_graph',
+      '/reports/iep_report',
     ],
     // component: loadable(() => import('pages/reports/index')),
     component: Reportss,

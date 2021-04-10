@@ -38,6 +38,7 @@ export const PeakBlockWiseTable = forwardRef((props, ref) => {
   const [currentBlock, setCurrentBlock] = useState(null)
   const [blockDetailsDrawer, setBlockDetailsDrawer] = useState(false)
 
+  console.log(peakBlockData, dates, studentName)
   useEffect(() => {
     if (peakBlockData) {
       const tempTable = []

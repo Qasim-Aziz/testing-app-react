@@ -42,6 +42,7 @@ import Behavior from './behavior'
 import Attendance from './attendance'
 import Timesheet from './timesheet'
 import Goals from './goals'
+import IEPReport from '../IEPReport'
 import Mand from './mand'
 import MonthlyReport from './monthlyReport'
 import CelerationChartPanel from './celeration-chart-panel.container'
@@ -89,6 +90,7 @@ const REPORT_MAPPING = {
   '/reports/mand': 'Mand',
   '/reports/sessions': 'Sessions',
   '/reports/goals': 'Goals',
+  '/reports/iep_report': 'IEP Report',
   '/reports/celer_chart': 'Celeration Chart',
   '/reports/appointment_report': 'Appointment Report',
   '/reports/staff_activity': 'Staff Activity',
@@ -617,6 +619,15 @@ class Reports extends React.Component {
                       >
                         <span style={HeadStyle}>Goals</span>
                       </div>
+                      <div
+                        style={TabCheck === 'IEP Report' ? ActiveStyle : BlockStyle}
+                        onClick={() => {
+                          this.SetTabFunction('IEP Report')
+                          this.changeReportRoute('reports/iep_report')
+                        }}
+                      >
+                        <span style={HeadStyle}>IEP Report</span>
+                      </div>
 
                       <div
                         style={TabCheck === 'Celeration Chart' ? ActiveStyle : BlockStyle}
@@ -742,6 +753,12 @@ class Reports extends React.Component {
                   )}
                   {path === '/reports/goals' && (
                     <Goals
+                      showDrawerFilter={this.showDrawerFilter}
+                      selectedStudentId={SelectedLearnerId}
+                    />
+                  )}
+                  {path === '/reports/iep_report' && (
+                    <IEPReport
                       showDrawerFilter={this.showDrawerFilter}
                       selectedStudentId={SelectedLearnerId}
                     />
