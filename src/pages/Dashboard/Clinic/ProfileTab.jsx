@@ -101,7 +101,7 @@ const ProfileTab = ({ activeProfileTab, onProfileTabChange }) => {
     },
     {
       key: 'therapist-shifting',
-      title: 'Theapist Shifting',
+      title: 'Theapist Shif Time',
       component: <TherapistShifting />,
       iconName: <FontAwesomeIcon icon={faStethoscope} style={{ marginRight: '10px' }} />,
     },

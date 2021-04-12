@@ -27,6 +27,8 @@ function RecordAssessmentForm({
   const { data: assessmentsData, loading: assessmentsLoading, error: assessmentsError } = useQuery(
     GET_GENERAL_ASSESSMENT,
   )
+
+  console.log(assessmentsData, 'assess')
   const [
     recordGeneralData,
     { data: recordedData, loading: recordedLoading, error: recordedError },
@@ -170,6 +172,28 @@ function RecordAssessmentForm({
               })}
           </Select>
         </Form.Item>
+        <Form.Item name="module" label="Assessment Module">
+          <Select
+            style={{ width: '100%' }}
+            placeholder="Select a module"
+            size="large"
+            showSearch
+            optionFilterProp="name"
+            value={currentAssessment}
+            onChange={e => setCurrentAssessment(e)}
+            loading={assessmentsLoading}
+          >
+            {assessments &&
+              assessments.map(item => {
+                return (
+                  <Option value={item.id} name={item.name} key={item.id}>
+                    {item.name}
+                  </Option>
+                )
+              })}
+          </Select>
+        </Form.Item>
+
         <Form.Item name="submodule" label="Submodule">
           <Select
             style={{ width: '100%' }}

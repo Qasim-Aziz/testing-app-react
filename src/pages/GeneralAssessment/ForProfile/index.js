@@ -103,13 +103,14 @@ function Assessment() {
             >
               {text}
             </Button>
-            {row.submodules.map(tag => {
-              return (
-                <Tag className="edit-tag" key={tag.name}>
-                  <span>{tag.name.length > 15 ? `${tag.slice(0, 15)}...` : tag.name}</span>
-                </Tag>
-              )
-            })}
+            {row.hasSubmodule &&
+              row.submodules.map(tag => {
+                return (
+                  <Tag className="edit-tag" key={tag.name}>
+                    <span>{tag.name.length > 15 ? `${tag.slice(0, 15)}...` : tag.name}</span>
+                  </Tag>
+                )
+              })}
           </span>
         )
       },
@@ -169,7 +170,10 @@ function Assessment() {
           </div>
         </div>
 
-        <div style={{ width: '100%', marginTop: '1em', backgroundColor: 'white' }} className="gen-assess-table">
+        <div
+          style={{ width: '100%', marginTop: '1em', backgroundColor: 'white' }}
+          className="gen-assess-table"
+        >
           <Table
             dataSource={tableData}
             loading={genAssessLoading}
@@ -186,7 +190,7 @@ function Assessment() {
         onClose={() => {
           setCreateAssessDrawer(false)
         }}
-        width={DRAWER.widthL3}
+        width={DRAWER.widthL2}
         destroyOnClose
         title="Create New Assessment"
       >
