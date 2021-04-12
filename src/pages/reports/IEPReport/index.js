@@ -1,6 +1,7 @@
 /* eslint-disable */
 import React, { useState, useEffect } from 'react'
 import { useQuery } from 'react-apollo'
+import groupObj from '@hunters/group-object'
 import moment from 'moment'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import { Row, Col, DatePicker, Button, Table } from 'antd'
@@ -84,24 +85,18 @@ function Index({ showDrawerFilter, selectedStudentId }) {
 
   // console.log(targetData, targetLoading, targetError, ' target data')
 
-  console.log(longGoalsDetails)
   useEffect(() => {
     if (longGoalsDetails) {
       const temp = []
       const tempLong = []
-      const tempShort = []
+      let tempShort = []
 
       longGoalsDetails.goalsLongProgressReport.map(item => {
         console.log(item, 'long goal --------------------------')
         const endDate = moment(item.goal.dateEnd)
-        const today = moment()
+        const today = moment().startOf('M')
         const sixMonths = moment().add(6, 'M')
 
-        console.log(
-          today.format('YYYY-MM-DD'),
-          endDate.format('YYYY-MM-DD'),
-          sixMonths.format('YYYY-MM-DD'),
-        )
         if (today <= endDate && endDate < sixMonths) {
           tempLong.push({
             goal: item.goal.goalName,
@@ -115,13 +110,22 @@ function Index({ showDrawerFilter, selectedStudentId }) {
           })
         }
         item.goal.shorttermgoalSet?.edges.map(short => {
-          tempShort.push({
-            goal: short.node.goalName,
-            goalId: short.node.id,
-            dateInitiated: short.node.dateInitiated,
-            dateEnd: short.node.dateEnd,
-            dateMastered: short.node.masterDate,
-          })
+          console.log(short.node, 'short ??????????????')
+          const endShort = moment(short.node.dateEnd)
+
+          if (today <= endShort && endShort < sixMonths) {
+            tempShort.push({
+              key: Math.random(),
+              shortGoal: short.node.goalName,
+              shortGoalId: short.node.id,
+              status: short.node.goalStatus.status,
+              longGoal: item.goal.goalName,
+              longGoalId: item.goal.id,
+              dateInitiated: short.node.dateInitialted,
+              dateEnd: short.node.dateEnd,
+              dateMastered: short.node.masterDate,
+            })
+          }
           short.node.targetAllocateSet?.edges.map(({ node: target }) =>
             target.targetStatus.statusName === 'Mastered'
               ? temp.push({
@@ -138,9 +142,20 @@ function Index({ showDrawerFilter, selectedStudentId }) {
           )
         })
       })
-      console.log(tempLong)
-      console.log(temp)
-      // temp.sort((a, b) => new Date(a.dateEnd) - new Date(b.dateEnd))
+      // console.log(tempLong)
+      // console.log(temp)
+
+      console.log(tempShort)
+      const groupedData = groupObj.group(tempShort, 'longGoal')
+      const keys = Object.keys(groupedData)
+      tempShort = []
+      keys.map(key => {
+        let tt = groupedData[key]
+        tt.forEach((t, index) => {
+          index === 0 ? tempShort.push(t) : tempShort.push({ ...t, longGoal: null })
+        })
+      })
+
       setMetLongGoals(temp)
       setShortTableData(tempShort)
       setLongTableData(tempLong)
@@ -175,16 +190,8 @@ function Index({ showDrawerFilter, selectedStudentId }) {
       dataIndex: 'shortGoal',
     },
     {
-      title: 'Date End',
-      dataIndex: 'dateEnd',
-    },
-    {
       title: 'Date Mastered',
       dataIndex: 'dateMastered',
-    },
-    {
-      title: 'Mastery Days',
-      dataIndex: 'masteryDays',
     },
   ]
 
@@ -206,12 +213,35 @@ function Index({ showDrawerFilter, selectedStudentId }) {
       dataIndex: 'dateEnd',
     },
   ]
+
+  const shortCol = [
+    {
+      title: 'Long Term Goal',
+      dataIndex: 'longGoal',
+    },
+    {
+      title: 'Short Term Goal',
+      dataIndex: 'shortGoal',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+    },
+    {
+      title: 'Date Initiated',
+      dataIndex: 'dateInitiated',
+    },
+    {
+      title: 'Date End',
+      dataIndex: 'dateEnd',
+    },
+  ]
   function disabledDate(current) {
     return current && current >= moment().endOf('M')
   }
 
-  console.log(domainData, domainLoading, domainError, 'doamin')
-  console.log(data, loading, error)
+  // console.log(domainData, domainLoading, domainError, 'doamin')
+  // console.log(data, loading, error)
   console.log(metLongGoals, 'metlonggoals')
   return (
     <div>
@@ -230,12 +260,47 @@ function Index({ showDrawerFilter, selectedStudentId }) {
         </Col>
         <Col sm={24}>
           <div style={{ margin: '10px 0 0 10px' }}>
-            <Table columns={columns} loading={longGoalsLoading} dataSource={metLongGoals} />
+            <Table
+              columns={columns}
+              loading={longGoalsLoading}
+              dataSource={metLongGoals}
+              pagination={{
+                defaultPageSize: 20,
+                showSizeChanger: true,
+                pageSizeOptions: ['20', '30', '50', '100'],
+                position: 'top',
+              }}
+            />
           </div>
         </Col>
         <Col sm={24}>
-          <div style={{ margin: '10px 0 0 10px' }}>
-            <Table columns={longCol} loading={longGoalsLoading} dataSource={longTableData} />
+          <div style={{ margin: '20px 0 0 10px' }}>
+            <Table
+              columns={longCol}
+              loading={longGoalsLoading}
+              dataSource={longTableData}
+              pagination={{
+                defaultPageSize: 20,
+                showSizeChanger: true,
+                pageSizeOptions: ['20', '30', '50', '100'],
+                position: 'top',
+              }}
+            />
+          </div>
+        </Col>
+        <Col sm={24}>
+          <div style={{ margin: '20px 0 0 10px' }}>
+            <Table
+              columns={shortCol}
+              loading={longGoalsLoading}
+              dataSource={shortTableData}
+              pagination={{
+                defaultPageSize: 20,
+                showSizeChanger: true,
+                pageSizeOptions: ['20', '30', '50', '100'],
+                position: 'top',
+              }}
+            />
           </div>
         </Col>
       </Row>
