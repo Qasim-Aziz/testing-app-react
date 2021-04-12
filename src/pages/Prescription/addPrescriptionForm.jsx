@@ -303,7 +303,6 @@ const BankDetails = props => {
         value: details.id,
       },
     })
-    console.log('THE VALUES')
   }, [])
 
   /*[Explaination]
@@ -317,7 +316,6 @@ const BankDetails = props => {
     console.log('THE PRESCRIPTION VALUE', prescriptions)
     if (prescriptions.SpecificPrescription) {
       let listOfMedicineObject = prescriptions.SpecificPrescription.medicineItems.edges
-      console.log('THE LIST OF MEDS 💊💊💊💊💊', listOfMedicineObject)
       /**Add key in the product_state */
       let x = addNevObject(listOfMedicineObject)
       productsDispatch({ type: 'SET_PRODUCTS', payload: x })
@@ -366,21 +364,6 @@ const BankDetails = props => {
     })
   }
 
-  const arrayOfOptions = []
-
-  const handleChange = value => {
-    console.log(`Selected: `, value)
-    console.log('THE TYPE OF val', typeof value)
-    const lastItem = value[value.length - 1]
-
-    console.log('THE VALUESSSSSS ', lastItem)
-  }
-
-  const EachSearchSelect = val => {
-    console.log(`Selected ====>: ${val}`)
-  }
-
-  const children = []
   return (
     <div>
       <Layout>
@@ -469,9 +452,6 @@ const BankDetails = props => {
               </Card>
             </div>
             <br />
-            {/* <Button type="primary" onClick={getComplaints('adhd')}>
-              Click me
-            </Button> */}
             <Divider orientation="left">Vitals</Divider>
             <div style={{ display: 'flow-root' }}>
               <div
@@ -557,10 +537,6 @@ const BankDetails = props => {
             ) : (
               <>Display Loading</>
             )}
-            {/* advice:"Test Advice"
-            nextVisit:"2 Days"
-            nextVisitDate:"2021-04-01"
-            testDate:"2021-04-01" */}
             <Form.Item {...layout1} label="Advice">
               {form.getFieldDecorator('advice')(
                 <TextArea placeholder="Advice" autoSize={{ minRows: 2, maxRows: 5 }} allowClear />,
@@ -603,11 +579,6 @@ const BankDetails = props => {
                 Cancel
               </Button>
             </div>
-            {/* <Form.Item>
-              <Button style={{ width: '100%' }} type="primary" htmlType="submit">
-                Save
-              </Button>
-            </Form.Item> */}
           </Form>
         </Content>
       </Layout>
