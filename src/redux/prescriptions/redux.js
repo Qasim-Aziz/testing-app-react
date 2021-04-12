@@ -29,9 +29,11 @@ export default function useReducer(state = initialState, action) {
         ],
       }
     case actions.APPEND_PRESCRIPTIONS_LIST:
+      console.log('THE PRESCRIPTION THAT IS ADDED', action.payload)
+      console.log('THE PRESCRIPTION GLOBAL STATE🔴🌟🔴', state)
       return {
         ...state,
-        PrescriptionsList: [action.payload.prescription, ...state.PrescriptionsList],
+        PrescriptionsList: [...state.PrescriptionsList, action.payload.prescription],
         PrescriptionCreated: 'Created',
       }
     case actions.DELETE_PRESCRIPTION_IN_LIST:

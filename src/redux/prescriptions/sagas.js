@@ -86,6 +86,14 @@ export function* CREATE_PRESCRIPTIONS({ payload }) {
     console.log('SINCE IT EXPECTS OBJs', typeof response.data)
     const prescriptions = response.data.createPrescription.details
     console.log('THE PRESCRIPTIONS', prescriptions)
+    /* **************************** */
+    yield put({
+      type: actions.APPEND_PRESCRIPTIONS_LIST,
+      payload: {
+        prescription: prescriptions,
+      },
+    })
+    /* **************************** */
     yield put({
       type: actions.SET_STATE,
       payload: {

@@ -105,6 +105,7 @@ function addNevObject(val) {
     let some_random = {}
     console.log('THE ITEM', item)
     some_random.key = index + 1 // item.node.id
+    some_random.id = item.node.id
     some_random.name = item.node.name
     some_random.medicineType = item.node.medicineType
     some_random.unit = item.node.unit
@@ -283,7 +284,7 @@ const EditPrescription = props => {
   */
 
   const [productsState, productsDispatch] = useReducer(productReducer, [])
-
+  console.log('THE ☑☑☑☑☑☑☑☑☑☑☑ productstate initially', productsState)
   const [subTotal, setSubTotal] = useState(0)
   const role = useSelector(state => state.user.role)
 

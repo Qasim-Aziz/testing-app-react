@@ -31,8 +31,8 @@ const components = {
 const PrescriptionItemTable = ({ products, dispatch, totalAmount, ...props }) => {
   // console.log('THE PRODUCTS', products)
   // console.log('THE Dispatch', dispatch)
-  console.log('THE TOTAL AMOUNT☑☑☑', props)
-  console.log('HEWIEJ', props.tryingTodelete)
+  // console.log('THE TOTAL AMOUNT☑☑☑', props)
+  // console.log('HEWIEJ', props.tryingTodelete)
   const columnsList = [
     {
       title: '#',
@@ -101,20 +101,52 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount, ...props }) =>
       title: 'Operation',
       dataIndex: 'operation',
       width: 50,
-      render: (text, { key }) => (
+      render: (text, { key, id }) => (
         <>
-          <Button
-            type="danger"
-            onClick={() => {
-              dispatch({
-                type: 'REMOVE_PRODUCT',
-                payload: { key },
-              })
-            }}
-          >
-            Delete
-          </Button>
-          {props.tryingTodelete && console.log('🚀👉🚀👉✌', key)}
+          {props.tryingTodelete ? (
+            <>
+              {console.log('THE KEY AND PRODUCT⏩⏩⏩⏩⏩⏩', id, key)}
+              {id ? (
+                <>
+                  <Button
+                    type="danger"
+                    onClick={() => {
+                      dispatch({
+                        type: 'DELETE_PRODUCT',
+                        payload: id,
+                      })
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  style={{ backgroundColor: '#ffbb33' }}
+                  onClick={() => {
+                    dispatch({
+                      type: 'REMOVE_PRODUCT',
+                      payload: { key },
+                    })
+                  }}
+                >
+                  Delete
+                </Button>
+              )}
+            </>
+          ) : (
+            <Button
+              type="danger"
+              onClick={() => {
+                dispatch({
+                  type: 'REMOVE_PRODUCT',
+                  payload: { key },
+                })
+              }}
+            >
+              Delete
+            </Button>
+          )}
         </>
       ),
     },
