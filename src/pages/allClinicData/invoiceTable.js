@@ -136,7 +136,6 @@ function InvoiceTable({ rowData }) {
   }, [deleteAssessChargeData, deleteAssessChargeError])
 
   const handleSendReminder = async invoiceId => {
-    console.log(invoiceId, 'invoiceId')
     try {
       const reminder = await client.mutate({
         mutation: NOTIFICATION,
@@ -233,8 +232,7 @@ function InvoiceTable({ rowData }) {
       },
     },
   ]
-  console.log(deleteAssessChargeData, deleteAssessChargeLoading, deleteAssessChargeError)
-  console.log(currentInvoice, 'current')
+
   return (
     <div>
       <Helmet title="Dashboard Alpha" />
@@ -247,7 +245,7 @@ function InvoiceTable({ rowData }) {
             margin: '0px auto',
           }}
         >
-          <PageHeader
+          {/* <PageHeader
             className="site-page-header"
             title="INVOICES"
             extra={[
@@ -261,7 +259,7 @@ function InvoiceTable({ rowData }) {
                 <PlusOutlined className={classes.headIcon} style={{ marginLeft: -3.5 }} />
               </Button>,
             ]}
-          />
+          /> */}
           <FilterCard
             statusSelect={statusSelect}
             setStatusSelect={setStatusSelect}

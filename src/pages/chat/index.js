@@ -10,7 +10,7 @@ import TherapistPeoplesList from './TherapistPeoplesList'
 const { Title } = Typography
 
 export default () => {
-  const [selectedPeople, setSelectedPeople] = useState()
+  const [selectedPeople, setSelectedPeople] = useState(-1)
   const [selectedPeopleDetails, setSelectedPeopleDetails] = useState(null)
   const userRole = localStorage.getItem('role')
 
@@ -65,7 +65,7 @@ export default () => {
               width: '100%',
             }}
           >
-            {selectedPeople ? (
+            {selectedPeople && selectedPeopleDetails ? (
               <MessageView
                 secondUser={selectedPeople}
                 selectedPeopleDetails={selectedPeopleDetails}

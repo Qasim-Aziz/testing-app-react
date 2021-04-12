@@ -132,27 +132,27 @@ function GenDetails(props) {
         </Form.Item> */}
         <Form.Item label="Designation" style={itemStyle}>
           {form.getFieldDecorator('designation', {
-            rules: [{ required: false, message: 'Please provide ClientId!' }],
+            rules: [{ required: false, message: 'Please provide Designation!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="Qualification" style={itemStyle}>
           {form.getFieldDecorator('qualification', {
-            rules: [{ required: false, message: 'Please provide ClientId!' }],
+            rules: [{ required: false, message: 'Please provide Qualification!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="First Name" style={itemStyle}>
           {form.getFieldDecorator('firstname', {
-            rules: [{ required: true, message: 'Please provide firstName!' }],
+            rules: [{ required: true, message: 'Please provide First Name!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="Last Name" style={itemStyle}>
           {form.getFieldDecorator('lastname', {
-            rules: [{ required: false, message: 'Please provide lastName!' }],
+            rules: [{ required: false, message: 'Please provide Last Name!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="Email" style={itemStyle}>
           {form.getFieldDecorator('email', {
-            rules: [{ required: true, message: 'Please provide email!' }],
+            rules: [{ required: true, message: 'Please provide Email!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
 
@@ -207,7 +207,7 @@ function GenDetails(props) {
         </Form.Item>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <Button type="primary" loading={updateLoading} htmlType="submit" style={SUBMITT_BUTTON}>
-            Submitt
+            Submit
           </Button>
           <Button type="default" onClick={() => closeDrawer(false)} style={CANCEL_BUTTON}>
             Cancel

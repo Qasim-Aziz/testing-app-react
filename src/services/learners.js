@@ -27,6 +27,12 @@ export async function getClinicLearners(payload) {
             before: $before
           ) {
             clinicTotal
+            pageInfo {
+              hasNextPage
+              hasPreviousPage
+              startCursor
+              endCursor
+            }
             edges {
               node {
                 id

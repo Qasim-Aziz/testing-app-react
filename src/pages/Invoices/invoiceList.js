@@ -1,18 +1,37 @@
-/* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet'
-import { Button, Layout, PageHeader, Table, Drawer, notification, Popover } from 'antd'
-import { PlusOutlined, MoreOutlined } from '@ant-design/icons'
-import { createUseStyles } from 'react-jss'
+import {
+  Button,
+  Drawer,
+  notification,
+  Table,
+  Menu,
+  Popconfirm,
+  Dropdown,
+  Select,
+  Icon,
+  Input,
+  DatePicker,
+} from 'antd'
+import * as FileSaver from 'file-saver'
+import * as XLSX from 'xlsx'
+import JsPDF from 'jspdf'
 import gql from 'graphql-tag'
+import {
+  CloudDownloadOutlined,
+  CloseCircleOutlined,
+  FilePdfOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from '@ant-design/icons'
 import { useQuery, useMutation } from 'react-apollo'
 import moment from 'moment'
-import InvoiceForm from '../../components/invoice/InvoiceForm'
-import FilterCard from './FilterCard'
-
-const { Content } = Layout
-const { Column } = Table
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
+import InvoiceForm from 'components/invoice/InvoiceForm'
+import EditInvoice from 'components/invoice/EditInvoice'
+import PreviewInvoice from '../allClinicData/viewInvoice'
+import './invoices.scss'
 
 const GET_INVOICES = gql`
   query getInvoices($from: Date, $to: Date, $status: ID) {
@@ -68,52 +87,44 @@ const DELETE_INVOICE = gql`
   }
 `
 
-const useStyles = createUseStyles(() => ({
-  headIconBut: {
-    width: 50,
-    height: 50,
-    marginLeft: 20,
-    margin: 10,
-  },
-
-  headIcon: {
-    fontSize: 24,
-    marginTop: 5,
-  },
-}))
-
 const dateFormate = 'YYYY-MM-DD'
 
 export default () => {
-  const classes = useStyles()
-  const [newInvDrawer, setNewInvDrawer] = useState(false)
+  const [isCreateInvoice, setCreateInvoice] = useState(false)
+  const [isPreviewInvoice, setPreviewInvoice] = useState(false)
+  const [isEditInvoice, setEditInvoice] = useState(false)
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState()
   const [data, setData] = useState()
+  const [deleteInvoiceId, setDeleteInvoiceId] = useState()
+  const [editInvoiceId, setEditInvoiceId] = useState()
+  const [currentInvoice, setCurrentInvoice] = useState(null)
 
   // invoice filer
-  const [form, setForm] = useState()
+  const [from, setFrom] = useState()
   const [to, setTo] = useState()
   const [month, setMonth] = useState()
-  const [statusSelect, setStatusSelect] = useState()
+  const [filterStatus, setFilterStatus] = useState('')
+  const [filterCustomer, setFilterCustomer] = useState('')
 
-  const { data: invoiceData, error: invoiceError, loading: invoiceLoading } = useQuery(
+  const { data: invoiceData, error: invoiceError, loading: invoiceLoading, refetch } = useQuery(
     GET_INVOICES,
     {
       variables: {
-        form: form
-          ? moment(form).format(dateFormate)
+        from: from
+          ? moment(from).format(dateFormate)
           : month
           ? moment(month)
               .startOf('month')
               .format(dateFormate)
-          : null,
+          : undefined,
         to: to
           ? moment(to).format(dateFormate)
           : month
           ? moment(month)
               .endOf('month')
               .format(dateFormate)
-          : null,
-        status: statusSelect,
+          : undefined,
+        status: filterStatus,
       },
     },
   )
@@ -128,11 +139,8 @@ export default () => {
       notification.success({
         message: 'Delete invoice sucessfully',
       })
-      setData(state => {
-        return state.filter(invoice => {
-          return invoice.key !== deleteInvoiceData.deleteInvoice.clientMutationId
-        })
-      })
+      refetch()
+      setDeleteInvoiceId(null)
     }
   }, [deleteInvoiceData])
 
@@ -141,6 +149,7 @@ export default () => {
       notification.error({
         message: 'opps error on delete invoice',
       })
+      setDeleteInvoiceId(null)
     }
   }, [deleteInvoiceError])
 
@@ -148,15 +157,9 @@ export default () => {
     if (invoiceData) {
       const dataList = [...invoiceData.getInvoices.edges]
       const arrengedData = dataList.map(({ node }) => {
-        return {
-          key: node.id,
-          invoiceNo: node.invoiceNo,
-          amount: node.amount,
-          client: 'hello',
-          status: node.status.statusName,
-          date: node.issueDate,
-        }
+        return node
       })
+      arrengedData.reverse()
       setData(arrengedData)
     }
   }, [invoiceData])
@@ -164,97 +167,337 @@ export default () => {
   useEffect(() => {
     if (invoiceError) {
       notification.error({
-        message: 'Opps their are something wrong on fatching invoces data',
+        message: 'Something went wrong',
+        description: 'Unable to fetch invoices data',
       })
     }
   }, [invoiceError])
 
-  return (
-    <div>
-      <Helmet title="Dashboard Alpha" />
-      <Layout style={{ padding: '0px' }}>
-        <Content
-          style={{
-            padding: '0px 20px',
-            maxWidth: 1300,
-            width: '100%',
-            margin: '0px auto',
-          }}
-        >
-          <PageHeader
-            className="site-page-header"
-            title="INVOICES"
-            extra={[
-              <Button
-                key="1"
-                type="primary"
-                shape="round"
-                className={classes.headIconBut}
-                onClick={() => setNewInvDrawer(true)}
-              >
-                <PlusOutlined className={classes.headIcon} style={{ marginLeft: -3.5 }} />
-              </Button>,
-            ]}
-          />
-          <FilterCard
-            statusSelect={statusSelect}
-            setStatusSelect={setStatusSelect}
-            form={form}
-            setForm={setForm}
-            to={to}
-            setTo={setTo}
-            month={month}
-            setMonth={setMonth}
-          />
+  const columns = [
+    {
+      title: 'Invoice No',
+      dataIndex: 'invoiceNo',
+      width: 160,
+    },
+    {
+      title: 'Clinic',
+      dataIndex: 'clinic.schoolName',
+    },
+    {
+      title: 'Issue Date',
+      dataIndex: 'issueDate',
+      width: 160,
+    },
+    {
+      title: 'Due Date',
+      dataIndex: 'dueDate',
+      width: 160,
+    },
+    {
+      title: 'Amount',
+      dataIndex: 'amount',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status.statusName',
+    },
+    {
+      title: 'Action',
+      width: 260,
+      render: row => {
+        console.log(row)
+        return (
+          <div>
+            <Button
+              onClick={() => {
+                setCurrentInvoice(row)
+                setSelectedInvoiceId(row.key)
+                setPreviewInvoice(true)
+              }}
+              type="link"
+            >
+              <FilePdfOutlined style={{ fontWeight: 600 }} />
+            </Button>
 
-          {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
-          <div style={{ margin: '30px 34px 0 24px' }}>
-            <Table dataSource={data} loading={invoiceLoading} pagination={false}>
-              <Column title="Invoice No" dataIndex="invoiceNo" key="invoiceNo" />
-              <Column title="Amount" dataIndex="amount" key="amount" />
-              <Column title="Client" dataIndex="client" key="clent" />
-              <Column title="Status" dataIndex="status" key="status" />
-              <Column title="Date" key="date" dataIndex="date" />
-              <Column
-                title="Actions"
-                key="actions"
-                render={invoice => {
-                  return (
-                    <div>
-                      <Popover
-                        content={
-                          <div>
-                            <Button
-                              type="danger"
-                              onClick={() => deleteInvoice({ variables: { id: invoice.key } })}
-                              loading={deleteInvoiceLoading}
-                            >
-                              Delete
-                            </Button>
-                            <Button type="primary" style={{ marginLeft: 10 }}>
-                              Send
-                            </Button>
-                          </div>
-                        }
-                        trigger="click"
-                      >
-                        <Button shape="circle" type="primary">
-                          <MoreOutlined style={{ fontSize: 24, marginTop: 4 }} />
-                        </Button>
-                      </Popover>
-                    </div>
-                  )
-                }}
-              />
-            </Table>
-            ,
+            {row.status !== 'Paid' && (
+              <>
+                {/* <Button
+                  type="link"
+                  onClick={() => {
+                    setEditInvoice(true)
+                    setEditInvoiceId(row.key)
+                  }}
+                >
+                  <EditOutlined style={{ fontWeight: 600 }} />
+                </Button> */}
+                <Popconfirm
+                  title="Are you sure to delete this invoice?"
+                  onConfirm={() => {
+                    deleteInvoice({ variables: { id: row.id } })
+                    setDeleteInvoiceId(row.id)
+                  }}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <Button type="link" style={{ color: COLORS.danger }}>
+                    <DeleteOutlined style={{ color: COLORS.danger, fontWeight: 600 }} />
+                  </Button>
+                </Popconfirm>
+              </>
+            )}
           </div>
+        )
+      },
+    },
+  ]
 
-          <Drawer visible={newInvDrawer} width="100vw" onClose={() => setNewInvDrawer(false)}>
-            <InvoiceForm setNewInvDrawer={setNewInvDrawer} />
-          </Drawer>
-        </Content>
-      </Layout>
+  let filteredList = data || []
+  filteredList = filteredList.filter(
+    item =>
+      item.status?.statusName &&
+      item.status?.statusName.toLowerCase().includes(filterStatus.toLowerCase()),
+  )
+
+  if (filterCustomer) {
+    filteredList = filteredList.filter(
+      item =>
+        item.clinic?.schoolName &&
+        item.clinic.schoolName.toLowerCase().includes(filterCustomer.toLowerCase()),
+    )
+  }
+
+  const status =
+    data && data.length > 0
+      ? data.reduce(function(sum, current) {
+          return sum.concat(current.status.statusName ? current.status.statusName : [])
+        }, [])
+      : null
+
+  const statusGrouped = status
+    ? status.reduce(function(group, item) {
+        const val = item
+        if (!group.includes(val)) {
+          group.push(val)
+          return group
+        }
+        return group
+      }, [])
+    : []
+
+  const exportPDF = () => {
+    const unit = 'pt'
+    const size = 'A4' // Use A1, A2, A3 or A4
+    const orientation = 'landscape' // portrait or landscape
+
+    const doc = new JsPDF(orientation, unit, size)
+
+    doc.setFontSize(10)
+
+    const title = 'Invoice List'
+    const headers = [['Invoice No', 'Amount', 'Clinic', 'Status', 'Date']]
+
+    const data1 = filteredList.map(e => [e.invoiceNo, e.amount, e.clinic, e.status, e.date])
+
+    const content = {
+      startY: 50,
+      head: headers,
+      body: data1,
+    }
+
+    doc.text(title, 10, 10)
+    doc.autoTable(content)
+    doc.save('invoices.pdf')
+  }
+
+  const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+  const fileExtension = '.xlsx'
+
+  const exportToCSV = () => {
+    const fileName = 'invoice_excel'
+    const formattedData = filteredList.map(function(e) {
+      return {
+        InvoiceNo: e.invoiceNo,
+        Amount: e.amount,
+        Clinic: e.clinic,
+        Status: e.status,
+        Date: e.date,
+      }
+    })
+
+    const ws = XLSX.utils.json_to_sheet(formattedData)
+    const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+    const data1 = new Blob([excelBuffer], { type: fileType })
+    FileSaver.saveAs(data1, fileName + fileExtension)
+  }
+
+  const menu = (
+    <Menu>
+      <Menu.Item key="0">
+        <Button onClick={() => exportPDF()} type="link" size="small">
+          PDF
+        </Button>
+      </Menu.Item>
+      <Menu.Item key="1">
+        <Button onClick={() => exportToCSV()} type="link" size="small">
+          CSV/Excel
+        </Button>
+      </Menu.Item>
+    </Menu>
+  )
+
+  const filterHeader = (
+    <div
+      style={{
+        minHeight: '20px',
+        height: 'fit-content',
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'flex-start',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        <div>
+          <span>Status :</span>
+          <Select
+            value={filterStatus}
+            onSelect={value => setFilterStatus(value)}
+            style={{ width: 188, margin: '0px 28px 0 6px' }}
+          >
+            <Select.Option value="">Select Status</Select.Option>
+            {statusGrouped.map((i, index) => {
+              return (
+                <Select.Option key={i} value={i}>
+                  {i}
+                </Select.Option>
+              )
+            })}
+          </Select>
+        </div>
+        <div>
+          <span>Clinic :</span>
+          <Input
+            placeholder="Search Clinic"
+            value={filterCustomer}
+            onChange={e => setFilterCustomer(e.target.value)}
+            style={{ width: 188, margin: '0px 28px 0 6px' }}
+          />
+        </div>
+        <span>From :</span>
+        <DatePicker
+          placeholder="Form Date"
+          value={from}
+          onChange={newDate => setFrom(newDate)}
+          style={{ margin: '0px 28px 0 6px' }}
+        />
+
+        <span>To :</span>
+        <DatePicker
+          style={{ width: 188, margin: '0px 28px 0 6px' }}
+          placeholder="To Date"
+          value={to}
+          onChange={newDate => setTo(newDate)}
+        />
+      </div>
+      <div style={{ marginLeft: 'auto' }}>
+        {filterStatus || filterCustomer || from || to ? (
+          <Button
+            type="link"
+            style={{ marginLeft: '10px', color: '#FEBB27' }}
+            onClick={() => {
+              setFilterStatus('')
+              setFilterCustomer('')
+              setFrom()
+              setTo()
+            }}
+            size="small"
+          >
+            Clear Filters
+            <CloseCircleOutlined />
+          </Button>
+        ) : null}
+        <Dropdown overlay={menu} trigger={['click']}>
+          <Button style={{ marginRight: 10 }} type="link" size="large">
+            <CloudDownloadOutlined />
+          </Button>
+        </Dropdown>
+      </div>
+    </div>
+  )
+
+  console.log(data, 'data')
+  console.log(invoiceData)
+  return (
+    <div style={{ marginTop: 10 }}>
+      <Helmet title="Dashboard Alpha" />
+
+      {/* <div
+        style={{
+          display: 'flex',
+          flexDirection: '',
+          justifyContent: 'flex-end',
+          alignItems: 'center',
+          marginTop: 10,
+          marginBottom: 10,
+        }}
+      >
+       
+        <Button type="primary" onClick={() => setCreateInvoice(true)}>
+          ADD INVOICE
+          <PlusOutlined />
+        </Button>
+      </div> */}
+
+      <div className="table-outer-border">
+        <Table
+          columns={columns}
+          dataSource={filteredList}
+          loading={invoiceLoading}
+          title={() => {
+            return filterHeader
+          }}
+          rowKey={record => record.key}
+          size="middle"
+          pagination={{
+            defaultPageSize: 20,
+            showSizeChanger: true,
+            pageSizeOptions: ['20', '30', '50', '100'],
+            position: 'bottom',
+          }}
+        />
+      </div>
+
+      <Drawer
+        visible={isPreviewInvoice}
+        width={DRAWER.widthL3}
+        className="change-invo-drawer"
+        onClose={() => setPreviewInvoice(false)}
+      >
+        <PreviewInvoice invoice={currentInvoice} />
+      </Drawer>
+
+      {/* <Drawer visible={isEditInvoice} width={DRAWER.widthL1} onClose={() => setEditInvoice(false)}>
+        <EditInvoice
+          invoiceId={editInvoiceId}
+          closeDrawer={setEditInvoice}
+          refetchInvoices={refetch}
+        />
+      </Drawer> */}
+
+      {/* <Drawer
+        visible={isCreateInvoice}
+        width={DRAWER.widthL1}
+        onClose={() => setCreateInvoice(false)}
+      >
+        <InvoiceForm setNewInvDrawer={setCreateInvoice} refetchInvoices={refetch} />
+      </Drawer> */}
     </div>
   )
 }

@@ -5,7 +5,7 @@ import React from 'react'
 class HeaderComponent extends React.Component {
 
 	render() {
-			const { leftContent, centerContent, rightContent } = this.props
+			const { leftContent = '', centerContent, rightContent = '' } = this.props
 		return (
 			<div
 				style={{

@@ -145,7 +145,7 @@ class BasicInformationForm extends React.Component {
 
         <Form.Item label="Mobile no" style={itemStyle}>
           {form.getFieldDecorator('mobileNo', {
-            rules: [{ required: true, message: 'Please provide Mobile No!' }],
+            rules: [{ required: false, message: 'Please provide Mobile No!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
 

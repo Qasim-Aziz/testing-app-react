@@ -14,6 +14,17 @@
   }
 }
 
+.ant-modals-design {
+  .ant-modal-body {
+    padding: 16px 24px;
+  }
+}
+
+.table-outer-border {
+  .ant-table {
+    border: 1px solid #e8e8e8;
+  }
+}
 @media screen and (max-width: 1000px) {
   .filter-parent {
     flex-wrap: wrap;

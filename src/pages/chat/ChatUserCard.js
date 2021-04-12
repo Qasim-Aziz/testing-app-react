@@ -21,7 +21,7 @@ export default ({
         borderBottom: '1px solid #F2F2F2',
         cursor: 'pointer',
       }}
-      bodyStyle={{ padding: '12px 4px', display: 'flex' }}
+      bodyStyle={{ padding: '12px', display: 'flex' }}
       onClick={() => {
         setSelectedPeople(id)
         setSelectedPeopleDetails({
@@ -32,11 +32,6 @@ export default ({
         })
       }}
     >
-      <img
-        src={profileImg}
-        alt="profile"
-        style={{ width: 50, height: 50, borderRadius: 30, marginRight: 12 }}
-      />
       <div>
         <Title style={{ fontSize: 16, color: '#000' }}>{name}</Title>
         <p>{role}</p>

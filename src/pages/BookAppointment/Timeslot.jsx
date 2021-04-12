@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import { Form, Input, Button, Popover, notification } from 'antd'
+import { COLORS } from 'assets/styles/globalStyles'
 import moment from 'moment'
 import { useMutation } from 'react-apollo'
 import { CREATE_APPOINTMENT } from './query'
 
+const True = true
+
 const Timeslot = ({
   selectedTimeSlot,
   selectedDate,
+  isAvailable,
   selectedTherapist,
   allTherapist,
   pendingStatusId,
@@ -28,7 +32,7 @@ const Timeslot = ({
   ] = useMutation(CREATE_APPOINTMENT)
 
   useEffect(() => {
-    if (createAppointmentData) {
+    if (createAppointmentData && createAppointmentData.CreateAppointment) {
       notification.success({ message: 'Appointment created successfully.' })
       if (refetchAvailableSlotTime)
         refetchAvailableSlotTime({
@@ -41,14 +45,22 @@ const Timeslot = ({
   }, [createAppointmentData])
 
   useEffect(() => {
-    if (createAppointmentError)
-      notification.error({ message: 'An error occurred to create Appointment.' })
+    if (createAppointmentError){
+      console.log(createAppointmentError)
+      notification.error({ 
+        message: 'Error! please check your timings or you already have appointment',
+        // message: createAppointmentError[0]?.message, 
+        duration: 10
+      })
+    }
   }, [createAppointmentError])
 
-  const getDateTime = momentObj => momentObj.format('YYYY-MM-DDTHH:mm:ssZ')
+  const getDateTime = momentObj => momentObj.local().utc().format('YYYY-MM-DDTHH:mm:ssZ')
+  
 
   const bookAppointment = e => {
     e.preventDefault()
+    console.log("slot time asdhahsjdhas =======> ",getDateTime(selectedDate))
     createAppointment({
       variables: {
         title: titleText,
@@ -62,6 +74,7 @@ const Timeslot = ({
         slotTime: selectedTimeSlot,
         appointmentStatus: pendingStatusId,
       },
+      errorPolicy: 'all'
     })
     setPopoverVisible(false)
   }
@@ -144,17 +157,30 @@ const Timeslot = ({
   )
 
   return (
-    <Popover
-      content={popoverContent}
-      title="Book Appointment"
-      trigger="click"
-      visible={isPopoverVisible}
-      onVisibleChange={setPopoverVisible}
-    >
-      <Button size="large" style={{ width: '80%' }} disabled={isCreateAppointmentLoading}>
-        {selectedTimeSlot}
-      </Button>
-    </Popover>
+    <>
+      {isAvailable === True ? (
+        <Popover
+          content={popoverContent}
+          title="Book Appointment"
+          trigger="click"
+          visible={isPopoverVisible}
+          onVisibleChange={setPopoverVisible}
+        >
+
+          <Button size="large" style={{ width: '80%' }} disabled={isCreateAppointmentLoading}>
+            {selectedTimeSlot}
+          </Button>
+
+        </Popover>
+      ) :
+
+        <Button size="large" style={{ width: '80%', backgroundColor: COLORS.palleteLightBlue }} disabled>
+          {selectedTimeSlot}
+        </Button>
+
+      }
+
+    </>
   )
 }
 

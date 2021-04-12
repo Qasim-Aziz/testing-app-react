@@ -4,8 +4,11 @@ import { connect } from 'react-redux'
 import { times } from 'ramda'
 import { PlusOutlined } from '@ant-design/icons'
 import actions from 'redux/authorizationCodes/actions'
+import { FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 import { modifierActions, modifierDispatch } from './modifierActions'
 import ModifierForm from './ModifierForm'
+
+const { layout, tailLayout } = FORM
 
 @connect(({ authorizationCode }) => ({ authorizationCode }))
 class EditFee extends React.Component {

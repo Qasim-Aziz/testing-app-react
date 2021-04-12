@@ -13,7 +13,7 @@ const initialState = {
   PageInfo: null,
   CurrentPage: 1,
   ItemPerPage: 20,
-  CurrentStatus: 'all',
+  CurrentStatus: 'active',
   loadingLearners: false,
   LearnerCreated: false,
 }

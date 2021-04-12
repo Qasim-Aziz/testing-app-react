@@ -106,17 +106,17 @@ function PersonalInfo(props) {
 
         <Form.Item label="SSN/Adhaar card" style={itemStyle}>
           {form.getFieldDecorator('ssnAadhar', {
-            rules: [{ message: 'Please provide Mobile No!' }],
+            rules: [{ message: 'Please provide Aadhar Number!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="Marital Status" style={itemStyle}>
           {form.getFieldDecorator('maritalStatus', {
-            rules: [{ required: false, message: 'Please provide Default Language!' }],
+            rules: [{ required: false, message: 'Please provide Marital Status!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <Button type="primary" htmlType="submit" loading={updateLoading} style={SUBMITT_BUTTON}>
-            Submitt
+            Submit
           </Button>
           <Button onClick={() => closeDrawer(false)} type="default" style={CANCEL_BUTTON}>
             Cancel

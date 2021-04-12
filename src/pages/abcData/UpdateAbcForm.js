@@ -13,6 +13,7 @@ import {
 } from 'antd'
 import { useMutation, useQuery } from 'react-apollo'
 import moment from 'moment'
+import { CANCEL_BUTTON, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import './MealForm.scss'
 import {
   PlusCircleOutlined,
@@ -36,6 +37,7 @@ import {
 const { Text } = Typography
 const { TextArea } = Input
 const { Option } = Select
+const { layout, tailLayout } = FORM
 
 const dateFormat = 'YYYY-MM-DD'
 
@@ -202,6 +204,9 @@ const UpdateABCForm = ({ style, form, updateAbc, setUpdateAbc, closeDrawer }) =>
       })
       form.resetFields()
       setUpdateAbc(null)
+      if (closeDrawer) {
+        closeDrawer()
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data])
@@ -256,36 +261,23 @@ const UpdateABCForm = ({ style, form, updateAbc, setUpdateAbc, closeDrawer }) =>
   if (error) {
     return <pre>{JSON.stringify(error, null, 2)}</pre>
   }
-  const formItemLayout = {
-    labelCol: {
-      span: 5,
-    },
-    wrapperCol: {
-      span: 17,
-      offset: 1,
-    },
-  }
-  const formTailLayout = {
-    labelCol: { span: 5 },
-    wrapperCol: { span: 8, offset: 6 },
-  }
 
   return (
     <Form
-      {...formItemLayout}
+      {...layout}
       onSubmit={e => SubmitForm(e, this)}
       name="control-ref"
       style={{ marginLeft: 0, position: 'relative', ...style }}
       layout="horizontal"
     >
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Date</span>}>
+      <Form.Item label="Date">
         {form.getFieldDecorator('date', {
           initialValue: moment(updateAbc.date),
           rules: [{ required: true, message: 'Please Select a Date!' }],
         })(<DatePicker placeholder="Select Date" tyle={{ width: '100%' }} />)}
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Time</span>}>
+      <Form.Item label="Time">
         {form.getFieldDecorator('time', {
           initialValue: moment(updateAbc.time, 'HH:mm a'),
           rules: [{ required: true, message: 'Please Select a Time!' }],
@@ -311,15 +303,13 @@ const UpdateABCForm = ({ style, form, updateAbc, setUpdateAbc, closeDrawer }) =>
           }}
         />
 
-        <Form.Item label={<span style={{ fontSize: '16px' }}>Antecedent</span>}>
+        <Form.Item label="Antecedent">
           {form.getFieldDecorator('antecedents', {
             initialValue: updateAbc.antecedent.edges.map(({ node }) => node.id),
             rules: [{ required: true, message: 'Please Select an Antecedent!' }],
           })(
             <Select
-              style={{}}
               placeholder="Select an Antecedent"
-              size="large"
               allowclear
               showSearch
               optionFilterProp="name"
@@ -351,15 +341,13 @@ const UpdateABCForm = ({ style, form, updateAbc, setUpdateAbc, closeDrawer }) =>
           }}
         />
 
-        <Form.Item label={<span style={{ fontSize: '16px' }}>Behavior</span>}>
+        <Form.Item label="Behavior">
           {form.getFieldDecorator('behaviors', {
             initialValue: updateAbc.behavior.edges.map(({ node }) => node.id),
             rules: [{ required: true, message: 'Please Select a Behavior!' }],
           })(
             <Select
-              style={{}}
               placeholder="Select a Behavior"
-              size="large"
               allowclear
               showSearch
               optionFilterProp="name"
@@ -391,15 +379,13 @@ const UpdateABCForm = ({ style, form, updateAbc, setUpdateAbc, closeDrawer }) =>
           }}
         />
 
-        <Form.Item label={<span style={{ fontSize: '16px' }}>Consequence</span>}>
+        <Form.Item label="Consequence">
           {form.getFieldDecorator('consequences', {
             initialValue: updateAbc.consequences.edges.map(({ node }) => node.id),
             rules: [{ required: true, message: 'Please Select a Consequence!' }],
           })(
             <Select
-              style={{}}
               placeholder="Select a Consequence"
-              size="large"
               allowclear
               showSearch
               optionFilterProp="name"
@@ -420,14 +406,12 @@ const UpdateABCForm = ({ style, form, updateAbc, setUpdateAbc, closeDrawer }) =>
       </div>
 
       <div style={{ position: 'relative' }}>
-        <Form.Item label={<span style={{ fontSize: '16px' }}>Environment</span>}>
+        <Form.Item label="Environment">
           {form.getFieldDecorator('environment', {
             initialValue: updateAbc.environments.id,
           })(
             <Select
-              style={{}}
               placeholder="Select a Environment"
-              size="large"
               allowclear
               showSearch
               optionFilterProp="name"
@@ -445,12 +429,12 @@ const UpdateABCForm = ({ style, form, updateAbc, setUpdateAbc, closeDrawer }) =>
         </Form.Item>
       </div>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Intensity</span>}>
+      <Form.Item label="Intensity">
         {form.getFieldDecorator('intensity', {
           initialValue: updateAbc.Intensiy,
           rules: [{ required: true, message: 'Please Select an intensity!' }],
         })(
-          <Select style={{ width: '100%' }} placeholder="Select an Intensity" size="large">
+          <Select style={{ width: '100%' }} placeholder="Select an Intensity">
             <Option key={1} value="Severe">
               Severe
             </Option>
@@ -464,12 +448,12 @@ const UpdateABCForm = ({ style, form, updateAbc, setUpdateAbc, closeDrawer }) =>
         )}
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Response</span>}>
+      <Form.Item label="Response">
         {form.getFieldDecorator('response', {
           initialValue: updateAbc.response,
           rules: [{ required: true, message: 'Please Select a response!' }],
         })(
-          <Select style={{}} placeholder="Select a Response" size="large" allowclear>
+          <Select placeholder="Select a Response" allowclear>
             <Option value="Improve" key="1">
               Improve
             </Option>
@@ -482,11 +466,11 @@ const UpdateABCForm = ({ style, form, updateAbc, setUpdateAbc, closeDrawer }) =>
           </Select>,
         )}
       </Form.Item>
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Frequency</span>}>
+      <Form.Item label="Frequency">
         <div style={{ display: 'flex' }}>
           <div style={{ paddingTop: '2px' }}>
             <MinusSquareOutlined
-              style={{ fontSize: '20px', marginRight: '10px' }}
+              style={{ fontSize: 24, marginRight: '10px' }}
               onClick={() =>
                 setFrequency(state => {
                   if (state > 0) {
@@ -506,18 +490,18 @@ const UpdateABCForm = ({ style, form, updateAbc, setUpdateAbc, closeDrawer }) =>
           <div style={{ paddingTop: '2px' }}>
             <PlusSquareOutlined
               onClick={() => setFrequency(state => state + 1)}
-              style={{ fontSize: '20px' }}
+              style={{ fontSize: 24 }}
             />
           </div>
         </div>
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Function</span>}>
+      <Form.Item label="Function">
         {form.getFieldDecorator('function', {
           initialValue: updateAbc.function,
           rules: [{ required: true, message: 'Please Select a Function!' }],
         })(
-          <Select style={{}} placeholder="Select a function" size="large" allowclear>
+          <Select placeholder="Select a function" allowclear>
             <Option value="Escape" key="1">
               Escape
             </Option>
@@ -534,7 +518,7 @@ const UpdateABCForm = ({ style, form, updateAbc, setUpdateAbc, closeDrawer }) =>
         )}
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Note</span>}>
+      <Form.Item label="Note">
         {form.getFieldDecorator('note', {
           initialValue: updateAbc.Notes,
         })(
@@ -548,44 +532,21 @@ const UpdateABCForm = ({ style, form, updateAbc, setUpdateAbc, closeDrawer }) =>
         )}
       </Form.Item>
 
-      <Form.Item {...formTailLayout}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
+      <Form.Item {...tailLayout}>
+        <Button type="primary" htmlType="submit" style={SUBMITT_BUTTON} loading={loading}>
+          Update Data
+        </Button>
+        <Button
+          type="danger"
+          style={CANCEL_BUTTON}
+          onClick={() => {
+            setUpdateAbc(null)
+            form.resetFields()
+            closeDrawer()
           }}
         >
-          <Button
-            type="primary"
-            htmlType="submit"
-            style={{
-              width: 180,
-              height: 40,
-              borderRadius: 0,
-            }}
-            loading={loading}
-          >
-            Update Data
-          </Button>
-          <Button
-            type="danger"
-            style={{
-              width: 180,
-              height: 40,
-              marginLeft: 10,
-              borderRadius: 0,
-              border: '0px solid',
-            }}
-            loading={loading}
-            onClick={() => {
-              setUpdateAbc(null)
-              form.resetFields()
-              closeDrawer()
-            }}
-          >
-            Cancel
-          </Button>
-        </div>
+          Cancel
+        </Button>
       </Form.Item>
 
       <Modal

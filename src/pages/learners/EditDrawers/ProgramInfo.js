@@ -108,7 +108,7 @@ function ProgramInfo(props) {
             />,
           )}
         </Form.Item> */}
-        <Form.Item label="VBMAPP Active" style={itemStyle}>
+        {/* <Form.Item label="VBMAPP Active" style={itemStyle}>
           {form.getFieldDecorator('isVbmappActive', {
             initialValue: userProfile.isVbmappActive,
             valuePropName: 'checked',
@@ -120,7 +120,7 @@ function ProgramInfo(props) {
               unCheckedChildren={<Icon type="close" />}
             />,
           )}
-        </Form.Item>
+        </Form.Item> */}
         <Form.Item label="Peak Active" style={itemStyle}>
           {form.getFieldDecorator('isPeakActive', {
             initialValue: userProfile.isPeakActive,
@@ -157,7 +157,7 @@ function ProgramInfo(props) {
         </Form.Item>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <Button type="primary" htmlType="submit" loading={updateLoading} style={SUBMITT_BUTTON}>
-            Submitt
+            Submit
           </Button>
           <Button onClick={() => closeDrawer(false)} type="default" style={CANCEL_BUTTON}>
             Cancel

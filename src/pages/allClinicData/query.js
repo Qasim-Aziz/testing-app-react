@@ -46,6 +46,7 @@ export const CLINIC_QUERY = gql`
               surname
               contactNo
               email
+              dateOfJoining
               gender
               user {
                 id

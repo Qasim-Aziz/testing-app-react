@@ -125,9 +125,23 @@ export const UPDATE_PAYMENT_DETAILS = gql`
 `
 
 export const ADVANCE_INVOICE = gql`
-  mutation($clinic: ID!, $month: String!) {
+  mutation(
+    $clinic: [ID]!
+    $month: String!
+    $cgst: Float
+    $sgst: Float
+    $discount: Float
+    $generateLink: Boolean
+  ) {
     createAdvanceInvoiceByClinic(
-      input: { clinic: $clinic, month: $month, cgst: 2.0, sgst: 5.0, discount: 1.0 }
+      input: {
+        clinic: $clinic
+        month: $month
+        cgst: $cgst
+        sgst: $sgst
+        discount: $discount
+        generateLink: $generateLink
+      }
     ) {
       status
       message
@@ -171,6 +185,81 @@ export const ADVANCE_INVOICE = gql`
           }
         }
       }
+    }
+  }
+`
+
+export const MONTHLY_INVOICE = gql`
+  mutation(
+    $month: String!
+    $clinics: [ID]!
+    $cgst: Float
+    $sgst: Float
+    $discount: Float
+    $generateLink: Boolean
+  ) {
+    createMonthlyInvoiceByClinic(
+      input: {
+        month: $month
+        clinics: $clinics
+        cgst: $cgst
+        sgst: $sgst
+        discount: $discount
+        generateLink: $generateLink
+      }
+    ) {
+      status
+      message
+      invoice {
+        id
+        invoiceNo
+        email
+        issueDate
+        dueDate
+        amount
+        address
+        taxableSubtotal
+        discount
+        total
+        lastAmount
+        clinic {
+          id
+          schoolName
+        }
+        customer {
+          id
+          firstname
+        }
+        status {
+          id
+          statusName
+        }
+        invoiceFee {
+          edges {
+            node {
+              id
+              quantity
+              rate
+              amount
+              tax
+              schoolServices {
+                id
+                name
+                description
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+export const PAYMENT_REMINDER = gql`
+  mutation($invoices: [ID], $clinics: [ID]) {
+    sendPaymentReminders(input: { invoices: $invoices, clinics: $clinics }) {
+      status
+      message
     }
   }
 `

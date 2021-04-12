@@ -78,6 +78,7 @@ class SessionDetailsForm extends React.Component {
     form.setFieldsValue({
       items: sessionObject.itemRequired,
       hosts: hostList,
+      sessionName: sessionObject.name,
       // keys: [0,1,2,3],
       names: instructionList,
       therapist: therapistHost,
@@ -229,6 +230,9 @@ class SessionDetailsForm extends React.Component {
     return (
       <>
         <Form onSubmit={this.handleSubmit}>
+          <Form.Item label="Custom Session Name" style={itemStyle}>
+            {form.getFieldDecorator('sessionName')(<Input />)}
+          </Form.Item>
           <Form.Item label="Host" style={itemStyle}>
             {form.getFieldDecorator('hosts')(
               <Select mode="multiple" placeholder="Select family members" allowClear>

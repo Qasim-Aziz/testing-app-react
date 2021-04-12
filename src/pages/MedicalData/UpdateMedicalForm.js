@@ -6,6 +6,8 @@ import { useMutation, useQuery } from 'react-apollo'
 import moment from 'moment'
 import { times, remove, update } from 'ramda'
 import './toiletForm.scss'
+import LoadingComponent from 'components/LoadingComponent'
+import { FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 import { PlusOutlined } from '@ant-design/icons'
 import ReminderForm from './Medicalform/ReminderForm'
 import PreseptionDrugFrom from './Medicalform/PreseptionDrugForm'
@@ -15,6 +17,7 @@ const { RangePicker } = DatePicker
 const { Option } = Select
 const { Title, Text } = Typography
 const { TextArea } = Input
+const { layout, tailLayout } = FORM
 
 const SEVERITY_TYPE = gql`
   query {
@@ -195,7 +198,9 @@ const UpdateMedicalForm = ({ style, setOpen, form, id, closeDrawer, setMedDataUp
       remainderDispatch({ type: 'RESET' })
       setOpen(null)
       setMedDataUpdated(true)
-      closeDrawer()
+      if (closeDrawer) {
+        closeDrawer()
+      }
     }
 
     if (error) {
@@ -211,20 +216,7 @@ const UpdateMedicalForm = ({ style, setOpen, form, id, closeDrawer, setMedDataUp
   }
 
   if (medLoading) {
-    return <h4>Loading...</h4>
-  }
-  const formItemLayout = {
-    labelCol: {
-      span: 6,
-    },
-    wrapperCol: {
-      span: 17,
-      offset: 1,
-    },
-  }
-  const formTailLayout = {
-    labelCol: { span: 5 },
-    wrapperCol: { span: 8, offset: 7 },
+    return <LoadingComponent />
   }
 
   return (
@@ -232,7 +224,7 @@ const UpdateMedicalForm = ({ style, setOpen, form, id, closeDrawer, setMedDataUp
       onSubmit={e => SubmitForm(e)}
       name="control-ref"
       style={{ marginLeft: 0, position: 'relative', ...style }}
-      {...formItemLayout}
+      {...layout}
       colon={false}
       layout="horizontal"
     >
@@ -240,27 +232,26 @@ const UpdateMedicalForm = ({ style, setOpen, form, id, closeDrawer, setMedDataUp
         {form.getFieldDecorator('condition', {
           initialValue: medData?.getMedicationDetails.condition,
           rules: [{ required: true, message: 'Please give the condition name' }],
-        })(<Input size="large" placeholder="Type the condition" />)}
+        })(<Input placeholder="Type the condition" />)}
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Start & End Date</span>}>
+      <Form.Item label="Start & End Date">
         {form.getFieldDecorator('timeFream', {
           initialValue: medData && [
             moment(medData.getMedicationDetails.startDate),
             moment(medData.getMedicationDetails.endDate),
           ],
           rules: [{ required: true, message: 'Please select start and end date!' }],
-        })(<RangePicker size="large" style={{ width: '100%' }} />)}
+        })(<RangePicker />)}
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Severity</span>}>
+      <Form.Item label="Severity">
         {form.getFieldDecorator('severity', {
           initialValue: medData.getMedicationDetails.severity.id,
           rules: [{ required: true, message: 'Please select a severity' }],
         })(
           <Select
             placeholder="Select Severity"
-            size="large"
             showSearch
             loading={severityTypeLoading}
             optionFilterProp="name"
@@ -275,13 +266,13 @@ const UpdateMedicalForm = ({ style, setOpen, form, id, closeDrawer, setMedDataUp
         )}
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Note</span>}>
+      <Form.Item label="Note">
         {form.getFieldDecorator('note', {
           initialValue: medData.getMedicationDetails.note,
-        })(<TextArea style={{ height: 120 }} size="large" placeholder="Take a note" />)}
+        })(<TextArea style={{ height: 120 }} placeholder="Take a note" />)}
       </Form.Item>
 
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Prescription</span>}>
+      <Form.Item label="Prescription">
         {times(n => {
           return (
             <PreseptionDrugFrom
@@ -293,16 +284,15 @@ const UpdateMedicalForm = ({ style, setOpen, form, id, closeDrawer, setMedDataUp
           )
         }, preseptionDrugCount)}
       </Form.Item>
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Medical Reminders</span>}>
+      <Form.Item label="Medical Reminders">
         <Switch
           defaultChecked
           onChange={() => {
             setReminder(state => !state)
           }}
-          size="large"
         />
       </Form.Item>
-      <Form.Item label={<span style={{ fontSize: '16px' }}>Add Reminders</span>}>
+      <Form.Item label="Add Reminders">
         {times(n => {
           return (
             <ReminderForm
@@ -315,44 +305,21 @@ const UpdateMedicalForm = ({ style, setOpen, form, id, closeDrawer, setMedDataUp
           )
         }, remainderCount)}
       </Form.Item>
-      <Form.Item {...formTailLayout}>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Form.Item style={{ width: '45%' }}>
-            <Button
-              type="primary"
-              htmlType="submit"
-              style={{
-                width: '100%',
-                height: 40,
-
-                borderRadius: 0,
-              }}
-              loading={loading}
-            >
-              Update
-            </Button>
-          </Form.Item>
-          <Form.Item style={{ width: '45%' }}>
-            <Button
-              type="primary"
-              style={{
-                width: '100%',
-                height: 40,
-                background: 'red',
-                color: '#fff',
-                borderRadius: 0,
-                border: '0px solid',
-              }}
-              onClick={() => {
-                form.resetFields()
-                setOpen(null)
-                closeDrawer()
-              }}
-            >
-              Cancel
-            </Button>
-          </Form.Item>
-        </div>
+      <Form.Item {...tailLayout}>
+        <Button type="primary" htmlType="submit" style={SUBMITT_BUTTON} loading={loading}>
+          Update
+        </Button>
+        <Button
+          type="primary"
+          style={CANCEL_BUTTON}
+          onClick={() => {
+            form.resetFields()
+            setOpen(null)
+            closeDrawer()
+          }}
+        >
+          Cancel
+        </Button>
       </Form.Item>
     </Form>
   )

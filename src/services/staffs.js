@@ -8,12 +8,12 @@ import { gql } from 'apollo-boost'
 import moment from 'moment'
 import apolloClient from '../apollo/config'
 
-export async function getClinicStaffs() {
+export async function getClinicStaffs(payload) {
   return apolloClient
     .query({
       query: gql`
-        query {
-          staffs {
+        query($isActive: Boolean) {
+          staffs(isActive: $isActive) {
             edges {
               node {
                 id
@@ -46,6 +46,9 @@ export async function getClinicStaffs() {
           }
         }
       `,
+      variables: {
+        isActive: payload.isActive,
+      },
     })
     .then(result => result)
     .catch(error => {

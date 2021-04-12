@@ -19,6 +19,7 @@ import UpdateTemplateForm from 'pages/BehaviourData/UpdateTemplateForm'
 import CreateTemplateForm from 'pages/BehaviourData/Templateform'
 import RecordDrawer from 'pages/BehaviourData/RecordDrawer'
 import BehaviorChart from 'pages/BehaviourData/BehaviorChart'
+import { DRAWER } from 'assets/styles/globalStyles'
 import moment from 'moment'
 import { GET_TEMPLETES, DELETE_TEMPLATE } from './queries'
 
@@ -53,8 +54,6 @@ const TemplateTab = ({
     },
     fetchPolicy: 'network-only',
   })
-
-  console.log(templateData, 'tpl')
 
   const [deleteTemplate, { data: deleteTemplateData, error: deleteTemplateError }] = useMutation(
     DELETE_TEMPLATE,
@@ -235,7 +234,6 @@ const TemplateTab = ({
     console.error(templateError)
     return <h3>An error occurred to load data.</h3>
   }
-  console.log(filteredTemplates, 'flt')
 
   return (
     <>
@@ -254,7 +252,7 @@ const TemplateTab = ({
         bordered
       />
       <Drawer
-        width={800}
+        width={DRAWER.widthL2}
         title="Edit Behavior Template"
         placement="right"
         visible={!!editTemplateFor}
@@ -267,7 +265,7 @@ const TemplateTab = ({
         />
       </Drawer>
       <Drawer
-        width={800}
+        width={DRAWER.widthL2}
         title="New Behavior Templates"
         placement="right"
         visible={openRightdrawer}
@@ -277,11 +275,12 @@ const TemplateTab = ({
           onCreatingTemplate={onCreatingTemplate}
           isBehaviorAlreadyExist={checkIsBehaviorAlreadyExist}
           cancel={setCreatingNewTemplate}
+          closeDrawer={closeDrawer}
         />
       </Drawer>
 
       <Drawer
-        width={600}
+        width={DRAWER.widthL2}
         title="Record Behavior"
         placement="right"
         visible={openRecordDrawerFor}

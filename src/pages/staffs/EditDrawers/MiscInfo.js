@@ -95,7 +95,7 @@ function MiscInfo(props) {
       <Form {...layout} onSubmit={handleSubmit}>
         <Form.Item label="NPI" style={itemStyle}>
           {form.getFieldDecorator('npi', {
-            rules: [{ required: false, message: 'Please provide Parent Name!' }],
+            rules: [{ required: false, message: 'Please provide npi!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="Tax ID" style={itemStyle}>
@@ -105,17 +105,17 @@ function MiscInfo(props) {
         </Form.Item>
         <Form.Item label="File Name" style={itemStyle}>
           {form.getFieldDecorator('fileName', {
-            rules: [{ required: false, message: 'Please provide Father Name!' }],
+            rules: [{ required: false, message: 'Please provide tax Id!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="File Description" style={itemStyle}>
           {form.getFieldDecorator('fileDescription', {
-            rules: [{ required: false, message: 'Please provide Father Name!' }],
+            rules: [{ required: false, message: 'Please provide description!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
           <Button type="primary" htmlType="submit" loading={updateLoading} style={SUBMITT_BUTTON}>
-            Submitt
+            Submit
           </Button>
           <Button onClick={() => closeDrawer(false)} type="default" style={CANCEL_BUTTON}>
             Cancel
