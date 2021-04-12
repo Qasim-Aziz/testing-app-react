@@ -20,20 +20,8 @@ import EditPrescription from './editPrescriptionComponent'
 // Every individual prescription
 export const History = props => {
   const dispatchOfPrescription = useDispatch()
-  // console.log('EACH HISTORY PROP', props)
+  console.log('EACH HISTORY PROP', props)
   const [editPrescription, setEditPrescription] = useState(false)
-  const customSpanStyle = {
-    backgroundColor: COLORS.success,
-    color: 'white',
-    borderRadius: '3px',
-    padding: '1px 5px',
-  }
-  const inActiveSpanStyle = {
-    backgroundColor: COLORS.danger,
-    color: 'white',
-    borderRadius: '3px',
-    padding: '1px 5px',
-  }
 
   const labelHead = {
     minWidth: 160,
@@ -288,6 +276,10 @@ export const History = props => {
     return <>loading</>
   }
 }
+
+/**@props ==> here in this component I am receiving a particular students details
+ * All the prescription regarding a particular student will be listed in a drawer component
+ */
 
 export default props => {
   const prescriptions = useSelector(state => state.prescriptions)

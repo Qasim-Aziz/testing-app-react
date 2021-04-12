@@ -41,39 +41,18 @@ const { Meta } = Card
 const { TextArea } = Input
 
 /* Some static css */
-const itemStyle = {
-  display: 'flex',
-  marginRight: '25px',
-  justifyContent: 'flex-end',
-  marginTop: -15,
-}
 const itemStyle2 = {
   display: 'flex',
   marginRight: '25px',
   // justifyContent: 'flex-end',
   marginTop: -15,
 }
-const itemStyle3 = {
-  display: 'flex',
-  marginRight: '25px',
-  // justifyContent: 'flex-end',
-  marginTop: -15,
-}
 
-const inputStyle = {
-  width: '200px',
-  borderRadius: 0,
-  border: 'none',
-  borderBottom: '2px solid',
-}
 const inputStyle2 = {
   width: '160px',
   borderRadius: 0,
   border: 'none',
   borderBottom: '2px solid',
-}
-const inputStyle3 = {
-  borderRadius: 0,
 }
 
 const layout1 = {
@@ -122,29 +101,7 @@ function addNevObject(val) {
   return theMainArray
 }
 
-/* Helper function */
-function uniqueFunc(arr1, arr2, uniqueArr) {
-  console.log('ALL THE VALUES IN UNIQUE FUNC', arr1, arr2, uniqueArr)
-  let flag
-  for (var i = 0; i < arr1.length; i++) {
-    flag = 0
-    for (var j = 0; j < arr2.length; j++) {
-      if (arr1[i] === arr2[j]) {
-        arr2.splice(j, 1)
-        j--
-        flag = 1
-      }
-    }
-
-    if (flag == 0) {
-      uniqueArr.push(arr1[i])
-    }
-  }
-  //     uniqueArr.push(arr2);
-  return uniqueArr
-}
-
-const GetComplaints = ({ form, handleChange, onDeselect }) => {
+const GetComplaints = ({ form, setDeleteComplaints }) => {
   const [sdText, setSdText] = useState('')
   const { data: sdData, error: sdError, loading: sdLoading } = useQuery(GET_COMPLAINT_QUERY, {
     variables: {
@@ -177,8 +134,8 @@ const GetComplaints = ({ form, handleChange, onDeselect }) => {
               loading={sdLoading}
               // disabled={form.getFieldValue('complaints')?.length > 0}
               placeholder="Search for find more sd"
-              onDeselect={onDeselect}
-              onChange={handleChange}
+              onDeselect={e => setDeleteComplaints(arr => [...arr, e])}
+              // onChange={handleChange}
             >
               {sdData?.getPrescriptionComplaints.edges.map(({ node }) => {
                 return (
@@ -195,7 +152,7 @@ const GetComplaints = ({ form, handleChange, onDeselect }) => {
   )
 }
 
-const GetDiagnosis = ({ form }) => {
+const GetDiagnosis = ({ form, setDeleteDiagnosis }) => {
   const [sdText, setSdText] = useState('')
   const { data: sdData, error: sdError, loading: sdLoading } = useQuery(GET_DIAGNOSIS_QUERY, {
     variables: {
@@ -225,6 +182,7 @@ const GetDiagnosis = ({ form }) => {
               onSearch={v => {
                 setSdText(v)
               }}
+              onDeselect={e => setDeleteDiagnosis(arr => [...arr, e])}
               loading={sdLoading}
               // disabled={form.getFieldValue('complaints')?.length > 0}
               placeholder="Search for find more sd"
@@ -244,7 +202,7 @@ const GetDiagnosis = ({ form }) => {
   )
 }
 
-const GetTest = ({ form }) => {
+const GetTest = ({ form, setDeleteTests }) => {
   const [sdText, setSdText] = useState('')
   const { data: sdData, error: sdError, loading: sdLoading } = useQuery(GET_TESTS_QUERY, {
     variables: {
@@ -274,6 +232,7 @@ const GetTest = ({ form }) => {
               onSearch={v => {
                 setSdText(v)
               }}
+              onDeselect={e => setDeleteTests(arr => [...arr, e])}
               loading={sdLoading}
               // disabled={form.getFieldValue('complaints')?.length > 0}
               placeholder="Search for find more sd"
@@ -308,11 +267,10 @@ const EditPrescription = props => {
   */
 
   const [productsState, productsDispatch] = useReducer(productReducer, [])
-  // console.log('THE ☑☑☑☑☑☑☑☑☑☑☑ productstate initially', productsState)
   const [deleteProduct, setDeleteProduct] = useState([])
-  const [listOfComplaints, setListOfComplints] = useState([])
-  const [listOfDiagnosis, setListOfDiagnosis] = useState([])
-  const [listOfTests, setListOfTests] = useState([])
+  const [deleteComplaints, setDeleteComplaints] = useState([])
+  const [deleteDiagnosis, setDeleteDiagnosis] = useState([])
+  const [deleteTests, setDeleteTests] = useState([])
 
   const [subTotal, setSubTotal] = useState(0)
   const role = useSelector(state => state.user.role)
@@ -336,18 +294,6 @@ const EditPrescription = props => {
       /**Add key in the product_state */
       let x = addNevObject(listOfMedicineObject)
       productsDispatch({ type: 'SET_PRODUCTS', payload: x })
-      setListOfComplints(arr => [
-        ...arr,
-        prescriptions.SpecificPrescription.complaints.edges.map(element => element.node.id),
-      ])
-      setListOfDiagnosis(arr => [
-        ...arr,
-        prescriptions.SpecificPrescription.diagnosis.edges.map(element => element.node.id),
-      ])
-      setListOfTests(arr => [
-        ...arr,
-        prescriptions.SpecificPrescription.tests.edges.map(element => element.node.id),
-      ])
       // Once the meds are imported we fill all those values
       form.setFieldsValue({
         height: prescriptions.SpecificPrescription.height,
@@ -363,18 +309,11 @@ const EditPrescription = props => {
         tests: prescriptions.SpecificPrescription.tests.edges.map(element => element.node.id),
       })
       console.log('THE INITIAL FORM FOR DIAGNOSIS', diagnosis)
-      console.log('THE LIST OF DIAGNOSIS', listOfDiagnosis)
     }
   }, [prescriptions.SpecificPrescription])
 
   function onChangeInputNumber(value) {
     console.log('changed', value)
-  }
-  function handleChange(value) {
-    console.log(`Selected: ${value}`)
-  }
-  function onDeselect(value) {
-    console.log('THE DESELECTED STUFF', value)
   }
 
   function onChangeNextVisitVal(e) {
@@ -388,32 +327,6 @@ const EditPrescription = props => {
     form.validateFields((err, values) => {
       console.log('THE LIST OF PRESCRIPTION', productsState)
       console.log('THE SUBMIT 🎉✨', err, values)
-      let deleteComplaintList = [],
-        deleteDiagnosisList = [],
-        deleteTestsList = []
-      // listOfComplaints = prescriptions.SpecificPrescription.complaints.edges.map(
-      //   element => element.node.id,
-      // )
-      // listOfDiagnosis = prescriptions.SpecificPrescription.diagnosis.edges.map(
-      //   element => element.node.id,
-      // )
-      // listOfTests = prescriptions.SpecificPrescription.tests.edges.map(element => element.node.id)
-      console.log(
-        'THE VALUES BEFORE DISPATCH ⏩⏩⏩⏩⏩⏩⏩⏩⏩⏩',
-        listOfComplaints[0],
-        listOfDiagnosis[0],
-        listOfTests[0],
-      )
-
-      deleteComplaintList = uniqueFunc(listOfComplaints[0], values.complaints, deleteComplaintList)
-      deleteDiagnosisList = uniqueFunc(listOfDiagnosis[0], values.diagnosis, deleteDiagnosisList)
-      deleteTestsList = uniqueFunc(listOfTests[0], values.tests, deleteTestsList)
-      console.log(
-        'THE VALUES TO BE DELETED',
-        deleteComplaintList,
-        deleteDiagnosisList,
-        deleteTestsList,
-      )
       dispatchOfPrescription({
         type: actionPrescription.EDIT_PRESCRIPTION,
         payload: {
@@ -424,9 +337,9 @@ const EditPrescription = props => {
           // medicines array
           data: productsState,
           deletionVals: {
-            deleteComplaintList: deleteComplaintList[0],
-            deleteDiagnosisList: deleteDiagnosisList[0],
-            deleteTestsList: deleteTestsList[0],
+            deleteComplaintList: deleteComplaints,
+            deleteDiagnosisList: deleteDiagnosis,
+            deleteTestsList: deleteTests,
             deleteMedItems: deleteProduct,
           },
         },
@@ -581,11 +494,11 @@ const EditPrescription = props => {
               </div>
             </div>
             {/* The complaints list */}
-            <GetComplaints handleChange={handleChange} onDeselect={onDeselect} form={form} />
+            <GetComplaints setDeleteComplaints={setDeleteComplaints} form={form} />
             {/* The diagnosis list */}
-            <GetDiagnosis form={form} />
+            <GetDiagnosis setDeleteDiagnosis={setDeleteDiagnosis} form={form} />
             {/* The test list */}
-            <GetTest form={form} />
+            <GetTest setDeleteTests={setDeleteTests} form={form} />
             {prescriptions.loadingPrescriptions !== true &&
             prescriptions.isSpecificPrescription !== false ? (
               <>
@@ -609,29 +522,28 @@ const EditPrescription = props => {
             ) : (
               <>Display Loading</>
             )}
-            {/* advice:"Test Advice"
-            nextVisit:"2 Days"
-            nextVisitDate:"2021-04-01"
-            testDate:"2021-04-01" */}
             <Form.Item {...layout1} label="Advice">
               {form.getFieldDecorator('advice')(
                 <TextArea placeholder="Advice" autoSize={{ minRows: 2, maxRows: 5 }} allowClear />,
               )}
             </Form.Item>
-            <Form.Item {...layout1} label="Next Visit">
-              {form.getFieldDecorator('nextVisitNumber')(
-                <InputNumber min={0} max={1000} onChange={onChangeInputNumber} />,
-              )}
-            </Form.Item>
-            <Form.Item>
-              {form.getFieldDecorator('nextVisitVal')(
-                <Radio.Group onChange={onChangeNextVisitVal}>
-                  <Radio.Button value="days">days</Radio.Button>
-                  <Radio.Button value="weeks">weeks</Radio.Button>
-                  <Radio.Button value="months">months</Radio.Button>
-                </Radio.Group>,
-              )}
-            </Form.Item>
+            <div {...layout1}>
+              <Form.Item label="Next Visit">
+                {form.getFieldDecorator('nextVisitNumber')(
+                  <InputNumber min={0} max={1000} onChange={onChangeInputNumber} />,
+                )}
+              </Form.Item>
+              <Form.Item>
+                {form.getFieldDecorator('nextVisitVal')(
+                  <Radio.Group onChange={onChangeNextVisitVal}>
+                    <Radio.Button value="days">days</Radio.Button>
+                    <Radio.Button value="weeks">weeks</Radio.Button>
+                    <Radio.Button value="months">months</Radio.Button>
+                  </Radio.Group>,
+                )}
+              </Form.Item>
+            </div>
+
             <Form.Item {...layout1} label="Next Visit Date">
               {form.getFieldDecorator('nextVisitDate')(<DatePicker />)}
             </Form.Item>

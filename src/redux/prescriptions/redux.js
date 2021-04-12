@@ -20,9 +20,13 @@ export default function useReducer(state = initialState, action) {
       return {
         ...state,
         PrescriptionsList: [
-          ...state.prescriptionsList.map(item => {
-            if (item.id === action.payload.object.id) {
-              return action.payload.object
+          ...state.PrescriptionsList.map(item => {
+            // console.log('THE VALUE in prescription List✅', item)
+            if (item.node.id === action.payload.prescription.id) {
+              console.log('THE ID MATCHED🎉', action.payload.prescription)
+              item.node = action.payload.prescription
+              console.log('THE ITEM XXXXXXX ===============> ', item)
+              return item
             }
             return item
           }),

@@ -19,10 +19,8 @@ export function* GET_PRESCRIPTIONS({ payload }) {
     },
   })
   const response = yield call(getPrescriptionFunc, payload)
-  console.log('THE RESPONSE', response)
+  console.log('THE RESPONSE ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐', response.data.getPrescriptions)
   if (response) {
-    console.log('response data inside sagas', response.data)
-    console.log('SINCE IT EXPECTS OBJs', typeof response.data)
     yield put({
       type: actions.SET_STATE,
       payload: {
@@ -39,7 +37,6 @@ export function* GET_PRESCRIPTIONS({ payload }) {
 }
 
 export function* GET_LASTEST_PRESCRIPTIONS({ payload }) {
-  console.log('THE SAGAS FOR THE SAME RAN', payload)
   yield put({
     type: actions.SET_STATE,
     payload: {
@@ -47,9 +44,7 @@ export function* GET_LASTEST_PRESCRIPTIONS({ payload }) {
     },
   })
   const response = yield call(getLatestPrescription, payload)
-  console.log('THE RESPONSE', response)
   if (response) {
-    console.log('response data inside sagas', response.data)
     const prescriptions = response.data
     console.log('THE PRESCRIPTIONS ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐', prescriptions)
     yield put({
@@ -69,7 +64,6 @@ export function* GET_LASTEST_PRESCRIPTIONS({ payload }) {
 }
 
 export function* CREATE_PRESCRIPTIONS({ payload }) {
-  console.log('PAYLOAD =====>', payload)
   yield put({
     type: actions.SET_STATE,
     payload: {
@@ -77,13 +71,11 @@ export function* CREATE_PRESCRIPTIONS({ payload }) {
     },
   })
   const response = yield call(createPrescriptionFunc, payload)
-  console.log('THE RESPONSE', response)
+  console.log('THE RESPONSE ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐', response)
   if (response && response.data) {
     notification.success({
       message: 'PRESCRIPTION Created Successfully',
     })
-    console.log('response data inside sagas', response.data)
-    console.log('SINCE IT EXPECTS OBJs', typeof response.data)
     const prescriptions = response.data.createPrescription.details
     console.log('THE PRESCRIPTIONS', prescriptions)
     /* **************************** */
@@ -111,22 +103,18 @@ export function* CREATE_PRESCRIPTIONS({ payload }) {
 }
 
 export function* GET_DETAILS_PRESCRIPTIONS({ payload }) {
-  console.log('PAYLOAD =====>', payload)
   yield put({
     type: actions.SET_STATE,
     payload: {
       loadingPrescription: true,
     },
   })
-  console.log('THE PAYLOAD VALUES RUNNING JUST BEFORE QUERY', payload)
   const response = yield call(getDetailPrescription, payload)
-  console.log('THE RESPONSE', response)
   if (response && response.data) {
     notification.success({
       message: 'PRESCRIPTION FETCHED',
     })
-    console.log('response data inside sagas', response.data)
-    console.log('SINCE IT EXPECTS OBJs', typeof response.data)
+    console.log('response data ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐', response.data)
     const prescriptions = response.data.getPrescriptionDetail
     console.log('THE PRESCRIPTIONS', prescriptions)
     yield put({
@@ -145,22 +133,19 @@ export function* GET_DETAILS_PRESCRIPTIONS({ payload }) {
   })
 }
 export function* EDIT_PRESCRIPTION({ payload }) {
-  console.log('PAYLOAD =====>', payload)
   yield put({
     type: actions.SET_STATE,
     payload: {
       loadingPrescription: true,
     },
   })
-  console.log('THE EDIT PRESCRIPTION COMPONENT', payload)
   const response = yield call(editAndSavePrescription, payload)
-  console.log('THE RESPONSE', response)
+  console.log('THE RESPONSE ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐', response)
   if (response && response.data) {
     notification.success({
       message: 'PRESCRIPTION UPDATED SUCCESSFULLY',
     })
     console.log('response data inside sagas', response.data)
-    console.log('SINCE IT EXPECTS OBJs', typeof response.data)
     const prescriptions = response.data.updatePrescription.details
     console.log('THE PRESCRIPTIONS', prescriptions)
     yield put({
@@ -168,6 +153,12 @@ export function* EDIT_PRESCRIPTION({ payload }) {
       payload: {
         SpecificPrescription: prescriptions,
         isSpecificPrescription: true,
+      },
+    })
+    yield put({
+      type: actions.UPDATE_PRESCRIPTIONS_LIST,
+      payload: {
+        prescription: prescriptions, // { node: prescriptions },
       },
     })
   }
@@ -180,7 +171,6 @@ export function* EDIT_PRESCRIPTION({ payload }) {
 }
 
 export function* DELETE_PRESCRIPTION({ payload }) {
-  console.log('PAYLOAD =====>', payload)
   yield put({
     type: actions.SET_STATE,
     payload: {
@@ -188,13 +178,10 @@ export function* DELETE_PRESCRIPTION({ payload }) {
     },
   })
   const response = yield call(deletePrescription, payload)
-  console.log('THE RESPONSE', response)
   if (response && response.data) {
     notification.success({
       message: 'PRESCRIPTION DELTED SUCCESSFULLY',
     })
-    console.log('response data inside sagas', response.data)
-    console.log('SINCE IT EXPECTS OBJs', response.data)
     yield put({
       type: actions.DELETE_PRESCRIPTION_IN_LIST,
       payload: {
