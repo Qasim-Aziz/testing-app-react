@@ -8,7 +8,7 @@ import { connect, useSelector, useDispatch } from 'react-redux'
 import { Helmet } from 'react-helmet'
 import { Button, Table, Layout, Drawer, Tabs, Input } from 'antd'
 import { PlusOutlined, CloseCircleOutlined } from '@ant-design/icons'
-// import Authorize from '../LayoutComponents/Authorize'
+import Authorize from '../../components/LayoutComponents/Authorize'
 import actionLearners from '../../redux/learners/actions'
 import PrescriptionList from './prescriptionList'
 import AddPrescription from './addPrescriptionForm'
@@ -134,21 +134,22 @@ const Index = props => {
       title: 'Add',
       dataIndex: 'addPrescription',
       render: (text, row) => (
-        // <Authorize roles={['admin']} redirect to="/dashboard/beta">
-        <Button
-          type="primary"
-          onClick={() => {
-            setLearnerState({
-              ...learnerState,
-              specificLearner: row,
-              addPrescriptionDrawer: true,
-            })
-          }}
-        >
-          ADD
-          <PlusOutlined />
-        </Button>
-        // </Authorize>
+        // Only a therapist is allowed to added prescription
+        <Authorize roles={['therapist']} redirect to="/dashboard/beta">
+          <Button
+            type="primary"
+            onClick={() => {
+              setLearnerState({
+                ...learnerState,
+                specificLearner: row,
+                addPrescriptionDrawer: true,
+              })
+            }}
+          >
+            ADD
+            <PlusOutlined />
+          </Button>
+        </Authorize>
       ),
     },
   ]
