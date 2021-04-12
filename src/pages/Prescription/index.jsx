@@ -14,6 +14,10 @@ import PrescriptionList from './prescriptionList'
 import AddPrescription from './addPrescriptionForm'
 
 const Index = props => {
+  /**the local state of the application is similar to learners but written in hooks
+   * @specificLearner will determine a single user and populate the components with its prescriptions
+   */
+
   const [learnerState, setLearnerState] = useState({
     filterName: '',
     filterEmail: '',
@@ -26,15 +30,16 @@ const Index = props => {
     viewPrescriptionDrawer: false,
   })
   const learners = useSelector(state => state.learners)
-  const prescription = useSelector(state => state.prescription)
   const dispatch = useDispatch()
+  /* At the initial render we get all the learners in a list */
 
   useEffect(() => {
     dispatch({
-      type: actionLearners.GET_DATA, // 'learners/GET_DATA',
+      type: actionLearners.GET_DATA,
     })
   }, [])
 
+  /* Once the learners are fetched this effect will set the values */
   useEffect(() => {
     setLearnerState({
       ...learnerState,
@@ -43,7 +48,8 @@ const Index = props => {
       tableData: learners.LearnersList,
     })
   }, [learners])
-  /* To filter all the data that would be displayed inside the table */
+
+  /**This useEffect will filter data based on every input in name and email field on the top of the page */
 
   useEffect(() => {
     let filteredList = learnerState.mainData
@@ -109,7 +115,11 @@ const Index = props => {
         <Button
           type="primary"
           onClick={() => {
-            setLearnerState({ ...learnerState, specificLearner: row, viewPrescriptionDrawer: true })
+            setLearnerState({
+              ...learnerState,
+              specificLearner: row,
+              viewPrescriptionDrawer: true,
+            })
           }}
         >
           view
@@ -187,7 +197,7 @@ const Index = props => {
   return (
     <>
       <Helmet title="Prescription" />
-
+      {/* If someone clicks on add then this drawer will open and hydrate the latest values in a prescription of that specific learner */}
       <Drawer
         width="90%"
         title="Add Prescription"
@@ -198,7 +208,7 @@ const Index = props => {
       >
         <AddPrescription details={learnerState.specificLearner} />
       </Drawer>
-
+      {/* If user clicks on "view" then a list of prescription will be shown of that specific learner */}
       <Drawer
         width="80%"
         title="View History Of Prescriptions"
@@ -243,11 +253,6 @@ const Index = props => {
         </div>
         <div>
           <span style={{ fontSize: '25px', color: '#000' }}>LEARNERS PRESCRIPTIONS</span>
-        </div>
-        <div style={{ padding: '5px 0px' }}>
-          {/* <Button onClick={this.showDrawer} type="primary">
-            <PlusOutlined /> 
-          </Button> */}
         </div>
       </div>
       <div style={{ marginBottom: '50px' }}>
