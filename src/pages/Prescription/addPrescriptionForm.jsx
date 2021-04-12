@@ -303,6 +303,12 @@ const BankDetails = props => {
         value: details.id,
       },
     })
+    dispatchOfPrescription({
+      type: actionPrescription.GET_PRESCRIPTIONS,
+      payload: {
+        value: details.id,
+      },
+    })
   }, [])
 
   /*[Explaination]
@@ -572,10 +578,10 @@ const BankDetails = props => {
               >
                 <Button loading={false} type="primary" style={{ margin: 5 }}>
                   {/* htmlType="submit" */}
-                  Update
+                  ADD
                 </Button>
               </Popconfirm>
-              <Button type="ghost" style={{ margin: 5 }}>
+              <Button onClick={() => props.closeAddDrawer()} type="ghost" style={{ margin: 5 }}>
                 Cancel
               </Button>
             </div>

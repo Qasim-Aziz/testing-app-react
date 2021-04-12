@@ -1,6 +1,6 @@
 /* eslint-disable no-plusplus */
-import { all, takeEvery, put, call, select } from 'redux-saga/effects'
-import { notification, message } from 'antd'
+import { all, takeEvery, put, call } from 'redux-saga/effects'
+import { notification } from 'antd'
 import {
   getPrescriptionFunc,
   createPrescriptionFunc,
@@ -82,7 +82,12 @@ export function* CREATE_PRESCRIPTIONS({ payload }) {
     yield put({
       type: actions.APPEND_PRESCRIPTIONS_LIST,
       payload: {
-        prescription: prescriptions,
+        /* TO reduce total number of mapping on different arrays
+         *  I have used the hack below ie to wrap the details
+         *  in a "node"
+         */
+
+        prescription: { node: prescriptions },
       },
     })
     /* **************************** */

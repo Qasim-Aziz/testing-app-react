@@ -31,6 +31,10 @@ const Index = props => {
   })
   const learners = useSelector(state => state.learners)
   const dispatch = useDispatch()
+
+  function closeAddDrawer() {
+    setLearnerState({ ...learnerState, addPrescriptionDrawer: false })
+  }
   /* At the initial render we get all the learners in a list */
 
   useEffect(() => {
@@ -206,7 +210,7 @@ const Index = props => {
         onClose={() => setLearnerState({ ...learnerState, addPrescriptionDrawer: false })}
         destroyOnClose
       >
-        <AddPrescription details={learnerState.specificLearner} />
+        <AddPrescription details={learnerState.specificLearner} closeAddDrawer={closeAddDrawer} />
       </Drawer>
       {/* If user clicks on "view" then a list of prescription will be shown of that specific learner */}
       <Drawer

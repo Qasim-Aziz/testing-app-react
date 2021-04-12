@@ -287,14 +287,14 @@ export default props => {
   console.log('PROPS', props)
   /**When the component first mounts it should render all the details regarding a learner's prescriptions */
   useEffect(() => {
-    // console.log('THE USE_EFFCE ')
+    console.log('THE USE_EFFCE ', props.details)
     dispatch({
       type: actionPrescription.GET_PRESCRIPTIONS,
       payload: {
         value: props.details.id,
       },
     })
-  }, [])
+  }, []) // prescriptions.PrescriptionsList, prescriptions.PrescriptionCreated
 
   console.log('🌟THE Prescription REDUCER STATE', prescriptions)
   return (
