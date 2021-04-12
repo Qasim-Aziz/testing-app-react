@@ -136,11 +136,6 @@ const TargetAllocation = () => {
       setSelectedDefaultShortTermGoal(defaultShortTermGoals[selectedProgramInDefaultTab])
   }, [selectedProgramInDefaultTab, defaultShortTermGoals])
 
-  useEffect(() => {
-    if (selectedProgramInDefaultTab && defaultShortTermGoals)
-      setSelectedDefaultShortTermGoal(defaultShortTermGoals[selectedProgramInDefaultTab])
-  }, [selectedProgramInDefaultTab, defaultShortTermGoals])
-
   const getDefaultGoalsQuery = async studentId => {
     const defaultGoalResponse = await getDefaultGoals(studentId)
     if (notNull(defaultGoalResponse)) {
