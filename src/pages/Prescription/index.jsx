@@ -258,6 +258,8 @@ const Index = props => {
         <div>
           <span style={{ fontSize: '25px', color: '#000' }}>LEARNERS PRESCRIPTIONS</span>
         </div>
+        {/* This empty div is for supporting the above div to have the title of the page centered  */}
+        <div style={{ padding: '5px 0px' }}></div>
       </div>
       <div style={{ marginBottom: '50px' }}>
         <div className="view_asset">
