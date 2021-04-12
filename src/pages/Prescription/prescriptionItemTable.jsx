@@ -91,30 +91,37 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount, ...props }) =>
       //   return parseFloat(record.qty) * parseFloat(record.rate)
       // },
     },
-    {
-      title: 'Note',
-      dataIndex: 'note',
-      editable: true,
-      width: 70,
-    },
+    // {
+    //   title: 'Note',
+    //   dataIndex: 'note',
+    //   editable: true,
+    //   width: 70,
+    // },
     {
       title: 'Operation',
       dataIndex: 'operation',
       width: 50,
-      render: (text, { key, id }) => (
+      render: (
+        text,
+        { key, ...val }, // key, id, ...val
+      ) => (
         <>
           {props.tryingTodelete ? (
             <>
-              {console.log('THE KEY AND PRODUCT⏩⏩⏩⏩⏩⏩', id, key)}
-              {id ? (
+              {/* {console.log('THE KEY AND PRODUCT⏩⏩⏩⏩⏩⏩', val.pk, val)} */}
+              {val.pk ? (
                 <>
                   <Button
                     type="danger"
                     onClick={() => {
+                      // Remove the row from the table
                       dispatch({
-                        type: 'DELETE_PRODUCT',
-                        payload: id,
+                        type: 'REMOVE_PRODUCT',
+                        payload: { key },
                       })
+                      // add the val.pk of which, the user wants to delete
+                      console.log('TRYING TO REMOVE🚀🚀🚀🚀🚀🚀', val.pk)
+                      props.setDeleteProduct(arr => [...arr, val.pk])
                     }}
                   >
                     Delete

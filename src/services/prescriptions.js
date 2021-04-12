@@ -442,7 +442,7 @@ export async function getDetailPrescription(payload) {
 }
 
 export async function editAndSavePrescription(payload) {
-  console.log('THE VALUE 🌟EDIT🌟 IN THE PAYLOAD ---------------------> ', payload)
+  console.log('THE VALUE 🌟EDIT🌟 IN THE PAYLOAD', payload)
   let array_of_meds = []
   let i
   for (i = 0; i < payload.data.length; i++) {
@@ -450,6 +450,7 @@ export async function editAndSavePrescription(payload) {
     delete x.key
     delete x.rate
     delete x.note
+    delete x.id
     if (x.qty === null) {
       delete x.qty
     }
@@ -473,6 +474,10 @@ export async function editAndSavePrescription(payload) {
           $diagnosis: [ID]
           $tests: [ID]
           $medicineItems: [MedicineItemsInput]
+          $removeMedicineItems: [ID]
+          $removeTests: [ID]
+          $removeDiagnosis: [ID]
+          $removeComplaints: [ID]
         ) {
           updatePrescription(
             input: {
@@ -489,6 +494,10 @@ export async function editAndSavePrescription(payload) {
               diagnosis: $diagnosis # array of ids
               tests: $tests # array of ids
               medicineItems: $medicineItems # array of objects
+              removeMedicineItems: $removeMedicineItems
+              removeTests: $removeTests
+              removeDiagnosis: $removeDiagnosis
+              removeComplaints: $removeComplaints
             }
           ) {
             details {
@@ -578,6 +587,10 @@ export async function editAndSavePrescription(payload) {
         diagnosis: payload.values.diagnosis ? payload.values.diagnosis : [],
         tests: payload.values.tests ? payload.values.tests : [],
         medicineItems: array_of_meds,
+        removeMedicineItems: payload.deletionVals.deleteMedItems,
+        removeTests: payload.deletionVals.deleteTestsList,
+        removeDiagnosis: payload.deletionVals.deleteDiagnosisList,
+        removeComplaints: payload.deletionVals.deleteComplaintList,
       },
     })
     .then(result => result)

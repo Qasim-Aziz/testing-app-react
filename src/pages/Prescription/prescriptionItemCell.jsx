@@ -17,7 +17,7 @@ import './index.scss'
  * handleSave ==> is a reducer function which save all the edits made in the local reducer of the component
  */
 export default ({ record, children, title, editable, dataIndex, handleSave, ...restProps }) => {
-  console.log('RECORD', record)
+  // console.log('RECORD', record)
   // console.log('CHILDREN', children)
   // console.log('TITLE', title)
   // console.log('EDITABLE', editable)

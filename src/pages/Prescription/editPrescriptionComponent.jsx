@@ -105,7 +105,7 @@ function addNevObject(val) {
     let some_random = {}
     console.log('THE ITEM', item)
     some_random.key = index + 1 // item.node.id
-    some_random.id = item.node.id
+    some_random.pk = item.node.id
     some_random.name = item.node.name
     some_random.medicineType = item.node.medicineType
     some_random.unit = item.node.unit
@@ -122,7 +122,29 @@ function addNevObject(val) {
   return theMainArray
 }
 
-const GetComplaints = ({ form }) => {
+/* Helper function */
+function uniqueFunc(arr1, arr2, uniqueArr) {
+  console.log('ALL THE VALUES IN UNIQUE FUNC', arr1, arr2, uniqueArr)
+  let flag
+  for (var i = 0; i < arr1.length; i++) {
+    flag = 0
+    for (var j = 0; j < arr2.length; j++) {
+      if (arr1[i] === arr2[j]) {
+        arr2.splice(j, 1)
+        j--
+        flag = 1
+      }
+    }
+
+    if (flag == 0) {
+      uniqueArr.push(arr1[i])
+    }
+  }
+  //     uniqueArr.push(arr2);
+  return uniqueArr
+}
+
+const GetComplaints = ({ form, handleChange, onDeselect }) => {
   const [sdText, setSdText] = useState('')
   const { data: sdData, error: sdError, loading: sdLoading } = useQuery(GET_COMPLAINT_QUERY, {
     variables: {
@@ -155,6 +177,8 @@ const GetComplaints = ({ form }) => {
               loading={sdLoading}
               // disabled={form.getFieldValue('complaints')?.length > 0}
               placeholder="Search for find more sd"
+              onDeselect={onDeselect}
+              onChange={handleChange}
             >
               {sdData?.getPrescriptionComplaints.edges.map(({ node }) => {
                 return (
@@ -284,7 +308,12 @@ const EditPrescription = props => {
   */
 
   const [productsState, productsDispatch] = useReducer(productReducer, [])
-  console.log('THE ☑☑☑☑☑☑☑☑☑☑☑ productstate initially', productsState)
+  // console.log('THE ☑☑☑☑☑☑☑☑☑☑☑ productstate initially', productsState)
+  const [deleteProduct, setDeleteProduct] = useState([])
+  const [listOfComplaints, setListOfComplints] = useState([])
+  const [listOfDiagnosis, setListOfDiagnosis] = useState([])
+  const [listOfTests, setListOfTests] = useState([])
+
   const [subTotal, setSubTotal] = useState(0)
   const role = useSelector(state => state.user.role)
 
@@ -307,6 +336,18 @@ const EditPrescription = props => {
       /**Add key in the product_state */
       let x = addNevObject(listOfMedicineObject)
       productsDispatch({ type: 'SET_PRODUCTS', payload: x })
+      setListOfComplints(arr => [
+        ...arr,
+        prescriptions.SpecificPrescription.complaints.edges.map(element => element.node.id),
+      ])
+      setListOfDiagnosis(arr => [
+        ...arr,
+        prescriptions.SpecificPrescription.diagnosis.edges.map(element => element.node.id),
+      ])
+      setListOfTests(arr => [
+        ...arr,
+        prescriptions.SpecificPrescription.tests.edges.map(element => element.node.id),
+      ])
       // Once the meds are imported we fill all those values
       form.setFieldsValue({
         height: prescriptions.SpecificPrescription.height,
@@ -321,11 +362,19 @@ const EditPrescription = props => {
         ),
         tests: prescriptions.SpecificPrescription.tests.edges.map(element => element.node.id),
       })
+      console.log('THE INITIAL FORM FOR DIAGNOSIS', diagnosis)
+      console.log('THE LIST OF DIAGNOSIS', listOfDiagnosis)
     }
   }, [prescriptions.SpecificPrescription])
 
   function onChangeInputNumber(value) {
     console.log('changed', value)
+  }
+  function handleChange(value) {
+    console.log(`Selected: ${value}`)
+  }
+  function onDeselect(value) {
+    console.log('THE DESELECTED STUFF', value)
   }
 
   function onChangeNextVisitVal(e) {
@@ -334,10 +383,37 @@ const EditPrescription = props => {
 
   const handleSubmitt = e => {
     e.preventDefault()
-    console.log('submit🥂🥂🥂🥂🙌🙌🙌🙌🙌')
+    console.log('submit🥂🥂🥂🥂🙌🙌🙌🙌🙌', deleteProduct)
+    console.log('THE FINAL FORM FOR DIAGNOSIS', form.getFieldValue('diagnosis'))
     form.validateFields((err, values) => {
       console.log('THE LIST OF PRESCRIPTION', productsState)
       console.log('THE SUBMIT 🎉✨', err, values)
+      let deleteComplaintList = [],
+        deleteDiagnosisList = [],
+        deleteTestsList = []
+      // listOfComplaints = prescriptions.SpecificPrescription.complaints.edges.map(
+      //   element => element.node.id,
+      // )
+      // listOfDiagnosis = prescriptions.SpecificPrescription.diagnosis.edges.map(
+      //   element => element.node.id,
+      // )
+      // listOfTests = prescriptions.SpecificPrescription.tests.edges.map(element => element.node.id)
+      console.log(
+        'THE VALUES BEFORE DISPATCH ⏩⏩⏩⏩⏩⏩⏩⏩⏩⏩',
+        listOfComplaints[0],
+        listOfDiagnosis[0],
+        listOfTests[0],
+      )
+
+      deleteComplaintList = uniqueFunc(listOfComplaints[0], values.complaints, deleteComplaintList)
+      deleteDiagnosisList = uniqueFunc(listOfDiagnosis[0], values.diagnosis, deleteDiagnosisList)
+      deleteTestsList = uniqueFunc(listOfTests[0], values.tests, deleteTestsList)
+      console.log(
+        'THE VALUES TO BE DELETED',
+        deleteComplaintList,
+        deleteDiagnosisList,
+        deleteTestsList,
+      )
       dispatchOfPrescription({
         type: actionPrescription.EDIT_PRESCRIPTION,
         payload: {
@@ -347,6 +423,12 @@ const EditPrescription = props => {
           values: values,
           // medicines array
           data: productsState,
+          deletionVals: {
+            deleteComplaintList: deleteComplaintList[0],
+            deleteDiagnosisList: deleteDiagnosisList[0],
+            deleteTestsList: deleteTestsList[0],
+            deleteMedItems: deleteProduct,
+          },
         },
       })
     })
@@ -499,7 +581,7 @@ const EditPrescription = props => {
               </div>
             </div>
             {/* The complaints list */}
-            <GetComplaints form={form} />
+            <GetComplaints handleChange={handleChange} onDeselect={onDeselect} form={form} />
             {/* The diagnosis list */}
             <GetDiagnosis form={form} />
             {/* The test list */}
@@ -520,6 +602,7 @@ const EditPrescription = props => {
                     products={productsState}
                     dispatch={productsDispatch}
                     tryingTodelete={{ HELLO: 'I AM DELETE' }}
+                    setDeleteProduct={setDeleteProduct}
                   />
                 </PrescriptionItemContext.Provider>
               </>
