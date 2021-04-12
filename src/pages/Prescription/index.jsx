@@ -28,20 +28,14 @@ const Index = props => {
   const learners = useSelector(state => state.learners)
   const prescription = useSelector(state => state.prescription)
   const dispatch = useDispatch()
-  console.log('THE PROPS', props)
-  console.log('LEARNER REDUCER', learners)
-
-  // const [addPrescriptionDrawer, setAddPrescriptionDrawer] = useState(false)
 
   useEffect(() => {
-    console.log('THE USE EFFECT RAN 1')
     dispatch({
       type: actionLearners.GET_DATA, // 'learners/GET_DATA',
     })
   }, [])
 
   useEffect(() => {
-    console.log('THE USE EFFECT RAN 2')
     setLearnerState({
       ...learnerState,
       mainData: learners.LearnersList,
@@ -83,25 +77,6 @@ const Index = props => {
     })
   }, [learnerState.filterName, learnerState.filterEmail])
 
-  const selectSpecificLearner = data => {
-    console.log('THE USER SELECTED IS', data)
-    setLearnerState({ ...learnerState, specificLearner: data })
-  }
-
-  const paymentDetailsButton = (
-    <Button
-      style={{
-        backgroundColor: '#07a7fc',
-        borderColor: '#07a7fc',
-        color: 'white',
-        fontWeight: '5px',
-      }}
-      onClick={() => setAddPrescriptionDrawer(true)}
-    >
-      Add Prescription
-    </Button>
-  )
-
   const columns = [
     {
       title: '#',
@@ -112,17 +87,9 @@ const Index = props => {
       dataIndex: 'firstname',
       sortable: true,
       render: (text, row) => (
-        <Button
-          type="link"
-          onClick={() => {
-            // this.setState({ showProfile: true })
-            // this.info(row)
-            console.log('CLICKED')
-          }}
-          style={{ padding: '0px', fontWeight: 'bold', fontSize: '14px' }}
-        >
+        <span style={{ padding: '0px', fontWeight: 'bold', fontSize: '14px' }}>
           {row.firstname} {row.lastname}
-        </Button>
+        </span>
       ),
     },
     {
@@ -142,9 +109,7 @@ const Index = props => {
         <Button
           type="primary"
           onClick={() => {
-            /** To select a specific learner */
             setLearnerState({ ...learnerState, specificLearner: row, viewPrescriptionDrawer: true })
-            console.log('CLICKED')
           }}
         >
           view
@@ -164,7 +129,6 @@ const Index = props => {
               specificLearner: row,
               addPrescriptionDrawer: true,
             })
-            console.log('CLICKED')
           }}
         >
           ADD
@@ -219,8 +183,6 @@ const Index = props => {
       </span>
     </div>
   )
-
-  console.log('THE LEARNER STATE LOCAL', learnerState)
 
   return (
     <>
