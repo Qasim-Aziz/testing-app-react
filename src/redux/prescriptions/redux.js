@@ -34,6 +34,14 @@ export default function useReducer(state = initialState, action) {
         PrescriptionsList: [action.payload.prescription, ...state.PrescriptionsList],
         PrescriptionCreated: 'Created',
       }
+    case actions.DELETE_PRESCRIPTION_IN_LIST:
+      console.log('THE DELETE PRESCRIPTION LIST', action.payload)
+      return {
+        ...state,
+        PrescriptionsList: [
+          ...state.PrescriptionsList.filter(item => item.node.id !== action.payload.item_id),
+        ],
+      }
     default:
       return state
   }

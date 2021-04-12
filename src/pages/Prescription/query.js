@@ -44,3 +44,14 @@ export const GET_TESTS_QUERY = gql`
     }
   }
 `
+
+export const DELETE_PRESCRIPTION_QUERY = gql`
+  mutation deletePrescription($pk: ID!) {
+    mutation {
+      deletePrescription(input: { pk: $pk }) {
+        status
+        msg
+      }
+    }
+  }
+`

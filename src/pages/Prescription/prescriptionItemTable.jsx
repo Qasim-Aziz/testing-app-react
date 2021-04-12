@@ -28,10 +28,11 @@ const components = {
   },
 }
 
-const PrescriptionItemTable = ({ products, dispatch, totalAmount }) => {
+const PrescriptionItemTable = ({ products, dispatch, totalAmount, ...props }) => {
   // console.log('THE PRODUCTS', products)
   // console.log('THE Dispatch', dispatch)
-  // console.log('THE TOTAL AMOUNT', totalAmount)
+  console.log('THE TOTAL AMOUNT☑☑☑', props)
+  console.log('HEWIEJ', props.tryingTodelete)
   const columnsList = [
     {
       title: '#',
@@ -101,17 +102,20 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount }) => {
       dataIndex: 'operation',
       width: 50,
       render: (text, { key }) => (
-        <Button
-          type="danger"
-          onClick={() => {
-            dispatch({
-              type: 'REMOVE_PRODUCT',
-              payload: { key },
-            })
-          }}
-        >
-          Delete
-        </Button>
+        <>
+          <Button
+            type="danger"
+            onClick={() => {
+              dispatch({
+                type: 'REMOVE_PRODUCT',
+                payload: { key },
+              })
+            }}
+          >
+            Delete
+          </Button>
+          {props.tryingTodelete && console.log('🚀👉🚀👉✌', key)}
+        </>
       ),
     },
   ]

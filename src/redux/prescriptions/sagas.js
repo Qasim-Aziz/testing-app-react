@@ -7,6 +7,7 @@ import {
   getLatestPrescription,
   getDetailPrescription,
   editAndSavePrescription,
+  deletePrescription,
 } from 'services/prescriptions'
 import actions from './actions'
 
@@ -169,6 +170,32 @@ export function* EDIT_PRESCRIPTION({ payload }) {
     },
   })
 }
+
+export function* DELETE_PRESCRIPTION({ payload }) {
+  console.log('PAYLOAD =====>', payload)
+  yield put({
+    type: actions.SET_STATE,
+    payload: {
+      loadingPrescription: true,
+    },
+  })
+  const response = yield call(deletePrescription, payload)
+  console.log('THE RESPONSE', response)
+  if (response && response.data) {
+    notification.success({
+      message: 'PRESCRIPTION DELTED SUCCESSFULLY',
+    })
+    console.log('response data inside sagas', response.data)
+    console.log('SINCE IT EXPECTS OBJs', response.data)
+    yield put({
+      type: actions.DELETE_PRESCRIPTION_IN_LIST,
+      payload: {
+        item_id: payload.value,
+      },
+    })
+  }
+}
+
 export default function* rootSaga() {
   yield all([
     takeEvery(actions.GET_PRESCRIPTIONS, GET_PRESCRIPTIONS),
@@ -176,5 +203,6 @@ export default function* rootSaga() {
     takeEvery(actions.GET_LASTEST_PRESCRIPTIONS, GET_LASTEST_PRESCRIPTIONS),
     takeEvery(actions.GET_DETAILS_PRESCRIPTIONS, GET_DETAILS_PRESCRIPTIONS),
     takeEvery(actions.EDIT_PRESCRIPTION, EDIT_PRESCRIPTION),
+    takeEvery(actions.DELETE_PRESCRIPTION, DELETE_PRESCRIPTION),
   ])
 }

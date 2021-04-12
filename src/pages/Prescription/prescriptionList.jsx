@@ -4,30 +4,21 @@
 /* eslint-disable react/jsx-boolean-value */
 /* eslint-disable */
 import React, { useState, useEffect, useCallback } from 'react'
+// import { renderToString } from 'react-dom/server'
 import { connect, useSelector, useDispatch } from 'react-redux'
-import {
-  Button,
-  Table,
-  Layout,
-  Drawer,
-  Tabs,
-  Input,
-  Card,
-  Col,
-  Row,
-  List,
-  Typography,
-  Divider,
-  Tag,
-} from 'antd'
-import { CloseCircleOutlined, CheckCircleOutlined, EditOutlined } from '@ant-design/icons'
-import { COLORS, DRAWER } from 'assets/styles/globalStyles'
+import { Redirect } from 'react-router-dom'
+import JsPDF from 'jspdf'
+import { Button, Table, Drawer, Divider, Tag, notification } from 'antd'
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { COLORS } from 'assets/styles/globalStyles'
 import actionPrescription from '../../redux/prescriptions/actions'
+
 import './index.scss'
 import EditPrescription from './editPrescriptionComponent'
 
 // Every individual prescription
 export const History = props => {
+  const dispatchOfPrescription = useDispatch()
   console.log('EACH HISTORY PROP', props)
   const [editPrescription, setEditPrescription] = useState(false)
   const [deletePrescription, setDeletePrescription] = useState(false)
@@ -50,7 +41,6 @@ export const History = props => {
     color: 'black',
   }
   const medicineTableData = props.data.node.medicineItems.edges
-  // console.log('🔥🔥🔥🔥🧨🧨🧨🧯🧯🧯', medicineTableData)
   const columns = [
     {
       title: '#',
@@ -99,6 +89,56 @@ export const History = props => {
       render: row => <span>{row.node.duration ? row.node.duration : ''}</span>,
     },
   ]
+
+  const prescriptionPfd = () => {
+    console.log('THE PDF PROPS', columns)
+    const tableData = medicineTableData
+    console.log('THE TABLE DATA', medicineTableData)
+    const unit = 'pt'
+    const size = 'A4' // Use A1, A2, A3 or A4
+    const orientation = 'landscape' // portrait or landscape
+
+    const doc = new JsPDF(orientation, unit, size)
+
+    doc.setFontSize(10)
+
+    const title = 'Prescription List'
+    const headers = [['#', 'name', 'Type', 'qty', 'unit', 'dosage', 'when', 'frequency']]
+
+    const data = tableData.map((e, i) => [
+      i + 1,
+      e.node.name,
+      e.node.medicineType,
+      e.node.qty,
+      e.node.unit,
+      e.node.dosage,
+      e.node.when,
+      e.node.frequency,
+      e.node.duration,
+    ])
+
+    const content = {
+      startY: 50,
+      head: headers,
+      body: data,
+    }
+    console.log('THE PROPS>NUMBER', props.number)
+    doc.text(title, 10, 10)
+    doc.autoTable(content)
+    console.log('CHECKED 🤞')
+    doc.html(document.querySelector(`#content${props.number}`), {
+      callback: function(doc) {
+        // doc.save()
+        console.log('HEYA')
+        doc.addPage()
+        doc.save('prescription.pdf')
+      },
+      x: 10,
+      y: doc.autoTable.previous.finalY + 30, // 10,
+    })
+    // doc.save('prescription.pdf')
+  }
+
   return (
     <>
       <div>
@@ -119,6 +159,39 @@ export const History = props => {
                 }}
               >
                 <EditOutlined />
+              </Button>
+              <Button
+                type="link"
+                onClick={() => {
+                  console.log('PERSONAL INFO CLICKED DELETE BUTTON CLICK')
+                  dispatchOfPrescription({
+                    type: actionPrescription.DELETE_PRESCRIPTION,
+                    payload: {
+                      value: props.data.node.id,
+                    },
+                  })
+                }}
+                style={{
+                  paddingRight: 0,
+                  fontSize: '16px',
+                  float: 'right',
+                }}
+              >
+                <DeleteOutlined />
+              </Button>
+              <Button
+                type="link"
+                onClick={() => {
+                  console.log(' ******************PDF****************** ')
+                  prescriptionPfd()
+                }}
+                style={{
+                  paddingRight: 0,
+                  fontSize: '16px',
+                  float: 'right',
+                }}
+              >
+                PDF
               </Button>
             </div>
             {props.data.node ? (
@@ -159,7 +232,7 @@ export const History = props => {
               <p> : {props.data.node.testDate}</p>
             </div>
           </div>
-          <div className="mainCard-child">
+          <div id={`content${props.number}`} className="mainCard-child">
             <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
               <p style={labelHead}>Diagnosis </p>
               <p>
@@ -189,18 +262,10 @@ export const History = props => {
                 ))}
               </p>
             </div>
-            {/* <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-            <p style={labelHead}>SSN/Adhaar </p>
-            <p> : {'whatever'}</p>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-            <p style={labelHead}>Language </p>
-            <p> : {'whatever'}</p>
-          </div> */}
           </div>
         </div>
         {/* Table of medicines */}
-        <Table columns={columns} dataSource={medicineTableData} />
+        <Table columns={columns} rowKey={props.data.node.id} dataSource={medicineTableData} />
       </div>
       <Drawer
         width="90%"
@@ -222,7 +287,7 @@ export default props => {
   console.log('PROPS', props)
   /**When the component first mounts it should render all the details regarding a learner's prescriptions */
   useEffect(() => {
-    console.log('THE USE_EFFCE ')
+    // console.log('THE USE_EFFCE ')
     dispatch({
       type: actionPrescription.GET_PRESCRIPTIONS,
       payload: {
@@ -239,7 +304,7 @@ export default props => {
       ) : (
         <div>
           {prescriptions.PrescriptionsList.map((item, index) => {
-            console.log('THE PRESCRIPTION 👉', item)
+            // console.log('THE PRESCRIPTION 👉', item)
             return (
               <div key={index}>
                 <Divider orientation="left">Prescription No.{index + 1}</Divider>

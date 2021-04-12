@@ -518,6 +518,7 @@ const EditPrescription = props => {
                     totalAmount={subTotal}
                     products={productsState}
                     dispatch={productsDispatch}
+                    tryingTodelete={{ HELLO: 'I AM DELETE' }}
                   />
                 </PrescriptionItemContext.Provider>
               </>

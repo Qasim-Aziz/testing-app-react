@@ -599,3 +599,38 @@ export async function editAndSavePrescription(payload) {
       // }
     })
 }
+
+export async function deletePrescription(payload) {
+  console.log('THE PAYLOAD FOR DELETE', payload)
+  return apolloClient
+    .mutate({
+      mutation: gql`
+        mutation deletePrescriptionMethod($pk: ID!) {
+          deletePrescription(input: { pk: $pk }) {
+            status
+            msg
+          }
+        }
+      `,
+      variables: {
+        pk: payload.value,
+      },
+    })
+    .then(result => result)
+    .catch(error => {
+      console.log('THE ERROR 🔴🔴🔴🔴🔴', JSON.stringify(error))
+      if (error.graphQLError) {
+        error.graphQLErrors.map(item => {
+          return notification.error({
+            message: 'Something went wrong',
+            description: item.message,
+          })
+        })
+      } else {
+        return notification.error({
+          message: `Something went wrong`,
+          description: `${error}`,
+        })
+      }
+    })
+}
