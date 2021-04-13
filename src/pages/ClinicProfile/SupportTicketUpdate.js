@@ -50,13 +50,13 @@ const TICKET_QUERY = gql`
 
 const UPDATE_TICKET = gql`
   mutation(
-    $id: ID!
-    $subject: String!
+    $id: ID
+    $subject: String
     $description: String
-    $priority: ID!
-    $service: ID!
-    $assign: ID!
-    $status: ID!
+    $priority: ID
+    $service: ID
+    $assign: ID
+    $status: ID
     $module: ID
     $submodule: ID
   ) {
@@ -228,7 +228,7 @@ export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpda
             priority: values.priority,
             service: values.service,
             assign: values.assign,
-            module: values.module,
+            module: parentID,
             submodule: values.submodule,
           },
         })
