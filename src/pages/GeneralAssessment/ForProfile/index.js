@@ -9,6 +9,7 @@ import {
   Tag,
   notification,
   Popconfirm,
+  Tooltip,
   Radio,
   Table,
   Tabs,
@@ -106,8 +107,12 @@ function Assessment() {
             {row.hasSubmodule &&
               row.submodules.map(tag => {
                 return (
-                  <Tag className="edit-tag" key={tag.name}>
-                    <span>{tag.name.length > 15 ? `${tag.slice(0, 15)}...` : tag.name}</span>
+                  <Tag id={tag.id} className="edit-tag" key={tag.name}>
+                    {tag.name.length > 15 ? (
+                      <Tooltip title={tag.name}>{tag.name.slice(0, 15)}...</Tooltip>
+                    ) : (
+                      <span>{tag.name}</span>
+                    )}
                   </Tag>
                 )
               })}
