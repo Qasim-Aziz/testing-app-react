@@ -168,10 +168,11 @@ const SUBMODULE = gql`
 `
 
 export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpdateTicketData }) => {
-  const { data, loading, error } = useQuery(TICKET_QUERY, {
+  const { data, loading, error, refetch } = useQuery(TICKET_QUERY, {
     variables: {
       id: updateTicketId,
     },
+    // fetchPolicy: 'no-cache'
   })
 
   const { data: ticketPriorityData, loading: ticketPriorityLoading } = useQuery(TICKET_PRIORITY)
@@ -185,6 +186,7 @@ export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpda
   const { data: moduleData, loading: moduleLoading } = useQuery(MODULE)
 
   const [parentID, setParentID] = useState(data?.ticket.module.id)
+  const [defaultModuleID, setdefaultModuleID] = useState(data?.ticket.submodule.id)
 
   const { data: submoduleData, loading: submoduleLoading } = useQuery(SUBMODULE, {
     variables: { varrr: parentID },
@@ -202,6 +204,7 @@ export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpda
       })
       setUpdateTicketData(updateTicketData.updateTicket.ticket)
       form.resetFields()
+      refetch()
       setUpdateTicketId(null)
     }
   }, [updateTicketData])
@@ -229,7 +232,7 @@ export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpda
             service: values.service,
             assign: values.assign,
             module: parentID,
-            submodule: values.submodule,
+            submodule: defaultModuleID,
           },
         })
       }
@@ -278,10 +281,17 @@ export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpda
         </Form.Item>
         <Form.Item label="Sub Module" style={ItemStyle} className="Form-field-container">
           {form.getFieldDecorator('submodule', {
-            initialValue: data.ticket.submodule.id,
+            initialValue: data.ticket.submodule.MenuName,
             rules: [{ message: 'Please select a sub module!' }],
           })(
-            <Select placeholder="Select sub module" size="large" loading={submoduleLoading}>
+            <Select
+              placeholder="Select sub module"
+              size="large"
+              loading={submoduleLoading}
+              onChange={value => {
+                setdefaultModuleID(`"${value}"`)
+              }}
+            >
               {submoduleData?.submodules.edges.map(({ node: { id, MenuName } }) => (
                 <Option key={id} value={id}>
                   {MenuName}
