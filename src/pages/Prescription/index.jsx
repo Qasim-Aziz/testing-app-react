@@ -30,6 +30,7 @@ const Index = props => {
     viewPrescriptionDrawer: false,
   })
   const learners = useSelector(state => state.learners)
+  const authenticatedUser = useSelector(state => state.user)
   const dispatch = useDispatch()
 
   function closeAddDrawer() {
@@ -135,24 +136,32 @@ const Index = props => {
       dataIndex: 'addPrescription',
       render: (text, row) => (
         // Only a therapist is allowed to added prescription
-        <Authorize roles={['therapist']} redirect to="/dashboard/beta">
-          <Button
-            type="primary"
-            onClick={() => {
-              setLearnerState({
-                ...learnerState,
-                specificLearner: row,
-                addPrescriptionDrawer: true,
-              })
-            }}
-          >
-            ADD
-            <PlusOutlined />
-          </Button>
-        </Authorize>
+        // <Authorize roles={['therapist', 'school_admin']} redirect to="/dashboard/beta">
+        <Button
+          type="primary"
+          onClick={() => {
+            setLearnerState({
+              ...learnerState,
+              specificLearner: row,
+              addPrescriptionDrawer: true,
+            })
+          }}
+        >
+          ADD
+          <PlusOutlined />
+        </Button>
+        // </Authorize>
       ),
     },
   ]
+
+  // Check to see if the authenticated user is a therapist based on which I will display the 'ADD' column
+  if (authenticatedUser.authorized && authenticatedUser.role !== 'therapist') {
+    console.log('THE COLUMN initially', columns)
+    // since the last object in columns is for adding new prescriptions I am poping it since the user isn't a therapist
+    columns.pop()
+    console.log('THE COLUMN finally', columns)
+  }
 
   const tableHeader = (
     <div
