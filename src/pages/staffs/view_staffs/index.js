@@ -21,6 +21,7 @@ import {
   Button,
   Card,
   Select,
+  Tooltip,
   DatePicker,
   Input,
   Drawer,
@@ -34,6 +35,7 @@ import {
   FilterOutlined,
   PlusOutlined,
   HistoryOutlined,
+  CalendarOutlined,
   CloseCircleOutlined,
   CloudDownloadOutlined,
   CheckCircleOutlined,
@@ -235,8 +237,9 @@ class StaffTable extends React.Component {
     })
   }
 
-  showSession = () => {
-    window.location.href = '/#/partners/staffManagement'
+  showSession = id => {
+    localStorage.setItem('current_therapist', JSON.stringify(id))
+    window.location.href = '/#/reports/appointment_report'
   }
 
   selectDateRange = value => {
@@ -460,13 +463,13 @@ class StaffTable extends React.Component {
         },
       },
       {
-        title: 'Session',
-        render: () => (
-          <span>
-            <Button type="link" onClick={this.showSession}>
-              <HistoryOutlined style={{ fontSize: 22 }} />
+        title: 'Action',
+        render: row => (
+          <Tooltip title="Appointments">
+            <Button type="link" onClick={() => this.showSession(row.id)}>
+              <CalendarOutlined style={{ fontSize: 22 }} />
             </Button>
-          </span>
+          </Tooltip>
         ),
       },
     ]

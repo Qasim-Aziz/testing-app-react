@@ -140,7 +140,6 @@ function Assessment() {
       },
     },
   ]
-  console.log(tableData)
 
   return (
     <div className="profileTab-container">

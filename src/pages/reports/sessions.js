@@ -98,6 +98,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
           if (itemExist) {
             filterData[itemIdx] = {
               ...filterData[itemIdx],
+              key: filterData[itemIdx].id,
               behCount: filterData[itemIdx].behCount + item.behCount,
               behaviour:
                 filterData[itemIdx].behaviour === 'No behaviour performed!'
@@ -484,21 +485,43 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
       ),
     },
     {
-      title: 'Behavior count',
+      title: 'Behavior',
       dataIndex: 'behaviour',
       render: text => {
-        const a = text.split(',')
-        a.map(item => console.log(item.split(' ')))
+        if (text === null || text === '' || text === 'null' || text === 'No behaviour performed!') {
+          return 'None'
+        }
+        const behaviorItems = text.split(',')
+        const tt = []
+        behaviorItems.map(item => {
+          const b = item.split(':')
+          tt.push({ behaviour: b[0], duration: Number(Number(b[1]) / 1000).toFixed(0) })
+        })
+        return (
+          <div>
+            {tt.map(item => (
+              <div key={Math.random()}>
+                {item.behaviour}: {item.duration}
+              </div>
+            ))}
+          </div>
+        )
       },
     },
     {
-      title: 'Mand Count',
+      title: 'Mand',
       dataIndex: 'mand',
+      render: text => {
+        if (text === null || text === '' || text === 'null' || text === 'No mand performed!') {
+          return 'None'
+        }
+
+        return <span>{text}</span>
+      },
     },
     {
       title: 'Toilet Count',
-      dataIndex: 'toilet',
-      render: (text, row) => <span>{row.toilet}</span>,
+      dataIndex: 'toiletCount',
       align: 'center',
       width: 100,
     },
@@ -576,6 +599,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
           dataSource={tableData}
           loading={loading}
           bordered
+          rowKey="id"
           scroll={{ x: 1950 }}
           pagination={{
             defaultPageSize: 10,

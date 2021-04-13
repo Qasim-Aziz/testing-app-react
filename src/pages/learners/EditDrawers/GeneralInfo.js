@@ -157,7 +157,7 @@ function GenDetails(props) {
 
         <Form.Item label="Mobile no" style={itemStyle}>
           {form.getFieldDecorator('mobileno', {
-            rules: [{ required: true, message: 'Please provide Mobile No!' }],
+            rules: [{ required: false, message: 'Please provide Mobile No!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="DOB" style={itemStyle}>
