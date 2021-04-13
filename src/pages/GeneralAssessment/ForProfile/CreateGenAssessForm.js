@@ -141,7 +141,6 @@ const CreateGenAssessForm = ({
         if (!hasSubmodules) {
           tempSubmodules = []
         }
-        console.log(values, hasSubmodules, tempSubmodules, pk, 'update')
         updateGenAssess({
           variables: {
             pk,

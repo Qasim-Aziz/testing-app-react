@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 /* eslint-disable array-callback-return */
 /* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable react/jsx-indent */
@@ -76,6 +77,24 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     },
   })
 
+  const getBehaviourList = behaviour => {
+    if (behaviour === 'No behaviour performed!') {
+      return []
+    }
+    const behaviorItems = behaviour.split(',')
+    const res = []
+    behaviorItems.map(item => {
+      const b = item.split(':')
+      if (!isNaN(Number(b[1]) / 1000))
+        res.push({
+          behaviour: b[0].trim(),
+          duration: Number(Number(Number(b[1]) / 1000).toFixed(0)),
+        })
+    })
+
+    return res
+  }
+
   const [
     getFreDisTarget,
     { data: freDisData, error: freDisError, loading: freDisLoading },
@@ -112,7 +131,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
                 filterData[itemIdx].mand === 'No mand performed!'
                   ? item.mand
                   : filterData[itemIdx].mand +
-                    (item.mand === 'No mand performed!' ? '' : item.mand),
+                    (item.mand === 'No mand performed!' ? '' : `, ${item.mand}`),
               peakCorrect: filterData[itemIdx].peakCorrect + item.peakCorrect,
               peakError: filterData[itemIdx].peakError + item.peakError,
               peakPrompt: filterData[itemIdx].peakPrompt + item.peakPrompt,
@@ -495,7 +514,8 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
         const tt = []
         behaviorItems.map(item => {
           const b = item.split(':')
-          tt.push({ behaviour: b[0], duration: Number(Number(b[1]) / 1000).toFixed(0) })
+          if (!isNaN(Number(Number(b[1]) / 1000).toFixed(0)))
+            tt.push({ behaviour: b[0], duration: Number(Number(b[1]) / 1000).toFixed(0) })
         })
         return (
           <div>
