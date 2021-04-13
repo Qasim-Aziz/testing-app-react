@@ -52,7 +52,7 @@ export async function createAssessment(payload) {
       mutation: gql`mutation CreateAssessment (
         $studentId: ID!
         $title: String!
-        $note: String!
+        $note: String
         $date: Date!
       ){
         IISACreateAssessment(input:{
