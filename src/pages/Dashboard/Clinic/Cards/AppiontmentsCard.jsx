@@ -49,7 +49,7 @@ const SingleRecord = ({ title, studentName, startDate, endDate }) => {
 }
 
 const AppiontmentsCard = ({ style, status }) => {
-  const { loading, data, error } = useQuery(APPIONTMENTS, {fetchPolicy: 'network-only'})
+  const { loading, data, error } = useQuery(APPIONTMENTS, { fetchPolicy: 'network-only' })
 
   const filtered =
     data &&
@@ -57,7 +57,7 @@ const AppiontmentsCard = ({ style, status }) => {
       return moment(node.start).format('YYYY-MM-DD') === moment().format('YYYY-MM-DD') ? node : null
     })
 
-  console.log("Error ========> ", error)
+  console.log('Error ========> ', error)
 
   return (
     <div>

@@ -18,10 +18,10 @@
 .shadowbox {
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.12) !important;
   .card-column {
-    background-color: #dbe2ef;
+    background-color: $palete-light-blue;
   }
   .ant-tabs-content.ant-tabs-content-animated.ant-tabs-left-content {
-    background-color: #edf1f7;
+    background-color: $palete-light;
   }
 }
 
@@ -72,7 +72,7 @@
 button {
   border-radius: 20px;
   border: none;
-  color: white;
+  color: $white;
   text-align: center;
   text-decoration: none;
   display: inline-block;
@@ -113,13 +113,13 @@ button {
     transition: 0.1s ease-in-out;
     font-size: 2rem;
     font-weight: bold;
-    border-color: #fff;
-    color: #fff;
+    border-color: $white;
+    color: $white;
     text-align: center;
 
     &:hover {
-      border-color: #fff;
-      color: #fff;
+      border-color: $white;
+      color: $white;
     }
   }
 }
@@ -132,7 +132,7 @@ button {
     padding: 10px;
     font-size: 14px;
     font-weight: bold;
-    color: #112d4e;
+    color: $palete-dark-blue;
   }
 
   .profile-avtar-title-block {
@@ -203,34 +203,34 @@ button {
 .success-badge {
   .ant-badge-count {
     background-color: #282;
-    color: #fff;
+    color: $white;
   }
 }
 
 .danger-badge {
   .ant-badge-count {
     background-color: #f00;
-    color: #fff;
+    color: $white;
   }
 }
 
 .warning-badge {
   .ant-badge-count {
     background-color: #faad14;
-    color: #fff;
+    color: $white;
   }
 }
 
 .processing-badge {
   .ant-badge-count {
     background-color: #1890ff;
-    color: #fff;
+    color: $white;
   }
 }
 
 .mainTabPanel {
   .ant-tabs-nav-wrap {
-    background-color: #fff;
+    background-color: $white;
   }
 }
 
@@ -322,17 +322,17 @@ button {
 }
 
 .profileTabs .ant-tabs-tab-active {
-  color: #112d4e !important;
-  background-color: #dbe2ef !important;
+  color: $palete-dark-blue !important;
+  background-color: $palete-light-blue !important;
 }
 
 .profileTabs .ant-tabs-ink-bar {
-  background: #112d4e;
+  background: $palete-dark-blue;
   pointer-events: none;
 }
 
 .Assessment-container > table {
-  background-color: white;
+  background-color: $white;
 }
 
 // .RightSidePanel-nav .ant-tabs-nav-scroll {
@@ -340,12 +340,6 @@ button {
 // }
 
 .RightSidePanel-nav .ant-tabs-tab-active {
-  color: #112d4e;
+  color: $palete-dark-blue;
   font-weight: bolder;
-}
-
-
-
-.shadowbox .card-column {
-  background-color: $palete-light;
 }

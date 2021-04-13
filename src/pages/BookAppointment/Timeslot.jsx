@@ -50,11 +50,12 @@ const Timeslot = ({
       console.log(createAppointmentError)
       notification.error({
         message: 'Error! please check your timings or you already have appointment',
-        // message: createAppointmentError[0]?.message, 
-        duration: 10
+        // message: createAppointmentError[0]?.message,
+        duration: 10,
       })
     }
   }, [createAppointmentError])
+
 
   const getDateTime = momentObj => momentObj.local().utc().format('YYYY-MM-DDTHH:mm:ssZ')
 
@@ -180,20 +181,19 @@ const Timeslot = ({
           visible={isPopoverVisible}
           onVisibleChange={setPopoverVisible}
         >
-
           <Button size="large" style={{ width: '80%' }} disabled={isCreateAppointmentLoading}>
             {selectedTimeSlot}
           </Button>
-
         </Popover>
-      ) :
-
-        <Button size="large" style={{ width: '80%', backgroundColor: COLORS.palleteLightBlue }} disabled>
+      ) : (
+        <Button
+          size="large"
+          style={{ width: '80%', backgroundColor: COLORS.palleteLightBlue }}
+          disabled
+        >
           {selectedTimeSlot}
         </Button>
-
-      }
-
+      )}
     </>
   )
 }

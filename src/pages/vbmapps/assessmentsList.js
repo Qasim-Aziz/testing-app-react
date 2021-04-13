@@ -49,7 +49,7 @@ class AssessmentsList extends Component {
       master: '',
       studentID: JSON.parse(localStorage.getItem('studentId')),
       deleteLoading: false,
-      loading: false
+      loading: false,
     }
   }
 
@@ -95,13 +95,13 @@ class AssessmentsList extends Component {
           }
         }
         `,
-        fetchPolicy: 'network-only'
+        fetchPolicy: 'network-only',
       })
       .then(result => {
         if (result.data.vbmappGetAssessments) {
           this.setState({
             assessments: result.data.vbmappGetAssessments.edges,
-            loading: false
+            loading: false,
           })
         }
         if (result.data.vbmappGetAssessments.edges.length > 0) {
@@ -140,7 +140,7 @@ class AssessmentsList extends Component {
       })
   }
 
-  handleKeyDown = () => { }
+  handleKeyDown = () => {}
 
   deleteAssessment = id => {
     this.setState({ deleteLoading: true })
@@ -523,18 +523,20 @@ class AssessmentsList extends Component {
       <Layout>
         <Content>
           <HeaderComponent
-            leftContent={user?.role !== 'parents' && (
-              <Button onClick={this.showDrawerFilter} size="large">
-                <FilterOutlined />
-              </Button>
-            )}
+            leftContent={
+              user?.role !== 'parents' && (
+                <Button onClick={this.showDrawerFilter} size="large">
+                  <FilterOutlined />
+                </Button>
+              )
+            }
             centerContent={
               <PageHeader
                 pageTitle={`VB-MAPP Assessment ${
                   this.state.selectedAssignment?.node?.testNo
                     ? this.state.selectedAssignment?.node?.testNo
                     : ''
-                  }`}
+                }`}
                 noLine={true}
               />
             }
@@ -542,7 +544,10 @@ class AssessmentsList extends Component {
               <Link
                 to={{
                   pathname: '/therapy/vbmapps/new',
-                  test: assessments.length > 0 ? assessments[assessments.length - 1].node.testNo + 1 : 1,
+                  test:
+                    assessments.length > 0
+                      ? assessments[assessments.length - 1].node.testNo + 1
+                      : 1,
                   student: studentID,
                 }}
               >
@@ -560,7 +565,6 @@ class AssessmentsList extends Component {
                     flex: 1,
                     // margin: '20px 10px',
                     // marginTop: 0,
-                    
                   }}
                 >
                   <p style={{ marginBottom: 0, textAlign: 'center' }}>New Assessment</p>
@@ -568,13 +572,13 @@ class AssessmentsList extends Component {
               </Link>
             }
           />
-          {loading === true ?
+          {loading === true ? (
             <>
               <LoadingComponent />
             </>
-            :
+          ) : (
             <>
-              {assessments.length > 0 ?
+              {assessments.length > 0 ? (
                 <Row gutter={[0, 0]} style={{ height: 'calc(100vh + 100px' }}>
                   <Col sm={6}>
                     <div style={{ ...leftDivStyle, height: 'calc(100vh + 100px' }}>
@@ -605,8 +609,7 @@ class AssessmentsList extends Component {
                     </div>
                   </Col>
                 </Row>
-                :
-
+              ) : (
                 <Link
                   to={{
                     pathname: '/therapy/vbmapps/new',
@@ -620,22 +623,22 @@ class AssessmentsList extends Component {
                       marginTop: 100,
                       width: 450,
                       color: '#000',
-                      cursor: 'pointer',                      
+                      cursor: 'pointer',
                       padding: '10px 20px',
                       borderRadius: 4,
                       marginLeft: 'auto',
                       marginRight: 'auto',
                       textAlign: 'center',
-                      boxShadow: '0px 0px 1px rgba(0, 0, 0, 0.08), 0px 0px 2px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(0, 0, 0, 0.08)',
+                      boxShadow:
+                        '0px 0px 1px rgba(0, 0, 0, 0.08), 0px 0px 2px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(0, 0, 0, 0.08)',
                     }}
                   >
                     Create first Assessment
                   </div>
                 </Link>
-              }
-
+              )}
             </>
-          }
+          )}
           <Drawer
             visible={this.state.target}
             onClose={() => this.setState({ target: null })}

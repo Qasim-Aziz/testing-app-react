@@ -23,7 +23,7 @@ import { times, remove, update } from 'ramda'
 import ReminderForm from 'components/tasks/ReminderForm'
 import { PlusOutlined, MinusOutlined } from '@ant-design/icons'
 import { useHistory } from 'react-router-dom'
-import { SUBMITT_BUTTON, CANCEL_BUTTON, FORM } from '../../assets/styles/globalStyles'
+import { SUBMITT_BUTTON, CANCEL_BUTTON, FORM, COLORS } from '../../assets/styles/globalStyles'
 
 const { Text, Title } = Typography
 const { TextArea } = Input
@@ -477,7 +477,7 @@ const BasicInformationForm = ({
               marginTop: 10,
             }}
           >
-            <Text style={{ color: '#000', fontSize: 16 }}>Add another reminder</Text>
+            <Text style={{ color: COLORS.blackLighten, fontSize: 16 }}>Add another reminder</Text>
             <Button
               style={{
                 height: 40,
@@ -504,7 +504,7 @@ const BasicInformationForm = ({
           paddingBottom: 20,
         }}
       >
-        <Text style={{ color: '#000', fontSize: 16 }}>Task Completion</Text>
+        <Text style={{ color: COLORS.blackLighten, fontSize: 16 }}>Task Completion</Text>
         <div style={{ position: 'absolute', right: 0, paddingRight: 80 }}>
           <Button
             onClick={() => {
@@ -517,7 +517,9 @@ const BasicInformationForm = ({
           >
             <MinusOutlined style={{ fontSize: 24, marginTop: 2 }} />
           </Button>
-          <Text style={{ color: '#000', fontSize: 24, padding: 10 }}>{taskCompletionCount}</Text>
+          <Text style={{ color: COLORS.blackLighten, fontSize: 24, padding: 10 }}>
+            {taskCompletionCount}
+          </Text>
           <Button
             onClick={() => {
               setTaskCompletionCount(taskCompletionCount + 1)

@@ -11,6 +11,7 @@ import Authorize from 'components/LayoutComponents/Authorize'
 import { APPOINTMENTS_FOR_RANGE } from './query'
 import SessionFeedbackForm from '../sessionFeedback'
 import { dateTimeToDate } from '../../utilities'
+import { COLORS, DRAWER } from '../../assets/styles/globalStyles'
 
 export default () => {
   let loadAppointmentCallback = null
@@ -128,7 +129,7 @@ export default () => {
             // justifyContent: 'space-between',
             alignItems: 'center',
             padding: '2px 10px',
-            backgroundColor: '#FFF',
+            backgroundColor: COLORS.white,
             boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
           }}
         >
@@ -140,7 +141,7 @@ export default () => {
               justifyContent: 'center',
             }}
           >
-            <span style={{ fontSize: '25px', color: '#000' }}>Appointments</span>
+            <span style={{ fontSize: '25px', color: COLORS.blackLighten }}>Appointments</span>
           </div>
           <div style={{ padding: '5px 0px', flex: 1 }}>
             <Button onClick={createAppointment} type="primary">
@@ -184,7 +185,7 @@ export default () => {
       <Drawer
         title="Give Session Feedback"
         placement="right"
-        width="500px"
+        width={DRAWER.widthL1}
         closable
         onClose={() => setFeedbackDrawer(false)}
         visible={feedbackDrawer}
