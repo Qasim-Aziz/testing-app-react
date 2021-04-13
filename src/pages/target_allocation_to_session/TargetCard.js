@@ -4,9 +4,9 @@ import { Button, Drawer, Input, Select, Typography, Popconfirm, Badge } from 'an
 import { useDispatch } from 'react-redux'
 import style from './style.module.scss'
 
-const {Text, Title} = Typography
+const { Text, Title } = Typography
 
-const TargetCard = ({ id = '', text = '', showDelete = false, onDelete, onEditTarget, srNo, node, sessionId = '', showAllocation = false }) => {
+const TargetCard = ({ id = '', text = '', showDelete = false, onDelete, onEditTarget, srNo, node, sessionId = '', showAllocation = false, showEdit = false }) => {
   const cardStyle = {
     backgroundColor: 'white',
     borderRadius: '10px',
@@ -61,8 +61,8 @@ const TargetCard = ({ id = '', text = '', showDelete = false, onDelete, onEditTa
     console.log("edit target targetNode ===> ", targetNode)
   }
 
-  const allocatedTagetBadgeStyle = {backgroundColor: '#52c41a'}
-  const notAllocatedTagetBadgeStyle = {backgroundColor: '#fff', color: '#999', boxShadow: '0 0 0 1px #d9d9d9 inset'}
+  const allocatedTagetBadgeStyle = { backgroundColor: '#52c41a' }
+  const notAllocatedTagetBadgeStyle = { backgroundColor: '#fff', color: '#999', boxShadow: '0 0 0 1px #d9d9d9 inset' }
 
   return (
     <div className={id} id={id} style={cardStyle} key={id}>
@@ -70,9 +70,9 @@ const TargetCard = ({ id = '', text = '', showDelete = false, onDelete, onEditTa
         <div style={closeBtnStyle}>
           {/* {node.targetStatus.statusName} &nbsp;  */}
           <Popconfirm title="Are you sure?" onConfirm={() => deleteTargetFromSession(node.id)}>
-            <Button style={{padding:0}} type="link"><CloseOutlined /></Button>
+            <Button style={{ padding: 0 }} type="link"><CloseOutlined /></Button>
           </Popconfirm>
-          
+
           {/* <CloseCircleOutlined onClick={onDelete} /> */}
           {/* {srNo} */}
         </div>
@@ -86,15 +86,18 @@ const TargetCard = ({ id = '', text = '', showDelete = false, onDelete, onEditTa
           <br />
         </div>
       </div>
-      
+
       <div style={closeBtnStyle2}>
         {node.targetStatus.statusName} &nbsp;
         #{srNo}
       </div>
 
-      <div style={closeBtnStyle3}>
-        <Badge count="Edit" onClick={() => onEditTarget()} style={notAllocatedTagetBadgeStyle} />
-      </div>
+      {showEdit && (
+        <div style={closeBtnStyle3}>
+          <Badge count="Edit" onClick={() => onEditTarget()} style={notAllocatedTagetBadgeStyle} />
+        </div>
+
+      )}
 
       {showAllocation && (
         <>
@@ -104,8 +107,8 @@ const TargetCard = ({ id = '', text = '', showDelete = false, onDelete, onEditTa
           <Badge count='D' style={node.default ? allocatedTagetBadgeStyle : notAllocatedTagetBadgeStyle} />
         </>
       )}
-      
-      
+
+
     </div>
   )
 }
