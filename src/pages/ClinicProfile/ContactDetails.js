@@ -135,7 +135,7 @@ const ContactDetails = ({ form }) => {
                 </Form.Item>
               </div>
 
-              <Form.Item style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Form.Item style={{ display: 'flex' }}>
                 <Button type="primary" htmlType="submit" loading={updateDetailsLoading}>
                   Save
                 </Button>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Select, DatePicker, Form, Button, Table, Drawer, notification } from 'antd'
 import moment from 'moment'
+import { useParams } from 'react-router-dom'
 import { useQuery, useMutation } from '@apollo/react-hooks'
 import { CloudDownloadOutlined } from '@ant-design/icons'
 import * as FileSaver from 'file-saver'
@@ -27,6 +28,8 @@ const AppointmentReport = () => {
   const [appointmentList, setAppointmentList] = useState([])
   const [feedbackDrawer, setFeedbackDrawer] = useState(false)
   const [selectedAppointmentId, setSelectedAppointmentId] = useState()
+  const gff = useParams()
+  console.log(gff)
 
   const { data: allLearners, loading: isLearnerLoading } = useQuery(GET_LEARNERS)
   const { data: allTherapist, loading: isTherapistLoading } = useQuery(GET_THERAPIST)
@@ -47,6 +50,14 @@ const AppointmentReport = () => {
   ] = useMutation(UPDATE_APPOINTMENT_STATUS)
 
   const dispatch = useDispatch()
+
+  useEffect(() => {
+    const therapistId = localStorage.getItem('current_therapist')
+    if (therapistId !== null && therapistId !== undefined) {
+      setSelectedTherapist(JSON.parse(therapistId))
+      localStorage.removeItem('current_therapist')
+    }
+  }, [])
 
   useEffect(() => {
     if (allAppointment) {
@@ -211,7 +222,7 @@ const AppointmentReport = () => {
             ))}
           </Select>
         </Form.Item>
-        <Form.Item label="Thetapist">
+        <Form.Item label="Therapist">
           <Select
             placeholder="Select Therapist"
             loading={isTherapistLoading}
@@ -242,7 +253,7 @@ const AppointmentReport = () => {
         </Form.Item>
       </Form>
 
-      <div style={{ padding: '0px 0 10px 10px' }}>
+      <div style={{ padding: '10px 0 10px 10px' }}>
         <Table
           loading={isAppointmentLoading}
           rowKey={record => record.id}

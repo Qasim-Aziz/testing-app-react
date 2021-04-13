@@ -260,7 +260,7 @@ export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpda
         </Form.Item>
         <Form.Item label="Module" style={ItemStyle} className="Form-field-container">
           {form.getFieldDecorator('module', {
-            initialValue: data.ticket.module.MenuName,
+            initialValue: data.ticket?.module?.id,
             rules: [{ required: true, message: 'Please select one!' }],
           })(
             <Select
@@ -281,7 +281,9 @@ export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpda
         </Form.Item>
         <Form.Item label="Sub Module" style={ItemStyle} className="Form-field-container">
           {form.getFieldDecorator('submodule', {
-            initialValue: data.ticket.submodule.MenuName,
+
+            initialValue: data.ticket.submodule?.id,
+
             rules: [{ message: 'Please select a sub module!' }],
           })(
             <Select
@@ -308,7 +310,7 @@ export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpda
         </Form.Item>
         <Form.Item label="Assign" style={ItemStyle} className="Form-field-container">
           {form.getFieldDecorator('assign', {
-            initialValue: data.ticket.assignTo.id,
+            initialValue: data.ticket.assignTo?.id,
             rules: [{ required: true, message: 'Please select one!' }],
           })(
             <Select placeholder="Select one" size="large" loading={ticketAssignLoading}>
@@ -322,7 +324,7 @@ export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpda
         </Form.Item>
         <Form.Item label="Priority" style={ItemStyle} className="Form-field-container">
           {form.getFieldDecorator('priority', {
-            initialValue: data.ticket.priority.id,
+            initialValue: data.ticket.priority?.id,
             rules: [{ required: true, message: 'Please select a priority!' }],
           })(
             <Select placeholder="Select priority" size="large" loading={ticketPriorityLoading}>
@@ -336,7 +338,7 @@ export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpda
         </Form.Item>
         <Form.Item label="Service Issue" style={ItemStyle} className="Form-field-container">
           {form.getFieldDecorator('service', {
-            initialValue: data.ticket.service.id,
+            initialValue: data.ticket.service?.id,
             rules: [{ required: true, message: 'Please select a service!' }],
           })(
             <Select
@@ -354,7 +356,7 @@ export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpda
         </Form.Item>
         <Form.Item label="Status" style={ItemStyle} className="Form-field-container">
           {form.getFieldDecorator('status', {
-            initialValue: data.ticket.status.id,
+            initialValue: data.ticket?.status?.id,
             rules: [{ required: true, message: 'Please select a status!' }],
           })(
             <Select placeholder="Select a status" size="large" loading={ticketStatusLoading}>
