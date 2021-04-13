@@ -33,6 +33,7 @@ import EditInvoice from 'components/invoice/EditInvoice'
 import LoadingComponent from '../../staffProfile/LoadingComponent'
 import PreviewInvoice from '../../../components/invoice/PreviewInvoice'
 import { GET_INVOICES, DELETE_INVOICE } from './Queries'
+import './template.scss'
 
 const dateFormate = 'YYYY-MM-DD'
 
@@ -44,11 +45,6 @@ export default () => {
   const [data, setData] = useState()
   const [deleteInvoiceId, setDeleteInvoiceId] = useState()
   const [editInvoiceId, setEditInvoiceId] = useState()
-  const [selectedRowKeys, setSelectedRowKeys] = useState([])
-  const [selectedClinicsName, setSelectedClinicsName] = useState(null)
-  const [invoiceType, setInvoiceType] = useState('advance')
-  const [createInvoicesDrawer, setCreateInvoicesDrawer] = useState(false)
-  const [payreminderDrawer, setPayreminderDrawer] = useState(false)
 
   // invoice filer
   const [from, setFrom] = useState()
@@ -370,30 +366,37 @@ export default () => {
           onChange={newDate => setTo(newDate)}
         />
       </div>
-      {filterStatus || filterCustomer || from || to ? (
-        <Button
-          type="link"
-          style={{ marginLeft: '10px', color: '#FEBB27' }}
-          onClick={() => {
-            setFilterStatus('')
-            setFilterCustomer('')
-            setFrom()
-            setTo()
-          }}
-          size="small"
-        >
-          Clear Filters
-          <CloseCircleOutlined />
-        </Button>
-      ) : null}
+      <div style={{ marginLeft: 'auto' }}>
+        {filterStatus || filterCustomer || from || to ? (
+          <Button
+            type="link"
+            style={{ marginLeft: '10px', color: '#FEBB27' }}
+            onClick={() => {
+              setFilterStatus('')
+              setFilterCustomer('')
+              setFrom()
+              setTo()
+            }}
+            size="small"
+          >
+            Clear Filters
+            <CloseCircleOutlined />
+          </Button>
+        ) : null}
+        <Dropdown overlay={menu} trigger={['click']}>
+          <Button style={{ marginRight: 10 }} type="link" size="large">
+            <CloudDownloadOutlined />
+          </Button>
+        </Dropdown>
+      </div>
     </div>
   )
 
   return (
-    <div>
+    <div style={{ marginTop: 10 }}>
       <Helmet title="Dashboard Alpha" />
 
-      <div
+      {/* <div
         style={{
           display: 'flex',
           flexDirection: '',
@@ -403,18 +406,14 @@ export default () => {
           marginBottom: 10,
         }}
       >
-        <Dropdown overlay={menu} trigger={['click']}>
-          <Button style={{ marginRight: 10 }} type="link" size="large">
-            <CloudDownloadOutlined />
-          </Button>
-        </Dropdown>
+       
         <Button type="primary" onClick={() => setCreateInvoice(true)}>
           ADD INVOICE
           <PlusOutlined />
         </Button>
-      </div>
+      </div> */}
 
-      <div>
+      <div className="table-outer-border">
         <Table
           columns={columns}
           dataSource={filteredList}

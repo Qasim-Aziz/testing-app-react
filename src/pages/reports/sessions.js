@@ -26,6 +26,7 @@ import { LineChartOutlined } from '@ant-design/icons'
 import { FaDownload } from 'react-icons/fa'
 import moment from 'moment'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
+import SessionReportPdf from './sessionReportPdf'
 import { SESSIONS_SUMMERY, FREQUENCY_DIS_TARGET } from './query'
 import './form.scss'
 import './table.scss'
@@ -55,6 +56,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
   const [tableData, setTableData] = useState([])
   const [barGraphData, setBarGraphData] = useState([])
   const [currentRow, setCurrentRow] = useState(null)
+  const [reportPdfDrawer, setReportPdfDrawer] = useState(false)
 
   function compare(a, b) {
     if (a.sessionDate < b.sessionDate) {
@@ -146,13 +148,11 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
           }
         })
       }
-      console.log(filterData, 'filtererer')
       filterData.sort(compare)
       setTableData(filterData)
     }
   }, [data, session])
 
-  console.log(tableData, 'table')
   useEffect(() => {
     if (freDisData) {
       const newGraphData = []
@@ -566,6 +566,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
           </Dropdown>
         </div>
       </div>
+      {/* <Button onClick={() => setReportPdfDrawer(true)}>Click me</Button> */}
       <div style={{ margin: '10px 0 10px 10px' }} className="session-table">
         <Table
           columns={columns}
@@ -581,6 +582,16 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
           }}
         />
       </div>
+
+      <Drawer
+        closable
+        width="100vw"
+        title="Report Pdf"
+        onClose={() => setReportPdfDrawer(false)}
+        visible={reportPdfDrawer}
+      >
+        <SessionReportPdf />
+      </Drawer>
 
       <Drawer
         visible={lineDrawer}

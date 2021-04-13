@@ -32,7 +32,7 @@ const Timeslot = ({
   ] = useMutation(CREATE_APPOINTMENT)
 
   useEffect(() => {
-    if (createAppointmentData) {
+    if (createAppointmentData && createAppointmentData.CreateAppointment) {
       notification.success({ message: 'Appointment created successfully.' })
       if (refetchAvailableSlotTime)
         refetchAvailableSlotTime({
@@ -45,14 +45,25 @@ const Timeslot = ({
   }, [createAppointmentData])
 
   useEffect(() => {
-    if (createAppointmentError)
-      notification.error({ message: 'Error! please check your timings or you already have appointment' })
+    if (createAppointmentError) {
+      console.log(createAppointmentError)
+      notification.error({
+        message: 'Error! please check your timings or you already have appointment',
+        // message: createAppointmentError[0]?.message,
+        duration: 10,
+      })
+    }
   }, [createAppointmentError])
 
-  const getDateTime = momentObj => momentObj.format('YYYY-MM-DDTHH:mm:ssZ')
+  const getDateTime = momentObj =>
+    momentObj
+      .local()
+      .utc()
+      .format('YYYY-MM-DDTHH:mm:ssZ')
 
   const bookAppointment = e => {
     e.preventDefault()
+    console.log('slot time asdhahsjdhas =======> ', getDateTime(selectedDate))
     createAppointment({
       variables: {
         title: titleText,
@@ -66,7 +77,7 @@ const Timeslot = ({
         slotTime: selectedTimeSlot,
         appointmentStatus: pendingStatusId,
       },
-      errorPolicy: 'all'
+      errorPolicy: 'all',
     })
     setPopoverVisible(false)
   }
@@ -158,20 +169,19 @@ const Timeslot = ({
           visible={isPopoverVisible}
           onVisibleChange={setPopoverVisible}
         >
-
           <Button size="large" style={{ width: '80%' }} disabled={isCreateAppointmentLoading}>
             {selectedTimeSlot}
           </Button>
-
         </Popover>
-      ) :
-
-        <Button size="large" style={{ width: '80%', backgroundColor: COLORS.palleteLightBlue }} disabled>
+      ) : (
+        <Button
+          size="large"
+          style={{ width: '80%', backgroundColor: COLORS.palleteLightBlue }}
+          disabled
+        >
           {selectedTimeSlot}
         </Button>
-
-      }
-
+      )}
     </>
   )
 }

@@ -239,8 +239,6 @@ class Screeing extends React.Component {
   }
 
   render() {
-    console.log('hereeee')
-    console.log(this.props)
     const {
       student: { StudentName },
       iisaassessment: {
@@ -265,6 +263,8 @@ class Screeing extends React.Component {
     if (AssessmentLoading) {
       return <LoadingComponent />
     }
+
+    console.log(IISAQuestionsListObject, IISADomains, 'iisa domain')
 
     return (
       <>

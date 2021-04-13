@@ -32,7 +32,7 @@ function AdvanceInvoiceForm({
             createAdvanceInvoice({
               variables: {
                 month: values.month?.format('MMMM'),
-                clinics: selectedRowKeys,
+                clinic: selectedRowKeys,
                 cgst: values.cgst,
                 sgst: values.sgst,
                 discount: values.discount,
@@ -110,8 +110,8 @@ function AdvanceInvoiceForm({
             rules: [{ required: true, message: 'Please provide SGST!' }],
           })(<Input />)}
         </Form.Item>
-        <Form.Item label="Tax">
-          {form.getFieldDecorator('tax', {
+        <Form.Item label="Discount">
+          {form.getFieldDecorator('discount', {
             rules: [{ required: true, message: 'Please provide Tax!' }],
           })(<Input />)}
         </Form.Item>

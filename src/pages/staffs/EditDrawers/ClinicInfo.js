@@ -116,12 +116,12 @@ function ClinicInfo(props) {
         </Form.Item>
         <Form.Item label="Work Experience" style={itemStyle}>
           {form.getFieldDecorator('workExp', {
-            rules: [{ required: false, message: 'Please provide ClientId!' }],
+            rules: [{ required: false, message: 'Please provide work experience' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="Salutation" style={itemStyle}>
           {form.getFieldDecorator('salutation', {
-            rules: [{ required: false, message: 'Please provide ClientId!' }],
+            rules: [{ required: false, message: 'Please provide salutation' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <div style={{ display: 'flex', justifyContent: 'center' }}>

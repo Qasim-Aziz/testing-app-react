@@ -15,7 +15,7 @@ const STUDNET_INFO = gql`
   }
 `
 
-export default ({ pageTitle, style, lastAssessment = false, questions }) => {
+export default ({ pageTitle, style, lastAssessment = false, questions, noLine = false }) => {
   const { data: studentData } = useQuery(STUDNET_INFO, {
     variables: {
       student: localStorage.getItem('studentId'),
@@ -38,7 +38,7 @@ export default ({ pageTitle, style, lastAssessment = false, questions }) => {
         {lastAssessment && <LastAssessmentResult questions={questions} />}
         {/* <Text style={{ fontSize: 20, color: '#000' }}>{pageTitle}</Text> */}
       </div>
-      <hr />
+      {!noLine && <hr />}
     </>
   )
 }
