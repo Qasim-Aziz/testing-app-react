@@ -47,7 +47,7 @@ function Assessment() {
         for (let i = 0; i < item.node.submodules?.edges.length; i++) {
           tempSubmodules.push(item.node.submodules.edges[i].node)
         }
-        temp.push({ ...item.node, submodules: tempSubmodules })
+        temp.push({ ...item.node, key: item.node.id, submodules: tempSubmodules })
       })
       setTableData(temp)
     }
@@ -140,11 +140,28 @@ function Assessment() {
       },
     },
   ]
+  console.log(tableData)
 
   return (
     <div className="profileTab-container">
       <div className="profileTab-heading">
-        <p>Assessment</p>
+        <p>Record Assessment Score</p>
+      </div>
+      <div>
+        <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 5 }}>
+          This Section allows you to digitize and record assessments scores for any paper-based
+          assessments with three simple steps
+        </div>
+        <div style={{ marginBottom: 5 }}>
+          <b>1.</b> Create Main assessments in this section.
+        </div>
+        <div style={{ marginBottom: 5 }}>
+          <b>2.</b> Create Sub assessments in this section.
+        </div>
+        <div style={{ marginBottom: 5 }}>
+          <b>3.</b> Record assessment scores for each child from the Main menu -
+          <b> Intervention &gt; Assessment &gt; Record Assessment score</b>.
+        </div>
       </div>
       <Content
         style={{

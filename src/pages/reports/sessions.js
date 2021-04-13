@@ -76,8 +76,6 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     },
   })
 
-  console.log(data, 'dt')
-
   const [
     getFreDisTarget,
     { data: freDisData, error: freDisError, loading: freDisLoading },
@@ -85,7 +83,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
   useEffect(() => {
     if (data && data.sessionSummary && session) {
       let filterData = []
-
+      console.log(data, 'data')
       if (session === 'All') {
         data.sessionSummary.map(item => {
           let itemExist = false
@@ -488,6 +486,10 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     {
       title: 'Behavior count',
       dataIndex: 'behaviour',
+      render: text => {
+        const a = text.split(',')
+        a.map(item => console.log(item.split(' ')))
+      },
     },
     {
       title: 'Mand Count',
@@ -525,6 +527,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
       </Menu.Item>
     </Menu>
   )
+  console.log(tableData)
 
   return (
     <div>

@@ -255,6 +255,7 @@ class TharepistStudentsDailyVitals extends PureComponent {
       user: { role },
     } = this.props
 
+    console.log(stateData, checkStudnetOnLocalStorage, 'local storage')
     return (
       <Authorize roles={['therapist', 'school_admin', 'parents']} redirect to="/">
         <Helmet title="Daily Vitals" />

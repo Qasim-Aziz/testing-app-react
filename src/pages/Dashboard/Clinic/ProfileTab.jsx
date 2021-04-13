@@ -95,7 +95,7 @@ const ProfileTab = ({ activeProfileTab, onProfileTabChange }) => {
     },
     {
       key: 'assessment',
-      title: 'Assessment',
+      title: 'Record Assessment Score',
       component: <Assessment />,
       iconName: <ExperimentOutlined />,
     },
