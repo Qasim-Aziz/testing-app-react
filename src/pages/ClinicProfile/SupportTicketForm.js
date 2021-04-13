@@ -14,7 +14,7 @@ const { Option } = Select
 const CREATE_TICKET = gql`
   mutation createTicket(
     $issue: String!
-    $description: String
+    $description: String!
     $priority: ID!
     $service: ID!
     $assign: ID!
