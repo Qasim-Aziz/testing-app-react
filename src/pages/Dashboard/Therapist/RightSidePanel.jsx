@@ -3,7 +3,7 @@ import { Tabs } from 'antd'
 import { COLORS } from 'assets/styles/globalStyles'
 import DashboardTab from './DashboardTab'
 import ProfileTab from './ProfileTab'
-import { COLORS } from '../../../assets/styles/globalStyles'
+// import { COLORS } from '../../../assets/styles/globalStyles'
 
 const { TabPane } = Tabs
 
@@ -14,9 +14,7 @@ const RightSidePanel = ({
   onActiveProfileTabChange,
 }) => (
   <div
-
     style={{ width: '100%', backgroundColor: COLORS.palleteLight, height: '100%' }}
-
     className="RightSidePanel-nav"
   >
     <Tabs
