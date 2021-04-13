@@ -158,17 +158,17 @@ function GenDetails(props) {
 
         <Form.Item label="Mobile no" style={itemStyle}>
           {form.getFieldDecorator('mobile', {
-            rules: [{ required: true, message: 'Please provide Mobile No!' }],
+            rules: [{ required: false, message: 'Please provide Mobile No!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="DOB" style={itemStyle}>
           {form.getFieldDecorator('dob', {
-            rules: [{ required: true, message: 'Please provide Date of Birth!' }],
+            rules: [{ required: false, message: 'Please provide Date of Birth!' }],
           })(<DatePicker style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="Gender" style={itemStyle}>
           {form.getFieldDecorator('gender', {
-            rules: [{ required: true, message: 'Please provide Gender' }],
+            rules: [{ required: false, message: 'Please provide Gender' }],
           })(
             <Select placeholder="Please provide Gender" allowClear>
               <Option value="male">Male</Option>

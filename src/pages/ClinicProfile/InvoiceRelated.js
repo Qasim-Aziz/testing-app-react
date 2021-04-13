@@ -4,6 +4,7 @@ import { Button, Form, Row, Col, Select, notification, Input } from 'antd'
 import gql from 'graphql-tag'
 import { useQuery, useMutation } from 'react-apollo'
 import './clinicProfile.scss'
+import LoadingComponent from 'components/LoadingComponent'
 
 const { Option } = Select
 
@@ -103,7 +104,7 @@ const InvoiceRelated = ({ form }) => {
 
   const [updateInvoiceDetails, { loading: updateInvoiceDetailLoading }] = useMutation(UPDATE_CLINIC)
 
-  console.log(data, 'currencyData')
+  console.log(currencyData, 'currencyData')
   // useEffect(() => {
   //   if (data) {
   //     setNewCurrency(data.schoolDetail.currency?.id)
@@ -170,7 +171,10 @@ const InvoiceRelated = ({ form }) => {
   }
 
   if (loading) {
-    return <div>loading...</div>
+    return <LoadingComponent />
+  }
+  if (error) {
+    return <div>Oops! Something went wrong</div>
   }
 
   return (
@@ -240,7 +244,7 @@ const InvoiceRelated = ({ form }) => {
           style={{ width: '40%' }}
         >
           {form.getFieldDecorator('invoiceCurrency', {
-            initialValue: data.school.currency.id,
+            initialValue: data.school.currency?.id,
             rules: [{ required: true, message: 'Please provide invoice currency' }],
           })(
             <Select
@@ -260,7 +264,7 @@ const InvoiceRelated = ({ form }) => {
           )}
         </Form.Item>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+      <div style={{ display: 'flex' }}>
         <Button loading={updateInvoiceDetailLoading} type="primary" onClick={handleSubmit}>
           Save
         </Button>

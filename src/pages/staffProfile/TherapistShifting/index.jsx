@@ -6,11 +6,10 @@ import moment from 'moment'
 import LoadingComponent from '../LoadingComponent'
 import { GET_SHIFTING, UPDATE_SHIFTING } from './queries'
 
-const TherapistShifting = () => {
+const TherapistShifting = ({ form }) => {
   const [selectedDays, setSelectedDays] = useState([])
   const [startTime, setStartTime] = useState(moment())
-  const [endTime, setEndTime] = useState(moment().add(30, 'minutes'))
-
+  const [endTime, setEndTime] = useState(moment())
   const therapistId = useSelector(state => state.user.staffId)
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
@@ -32,38 +31,41 @@ const TherapistShifting = () => {
     if (getShiftData?.staff?.shift) {
       const { shift } = getShiftData.staff
       setSelectedDays(shift.days.edges.map(({ node }) => node.name))
-      setStartTime(moment(`2020-01-01 ${shift.startTime}`)) // Here dumped with dummy date to convert time to moment
-      setEndTime(moment(`2020-01-01 ${shift.endTime}`))
+      if (shift.startTime && shift.endTime) {
+        setStartTime(moment(`2020-01-01 ${shift.startTime}`)) // Here dumped with dummy date to convert time to moment
+        setEndTime(moment(`2020-01-01 ${shift.endTime}`))
+      } else {
+        setStartTime(moment(`2020-01-01 09:30 AM`)) // Here dumped with dummy date to convert time to moment
+        setEndTime(moment(`2020-01-01 6:30 PM`))
+      }
     }
   }, [getShiftData])
-
-  useEffect(() => {
-    if (updatedShiftingData) {
-      notification.success({
-        message: 'Therapist shifting',
-        description: 'Shifting details updated successfully.',
-      })
-    }
-  }, [updatedShiftingData])
-
-  useEffect(() => {
-    if (updateShiftingError) {
-      notification.error({
-        message: 'Therapist shifting',
-        description: updateShiftingError.message,
-      })
-    }
-  }, [updateShiftingError])
-
+  // 8588824428 gagan sharma
   const handleSubmit = e => {
     e.preventDefault()
-    updateShifting({
-      variables: {
-        therapistId,
-        startTime: startTime.format('hh:mm A'),
-        endTime: endTime.format('hh:mm A'),
-        workingDays: selectedDays,
-      },
+    form.validateFields((err, values) => {
+      if (!err && therapistId) {
+        updateShifting({
+          variables: {
+            therapistId,
+            startTime: values.startTime.format('hh:mm A'),
+            endTime: values.endTime.format('hh:mm A'),
+            workingDays: values.workingDays,
+          },
+        })
+          .then(response => {
+            notification.success({
+              message: 'Therapist shift time',
+              description: 'Shifting details updated successfully.',
+            })
+          })
+          .catch(error => {
+            notification.error({
+              message: 'Therapist shifting',
+              description: updateShiftingError.message,
+            })
+          })
+      }
     })
   }
 
@@ -91,13 +93,10 @@ const TherapistShifting = () => {
               wrapperCol={{ span: 24 }}
               className="form-label"
             >
-              <TimePicker
-                placeholder="Start Time"
-                format="HH:mm"
-                minuteStep={30}
-                value={startTime}
-                onChange={setStartTime}
-              />
+              {form.getFieldDecorator('startTime', {
+                initialValue: startTime,
+                rules: [{ required: true, message: 'Please select start Time' }],
+              })(<TimePicker placeholder="Start Time" format="HH:mm" minuteStep={30} />)}
             </Form.Item>
           </Col>
           <Col sm={12} md={12} lg={12}>
@@ -107,13 +106,10 @@ const TherapistShifting = () => {
               wrapperCol={{ span: 24 }}
               className="form-label"
             >
-              <TimePicker
-                placeholder="End Time"
-                format="HH:mm"
-                minuteStep={30}
-                value={endTime}
-                onChange={setEndTime}
-              />
+              {form.getFieldDecorator('endTime', {
+                initialValue: endTime,
+                rules: [{ required: true, message: 'Please select end Time' }],
+              })(<TimePicker placeholder="End Time" format="HH:mm" minuteStep={30} />)}
             </Form.Item>
           </Col>
         </Row>
@@ -126,26 +122,29 @@ const TherapistShifting = () => {
               wrapperCol={{ span: 24 }}
               className="form-label"
             >
-              <Select
-                placeholder="Select Working Days"
-                showSearch
-                optionFilterProp="displayText"
-                mode="tags"
-                value={selectedDays}
-                onChange={setSelectedDays}
-              >
-                {days.map(day => (
-                  <Select.Option key={day} name={day}>
-                    {day}
-                  </Select.Option>
-                ))}
-              </Select>
+              {form.getFieldDecorator('workingDays', {
+                initialValue: selectedDays,
+                rules: [{ required: true, message: 'Please select atleast one day' }],
+              })(
+                <Select
+                  placeholder="Select Working Days"
+                  showSearch
+                  optionFilterProp="displayText"
+                  mode="tags"
+                >
+                  {days.map(day => (
+                    <Select.Option key={day} name={day}>
+                      {day}
+                    </Select.Option>
+                  ))}
+                </Select>,
+              )}
             </Form.Item>
           </Col>
         </Row>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" disabled={isUpdateShiftingLoading}>
+          <Button type="primary" htmlType="submit" loading={isUpdateShiftingLoading}>
             Save
           </Button>
         </Form.Item>
@@ -154,4 +153,4 @@ const TherapistShifting = () => {
   )
 }
 
-export default TherapistShifting
+export default Form.create()(TherapistShifting)

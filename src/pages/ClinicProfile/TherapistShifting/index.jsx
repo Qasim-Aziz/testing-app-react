@@ -5,7 +5,7 @@ import moment from 'moment'
 import LoadingComponent from '../../staffProfile/LoadingComponent'
 import { ALL_THERAPIST, UPDATE_SHIFTING } from './queries'
 
-const TherapistShifting = () => {
+const TherapistShifting = ({ form }) => {
   const [isForAllTherapist, setIsForAllTherapist] = useState(false)
   const [selectedDays, setSelectedDays] = useState([])
   const [selectedTherapists, setSelectedTherapists] = useState([])
@@ -22,37 +22,34 @@ const TherapistShifting = () => {
     { data: updatedShiftingData, error: updateShiftingError, loading: isUpdateShiftingLoading },
   ] = useMutation(UPDATE_SHIFTING)
 
-  useEffect(() => {
-    if (updatedShiftingData) {
-      notification.success({
-        message: 'Therapist shifting',
-        description: 'Shifting details updated successfully.',
-      })
-    }
-  }, [updatedShiftingData])
-
-  useEffect(() => {
-    if (updateShiftingError) {
-      notification.error({
-        message: 'Therapist shifting',
-        description: updateShiftingError.message,
-      })
-    }
-  }, [updateShiftingError])
-
   const handleSubmit = e => {
     e.preventDefault()
 
     const allTherapistIds = []
     if (allTherapist) allTherapistIds.push(allTherapist.staffs.edges.map(({ node }) => node.id))
-
-    updateShifting({
-      variables: {
-        therapistIds: isForAllTherapist ? allTherapistIds : selectedTherapists,
-        startTime: startTime.format('hh:mm A'),
-        endTime: endTime.format('hh:mm A'),
-        workingDays: selectedDays,
-      },
+    form.validateFields((err, values) => {
+      if (!err && allTherapistIds) {
+        updateShifting({
+          variables: {
+            therapistIds: isForAllTherapist ? allTherapistIds : selectedTherapists,
+            startTime: values.startTime.format('hh:mm A'),
+            endTime: values.endTime.format('hh:mm A'),
+            workingDays: values.workingDays,
+          },
+        })
+          .then(response => {
+            notification.success({
+              message: 'Therapist shift time',
+              description: 'Shifting details updated successfully.',
+            })
+          })
+          .catch(error => {
+            notification.error({
+              message: 'Therapist shifting',
+              description: updateShiftingError.message,
+            })
+          })
+      }
     })
   }
 
@@ -118,29 +115,23 @@ const TherapistShifting = () => {
               wrapperCol={{ span: 24 }}
               className="form-label"
             >
-              <TimePicker
-                placeholder="Start Time"
-                format="HH:mm"
-                minuteStep={30}
-                value={startTime}
-                onChange={setStartTime}
-              />
+              {form.getFieldDecorator('startTime', {
+                initialValue: startTime,
+                rules: [{ required: true, message: 'Please select start Time' }],
+              })(<TimePicker placeholder="Start Time" format="HH:mm" minuteStep={30} />)}
             </Form.Item>
           </Col>
-          <Col>
+          <Col sm={12} md={12} lg={12}>
             <Form.Item
               label="End Time"
               labelCol={{ span: 24 }}
               wrapperCol={{ span: 24 }}
               className="form-label"
             >
-              <TimePicker
-                placeholder="End Time"
-                format="HH:mm"
-                minuteStep={30}
-                value={endTime}
-                onChange={setEndTime}
-              />
+              {form.getFieldDecorator('endTime', {
+                initialValue: endTime,
+                rules: [{ required: true, message: 'Please select end Time' }],
+              })(<TimePicker placeholder="End Time" format="HH:mm" minuteStep={30} />)}
             </Form.Item>
           </Col>
         </Row>
@@ -153,26 +144,29 @@ const TherapistShifting = () => {
               wrapperCol={{ span: 24 }}
               className="form-label"
             >
-              <Select
-                placeholder="Select Working Days"
-                showSearch
-                optionFilterProp="displayText"
-                mode="tags"
-                value={selectedDays}
-                onChange={setSelectedDays}
-              >
-                {days.map(day => (
-                  <Select.Option key={day} name={day}>
-                    {day}
-                  </Select.Option>
-                ))}
-              </Select>
+              {form.getFieldDecorator('workingDays', {
+                initialValue: selectedDays,
+                rules: [{ required: true, message: 'Please select atleast one day' }],
+              })(
+                <Select
+                  placeholder="Select Working Days"
+                  showSearch
+                  optionFilterProp="displayText"
+                  mode="tags"
+                >
+                  {days.map(day => (
+                    <Select.Option key={day} name={day}>
+                      {day}
+                    </Select.Option>
+                  ))}
+                </Select>,
+              )}
             </Form.Item>
           </Col>
         </Row>
 
-        <Form.Item style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <Button type="primary" htmlType="submit" disabled={isUpdateShiftingLoading}>
+        <Form.Item>
+          <Button type="primary" htmlType="submit" loading={isUpdateShiftingLoading}>
             Save
           </Button>
         </Form.Item>
@@ -181,4 +175,4 @@ const TherapistShifting = () => {
   )
 }
 
-export default TherapistShifting
+export default Form.create()(TherapistShifting)

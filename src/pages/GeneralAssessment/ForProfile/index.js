@@ -9,6 +9,7 @@ import {
   Tag,
   notification,
   Popconfirm,
+  Tooltip,
   Radio,
   Table,
   Tabs,
@@ -46,7 +47,7 @@ function Assessment() {
         for (let i = 0; i < item.node.submodules?.edges.length; i++) {
           tempSubmodules.push(item.node.submodules.edges[i].node)
         }
-        temp.push({ ...item.node, submodules: tempSubmodules })
+        temp.push({ ...item.node, key: item.node.id, submodules: tempSubmodules })
       })
       setTableData(temp)
     }
@@ -103,13 +104,18 @@ function Assessment() {
             >
               {text}
             </Button>
-            {row.submodules.map(tag => {
-              return (
-                <Tag className="edit-tag" key={tag.name}>
-                  <span>{tag.name.length > 15 ? `${tag.slice(0, 15)}...` : tag.name}</span>
-                </Tag>
-              )
-            })}
+            {row.hasSubmodule &&
+              row.submodules.map(tag => {
+                return (
+                  <Tag id={tag.id} className="edit-tag" key={tag.name}>
+                    {tag.name.length > 15 ? (
+                      <Tooltip title={tag.name}>{tag.name.slice(0, 15)}...</Tooltip>
+                    ) : (
+                      <span>{tag.name}</span>
+                    )}
+                  </Tag>
+                )
+              })}
           </span>
         )
       },
@@ -138,7 +144,23 @@ function Assessment() {
   return (
     <div className="profileTab-container">
       <div className="profileTab-heading">
-        <p>Assessment</p>
+        <p>Record Assessment Score</p>
+      </div>
+      <div>
+        <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 5 }}>
+          This Section allows you to digitize and record assessments scores for any paper-based
+          assessments with three simple steps
+        </div>
+        <div style={{ marginBottom: 5 }}>
+          <b>1.</b> Create Main assessments in this section.
+        </div>
+        <div style={{ marginBottom: 5 }}>
+          <b>2.</b> Create Sub assessments in this section.
+        </div>
+        <div style={{ marginBottom: 5 }}>
+          <b>3.</b> Record assessment scores for each child from the Main menu -
+          <b> Intervention &gt; Assessment &gt; Record Assessment score</b>.
+        </div>
       </div>
       <Content
         style={{
@@ -169,7 +191,10 @@ function Assessment() {
           </div>
         </div>
 
-        <div style={{ width: '100%', marginTop: '1em', backgroundColor: 'white' }} className="gen-assess-table">
+        <div
+          style={{ width: '100%', marginTop: '1em', backgroundColor: 'white' }}
+          className="gen-assess-table"
+        >
           <Table
             dataSource={tableData}
             loading={genAssessLoading}
@@ -186,7 +211,7 @@ function Assessment() {
         onClose={() => {
           setCreateAssessDrawer(false)
         }}
-        width={DRAWER.widthL3}
+        width={DRAWER.widthL2}
         destroyOnClose
         title="Create New Assessment"
       >

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import { Form, Button, Input, Select, notification, DatePicker } from 'antd'
 import { useQuery, useLazyQuery, useMutation } from 'react-apollo'
+import moment from 'moment'
 import { GET_GENERAL_ASSESSMENT, RECORD_GENERAL_DATA, UPDATE_GENERAL_DATA } from './query'
 import { COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 
@@ -20,6 +21,7 @@ function RecordAssessmentForm({
   currentRow,
 }) {
   const studentId = localStorage.getItem('studentId')
+  const [recordDate, setRecordDate] = useState(moment())
   const [assessments, setAssessments] = useState(null)
   const [currentAssessment, setCurrentAssessment] = useState(null)
   const [submodulesList, setSubmodulesList] = useState([])
@@ -27,6 +29,8 @@ function RecordAssessmentForm({
   const { data: assessmentsData, loading: assessmentsLoading, error: assessmentsError } = useQuery(
     GET_GENERAL_ASSESSMENT,
   )
+
+  console.log(assessmentsData, 'assess')
   const [
     recordGeneralData,
     { data: recordedData, loading: recordedLoading, error: recordedError },
@@ -149,6 +153,9 @@ function RecordAssessmentForm({
   return (
     <div>
       <Form {...layout} onSubmit={update ? handleUpdate : handleSubmitt}>
+        <Form.Item name="module" label="Date">
+          <DatePicker value={recordDate} onChange={setRecordDate} />
+        </Form.Item>
         <Form.Item name="module" label="Assessment Module">
           <Select
             style={{ width: '100%' }}
@@ -170,6 +177,7 @@ function RecordAssessmentForm({
               })}
           </Select>
         </Form.Item>
+
         <Form.Item name="submodule" label="Submodule">
           <Select
             style={{ width: '100%' }}

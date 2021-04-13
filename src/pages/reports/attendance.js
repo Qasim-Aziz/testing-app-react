@@ -290,6 +290,7 @@ export default () => {
         ],
       })
     })
+
     setColumns(columns)
   }
 
@@ -314,6 +315,8 @@ export default () => {
       </Menu.Item>
     </Menu>
   )
+
+  console.log(columns)
 
   return (
     <>
@@ -373,9 +376,8 @@ export default () => {
               {attLoading ? (
                 <LoadingComponent />
               ) : (
-                <div style={{ margin: '0 0 10px 10px' }}>
+                <div style={{ margin: '10px 0 10px 10px' }}>
                   <Table
-                    className="goal-table"
                     columns={columns}
                     dataSource={filteredTableData}
                     bordered

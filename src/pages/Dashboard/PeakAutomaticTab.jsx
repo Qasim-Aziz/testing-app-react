@@ -47,7 +47,8 @@ const PeakAutomaticTab = () => {
   const [updatePeakAutomatic] = useMutation(UPDATE_PEAK_AUTOMATIC)
 
   useEffect(() => {
-    if (userDetails) {
+    console.log(userDetails, 'userDetails')
+    if (userDetails && userDetails.userSettings?.edges.length > 0) {
       const settings = userDetails.userSettings.edges[0]?.node
       setPeakAutomatic(settings.peakAutomaticBlocks)
     }

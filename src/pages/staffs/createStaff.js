@@ -183,7 +183,7 @@ class StaffBasicInfo extends React.Component {
         </Form.Item>
         <Form.Item label="Last Name" style={itemStyle}>
           {form.getFieldDecorator('lastname', {
-            rules: [{ required: true, message: 'Please provide your last name' }],
+            rules: [{ required: false, message: 'Please provide your last name' }],
             initialValue: '',
           })(<Input />)}
         </Form.Item>
@@ -192,9 +192,16 @@ class StaffBasicInfo extends React.Component {
             rules: [{ required: true, type: 'email', message: 'Please provide your email' }],
           })(<Input />)}
         </Form.Item>
+        <Form.Item label="Date of Joining" style={itemStyle}>
+          {form.getFieldDecorator('dateOfJoining', {
+            rules: [{ required: true, message: 'Please provide your Date of Joining!' }],
+          })(<DatePicker />)}
+        </Form.Item>
+
+        <Divider orientation="left">Personal Details</Divider>
         <Form.Item label="Gender" style={itemStyle}>
           {form.getFieldDecorator('gender', {
-            rules: [{ required: true, message: 'Please select gender' }],
+            rules: [{ required: false, message: 'Please select gender' }],
           })(
             <Select>
               <Select.Option value="male">Male</Select.Option>
@@ -205,17 +212,9 @@ class StaffBasicInfo extends React.Component {
         </Form.Item>
         <Form.Item label="D.O.B" style={itemStyle}>
           {form.getFieldDecorator('dob', {
-            rules: [{ required: true, message: 'Please provide Date of Birth' }],
+            rules: [{ required: false, message: 'Please provide Date of Birth' }],
           })(<DatePicker />)}
         </Form.Item>
-        <Form.Item label="Date of Joining" style={itemStyle}>
-          {form.getFieldDecorator('dateOfJoining', {
-            rules: [{ required: true, message: 'Please provide your Date of Joining!' }],
-          })(<DatePicker />)}
-        </Form.Item>
-
-        <Divider orientation="left">Personal Details</Divider>
-
         <Form.Item label="Designation" style={itemStyle}>
           {form.getFieldDecorator('designation', { initialValue: '' })(<Input />)}
         </Form.Item>

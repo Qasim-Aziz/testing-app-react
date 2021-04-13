@@ -58,10 +58,8 @@ const CreateGenAssessForm = ({
   )
   const [hasSubmodules, setHasSubmodules] = useState(false)
   const [pk, setPk] = useState(currentRow?.id)
-  console.log(update, 'update')
   const [submodulesState, submodulesDispatch] = useReducer(submodulesReducer, [{ name: '' }])
 
-  console.log(submodulesState, 'sub mode sd state')
   const [createGenAssess, { data, error, loading }] = useMutation(
     CREATE_GENERAL_ASSESSMENT,
     //   , {
@@ -97,14 +95,12 @@ const CreateGenAssessForm = ({
   ] = useMutation(UPDATE_GENERAL_ASSESSMENT)
 
   useEffect(() => {
-    console.log(update, currentRow?.hasSubmodule)
     if (update && currentRow.hasSubmodule) {
       submodulesDispatch({
         type: 'SET_STATE',
         payload: currentRow.submodules,
       })
       setHasSubmodules(true)
-      console.log(currentRow.hasSubmodule, 'useEffect')
     }
   }, [])
 
@@ -145,7 +141,6 @@ const CreateGenAssessForm = ({
         if (!hasSubmodules) {
           tempSubmodules = []
         }
-        console.log(values, hasSubmodules, tempSubmodules, pk, 'update')
         updateGenAssess({
           variables: {
             pk,
@@ -159,17 +154,23 @@ const CreateGenAssessForm = ({
     })
   }
 
+  console.log(currentRow, 'current row')
+
   const handleSubmit = e => {
     e.preventDefault()
     form.validateFields((formError, values) => {
       if (!formError) {
-        console.log(values, hasSubmodules, submodulesState, 'in submitt')
+        let tempSubmodules = submodulesState
+        if (!hasSubmodules) {
+          tempSubmodules = []
+        }
+        console.log(values, hasSubmodules, tempSubmodules, 'in submitt')
         createGenAssess({
           variables: {
             name: values.name,
             date: moment(values.date).format('YYYY-MM-DD'),
             hasSubmodule: hasSubmodules,
-            submodules: submodulesState,
+            submodules: tempSubmodules,
           },
         })
       }
