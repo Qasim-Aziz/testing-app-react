@@ -208,27 +208,55 @@ export const RECORD_GENERAL_DATA = gql`
 `
 
 export const UPDATE_GENERAL_DATA = gql`
-  mutation($pk: ID!, $module: ID, $submodule: ID, $score: Int, $note: String) {
+  mutation(
+    $clearAll: Boolean
+    $pk: ID!
+    $date: Date
+    $modules: [ModuleInput2]
+    $submodules: [SubModuleInput2]
+    $note: String
+  ) {
     updateGeneralData(
-      input: { pk: $pk, module: $module, submodule: $submodule, score: $score, note: $note }
+      input: {
+        clearAll: $clearAll
+        pk: $pk
+        modules: $modules
+        submodules: $submodules
+        note: $note
+        date: $date
+      }
     ) {
       details {
         id
-        score
         time
         student {
           id
           firstname
         }
-        module {
-          id
-          name
-          date
-          hasSubmodule
+        modules {
+          edges {
+            node {
+              id
+              score
+              module {
+                name
+                id
+              }
+            }
+          }
         }
-        submodule {
-          id
-          name
+        note
+        submodules {
+          edges {
+            node {
+              id
+              score
+              submodule {
+                id
+                name
+              }
+            }
+          }
         }
       }
     }

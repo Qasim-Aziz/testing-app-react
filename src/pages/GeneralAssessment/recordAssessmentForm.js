@@ -69,14 +69,13 @@ function RecordAssessmentForm({
 
       const tt = assessments.filter(item => item.id === currentAssessment)
 
+      console.log(tt, 'this is tt')
       if (tt[0].hasSubmodule) {
-        console.log(tt[0].submodules.edges, 'sbm')
-        // setSubmodulesList(tt[0].submodules.edges)
-        // setCurrentSubmodules(
-        //   update && currentRow.module.id === currentAssessment
-        //     ? currentRow.submodule.id
-        //     : tt[0].submodules.edges[0].node.id,
-        // )
+        setCurrentSubmodules(
+          update && currentRow.module.id === currentAssessment
+            ? currentRow.submodules
+            : tt[0].submodules.edges.map(item => ({ name: item.node.name, id: item.node.id })),
+        )
       } else {
         setSubmodulesList(null)
         setCurrentSubmodules(null)
@@ -88,13 +87,13 @@ function RecordAssessmentForm({
     e.preventDefault()
     form.validateFields((error, values) => {
       if (!error && currentAssessment) {
-        // console.log(studentId, currentAssessment, currentSubmodules, error, values)
+        console.log(currentAssessment, currentSubmodules, values)
         const subModulesRes = []
         const moduleRes = [{ module: currentAssessment, score: parseInt(values.score) }]
-        submodulesList.forEach(item => {
-          subModulesRes.push({ submodule: item.node.id, score: parseInt(values[item.node.id]) })
+        currentSubmodules.forEach(item => {
+          subModulesRes.push({ submodule: item.id, score: parseInt(values[item.id]) })
         })
-        // console.log(subModulesRes, moduleRes, recordDate)
+        console.log(subModulesRes, moduleRes, recordDate)
         recordGeneralData({
           variables: {
             student: studentId,
@@ -119,35 +118,55 @@ function RecordAssessmentForm({
   const handleUpdate = e => {
     e.preventDefault()
     form.validateFields((error, values) => {
-      console.log(currentRow.id, currentAssessment, currentSubmodules, values)
       if (!error && currentRow.id && currentAssessment) {
-        console.log(currentAssessment)
-        // updateGeneralData({
-        //   variables: {
-        //     pk: currentRow.id,
-        //     date: recordDate,
-        //     module: currentAssessment,
-        //     submodule: currentSubmodules,
-        //     score: parseInt(values.score),
-        //     note: values.note,
-        //   },
-        // }).then(res => {
-        //   notification.success({
-        //     message: 'Data updated successfully',
-        //   })
-        //   refetch()
-        //   setOpen(false)
-        // })
-        // .catch(err => {
-        //   notification.error({
-        //     message: 'Something went wrong',
-        //     description: 'Unable to update assessment data',
-        //   })
+        let moduleRes = [{ module: currentAssessment, score: parseInt(values.score) }]
+        const subModulesRes = []
+        if (currentAssessment === currentRow.module.id) {
+          moduleRes = [
+            { pk: currentRow.module.pk, module: currentAssessment, score: parseInt(values.score) },
+          ]
+          currentSubmodules.map(item => {
+            console.log(item, 'item 1')
+            subModulesRes.push({
+              pk: item.pk,
+              submodule: item.id,
+              score: parseInt(values[item.id]),
+            })
+          })
+        } else {
+          currentSubmodules.map(item => {
+            console.log(item, 'item 2')
+            subModulesRes.push({ submodule: item.id, score: parseInt(values[item.id]) })
+          })
+        }
+        console.log(moduleRes, subModulesRes, 'bye')
+
+        updateGeneralData({
+          variables: {
+            clearAll: currentAssessment === currentRow.module.id ? false : true,
+            pk: currentRow.id,
+            date: recordDate.format('YYYY-MM-DD'),
+            modules: moduleRes,
+            submodules: subModulesRes,
+            note: values.note,
+          },
+        })
+          .then(res => {
+            notification.success({
+              message: 'Data updated successfully',
+            })
+            refetch()
+            setOpen(false)
+          })
+          .catch(err => {
+            notification.error({
+              message: 'Something went wrong',
+              description: 'Unable to update assessment data',
+            })
+          })
       }
     })
   }
-
-  console.log(submodulesList, 'subModeulsr')
 
   const subLayout = {
     labelCol: {
@@ -196,55 +215,35 @@ function RecordAssessmentForm({
         </Form.Item>
         <Form.Item name="module" label="Module - T score">
           {form.getFieldDecorator('score', {
+            initialValue:
+              update && currentRow.module.id === currentAssessment ? currentRow.module.score : null,
             rules: [{ required: true, message: 'Enter score' }],
-          })(
-            <Input
-              type="number"
-              value={
-                update && currentRow.module.id === currentAssessment
-                  ? currentRow.module.score
-                  : null
-              }
-              placeholder="Enter number"
-            />,
-          )}
+          })(<Input type="number" placeholder="Enter number" />)}
         </Form.Item>
 
-        {submodulesList &&
-          submodulesList.map(item => {
+        {currentSubmodules &&
+          currentSubmodules.map((item, index) => {
             return (
-              <Form.Item key={item.node.id} label={`${item.node.name} - T Score`}>
-                {form.getFieldDecorator(`${item.node.id}`, {
+              <Form.Item key={item.id} label={`${item.name} - T Score`}>
+                {form.getFieldDecorator(`${item.id}`, {
+                  initialValue: update ? item.score : null,
                   rules: [{ required: true, message: 'Enter score' }],
                 })(<Input type="number" placeholder="Enter number" />)}
               </Form.Item>
             )
           })}
-        {update && currentRow ? (
-          <>
-            <Form.Item label="Note">
-              {form.getFieldDecorator('note', {
-                initialValue: currentRow.note,
-              })(
-                <TextArea
-                  placeholder="Take a note"
-                  style={{ resize: 'none', width: '100%', height: 120 }}
-                />,
-              )}
-            </Form.Item>
-          </>
-        ) : (
-          <>
-            <Form.Item label="Note">
-              {form.getFieldDecorator('note')(
-                <TextArea
-                  placeholder="Take a note"
-                  style={{ resize: 'none', width: '100%', height: 120 }}
-                />,
-              )}
-            </Form.Item>
-          </>
-        )}
+
+        <Form.Item label="Note">
+          {form.getFieldDecorator('note', {
+            initialValue: update ? currentRow.note : null,
+          })(
+            <TextArea
+              placeholder="Take a note"
+              style={{ resize: 'none', width: '100%', height: 120 }}
+            />,
+          )}
+        </Form.Item>
+
         <Form.Item {...modLayout}>
           <Button
             htmlType="submit"
