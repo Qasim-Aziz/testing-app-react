@@ -31,7 +31,7 @@ function RecordAssessmentForm({
     GET_GENERAL_ASSESSMENT,
   )
 
-  console.log(update, currentRow)
+  // console.log(update, currentRow)
   const [
     recordGeneralData,
     { data: recordedData, loading: recordedLoading, error: recordedError },
@@ -64,21 +64,18 @@ function RecordAssessmentForm({
 
   useEffect(() => {
     if (currentAssessment) {
-      console.log(assessments, 'assesments')
-      console.log(currentRow, 'current row')
-
       const tt = assessments.filter(item => item.id === currentAssessment)
-
-      console.log(tt, 'this is tt')
+      console.log(tt[0], 'tt')
       if (tt[0].hasSubmodule) {
+        console.log('im in')
         setCurrentSubmodules(
           update && currentRow.module.id === currentAssessment
             ? currentRow.submodules
             : tt[0].submodules.edges.map(item => ({ name: item.node.name, id: item.node.id })),
         )
       } else {
-        setSubmodulesList(null)
-        setCurrentSubmodules(null)
+        console.log('im out')
+        setCurrentSubmodules([])
       }
     }
   }, [currentAssessment])
@@ -93,7 +90,7 @@ function RecordAssessmentForm({
         currentSubmodules.forEach(item => {
           subModulesRes.push({ submodule: item.id, score: parseInt(values[item.id]) })
         })
-        console.log(subModulesRes, moduleRes, recordDate)
+
         recordGeneralData({
           variables: {
             student: studentId,
@@ -120,13 +117,13 @@ function RecordAssessmentForm({
     form.validateFields((error, values) => {
       if (!error && currentRow.id && currentAssessment) {
         let moduleRes = [{ module: currentAssessment, score: parseInt(values.score) }]
+
         const subModulesRes = []
         if (currentAssessment === currentRow.module.id) {
           moduleRes = [
             { pk: currentRow.module.pk, module: currentAssessment, score: parseInt(values.score) },
           ]
           currentSubmodules.map(item => {
-            console.log(item, 'item 1')
             subModulesRes.push({
               pk: item.pk,
               submodule: item.id,
@@ -135,11 +132,11 @@ function RecordAssessmentForm({
           })
         } else {
           currentSubmodules.map(item => {
-            console.log(item, 'item 2')
             subModulesRes.push({ submodule: item.id, score: parseInt(values[item.id]) })
           })
         }
-        console.log(moduleRes, subModulesRes, 'bye')
+
+        // console.log(currentSubmodules, subModulesRes, moduleRes)
 
         updateGeneralData({
           variables: {
