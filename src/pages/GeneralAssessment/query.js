@@ -117,22 +117,35 @@ export const GET_GENERAL_DATA = gql`
       edges {
         node {
           id
-          score
           time
           student {
             id
             firstname
           }
-          module {
-            id
-            name
-            date
-            hasSubmodule
+          modules {
+            edges {
+              node {
+                id
+                score
+                module {
+                  name
+                  id
+                }
+              }
+            }
           }
           note
-          submodule {
-            id
-            name
+          submodules {
+            edges {
+              node {
+                id
+                score
+                submodule {
+                  id
+                  name
+                }
+              }
+            }
           }
         }
       }
@@ -141,34 +154,53 @@ export const GET_GENERAL_DATA = gql`
 `
 
 export const RECORD_GENERAL_DATA = gql`
-  mutation($student: ID!, $module: ID!, $submodule: ID, $score: Int!, $note: String) {
+  mutation(
+    $student: ID!
+    $date: Date
+    $modules: [ModuleInput2]
+    $submodules: [SubModuleInput2]
+    $note: String
+  ) {
     recordGeneralData(
       input: {
         student: $student
-        module: $module
-        submodule: $submodule
-        score: $score
+        date: $date
+        modules: $modules
+        submodules: $submodules
         note: $note
       }
     ) {
       details {
         id
-        score
         time
-        note
         student {
           id
           firstname
         }
-        module {
-          id
-          name
-          date
-          hasSubmodule
+        modules {
+          edges {
+            node {
+              id
+              score
+              module {
+                name
+                id
+              }
+            }
+          }
         }
-        submodule {
-          id
-          name
+        note
+        submodules {
+          edges {
+            node {
+              id
+              score
+              submodule {
+                id
+                name
+              }
+            }
+          }
         }
       }
     }

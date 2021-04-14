@@ -5,6 +5,7 @@ import { useQuery, useLazyQuery, useMutation } from 'react-apollo'
 import moment from 'moment'
 import { GET_GENERAL_ASSESSMENT, RECORD_GENERAL_DATA, UPDATE_GENERAL_DATA } from './query'
 import { COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
+import LoadingComponent from 'components/LoadingComponent'
 
 const { TextArea } = Input
 const { Option } = Select
@@ -30,7 +31,7 @@ function RecordAssessmentForm({
     GET_GENERAL_ASSESSMENT,
   )
 
-  console.log(assessmentsData, 'assess')
+  console.log(update, currentRow)
   const [
     recordGeneralData,
     { data: recordedData, loading: recordedLoading, error: recordedError },
@@ -70,12 +71,12 @@ function RecordAssessmentForm({
 
       if (tt[0].hasSubmodule) {
         console.log(tt[0].submodules.edges, 'sbm')
-        setSubmodulesList(tt[0].submodules.edges)
-        setCurrentSubmodules(
-          update && currentRow.module.id === currentAssessment
-            ? currentRow.submodule.id
-            : tt[0].submodules.edges[0].node.id,
-        )
+        // setSubmodulesList(tt[0].submodules.edges)
+        // setCurrentSubmodules(
+        //   update && currentRow.module.id === currentAssessment
+        //     ? currentRow.submodule.id
+        //     : tt[0].submodules.edges[0].node.id,
+        // )
       } else {
         setSubmodulesList(null)
         setCurrentSubmodules(null)
@@ -83,49 +84,34 @@ function RecordAssessmentForm({
     }
   }, [currentAssessment])
 
-  useEffect(() => {
-    if (recordedData) {
-      notification.success({
-        message: 'Data recorded successfully',
-      })
-      refetch()
-      setOpen(false)
-    }
-    if (recordedError) {
-      notification.error({
-        message: 'Something went wrong',
-        description: 'Unable to record assessment data',
-      })
-    }
-    if (updatedData) {
-      notification.success({
-        message: 'Data updated successfully',
-      })
-      refetch()
-      setOpen(false)
-    }
-    if (updatedError) {
-      notification.error({
-        message: 'Something went wrong',
-        description: 'Unable to update assessment data',
-      })
-    }
-  }, [recordedData, recordedError, updatedData, updatedError])
-
   const handleSubmitt = e => {
     e.preventDefault()
     form.validateFields((error, values) => {
       if (!error && currentAssessment) {
-        console.log(studentId, currentAssessment, currentSubmodules, error, values)
+        // console.log(studentId, currentAssessment, currentSubmodules, error, values)
+        const subModulesRes = []
+        const moduleRes = [{ module: currentAssessment, score: parseInt(values.score) }]
+        submodulesList.forEach(item => {
+          subModulesRes.push({ submodule: item.node.id, score: parseInt(values[item.node.id]) })
+        })
+        // console.log(subModulesRes, moduleRes, recordDate)
         recordGeneralData({
           variables: {
             student: studentId,
-            module: currentAssessment,
-            submodule: currentSubmodules,
-            score: parseInt(values.score),
+            date: '2021-04-14',
+            modules: moduleRes,
+            submodules: subModulesRes,
             note: values.note,
           },
         })
+          .then(res => {
+            notification.success({
+              message: 'Data recorded successfully',
+            })
+            refetch()
+            setOpen(false)
+          })
+          .catch(err => console.log(err))
       }
     })
   }
@@ -133,26 +119,58 @@ function RecordAssessmentForm({
   const handleUpdate = e => {
     e.preventDefault()
     form.validateFields((error, values) => {
+      console.log(currentRow.id, currentAssessment, currentSubmodules, values)
       if (!error && currentRow.id && currentAssessment) {
-        console.log(currentRow.id, currentAssessment, currentSubmodules, values)
-        updateGeneralData({
-          variables: {
-            pk: currentRow.id,
-            module: currentAssessment,
-            submodule: currentSubmodules,
-            score: parseInt(values.score),
-            note: values.note,
-          },
-        })
+        console.log(currentAssessment)
+        // updateGeneralData({
+        //   variables: {
+        //     pk: currentRow.id,
+        //     date: recordDate,
+        //     module: currentAssessment,
+        //     submodule: currentSubmodules,
+        //     score: parseInt(values.score),
+        //     note: values.note,
+        //   },
+        // }).then(res => {
+        //   notification.success({
+        //     message: 'Data updated successfully',
+        //   })
+        //   refetch()
+        //   setOpen(false)
+        // })
+        // .catch(err => {
+        //   notification.error({
+        //     message: 'Something went wrong',
+        //     description: 'Unable to update assessment data',
+        //   })
       }
     })
   }
 
   console.log(submodulesList, 'subModeulsr')
 
+  const subLayout = {
+    labelCol: {
+      span: 6,
+    },
+    wrapperCol: {
+      span: 18,
+    },
+  }
+  const modLayout = {
+    wrapperCol: {
+      offset: 6,
+      span: 18,
+    },
+  }
+
+  if (assessmentsLoading) {
+    return <LoadingComponent />
+  }
+
   return (
     <div>
-      <Form {...layout} onSubmit={update ? handleUpdate : handleSubmitt}>
+      <Form {...subLayout} onSubmit={update ? handleUpdate : handleSubmitt}>
         <Form.Item name="module" label="Date">
           <DatePicker value={recordDate} onChange={setRecordDate} />
         </Form.Item>
@@ -160,7 +178,6 @@ function RecordAssessmentForm({
           <Select
             style={{ width: '100%' }}
             placeholder="Select a module"
-            size="large"
             showSearch
             optionFilterProp="name"
             value={currentAssessment}
@@ -177,42 +194,34 @@ function RecordAssessmentForm({
               })}
           </Select>
         </Form.Item>
-
-        <Form.Item name="submodule" label="Submodule">
-          <Select
-            style={{ width: '100%' }}
-            placeholder="Select a submodule"
-            size="large"
-            showSearch
-            optionFilterProp="name"
-            disabled={!submodulesList}
-            value={currentSubmodules}
-            onChange={e => setCurrentSubmodules(e)}
-            loading={assessmentsLoading}
-          >
-            {submodulesList &&
-              submodulesList.map(item => {
-                return (
-                  <Option value={item.node.id} name={item.node.name} key={item.node.id}>
-                    {item.node.name}
-                  </Option>
-                )
-              })}
-          </Select>
+        <Form.Item name="module" label="Module - T score">
+          {form.getFieldDecorator('score', {
+            rules: [{ required: true, message: 'Enter score' }],
+          })(
+            <Input
+              type="number"
+              value={
+                update && currentRow.module.id === currentAssessment
+                  ? currentRow.module.score
+                  : null
+              }
+              placeholder="Enter number"
+            />,
+          )}
         </Form.Item>
+
+        {submodulesList &&
+          submodulesList.map(item => {
+            return (
+              <Form.Item key={item.node.id} label={`${item.node.name} - T Score`}>
+                {form.getFieldDecorator(`${item.node.id}`, {
+                  rules: [{ required: true, message: 'Enter score' }],
+                })(<Input type="number" placeholder="Enter number" />)}
+              </Form.Item>
+            )
+          })}
         {update && currentRow ? (
           <>
-            <Form.Item label="Score">
-              {form.getFieldDecorator('score', {
-                initialValue: currentRow.score,
-                rules: [
-                  {
-                    required: true,
-                    message: 'Enter score',
-                  },
-                ],
-              })(<Input size="large" type="number" placeholder="Enter number" />)}
-            </Form.Item>
             <Form.Item label="Note">
               {form.getFieldDecorator('note', {
                 initialValue: currentRow.note,
@@ -226,16 +235,6 @@ function RecordAssessmentForm({
           </>
         ) : (
           <>
-            <Form.Item label="Score">
-              {form.getFieldDecorator('score', {
-                rules: [
-                  {
-                    required: true,
-                    message: 'Enter score',
-                  },
-                ],
-              })(<Input size="large" type="number" placeholder="Enter number" />)}
-            </Form.Item>
             <Form.Item label="Note">
               {form.getFieldDecorator('note')(
                 <TextArea
@@ -246,7 +245,7 @@ function RecordAssessmentForm({
             </Form.Item>
           </>
         )}
-        <Form.Item {...tailLayout}>
+        <Form.Item {...modLayout}>
           <Button
             htmlType="submit"
             loading={recordedLoading || updatedLoading}

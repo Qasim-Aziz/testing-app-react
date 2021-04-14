@@ -86,12 +86,39 @@ export default () => {
 
   const updateTableData = () => {
     if (data) {
-      const tempTable = []
-      data.getGeneralData.edges.map(item => {
-        tempTable.push(item.node)
-      })
-      setOriginalData(tempTable)
-      setTableData(tempTable)
+      try {
+        const tempTable = []
+        data.getGeneralData.edges.map(item => {
+          if (item.node.modules && item.node.modules.edges.length > 0) {
+            tempTable.push({
+              key: item.node.id,
+              date: item.node.time,
+              module: {
+                pk: item.node.modules.edges[0].node.id,
+                id: item.node.modules.edges[0].node.module.id,
+                name: item.node.modules.edges[0].node.module.name,
+                score: item.node.modules.edges[0].node.score,
+              },
+              note: item.node.note,
+              submodules: item.node.submodules.edges.map(sbm => ({
+                pk: sbm.node.id,
+                id: sbm.node.submodule.id,
+                name: sbm.node.submodule.name,
+                score: sbm.node.score,
+              })),
+            })
+          }
+        })
+        console.log(tempTable, 'tempTable')
+        setOriginalData(tempTable)
+        setTableData(tempTable)
+      } catch (e) {
+        console.log(e)
+        notification.error({
+          message: 'Something went wrong',
+          description: e.message,
+        })
+      }
     }
   }
 
@@ -102,7 +129,7 @@ export default () => {
   }, [studentId])
 
   console.log(data, loading, error, tableData, 'sd')
-
+  console.log(currentRow)
   useEffect(() => {
     let tempList = originalData
     if (filterAssessment) {
@@ -179,12 +206,8 @@ export default () => {
       dataIndex: 'module.name',
     },
     {
-      title: 'Sub Module',
-      dataIndex: 'submodule.name',
-    },
-    {
       title: 'Score',
-      dataIndex: 'score',
+      dataIndex: 'module.score',
       key: 'score',
       sorter: (a, b) => a.score - b.score,
       sortOrder: sortedInfo.columnKey === 'score' && sortedInfo.order,
@@ -335,7 +358,7 @@ export default () => {
             columns={columns}
             onChange={handleSortChange}
             bordered
-            rowKey={record => record.id}
+            rowKey="key"
             dataSource={tableData}
             title={() => {
               return filterHeader
