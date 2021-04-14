@@ -7,7 +7,7 @@ import { useMutation } from 'react-apollo'
 import { remove, times, update } from 'ramda'
 import moment from 'moment'
 import SubmodulesForm from './SubmodulesForm'
-import { CREATE_GENERAL_ASSESSMENT, UPDATE_GENERAL_ASSESSMENT } from '../query'
+import { CREATE_GENERAL_ASSESSMENT, UPDATE_GENERAL_ASSESSMENT, REMOVE_SUBMODULE } from '../query'
 import { COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 
 const { TextArea } = Input
@@ -20,7 +20,7 @@ const submodulesReducer = (state, action) => {
       if (action.payload.length > 0) {
         let temp = []
         temp = action.payload.map(item => {
-          return { name: item.name }
+          return { name: item.name, id: item.id }
         })
         return temp
       } else {
@@ -60,34 +60,8 @@ const CreateGenAssessForm = ({
   const [pk, setPk] = useState(currentRow?.id)
   const [submodulesState, submodulesDispatch] = useReducer(submodulesReducer, [{ name: '' }])
 
-  const [createGenAssess, { data, error, loading }] = useMutation(
-    CREATE_GENERAL_ASSESSMENT,
-    //   , {
-    //   update(cache, { data }) {
-    //     const generalAssess = cache.readQuery({
-    //       query: GET_GENERAL_ASSESSMENT,
-    //     })
-
-    //     // data = response of mutation query => need to be added in cache(generalAssess)
-    //     // generalAssess = data response from GENERAL_ASSESSMENT query
-    //     cache.writeQuery({
-    //       query: GET_GENERAL_ASSESSMENT,
-    //       data: {
-    //         getGeneralAssessment: {
-    //           edges: [
-    //             ...generalAssess.getGeneralAssessment.edges,
-    //             {
-    //               node: data.createGeneralAssessment.details,
-    //               __typename: 'GeneralAssessmentTypeEdge',
-    //             },
-    //           ],
-    //           __typename: 'GeneralAssessmentTypeConnection',
-    //         },
-    //       },
-    //     })
-    //   },
-    // }
-  )
+  const [createGenAssess, { data, error, loading }] = useMutation(CREATE_GENERAL_ASSESSMENT)
+  const [removeSubmodules] = useMutation(REMOVE_SUBMODULE)
 
   const [
     updateGenAssess,
@@ -137,9 +111,17 @@ const CreateGenAssessForm = ({
     e.preventDefault()
     form.validateFields((errors, values) => {
       if (!errors && pk) {
-        let tempSubmodules = submodulesState
-        if (!hasSubmodules) {
+        let tempSubmodules = submodulesState.map(item => ({ name: item.name }))
+        if (!hasSubmodules && submodulesState.length > 0) {
           tempSubmodules = []
+          const removeIds = []
+          submodulesState.map(item => (item.id ? removeIds.push(item.id) : null))
+          removeSubmodules({
+            variables: {
+              pk,
+              id: removeIds,
+            },
+          }).catch(err => console.error(err))
         }
         updateGenAssess({
           variables: {
@@ -218,6 +200,7 @@ const CreateGenAssessForm = ({
                 key={n}
                 state={submodulesState}
                 index={n}
+                currentRow={currentRow}
                 setHasSubmodules={setHasSubmodules}
                 dispatch={submodulesDispatch}
                 setSubmodulesCount={setSubmodulesCount}
