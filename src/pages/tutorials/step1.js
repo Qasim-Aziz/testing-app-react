@@ -55,33 +55,33 @@ class TutorialStep1 extends React.Component {
           selectedProjectName: result.data.VimeoProject.edges[0].node.name,
         })
         this.getSelectedProjectContinueURL(spid)
-        // this.getSelectedProjectVideos(spid)
+        this.getSelectedProjectVideos(spid)
       })
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.projects !== this.state.projects) {
-      this.state.projects.map(({ node }) => {
-        fetch(`https://api.vimeo.com/users/100800066/projects/${node.projectId}/videos`, {
-          method: 'GET',
-          page: 1,
-          headers: new Headers({
-            'Content-Type': 'application/vnd.vimeo.*+json',
-            Authorization: 'Bearer 57fe5b03eac21264d45df680fb335a42',
-          }),
-        })
-          .then(res => res.json())
-          .then(res => {
-            this.setState(tt => ({
-              projectVideos: [...tt.projectVideos, { projectId: node.projectId, data: res.data }],
-              loadingMoreVideos: false,
-              playingUrl: res.data && res.data.length > 0 && res.data[0].link,
-            }))
-          })
-          .catch(err => console.log(err))
-      })
-    }
-  }
+  // componentDidUpdate(prevProps, prevState) {
+  //   if (prevState.projects !== this.state.projects) {
+  //     this.state.projects.map(({ node }) => {
+  //       fetch(`https://api.vimeo.com/users/100800066/projects/${node.projectId}/videos`, {
+  //         method: 'GET',
+  //         page: 1,
+  //         headers: new Headers({
+  //           'Content-Type': 'application/vnd.vimeo.*+json',
+  //           Authorization: 'Bearer 57fe5b03eac21264d45df680fb335a42',
+  //         }),
+  //       })
+  //         .then(res => res.json())
+  //         .then(res => {
+  //           this.setState(tt => ({
+  //             projectVideos: [...tt.projectVideos, { projectId: node.projectId, data: res.data }],
+  //             loadingMoreVideos: false,
+  //             playingUrl: res.data && res.data.length > 0 && res.data[0].link,
+  //           }))
+  //         })
+  //         .catch(err => console.log(err))
+  //     })
+  //   }
+  // }
 
   secondsToHms = d => {
     d = Number(d)
@@ -126,21 +126,18 @@ class TutorialStep1 extends React.Component {
             switch (video.node.status) {
               case '1':
                 break
-
               case '2':
                 this.setState({
                   continueURL: video.node.url,
                 })
                 already = true
                 break
-
               case '3':
                 this.setState({
                   continueURL: video.node.url,
                 })
                 already = true
                 break
-
               default:
                 console.log('Default')
                 break
@@ -155,26 +152,26 @@ class TutorialStep1 extends React.Component {
       })
   }
 
-  // getSelectedProjectVideos = projectId => {
-  //   fetch(`https://api.vimeo.com/users/100800066/projects/${projectId}/videos`, {
-  //     method: 'GET',
-  //     page: 1,
-  //     headers: new Headers({
-  //       'Content-Type': 'application/vnd.vimeo.*+json',
-  //       Authorization: 'Bearer 57fe5b03eac21264d45df680fb335a42',
-  //     }),
-  //   })
-  //     .then(res => res.json())
-  //     .then(res => {
-  //       console.log(res)
-  //       this.setState({
-  //         projectVideos: res.data,
-  //         loadingMoreVideos: false,
-  //         playingUrl: res.data && res.data.length > 0 && res.data[0].link,
-  //       })
-  //     })
-  //     .catch(err => console.log(err))
-  // }
+  getSelectedProjectVideos = projectId => {
+    fetch(`https://api.vimeo.com/users/100800066/projects/${projectId}/videos`, {
+      method: 'GET',
+      page: 1,
+      headers: new Headers({
+        'Content-Type': 'application/vnd.vimeo.*+json',
+        Authorization: 'Bearer 57fe5b03eac21264d45df680fb335a42',
+      }),
+    })
+      .then(res => res.json())
+      .then(res => {
+        console.log(res)
+        this.setState({
+          projectVideos: res.data,
+          loadingMoreVideos: false,
+          playingUrl: res.data && res.data.length > 0 && res.data[0].link,
+        })
+      })
+      .catch(err => console.log(err))
+  }
 
   handleKeyDown = () => {}
 
@@ -197,7 +194,6 @@ class TutorialStep1 extends React.Component {
     if (isLoading) {
       return <div>Loding...</div>
     }
-    console.log(projects, projectVideos, 'projects')
     return (
       <Authorize roles={['parents', 'therapist', 'school_admin']} redirect to="/dashboard/beta">
         <div
@@ -256,6 +252,59 @@ class TutorialStep1 extends React.Component {
                   {loadingMoreVideos === false && projectVideos && projectVideos.length === 0 && (
                     <p>There are no more videos in this category.</p>
                   )}
+                  {loadingMoreVideos === false &&
+                    projectVideos &&
+                    projectVideos.length > 0 &&
+                    projectVideos.map(video => (
+                      <div>
+                        {/* <Link
+                          to={{
+                            pathname: '/tutorials/step2',
+                            videoUrl: video.link,
+                            videoId: this.getVideoIdFromUrl(video.uri),
+                            videoTitle: video.name,
+                            videoDuration: this.secondsToHms(video.duration),
+                            projectId: selectedProjectId,
+                            description: video.description,
+                          }}
+                        > */}
+                        <Card
+                          onClick={() => {
+                            this.setState({ playingUrl: video.link })
+                          }}
+                          hoverable
+                          style={{
+                            margin: '5px 5px 5px 0',
+                            borderRadius: '10px',
+                            backgroundColor: '#dbe2ef',
+                          }}
+                          cover={
+                            <img
+                              alt="video"
+                              src={video.pictures.sizes[1].link}
+                              style={{ height: '150px' }}
+                            />
+                          }
+                        >
+                          <Title
+                            level={4}
+                            style={{
+                              marginBottom: '0',
+                              color: '#777777',
+                              fontWeight: '700',
+                              fontSize: 13,
+                              marginRight: '5px',
+                            }}
+                          >
+                            {video.name}
+                          </Title>
+                          <Text type="secondary" style={{ fontSize: '10px' }}>
+                            {this.secondsToHms(video.duration)}
+                          </Text>
+                        </Card>
+                        {/* </Link> */}
+                      </div>
+                    ))}
                 </div>
               </div>
             </div>
@@ -310,7 +359,7 @@ class TutorialStep1 extends React.Component {
                       selectedProjectName: project.node.name,
                       loadingMoreVideos: true,
                     })
-                    // this.getSelectedProjectVideos(project.node.projectId)
+                    this.getSelectedProjectVideos(project.node.projectId)
                   }}
                   onKeyDown={this.handleKeyDown}
                 >

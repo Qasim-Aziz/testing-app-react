@@ -4,7 +4,9 @@ import { EditOutlined } from '@ant-design/icons'
 import gql from 'graphql-tag'
 import { useQuery } from 'react-apollo'
 import { useSelector } from 'react-redux'
+
 import { COLORS } from 'assets/styles/globalStyles'
+
 
 const CONTACT_DETAILS = gql`
   query($id: ID!) {
@@ -80,7 +82,9 @@ const LeftSidePanel = ({ onActiveProfileTabChange }) => {
 
   return (
     <div
+
       style={{ minWidth: '240px', width: '386px', backgroundColor: COLORS.palleteLight }}
+
       className="border-right profile-details"
     >
       <div className="profile-title">Profile</div>

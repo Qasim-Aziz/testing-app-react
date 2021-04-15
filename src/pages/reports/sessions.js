@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 /* eslint-disable array-callback-return */
 /* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable react/jsx-indent */
@@ -76,7 +77,23 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     },
   })
 
-  console.log(data, 'dt')
+  const getBehaviourList = behaviour => {
+    if (behaviour === 'No behaviour performed!') {
+      return []
+    }
+    const behaviorItems = behaviour.split(',')
+    const res = []
+    behaviorItems.map(item => {
+      const b = item.split(':')
+      if (!isNaN(Number(b[1]) / 1000))
+        res.push({
+          behaviour: b[0].trim(),
+          duration: Number(Number(Number(b[1]) / 1000).toFixed(0)),
+        })
+    })
+
+    return res
+  }
 
   const [
     getFreDisTarget,
@@ -85,7 +102,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
   useEffect(() => {
     if (data && data.sessionSummary && session) {
       let filterData = []
-
+      console.log(data, 'data')
       if (session === 'All') {
         data.sessionSummary.map(item => {
           let itemExist = false
@@ -100,6 +117,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
           if (itemExist) {
             filterData[itemIdx] = {
               ...filterData[itemIdx],
+              key: filterData[itemIdx].id,
               behCount: filterData[itemIdx].behCount + item.behCount,
               behaviour:
                 filterData[itemIdx].behaviour === 'No behaviour performed!'
@@ -113,7 +131,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
                 filterData[itemIdx].mand === 'No mand performed!'
                   ? item.mand
                   : filterData[itemIdx].mand +
-                    (item.mand === 'No mand performed!' ? '' : item.mand),
+                    (item.mand === 'No mand performed!' ? '' : `, ${item.mand}`),
               peakCorrect: filterData[itemIdx].peakCorrect + item.peakCorrect,
               peakError: filterData[itemIdx].peakError + item.peakError,
               peakPrompt: filterData[itemIdx].peakPrompt + item.peakPrompt,
@@ -486,17 +504,44 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
       ),
     },
     {
-      title: 'Behavior count',
+      title: 'Behavior',
       dataIndex: 'behaviour',
+      render: text => {
+        if (text === null || text === '' || text === 'null' || text === 'No behaviour performed!') {
+          return 'None'
+        }
+        const behaviorItems = text.split(',')
+        const tt = []
+        behaviorItems.map(item => {
+          const b = item.split(':')
+          if (!isNaN(Number(Number(b[1]) / 1000).toFixed(0)))
+            tt.push({ behaviour: b[0], duration: Number(Number(b[1]) / 1000).toFixed(0) })
+        })
+        return (
+          <div>
+            {tt.map(item => (
+              <div key={Math.random()}>
+                {item.behaviour}: {item.duration}
+              </div>
+            ))}
+          </div>
+        )
+      },
     },
     {
-      title: 'Mand Count',
+      title: 'Mand',
       dataIndex: 'mand',
+      render: text => {
+        if (text === null || text === '' || text === 'null' || text === 'No mand performed!') {
+          return 'None'
+        }
+
+        return <span>{text}</span>
+      },
     },
     {
       title: 'Toilet Count',
-      dataIndex: 'toilet',
-      render: (text, row) => <span>{row.toilet}</span>,
+      dataIndex: 'toiletCount',
       align: 'center',
       width: 100,
     },
@@ -525,6 +570,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
       </Menu.Item>
     </Menu>
   )
+  console.log(tableData)
 
   return (
     <div>
@@ -573,6 +619,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
           dataSource={tableData}
           loading={loading}
           bordered
+          rowKey="id"
           scroll={{ x: 1950 }}
           pagination={{
             defaultPageSize: 10,

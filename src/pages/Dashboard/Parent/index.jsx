@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet'
 
 import LeftSidePanel from './LeftSidePanel'
 import RightSidePanel from './RightSidePanel'
+import { COLORS } from '../../../assets/styles/globalStyles'
 
 import '../Style.scss'
 
@@ -20,7 +21,7 @@ const TherapistDashboard = () => {
       <Helmet title="Dashboard" />
       <div
         className="parent-dashboard"
-        style={{ display: 'flex', flexDirection: 'row', backgroundColor: '#dbe2ef' }}
+        style={{ display: 'flex', flexDirection: 'row', backgroundColor: COLORS.palleteLightBlue }}
       >
         <LeftSidePanel onActiveProfileTabChange={updateActiveProfileTab} />
         <RightSidePanel

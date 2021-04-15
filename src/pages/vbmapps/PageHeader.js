@@ -38,8 +38,7 @@ export default ({ pageTitle, style, lastAssessment = false, questions, noLine = 
         {lastAssessment && <LastAssessmentResult questions={questions} />}
         {/* <Text style={{ fontSize: 20, color: '#000' }}>{pageTitle}</Text> */}
       </div>
-      {!noLine &&  <hr />}
-      
+      {!noLine && <hr />}
     </>
   )
 }

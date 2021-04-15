@@ -3,6 +3,7 @@ import { Tabs } from 'antd'
 import { COLORS } from 'assets/styles/globalStyles'
 import DashboardTab from './DashboardTab'
 import ProfileTab from './ProfileTab'
+// import { COLORS } from '../../../assets/styles/globalStyles'
 
 const { TabPane } = Tabs
 
@@ -20,14 +21,14 @@ const RightSidePanel = ({
       defaultActiveKey={activeTabKey}
       activeKey={activeTabKey}
       onChange={onActiveTabChange}
-      style={{ color: '#112d4e' }}
+      style={{ color: COLORS.palleteDarkBlue }}
     >
       <TabPane className="scrollClass shadowbox" tab="My Dashboard" key="1">
         <DashboardTab />
       </TabPane>
       <TabPane
         tab="My Profile"
-        style={{ minHeight: 400, backgroundColor: '#f4f4f4', color: '#112d4e' }}
+        style={{ minHeight: 400, backgroundColor: '#f4f4f4', color: COLORS.palleteDarkBlue }}
         key="2"
       >
         <ProfileTab

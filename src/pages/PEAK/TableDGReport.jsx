@@ -227,7 +227,6 @@ const factorageSubmissionQuery = gql`
   }
 `
 
-
 export default () => {
   const programId = localStorage.getItem('peakId')
   const peakType = localStorage.getItem('peakType')
@@ -315,28 +314,28 @@ export default () => {
   const convertDateFormat = rawAge => {
     let fAgeLocal = `1-2:11 yrs`
 
-    if (rawAge === '1-2 yrs'){      
+    if (rawAge === '1-2 yrs') {
       fAgeLocal = '1-2:11 yrs'
     }
-    if (rawAge === '3-4 yrs'){
+    if (rawAge === '3-4 yrs') {
       fAgeLocal = '3-4:11 yrs'
     }
-    if (rawAge === '5-6 yrs'){
+    if (rawAge === '5-6 yrs') {
       fAgeLocal = '5-6:11 yrs'
     }
-    if (rawAge === '7-8 yrs'){
+    if (rawAge === '7-8 yrs') {
       fAgeLocal = '7-8:11 yrs'
     }
-    if (rawAge === '9-10 yrs'){    
+    if (rawAge === '9-10 yrs') {
       fAgeLocal = '9-10:11 yrs'
     }
-    if (rawAge === '11-12 yrs'){
+    if (rawAge === '11-12 yrs') {
       fAgeLocal = '11-12:11 yrs'
     }
-    if (rawAge === '13-14 yrs'){
+    if (rawAge === '13-14 yrs') {
       fAgeLocal = '13-14:11 yrs'
     }
-    if (rawAge === '15+ yrs'){
+    if (rawAge === '15+ yrs') {
       fAgeLocal = '15+ yrs'
     }
 
@@ -346,19 +345,16 @@ export default () => {
   // updating local factor response object
   useEffect(() => {
     if (factorScores) {
-      console.log("Initial Factor score data ====> ", factorScores);
+      console.log('Initial Factor score data ====> ', factorScores)
       if (factorScores?.peakProgram?.finalAge) {
         setFinalAge(factorScores?.peakProgram?.finalAge)
         convertDateFormat(factorScores?.peakProgram?.finalAge)
         // localStorage.setItem('PeakFactorAge', factorScores?.peakProgram?.finalAge)
-      }
-      else {
-
+      } else {
         const birthday = factorScores?.peakProgram?.student.dob
         if (birthday) {
           calculateFactorAge(birthday)
         }
-
       }
 
       const copyFactorsAgeResponse = factorsAgeResponse
@@ -376,8 +372,6 @@ export default () => {
       setInitialLoading(false)
     }
   }, [factorScores])
-
-
 
   function handleChangeTable(value, v) {
     const ar = factorsAgeResponse
@@ -448,7 +442,7 @@ export default () => {
 
   // working correctly
   const getAge = (key, value, peakTYPE) => {
-    console.log("get age ==============>", key, value)
+    console.log('get age ==============>', key, value)
     let y = ''
     if (factorScores?.peakProgram?.finalAge) {
       setFinalAge(factorScores?.peakProgram?.finalAge)
@@ -461,7 +455,7 @@ export default () => {
     }
 
     if (factorScores?.peakProgram?.factorScores.edges.length > 0) {
-      console.log("factor age response true statement ===>", factorScores)
+      console.log('factor age response true statement ===>', factorScores)
       const arr = factorScores?.peakProgram?.factorScores?.edges?.forEach(element => {
         if (key === '1' && element?.node?.codeType === 'FLS') {
           y = element?.node?.age
@@ -481,8 +475,7 @@ export default () => {
         if (value <= 2) y = '1-2 yrs'
         if (2 < value && value <= 30) y = '3-4 yrs'
         if (30 < value) y = '5-6 yrs'
-      }
-      else {
+      } else {
         if (value <= 2) y = '1-2 yrs'
         if (2 < value && value <= 20) y = '3-4 yrs'
         if (20 < value && value <= 24) y = '5-6 yrs'
@@ -491,17 +484,13 @@ export default () => {
         if (28 < value && value <= 29) y = '11-12 yrs'
         if (29 < value) y = '15+ yrs'
       }
-
-
-    }
-    else if (key === '2') {
+    } else if (key === '2') {
       if (peakTYPE === 'DIRECT') {
         if (value <= 17) y = '1-2 yrs'
         if (17 < value && value < 21) y = '3-4 yrs'
         if (20 < value && value < 22) y = '5-6 yrs'
         if (21 < value) y = '7-8 yrs'
-      }
-      else {
+      } else {
         if (value <= 1) y = '1-2 yrs'
         if (1 < value && value <= 15) y = '3-4 yrs'
         if (15 < value && value <= 25) y = '5-6 yrs'
@@ -511,17 +500,14 @@ export default () => {
         if (57 < value && value <= 58) y = '13-15 yrs'
         if (58 < value) y = '15+ yrs'
       }
-
-    }
-    else if (key === '3') {
+    } else if (key === '3') {
       if (peakTYPE === 'DIRECT') {
         if (value <= 18) y = '1-2 yrs'
         if (18 < value && value < 80) y = '3-4 yrs'
         if (79 < value && value < 94) y = '5-6 yrs'
         if (93 < value && value < 99) y = '7-8 yrs'
         if (99 < value) y = '9-10 yrs'
-      }
-      else {
+      } else {
         if (value <= 2) y = '1-2 yrs'
         if (2 < value && value <= 4) y = '3-4 yrs'
         if (4 < value && value <= 9) y = '5-6 yrs'
@@ -531,24 +517,19 @@ export default () => {
         if (52 < value && value <= 61) y = '13-15 yrs'
         if (61 < value) y = '15+ yrs'
       }
-
-    }
-    else if (key === '4') {
+    } else if (key === '4') {
       if (peakTYPE === 'DIRECT') {
         if (value <= 9) y = '1-2 yrs'
         if (9 < value && value < 22) y = '5-6 yrs'
         if (21 < value && value < 28) y = '7-8 yrs'
         if (27 < value) y = '9-10 yrs'
-      }
-      else {
+      } else {
         if (value <= 16) y = '9-10 yrs'
         if (16 < value && value <= 20) y = '11-12 yrs'
         if (20 < value && value <= 26) y = '13-15 yrs'
         if (26 < value) y = '15+ yrs'
       }
-
     }
-
 
     return y
   }
@@ -712,11 +693,11 @@ export default () => {
 
   const showDrawer = () => {
     setVisible(true)
-  };
+  }
 
   const onClose = () => {
     setVisible(false)
-  };
+  }
 
   return (
     <>
@@ -729,19 +710,11 @@ export default () => {
           onClose={onClose}
           visible={visible}
         >
-          <NewTableReportPdf
-            tdata={tdata}
-            defaultScores={defaultScores}
-            peakType={peakType}
-          />
+          <NewTableReportPdf tdata={tdata} defaultScores={defaultScores} peakType={peakType} />
         </Drawer>
         <Col sm={24}>
           <div>
-            <Button
-              type="link"
-              style={{ float: 'right', marginBottom: 5 }}
-              onClick={showDrawer}
-            >
+            <Button type="link" style={{ float: 'right', marginBottom: 5 }} onClick={showDrawer}>
               View & Download PDF
             </Button>
           </div>
@@ -772,18 +745,16 @@ export default () => {
                   {peakType === 'GENERALIZATION' && (
                     <Option value="13-14 yrs">13 - 14:11 Yrs</Option>
                   )}
-                  {peakType === 'GENERALIZATION' && (
-                    <Option value="15+ yrs">15+ :11 Yrs</Option>
-                  )}
+                  {peakType === 'GENERALIZATION' && <Option value="15+ yrs">15+ :11 Yrs</Option>}
                 </Select>
               </td>
               <td style={{ ...tdStyle, backgroundColor: colorRed }}>
                 <p style={{ fontSize: 11 }}>
-                  INSTRUCTIONS: Learner Scores, Typical Age Scores and Difference Scores
-                  will automatically calculate when Age Range of Child is input AND when
-                  Factor Scoring Grid is completed. Use the information to determine
-                  Approximate Age Equivalent and select from dropdown.
-                        </p>
+                  INSTRUCTIONS: Learner Scores, Typical Age Scores and Difference Scores will
+                  automatically calculate when Age Range of Child is input AND when Factor Scoring
+                  Grid is completed. Use the information to determine Approximate Age Equivalent and
+                  select from dropdown.
+                </p>
               </td>
             </tr>
           </table>
@@ -792,9 +763,7 @@ export default () => {
           <p style={{ textAlign: 'center', marginTop: 10, fontWeight: 700 }}>
             DIRECT TRAINING MODULE
           </p>
-          <table
-            style={{ borderCollapse: 'collapse', width: '100%', border: '2px solid black' }}
-          >
+          <table style={{ borderCollapse: 'collapse', width: '100%', border: '2px solid black' }}>
             <tr>
               <td style={{ ...moduleTheaderStyle, width: 370 }}>PEAK FACTOR</td>
               <td style={moduleTheaderStyle}>SCORE</td>
@@ -813,35 +782,35 @@ export default () => {
                     <td style={moduleTfooterStyle}>&nbsp;</td>
                   </>
                 ) : (
-                    <>
-                      <td style={{ ...moduleTbodyStyle, width: 370 }}>{item.peak}</td>
-                      <td style={moduleTbodyStyle}>{item.s_score}</td>
-                      <td style={moduleTbodyStyle}>{item.t_age_score}</td>
-                      <td style={moduleTbodyStyle}>{item.difference}</td>
-                      <td style={moduleTbodyStyle}>
-                        <Select
-                          defaultValue={item.age}
-                          style={{ width: 120 }}
-                          onChange={value => handleChangeTable(JSON.stringify(item), value)}
-                        >
-                          <Option value="1-2 yrs">1 - 2:11 Yrs</Option>
-                          <Option value="3-4 yrs">3 - 4:11 Yrs</Option>
-                          <Option value="5-6 yrs">5 - 6:11 Yrs</Option>
-                          <Option value="7-8 yrs">7 - 8:11 Yrs</Option>
-                          <Option value="9-10 yrs">9 - 10:11 Yrs</Option>
-                          {peakType === 'GENERALIZATION' && (
-                            <Option value="11-12 yrs">11 - 12:11 Yrs</Option>
-                          )}
-                          {peakType === 'GENERALIZATION' && (
-                            <Option value="13-14 yrs">13 - 14:11 Yrs</Option>
-                          )}
-                          {peakType === 'GENERALIZATION' && (
-                            <Option value="15+ yrs">15+ :11 Yrs</Option>
-                          )}
-                        </Select>
-                      </td>
-                    </>
-                  )}
+                  <>
+                    <td style={{ ...moduleTbodyStyle, width: 370 }}>{item.peak}</td>
+                    <td style={moduleTbodyStyle}>{item.s_score}</td>
+                    <td style={moduleTbodyStyle}>{item.t_age_score}</td>
+                    <td style={moduleTbodyStyle}>{item.difference}</td>
+                    <td style={moduleTbodyStyle}>
+                      <Select
+                        defaultValue={item.age}
+                        style={{ width: 120 }}
+                        onChange={value => handleChangeTable(JSON.stringify(item), value)}
+                      >
+                        <Option value="1-2 yrs">1 - 2:11 Yrs</Option>
+                        <Option value="3-4 yrs">3 - 4:11 Yrs</Option>
+                        <Option value="5-6 yrs">5 - 6:11 Yrs</Option>
+                        <Option value="7-8 yrs">7 - 8:11 Yrs</Option>
+                        <Option value="9-10 yrs">9 - 10:11 Yrs</Option>
+                        {peakType === 'GENERALIZATION' && (
+                          <Option value="11-12 yrs">11 - 12:11 Yrs</Option>
+                        )}
+                        {peakType === 'GENERALIZATION' && (
+                          <Option value="13-14 yrs">13 - 14:11 Yrs</Option>
+                        )}
+                        {peakType === 'GENERALIZATION' && (
+                          <Option value="15+ yrs">15+ :11 Yrs</Option>
+                        )}
+                      </Select>
+                    </td>
+                  </>
+                )}
               </tr>
             ))}
           </table>
@@ -858,14 +827,12 @@ export default () => {
             onClick={saveTableData}
           >
             Save
-                  </Button>
+          </Button>
           <p style={{ textAlign: 'center', marginTop: 10, fontWeight: 700 }}>
             TYPICAL AGE DISTRIBUTION OF PEAK FACTOR SCORES
-                  </p>
+          </p>
 
-          <table
-            style={{ borderCollapse: 'collapse', width: '100%', border: '2px solid black' }}
-          >
+          <table style={{ borderCollapse: 'collapse', width: '100%', border: '2px solid black' }}>
             <thead>
               <tr>
                 <td style={{ ...moduleTheaderStyle, width: 370 }}>PEAK Factor</td>
@@ -902,29 +869,27 @@ export default () => {
                     )}
                   </>
                 ) : (
-                    <>
-                      <td style={{ ...moduleTbodyStyle, width: 370 }}>{item.name}</td>
-                      <td style={moduleTbodyStyle}>{item.first}</td>
-                      <td style={moduleTbodyStyle}>{item.second}</td>
-                      <td style={moduleTbodyStyle}>{item.third}</td>
-                      <td style={moduleTbodyStyle}>{item.fourth}</td>
-                      <td style={moduleTbodyStyle}>{item.fifth}</td>
-                      {peakType === 'GENERALIZATION' && (
-                        <>
-                          <td style={moduleTbodyStyle}>{item.sixth}</td>
-                          <td style={moduleTbodyStyle}>{item.seventh}</td>
-                          <td style={moduleTbodyStyle}>{item.eighth}</td>
-                        </>
-                      )}
-                    </>
-                  )}
+                  <>
+                    <td style={{ ...moduleTbodyStyle, width: 370 }}>{item.name}</td>
+                    <td style={moduleTbodyStyle}>{item.first}</td>
+                    <td style={moduleTbodyStyle}>{item.second}</td>
+                    <td style={moduleTbodyStyle}>{item.third}</td>
+                    <td style={moduleTbodyStyle}>{item.fourth}</td>
+                    <td style={moduleTbodyStyle}>{item.fifth}</td>
+                    {peakType === 'GENERALIZATION' && (
+                      <>
+                        <td style={moduleTbodyStyle}>{item.sixth}</td>
+                        <td style={moduleTbodyStyle}>{item.seventh}</td>
+                        <td style={moduleTbodyStyle}>{item.eighth}</td>
+                      </>
+                    )}
+                  </>
+                )}
               </tr>
             ))}
           </table>
         </Col>
       </Row>
-
     </>
-
   )
 }

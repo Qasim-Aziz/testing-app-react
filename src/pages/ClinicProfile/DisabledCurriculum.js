@@ -29,6 +29,7 @@ import {
 } from 'antd'
 import gql from 'graphql-tag'
 import apolloClient from '../../apollo/config'
+import { COLORS } from '../../assets/styles/globalStyles'
 
 const { Title, Text } = Typography
 
@@ -308,11 +309,11 @@ class ChangePasswordForm extends React.Component {
       return 'Loading...'
     }
 
-    const divStyle = { height: 600, overflow: 'auto', backgroundColor: '#edf1f7' }
+    const divStyle = { height: 600, overflow: 'auto', backgroundColor: COLORS.palleteLight }
     const childDivStyle = { padding: 4 }
     const childChildDivStyle = {
       border: '1px solid black',
-      backgroundColor: 'white',
+      backgroundColor: COLORS.white,
       borderRadius: 4,
       padding: 4,
     }

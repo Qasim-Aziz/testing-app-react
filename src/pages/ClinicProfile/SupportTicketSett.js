@@ -106,7 +106,7 @@ const InfoCard = ({ count, title, style, onClick, filterButId, id }) => (
       width: 160,
       height: 85,
       background: filterButId === id ? '#74b4ef' : '#eee',
-      color: filterButId === id ? '#fff' : '#000',
+      color: filterButId === id ? COLORS.white : COLORS.blackLighten,
       cursor: 'pointer',
       boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
       ...style,
@@ -116,7 +116,7 @@ const InfoCard = ({ count, title, style, onClick, filterButId, id }) => (
       style={{
         fontSize: 22,
         fontWeight: 600,
-        color: filterButId === id ? '#fff' : '#000',
+        color: filterButId === id ? COLORS.white : COLORS.blackLighten,
       }}
     >
       {count}
@@ -127,7 +127,7 @@ const InfoCard = ({ count, title, style, onClick, filterButId, id }) => (
         fontWeight: 600,
         display: 'block',
         lineHeight: '20px',
-        color: filterButId === id ? '#fff' : '#000',
+        color: filterButId === id ? COLORS.white : COLORS.blackLighten,
       }}
     >
       {title}

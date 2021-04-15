@@ -22,156 +22,172 @@
 
 import React from 'react'
 import { Helmet } from 'react-helmet'
-import { Layout, Row, Col, Typography, Button, Icon, Collapse, } from 'antd'
+import { Layout, Row, Col, Typography, Button, Icon, Collapse, Tooltip } from 'antd'
+import { DownloadOutlined } from '@ant-design/icons'
 import { connect } from 'react-redux'
 import LoadingComponent from 'components/LoadingComponent'
 import actions from 'redux/iisaassessment/actions'
+import { withRouter } from 'react-router-dom'
+import DownloadReport from './downloadReport'
+import { FONT } from '../../../assets/styles/globalStyles'
+import '../assessment.scss'
+import logo from '../../../images/WhatsApp Image 2020-04-23 at 10.00.40 (1).jpeg'
 
 const { Content } = Layout
 const { Title, Text } = Typography
-const { Panel } = Collapse;
+const { Panel } = Collapse
 
 const cardStyle = {
-	background: '#FFFFFF',
-	boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
-	borderRadius: 7,
-	padding: '5px 12px',
-	alignItems: 'center',
-	display: 'block',
-	width: '100%',
-	marginBottom: '10px',
-	lineHeight: '27px',
-	cursor: 'pointer'
-	// minHeight: '130px',
+  background: '#FFFFFF',
+  boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
+  borderRadius: 7,
+  padding: '5px 12px',
+  alignItems: 'center',
+  display: 'block',
+  width: '100%',
+  marginBottom: '10px',
+  lineHeight: '27px',
+  cursor: 'pointer',
+  // minHeight: '130px',
 }
 
 const selectedCardStyle = {
-	background: '#3f72af',
-	color: '#fff',
-	boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
-	borderRadius: 7,
-	padding: '5px 12px',
-	alignItems: 'center',
-	display: 'block',
-	width: '100%',
-	marginBottom: '10px',
-	lineHeight: '27px',
-	cursor: 'pointer'
-	// minHeight: '130px',
+  background: '#3f72af',
+  color: '#fff',
+  boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
+  borderRadius: 7,
+  padding: '5px 12px',
+  alignItems: 'center',
+  display: 'block',
+  width: '100%',
+  marginBottom: '10px',
+  lineHeight: '27px',
+  cursor: 'pointer',
+  // minHeight: '130px',
 }
 
 const titleStyle = {
-	fontSize: '14px',
-	lineHeight: '24px',
-	display: 'block',
-	width: '100%',
+  fontSize: '14px',
+  lineHeight: '24px',
+  display: 'block',
+  width: '100%',
 }
 
 const selectedTitleStyle = {
-	fontSize: '14px',
-	lineHeight: '24px',
-	display: 'block',
-	width: '100%',
-	color: '#fff'
+  fontSize: '14px',
+  lineHeight: '24px',
+  display: 'block',
+  width: '100%',
+  color: '#fff',
 }
 
-const buttonDefaultStyle = { padding: '20px auto', width: '220px', height: '50px', marginRight: '20px', fontSize: '15px', color: '#3f72af', margin: 5 }
-const buttonTrueStyle = { padding: '20px auto', width: '220px', height: '50px', marginRight: '20px', fontSize: '15px', color: 'white', backgroundColor: '#3f72af', margin: 5 }
-
-
+const buttonDefaultStyle = {
+  padding: '20px auto',
+  width: '220px',
+  height: '50px',
+  marginRight: '20px',
+  fontSize: '15px',
+  color: '#3f72af',
+  margin: 5,
+}
+const buttonTrueStyle = {
+  padding: '20px auto',
+  width: '220px',
+  height: '50px',
+  marginRight: '20px',
+  fontSize: '15px',
+  color: 'white',
+  backgroundColor: '#3f72af',
+  margin: 5,
+}
 
 @connect(({ iisaassessment, student }) => ({
-	iisaassessment,
-	student,
+  iisaassessment,
+  student,
 }))
 class Screeing extends React.Component {
-	constructor(props) {
-		super(props)
+  constructor(props) {
+    super(props)
 
-		this.state = {}
-	}
+    this.state = {}
+  }
 
-	componentDidMount() {
-		this.onRenderWithoutID()
-	}
+  componentDidMount() {
+    this.onRenderWithoutID()
+  }
 
-	onRenderWithoutID = () => {
-		const { dispatch, iisaassessment: { SelectedAssessmentId } } = this.props
-		if (!SelectedAssessmentId) {
-			window.location.href = '/#/iisaAssessment'
-		}
-		else {
-			dispatch({
-				type: actions.LOAD_ASSESSMENT_REPORT,
-				payload: {
-					objectId: SelectedAssessmentId
-				}
-			})
-		}
-	}
+  onRenderWithoutID = () => {
+    const {
+      dispatch,
+      iisaassessment: { SelectedAssessmentId },
+    } = this.props
+    if (!SelectedAssessmentId) {
+      window.location.href = '/#/iisaAssessment'
+    } else {
+      dispatch({
+        type: actions.LOAD_ASSESSMENT_REPORT,
+        payload: {
+          objectId: SelectedAssessmentId,
+        },
+      })
+    }
+  }
 
-	showReport = () => {
-		window.location.href = '/#/iisaReport'
-	}
+  showReport = () => {
+    window.location.href = '/#/iisaReport'
+  }
 
-	render() {
-		const {
-			student: { StudentName },
-			iisaassessment: {
-				AssessmentReportLoading,
-				SelectedAssessmentId,
-				AssessmentReport,
-			},
-		} = this.props
+  render() {
+    console.log('report')
+    console.log(this.props)
+    const {
+      student: { StudentName },
+      iisaassessment: { AssessmentReportLoading, SelectedAssessmentId, AssessmentReport },
+    } = this.props
 
-		if (!SelectedAssessmentId) {
-			window.location.href = '/#/iisaAssessment'
-		}
+    if (!SelectedAssessmentId) {
+      window.location.href = '/#/iisaAssessment'
+    }
 
-		if (AssessmentReportLoading) {
-			return <LoadingComponent />
-		}
+    if (AssessmentReportLoading) {
+      return <LoadingComponent />
+    }
 
-		return (
-			<>
-				<Helmet title="IISA Report" />
-				<Layout style={{ padding: '0px' }}>
-					<Content
-						style={{
-							padding: '0px 20px',
-							maxWidth: 1300,
-							width: '100%',
-							margin: '0px auto',
-						}}
-					>
-						{!AssessmentReportLoading ?
-							<Row>
-								<Col sm={24}>
-									
-										{AssessmentReport && (
-											<>
-												<Title style={{ fontSize: '20px', lineHeight: '20px' }}>{StudentName}&apos;s Assessment</Title>
-												<br />
-												<Title style={{ fontSize: '20px', lineHeight: '20px' }}>Score : {AssessmentReport.score}</Title>
-												<br />
-												<Title style={{ fontSize: '20px', lineHeight: '20px' }}>classification : {AssessmentReport.classification}</Title>
-											</>
-										)}
-
-									
-								</Col>
-							</Row>
-							:
-							<>
-								<p>Loading Assessment Report..</p>
-							</>
-						}
-					</Content>
-
-				</Layout>
-			</>
-		)
-	}
+    return (
+      <>
+        <Helmet title="IISA Report" />
+        <Layout style={{ padding: '0px' }}>
+          <Content
+            style={{
+              // padding: '0px 20px',
+              // maxWidth: 1300,
+              width: '100%',
+              margin: '0px auto',
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            {!AssessmentReportLoading ? (
+              <>
+                {AssessmentReport && (
+                  <>
+                    <DownloadReport
+                      Assessmentscore={this.props.iisaassessment.AssessmentReport.score}
+                      SelectedAssessmentId={this.props.iisaassessment.SelectedAssessmentId}
+                    />
+                  </>
+                )}
+              </>
+            ) : (
+              <>
+                <p>Loading Assessment Report..</p>
+              </>
+            )}
+          </Content>
+        </Layout>
+      </>
+    )
+  }
 }
 
 export default Screeing

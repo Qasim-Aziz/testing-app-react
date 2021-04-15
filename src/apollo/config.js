@@ -4,7 +4,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-shadow */
 /* eslint-disable import/extensions */
-
+/* eslint-disable object-shorthand */
 import { ApolloClient } from 'apollo-client'
 import { createHttpLink } from 'apollo-link-http'
 import { setContext } from 'apollo-link-context'
@@ -20,12 +20,13 @@ const httpLink = createHttpLink({
 
 const errorLink = onError(({ graphQLErrors, networkError, response, operation, forward }) => {
   if (graphQLErrors) {
-    // graphQLErrors.forEach(({ message, locations, path }) =>
-    //   notification.success({
-    //     message: message,
-    //     description: message,
-    //   })
-    // );
+    graphQLErrors.forEach(({ message, locations, path }) =>
+      notification.error({
+        message: message,
+        duration: 10
+        // description: message,
+      })
+    );
   }
 })
 

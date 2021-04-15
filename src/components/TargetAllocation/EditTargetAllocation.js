@@ -660,7 +660,7 @@ export default Form.create()(
           </Form.Item>
           <Form.Item label="Domain Name" name="Domain Name">
             {form.getFieldDecorator('domain', {
-              initialValue: activeAllocatedTarget && activeAllocatedTarget.manualAllocateDomain?.id,
+              initialValue: activeAllocatedTarget && activeAllocatedTarget?.targetId ? activeAllocatedTarget.targetId?.domain?.id : activeAllocatedTarget?.manualAllocateDomain?.id,
               rules: [{ required: true, message: 'Please select a domain' }],
             })(
               <Select name="domain" {...searchableDropDownOption} loading={isDomainLoading}>

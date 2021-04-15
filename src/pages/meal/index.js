@@ -139,25 +139,7 @@ const MealDataPage = props => {
   }, [updateMealId])
 
   useEffect(() => {
-    if (deleteError) {
-      notification.error({
-        message: 'Something went wrong',
-        description: 'Unable to delete meal record',
-      })
-    }
-    if (deleteData) {
-      notification.success({
-        message: 'Meal Data',
-        description: 'Meal Data Deleted Successfully',
-      })
-      refetchMeal()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [deleteData])
-
-  useEffect(() => {
     if (moment(newMealDate).isBetween(startDate, endDate, undefined, []) && newMeal) {
-      console.log('new meal created--->', newMealDate)
       setMealList(state => {
         if (state.length) {
           setMealList([...state, newMeal])
@@ -269,6 +251,22 @@ const MealDataPage = props => {
         id,
       },
     })
+      .then(res => {
+        if (res) {
+          notification.success({
+            message: 'Meal Data',
+            description: 'Meal Data Deleted Successfully',
+          })
+          console.log('refetching')
+          refetchMeal()
+        }
+      })
+      .catch(err => {
+        notification.error({
+          message: 'Something went wrong',
+          description: 'Unable to delete meal record',
+        })
+      })
   }
 
   const searchMeal = e => {

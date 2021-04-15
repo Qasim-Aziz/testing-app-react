@@ -363,6 +363,7 @@ class TargetAllocationToSession extends React.Component {
           node={item.node}
           text={item.node.targetAllcatedDetails.targetName}
           showAllocation={true}
+          showEdit={true}
           onEditTarget={() => this.showEditTargetDrawer(item.node)}
         />,
       )

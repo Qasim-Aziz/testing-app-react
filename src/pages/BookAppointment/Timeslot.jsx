@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Form, Input, Button, Popover, notification } from 'antd'
 import { COLORS } from 'assets/styles/globalStyles'
 import moment from 'moment'
+import { combineDateAndTime } from 'utilities'
 import { useMutation } from 'react-apollo'
 import { CREATE_APPOINTMENT } from './query'
 
@@ -45,38 +46,52 @@ const Timeslot = ({
   }, [createAppointmentData])
 
   useEffect(() => {
-    if (createAppointmentError){
+    if (createAppointmentError) {
       console.log(createAppointmentError)
-      notification.error({ 
+      notification.error({
         message: 'Error! please check your timings or you already have appointment',
-        // message: createAppointmentError[0]?.message, 
-        duration: 10
+        // message: createAppointmentError[0]?.message,
+        duration: 10,
       })
     }
   }, [createAppointmentError])
 
+
   const getDateTime = momentObj => momentObj.local().utc().format('YYYY-MM-DDTHH:mm:ssZ')
-  
+
 
   const bookAppointment = e => {
     e.preventDefault()
-    console.log("slot time asdhahsjdhas =======> ",getDateTime(selectedDate))
-    createAppointment({
-      variables: {
-        title: titleText,
-        studentId,
-        therapistId: selectedTherapist,
-        note: noteText,
-        purposeAssignment: purposeText,
-        startDateAndTime: getDateTime(selectedDate),
-        endDateAndTime: getDateTime(selectedDate),
-        slotDate: selectedDate.format('YYYY-MM-DD'),
-        slotTime: selectedTimeSlot,
-        appointmentStatus: pendingStatusId,
-      },
-      errorPolicy: 'all'
-    })
-    setPopoverVisible(false)
+    console.log("selectedTimeSlot ===>", selectedTimeSlot)
+    console.log("selectedDate ===>", selectedDate)
+    console.log(combineDateAndTime(selectedDate, moment(selectedTimeSlot, 'HH:mm a')))
+    console.log("slot time asdhahsjdhas =======> ", getDateTime(selectedDate))
+    if (!titleText || !purposeText) {
+      notification.error({
+        message: 'Appointment Title and purpose is required',
+        // message: createAppointmentError[0]?.message, 
+        duration: 5
+      })
+    }
+    else {
+      createAppointment({
+        variables: {
+          title: titleText,
+          studentId,
+          therapistId: selectedTherapist,
+          note: noteText,
+          purposeAssignment: purposeText,
+          startDateAndTime: combineDateAndTime(selectedDate, moment(selectedTimeSlot, 'HH:mm a')),
+          endDateAndTime: combineDateAndTime(selectedDate, moment(selectedTimeSlot, 'HH:mm a')),
+          slotDate: selectedDate.format('YYYY-MM-DD'),
+          slotTime: selectedTimeSlot,
+          appointmentStatus: pendingStatusId,
+        },
+        errorPolicy: 'all'
+      })
+      setPopoverVisible(false)
+    }
+    
   }
 
   const popoverContent = (
@@ -166,20 +181,19 @@ const Timeslot = ({
           visible={isPopoverVisible}
           onVisibleChange={setPopoverVisible}
         >
-
           <Button size="large" style={{ width: '80%' }} disabled={isCreateAppointmentLoading}>
             {selectedTimeSlot}
           </Button>
-
         </Popover>
-      ) :
-
-        <Button size="large" style={{ width: '80%', backgroundColor: COLORS.palleteLightBlue }} disabled>
+      ) : (
+        <Button
+          size="large"
+          style={{ width: '80%', backgroundColor: COLORS.palleteLightBlue }}
+          disabled
+        >
           {selectedTimeSlot}
         </Button>
-
-      }
-
+      )}
     </>
   )
 }

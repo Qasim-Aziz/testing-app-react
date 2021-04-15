@@ -6,7 +6,7 @@ import { useQuery, useMutation } from 'react-apollo'
 import { useSelector, useDispatch } from 'react-redux'
 import CreateAppointmentForm from 'components/Form/CreateAppointmentForm'
 import UpdateAppointmentForm from 'components/Form/UpdateAppointmentForm'
-import { DRAWER } from 'assets/styles/globalStyles'
+import { DRAWER, COLORS } from 'assets/styles/globalStyles'
 import { PlusOutlined } from '@ant-design/icons'
 import SessionFeedbackForm from '../sessionFeedback'
 import { APPOINTMENTS_FOR_RANGE, UPDATE_APPOINTMENT } from './query'
@@ -201,12 +201,12 @@ export default () => {
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '0px 10px',
-            backgroundColor: '#FFF',
+            backgroundColor: COLORS.white,
             boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
           }}
         >
           <div>
-            <span style={{ fontSize: '25px', color: '#000' }}>Appointments</span>
+            <span style={{ fontSize: '25px', color: COLORS.blackLighten }}>Appointments</span>
           </div>
           <div style={{ padding: '5px 0px' }}>
             {userRole !== 'parents' && (
