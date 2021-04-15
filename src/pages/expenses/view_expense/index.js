@@ -19,7 +19,6 @@ import { Helmet } from 'react-helmet'
 import { connect } from 'react-redux'
 import DataTable from 'react-data-table-component'
 import {
-  Table,
   Button,
   Card,
   Avatar,
@@ -34,7 +33,7 @@ import {
   Tag,
 } from 'antd'
 import JsPDF from 'jspdf'
-// import 'jspdf-autotable'
+import 'jspdf-autotable'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import { Scrollbars } from 'react-custom-scrollbars'
@@ -46,8 +45,6 @@ import {
   FileExcelOutlined,
   DownOutlined,
   CloudDownloadOutlined,
-  DeleteOutlined,
-  EditOutlined,
 } from '@ant-design/icons'
 import moment from 'moment'
 // imports for supporting files
@@ -374,15 +371,11 @@ class ExpenseTable extends React.Component {
 
     const columns = [
       {
-        title: '#',
-        render: row => filteredList.indexOf(row) + 1,
-      },
-      {
-        title: 'ItemName',
-        // selector: 'itemName',
+        name: 'ItemName',
+        selector: 'itemName',
         sortable: true,
         // maxWidth: '120px',
-        render: row => {
+        cell: row => {
           row.itemName === null ? <span> </span> : <></>
 
           return (
@@ -397,53 +390,34 @@ class ExpenseTable extends React.Component {
         },
       },
       {
-        title: 'purchaseFrom',
-        // selector: 'purchaseFrom',
+        name: 'purchaseFrom',
+        selector: 'purchaseFrom',
         // maxWidth: '120px',
-        render: row => {
+        cell: row => {
           return <span>{row.purchaseFrom ? row.purchaseFrom : ''} </span>
         },
       },
       {
-        title: 'Amount',
-        // selector: 'amount',
+        name: 'Amount',
+        selector: 'amount',
         // maxWidth: '120px',
-        render: row => {
+        cell: row => {
           // console.log('ROW', row.phone)
           return <span>{row.amount ? row.amount : ''} </span>
         },
       },
       {
-        title: 'Paid By',
-        // selector: 'paidBy',
+        name: 'Paid By',
+        selector: 'paidBy',
         // maxWidth: '120px',
-        render: row => <span>{row.paidBy ? row.paidBy : ''} </span>,
+        cell: row => <span>{row.paidBy ? row.paidBy : ''} </span>,
       },
       {
-        title: 'Status',
-        // selector: 'status',
+        name: 'Status',
+        selector: 'status',
         // maxWidth: '120px',
-        render: row => <span>{row.status ? row.status : ''}</span>,
+        cell: row => <span>{row.status ? row.status : ''}</span>,
       },
-      /*{
-        title: 'Actions',
-        // selector: 'status',
-        // maxWidth: '120px',
-        render: row => {
-          console.log('THE ROW', row)
-          return (
-            <>
-              <Button>
-                <EditOutlined />
-                Comment
-              </Button>
-              <Button>
-                <DeleteOutlined />
-              </Button>
-            </>
-          )
-        },
-      },*/
     ]
 
     const exportPDF = () => {
@@ -469,98 +443,8 @@ class ExpenseTable extends React.Component {
       </Menu>
     )
 
-    const tableHeader = (
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          position: 'relative',
-          whiteSpace: 'nowrap',
-          zIndex: 2,
-          width: 'fit-content',
-          paddingTop: '4px',
-        }}
-      >
-        {/* Search bar for itemName */}
-        <span style={{ display: 'flex', alignItems: 'center' }}>
-          <span>Name :</span>
-          <Input
-            size="small"
-            name="itemName"
-            placeholder="Search Name"
-            value={this.state.filterItemName}
-            onChange={e => {
-              this.setState({
-                filterItemName: e.target.value,
-                isFilterActive: e.target.value && true,
-              })
-              this.filterHandler({ itemName: e.target.value })
-            }}
-            style={{ ...tableFilterStyles, width: '112px' }}
-          />
-        </span>
-        {/* Search bar for Purchased From */}
-        <span style={{ display: 'flex', alignItems: 'center' }}>
-          <span>Purchased From :</span>
-          <Input
-            size="small"
-            name="purchaseFrom"
-            placeholder="Purchased From"
-            value={this.state.filterPurchaseFrom}
-            onChange={e => {
-              this.setState({
-                filterPurchaseFrom: e.target.value,
-                isFilterActive: e.target.value && true,
-              })
-              this.filterHandler({ purchaseFrom: e.target.value })
-            }}
-            style={{ ...tableFilterStyles, width: '148px' }}
-          />
-        </span>
-
-        {/* Different kinds of status */}
-        <span style={{ display: 'flex', alignItems: 'center', padding: '7px' }}>
-          <span>STATUS :</span>
-          <Select
-            placeholder="Status"
-            // allowClear
-            value={this.state.filterStatus}
-            onChange={e => {
-              console.log('-----------------------------------------------', e)
-              this.selectActiveStatus(e)
-              this.setState({ filterStatus: e, isFilterActive: true })
-            }}
-            style={{ width: '120px' }}
-          >
-            <Select.Option value="PENDING">PENDING</Select.Option>
-            <Select.Option value="COMPLETED">COMPLETED</Select.Option>
-            <Select.Option value="CREATED">CREATED</Select.Option>
-          </Select>
-        </span>
-        {/* Different kinds of Paid By values */}
-        <span style={{ display: 'flex', alignItems: 'center', padding: '7px' }}>
-          <span>PAID BY :</span>
-          <Select
-            placeholder="Status"
-            // allowClear
-            value={this.state.filterPaidBy}
-            onChange={e => {
-              console.log('-----------------------------------------------', e)
-              this.selectActiveStatus(e)
-              this.setState({ filterPaidBy: e, isFilterActive: true })
-            }}
-            style={{ width: '120px' }}
-          >
-            <Select.Option value="CASH">CASH</Select.Option>
-            <Select.Option value="CHEQUE">CHEQUE</Select.Option>
-            <Select.Option value="CARD">CARD</Select.Option>
-          </Select>
-        </span>
-      </div>
-    )
-
     return (
-      <>
+      <div>
         <Helmet title="Expenses" />
         {/* DRAWER FOR CREATE EXPENSES */}
         <Drawer
@@ -587,8 +471,7 @@ class ExpenseTable extends React.Component {
           {SpecificExpense ? (
             <div className="card" style={{ marginTop: '5px', border: 'none' }}>
               <div className="card-body">
-                {/* style={{ marginTop: '100px' }} */}
-                <div id="basic_form_div">
+                <div id="basic_form_div" style={{ marginTop: '100px' }}>
                   {isSpecificExpense ? <EditBasicInformation key={SpecificExpense.id} /> : null}
                 </div>
               </div>
@@ -606,6 +489,7 @@ class ExpenseTable extends React.Component {
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '0px 10px',
+            marginTop: '20px',
             backgroundColor: '#FFF',
             boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
           }}
@@ -657,38 +541,132 @@ class ExpenseTable extends React.Component {
           </div>
         </div>
         {/* ********************** END of DIV FOR TOP_BAR***************** */}
-
-        {/* ************* DIV FOR DATA-TABLE ************ */}
-        <div>
-          <div style={{ marginBottom: '50px' }}>
-            <div className="view_expense">
-              <Table
-                title={() => {
-                  return tableHeader
-                }}
-                columns={columns}
-                rowKey={record => record.id}
-                dataSource={filteredList}
-                loading={loadingExpenses} // this.state.loadingExpenses
-                // ⭐ The below commented code is for pagination from server side
-                /* pagination={{
-                   defaultPageSize: 20,
-                   onChange: (page, rows) => this.pageChanged(page, rows),
-                   onShowSizeChange: (currentPage, currentRowsPerPage) =>
-                   this.rowsChanged(currentRowsPerPage, currentPage),
-                   showSizeChanger: true,
-                   pageSizeOptions:
-                     TotalLeaders > 100
-                       ? ['20', '50', '80', '100', `${TotalLeaders}`]
-                       : ['20', '50', '80', '100'],
-                   position: 'bottom',
+        {/* ********************** END of DIV FOR TOP_BAR***************** */}
+        <div className={divClass}>
+          <div style={{ marginTop: '24px', marginBottom: '50px' }}>
+            {/* ************* DIV FOR filtering ************ */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                position: 'relative',
+                whiteSpace: 'nowrap',
+                zIndex: 2,
+                width: 'fit-content',
+                paddingTop: '4px',
+              }}
+            >
+              {/* Search bar for itemName */}
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <span>Name :</span>
+                <Input
+                  size="small"
+                  name="itemName"
+                  placeholder="Search Name"
+                  value={this.state.filterItemName}
+                  onChange={e => {
+                    this.setState({
+                      filterItemName: e.target.value,
+                      isFilterActive: e.target.value && true,
+                    })
+                    this.filterHandler({ itemName: e.target.value })
                   }}
-                */
+                  style={{ ...tableFilterStyles, width: '112px' }}
+                />
+              </span>
+              {/* Search bar for Purchased From */}
+              <span style={{ display: 'flex', alignItems: 'center' }}>
+                <span>Purchased From :</span>
+                <Input
+                  size="small"
+                  name="purchaseFrom"
+                  placeholder="Purchased From"
+                  value={this.state.filterPurchaseFrom}
+                  onChange={e => {
+                    this.setState({
+                      filterPurchaseFrom: e.target.value,
+                      isFilterActive: e.target.value && true,
+                    })
+                    this.filterHandler({ purchaseFrom: e.target.value })
+                  }}
+                  style={{ ...tableFilterStyles, width: '148px' }}
+                />
+              </span>
+
+              {/* Different kinds of status */}
+              <span style={{ display: 'flex', alignItems: 'center', padding: '7px' }}>
+                <span>STATUS :</span>
+                <Select
+                  placeholder="Status"
+                  // allowClear
+                  value={this.state.filterStatus}
+                  onChange={e => {
+                    console.log('-----------------------------------------------', e)
+                    this.selectActiveStatus(e)
+                    this.setState({ filterStatus: e, isFilterActive: true })
+                  }}
+                  style={{ width: '120px' }}
+                >
+                  <Select.Option value="PENDING">PENDING</Select.Option>
+                  <Select.Option value="COMPLETED">COMPLETED</Select.Option>
+                  <Select.Option value="CREATED">CREATED</Select.Option>
+                </Select>
+              </span>
+              {/* Different kinds of Paid By values */}
+              <span style={{ display: 'flex', alignItems: 'center', padding: '7px' }}>
+                <span>PAID BY :</span>
+                <Select
+                  placeholder="Status"
+                  // allowClear
+                  value={this.state.filterPaidBy}
+                  onChange={e => {
+                    console.log('-----------------------------------------------', e)
+                    this.selectActiveStatus(e)
+                    this.setState({ filterPaidBy: e, isFilterActive: true })
+                  }}
+                  style={{ width: '120px' }}
+                >
+                  <Select.Option value="CASH">CASH</Select.Option>
+                  <Select.Option value="CHEQUE">CHEQUE</Select.Option>
+                  <Select.Option value="CARD">CARD</Select.Option>
+                </Select>
+              </span>
+            </div>
+            {/* ************* END OF DIV FOR filtering ************ */}
+            {/* ************* DIV FOR DATA-TABLE ************ */}
+            <div className="modify-data-table">
+              <DataTable
+                title="Expense Table"
+                columns={columns}
+                theme="default"
+                dense={true}
+                key="id"
+                keyField="id"
+                pagination={true}
+                data={filteredList}
+                customStyles={customStyles}
+                noHeader={true}
+                progressPending={loadingExpenses}
+                // paginationServer={true}
+                // paginationTotalRows={TotalExpenses}
+                // onChangePage={(page, rows) => this.pageChanged(page, rows)}
+                paginationServerOptions={{
+                  persistSelectedOnPageChange: false,
+                  persistSelectedOnSort: false,
+                }}
+                // onChangeRowsPerPage={(currentRowsPerPage, currentPage) =>
+                //   this.rowsChanged(currentRowsPerPage, currentPage)
+                // }
+                // paginationRowsPerPageOptions={
+                //   TotalExpenses > 100 ? [10, 20, 50, 80, 100, TotalExpenses] : [10, 20, 50, 80, 100]
+                // }
+                currentPage={2}
               />
             </div>
           </div>
         </div>
-      </>
+        {/* ************* END OF DIV FOR DATA-TABLE ************ */}
+      </div>
     )
   }
 }

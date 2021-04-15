@@ -20,19 +20,11 @@ import {
   Checkbox,
   Icon,
   message,
-  Timeline,
 } from 'antd'
-import {
-  CaretRightOutlined,
-  EditOutlined,
-  ClockCircleOutlined,
-  MessageOutlined,
-} from '@ant-design/icons'
 import moment from 'moment'
 import { connect } from 'react-redux'
 import axios from 'axios'
 import AntdTag from '../../staffs/antdTag'
-import { CANCEL_BUTTON, COLORS, FORM, SUBMITT_BUTTON, FONT } from 'assets/styles/globalStyles' // '../../../assets/styles/globalStyles' //
 
 const { TextArea } = Input
 const { Option } = Select
@@ -118,33 +110,6 @@ class EditBasicInformation extends React.Component {
     })
   }
 
-  handleSubmitForComment = e => {
-    const {
-      form,
-      dispatch,
-      expenses: { SpecificExpense },
-    } = this.props
-    // const data = new FormData()
-    e.preventDefault()
-    console.log('THE COMMENT', e)
-    console.log('THE VALE', e.target.value)
-    form.validateFields((error, values) => {
-      console.log('THE ERROR & VALUE', error, values)
-      if (!error) {
-        message.success('Upload Successfully.')
-        dispatch({
-          type: 'expenses/EDIT_EXPENSE',
-          payload: {
-            id: SpecificExpense.id,
-            values: values,
-          },
-        })
-      } else {
-        message.error(`THE FORM SUBMISSION COULDN'T BE DONE ${error}`)
-      }
-    })
-  }
-
   render() {
     console.log('THE PROPS in EDIT-BASIC-INFO====> initially in render \n', this.props)
     console.log('THE STATE in EDIT-BASIC-INFO====> initially in render \n', this.state)
@@ -153,7 +118,6 @@ class EditBasicInformation extends React.Component {
       form,
       expenses: { clinicLocationList, categoryList, staffDropdownList, languageList },
     } = this.props
-    const { SpecificExpense } = this.props.expenses
     const itemStyle1 = { marginBottom: '5px', fontWeight: 'bold' }
     // console.log(this.props.form, 'pppp')
     console.log('THE PROPS in EDIT-BASIC-INFO====> END of render \n', this.props)
@@ -207,63 +171,14 @@ class EditBasicInformation extends React.Component {
           </Form.Item>
 
           <Form.Item {...tailLayout}>
-            <Button type="primary" htmlType="submit" style={SUBMITT_BUTTON}>
-              Submit
+            <Button style={{ width: '100%' }} type="primary" htmlType="submit">
+              Save
             </Button>
             {/* <Button htmlType="primary" onClick={this.onReset} className="ml-4">
             cancel
           </Button> */}
           </Form.Item>
         </Form>
-        {/* COMMENT SECTION */}
-        {/* Add a new comment */}
-        <div style={{ marginTop: '4em' }}>
-          <Divider orientation="left">COMMENTS</Divider>
-          <Form onSubmit={e => this.handleSubmitForComment(e)} style={{ display: 'flex' }}>
-            <Form.Item style={{ display: 'flex', width: '90%' }} className="TimeLine-Form">
-              {form.getFieldDecorator('comment', {
-                rules: [{ required: true, message: 'Please add comment!' }],
-              })(<Input placeholder="Add comment here" size="large" />)}
-            </Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              style={{
-                backgroundColor: 'white',
-                border: '1px solid #0b35b3',
-                color: COLORS.palleteDarkBlue,
-              }}
-              // loading={updateCommentLoading}
-            >
-              Add Comment
-            </Button>
-          </Form>
-        </div>
-        {/* list of comments */}
-        {console.log('Expense comments🎉🍾🥂🙌🙌🙌', SpecificExpense.comments)}
-        <div>
-          {SpecificExpense.comments?.edges.length === 0 ? (
-            <p style={{ textAlign: 'center', fontSize: FONT.level3 }}>No Comments to show </p>
-          ) : (
-            SpecificExpense.comments?.edges
-              .slice(0)
-              .reverse()
-              .map(({ node: { id, time, comment, user: { username } } }) => (
-                <Timeline mode="alternate" key={id}>
-                  <Timeline.Item dot={<EditOutlined className="Timeline-Icon" />}>
-                    <span id="timeline-body">Commented by</span>
-                    <p> {username}</p>{' '}
-                  </Timeline.Item>
-                  <Timeline.Item dot={<ClockCircleOutlined className="Timeline-Icon" />}>
-                    at {moment(time).format('MMMM DD, YYYY')}{' '}
-                  </Timeline.Item>
-                  <Timeline.Item dot={<MessageOutlined className="Timeline-Icon" />}>
-                    {comment}
-                  </Timeline.Item>
-                </Timeline>
-              ))
-          )}
-        </div>
       </div>
     )
   }

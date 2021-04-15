@@ -1,5 +1,4 @@
 /* eslint-disable react/jsx-indent */
-/* eslint-disable */
 import React from 'react'
 import { Helmet } from 'react-helmet'
 import { Button, Card, Layout, Menu, Typography } from 'antd'

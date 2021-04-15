@@ -16,9 +16,7 @@ import leaders from './leads/reducer'
 // THE EXPENSE REDUCER BELOW
 import expenses from './expenses/reducers'
 // THE ASSETS REDUCER BELOW
-// import assets from './assets_redux/reducers'
 import assets from './assets_redux/reducers'
-import prescriptions from './prescriptions/redux'
 import screening from './screening/reducers'
 import payor from './payor/reducers'
 import authorizationCode from './authorizationCodes/reducers'
@@ -50,8 +48,6 @@ export default history =>
     expenses,
     // ASSET REDUCER
     assets,
-    // PRESCRIPTION REDUCER
-    prescriptions,
     settings,
     screening,
     payor,

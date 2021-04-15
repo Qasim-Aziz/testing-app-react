@@ -1,57 +1,317 @@
-/* eslint-disable no-else-return */
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable */
+import gql from 'graphql-tag'
 
-import { notification } from 'antd'
-import { gql } from 'apollo-boost'
-import axios from 'axios'
-import apolloClient from '../../apollo/config'
-
-export const GET_COMPLAINT_QUERY = gql`
-  query getComplaintsDef($val: String) {
-    getPrescriptionComplaints(name_Icontains: $val, first: 5) {
-      edges {
-        node {
+export const CREATE_INVOICE = gql`
+  mutation createInvoice(
+    $customer: ID!
+    $email: String!
+    $status: ID!
+    $issueDate: Date!
+    $dueDate: Date!
+    $address: String!
+    $taxableSubtotal: Float!
+    $discount: Float!
+    $products: [FeeInput!]!
+    $total: Float!
+    $due: Float!
+  ) {
+    createInvoice(
+      input: {
+        invoiceNo: "# 0001" # need to generate from server (for now its hard coded)
+        customer: $customer
+        email: $email
+        status: $status
+        issueDate: $issueDate
+        dueDate: $dueDate
+        amount: $due # ballance due (maybe calculated by server)
+        address: $address
+        taxableSubtotal: $taxableSubtotal # should be calculated by server
+        discount: $discount
+        total: $total # should be calculated by server
+        products: $products
+      }
+    ) {
+      details {
+        id
+        invoiceNo
+        email
+        issueDate
+        dueDate
+        amount
+        address
+        taxableSubtotal
+        discount
+        total
+        clinic {
           id
-          name
+          schoolName
+        }
+        status {
+          id
+          statusName
+        }
+        invoiceFee {
+          edges {
+            node {
+              id
+              quantity
+              rate
+              amount
+              tax
+              schoolServices {
+                id
+                name
+              }
+            }
+          }
         }
       }
     }
   }
 `
-export const GET_DIAGNOSIS_QUERY = gql`
-  query getDiagnosisDef($val: String) {
-    getPrescriptionDiagnosis(name_Icontains: $val, first: 5) {
-      edges {
-        node {
-          id
-          name
-        }
+
+export const UPDATE_INVOICE = gql`
+  mutation updateInvoice(
+    $invoiceId: ID!
+    # $customer: ID!
+    $email: String!
+    $status: ID!
+    $issueDate: Date!
+    $dueDate: Date!
+    $address: String!
+    $taxableSubtotal: Float!
+    $discount: Float!
+    $products: [FeeInput2]
+    $total: Float!
+    $due: Float!
+  ) {
+    updateInvoice(
+      input: {
+        pk: $invoiceId
+        invoiceNo: "#0002"
+        # customer: $customer
+        email: $email
+        status: $status
+        issueDate: $issueDate
+        dueDate: $dueDate
+        amount: $due
+        address: $address
+        taxableSubtotal: $taxableSubtotal
+        discount: $discount
+        total: $total
+        products: $products
       }
-    }
-  }
-`
-export const GET_TESTS_QUERY = gql`
-  query getTestsDef($val: String) {
-    getPrescriptionTests(name_Icontains: $val, first: 5) {
-      edges {
-        node {
+    ) {
+      details {
+        id
+        invoiceNo
+        email
+        issueDate
+        dueDate
+        amount
+        address
+        taxableSubtotal
+        discount
+        total
+        clinic {
           id
-          name
+          schoolName
+        }
+        status {
+          id
+          statusName
+        }
+        invoiceFee {
+          edges {
+            node {
+              id
+              quantity
+              rate
+              amount
+              tax
+              schoolServices {
+                id
+                name
+              }
+            }
+          }
         }
       }
     }
   }
 `
 
-export const DELETE_PRESCRIPTION_QUERY = gql`
-  mutation deletePrescription($pk: ID!) {
-    mutation {
-      deletePrescription(input: { pk: $pk }) {
-        status
-        msg
+export const ALL_STUDENT = gql`
+  query {
+    students {
+      edges {
+        node {
+          id
+          firstname
+          studentId
+        }
       }
+    }
+  }
+`
+
+export const CREATE_PRODUCT = gql`
+  mutation($name: String!, $description: String) {
+    createInvoiceProduct(input: { name: $name, description: $description }) {
+      details {
+        id
+        name
+        description
+      }
+    }
+  }
+`
+
+export const UPDATE_PRODUCT = gql`
+  mutation($name: String!, $description: String) {
+    updateInvoiceProduct(input: { name: $name, description: $description }) {
+      details {
+        id
+        name
+        description
+      }
+    }
+  }
+`
+
+export const GET_STUDENT_EMAIL = gql`
+  query($id: ID!) {
+    student(id: $id) {
+      id
+      email
+      currentAddress
+    }
+  }
+`
+
+export const INVOICE_STATUS = gql`
+  query {
+    invoiceStatusList {
+      id
+      statusName
+      colorCode
+    }
+  }
+`
+
+export const GET_INVOICES = gql`
+  query getInvoices($from: Date, $to: Date, $status: ID) {
+    getInvoices(date_Gte: $from, date_Lte: $to, status: $status) {
+      edges {
+        node {
+          id
+          invoiceNo
+          email
+          issueDate
+          dueDate
+          amount
+          address
+          taxableSubtotal
+          discount
+          total
+          clinic {
+            id
+            schoolName
+          }
+          status {
+            id
+            statusName
+          }
+          customer {
+            id
+            parent {
+              username
+            }
+          }
+          invoiceFee {
+            edges {
+              node {
+                id
+                quantity
+                rate
+                amount
+                tax
+                schoolServices {
+                  id
+                  name
+                  description
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+export const GET_INVOICE = gql`
+  query invoiceDetail($id: ID!) {
+    invoiceDetail(id: $id) {
+      id
+      invoiceNo
+      email
+      issueDate
+      dueDate
+      amount
+      address
+      taxableSubtotal
+      discount
+      sgst
+      cgst
+      total
+      clinic {
+        id
+        schoolName
+        address
+        currency {
+          id
+          currency
+          symbol
+        }
+      }
+      customer {
+        id
+        firstname
+        lastname
+      }
+      status {
+        id
+        statusName
+      }
+      invoiceFee {
+        edges {
+          node {
+            id
+            quantity
+            rate
+            amount
+            tax
+            schoolServices {
+              id
+              name
+              description
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+export const GET_PAYMENT_RECIEVING_DETIAILS = gql`
+  query {
+    schoolDetail {
+      id
+      schoolName
+      bankName
+      bankAccountNo
+      ifscCode
+      accountHolderName
     }
   }
 `

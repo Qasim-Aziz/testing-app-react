@@ -18,23 +18,10 @@ export async function getExpenses(payload) {
           expenses {
             id
             itemName
-            purchaseFrom
             amount
+            purchaseFrom
             paidBy
             status
-            comments {
-              edges {
-                node {
-                  id
-                  comment
-                  time
-                  user {
-                    id
-                    username
-                  }
-                }
-              }
-            }
           }
         }
       `,
@@ -83,19 +70,6 @@ export async function createExpense(payload) {
               amount
               status
               purchaseFrom
-              comments {
-                edges {
-                  node {
-                    id
-                    comment
-                    time
-                    user {
-                      id
-                      username
-                    }
-                  }
-                }
-              }
             }
           }
         }
@@ -125,23 +99,18 @@ export async function createExpense(payload) {
 
 export async function updateExpense(payload) {
   console.log('THE PAYLOAD', payload)
-  // Check if comment exists
-  let comment_list = []
-  if (payload.values.comment) {
-    comment_list.push(payload.values.comment)
-  }
-  console.log('🚄🚄🚄🚄🚄🚄🚄🚄', comment_list, payload)
+  let expense_id = parseInt(payload.id)
+  console.log('THE PAYLOAD UPDATED WITH ID', expense_id)
   return apolloClient
     .mutate({
       mutation: gql`
         mutation Update_Expense(
-          $id: ID!
+          $id: Int!
           $itemName: String!
           $purchaseFrom: String!
           $amount: Int!
           $paidBy: String!
           $status: String!
-          $comments: [String]
         ) {
           updateExpense(
             id: $id
@@ -151,7 +120,6 @@ export async function updateExpense(payload) {
               amount: $amount
               paidBy: $paidBy
               status: $status
-              comments: $comments
             }
           ) {
             ok
@@ -162,31 +130,17 @@ export async function updateExpense(payload) {
               amount
               status
               purchaseFrom
-              comments {
-                edges {
-                  node {
-                    id
-                    comment
-                    time
-                    user {
-                      id
-                      username
-                    }
-                  }
-                }
-              }
             }
           }
         }
       `,
       variables: {
-        id: payload.id,
+        id: expense_id,
         itemName: payload.values.itemName,
         purchaseFrom: payload.values.purchaseFrom,
         amount: payload.values.amount,
         paidBy: payload.values.paidBy,
         status: payload.values.status,
-        comments: comment_list,
       },
     })
     .then(result => {
