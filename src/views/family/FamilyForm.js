@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-/* eslint-disable */
 import React, { Fragment } from 'react'
 import { Row, Col, Button, Input, Form, Select, Typography, notification, Modal } from 'antd'
 import { connect } from 'react-redux'
