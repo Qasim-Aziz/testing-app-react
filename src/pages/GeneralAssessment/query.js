@@ -272,6 +272,18 @@ export const DELETE_GENERAL_DATA = gql`
   }
 `
 
+export const UPDATE_SUBMODULE = gql`
+  mutation($pk: ID!, $name: String) {
+    updateGeneralSubmodule(input: { pk: $pk, name: $name }) {
+      details {
+        id
+        name
+        note
+      }
+    }
+  }
+`
+
 export const REMOVE_SUBMODULE = gql`
   mutation($pk: ID!, $id: [ID]) {
     updateGeneralAssessment(input: { pk: $pk, removeSubmodules: $id }) {

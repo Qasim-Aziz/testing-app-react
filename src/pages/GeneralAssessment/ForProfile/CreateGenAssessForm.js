@@ -7,7 +7,12 @@ import { useMutation } from 'react-apollo'
 import { remove, times, update } from 'ramda'
 import moment from 'moment'
 import SubmodulesForm from './SubmodulesForm'
-import { CREATE_GENERAL_ASSESSMENT, UPDATE_GENERAL_ASSESSMENT, REMOVE_SUBMODULE } from '../query'
+import {
+  CREATE_GENERAL_ASSESSMENT,
+  UPDATE_SUBMODULE,
+  UPDATE_GENERAL_ASSESSMENT,
+  REMOVE_SUBMODULE,
+} from '../query'
 import { COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 
 const { TextArea } = Input
@@ -62,7 +67,7 @@ const CreateGenAssessForm = ({
 
   const [createGenAssess, { data, error, loading }] = useMutation(CREATE_GENERAL_ASSESSMENT)
   const [removeSubmodules] = useMutation(REMOVE_SUBMODULE)
-
+  const [updateSubmodule] = useMutation(UPDATE_SUBMODULE)
   const [
     updateGenAssess,
     { data: updatedData, loading: updatedLoading, error: updatedError },
@@ -111,9 +116,37 @@ const CreateGenAssessForm = ({
     e.preventDefault()
     form.validateFields((errors, values) => {
       if (!errors && pk) {
-        let tempSubmodules = submodulesState.map(item => ({ name: item.name }))
+        console.log(submodulesState)
+        console.log(currentRow.submodules)
+        let tempSubmodules = submodulesState.filter(item => {
+          if (item.id) {
+            console.log('in 1st')
+            currentRow.submodules.map(async item2 => {
+              if (item2.id === item.id && item2.name !== item.name) {
+                try {
+                  console.log(item.id, item.name, 'this is item')
+                  updateSubmodule({
+                    variables: {
+                      pk: item.id,
+                      name: item.name,
+                    },
+                  })
+                } catch (e) {
+                  notification.error({
+                    message: 'Unable to update assess type',
+                  })
+                }
+              }
+            })
+          } else {
+            console.log('in 2nd')
+            return true
+          }
+
+          console.log('im out')
+          return false
+        })
         if (!hasSubmodules && submodulesState.length > 0) {
-          tempSubmodules = []
           const removeIds = []
           submodulesState.map(item => (item.id ? removeIds.push(item.id) : null))
           removeSubmodules({
@@ -123,6 +156,7 @@ const CreateGenAssessForm = ({
             },
           }).catch(err => console.error(err))
         }
+        console.log(tempSubmodules, 'tempsubModules')
         updateGenAssess({
           variables: {
             pk,
