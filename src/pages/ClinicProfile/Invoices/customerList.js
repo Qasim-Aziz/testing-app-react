@@ -4,20 +4,27 @@ import { Button, notification, Table, Menu, Icon, Dropdown, Drawer, Form } from 
 import { PlusOutlined, MailOutlined } from '@ant-design/icons'
 import { DRAWER, COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 import { useMutation, useQuery } from 'react-apollo'
-import { STUDENTS } from './Queries'
+import { STUDENTS, STUDENT_INVOICE_ITEMS } from './Queries'
 import CreateInvoiceForm from './createInvoicesForm'
+import LoadingComponent from 'components/LoadingComponent'
+import MaintainRates from './maintainRates'
 
 const { layout, tailLayout } = FORM
 
 function CustomerList() {
   const { data, loading, error } = useQuery(STUDENTS)
+  const [currentRow, setCurrentRow] = useState(null)
   const [tableData, setTableData] = useState([])
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
   const [createInvoiceDrawer, setCreateInvoiceDrawer] = useState(false)
   const [payReminderModal, setPayReminderModal] = useState(false)
   const [selectedClinicsName, setSelectedClinicsName] = useState(null)
+  const [invoiceItemsDrawer, setInvoiceItemsDrawer] = useState(false)
+  const [maintainRatesDrawer, setMaintainRatesDrawer] = useState(false)
   const [invoiceType, setInvoiceType] = useState('advance')
+  const { data: invoiceItemsData, loading: invoiceItemsLoading } = useQuery(STUDENT_INVOICE_ITEMS)
 
+  console.log(invoiceItemsData, 'item data')
   useEffect(() => {
     if (data) {
       console.log(data, 'THIS IS DATA')
@@ -59,6 +66,23 @@ function CustomerList() {
     },
     {
       title: 'Credit',
+    },
+    {
+      title: 'Actions',
+      render: row => {
+        return (
+          <Button
+            onClick={() => {
+              setMaintainRatesDrawer(true)
+              setCurrentRow(row)
+            }}
+            style={{ padding: 0 }}
+            type="link"
+          >
+            Maintain Rates
+          </Button>
+        )
+      },
     },
   ]
 
@@ -115,7 +139,7 @@ function CustomerList() {
         height: 'fit-content',
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'flex-start',
+        justifyContent: 'space-between',
       }}
     >
       <Dropdown overlay={menu}>
@@ -123,6 +147,7 @@ function CustomerList() {
           Actions <Icon type="down" />
         </Button>
       </Dropdown>
+      <Button onClick={() => setInvoiceItemsDrawer(true)}>Invoice Items</Button>
     </div>
   )
 
@@ -143,7 +168,46 @@ function CustomerList() {
           closeDrawer={() => setCreateInvoiceDrawer(false)}
         />
       </Drawer>
-
+      <Drawer
+        title="Invoice Items"
+        width={DRAWER.widthL2}
+        visible={invoiceItemsDrawer}
+        closable
+        destroyOnClose
+        onClose={() => setInvoiceItemsDrawer(false)}
+      >
+        <>
+          {invoiceItemsLoading ? (
+            <LoadingComponent />
+          ) : (
+            <div style={{ display: 'flex' }}>
+              <ul style={{ margin: '20px auto' }}>
+                {invoiceItemsData.getStudentInvoiceItems?.map(item => (
+                  <li style={{ fontSize: 16, color: 'black', margin: '6px auto' }} key={item.id}>
+                    {item.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </>
+      </Drawer>
+      <Drawer
+        title="Maintain Rates"
+        width={DRAWER.widthL2}
+        visible={maintainRatesDrawer}
+        closable
+        destroyOnClose
+        onClose={() => setMaintainRatesDrawer(false)}
+      >
+        <MaintainRates
+          selectedClinicsName={selectedClinicsName}
+          selectedRowKeys={selectedRowKeys}
+          invoiceType={invoiceType}
+          currentRow={currentRow}
+          closeDrawer={() => setCreateInvoiceDrawer(false)}
+        />
+      </Drawer>
       <Drawer
         title="Send pay reminder"
         visible={payReminderModal}
