@@ -23,6 +23,7 @@ import styled from 'styled-components'
 // END OF IMPORTS FOR STEP PROGRESS BAR COMPONENT
 import DataTable from 'react-data-table-component'
 import {
+  Table,
   Button,
   Card,
   Avatar,
@@ -56,8 +57,9 @@ import moment from 'moment'
 import { FilterCard } from '../../../components/FilterCard/FilterTable'
 import EditBasicInformation from './EditBasicInformation'
 import CreateLeader from '../createLeader'
-// import client from '../../../apollo/config'
+// importing styles
 import './style.scss'
+import { COLORS, FORM, DRAWER } from 'assets/styles/globalStyles'
 
 /* *************************** THE STEP PROGRESS BAR COMPONENT *************************** */
 
@@ -467,19 +469,17 @@ class LeaderTable extends React.Component {
 
     const columns = [
       {
-        name: 'Name',
-        selector: 'name',
+        title: '#',
+        render: row => filteredList.indexOf(row) + 1,
+      },
+      {
+        title: 'Name',
+        // selector: 'name',
         sortable: true,
-        // maxWidth: '120px',
-        cell: row => {
+
+        render: row => {
           // console.log('ROW', row)
-          // console.log('ROW', row.user)
-
           row.user === null ? <span> </span> : <></>
-
-          // if (row.user.firstName === null || row.user.lastName === null) {
-          //   return <span> </span>
-          // }
 
           return (
             <Button
@@ -495,10 +495,11 @@ class LeaderTable extends React.Component {
         },
       },
       {
-        name: 'Email',
-        selector: 'email',
-        // maxWidth: '120px',
-        cell: row => {
+        title: 'Email',
+        // selector: 'email',
+
+        sortable: true,
+        render: row => {
           // console.log('ROW', row)
           if (row.user === null) {
             return <span> </span>
@@ -508,10 +509,10 @@ class LeaderTable extends React.Component {
         },
       },
       {
-        name: 'Mobile',
-        selector: 'mobile',
-        // maxWidth: '120px',
-        cell: row => {
+        title: 'Mobile',
+        // selector: 'mobile',
+
+        render: row => {
           // console.log('ROW', row)
           if (row.phone === null) {
             return <span> </span>
@@ -521,22 +522,22 @@ class LeaderTable extends React.Component {
         },
       },
       {
-        name: 'project Name',
-        selector: 'projectName',
-        // maxWidth: '120px',
-        cell: row => <span>{row.projectName ? row.projectName : ''} </span>,
+        title: 'project Name',
+        // selector: 'projectName',
+
+        render: row => <span>{row.projectName ? row.projectName : ''} </span>,
       },
       {
-        name: 'Lead Status',
-        selector: 'leadStatus',
-        // maxWidth: '120px',
-        cell: row => <span>{row.leadStatus ? row.leadStatus : ''}</span>,
+        title: 'Lead Status',
+        // selector: 'leadStatus',
+
+        render: row => <span>{row.leadStatus ? row.leadStatus : ''}</span>,
       },
       {
-        name: 'Created At',
-        selector: 'createdAt',
-        // maxWidth: '120px',
-        cell: row => {
+        title: 'Created At',
+        // selector: 'createdAt',
+
+        render: row => {
           return <span>{row.createdAt ? new Date(row.createdAt).toDateString() : ''} </span>
         },
       },
@@ -565,6 +566,98 @@ class LeaderTable extends React.Component {
       </Menu>
     )
 
+    // The headers for table headers
+    const tableHeader = (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          position: 'relative',
+          whiteSpace: 'nowrap',
+          zIndex: 2,
+          height: '28px',
+          width: '100%',
+          padding: '4px 12px',
+        }}
+      >
+        {/* Search bar for name */}
+        <span style={{ display: 'flex', alignItems: 'center' }}>
+          <span>Name :</span>
+          <Input
+            size="small"
+            name="name"
+            placeholder="Search Name"
+            value={this.state.filterName}
+            onChange={e => {
+              this.setState({
+                filterName: e.target.value,
+                isFilterActive: e.target.value && true,
+              })
+              this.filterHandler({ name: e.target.value })
+            }}
+            style={{ ...tableFilterStyles, width: '112px' }}
+          />
+        </span>
+        {/* Search bar for email */}
+        <span style={{ display: 'flex', alignItems: 'center' }}>
+          <span>Email :</span>
+          <Input
+            size="small"
+            name="name"
+            placeholder="Search Email"
+            value={this.state.filterEmail}
+            onChange={e => {
+              this.setState({
+                filterEmail: e.target.value,
+                isFilterActive: e.target.value && true,
+              })
+              this.filterHandler({ email: e.target.value })
+            }}
+            style={{ ...tableFilterStyles, width: '148px' }}
+          />
+        </span>
+        {/* Search bar for project */}
+        <span style={{ display: 'flex', alignItems: 'center' }}>
+          <span>project :</span>
+          <Input
+            size="small"
+            name="name"
+            placeholder="Search Project"
+            value={this.state.filterProject}
+            onChange={e => {
+              this.setState({
+                filterProject: e.target.value,
+                isFilterActive: e.target.value && true,
+              })
+              this.filterHandler({ email: e.target.value })
+            }}
+            style={{ ...tableFilterStyles, width: '148px' }}
+          />
+        </span>
+        {/* Different kinds of status */}
+        <span style={{ display: 'flex', alignItems: 'center' }}>
+          <span>STATUS :</span>
+          <Select
+            placeholder="Status"
+            // allowClear
+            value={this.state.filterStatus}
+            onChange={e => {
+              console.log('-----------------------------------------------', e)
+              this.selectActiveStatus(e)
+              this.setState({ filterStatus: e, isFilterActive: true })
+            }}
+            style={inputCustom} // {{ width: '120px' }}
+          >
+            <Select.Option value="NEW">NEW</Select.Option>
+            <Select.Option value="CONTACTED">CONTACTED</Select.Option>
+            <Select.Option value="INTRESTED">INTRESTED</Select.Option>
+            <Select.Option value="DEMO">DEMO</Select.Option>
+            <Select.Option value="CONVERTED">CONVERTED</Select.Option>
+          </Select>
+        </span>
+      </div>
+    )
+
     // THE PROPS FOR STEP PROGRESS BAR
     let drawdownStatus = 'NEW'
     let disbursementStatus = 'UNDER_REVIEW'
@@ -578,21 +671,23 @@ class LeaderTable extends React.Component {
 
     return (
       <>
+        {/* 📌 Make sure to wrap the authorization 
+            component once Raj sir sends the API  
+        */}
         {console.log(`LETS SEE ALL PROPS \n `, this.props)}
         {console.log(`LETS SEE ALL state \n `, this.state)}
         <Helmet title="Leaders" />
-        {/* DRAWER FOR FILTER */}
-        {/* ------------------------------------ */}
-        {/* END OF DRAWER FOR FILTER */}
 
         {/* DRAWER FOR Create-lEADER  */}
         <Drawer
           title="CREATE LEADER"
-          width="75%"
+          // "75%"
+          width={this.state.windowWidth > 1250 ? DRAWER.widthL1 : DRAWER.widthL4}
           placement="right"
           closable={true}
           onClose={this.onClose}
           visible={this.state.visible}
+          // headerStyle={{alignItems:"center"}}
         >
           <CreateLeader CloseDrawer={this.onClose} />
         </Drawer>
@@ -601,7 +696,8 @@ class LeaderTable extends React.Component {
         {/* DRAWER FOR EDIT-LEADER */}
         <Drawer
           title="EDIT LEADER"
-          width="80%"
+          // "80%"
+          width={DRAWER.widthL1}
           placement="right"
           closable={true}
           onClose={this.onCloseEdit}
@@ -612,8 +708,6 @@ class LeaderTable extends React.Component {
               • And the form values will be set to that user's details
           */}
           {UserProfile ? (
-            /* The entire drawer is a card */
-
             <div className="card" style={{ marginTop: '5px', border: 'none' }}>
               <div className="card-body">
                 {/* <h2>hello {UserProfile.leadStatus}</h2> */}
@@ -646,17 +740,12 @@ class LeaderTable extends React.Component {
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '0px 10px',
-            marginTop: '20px',
             backgroundColor: '#FFF',
             boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
           }}
         >
           {/* Div is used to position the stuff inside it on the left-side  */}
           <div style={{ padding: '5px 0px' }}>
-            {/* The filter icon on the top-left side of top bar  */}
-            {/* <Button onClick={() => this.showDrawerFilter()} size="large">
-              <FilterOutlined />
-            </Button> */}
             {/* The below section is when someone adds filters a clear-filter button gets displayed */}
             {this.state.isFilterActive ? (
               <Button
@@ -698,199 +787,39 @@ class LeaderTable extends React.Component {
           </div>
         </div>
         {/* ********************** END of DIV FOR TOP_BAR***************** */}
-        <div className={divClass}>
-          <div style={{ marginTop: '24px', marginBottom: '50px' }}>
-            {/* ************* DIV FOR filtering ************ */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                position: 'relative',
-                whiteSpace: 'nowrap',
-                zIndex: 2,
-                width: 'fit-content',
-                paddingTop: '4px',
-              }}
-            >
-              {/* Search bar for name */}
-              <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span>Name :</span>
-                <Input
-                  size="small"
-                  name="name"
-                  placeholder="Search Name"
-                  value={this.state.filterName}
-                  onChange={e => {
-                    this.setState({
-                      filterName: e.target.value,
-                      isFilterActive: e.target.value && true,
-                    })
-                    this.filterHandler({ name: e.target.value })
-                  }}
-                  style={{ ...tableFilterStyles, width: '112px' }}
-                />
-              </span>
-              {/* Search bar for email */}
-              <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span>Email :</span>
-                <Input
-                  size="small"
-                  name="name"
-                  placeholder="Search Email"
-                  value={this.state.filterEmail}
-                  onChange={e => {
-                    this.setState({
-                      filterEmail: e.target.value,
-                      isFilterActive: e.target.value && true,
-                    })
-                    this.filterHandler({ email: e.target.value })
-                  }}
-                  style={{ ...tableFilterStyles, width: '148px' }}
-                />
-              </span>
-              {/* Search bar for project */}
-              <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span>project :</span>
-                <Input
-                  size="small"
-                  name="name"
-                  placeholder="Search Project"
-                  value={this.state.filterProject}
-                  onChange={e => {
-                    this.setState({
-                      filterProject: e.target.value,
-                      isFilterActive: e.target.value && true,
-                    })
-                    this.filterHandler({ email: e.target.value })
-                  }}
-                  style={{ ...tableFilterStyles, width: '148px' }}
-                />
-              </span>
-              {/* Different kinds of status */}
-              <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span>STATUS :</span>
-                {/* DO NOT DELETE */}
-                {/* <Radio.Group
-                  size="small"
-                  buttonStyle="solid"
-                  value={this.state.filterStatus}
-                  onChange={e => {
-                    this.selectActiveStatus(e.target.value)
-                    this.setState({ filterStatus: e.target.value, isFilterActive: true })
-                  }}
-                  style={tableFilterStyles}
-                >
-                  <Radio.Button value="all">All</Radio.Button>
-                  <Radio.Button value="In_progress">In progress</Radio.Button>
-                  <Radio.Button value="Converted">Converted</Radio.Button>
-                  <Radio.Button value="Not_converted">Not Converted</Radio.Button>
-                  <Radio.Button value="Contact_Later">Contact Later</Radio.Button>
-                </Radio.Group> */}
-                <Select
-                  placeholder="Status"
-                  // allowClear
-                  value={this.state.filterStatus}
-                  onChange={e => {
-                    console.log('-----------------------------------------------', e)
-                    this.selectActiveStatus(e)
-                    this.setState({ filterStatus: e, isFilterActive: true })
-                  }}
-                  style={{ width: '120px' }}
-                >
-                  <Select.Option value="NEW">NEW</Select.Option>
-                  <Select.Option value="CONTACTED">CONTACTED</Select.Option>
-                  <Select.Option value="INTRESTED">INTRESTED</Select.Option>
-                  <Select.Option value="DEMO">DEMO</Select.Option>
-                  <Select.Option value="CONVERTED">CONVERTED</Select.Option>
-                </Select>
-              </span>
-            </div>
-            {/* ************* END OF DIV FOR filtering ************ */}
-            {/* ************* DIV FOR DATA-TABLE ************ */}
-            <div className="modify-data-table">
-              <DataTable
-                title="Leaders List"
-                columns={columns}
-                theme="default"
-                dense={true}
-                key="id"
-                keyField="id"
-                pagination={true}
-                data={filteredList}
-                customStyles={customStyles}
-                noHeader={true}
-                progressPending={loadingLeaders}
-                // paginationServer={true}
-                // paginationTotalRows={TotalLeaders}
-                // onChangePage={(page, rows) => this.pageChanged(page, rows)}
-                paginationServerOptions={{
-                  persistSelectedOnPageChange: false,
-                  persistSelectedOnSort: false,
+        <div>
+          <div style={{ marginBottom: '50px' }}>
+            <div className="view_leader">
+              <Table
+                title={() => {
+                  return tableHeader
                 }}
-                // onChangeRowsPerPage={(currentRowsPerPage, currentPage) =>
-                //   this.rowsChanged(currentRowsPerPage, currentPage)
-                // }
-                // paginationRowsPerPageOptions={
-                //   TotalLeaders > 100 ? [10, 20, 50, 80, 100, TotalLeaders] : [10, 20, 50, 80, 100]
-                // }
-                currentPage={2}
+                columns={columns}
+                rowKey={record => record.id}
+                dataSource={filteredList}
+                loading={loadingLeaders} // this.state.loadingLeaders
+                // ⭐ The below commented code is for pagination from server side
+                /* pagination={{
+                   defaultPageSize: 20,
+                   onChange: (page, rows) => this.pageChanged(page, rows),
+                   onShowSizeChange: (currentPage, currentRowsPerPage) =>
+                   this.rowsChanged(currentRowsPerPage, currentPage),
+                   showSizeChanger: true,
+                   pageSizeOptions:
+                     TotalLeaders > 100
+                       ? ['20', '50', '80', '100', `${TotalLeaders}`]
+                       : ['20', '50', '80', '100'],
+                   position: 'bottom',
+                  }}
+                */
               />
             </div>
-            {/* ************* END OF DIV FOR DATA-TABLE ************ */}
           </div>
         </div>
+        {/* ************* END OF DIV FOR DATA-TABLE ************ */}
       </>
     )
   }
 }
 
 export default LeaderTable
-
-/* ********************* DISCARDED STUFF ********************
-// fetch(`http://127.0.0.1:8000/graphql/`, {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({
-    //     query: `
-    // query{
-    //   leads{
-    //     id
-    //     name
-    //     projectName,
-    //     leadStatus,
-    //     phone
-    //     user{
-    //       email
-    //     }
-    //   }
-    //         }`,
-    //   }),
-    // })
-    //   .then(res => res.json())
-    //   .then(data => {
-    //     console.log('***********************', data)
-    //   })
-
-    *****************************************************
-    // console.log('ROCKEt SCience', this.props)
-    // leadClient
-    //   .query({
-    //     query: gql`
-    //       {
-    //         leads {
-    //           id
-    //           name
-    //           projectName
-    //           leadStatus
-    //           phone
-    //           user {
-    //             email
-    //           }
-    //         }
-    //       }
-    //     `,
-    //   })
-    //   .then(result => {
-    //     console.log('MY VALUE', result.data)
-    //   })
-*/

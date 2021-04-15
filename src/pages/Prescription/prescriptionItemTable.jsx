@@ -7,20 +7,14 @@
 /* eslint-disable react/destructuring-assignment */
 import React, { useEffect, useState } from 'react'
 import 'antd/dist/antd.css'
-import { Table, Button, Form, Typography, notification, Input, Modal } from 'antd'
-import { useQuery, useMutation } from 'react-apollo'
-import gql from 'graphql-tag'
+import { Table, Button, Form } from 'antd'
 import PrescriptionItemCell from './prescriptionItemCell'
-import './index.css'
+import './index.scss'
 import { PrescriptionFormContext } from './context'
-import { CREATE_PRODUCT } from './query'
-
-const { TextArea } = Input
-
-const { Text } = Typography
 
 const EditableRow = ({ form, index, ...props }) => (
   <PrescriptionFormContext.Provider value={form} key={index}>
+    {/* {console.log('THE FORM⏩⏩⏩⏩', form, index, props)} */}
     <tr {...props} />
   </PrescriptionFormContext.Provider>
 )
@@ -34,86 +28,133 @@ const components = {
   },
 }
 
-const PrescriptionItemTable = ({ products, dispatch, totalAmount }) => {
-
+const PrescriptionItemTable = ({ products, dispatch, totalAmount, ...props }) => {
+  // console.log('THE PRODUCTS', products)
+  // console.log('THE Dispatch', dispatch)
+  // console.log('THE TOTAL AMOUNT☑☑☑', props)
+  // console.log('HEWIEJ', props.tryingTodelete)
   const columnsList = [
     {
       title: '#',
       dataIndex: 'key',
-      width: 10,
+      // width: 5,
     },
     {
-      title: 'Type',
+      title: 'Type', // MedicineType
       editable: true,
-      dataIndex: 'type',
-      width: 50
+      dataIndex: 'medicineType', // ::before 'type',
+      // width: 20,
     },
     {
-      title: 'Product/Service',
+      title: 'Product/Service', // Name
       editable: true,
-      dataIndex: 'service',
-      width: 180
+      dataIndex: 'name', // name // ::before service
+      // width: 180,
     },
     {
-      title: 'Dose',
-      dataIndex: 'dose',
+      title: 'Dosage',
+      dataIndex: 'dosage',
       editable: true,
-      width: 70
+      // width: 70,
     },
     {
       title: 'Unit',
       dataIndex: 'unit',
       editable: true,
-      width: 70
+      // width: 70,
     },
     {
       title: 'When',
       dataIndex: 'when',
       editable: true,
-      width: 70
+      // width: 70,
     },
     {
       title: 'Frequency',
       dataIndex: 'frequency',
       editable: true,
-      width: 70
+      // width: 70,
     },
     {
       title: 'Duration',
       dataIndex: 'duration',
       editable: true,
-      width: 70
+      // width: 100,
     },
-    
+
     {
       title: 'Qty',
-      width: 100,
-      render: (text, record) => {
-        return parseFloat(record.qty) * parseFloat(record.rate)
-      },
-    },
-    {
-      title: 'Note',
-      dataIndex: 'note',
+      dataIndex: 'qty',
+      // width: 10,
       editable: true,
-      width: 70
+      // render: (text, record) => {
+      //   return parseFloat(record.qty) * parseFloat(record.rate)
+      // },
     },
+    // {
+    //   title: 'Note',
+    //   dataIndex: 'note',
+    //   editable: true,
+    //   width: 70,
+    // },
     {
       title: 'Operation',
       dataIndex: 'operation',
       width: 50,
-      render: (text, { key }) => (
-        <Button
-          type="danger"
-          onClick={() => {
-            dispatch({
-              type: 'REMOVE_PRODUCT',
-              payload: { key },
-            })
-          }}
-        >
-          Delete
-        </Button>
+      render: (
+        text,
+        { key, ...val }, // key, id, ...val
+      ) => (
+        <>
+          {props.tryingTodelete ? (
+            <>
+              {/* {console.log('THE KEY AND PRODUCT⏩⏩⏩⏩⏩⏩', val.pk, val)} */}
+              {val.pk ? (
+                <>
+                  <Button
+                    type="danger"
+                    onClick={() => {
+                      // Remove the row from the table
+                      dispatch({
+                        type: 'REMOVE_PRODUCT',
+                        payload: { key },
+                      })
+                      // add the val.pk of which, the user wants to delete
+                      console.log('TRYING TO REMOVE🚀🚀🚀🚀🚀🚀', val.pk)
+                      props.setDeleteProduct(arr => [...arr, val.pk])
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  style={{ backgroundColor: '#ffbb33' }}
+                  onClick={() => {
+                    dispatch({
+                      type: 'REMOVE_PRODUCT',
+                      payload: { key },
+                    })
+                  }}
+                >
+                  Delete
+                </Button>
+              )}
+            </>
+          ) : (
+            <Button
+              type="danger"
+              onClick={() => {
+                dispatch({
+                  type: 'REMOVE_PRODUCT',
+                  payload: { key },
+                })
+              }}
+            >
+              Delete
+            </Button>
+          )}
+        </>
       ),
     },
   ]
@@ -121,8 +162,8 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount }) => {
   const handleAdd = () => {
     const newProductData = {
       key: products.length + 1,
-      service: '',
-      qty: 1,
+      name: '', // ::before service: '',
+      // qty: 1,
       rate: 0,
     }
     dispatch({ type: 'ADD_PRODUCT', payload: newProductData })
@@ -133,6 +174,7 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount }) => {
   }
 
   const columns = columnsList.map(col => {
+    // console.log('THE COL', col)
     if (!col.editable) {
       return col
     }
@@ -148,8 +190,6 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount }) => {
     }
   })
 
-  console.log(products, 'tableData')
-
   return (
     <div>
       <Table
@@ -162,7 +202,7 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount }) => {
         pagination={false}
         loading={false}
         footer={() => (
-          <div style={{ display: 'flex', alignItems: 'center'}}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             <Button onClick={handleAdd} type="primary">
               Add a Line
             </Button>

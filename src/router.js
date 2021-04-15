@@ -664,7 +664,7 @@ const routes = [
   },
   {
     path: '/prescription',
-    component: loadable(() => import('pages/Prescription')),
+    component: loadable(() => import('pages/prescription')),
     exact: true,
   },
   {

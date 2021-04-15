@@ -25,6 +25,7 @@ import moment from 'moment'
 import { connect } from 'react-redux'
 import axios from 'axios'
 import AntdTag from '../../staffs/antdTag'
+import { CANCEL_BUTTON, COLORS, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles' // '../../../assets/styles/globalStyles' //
 
 const { TextArea } = Input
 const { Option } = Select
@@ -193,12 +194,13 @@ class EditBasicInformation extends React.Component {
           </Form.Item> */}
 
           <Form.Item {...tailLayout}>
-            <Button style={{ width: '100%' }} type="primary" htmlType="submit">
-              Save
+            <Button type="primary" htmlType="submit" style={SUBMITT_BUTTON}>
+              Submit
             </Button>
-            {/* <Button htmlType="primary" onClick={this.onReset} className="ml-4">
-            cancel
-          </Button> */}
+
+            {/* <Button type="default" onClick={this.onReset} style={CANCEL_BUTTON}>
+              Reset
+            </Button> */}
           </Form.Item>
         </Form>
       </div>

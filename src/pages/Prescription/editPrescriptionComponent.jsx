@@ -1,16 +1,7 @@
 /* eslint-disable */
 
 /**[Explaination]
- * This component is a part of the "Prescription" component wherein
- *  - Only the authenticated & allowed users which are doctors/therapist can have access
- *  - The Parent of a particular learner can view their child's prescription and take a printout of it in a pdf formart
- * How is component structured
- *  - In antD we already have Editable-Row & Editable-Cell Table component
- *    • wherein we can edit every row
- *    • and delete each row
- *    • Once all values in the prescription table are set we will send save & dispatch that the entire array of objects
- *      to the API for CRUD application
- *  - NOTE:
+
  */
 
 import React, { useEffect, useState, useReducer } from 'react'
@@ -50,39 +41,18 @@ const { Meta } = Card
 const { TextArea } = Input
 
 /* Some static css */
-const itemStyle = {
-  display: 'flex',
-  marginRight: '25px',
-  justifyContent: 'flex-end',
-  marginTop: -15,
-}
 const itemStyle2 = {
   display: 'flex',
   marginRight: '25px',
   // justifyContent: 'flex-end',
   marginTop: -15,
 }
-const itemStyle3 = {
-  display: 'flex',
-  marginRight: '25px',
-  // justifyContent: 'flex-end',
-  marginTop: -15,
-}
 
-const inputStyle = {
-  width: '200px',
-  borderRadius: 0,
-  border: 'none',
-  borderBottom: '2px solid',
-}
 const inputStyle2 = {
   width: '160px',
   borderRadius: 0,
   border: 'none',
   borderBottom: '2px solid',
-}
-const inputStyle3 = {
-  borderRadius: 0,
 }
 
 const layout1 = {
@@ -114,6 +84,7 @@ function addNevObject(val) {
     let some_random = {}
     console.log('THE ITEM', item)
     some_random.key = index + 1 // item.node.id
+    some_random.pk = item.node.id
     some_random.name = item.node.name
     some_random.medicineType = item.node.medicineType
     some_random.unit = item.node.unit
@@ -130,7 +101,7 @@ function addNevObject(val) {
   return theMainArray
 }
 
-const GetComplaints = ({ form }) => {
+const GetComplaints = ({ form, setDeleteComplaints }) => {
   const [sdText, setSdText] = useState('')
   const { data: sdData, error: sdError, loading: sdLoading } = useQuery(GET_COMPLAINT_QUERY, {
     variables: {
@@ -163,6 +134,8 @@ const GetComplaints = ({ form }) => {
               loading={sdLoading}
               // disabled={form.getFieldValue('complaints')?.length > 0}
               placeholder="Search for find more sd"
+              onDeselect={e => setDeleteComplaints(arr => [...arr, e])}
+              // onChange={handleChange}
             >
               {sdData?.getPrescriptionComplaints.edges.map(({ node }) => {
                 return (
@@ -179,7 +152,7 @@ const GetComplaints = ({ form }) => {
   )
 }
 
-const GetDiagnosis = ({ form }) => {
+const GetDiagnosis = ({ form, setDeleteDiagnosis }) => {
   const [sdText, setSdText] = useState('')
   const { data: sdData, error: sdError, loading: sdLoading } = useQuery(GET_DIAGNOSIS_QUERY, {
     variables: {
@@ -209,6 +182,7 @@ const GetDiagnosis = ({ form }) => {
               onSearch={v => {
                 setSdText(v)
               }}
+              onDeselect={e => setDeleteDiagnosis(arr => [...arr, e])}
               loading={sdLoading}
               // disabled={form.getFieldValue('complaints')?.length > 0}
               placeholder="Search for find more sd"
@@ -228,7 +202,7 @@ const GetDiagnosis = ({ form }) => {
   )
 }
 
-const GetTest = ({ form }) => {
+const GetTest = ({ form, setDeleteTests }) => {
   const [sdText, setSdText] = useState('')
   const { data: sdData, error: sdError, loading: sdLoading } = useQuery(GET_TESTS_QUERY, {
     variables: {
@@ -258,6 +232,7 @@ const GetTest = ({ form }) => {
               onSearch={v => {
                 setSdText(v)
               }}
+              onDeselect={e => setDeleteTests(arr => [...arr, e])}
               loading={sdLoading}
               // disabled={form.getFieldValue('complaints')?.length > 0}
               placeholder="Search for find more sd"
@@ -277,9 +252,11 @@ const GetTest = ({ form }) => {
   )
 }
 
-const BankDetails = props => {
-  const { form, details } = props
+const EditPrescription = props => {
+  const { form, details, learners } = props
   console.log('The state', props)
+  // const learners = useSelector(state => state.learners)
+  // console.log("THE LEARNER",learner)
   const prescriptions = useSelector(state => state.prescriptions)
   const dispatchOfPrescription = useDispatch()
   console.log('THE LOCAL STATE for getting prescription', prescriptions)
@@ -290,6 +267,10 @@ const BankDetails = props => {
   */
 
   const [productsState, productsDispatch] = useReducer(productReducer, [])
+  const [deleteProduct, setDeleteProduct] = useState([])
+  const [deleteComplaints, setDeleteComplaints] = useState([])
+  const [deleteDiagnosis, setDeleteDiagnosis] = useState([])
+  const [deleteTests, setDeleteTests] = useState([])
 
   const [subTotal, setSubTotal] = useState(0)
   const role = useSelector(state => state.user.role)
@@ -297,31 +278,19 @@ const BankDetails = props => {
   useEffect(() => {
     console.log('******************* THE COMPONENT Did mount method ie it will run only once ')
     dispatchOfPrescription({
-      type: actionPrescription.GET_LASTEST_PRESCRIPTIONS,
+      type: actionPrescription.GET_DETAILS_PRESCRIPTIONS,
       payload: {
-        /**Sending student's ID */
-        value: details.id,
-      },
-    })
-    dispatchOfPrescription({
-      type: actionPrescription.GET_PRESCRIPTIONS,
-      payload: {
+        /**Sending ID of that particular prescription */
         value: details.id,
       },
     })
   }, [])
 
-  /*[Explaination]
-    This effect will only run if the prescription values are set.
-    When this run what it does you may think???
-    1. It sets the productState (aka list-of-meds-objects) with the latest prescriptions
-    2. It will then, fill the form page with the latest prescription details
-  */
-
   useEffect(() => {
     console.log('THE PRESCRIPTION VALUE', prescriptions)
     if (prescriptions.SpecificPrescription) {
       let listOfMedicineObject = prescriptions.SpecificPrescription.medicineItems.edges
+      console.log('THE LIST OF MEDS 💊💊💊💊💊', listOfMedicineObject)
       /**Add key in the product_state */
       let x = addNevObject(listOfMedicineObject)
       productsDispatch({ type: 'SET_PRODUCTS', payload: x })
@@ -339,6 +308,7 @@ const BankDetails = props => {
         ),
         tests: prescriptions.SpecificPrescription.tests.edges.map(element => element.node.id),
       })
+      console.log('THE INITIAL FORM FOR DIAGNOSIS', diagnosis)
     }
   }, [prescriptions.SpecificPrescription])
 
@@ -352,19 +322,26 @@ const BankDetails = props => {
 
   const handleSubmitt = e => {
     e.preventDefault()
-    console.log('submit✌✌✌✌✌✌✌✌✌')
+    console.log('submit🥂🥂🥂🥂🙌🙌🙌🙌🙌', deleteProduct)
+    console.log('THE FINAL FORM FOR DIAGNOSIS', form.getFieldValue('diagnosis'))
     form.validateFields((err, values) => {
       console.log('THE LIST OF PRESCRIPTION', productsState)
       console.log('THE SUBMIT 🎉✨', err, values)
       dispatchOfPrescription({
-        type: actionPrescription.CREATE_PRESCRIPTION,
+        type: actionPrescription.EDIT_PRESCRIPTION,
         payload: {
-          // Student's ID
+          // prescription ID
           id: details.id,
           // vitals' values & array of complaints/tests/diagnosis
           values: values,
           // medicines array
           data: productsState,
+          deletionVals: {
+            deleteComplaintList: deleteComplaints,
+            deleteDiagnosisList: deleteDiagnosis,
+            deleteTestsList: deleteTests,
+            deleteMedItems: deleteProduct,
+          },
         },
       })
     })
@@ -399,7 +376,7 @@ const BankDetails = props => {
                   }
                   title={
                     <h5 style={{ marginTop: '20px' }}>
-                      {details ? details.firstname : ''} {details ? details.lastname : ''}
+                      {learners ? learners.firstname : ''} {learners ? learners.firstname : ''}
                       <span
                         style={{
                           float: 'right',
@@ -408,7 +385,7 @@ const BankDetails = props => {
                           color: '#0190fe',
                         }}
                       >
-                        {details.isActive === true ? (
+                        {learners.isActive === true ? (
                           <Switch
                             checkedChildren={<Icon type="check" />}
                             unCheckedChildren={<Icon type="close" />}
@@ -435,7 +412,7 @@ const BankDetails = props => {
                           }}
                         >
                           Enrollment Status &nbsp;{' '}
-                          {details.isActive ? (
+                          {learners.isActive ? (
                             <span style={customSpanStyle}>Active</span>
                           ) : (
                             <span style={inActiveSpanStyle}>In-Active</span>
@@ -449,7 +426,7 @@ const BankDetails = props => {
                             marginBottom: '4px',
                           }}
                         >
-                          <span>{details ? details.email : ''}</span>
+                          <span>{learners ? learners.email : ''}</span>
                         </p>
                       </div>
                     </div>
@@ -517,11 +494,11 @@ const BankDetails = props => {
               </div>
             </div>
             {/* The complaints list */}
-            <GetComplaints form={form} />
+            <GetComplaints setDeleteComplaints={setDeleteComplaints} form={form} />
             {/* The diagnosis list */}
-            <GetDiagnosis form={form} />
+            <GetDiagnosis setDeleteDiagnosis={setDeleteDiagnosis} form={form} />
             {/* The test list */}
-            <GetTest form={form} />
+            <GetTest setDeleteTests={setDeleteTests} form={form} />
             {prescriptions.loadingPrescriptions !== true &&
             prescriptions.isSpecificPrescription !== false ? (
               <>
@@ -537,6 +514,8 @@ const BankDetails = props => {
                     totalAmount={subTotal}
                     products={productsState}
                     dispatch={productsDispatch}
+                    tryingTodelete={{ HELLO: 'I AM DELETE' }}
+                    setDeleteProduct={setDeleteProduct}
                   />
                 </PrescriptionItemContext.Provider>
               </>
@@ -548,20 +527,23 @@ const BankDetails = props => {
                 <TextArea placeholder="Advice" autoSize={{ minRows: 2, maxRows: 5 }} allowClear />,
               )}
             </Form.Item>
-            <Form.Item {...layout1} label="Next Visit">
-              {form.getFieldDecorator('nextVisitNumber')(
-                <InputNumber min={0} max={1000} onChange={onChangeInputNumber} />,
-              )}
-            </Form.Item>
-            <Form.Item>
-              {form.getFieldDecorator('nextVisitVal')(
-                <Radio.Group onChange={onChangeNextVisitVal}>
-                  <Radio.Button value="days">days</Radio.Button>
-                  <Radio.Button value="weeks">weeks</Radio.Button>
-                  <Radio.Button value="months">months</Radio.Button>
-                </Radio.Group>,
-              )}
-            </Form.Item>
+            <div {...layout1}>
+              <Form.Item label="Next Visit">
+                {form.getFieldDecorator('nextVisitNumber')(
+                  <InputNumber min={0} max={1000} onChange={onChangeInputNumber} />,
+                )}
+              </Form.Item>
+              <Form.Item>
+                {form.getFieldDecorator('nextVisitVal')(
+                  <Radio.Group onChange={onChangeNextVisitVal}>
+                    <Radio.Button value="days">days</Radio.Button>
+                    <Radio.Button value="weeks">weeks</Radio.Button>
+                    <Radio.Button value="months">months</Radio.Button>
+                  </Radio.Group>,
+                )}
+              </Form.Item>
+            </div>
+
             <Form.Item {...layout1} label="Next Visit Date">
               {form.getFieldDecorator('nextVisitDate')(<DatePicker />)}
             </Form.Item>
@@ -578,10 +560,10 @@ const BankDetails = props => {
               >
                 <Button loading={false} type="primary" style={{ margin: 5 }}>
                   {/* htmlType="submit" */}
-                  ADD
+                  Update
                 </Button>
               </Popconfirm>
-              <Button onClick={() => props.closeAddDrawer()} type="ghost" style={{ margin: 5 }}>
+              <Button type="ghost" style={{ margin: 5 }}>
                 Cancel
               </Button>
             </div>
@@ -592,4 +574,4 @@ const BankDetails = props => {
   )
 }
 
-export default Form.create()(BankDetails)
+export default Form.create()(EditPrescription)

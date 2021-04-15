@@ -14,7 +14,9 @@ import leaders from './leads/sagas'
 // EXPENSE IMPORTED
 import expenses from './expenses/sagas'
 // Assets imported
+// import assets from './assets_redux/sagas'
 import assets from './assets_redux/sagas'
+import prescriptions from './prescriptions/sagas'
 import settings from './settings/sagas'
 import screening from './screening/sagas'
 import payor from './payor/sagas'
@@ -45,6 +47,8 @@ export default function* rootSaga() {
     expenses(),
     // assets used
     assets(),
+    // prescription
+    prescriptions(),
     settings(),
     screening(),
     payor(),
