@@ -32,7 +32,7 @@ import InvoiceForm from 'components/invoice/InvoiceForm'
 import EditInvoice from 'components/invoice/EditInvoice'
 import LoadingComponent from '../../staffProfile/LoadingComponent'
 import PreviewInvoice from '../../../components/invoice/PreviewInvoice'
-import { GET_INVOICES, DELETE_INVOICE } from './Queries'
+import { GET_INVOICES, DELETE_INVOICE } from './query'
 import './template.scss'
 
 const dateFormate = 'YYYY-MM-DD'

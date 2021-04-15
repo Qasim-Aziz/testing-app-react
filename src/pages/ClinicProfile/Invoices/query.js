@@ -137,7 +137,7 @@ export const GET_STUDENT_INVOICE_FEE = gql`
 `
 
 export const GET_STUDENT_FEE_DETAILS = gql`
-  query {
+  query($student: ID!) {
     getStudentInvoiceFeeDetails(id: "U3R1ZGVudEludm9pY2VmZWVUeXBlOjE=") {
       id
       feeType
@@ -235,6 +235,41 @@ export const CREATE_STUDENT_RATES = gql`
   }
 `
 
+export const UPDATE_STUDENT_FLAT_RATES = gql`
+  mutation($student: ID!, $feeType: String!, $flatItems: [FlatItemsInput]) {
+    createStudentRates(
+      input: {
+        student: $student
+        feeType: $feeType # Options => FLAT/PER_HOUR
+        flatItems: $flatItems
+      }
+    ) {
+      details {
+        id
+        feeType
+        startDate
+        endDate
+        gstApplicable
+        student {
+          id
+          firstname
+        }
+        flatItems {
+          edges {
+            node {
+              id
+              flatRate
+              item {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
 export const UPDATE_STUDENT_RATES = gql`
   mutation {
     updateStudentRates(

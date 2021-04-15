@@ -5,9 +5,13 @@ import { useQuery, useMutation } from 'react-apollo'
 import { Form, Input, Button, Row, Col, Modal, Select } from 'antd'
 import { MinusCircleOutlined } from '@ant-design/icons'
 import { CANCEL_BUTTON, COLORS, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
-import { GET_STUDENT_FEE_DETAILS, GET_STUDENT_INVOICE_FEE, STUDENT_INVOICE_ITEMS } from './Queries'
+import {
+  GET_STUDENT_FEE_DETAILS,
+  GET_STUDENT_INVOICE_FEE,
+  STUDENT_INVOICE_ITEMS,
+  UPDATE_STUDENT_FLAT_RATES,
+} from './query'
 import './template.scss'
-import { id } from 'chartjs-plugin-annotation'
 
 const layout = {
   labelCol: {
@@ -26,29 +30,43 @@ const tailLayout = {
 }
 
 function FlatRates({ form, closeDrawer, currentRow }) {
-  const [feeItems, setFeeItems] = useState([])
-  const { data, loading, error } = useQuery(GET_STUDENT_FEE_DETAILS)
-  const { data: invoiceItemsData, loading: invoiceItemsLoading } = useQuery(STUDENT_INVOICE_ITEMS)
   const [feeListModal, setFeeListModal] = useState(false)
+  const [selected, setSelected] = useState([])
+  const [feeItems, setFeeItems] = useState([])
   const [invoiceItemsList, setInvoiceItemsList] = useState([])
+  const { data, loading, error } = useQuery(GET_STUDENT_FEE_DETAILS, {
+    variables: {
+      id: currentRow.key,
+    },
+  })
+  const { data: invoiceItemsData, loading: invoiceItemsLoading } = useQuery(STUDENT_INVOICE_ITEMS)
+  const [updateStudentFlatRates] = useMutation(UPDATE_STUDENT_FLAT_RATES)
 
   useEffect(() => {
     if (invoiceItemsData) {
-      const tempList = []
-      setInvoiceItemsList(invoiceItemsData.getStudentInvoiceItems)
+      let tempList = invoiceItemsData.getStudentInvoiceItems
+      tempList = tempList.filter(item => {
+        for (let i = 0; i < feeItems.length; i++) {
+          if (feeItems[i].id === item.id) {
+            return false
+          }
+        }
+        return true
+      })
+      setInvoiceItemsList(tempList)
     }
-  }, [invoiceItemsData])
+  }, [invoiceItemsData, feeItems])
 
-  console.log(invoiceItemsList, 'invoiceItems List')
   useEffect(() => {
     if (data && data.getStudentInvoiceFeeDetails?.flatItems) {
       const tempFeeDetails = []
       data.getStudentInvoiceFeeDetails.flatItems.edges.map(({ node }) => {
         console.log(node)
         tempFeeDetails.push({
-          key: node.id,
+          pk: node.id,
           flatRate: node.flatRate,
-          feeItem: node.item,
+          id: node.item.id,
+          name: node.item.name,
         })
       })
 
@@ -65,17 +83,39 @@ function FlatRates({ form, closeDrawer, currentRow }) {
   const handleSubmitt = e => {
     e.preventDefault()
     form.validateFields((error, values) => {
-      if (!error) {
-        console.log(values, 'values')
+      if (!error && currentRow.key) {
+        const ratesList = []
+        console.log(values, feeItems)
+        feeItems.map(feeItem => {
+          ratesList.push(
+            feeItem.pk
+              ? {
+                  pk: feeItem.pk,
+                  item: feeItem.id,
+                  flatRates: values[feeItem.name],
+                }
+              : { item: feeItem.id, flatRates: values[feeItem.name] },
+          )
+        })
+        console.log(ratesList, 'rates')
+        updateStudentFlatRates({
+          variable: {
+            student: currentRow.key,
+            feeType: 'FLAT',
+            flatItems: feeItems,
+          },
+        }).then(res => console.log(res, 'res'))
       }
     })
   }
-  console.log(data, loading, error)
+
+  console.log(currentRow, 'currentRow')
 
   if (loading) {
     return <LoadingComponent />
   }
 
+  console.log(selected, 'selected')
   console.log(feeItems)
   return (
     <div>
@@ -96,8 +136,8 @@ function FlatRates({ form, closeDrawer, currentRow }) {
           return (
             <Row>
               <Col span={23}>
-                <Form.Item {...layout} label={item.feeItem.name}>
-                  {form.getFieldDecorator(`${item.feeItem.name}`, {
+                <Form.Item {...layout} label={item.name}>
+                  {form.getFieldDecorator(`${item.name}`, {
                     initialValue: item.flatRate,
                     rules: [{ required: true, message: 'Please provide rate!' }],
                   })(<Input type="number" />)}
@@ -122,20 +162,43 @@ function FlatRates({ form, closeDrawer, currentRow }) {
       </Form>
 
       <Modal
-        title="Title"
+        title="Add Fee Items"
         visible={feeListModal}
-        onOk={() => setFeeListModal(false)}
+        width={600}
+        height={220}
+        destroyOnClose
+        onOk={() => {
+          console.log(selected)
+          const temp = []
+          selected.map(item => {
+            for (let i = 0; i < invoiceItemsList.length; i++) {
+              if (invoiceItemsList[i].id === item) {
+                temp.push({ id: invoiceItemsList[i].id, name: invoiceItemsList[i].name })
+              }
+            }
+            setFeeItems([...feeItems, ...temp])
+          })
+          setFeeListModal(false)
+        }}
         onCancel={() => setFeeListModal(false)}
       >
-        <Select style={{ width: '100%', marginBottom: 100 }} placeholder="Select Invoice Item">
-          {invoiceItemsList.map(item => {
-            return (
-              <Select.Option key={item.key} value={item.key}>
-                {item.name}
-              </Select.Option>
-            )
-          })}
-        </Select>
+        <div style={{ height: 230 }}>
+          <span style={{ color: 'black', marginRight: 8, width: 140 }}>Select Fee Items: </span>
+          <Select
+            onChange={e => setSelected(e)}
+            mode="multiple"
+            style={{ width: 380 }}
+            placeholder="Select Fee Item"
+          >
+            {invoiceItemsList.map(item => {
+              return (
+                <Select.Option key={item.id} value={item.id}>
+                  {item.name}
+                </Select.Option>
+              )
+            })}
+          </Select>
+        </div>
       </Modal>
     </div>
   )

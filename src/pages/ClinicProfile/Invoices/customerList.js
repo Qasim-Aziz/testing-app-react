@@ -4,7 +4,7 @@ import { Button, notification, Table, Menu, Icon, Dropdown, Drawer, Form } from 
 import { PlusOutlined, MailOutlined } from '@ant-design/icons'
 import { DRAWER, COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 import { useMutation, useQuery } from 'react-apollo'
-import { STUDENTS, STUDENT_INVOICE_ITEMS } from './Queries'
+import { STUDENTS, STUDENT_INVOICE_ITEMS } from './query'
 import CreateInvoiceForm from './createInvoicesForm'
 import LoadingComponent from 'components/LoadingComponent'
 import MaintainRates from './maintainRates'
@@ -29,6 +29,7 @@ function CustomerList() {
     if (data) {
       console.log(data, 'THIS IS DATA')
       const tempTable = []
+      console.log(data.students)
       data.students?.edges.map(item => {
         tempTable.push({
           key: item.node.id,
