@@ -26,6 +26,7 @@ import cogniableassessment from './cogniableassessment/sagas'
 import iisaassessment from './iisaassessment/sagas'
 import sessiontargetallocation from './sessiontargetallocation/sagas'
 import appointments from './appointments/sagas'
+import prescriptions from './prescriptions/sagas'
 
 export default function* rootSaga() {
   yield all([
@@ -56,5 +57,6 @@ export default function* rootSaga() {
     cogniableassessment(),
     sessiontargetallocation(),
     appointments(),
+    prescriptions(),
   ])
 }
