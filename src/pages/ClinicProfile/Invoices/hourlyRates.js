@@ -1,7 +1,7 @@
 /* eslint-disable */
 import LoadingComponent from 'components/LoadingComponent'
 import React, { useEffect, useState } from 'react'
-import { useQuery, useMutation } from 'react-apollo'
+import { useQuery, useMutation, useLazyQuery } from 'react-apollo'
 import { Form, Input, Button, Row, Col, Modal, Select, notification, Popconfirm } from 'antd'
 import { MinusCircleOutlined } from '@ant-design/icons'
 import { CANCEL_BUTTON, COLORS, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
@@ -47,19 +47,24 @@ function HourlyRates({ form, closeDrawer, currentRow }) {
   const [createRates, setCreateRates] = useState(false)
   const [objPk, setObjPk] = useState(null)
   const [invoiceItemsList, setInvoiceItemsList] = useState([])
-  const { data, loading, error } = useQuery(GET_STUDENT_INVOICE_FEE, {
-    variables: {
-      student: currentRow.key,
-      feeType: null,
-    },
-  })
+  const [fetchData, { data, loading, error }] = useLazyQuery(GET_STUDENT_INVOICE_FEE)
 
   const { data: invoiceItemsData, loading: invoiceItemsLoading } = useQuery(STUDENT_INVOICE_ITEMS)
   const [updateStudentRates, { loading: updateRatesLoading }] = useMutation(UPDATE_STUDENT_RATES)
   const [removeFeeItem] = useMutation(REMOVE_FEE_ITEM)
   const [createStudentRates, { loading: createRatesLoading }] = useMutation(CREATE_STUDENT_RATES)
 
-  console.log(invoiceItemsData, data, 'nivv')
+  useEffect(() => {
+    if (currentRow.key) {
+      fetchData({
+        variables: {
+          student: currentRow.key,
+          feeType: 'PER_HOUR',
+        },
+      })
+    }
+  }, [currentRow.key])
+
   useEffect(() => {
     if (invoiceItemsData) {
       let tempList = invoiceItemsData.getStudentInvoiceItems
@@ -110,7 +115,7 @@ function HourlyRates({ form, closeDrawer, currentRow }) {
     form.validateFields((error, values) => {
       if (!error && currentRow.key) {
         const ratesList = []
-        console.log(values, feeItems)
+
         feeItems.map(feeItem => {
           ratesList.push({
             item: feeItem.id,
@@ -118,28 +123,26 @@ function HourlyRates({ form, closeDrawer, currentRow }) {
             hourRate: Number(values[feeItem.name]),
           })
         })
-        console.log(ratesList, 'rates in create')
-        // createStudentRates({
-        //   variables: {
-        //     student: currentRow.key,
-        //     feeType: 'PER_HOUR',
-        //     startDate: moment().format('YYYY-MM-DD'),
-        //     endDate: moment()
-        //       .add(1, 'M')
-        //       .format('YYYY-MM-DD'),
-        //     gstApplicable: true,
-        //     flatItems: [],
-        //     hourlyItems: ratesList,
-        //   },
-        // })
-        //   .then(res => {
-        //     console.log(res)
-        //     notification.success({
-        //       message: 'Rates added successfully',
-        //     })
-        //     closeDrawer(false)
-        //   })
-        //   .catch(err => console.error(err))
+        createStudentRates({
+          variables: {
+            student: currentRow.key,
+            feeType: 'PER_HOUR',
+            startDate: moment().format('YYYY-MM-DD'),
+            endDate: moment()
+              .add(1, 'M')
+              .format('YYYY-MM-DD'),
+            gstApplicable: true,
+            flatItems: [],
+            hourlyItems: ratesList,
+          },
+        })
+          .then(res => {
+            notification.success({
+              message: 'Rates added successfully',
+            })
+            closeDrawer(false)
+          })
+          .catch(err => console.error(err))
       }
     })
   }
@@ -149,7 +152,6 @@ function HourlyRates({ form, closeDrawer, currentRow }) {
     form.validateFields((error, values) => {
       if (!error && objPk) {
         const ratesList = []
-        console.log(values, feeItems, 'values')
 
         feeItems.map(feeItem => {
           ratesList.push(
@@ -168,21 +170,20 @@ function HourlyRates({ form, closeDrawer, currentRow }) {
           )
         })
 
-        console.log(ratesList, 'rates in updates')
-        // updateStudentRates({
-        //   variables: {
-        //     pk: objPk,
-        //     flatItems: [],
-        //     hourlyItems: ratesList,
-        //   },
-        // })
-        //   .then(res => {
-        //     notification.success({
-        //       message: 'Rates updated successfully',
-        //     })
-        //     closeDrawer(false)
-        //   })
-        //   .catch(err => console.log(err))
+        updateStudentRates({
+          variables: {
+            pk: objPk,
+            flatItems: [],
+            hourlyItems: ratesList,
+          },
+        })
+          .then(res => {
+            notification.success({
+              message: 'Rates updated successfully',
+            })
+            closeDrawer(false)
+          })
+          .catch(err => console.log(err))
       }
     })
   }
@@ -213,7 +214,6 @@ function HourlyRates({ form, closeDrawer, currentRow }) {
     return <LoadingComponent />
   }
 
-  console.log(feeItems, 'feeItems')
   return (
     <div>
       <div
@@ -221,7 +221,7 @@ function HourlyRates({ form, closeDrawer, currentRow }) {
           margin: '20px auto 20px',
           width: '100%',
           display: 'flex',
-          justifyContent: 'flex-end',
+          justifyContent: feeItems.length === 0 ? 'center' : 'flex-end',
         }}
       >
         <Button onClick={() => setFeeListModal(true)} type="primary">
@@ -298,7 +298,6 @@ function HourlyRates({ form, closeDrawer, currentRow }) {
         height={220}
         destroyOnClose
         onOk={() => {
-          console.log(selected)
           const temp = []
           selected.map(item => {
             for (let i = 0; i < invoiceItemsList.length; i++) {

@@ -1,7 +1,7 @@
 /* eslint-disable */
 import LoadingComponent from 'components/LoadingComponent'
 import React, { useEffect, useState } from 'react'
-import { useQuery, useMutation } from 'react-apollo'
+import { useQuery, useLazyQuery, useMutation } from 'react-apollo'
 import { Form, Input, Button, Row, Col, Modal, Select, notification, Popconfirm } from 'antd'
 import { MinusCircleOutlined } from '@ant-design/icons'
 import { CANCEL_BUTTON, COLORS, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
@@ -38,12 +38,7 @@ function FlatRates({ form, closeDrawer, currentRow }) {
   const [createRates, setCreateRates] = useState(false)
   const [objPk, setObjPk] = useState(null)
   const [invoiceItemsList, setInvoiceItemsList] = useState([])
-  const { data, loading, error } = useQuery(GET_STUDENT_INVOICE_FEE, {
-    variables: {
-      student: currentRow.key,
-      feeType: 'FLAT',
-    },
-  })
+  const [fetchData, { data, loading, error }] = useLazyQuery(GET_STUDENT_INVOICE_FEE)
 
   const { data: invoiceItemsData, loading: invoiceItemsLoading } = useQuery(STUDENT_INVOICE_ITEMS)
   const [updateStudentFlatRates, { loading: updateRatesLoading }] = useMutation(
@@ -53,6 +48,17 @@ function FlatRates({ form, closeDrawer, currentRow }) {
   const [createStudentFlatRates, { loading: createRatesLoading }] = useMutation(
     CREATE_STUDENT_RATES,
   )
+
+  useEffect(() => {
+    if (currentRow.key) {
+      fetchData({
+        variables: {
+          student: currentRow.key,
+          feeType: 'FLAT',
+        },
+      })
+    }
+  }, [currentRow.key])
 
   useEffect(() => {
     if (invoiceItemsData) {
@@ -103,11 +109,11 @@ function FlatRates({ form, closeDrawer, currentRow }) {
     form.validateFields((error, values) => {
       if (!error && currentRow.key) {
         const ratesList = []
-        console.log(values, feeItems)
+
         feeItems.map(feeItem => {
           ratesList.push({ item: feeItem.id, flatRate: Number(values[feeItem.name]) })
         })
-        console.log(ratesList, 'rates in create')
+
         createStudentFlatRates({
           variables: {
             student: currentRow.key,
@@ -122,7 +128,6 @@ function FlatRates({ form, closeDrawer, currentRow }) {
           },
         })
           .then(res => {
-            console.log(res)
             notification.success({
               message: 'Rates added successfully',
             })
@@ -138,7 +143,6 @@ function FlatRates({ form, closeDrawer, currentRow }) {
     form.validateFields((error, values) => {
       if (!error && objPk) {
         const ratesList = []
-        console.log(values, feeItems)
 
         feeItems.map(feeItem => {
           ratesList.push(
@@ -152,7 +156,6 @@ function FlatRates({ form, closeDrawer, currentRow }) {
           )
         })
 
-        console.log(ratesList, 'rates in updates')
         updateStudentFlatRates({
           variables: {
             pk: objPk,
@@ -197,7 +200,6 @@ function FlatRates({ form, closeDrawer, currentRow }) {
     return <LoadingComponent />
   }
 
-  console.log(feeItems, 'feeItems')
   return (
     <div>
       <div
@@ -205,7 +207,7 @@ function FlatRates({ form, closeDrawer, currentRow }) {
           margin: '20px auto 20px',
           width: '100%',
           display: 'flex',
-          justifyContent: 'flex-end',
+          justifyContent: feeItems.length === 0 ? 'center' : 'flex-end',
         }}
       >
         <Button onClick={() => setFeeListModal(true)} type="primary">
@@ -265,7 +267,6 @@ function FlatRates({ form, closeDrawer, currentRow }) {
         height={220}
         destroyOnClose
         onOk={() => {
-          console.log(selected)
           const temp = []
           selected.map(item => {
             for (let i = 0; i < invoiceItemsList.length; i++) {
