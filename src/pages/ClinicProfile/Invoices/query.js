@@ -82,6 +82,7 @@ const STUDENTS = gql`
     }
   }
 `
+
 export const STUDENT_INVOICE_ITEMS = gql`
   query {
     getStudentInvoiceItems {
@@ -92,8 +93,8 @@ export const STUDENT_INVOICE_ITEMS = gql`
 `
 
 export const GET_STUDENT_INVOICE_FEE = gql`
-  query {
-    getStudentInvoiceFee {
+  query($student: ID, $feeType: String) {
+    getStudentInvoiceFee(student: $student, feeType: $feeType) {
       edges {
         node {
           id
@@ -137,7 +138,7 @@ export const GET_STUDENT_INVOICE_FEE = gql`
 `
 
 export const GET_STUDENT_FEE_DETAILS = gql`
-  query($student: ID!) {
+  query {
     getStudentInvoiceFeeDetails(id: "U3R1ZGVudEludm9pY2VmZWVUeXBlOjE=") {
       id
       feeType
@@ -177,16 +178,6 @@ export const GET_STUDENT_FEE_DETAILS = gql`
   }
 `
 
-// student: "U3R1ZGVudFR5cGU6MTYz"
-// feeType: "FLAT" # Options => FLAT/PER_HOUR
-// startDate: "2021-04-01"
-// endDate: "2021-04-30"
-// gstApplicable: false
-// flatItems: [
-//   { item: "U3R1ZGVudEludm9pY2VJdGVtc1R5cGU6MQ==", flatRate: 550 }
-//   { item: "U3R1ZGVudEludm9pY2VJdGVtc1R5cGU6Mg==", flatRate: 500 }
-// ]
-
 export const CREATE_STUDENT_RATES = gql`
   mutation(
     $student: ID!
@@ -194,53 +185,17 @@ export const CREATE_STUDENT_RATES = gql`
     $startDate: Date
     $endDate: Date
     $gstApplicable: Boolean
-    $FlatItems: [FlatItemsInput]
+    $flatItems: [FlatItemsInput]
     $hourlyItems: [HourlyItemsInput]
   ) {
     createStudentRates(
       input: {
         student: $student
-        feeType: $feeType # Options => FLAT/PER_HOUR
+        feeType: $feeType
         startDate: $startDate
         endDate: $endDate
-        gstApplicable: false
-        hourlyItems: [hourlyItems]
-        flatItems: [FlatItems]
-      }
-    ) {
-      details {
-        id
-        feeType
-        startDate
-        endDate
-        gstApplicable
-        student {
-          id
-          firstname
-        }
-        flatItems {
-          edges {
-            node {
-              id
-              flatRate
-              item {
-                id
-                name
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`
-
-export const UPDATE_STUDENT_FLAT_RATES = gql`
-  mutation($student: ID!, $feeType: String!, $flatItems: [FlatItemsInput]) {
-    createStudentRates(
-      input: {
-        student: $student
-        feeType: $feeType # Options => FLAT/PER_HOUR
+        gstApplicable: $gstApplicable
+        hourlyItems: $hourlyItems
         flatItems: $flatItems
       }
     ) {
@@ -270,29 +225,61 @@ export const UPDATE_STUDENT_FLAT_RATES = gql`
     }
   }
 `
+
 export const UPDATE_STUDENT_RATES = gql`
-  mutation {
-    updateStudentRates(
-      input: {
-        pk: "U3R1ZGVudEludm9pY2VmZWVUeXBlOjE="
-        flatItems: [
-          {
-            pk: "U3R1ZGVudEludm9pY2VGbGF0SXRlbXNUeXBlOjE="
-            item: "U3R1ZGVudEludm9pY2VJdGVtc1R5cGU6MQ=="
-            flatRate: 550
+  mutation($pk: ID!, $flatItems: [FlatItemsInput], $hourlyItems: [HourlyItemsInput]) {
+    updateStudentRates(input: { pk: $pk, flatItems: $flatItems, hourlyItems: $hourlyItems }) {
+      details {
+        id
+        feeType
+        startDate
+        endDate
+        gstApplicable
+        student {
+          id
+          firstname
+        }
+        flatItems {
+          edges {
+            node {
+              id
+              flatRate
+              item {
+                id
+                name
+              }
+            }
           }
-          {
-            pk: "U3R1ZGVudEludm9pY2VGbGF0SXRlbXNUeXBlOjI="
-            item: "U3R1ZGVudEludm9pY2VJdGVtc1R5cGU6Mg=="
-            flatRate: 500
+        }
+        hourlyItems {
+          edges {
+            node {
+              id
+              hour
+              hourRate
+              item {
+                id
+                name
+              }
+            }
           }
-        ]
-        removeFlatItems: []
+        }
       }
+    }
+  }
+`
+
+export const REMOVE_FEE_ITEM = gql`
+  mutation($pk: ID!, $removeFlatItems: [ID], $removeHourlyItems: [ID]) {
+    updateStudentRates(
+      input: { pk: $pk, removeFlatItems: $removeFlatItems, removeHourlyItems: $removeHourlyItems }
     ) {
       details {
         id
         feeType
+        startDate
+        endDate
+        gstApplicable
         student {
           id
           firstname

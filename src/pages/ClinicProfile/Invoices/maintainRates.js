@@ -14,9 +14,6 @@ import HourlyRates from './hourlyRates'
 const { TabPane } = Tabs
 
 function MaintainRates({ currentRow, closeDrawer }) {
-  const { data: invoiceFee, loading: invoiceFeeLoading } = useQuery(GET_STUDENT_INVOICE_FEE)
-  console.log(invoiceFee, 'inv fee')
-
   return (
     <div style={{ marginBottom: 50 }}>
       <Helmet title="Dashboard Alpha" />
@@ -26,7 +23,7 @@ function MaintainRates({ currentRow, closeDrawer }) {
             <FlatRates currentRow={currentRow} closeDrawer={closeDrawer} />
           </TabPane>
           <TabPane tab="Hourly Rates" key="hourlyRates">
-            <HourlyRates />
+            <HourlyRates currentRow={currentRow} closeDrawer={closeDrawer} />
           </TabPane>
         </Tabs>
       </Layout>

@@ -24,12 +24,12 @@ function CustomerList() {
   const [invoiceType, setInvoiceType] = useState('advance')
   const { data: invoiceItemsData, loading: invoiceItemsLoading } = useQuery(STUDENT_INVOICE_ITEMS)
 
-  console.log(invoiceItemsData, 'item data')
+  // console.log(invoiceItemsData, 'item data')
   useEffect(() => {
     if (data) {
-      console.log(data, 'THIS IS DATA')
+      // console.log(data, 'THIS IS DATA')
       const tempTable = []
-      console.log(data.students)
+      // console.log(data.students)
       data.students?.edges.map(item => {
         tempTable.push({
           key: item.node.id,
@@ -88,7 +88,7 @@ function CustomerList() {
   ]
 
   const onSelectChange = selectedRowKeys => {
-    console.log('selectedRowKeys changed: ', selectedRowKeys)
+    // console.log('selectedRowKeys changed: ', selectedRowKeys)
     setSelectedRowKeys(selectedRowKeys)
   }
 
@@ -106,7 +106,7 @@ function CustomerList() {
           : null,
       ),
     )
-    console.log(names, 'names')
+    // console.log(names, 'names')
     setSelectedClinicsName(names)
     if (e.key == 'advanceInvoice') {
       setInvoiceType('advance')
@@ -194,7 +194,7 @@ function CustomerList() {
         </>
       </Drawer>
       <Drawer
-        title="Maintain Rates"
+        title={`${currentRow?.firstname}'s - Rates`}
         width={DRAWER.widthL2}
         visible={maintainRatesDrawer}
         closable
@@ -206,7 +206,7 @@ function CustomerList() {
           selectedRowKeys={selectedRowKeys}
           invoiceType={invoiceType}
           currentRow={currentRow}
-          closeDrawer={() => setCreateInvoiceDrawer(false)}
+          closeDrawer={() => setMaintainRatesDrawer(false)}
         />
       </Drawer>
       <Drawer

@@ -2,16 +2,18 @@
 import LoadingComponent from 'components/LoadingComponent'
 import React, { useEffect, useState } from 'react'
 import { useQuery, useMutation } from 'react-apollo'
-import { Form, Input, Button, Row, Col, Modal, Select } from 'antd'
+import { Form, Input, Button, Row, Col, Modal, Select, notification, Popconfirm } from 'antd'
 import { MinusCircleOutlined } from '@ant-design/icons'
 import { CANCEL_BUTTON, COLORS, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import {
-  GET_STUDENT_FEE_DETAILS,
   GET_STUDENT_INVOICE_FEE,
+  CREATE_STUDENT_RATES,
+  REMOVE_FEE_ITEM,
   STUDENT_INVOICE_ITEMS,
-  UPDATE_STUDENT_FLAT_RATES,
+  UPDATE_STUDENT_RATES,
 } from './query'
 import './template.scss'
+import moment from 'moment'
 
 const layout = {
   labelCol: {
@@ -33,14 +35,24 @@ function FlatRates({ form, closeDrawer, currentRow }) {
   const [feeListModal, setFeeListModal] = useState(false)
   const [selected, setSelected] = useState([])
   const [feeItems, setFeeItems] = useState([])
+  const [createRates, setCreateRates] = useState(false)
+  const [objPk, setObjPk] = useState(null)
   const [invoiceItemsList, setInvoiceItemsList] = useState([])
-  const { data, loading, error } = useQuery(GET_STUDENT_FEE_DETAILS, {
+  const { data, loading, error } = useQuery(GET_STUDENT_INVOICE_FEE, {
     variables: {
-      id: currentRow.key,
+      student: currentRow.key,
+      feeType: 'FLAT',
     },
   })
+
   const { data: invoiceItemsData, loading: invoiceItemsLoading } = useQuery(STUDENT_INVOICE_ITEMS)
-  const [updateStudentFlatRates] = useMutation(UPDATE_STUDENT_FLAT_RATES)
+  const [updateStudentFlatRates, { loading: updateRatesLoading }] = useMutation(
+    UPDATE_STUDENT_RATES,
+  )
+  const [removeFeeItem] = useMutation(REMOVE_FEE_ITEM)
+  const [createStudentFlatRates, { loading: createRatesLoading }] = useMutation(
+    CREATE_STUDENT_RATES,
+  )
 
   useEffect(() => {
     if (invoiceItemsData) {
@@ -58,10 +70,9 @@ function FlatRates({ form, closeDrawer, currentRow }) {
   }, [invoiceItemsData, feeItems])
 
   useEffect(() => {
-    if (data && data.getStudentInvoiceFeeDetails?.flatItems) {
+    if (data && data.getStudentInvoiceFee?.edges.length > 0) {
       const tempFeeDetails = []
-      data.getStudentInvoiceFeeDetails.flatItems.edges.map(({ node }) => {
-        console.log(node)
+      data.getStudentInvoiceFee.edges[0].node.flatItems.edges.map(({ node }) => {
         tempFeeDetails.push({
           pk: node.id,
           flatRate: node.flatRate,
@@ -69,54 +80,124 @@ function FlatRates({ form, closeDrawer, currentRow }) {
           name: node.item.name,
         })
       })
-
+      setObjPk(data.getStudentInvoiceFee.edges[0].node.id)
       setFeeItems(tempFeeDetails)
+      setCreateRates(false)
+    } else if (data && data.getStudentInvoiceFee?.edges.length === 0) {
+      setObjPk(null)
+      setFeeItems([])
+      setCreateRates(true)
     }
   }, [data])
 
-  const handleRateChange = (index, e) => {
-    let tempList = feeItems
-    tempList[index].flatRate = e.target.value
-    setFeeItems(tempList)
-  }
+  useEffect(() => {
+    if (error) {
+      return notification.error({
+        message: 'Something went wrong',
+      })
+    }
+  }, [error])
 
-  const handleSubmitt = e => {
+  const handleCreate = e => {
     e.preventDefault()
     form.validateFields((error, values) => {
       if (!error && currentRow.key) {
         const ratesList = []
         console.log(values, feeItems)
         feeItems.map(feeItem => {
+          ratesList.push({ item: feeItem.id, flatRate: Number(values[feeItem.name]) })
+        })
+        console.log(ratesList, 'rates in create')
+        createStudentFlatRates({
+          variables: {
+            student: currentRow.key,
+            feeType: 'FLAT',
+            startDate: moment().format('YYYY-MM-DD'),
+            endDate: moment()
+              .add(1, 'M')
+              .format('YYYY-MM-DD'),
+            gstApplicable: true,
+            flatItems: ratesList,
+            hourlyItems: [],
+          },
+        })
+          .then(res => {
+            console.log(res)
+            notification.success({
+              message: 'Rates added successfully',
+            })
+            closeDrawer(false)
+          })
+          .catch(err => console.error(err))
+      }
+    })
+  }
+
+  const handleUpdate = e => {
+    e.preventDefault()
+    form.validateFields((error, values) => {
+      if (!error && objPk) {
+        const ratesList = []
+        console.log(values, feeItems)
+
+        feeItems.map(feeItem => {
           ratesList.push(
             feeItem.pk
               ? {
                   pk: feeItem.pk,
                   item: feeItem.id,
-                  flatRates: values[feeItem.name],
+                  flatRate: Number(values[feeItem.name]),
                 }
-              : { item: feeItem.id, flatRates: values[feeItem.name] },
+              : { item: feeItem.id, flatRate: Number(values[feeItem.name]) },
           )
         })
-        console.log(ratesList, 'rates')
+
+        console.log(ratesList, 'rates in updates')
         updateStudentFlatRates({
-          variable: {
-            student: currentRow.key,
-            feeType: 'FLAT',
-            flatItems: feeItems,
+          variables: {
+            pk: objPk,
+            flatItems: ratesList,
+            hourlyItems: [],
           },
-        }).then(res => console.log(res, 'res'))
+        })
+          .then(res => {
+            notification.success({
+              message: 'Rates updated successfully',
+            })
+            closeDrawer(false)
+          })
+          .catch(err => console.log(err))
       }
     })
   }
 
-  console.log(currentRow, 'currentRow')
+  const handleRemove = obj => {
+    if (obj && obj.pk && objPk) {
+      removeFeeItem({
+        variables: {
+          pk: objPk,
+          removeFlatItems: [obj.pk],
+          removeHourlyItems: [],
+        },
+      })
+        .then(res => {
+          let tempList = []
+          tempList = feeItems.filter(item => obj.id !== item.id)
+          setFeeItems(tempList)
+        })
+        .catch(err => console.error(err))
+    } else if (obj) {
+      let tempList = []
+      tempList = feeItems.filter(item => obj.id !== item.id)
+      setFeeItems(tempList)
+    }
+  }
 
   if (loading) {
     return <LoadingComponent />
   }
 
-  console.log(selected, 'selected')
-  console.log(feeItems)
+  console.log(feeItems, 'feeItems')
   return (
     <div>
       <div
@@ -131,35 +212,51 @@ function FlatRates({ form, closeDrawer, currentRow }) {
           + Add Item
         </Button>
       </div>
-      <Form {...layout} onSubmit={handleSubmitt}>
-        {feeItems.map((item, index) => {
-          return (
-            <Row>
-              <Col span={23}>
-                <Form.Item {...layout} label={item.name}>
-                  {form.getFieldDecorator(`${item.name}`, {
-                    initialValue: item.flatRate,
-                    rules: [{ required: true, message: 'Please provide rate!' }],
-                  })(<Input type="number" />)}
-                </Form.Item>
-              </Col>
-              <Col span={1}>
-                <Button style={{ paddingRight: 0 }} type="link">
-                  <MinusCircleOutlined style={{ fontSize: 24, marginTop: 4 }} />
-                </Button>
-              </Col>
-            </Row>
-          )
-        })}
-        <Form.Item {...tailLayout}>
-          <Button type="primary" style={SUBMITT_BUTTON} htmlType="submit">
-            Submit
-          </Button>
-          <Button type="ghost" style={CANCEL_BUTTON} onClick={() => closeDrawer(false)}>
-            Cancel
-          </Button>
-        </Form.Item>
-      </Form>
+      {feeItems && feeItems.length > 0 ? (
+        <Form {...layout} onSubmit={createRates ? handleCreate : handleUpdate}>
+          {feeItems.map((item, index) => {
+            return (
+              <Row key={item.id}>
+                <Col span={23}>
+                  <Form.Item {...layout} label={item.name}>
+                    {form.getFieldDecorator(`${item.name}`, {
+                      initialValue: item.flatRate,
+                      rules: [{ required: true, message: 'Please provide rate!' }],
+                    })(<Input type="number" />)}
+                  </Form.Item>
+                </Col>
+                <Col span={1}>
+                  <Popconfirm
+                    onConfirm={() => handleRemove(item)}
+                    title="Are you sure to remove this item?"
+                    placement="topRight"
+                    okText="Yes"
+                    cancelText="No"
+                    trigger="click"
+                  >
+                    <Button style={{ paddingRight: 0 }} type="link">
+                      <MinusCircleOutlined style={{ fontSize: 24, marginTop: 4 }} />
+                    </Button>
+                  </Popconfirm>
+                </Col>
+              </Row>
+            )
+          })}
+          <Form.Item {...tailLayout}>
+            <Button
+              loading={updateRatesLoading || createRatesLoading}
+              type="primary"
+              style={SUBMITT_BUTTON}
+              htmlType="submit"
+            >
+              {createRates ? 'Create' : 'Update'}
+            </Button>
+            <Button type="ghost" style={CANCEL_BUTTON} onClick={() => closeDrawer(false)}>
+              Cancel
+            </Button>
+          </Form.Item>
+        </Form>
+      ) : null}
 
       <Modal
         title="Add Fee Items"
@@ -189,6 +286,7 @@ function FlatRates({ form, closeDrawer, currentRow }) {
             mode="multiple"
             style={{ width: 380 }}
             placeholder="Select Fee Item"
+            loading={invoiceItemsLoading}
           >
             {invoiceItemsList.map(item => {
               return (
