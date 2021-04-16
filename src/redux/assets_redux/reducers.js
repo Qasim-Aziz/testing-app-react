@@ -21,6 +21,19 @@ export default function useReduer(state = initialState, action) {
   switch (action.type) {
     case actions.SET_STATE:
       return { ...state, ...action.payload }
+    case 'UPDATE_ASSET_VALUE':
+      console.log('THE UPDATED ASSET', action.payload.object)
+      return {
+        ...state,
+        AssetsList: [
+          ...state.AssetsList.map(item => {
+            if (item.id === action.payload.object.id) {
+              return action.payload.object
+            }
+            return item
+          }),
+        ],
+      }
     case actions.UPDATE_ASSETS_LIST:
       console.log('THE UPDATED ASSET', action.payload.object)
       return {

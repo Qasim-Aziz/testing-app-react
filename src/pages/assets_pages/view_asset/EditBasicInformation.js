@@ -25,7 +25,9 @@ import moment from 'moment'
 import { connect } from 'react-redux'
 import axios from 'axios'
 import AntdTag from '../../staffs/antdTag'
-
+import { CANCEL_BUTTON, COLORS, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
+import actions from '../../../redux/assets_redux/actions'
+import { GetUsers } from '../createAsset'
 const { TextArea } = Input
 const { Option } = Select
 const layout = {
@@ -65,26 +67,31 @@ class EditBasicInformation extends React.Component {
   }
 
   componentDidMount() {
-    console.log('THE PROPS ', this.props)
+    console.log('THE PROPS ⭐', this.props)
     const {
       form,
       assets: { SpecificAsset },
     } = this.props
 
-    console.log('THE IS SpecificAsset --------------------->', SpecificAsset)
+    console.log('THE IS SpecificAsset 👉👉👉', SpecificAsset)
     var val_asset_assign_to = null
     var val_asset_assign_by = null
-    if (SpecificAsset.assetdesignationmodelSet.length > 0) {
-      var val_asset_assign_to = SpecificAsset.assetdesignationmodelSet[0].assignedTo
-      var val_asset_assign_by = SpecificAsset.assetdesignationmodelSet[0].assignedBy
+    if (SpecificAsset.assetdesignationmodelSet.edges.length > 0) {
+      /* Whoever it is assigned to latest */
+      let model_val = SpecificAsset.assetdesignationmodelSet.edges.length - 1
+      var val_asset_assign_to =
+        SpecificAsset.assetdesignationmodelSet.edges[model_val].node.assignedTo.id
+      var val_asset_assign_by =
+        SpecificAsset.assetdesignationmodelSet.edges[model_val].node.assignedBy.id
     }
+    console.log('THE ASSET ASSIGNED TO', val_asset_assign_to)
     form.setFieldsValue({
       assetName: SpecificAsset.assetName,
       assetStatus: SpecificAsset.assetStatus,
       description: SpecificAsset.description,
-      createdBy: SpecificAsset.createdBy,
-      asset_assignTo: moment(val_asset_assign_to),
-      asset_assignBy: moment(val_asset_assign_by),
+      createdBy: SpecificAsset.createdBy.id,
+      asset_assignTo: val_asset_assign_to,
+      asset_assignBy: val_asset_assign_by,
     })
 
     this.setState({
@@ -105,13 +112,11 @@ class EditBasicInformation extends React.Component {
     } = this.props
     e.preventDefault()
     const data = new FormData()
-    // data.append('file', this.state.selectedFile)
     data.append('pk', this.state.SpecificAssetID)
     console.log('THE DATA', data)
     form.validateFields((err, values) => {
       console.log('THE VALUES in edit form', err, values)
-      // values = { ...values, tags: this.state.tagArray }
-      message.success('Upload Successfully.')
+      message.info('FORM SUBMITED WAIT FOR RESPONSE')
       dispatch({
         type: 'assets/EDIT_ASSET',
         payload: {
@@ -120,6 +125,45 @@ class EditBasicInformation extends React.Component {
         },
       })
     })
+  }
+
+  handleSubmitFormForAssetDesignation = () => {
+    const {
+      form,
+      dispatch,
+      assets: { SpecificAsset },
+    } = this.props
+    // e.preventDefault()
+    console.log('THE BUTTON CLICKED', this.props)
+    console.log('ASSIGNED TO', form.getFieldValue('asset_assignTo'))
+    if (SpecificAsset.assetdesignationmodelSet.edges.length > 0) {
+      console.log('THE DISPATCH FOR ASSIGNING UPDATION OF ASSET DESIGNATION MODEL')
+      let model_val = SpecificAsset.assetdesignationmodelSet.edges.length - 1
+      var asset_designation_id = SpecificAsset.assetdesignationmodelSet.edges[model_val].node.id
+      console.log('THE ID', asset_designation_id)
+      dispatch({
+        type: actions.UPDATE_DESIGNATE_ASSET,
+        payload: {
+          values: {
+            id: asset_designation_id,
+            idForAsset: SpecificAsset.id,
+            idForAssignedBy: this.props.user.id,
+            idForAssignedTo: form.getFieldValue('asset_assignTo'),
+          },
+        },
+      })
+    } else {
+      dispatch({
+        type: actions.DESIGNATE_ASSET, //'assets/DESIGNATE_ASSET',
+        payload: {
+          values: {
+            idForAsset: SpecificAsset.id,
+            idForAssignedBy: this.props.user.id,
+            idForAssignedTo: form.getFieldValue('asset_assignTo'),
+          },
+        },
+      })
+    }
   }
 
   render() {
@@ -131,13 +175,9 @@ class EditBasicInformation extends React.Component {
       assets: { UsersList },
     } = this.props
     const itemStyle1 = { marginBottom: '5px', fontWeight: 'bold' }
-    // console.log(this.props.form, 'pppp')
-    console.log('THE PROPS in EDIT-BASIC-INFO====> END of render \n', this.props)
-    console.log('THE STATE in EDIT-BASIC-INFO====> END of render \n', this.state)
     return (
       <div>
         <Form {...layout} onSubmit={e => this.handleSubmit(e)}>
-          {/* {} */}
           <Divider orientation="left">Mandatory Fields</Divider>
           {/* item name */}
           <Form.Item label="Asset Name" style={itemStyle}>
@@ -164,43 +204,43 @@ class EditBasicInformation extends React.Component {
             )}
           </Form.Item>
           {/* ADD DATE FIELD BELOW */}
-          {/* <Form.Item label="Date" style={itemStyle}>
-            {form.getFieldDecorator('finalDate', {
-              rules: [
-                {
-                  required: false,
-                  // message: 'Please input Final Date',
-                  whitespace: true,
-                },
-              ],
-            })(<DatePicker format="DD-MM-YYYY" dateString onChange={this.onChange} />)}
-          </Form.Item> */}
-          {/* ---------------------------- ASSIGNING STUFF ---------------------------------- */}
-          <Divider orientation="left">Assigning Assets to User</Divider>
-
-          {/* <Form.Item label="Assign To" style={itemStyle}>
-            {form.getFieldDecorator('assigedTo', {
-              rules: [{ required: true, message: 'Please provide Choose a user' }],
-            })(
-              <Select placeholder="Assign To" allowClear>
-                {UsersList.map((item, index) => (
-                  <Select.Option key={index} value={item.id}>
-                    {item.firstName} {item.lastName}
-                  </Select.Option>
-                ))}
-              </Select>,
-            )}
-          </Form.Item> */}
-
+          <Form.Item label="FINAL DATE OF USE" style={itemStyle}>
+            {form.getFieldDecorator('date')(<DatePicker />)}
+          </Form.Item>
           <Form.Item {...tailLayout}>
-            <Button style={{ width: '100%' }} type="primary" htmlType="submit">
-              Save
+            <Button type="primary" htmlType="submit" style={SUBMITT_BUTTON}>
+              Submit
             </Button>
-            {/* <Button htmlType="primary" onClick={this.onReset} className="ml-4">
-            cancel
-          </Button> */}
+
+            {/* <Button type="default" onClick={this.onReset} style={CANCEL_BUTTON}>
+              Reset
+            </Button> */}
           </Form.Item>
         </Form>
+        {/* ---------------------------- ASSIGNING STUFF ---------------------------------- */}
+        <div style={{ marginTop: '4em' }}>
+          <Divider orientation="left">Assigning Assets to User</Divider>
+          {/* ASSIGNING ASSET TO WHICH USER */}
+          <Form
+            // onSubmit={e => this.handleSubmitFormForAssetDesignation(e)}
+            style={{ display: 'flex' }}
+          >
+            <GetUsers form={form} />
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{
+                backgroundColor: 'white',
+                border: '1px solid #0b35b3',
+                color: COLORS.palleteDarkBlue,
+              }}
+              onClick={this.handleSubmitFormForAssetDesignation}
+              // loading={updateCommentLoading}
+            >
+              ASSIGN
+            </Button>
+          </Form>
+        </div>
       </div>
     )
   }

@@ -9,6 +9,8 @@ const actions = {
   GET_ASSETS: 'assets/GET_ASSETS',
   PAGE_CHANGED: 'assets/PAGE_CHANGED',
   ROWS_CHANGED: 'assets/ROWS_CHANGED',
+  DESIGNATE_ASSET: 'assets/DESIGNATE_ASSET',
+  UPDATE_DESIGNATE_ASSET: 'assets/UPDATE_DESIGNATE_ASSET',
 }
 
 export default actions

@@ -19,6 +19,7 @@ import { Helmet } from 'react-helmet'
 import { connect } from 'react-redux'
 import DataTable from 'react-data-table-component'
 import {
+  Table,
   Button,
   Card,
   Avatar,
@@ -150,7 +151,7 @@ class AssetTable extends React.Component {
     noOfRows: 10,
     filterAssetName: '',
     // filterPurchaseFrom: '',
-    // filterPaidBy: 'all', // instead of tags, we have project-name
+    // filterPaidBy: 'all', // instead of tags, we have project-title
   }
 
   filterRef = React.createRef()
@@ -172,7 +173,6 @@ class AssetTable extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (prevProps?.assets !== this.props?.assets) {
-      console.log('UPDATED AssetS', this.props.assets.AssetsList)
       this.setState({
         mainData: this.props.assets.AssetsList,
         tableData: this.props.assets.AssetsList,
@@ -195,7 +195,7 @@ class AssetTable extends React.Component {
   info = e => {
     const { dispatch } = this.props
     // setting asset id to local storage for further operations
-    localStorage.setItem('AssetId', JSON.stringify(e.id))
+    // localStorage.setItem('AssetId', JSON.stringify(e.id))
 
     dispatch({
       type: 'assets/SET_STATE',
@@ -236,7 +236,6 @@ class AssetTable extends React.Component {
 
   /* BELOW CODE IS COMMENTED SINCE I PROBABLY WONT BE USING IT */
   selectActiveStatus = value => {
-    console.log('THE VALUES ------------ ➡ ', value)
     const {
       dispatch,
       assets: { ItemPerPage },
@@ -265,21 +264,18 @@ class AssetTable extends React.Component {
     })
   }
 
-  filterHandler = ({ name }) => {
+  filterHandler = ({ title }) => {
     let filteredList = this.state.mainData
     let tempFilterActive = false
-    console.log('Expense filter', name)
-    if (!name) {
+    if (!title) {
       tempFilterActive = false
     }
-    if (name) {
+    if (title) {
       tempFilterActive = true
-      console.log('THE filteredList', filteredList)
       filteredList =
         filteredList &&
         filteredList.filter(item => {
-          console.log('WHAT ITEMS', item)
-          return item.assetName?.toLowerCase().includes(name.toLowerCase())
+          return item.assetName?.toLowerCase().includes(title.toLowerCase())
         })
     }
 
@@ -316,10 +312,8 @@ class AssetTable extends React.Component {
     } = this.props
 
     let filteredList = this.state.tableData
-    console.log('FILTEREDLIST', filteredList)
 
     if (this.state.filterStatus) {
-      console.log('FILTER-STATUS in expense', this.state.filterStatus)
       /**Instead of changing the state I will store the value of state in a local-variable */
       let local_status = this.state.filterStatus
       if (local_status === 'all') {
@@ -328,7 +322,6 @@ class AssetTable extends React.Component {
         filteredList =
           filteredList &&
           filteredList.filter(item => {
-            // console.log('Filtering by asset-status', item)
             return (
               item.assetStatus &&
               item.assetStatus.toLowerCase().includes(local_status.toLowerCase())
@@ -338,7 +331,6 @@ class AssetTable extends React.Component {
         filteredList =
           filteredList &&
           filteredList.filter(item => {
-            // console.log('Filtering by asset-status', item)
             return (
               item.assetStatus === local_status //&& item.assetStatus.toLowerCase().includes(local_status.toLowerCase())
             )
@@ -352,65 +344,44 @@ class AssetTable extends React.Component {
 
     const columns = [
       {
-        name: 'Asset Name',
-        selector: 'assetName',
+        title: '#',
+        render: row => filteredList.indexOf(row) + 1,
+      },
+      {
+        title: 'Asset Name',
         sortable: true,
-        // maxWidth: '120px',
-        cell: row => {
-          row.assetName === null ? <span> </span> : <></>
-
-          return (
+        render: row => (
+          <>
             <Button
               onClick={() => this.info(row)} // this.info(row)
               type="link"
               style={{ padding: '0px', fontWeight: 'bold', fontSize: '11px' }}
             >
-              {row.assetName}
+              {row.assetName ? row.assetName : ''}
             </Button>
-          )
-        },
+          </>
+        ),
       },
       {
-        name: 'Description',
+        title: 'Description',
         selector: 'description',
-        // maxWidth: '120px',
-        cell: row => {
+        render: row => {
           return <span>{row.description ? row.description : ''} </span>
         },
       },
       {
-        name: 'Asset Status',
+        title: 'Asset Status',
         selector: 'assetStatus',
-        // maxWidth: '120px',
-        cell: row => {
+        render: row => {
           return <span>{row.assetStatus ? row.assetStatus : ''} </span>
         },
       },
       {
-        name: 'Created At',
-        selector: 'createdAt',
-        // maxWidth: '120px',
-        cell: row => {
-          return <span>{row.createdAt ? row.createdAt : ''} </span>
-        },
-      },
-      {
-        name: 'Updated At',
-        selector: 'updatedAt',
-        // maxWidth: '120px',
-        cell: row => {
-          return <span>{row.updatedAt ? row.updatedAt : ''} </span>
-        },
-      },
-      {
-        name: 'Created By',
+        title: 'Created By',
         selector: 'createdBy',
-        // maxWidth: '120px',
-        cell: row => {
+        render: row => {
           let object_of_assigned_by = row.createdBy
-          // console.log('THE OBJ ====👉', object_of_assigned_by)
           if (object_of_assigned_by) {
-            // console.log('object_of_assigned_by', object_of_assigned_by.assignedBy)
             return (
               <span>
                 {object_of_assigned_by.firstName} {object_of_assigned_by.lastName}
@@ -422,63 +393,58 @@ class AssetTable extends React.Component {
         },
       },
       {
-        name: 'Assigned By',
+        title: 'Assigned By',
         selector: 'assignedBy',
-        // maxWidth: '120px',
-        cell: row => {
-          // console.log(
-          //   '*******************',
-          //   row.assetdesignationmodelSet,
-          //   row.assetdesignationmodelSet.length,
-          // )
-          let object_of_assigned_by = row.assetdesignationmodelSet[0]
-          // console.log('THE OBJ ====👉', object_of_assigned_by)
+        render: row => {
+          let object_of_assigned_by = row.assetdesignationmodelSet?.edges[0]
           if (object_of_assigned_by) {
-            // console.log('object_of_assigned_by', object_of_assigned_by.assignedBy)
             return (
               <span>
-                {object_of_assigned_by.assignedBy.firstName}{' '}
-                {object_of_assigned_by.assignedBy.lastName}
+                {object_of_assigned_by.node?.assignedBy.firstName}{' '}
+                {object_of_assigned_by.node?.assignedBy.lastName}
               </span>
             )
           } else {
-            // console.log(
-            //   '------------------------------>',
-            //   row.assetdesignationmodelSet,
-            //   row.assetdesignationmodelSet.length,
-            // )
-            return <>NULL</>
+            return <span>NULL</span>
           }
         },
       },
       {
-        name: 'Assigned To',
+        title: 'Assigned To',
         selector: 'assignedTo',
-        // maxWidth: '120px',
-        cell: row => {
-          // console.log(
-          //   'ASSIGNED TO *******************',
-          //   row.assetdesignationmodelSet,
-          //   row.assetdesignationmodelSet.length,
-          // )
-          let object_of_assigned_to = row.assetdesignationmodelSet[0]
-          // console.log('THE OBJ ====> ▶', object_of_assigned_to)
+        render: row => {
+          let object_of_assigned_to = row.assetdesignationmodelSet?.edges[0]
           if (object_of_assigned_to) {
-            // console.log('object_of_assigned_to', object_of_assigned_to.assignedTo)
             return (
               <span>
-                {object_of_assigned_to.assignedTo.firstName}{' '}
-                {object_of_assigned_to.assignedTo.lastName}
+                {object_of_assigned_to.node?.assignedTo.firstName}{' '}
+                {object_of_assigned_to.node?.assignedTo.lastName}
               </span>
             )
           } else {
-            // console.log(
-            //   '------------------------------>',
-            //   row.assetdesignationmodelSet,
-            //   row.assetdesignationmodelSet.length,
-            // )
-            return <>NULL</>
+            return <span>NULL</span>
           }
+        },
+      },
+      {
+        title: 'Final Date',
+        selector: 'finalDate',
+        render: row => {
+          return <span>{row.finalDate ? moment(row.finalDate).format('YYYY-MM-DD') : ''} </span>
+        },
+      },
+      {
+        title: 'Created At',
+        selector: 'createdAt',
+        render: row => {
+          return <span>{row.createdAt ? moment(row.createdAt).format('YYYY-MM-DD') : ''} </span>
+        },
+      },
+      {
+        title: 'Updated At',
+        selector: 'updatedAt',
+        render: row => {
+          return <span>{row.updatedAt ? moment(row.updatedAt).format('YYYY-MM-DD') : ''} </span>
         },
       },
     ]
@@ -505,15 +471,64 @@ class AssetTable extends React.Component {
         </Menu.Item>
       </Menu>
     )
+
+    const tableHeader = (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          position: 'relative',
+          whiteSpace: 'nowrap',
+          zIndex: 2,
+          height: '28px',
+          width: '100%',
+          padding: '4px 12px',
+        }}
+      >
+        {/* Search bar for title */}
+        <span style={{ display: 'flex', alignItems: 'center' }}>
+          <span>Name :</span>
+          <Input
+            size="small"
+            title="title"
+            placeholder="Search Name"
+            value={this.state.filterName}
+            onChange={e => {
+              this.setState({
+                filterName: e.target.value,
+                isFilterActive: e.target.value && true,
+              })
+              this.filterHandler({ title: e.target.value })
+            }}
+            style={{ ...tableFilterStyles, width: '112px' }}
+          />
+        </span>
+        {/* Different kinds of status */}
+        <span style={{ display: 'flex', alignItems: 'center' }}>
+          <span>STATUS :</span>
+          <Radio.Group
+            size="small"
+            buttonStyle="solid"
+            value={this.state.filterStatus}
+            onChange={e => {
+              // this.selectActiveStatus(e.target.value)
+              this.setState({ filterStatus: e.target.value, isFilterActive: true })
+            }}
+            style={tableFilterStyles}
+          >
+            <Radio.Button value="all">All</Radio.Button>
+            <Radio.Button value="ASSIGNED">ASSIGNED</Radio.Button>
+            <Radio.Button value="NOT_ASSIGNED">NOT_ASSIGNED</Radio.Button>
+          </Radio.Group>
+        </span>
+      </div>
+    )
+
     // ****************************** PDF & CSV ******************************
-    console.log('END OF RENDER HELLO PROPS', this.props)
-    console.log('END OF RENDER ALL STATE', this.state)
     // let filteredList = this.state.
 
     return (
-      <div>
-        {console.log(`LETS SEE ALL PROPS \n `, this.props)}
-        {console.log(`LETS SEE ALL state \n `, this.state)}
+      <>
         <Helmet title="Assets" />
         {/* DRAWER FOR FILTER */}
         {/* ------------------------------------ */}
@@ -570,7 +585,6 @@ class AssetTable extends React.Component {
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '0px 10px',
-            marginTop: '20px',
             backgroundColor: '#FFF',
             boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
           }}
@@ -620,92 +634,23 @@ class AssetTable extends React.Component {
           </div>
         </div>
         {/* ********************** END of DIV FOR TOP_BAR***************** */}
-        <div className={divClass}>
-          <div style={{ marginTop: '24px', marginBottom: '50px' }}>
-            {/* ************* DIV FOR filtering ************ */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                position: 'relative',
-                whiteSpace: 'nowrap',
-                zIndex: 2,
-                width: 'fit-content',
-                paddingTop: '4px',
-              }}
-            >
-              {/* Search bar for name */}
-              <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span>Name :</span>
-                <Input
-                  size="small"
-                  name="name"
-                  placeholder="Search Name"
-                  value={this.state.filterName}
-                  onChange={e => {
-                    this.setState({
-                      filterName: e.target.value,
-                      isFilterActive: e.target.value && true,
-                    })
-                    this.filterHandler({ name: e.target.value })
-                  }}
-                  style={{ ...tableFilterStyles, width: '112px' }}
-                />
-              </span>
-              {/* Different kinds of status */}
-              <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span>STATUS :</span>
-                <Radio.Group
-                  size="small"
-                  buttonStyle="solid"
-                  value={this.state.filterStatus}
-                  onChange={e => {
-                    // this.selectActiveStatus(e.target.value)
-                    this.setState({ filterStatus: e.target.value, isFilterActive: true })
-                  }}
-                  style={tableFilterStyles}
-                >
-                  <Radio.Button value="all">All</Radio.Button>
-                  <Radio.Button value="ASSIGNED">ASSIGNED</Radio.Button>
-                  <Radio.Button value="NOT_ASSIGNED">NOT_ASSIGNED</Radio.Button>
-                </Radio.Group>
-              </span>
-            </div>
-            {/* ************* END OF DIV FOR filtering ************ */}
-            {/* ************* DIV FOR DATA-TABLE ************ */}
-            <div className="modify-data-table">
-              <DataTable
-                title="Assets List"
-                columns={columns}
-                theme="default"
-                dense={true}
-                key="id"
-                keyField="id"
-                pagination={true}
-                data={filteredList}
-                customStyles={customStyles}
-                noHeader={true}
-                progressPending={loadingAssets}
-                // paginationServer={true}
-                // paginationTotalRows={TotalAssets}
-                // onChangePage={(page, rows) => this.pageChanged(page, rows)}
-                paginationServerOptions={{
-                  persistSelectedOnPageChange: false,
-                  persistSelectedOnSort: false,
+        <div>
+          {/* ************* DIV FOR DATA-TABLE ************ */}
+          <div style={{ marginBottom: '50px' }}>
+            <div className="view_asset">
+              <Table
+                title={() => {
+                  return tableHeader
                 }}
-                // onChangeRowsPerPage={(currentRowsPerPage, currentPage) =>
-                //   this.rowsChanged(currentRowsPerPage, currentPage)
-                // }
-                // paginationRowsPerPageOptions={
-                //   TotalAssets > 100 ? [10, 20, 50, 80, 100, TotalAssets] : [10, 20, 50, 80, 100]
-                // }
-                currentPage={2}
+                columns={columns}
+                rowKey={record => record.id}
+                dataSource={filteredList}
+                loading={loadingAssets}
               />
             </div>
-            {/* ***** END OF DIV FOR DATA-TABLE ***** */}
           </div>
         </div>
-      </div>
+      </>
     )
   }
 }

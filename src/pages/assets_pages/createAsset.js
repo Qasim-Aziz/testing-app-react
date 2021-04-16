@@ -6,10 +6,78 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable object-shorthand */
-import React from 'react'
-import { Form, Input, Button, Select, DatePicker, Checkbox, Divider, message, Tag } from 'antd'
+import React, { useState, useEffect } from 'react'
+import {
+  Form,
+  Input,
+  Spin,
+  Button,
+  Select,
+  DatePicker,
+  Checkbox,
+  Divider,
+  message,
+  Tag,
+} from 'antd'
 import { connect } from 'react-redux'
 import AntdTag from '../staffs/antdTag'
+import { CANCEL_BUTTON, COLORS, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles' // '../../../assets/styles/globalStyles' //
+import { useQuery } from 'react-apollo'
+import { gql } from 'apollo-boost'
+import { FETCH_USERS_QUERY } from './view_asset/query'
+
+export const GetUsers = ({ form }) => {
+  const [sdText, setSdText] = useState('')
+  const { data: sdData, error: sdError, loading: sdLoading } = useQuery(FETCH_USERS_QUERY, {
+    variables: {
+      val: sdText,
+    },
+  })
+
+  useEffect(() => {
+    if (sdError) {
+      notification.error({
+        message: 'Failed to load list of users',
+      })
+    }
+  }, [sdError])
+
+  return (
+    <>
+      {/* ASSIGNING ASSET TO */}
+      {(form.getFieldValue('asset_assignTo') || !form.getFieldValue('asset_assignTo')) && (
+        <Form.Item style={{ display: 'flex', width: '90%' }} className="TimeLine-Form">
+          {form.getFieldDecorator('asset_assignTo')(
+            <Select
+              // mode="default"
+              // style={{ width: '90%' }}
+              allowClear
+              size="large"
+              notFoundContent={sdLoading ? <Spin size="small" /> : null}
+              filterOption={false}
+              // onSearch
+              onSearch={v => {
+                setSdText(v)
+              }}
+              showSearch
+              loading={sdLoading}
+              placeholder="Search a User"
+            >
+              {sdData?.getuser.edges.map(({ node }) => {
+                // console.log('THE NODE NAME', node.username)
+                return (
+                  <Select.Option key={node.id} value={node.id}>
+                    {node.username}
+                  </Select.Option>
+                )
+              })}
+            </Select>,
+          )}
+        </Form.Item>
+      )}
+    </>
+  )
+}
 
 const { TextArea } = Input
 const { Option } = Select
@@ -58,9 +126,6 @@ class BasicInformationForm extends React.Component {
   componentDidMount() {
     const { dispatch } = this.props
     console.log('THE PROPS in CDM', this.props)
-    // dispatch({
-    //   type: 'leaders/GET_LEADS_DROPDOWNS',
-    // })
   }
 
   onReset = () => {
@@ -77,11 +142,13 @@ class BasicInformationForm extends React.Component {
     form.validateFields((error, values) => {
       if (!error) {
         console.log('VALUES SEND TO THE SAGAS middleware are', error, values)
+        console.log('THE ASSET IS ASSIGNED BY', this.props.user.id)
         dispatch({
           type: 'assets/CREATE_ASSET',
           payload: {
             values: values,
-            data: data,
+            // Id of the user who will create the asset is the one who is authenticated
+            createdBy: this.props.user.id,
           },
         })
         form.resetFields()
@@ -110,7 +177,6 @@ class BasicInformationForm extends React.Component {
       assets: { UsersList },
     } = this.props
     const itemStyle = { marginBottom: '5px', fontWeight: 'bold' }
-    const itemStyle1 = { textAlign: 'center', marginBottom: '5px', fontWeight: 'bold' }
 
     console.log('THE RENDER END ====> ', this.props)
     console.log('THE RENDER END ====> ', this.state)
@@ -119,38 +185,23 @@ class BasicInformationForm extends React.Component {
 
     return (
       <>
-        {console.log('THE INITIAL RETURN ====> ', this.props)}
-        {console.log('THE INITIAL RETURN ====> ', this.state)}
         <Form {...layout} name="control-ref" onSubmit={e => this.handleSubmit(e)}>
           <Divider orientation="left">Mandatory Fields</Divider>
           {/* item name */}
-          <Form.Item label="Asset Name" style={itemStyle}>
+          <Form.Item label="ASSET NAME" style={itemStyle}>
             {form.getFieldDecorator('assetName', {
               rules: [{ required: true, message: 'Please provide asset name!' }],
             })(<Input style={{ borderRadius: 0 }} />)}
           </Form.Item>
           {/* Description */}
-          <Form.Item label="Description From" style={itemStyle}>
+          <Form.Item label="DESCRIPTION" style={itemStyle}>
             {form.getFieldDecorator('description')(
-              <Input.TextArea rows={4} style={{ borderRadius: 0 }} />,
+              <Input.TextArea rows={2} style={{ borderRadius: 0 }} />,
             )}
           </Form.Item>
-          {/* USER */}
-          <Form.Item label="Select" style={itemStyle}>
-            {form.getFieldDecorator('userId', {
-              rules: [{ required: true, message: 'Please provide Choose a user' }],
-            })(
-              <Select placeholder="userId" allowClear>
-                {UsersList.map((item, index) => (
-                  <Select.Option key={index} value={item.id}>
-                    {item.firstName} {item.lastName}
-                  </Select.Option>
-                ))}
-              </Select>,
-            )}
-          </Form.Item>
-          {/* Status */}
-          <Form.Item label="Status" style={itemStyle}>
+
+          {/* Status of asset */}
+          <Form.Item label="STATUS" style={itemStyle}>
             {form.getFieldDecorator('assetStatus', {
               rules: [{ required: true, message: 'Please provide Status' }],
             })(
@@ -161,13 +212,15 @@ class BasicInformationForm extends React.Component {
             )}
           </Form.Item>
           {/* ADD DATE FIELD BELOW */}
-
+          <Form.Item label="FINAL DATE OF USE" style={itemStyle}>
+            {form.getFieldDecorator('date')(<DatePicker />)}
+          </Form.Item>
           <Form.Item {...tailLayout}>
-            <Button type="primary" htmlType="submit" className="mt-4">
+            <Button type="primary" htmlType="submit" style={SUBMITT_BUTTON}>
               Submit
             </Button>
 
-            <Button type="primary" onClick={this.onReset} className="ml-4">
+            <Button type="default" onClick={this.onReset} style={CANCEL_BUTTON}>
               Reset
             </Button>
           </Form.Item>
