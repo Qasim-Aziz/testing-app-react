@@ -12,6 +12,7 @@ import {
   Tooltip,
   Radio,
   Table,
+  Icon,
   Tabs,
   Typography,
 } from 'antd'
@@ -19,7 +20,7 @@ import { GET_GENERAL_ASSESSMENT, DELETE_GENERAL_ASSESSMENT } from '../query'
 import client from '../../../apollo/config'
 import { useQuery, useLazyQuery, useMutation } from 'react-apollo'
 import CreateGenAssessForm from './CreateGenAssessForm'
-import { DRAWER } from 'assets/styles/globalStyles'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import '../index.scss'
 
 const { Content } = Layout
@@ -95,6 +96,7 @@ function Assessment() {
         return (
           <span>
             <Button
+              style={{ padding: '0 8px 0 0' }}
               type="link"
               onClick={() => {
                 setUpdate(true)
@@ -131,10 +133,22 @@ function Assessment() {
               okText="Yes"
               cancelText="No"
             >
-              <Button type="link" style={{ color: 'red' }}>
+              <Button type="link" style={{ color: COLORS.danger }}>
                 <DeleteOutlined /> Delete
               </Button>
             </Popconfirm>
+            {/* <span style={{ borderRight: '1px solid #ccc', margin: '0 8px' }} />
+            <Button
+              type="link"
+              onClick={() => {
+                setUpdate(true)
+                setCurrentRow(row)
+                setCreateAssessDrawer(true)
+              }}
+            >
+              <Icon type="edit" />
+              Edit
+            </Button> */}
           </>
         )
       },

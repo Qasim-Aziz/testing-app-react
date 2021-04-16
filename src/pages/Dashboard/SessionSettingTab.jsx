@@ -120,11 +120,13 @@ const SessionSettingTab = () => {
 
   useEffect(() => {
     if (userDetails) {
-      const settings = userDetails.userSettings.edges[0]?.node
-      setDefaultSession(settings.default)
-      setMorningSession(settings.morning)
-      setAfternoonSession(settings.afternoon)
-      setEveningSession(settings.evening)
+      if (userDetails && userDetails.userSettings?.edges.length > 0) {
+        const settings = userDetails.userSettings.edges[0]?.node
+        setDefaultSession(settings.default)
+        setMorningSession(settings.morning)
+        setAfternoonSession(settings.afternoon)
+        setEveningSession(settings.evening)
+      }
     }
   }, [userDetails])
 

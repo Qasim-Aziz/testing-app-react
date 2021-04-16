@@ -620,6 +620,7 @@ export default Form.create()(
 
     // end of equivalence class code
 
+    console.log(targetInstructions, 'targetINstructions')
     return (
       <div className="targetAllocationFormForAddOrEdit">
         <Form onSubmit={handleSubmit} labelCol={{ sm: 24, md: 6 }} wrapperCol={{ sm: 24, md: 18 }}>
@@ -660,7 +661,10 @@ export default Form.create()(
           </Form.Item>
           <Form.Item label="Domain Name" name="Domain Name">
             {form.getFieldDecorator('domain', {
-              initialValue: activeAllocatedTarget && activeAllocatedTarget?.targetId ? activeAllocatedTarget.targetId?.domain?.id : activeAllocatedTarget?.manualAllocateDomain?.id,
+              initialValue:
+                activeAllocatedTarget && activeAllocatedTarget?.targetId
+                  ? activeAllocatedTarget.targetId?.domain?.id
+                  : activeAllocatedTarget?.manualAllocateDomain?.id,
               rules: [{ required: true, message: 'Please select a domain' }],
             })(
               <Select name="domain" {...searchableDropDownOption} loading={isDomainLoading}>

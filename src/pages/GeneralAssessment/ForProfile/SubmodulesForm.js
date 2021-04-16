@@ -2,12 +2,15 @@
 /* eslint-disable no-unused-vars */
 import React from 'react'
 import { Form, Button, Select, Input, TimePicker } from 'antd'
+import { useMutation } from 'react-apollo'
 import { MinusOutlined, PlusOutlined } from '@ant-design/icons'
 import moment from 'moment'
+import { REMOVE_SUBMODULE } from '../query'
 
 const { Option } = Select
 
-export default ({ index, dispatch, setSubmodulesCount, state }) => {
+export default ({ index, dispatch, setSubmodulesCount, state, currentRow }) => {
+  const [removeSubmodule] = useMutation(REMOVE_SUBMODULE)
   return (
     <div
       style={{
@@ -29,9 +32,13 @@ export default ({ index, dispatch, setSubmodulesCount, state }) => {
         <MinusOutlined
           style={{ fontSize: 22, marginTop: 2, marginLeft: 10 }}
           onClick={() => {
-            console.log(index, 'index')
-            if (state.length === 2) {
-              console.log(state, 'state')
+            if (state[index].id && currentRow.id) {
+              removeSubmodule({
+                variables: {
+                  pk: currentRow.id,
+                  id: [state[index].id],
+                },
+              })
             }
             setSubmodulesCount(state => state - 1)
             dispatch({ type: 'REMOVE_SUBMODULE', index })

@@ -86,12 +86,51 @@ export default () => {
 
   const updateTableData = () => {
     if (data) {
-      const tempTable = []
-      data.getGeneralData.edges.map(item => {
-        tempTable.push(item.node)
-      })
-      setOriginalData(tempTable)
-      setTableData(tempTable)
+      try {
+        const tempTable = []
+        data.getGeneralData.edges.map(item => {
+          if (item.node.modules && item.node.modules.edges.length > 0) {
+            tempTable.push({
+              id: item.node.id,
+              key: Math.random(),
+              date: item.node.time,
+              module: {
+                isParent: true,
+                pk: item.node.modules.edges[0].node.id,
+                id: item.node.modules.edges[0].node.module.id,
+                name: item.node.modules.edges[0].node.module.name,
+                score: item.node.modules.edges[0].node.score,
+              },
+              submodules: item.node.submodules.edges.map(sbm => ({
+                pk: sbm.node.id,
+                id: sbm.node.submodule.id,
+                name: sbm.node.submodule.name,
+                score: sbm.node.score,
+              })),
+              note: item.node.note,
+              children: item.node.submodules.edges.map(sbm => ({
+                module: {
+                  pk: sbm.node.id,
+                  id: sbm.node.submodule.id,
+                  name: sbm.node.submodule.name,
+                  score: sbm.node.score,
+                },
+                id: sbm.node.submodule.id,
+                key: Math.random(),
+              })),
+            })
+          }
+        })
+        console.log(tempTable, 'tempTable')
+        setOriginalData(tempTable)
+        setTableData(tempTable)
+      } catch (e) {
+        console.log(e)
+        notification.error({
+          message: 'Something went wrong',
+          description: e.message,
+        })
+      }
     }
   }
 
@@ -101,8 +140,7 @@ export default () => {
     }
   }, [studentId])
 
-  console.log(data, loading, error, tableData, 'sd')
-
+  console.log(currentRow)
   useEffect(() => {
     let tempList = originalData
     if (filterAssessment) {
@@ -172,19 +210,15 @@ export default () => {
       },
       sortOrder: sortedInfo.columnKey === 'date' && sortedInfo.order,
       sortDirections: ['ascend', 'descend'],
-      render: text => moment(text).format('YYYY-MM-DD'),
+      render: (text, row) => (row.module.isParent ? moment(text).format('YYYY-MM-DD') : null),
     },
     {
       title: 'Assessment',
       dataIndex: 'module.name',
     },
     {
-      title: 'Sub Module',
-      dataIndex: 'submodule.name',
-    },
-    {
       title: 'Score',
-      dataIndex: 'score',
+      dataIndex: 'module.score',
       key: 'score',
       sorter: (a, b) => a.score - b.score,
       sortOrder: sortedInfo.columnKey === 'score' && sortedInfo.order,
@@ -198,32 +232,35 @@ export default () => {
       title: 'Actions',
       width: '250px',
       render: text => {
-        return (
-          <>
-            <Popconfirm
-              title="Are you sure you don't want this record?"
-              onConfirm={() => handleDelete(text)}
-              okText="Yes"
-              cancelText="No"
-            >
-              <Button type="link" style={{ color: 'red' }}>
-                <DeleteOutlined /> Delete
+        if (text.module.isParent) {
+          return (
+            <>
+              <Popconfirm
+                title="Are you sure you don't want this record?"
+                onConfirm={() => handleDelete(text)}
+                okText="Yes"
+                cancelText="No"
+              >
+                <Button type="link" style={{ color: 'red' }}>
+                  <DeleteOutlined /> Delete
+                </Button>
+              </Popconfirm>
+              <span style={{ borderRight: '1px solid #ccc', margin: '0 8px' }} />
+              <Button
+                type="link"
+                onClick={() => {
+                  setCurrentRow(text)
+                  setUpdate(true)
+                  setOpen(true)
+                }}
+              >
+                <Icon type="edit" />
+                Edit
               </Button>
-            </Popconfirm>
-            <span style={{ borderRight: '1px solid #ccc', margin: '0 8px' }} />
-            <Button
-              type="link"
-              onClick={() => {
-                setCurrentRow(text)
-                setUpdate(true)
-                setOpen(true)
-              }}
-            >
-              <Icon type="edit" />
-              Edit
-            </Button>
-          </>
-        )
+            </>
+          )
+        }
+        return null
       },
     },
   ]
@@ -335,7 +372,7 @@ export default () => {
             columns={columns}
             onChange={handleSortChange}
             bordered
-            rowKey={record => record.id}
+            rowKey="key"
             dataSource={tableData}
             title={() => {
               return filterHeader
