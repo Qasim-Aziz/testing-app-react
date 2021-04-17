@@ -22,6 +22,7 @@ const GET_INVOICES = gql`
           status {
             id
             statusName
+            colorCode
           }
           customer {
             id
@@ -226,6 +227,78 @@ export const CREATE_STUDENT_RATES = gql`
   }
 `
 
+export const GENERATE_LINK = gql`
+  mutation RazorpayGenerateLink($pk: ID!) {
+    razorpayGenerateLink(input: { pk: $pk }) {
+      status
+      message
+    }
+  }
+`
+
+export const GET_INVOICE = gql`
+  query($id: ID!) {
+    invoiceDetail(id: $id) {
+      id
+      invoiceNo
+      email
+      issueDate
+      dueDate
+      amount
+      address
+      taxableSubtotal
+      discount
+      sgst
+      cgst
+      total
+      clinic {
+        id
+        schoolName
+        address
+        currency {
+          id
+          currency
+          symbol
+        }
+      }
+      customer {
+        id
+        firstname
+        lastname
+      }
+      status {
+        id
+        statusName
+      }
+      invoiceFee {
+        edges {
+          node {
+            id
+            quantity
+            rate
+            amount
+            tax
+            schoolServices {
+              id
+              name
+              description
+            }
+          }
+        }
+      }
+    }
+  }
+`
+export const PRODUCT_LIST = gql`
+  query {
+    invoiceProductsList {
+      id
+      name
+      description
+    }
+  }
+`
+
 export const UPDATE_STUDENT_RATES = gql`
   mutation($pk: ID!, $flatItems: [FlatItemsInput], $hourlyItems: [HourlyItemsInput]) {
     updateStudentRates(input: { pk: $pk, flatItems: $flatItems, hourlyItems: $hourlyItems }) {
@@ -297,6 +370,130 @@ export const REMOVE_FEE_ITEM = gql`
           }
         }
       }
+    }
+  }
+`
+
+const GET_PAYMENT_METHODS = gql`
+  query {
+    getPaymentMethods {
+      id
+      method
+    }
+  }
+`
+
+export const GET_INVOICE_STATUS_LIST = gql`
+  query {
+    invoiceStatusList {
+      id
+      statusName
+      colorCode
+    }
+  }
+`
+
+export const GET_INVOICE_PAYMENTS = gql`
+  query {
+    getInvoicePayments {
+      edges {
+        node {
+          id
+          amount
+          datetime
+          paymentMethod {
+            id
+            method
+          }
+          createdBy {
+            id
+            username
+          }
+          invoice {
+            id
+            invoiceNo
+          }
+        }
+      }
+    }
+  }
+`
+
+export const CREATE_INVOICE_PAYMENT = gql`
+  mutation {
+    createInvoicePayments(
+      input: {
+        invoiceId: "SW52b2ljZVR5cGU6NDQ="
+        paymentMethod: "UGF5bWVudE1ldGhvZHNUeXBlOjI="
+        amount: 100.0
+      }
+    ) {
+      details {
+        id
+        amount
+        datetime
+        paymentMethod {
+          id
+          method
+        }
+        createdBy {
+          id
+          username
+        }
+        invoice {
+          id
+          invoiceNo
+        }
+      }
+    }
+  }
+`
+
+export const UPDATE_INVOICE_PAYMENT = gql`
+  mutation {
+    updateInvoicePayments(
+      input: {
+        pk: "SW52b2ljZVBheW1lbnRUeXBlOjE="
+        invoiceId: "SW52b2ljZVR5cGU6NDQ="
+        paymentMethod: "UGF5bWVudE1ldGhvZHNUeXBlOjI="
+        amount: 99.0
+      }
+    ) {
+      details {
+        id
+        amount
+        datetime
+        paymentMethod {
+          id
+          method
+        }
+        createdBy {
+          id
+          username
+        }
+        invoice {
+          id
+          invoiceNo
+        }
+      }
+    }
+  }
+`
+
+export const DELETE_INVOICE_PAYMENTS = gql`
+  mutation {
+    deleteInvoicePayments(input: { pk: "SW52b2ljZVBheW1lbnRUeXBlOjE=" }) {
+      status
+      message
+    }
+  }
+`
+
+export const DELETE_ALL_INVOICE_PAYMENTS = gql`
+  mutation {
+    deleteAllInvoicePayments(input: { invoiceId: "" }) {
+      status
+      message
     }
   }
 `

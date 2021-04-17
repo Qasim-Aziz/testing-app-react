@@ -48,6 +48,7 @@ const EditInvoice = ({ form, closeDrawer, refetchInvoices, invoiceId }) => {
     { data: updatedInvoiceData, loading: isUpdateInvoiceLoading, error: updateInvoiceErrors },
   ] = useMutation(UPDATE_INVOICE)
 
+  console.log(invoiceData, 'invData')
   useEffect(() => {
     if (productsState) {
       const totalAmount = countSubTotal(productsState)

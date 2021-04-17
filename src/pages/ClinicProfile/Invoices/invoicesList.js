@@ -1,3 +1,4 @@
+/* eslint-disable */
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet'
@@ -7,6 +8,7 @@ import {
   notification,
   Table,
   Menu,
+  Tooltip,
   Popconfirm,
   Dropdown,
   Select,
@@ -29,10 +31,11 @@ import { useQuery, useMutation } from 'react-apollo'
 import moment from 'moment'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import InvoiceForm from 'components/invoice/InvoiceForm'
-import EditInvoice from 'components/invoice/EditInvoice'
+import EditInvoice from './invoiceForm'
 import LoadingComponent from '../../staffProfile/LoadingComponent'
+import UpdateInvoiceStatus from './updateInvoiceStatus'
 import PreviewInvoice from '../../../components/invoice/PreviewInvoice'
-import { GET_INVOICES, DELETE_INVOICE } from './query'
+import { GET_INVOICES, DELETE_INVOICE, GET_INVOICE_STATUS_LIST } from './query'
 import './template.scss'
 
 const dateFormate = 'YYYY-MM-DD'
@@ -45,6 +48,7 @@ export default () => {
   const [data, setData] = useState()
   const [deleteInvoiceId, setDeleteInvoiceId] = useState()
   const [editInvoiceId, setEditInvoiceId] = useState()
+  const [invoiceStatusDrawer, setInvoiceStatusDrawer] = useState(false)
 
   // invoice filer
   const [from, setFrom] = useState()
@@ -53,6 +57,8 @@ export default () => {
   const [filterStatus, setFilterStatus] = useState('')
   const [filterCustomer, setFilterCustomer] = useState('')
 
+  const { data: invoiceS } = useQuery(GET_INVOICE_STATUS_LIST)
+  console.log(invoiceS, 'invS')
   const { data: invoiceData, error: invoiceError, loading: invoiceLoading, refetch } = useQuery(
     GET_INVOICES,
     {
@@ -114,6 +120,7 @@ export default () => {
           amount: node.amount,
           client: node.customer?.parent?.username,
           status: node.status.statusName,
+          colorCode: node.status.colorCode,
           date: node.issueDate,
           name: node.customer?.parent
             ? `${node.customer.parent.firstName} ${
@@ -135,6 +142,10 @@ export default () => {
       })
     }
   }, [invoiceError])
+
+  const updateInvoiceStatus = row => {
+    console.log(row)
+  }
 
   const columns = [
     {
@@ -166,6 +177,26 @@ export default () => {
     {
       title: 'Status',
       dataIndex: 'status',
+      render: (text, row) => {
+        console.log(row.colorCode)
+        const color = COLORS[row.colorCode]
+
+        if (text === 'Partially Paid' || text === 'Sent' || text === 'Pending') {
+          return (
+            <Tooltip title="Edit status" trigger={['hover']}>
+              <Button
+                type="link"
+                onClick={() => setInvoiceStatusDrawer(row)}
+                style={{ color, fontSize: 16, padding: 0 }}
+              >
+                {text}
+              </Button>
+            </Tooltip>
+          )
+        }
+
+        return <span style={{ color, fontSize: 16 }}>{text}</span>
+      },
     },
     {
       title: 'Action',
@@ -434,7 +465,7 @@ export default () => {
 
       <Drawer
         visible={isPreviewInvoice}
-        width={DRAWER.widthL3}
+        width={DRAWER.widthL2}
         className="change-invo-drawer"
         onClose={() => setPreviewInvoice(false)}
       >
@@ -448,7 +479,21 @@ export default () => {
           refetchInvoices={refetch}
         />
       </Drawer>
-
+      <Drawer
+        title="Update invoice status"
+        visible={invoiceStatusDrawer ? true : false}
+        width={DRAWER.widthL2}
+        onClose={() => setInvoiceStatusDrawer(null)}
+      >
+        {invoiceStatusDrawer && (
+          <UpdateInvoiceStatus
+            invoiceId={editInvoiceId}
+            invoiceObj={invoiceStatusDrawer}
+            closeDrawer={() => setInvoiceStatusDrawer(null)}
+            refetchInvoices={refetch}
+          />
+        )}
+      </Drawer>
       <Drawer
         visible={isCreateInvoice}
         width={DRAWER.widthL1}

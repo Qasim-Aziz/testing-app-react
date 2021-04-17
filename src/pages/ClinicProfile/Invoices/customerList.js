@@ -8,6 +8,7 @@ import { STUDENTS, STUDENT_INVOICE_ITEMS } from './query'
 import CreateInvoiceForm from './createInvoicesForm'
 import LoadingComponent from 'components/LoadingComponent'
 import MaintainRates from './maintainRates'
+import InvoiceListItems from './invoiceListItems'
 
 const { layout, tailLayout } = FORM
 
@@ -22,7 +23,6 @@ function CustomerList() {
   const [invoiceItemsDrawer, setInvoiceItemsDrawer] = useState(false)
   const [maintainRatesDrawer, setMaintainRatesDrawer] = useState(false)
   const [invoiceType, setInvoiceType] = useState('advance')
-  const { data: invoiceItemsData, loading: invoiceItemsLoading } = useQuery(STUDENT_INVOICE_ITEMS)
 
   // console.log(invoiceItemsData, 'item data')
   useEffect(() => {
@@ -177,21 +177,7 @@ function CustomerList() {
         destroyOnClose
         onClose={() => setInvoiceItemsDrawer(false)}
       >
-        <>
-          {invoiceItemsLoading ? (
-            <LoadingComponent />
-          ) : (
-            <div style={{ display: 'flex' }}>
-              <ul style={{ margin: '20px auto' }}>
-                {invoiceItemsData.getStudentInvoiceItems?.map(item => (
-                  <li style={{ fontSize: 16, color: 'black', margin: '6px auto' }} key={item.id}>
-                    {item.name}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </>
+        <InvoiceListItems />
       </Drawer>
       <Drawer
         title={`${currentRow?.firstname}'s - Rates`}
