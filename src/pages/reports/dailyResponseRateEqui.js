@@ -56,12 +56,17 @@ export const ResponseRateEqui = forwardRef((props, ref) => {
 
   const loadData = equiData => {
     if (equiData && peakEquiFilData) {
+      // console.log(equiData)
+      // console.log(peakEquiFilData, 'peakEquiFilData')
       const tempTable = []
       const groupEquiData = groupObj.group(equiData, 'targetName')
       const groupPeakEquiDetails = groupObj.group(peakEquiFilData, 'targetName')
       const keys = Object.keys(groupEquiData)
       const expandType = 'Stimulus'
 
+      // console.log(groupEquiData, 'grouped Data')
+      // console.log(groupPeakEquiDetails, 'group peak equi details')
+      // console.log(keys, 'keys')
       keys.map(target => {
         tempTable.push({
           target,
@@ -72,8 +77,8 @@ export const ResponseRateEqui = forwardRef((props, ref) => {
           children: [],
         })
         const tarIdx = tempTable.length - 1
-
-        groupPeakEquiDetails[target].map(item => {
+        // console.log(target, 'target')
+        groupPeakEquiDetails[target?.trim()].map(item => {
           item.equBlocks.map(tt => {
             let stimExist = false
             let stimIdx = -1
@@ -443,7 +448,8 @@ export const ResponseRateEqui = forwardRef((props, ref) => {
             columns={columns}
             dataSource={tableData}
             bordered
-            expandIcon={record => {
+            rowKey="key"
+            expandIcon={() => {
               return null
             }}
             pagination={false}

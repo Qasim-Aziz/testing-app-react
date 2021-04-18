@@ -20,18 +20,13 @@ import React from 'react'
 import { Helmet } from 'react-helmet'
 import Highlighter from 'react-highlight-words'
 import {
-  Table,
   Button,
-  Collapse,
   Card,
-  Avatar,
-  Form,
   Select,
   DatePicker,
   Input,
   Icon,
   Drawer,
-  Switch,
   Popconfirm,
   Menu,
   Dropdown,
@@ -39,7 +34,6 @@ import {
   Radio,
 } from 'antd'
 import Authorize from 'components/LayoutComponents/Authorize'
-import { Scrollbars } from 'react-custom-scrollbars'
 import {
   PlusOutlined,
   CloseCircleOutlined,
@@ -52,6 +46,7 @@ import { connect } from 'react-redux'
 import DataTable from 'react-data-table-component'
 import JsPDF from 'jspdf'
 import moment from 'moment'
+import LoadingComponent from 'components/LoadingComponent'
 import 'jspdf-autotable'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
@@ -305,7 +300,7 @@ class TaskTable extends React.Component {
     } = this.props
 
     if (loading) {
-      return <div>Loading...</div>
+      return <LoadingComponent />
     }
 
     let filteredList = TaskList
@@ -379,7 +374,7 @@ class TaskTable extends React.Component {
           borderTopStyle: 'solid',
           borderTopWidth: '1px',
           borderTopColor: '#ddd',
-          backgroundColor: '#f5f5f5',
+          backgroundColor: COLORS.palleteLightBlue,
         },
       },
       headCells: {

@@ -291,7 +291,7 @@ export default () => {
         borderTopStyle: 'solid',
         borderTopWidth: '1px',
         borderTopColor: '#ddd',
-        backgroundColor: '#f5f5f5',
+        backgroundColor: COLORS.palleteLightBlue,
       },
     },
     headCells: {
@@ -591,7 +591,7 @@ export default () => {
         visible={updateTimeline}
         onClose={() => setUpdateTimeline(null)}
         title="Timeline"
-        width={DRAWER.widthL3}
+        width={DRAWER.widthL2}
       >
         <div
           style={{
