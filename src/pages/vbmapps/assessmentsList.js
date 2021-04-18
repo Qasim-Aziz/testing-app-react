@@ -55,10 +55,13 @@ class AssessmentsList extends Component {
 
   componentDidMount() {
     const { studentID } = this.state
-    const { dispatch } = this.props
-    dispatch({
-      type: 'learnersprogram/LOAD_DATA',
-    })
+    const { dispatch, learnersprogram } = this.props
+
+    if (learnersprogram && learnersprogram.Learners?.length === 0) {
+      dispatch({
+        type: 'learnersprogram/LOAD_DATA',
+      })
+    }
     this.getVbmappData(studentID)
   }
 
@@ -144,7 +147,7 @@ class AssessmentsList extends Component {
 
   deleteAssessment = id => {
     this.setState({ deleteLoading: true })
-    console.log(`deleting assessment ${id}`)
+    // console.log(`deleting assessment ${id}`)
     client
       .mutate({
         mutation: gql`
@@ -206,7 +209,7 @@ class AssessmentsList extends Component {
               <span>{outputDate}</span>
             </p>
           </div>
-          <div onClick={() => console.log({ id, testNo })}>
+          <div>
             <Tooltip placement="top" title="Delete Assessment">
               <Popconfirm
                 title="Are you sure ?"
@@ -265,7 +268,7 @@ class AssessmentsList extends Component {
                 `,
                 })
                 .then(result => {
-                  console.log(result)
+                  // console.log(result)
                   window.open(result.data.vbmappIepReport.file)
                 })
             }}
@@ -367,6 +370,7 @@ class AssessmentsList extends Component {
               selectedAssignment: assessments[x],
             })
           }
+          key={Math.random()}
           id={assessments[x].node.id}
           test={assessments[x].node.testNo}
           bg={bg}
@@ -455,7 +459,7 @@ class AssessmentsList extends Component {
     const areass = []
     const { AreaCard } = this
     let milestoneCounter = 0
-    console.log(selectedAssignment)
+    // console.log(selectedAssignment)
     for (let x = 0; x < areas.length; x += 1) {
       let pathname = ''
       let lineColor = ''
@@ -491,6 +495,7 @@ class AssessmentsList extends Component {
       }
       areass.push(
         <AreaCard
+          key={Math.random()}
           id={areas[x].id}
           name={areas[x].areaName}
           description={areas[x].description}
@@ -518,7 +523,7 @@ class AssessmentsList extends Component {
   render() {
     const { assessments, areas, studentID, loading } = this.state
     const { user } = this.props
-    console.log(this.state.selectedAssignment, 'selectedAssignment')
+    // console.log(this.state.selectedAssignment, 'selectedAssignment')
     return (
       <Layout>
         <Content>

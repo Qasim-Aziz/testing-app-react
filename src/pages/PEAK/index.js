@@ -124,6 +124,7 @@ export default () => {
 
   const user = useSelector(state => state.user)
   const student = useSelector(state => state.student)
+  const learnersprogram = useSelector(state => state.learnersprogram)
 
   useEffect(() => {
     console.log(studnetInfo)
@@ -143,9 +144,11 @@ export default () => {
   }, [studentId])
 
   useEffect(() => {
-    dispatch({
-      type: 'learnersprogram/LOAD_DATA',
-    })
+    if (learnersprogram && learnersprogram.Learners?.length === 0) {
+      dispatch({
+        type: 'learnersprogram/LOAD_DATA',
+      })
+    }
   }, [])
 
   useEffect(() => {
@@ -332,9 +335,7 @@ export default () => {
           count={
             obj.node?.status?.charAt(0).toUpperCase() + obj.node.status?.slice(1).toLowerCase()
           }
-
           style={{ background: obj.node?.status === 'PROGRESS' ? COLORS.success : '#faad14' }}
-
         />
       ),
     },
@@ -571,10 +572,7 @@ export default () => {
         onClose={() => {
           setOpen(false)
         }}
-
-
         width={DRAWER.widthL2}
-
         title="Create New Assessment"
       >
         <CreateAssignmentForm setOpen={setOpen} PEAK_PROGRAMS={PEAK_PROGRAMS} />

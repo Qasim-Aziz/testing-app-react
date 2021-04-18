@@ -47,6 +47,7 @@ class Screeing extends React.Component {
     const { dispatch } = this.props
     const studentId = JSON.parse(localStorage.getItem('studentId'))
     if (studentId) {
+      console.log('got student id')
       dispatch({
         type: 'cogniableassessment/LOAD_DATA',
         payload: {
@@ -60,6 +61,7 @@ class Screeing extends React.Component {
 
   onRenderWithoutID = () => {
     const { dispatch } = this.props
+    console.log('got not stduednt id')
     dispatch({
       type: 'learnersprogram/LOAD_DATA',
     })

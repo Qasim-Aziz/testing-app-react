@@ -3,9 +3,7 @@
 /* eslint-disable no-var */
 /* eslint-disable no-unused-vars */
 import { all, put, takeEvery, call, select } from 'redux-saga/effects'
-import {
-  getData,
-} from 'services/learnersprogram'
+import { getData } from 'services/learnersprogram'
 import actions from './actions'
 import { notNull } from '../../utilities'
 
@@ -13,13 +11,12 @@ export function* LOAD_DATA() {
   yield put({
     type: 'learnersprogram/SET_STATE',
     payload: {
-      Loading: false,
-      Learners: [],
-
+      Loading: true,
     },
   })
 
   const response = yield call(getData)
+  console.log(response, 'learner resonse got called caleed')
   if (response && response.data) {
     yield put({
       type: 'learnersprogram/SET_STATE',
@@ -28,17 +25,13 @@ export function* LOAD_DATA() {
         Learners: response.data.students.edges,
         CloneLearners: response.data.students.edges,
         ProgramAreas: response.data.programArea.edges,
-
       },
     })
 
     const std = localStorage.getItem('studentId')
     if (std === null) {
       if (response.data.students.edges.length > 0) {
-
         localStorage.setItem('studentId', JSON.stringify(response.data.students.edges[0].node.id))
-
-
         yield put({
           type: 'learnersprogram/SET_STATE',
           payload: {
@@ -50,23 +43,16 @@ export function* LOAD_DATA() {
         })
       }
     }
-
   }
 
   yield put({
     type: 'learnersprogram/SET_STATE',
     payload: {
       Loading: false,
-
     },
   })
-
 }
 
-
-
 export default function* rootSaga() {
-  yield all([
-    takeEvery(actions.LOAD_DATA, LOAD_DATA),
-  ])
+  yield all([takeEvery(actions.LOAD_DATA, LOAD_DATA)])
 }

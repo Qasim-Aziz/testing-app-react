@@ -143,10 +143,13 @@ class Reports extends React.Component {
   }
 
   componentDidMount() {
-    const { dispatch, user } = this.props
-    dispatch({
-      type: 'learnersprogram/LOAD_DATA',
-    })
+    const { dispatch, user, learnersprogram } = this.props
+    console.log(learnersprogram, 'lplp')
+    if (learnersprogram && learnersprogram.Learners?.length === 0) {
+      dispatch({
+        type: 'learnersprogram/LOAD_DATA',
+      })
+    }
 
     dispatch({
       type: 'student/STUDENT_DETAILS',

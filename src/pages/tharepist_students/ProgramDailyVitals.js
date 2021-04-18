@@ -1,3 +1,6 @@
+/* eslint-disable no-nested-ternary */
+/* eslint-disable react/no-did-update-set-state */
+/* eslint-disable react/destructuring-assignment */
 /* eslint-disable react/jsx-indent */
 /* eslint-disable react/jsx-tag-spacing */
 /* eslint-disable react/jsx-closing-tag-location */
@@ -15,16 +18,18 @@ import { gql } from 'apollo-boost'
 import { connect } from 'react-redux'
 import { FilterOutlined, PlusOutlined } from '@ant-design/icons'
 import { MdFilterList } from 'react-icons/md'
+import LoadingComponent from 'components/LoadingComponent'
+import LearnerSelect from 'components/LearnerSelect'
+import { DRAWER } from 'assets/styles/globalStyles'
 import apolloClient from '../../apollo/config'
 import LearnerCard from './LearnerCard'
 import DailyVitalsCard from './DailyVitalsCard'
-
 import './ProgramDailyVitals.scss'
 
 const { Content } = Layout
 const { Search } = Input
 
-@connect(({ student, user }) => ({ student, user }))
+@connect(({ student, user, learnersprogram }) => ({ student, user, learnersprogram }))
 class TharepistStudentsDailyVitals extends PureComponent {
   constructor(props) {
     super(props)
@@ -32,7 +37,6 @@ class TharepistStudentsDailyVitals extends PureComponent {
     this.handleFilterToggle = this.handleFilterToggle.bind(this)
     this.setTabCheck = this.setTabCheck.bind(this)
     this.openDrawer = this.openDrawer.bind(this)
-    this.filterLearnerData = this.filterLearnerData.bind(this)
     this.onClose = this.onClose.bind(this)
 
     const { activeTab } = this.props
@@ -53,96 +57,48 @@ class TharepistStudentsDailyVitals extends PureComponent {
       filter: false,
       TabStage: 1,
       TabCheck: activeTab ? activeTab : 'Meal Data',
-      selectedStudent: '',
+      selectedStudent: localStorage.getItem('studentId'),
     }
   }
 
   componentDidMount() {
-    apolloClient
-      .query({
-        query: gql`
-          query {
-            students(isActive: true) {
-              edges {
-                node {
-                  id
-                  firstname
-                  lastname
-                  internalNo
-                  mobileno
-                  email
-                  parent {
-                    id
-                    username
-                  }
-                  school {
-                    id
-                  }
-                  caseManager {
-                    id
-                    name
-                    email
-                    contactNo
-                  }
-                  category {
-                    id
-                    category
-                  }
-                }
-              }
-            }
-          }
-        `,
+    const { dispatch, learnersprogram } = this.props
+
+    if (learnersprogram && learnersprogram.Learners?.length === 0) {
+      dispatch({
+        type: 'learnersprogram/LOAD_DATA',
       })
-      .then(qresult => {
-        const storage = localStorage.getItem('studentId')
-        if (storage !== null && storage !== '') {
-          const result = storage.substring(1, storage.length - 1)
-          // pass result below
-          const refinedArray = this.move(qresult.data.students.edges, result)
-          this.setState({
-            students: refinedArray,
-            prevData: refinedArray,
-            isPresent: true,
-            selectedNode: refinedArray[0].node,
-            loading: false,
-            selectedStudent: result,
-          })
-        } else {
-          this.setState({
-            loading: false,
-            students: qresult.data.students.edges,
-            prevData: qresult.data.students.edges,
-            selectedStudent: qresult.data.students.edges[0]?.node?.id,
-          })
-          localStorage.setItem(
-            'studentId',
-            JSON.stringify(qresult.data.students.edges[0]?.node?.id),
-          )
-        }
+    }
+
+    dispatch({
+      type: 'student/STUDENT_DETAILS',
+    })
+
+    let std = localStorage.getItem('studentId')
+    if (std) {
+      std = JSON.parse(std)
+      dispatch({
+        type: 'learnersprogram/SET_STATE',
+        payload: {
+          SelectedLearnerId: std,
+        },
       })
-      .catch(error => {
-        console.log(error)
+    } else {
+      dispatch({
+        type: 'student/SET_STATE',
+        payload: {
+          StudentName: '',
+        },
       })
+    }
   }
 
-  setClickHandler = node => {
-    localStorage.setItem('studentId', JSON.stringify(node.id))
-    this.setState({
-      isDrawer: false,
-      selectedNode: node,
-      isPresent: false,
-    })
-  }
-
-  move = (data, storageData) => {
-    data.forEach(function(item, i) {
-      if (item.node.id.toUpperCase() === storageData.toUpperCase()) {
-        data.splice(i, 1)
-        data.unshift(item)
-      }
-    })
-    return data
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.learnersprogram !== this.props.learnersprogram) {
+      this.setState({
+        selectedStudent: this.props.learnersprogram.SelectedLearnerId,
+      })
+    }
   }
 
   filter = (data, name) => {
@@ -153,39 +109,13 @@ class TharepistStudentsDailyVitals extends PureComponent {
     })
   }
 
-  renderStudentCards = () => {
-    const stateData = this.state
-    const cards = []
-    if (stateData.students !== undefined) {
-      for (let i = 0; i < stateData.students.length; i += 1) {
-        cards.push(
-          <div
-            key={stateData.students[i].node.id}
-            role="presentation"
-            onClick={() => {
-              this.setClickHandler(stateData.students[i].node)
-            }}
-          >
-            <LearnerCard
-              node={stateData.students[i].node}
-              name={stateData.students[i].node.firstname}
-              style={{ marginTop: 18 }}
-              leaveRequest={stateData.students[i].node.leaveRequest}
-            />
-          </div>,
-        )
-      }
-    }
-    return cards
-  }
-
   setTabCheck = val => {
     this.setState({ TabCheck: val })
   }
 
   renderDetail = () => {
     const data = this.state
-    if (data.students[0] !== undefined) {
+    if (data.selectedStudent) {
       return (
         <>
           <Row>
@@ -193,32 +123,18 @@ class TharepistStudentsDailyVitals extends PureComponent {
               <DailyVitalsCard
                 openRightdrawer={data.openRightdrawer}
                 closeDrawer={this.closeDrawer}
+                openDrawer={this.openDrawer}
                 filterToggle={data.filter}
                 handleFilterToggle={this.handleFilterToggle}
                 TabCheck={data.TabCheck}
                 data={data}
                 setTabCheck={this.setTabCheck}
-                openDrawer={this.openDrawer}
                 selectedStudent={data.selectedStudent}
               />
             </Col>
           </Row>
         </>
       )
-    }
-  }
-
-  filterLearnerData = e => {
-    const stateData = this.state
-    if (e.target.value === '') {
-      this.setState({
-        students: stateData.prevData,
-      })
-    } else {
-      const filteredArray = this.filter(stateData.students, e.target.value)
-      this.setState({
-        students: filteredArray,
-      })
     }
   }
 
@@ -249,13 +165,12 @@ class TharepistStudentsDailyVitals extends PureComponent {
 
   render() {
     const stateData = this.state
-    const checkStudnetOnLocalStorage = localStorage.getItem('studentId')
-
     const {
       user: { role },
+      student: { StudentName },
+      learnersprogram: { Loading, SelectedLearnerId },
     } = this.props
 
-    console.log(stateData, checkStudnetOnLocalStorage, 'local storage')
     return (
       <Authorize roles={['therapist', 'school_admin', 'parents']} redirect to="/">
         <Helmet title="Daily Vitals" />
@@ -289,28 +204,13 @@ class TharepistStudentsDailyVitals extends PureComponent {
                   <Drawer
                     title="Learners"
                     placement="left"
-                    width="300px"
+                    width={DRAWER.widthL4}
                     closable={true}
                     onClose={this.onClose}
                     visible={stateData.drawer}
                     key="left"
                   >
-                    <Search
-                      placeholder="Search learner from the list"
-                      onChange={e => {
-                        this.filterLearnerData(e)
-                      }}
-                      style={{ width: '100%', marginBottom: '10px' }}
-                    />
-                    <div>
-                      {stateData.loading === true ? (
-                        <>
-                          <p style={{ marginTop: '20px' }}>loading students...</p>
-                        </>
-                      ) : (
-                        <>{this.renderStudentCards()}</>
-                      )}
-                    </div>
+                    <LearnerSelect />
                   </Drawer>
                 </div>
                 <div>
@@ -321,8 +221,7 @@ class TharepistStudentsDailyVitals extends PureComponent {
                       marginTop: '2px',
                     }}
                   >
-                    {stateData.selectedNode.firstname &&
-                      `${stateData.selectedNode.firstname}'s ${stateData.TabCheck}`}
+                    {StudentName && `${StudentName}'s ${stateData.TabCheck}`}
                   </div>
                 </div>
                 <div style={{ paddingTop: '5px' }}>
@@ -335,12 +234,12 @@ class TharepistStudentsDailyVitals extends PureComponent {
           </div>
 
           <Col style={{ paddingRight: 0 }}>
-            {stateData.selectedStudent || checkStudnetOnLocalStorage ? (
+            {Loading ? (
+              <LoadingComponent />
+            ) : stateData.selectedStudent || SelectedLearnerId ? (
               this.renderDetail()
             ) : (
-              <>
-                <Empty />
-              </>
+              <Empty />
             )}
           </Col>
         </Layout>

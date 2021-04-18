@@ -1,3 +1,4 @@
+/* eslint-disable react/no-did-update-set-state */
 /* eslint-disable react/no-unused-state */
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable prefer-const */
@@ -40,9 +41,10 @@ import EditTarget from './editTarget'
 const { TabPane } = Tabs
 const { Search } = Input
 
-@connect(({ user, sessiontargetallocation, student }) => ({
+@connect(({ user, sessiontargetallocation, student, learnersprogram }) => ({
   user,
   sessiontargetallocation,
+  learnersprogram,
   student,
 }))
 class TargetAllocationToSession extends React.Component {
@@ -54,7 +56,7 @@ class TargetAllocationToSession extends React.Component {
     studentName: '',
     top: 10,
     visibleFilter: false,
-    selectedTarget: ''
+    selectedTarget: '',
   }
 
   componentWillMount() {
@@ -75,21 +77,45 @@ class TargetAllocationToSession extends React.Component {
   }
 
   componentDidMount() {
-    if (localStorage.getItem('studentId')) {
-      const studentID = JSON.parse(localStorage.getItem('studentId'))
-      this.setState({ studentID, studentName: this.props.student.StudentName })
+    const { dispatch, user, learnersprogram } = this.props
+
+    if (learnersprogram && learnersprogram.Learners?.length === 0) {
+      dispatch({
+        type: 'learnersprogram/LOAD_DATA',
+      })
     }
-    const { dispatch } = this.props
+
     dispatch({
-      type: 'learnersprogram/LOAD_DATA',
+      type: 'student/STUDENT_DETAILS',
     })
+
+    let std = localStorage.getItem('studentId')
+    if (std) {
+      std = JSON.parse(std)
+      dispatch({
+        type: 'learnersprogram/SET_STATE',
+        payload: {
+          SelectedLearnerId: std,
+        },
+      })
+      this.setState({ studentID: std, studentName: this.props.student.StudentName })
+    } else {
+      dispatch({
+        type: 'student/SET_STATE',
+        payload: {
+          StudentName: '',
+        },
+      })
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
     const studentID = JSON.parse(localStorage.getItem('studentId'))
-    if (this.props.student.StudentName !== prevState.studentName) {
-      console.log('student changed', this.props.student.StudentName, studentID)
-      // eslint-disable-next-line react/no-did-update-set-state
+    if (
+      prevProps.learnersprogram !== this.props.learnersprogram ||
+      this.props.student.StudentName !== prevState.studentName
+    ) {
+      console.log(studentID, 'this is student us')
       this.setState({ studentName: this.props.student.StudentName, studentID })
       const { dispatch } = this.props
 
@@ -107,10 +133,6 @@ class TargetAllocationToSession extends React.Component {
     }
   }
 
-  clearAll = session => {
-    // console.log('session==>', session)
-  }
-
   showDrawerFilter = () => {
     this.setState({ visibleFilter: true })
   }
@@ -118,7 +140,6 @@ class TargetAllocationToSession extends React.Component {
   onCloseFilter = () => {
     this.setState({ visibleFilter: false })
   }
-  
 
   showDrawer = session => {
     const { dispatch } = this.props
@@ -150,7 +171,7 @@ class TargetAllocationToSession extends React.Component {
     console.log(node)
     this.setState({
       visibleEditTarget: true,
-      selectedTarget: node
+      selectedTarget: node,
     })
   }
 
@@ -215,10 +236,6 @@ class TargetAllocationToSession extends React.Component {
       },
     })
   }
-
-  // searchTarget = value => {
-  //   // console.log('searchTarget==>', value)
-  // }
 
   sortTargetInDesiredFormat = targetList => {
     const baseline = 'U3RhdHVzVHlwZTox'
@@ -494,21 +511,34 @@ class TargetAllocationToSession extends React.Component {
       }
     }
 
-    const targetSortableStyle = { height: 640, overflow: 'auto', backgroundColor: COLORS.palleteLight }
-    const sessionsSortableStyle = { height: 500, overflow: 'auto', marginTop: '10px', backgroundColor: COLORS.palleteLight  }
+    const targetSortableStyle = {
+      height: 640,
+      overflow: 'auto',
+      backgroundColor: COLORS.palleteLight,
+    }
+    const sessionsSortableStyle = {
+      height: 500,
+      overflow: 'auto',
+      marginTop: '10px',
+      backgroundColor: COLORS.palleteLight,
+    }
 
     return (
       <Authorize roles={['school_admin', 'therapist']} redirect to="/dashboard/beta">
         <div className={style.targetAllocation}>
           <Helmet title="Target Allocation To Sessions" />
-          <HeaderComponent 
+          <HeaderComponent
             leftContent="&nbsp;"
             centerContent={<span>{studentName}&apos;s Sessions</span>}
-            rightContent={role !== 'parents' ? (
-              <Button onClick={this.showDrawerFilter} size="large">
-                <FilterOutlined />
-              </Button>
-            ) : <>&nbsp;</>}
+            rightContent={
+              role !== 'parents' ? (
+                <Button onClick={this.showDrawerFilter} size="large">
+                  <FilterOutlined />
+                </Button>
+              ) : (
+                <>&nbsp;</>
+              )
+            }
           />
 
           <div className="row">
@@ -516,6 +546,7 @@ class TargetAllocationToSession extends React.Component {
               <div className={style.heading}>
                 <Input
                   placeholder="Search target by name"
+                  allowClear
                   onChange={e => this.searchTarget(e.target.value)}
                   style={{ fontSize: FONT.level4 }}
                 />
@@ -523,10 +554,15 @@ class TargetAllocationToSession extends React.Component {
                 <Select
                   style={{ width: '100%', marginTop: '2px' }}
                   placeholder="Select Target Status"
+                  allowClear
                   onSelect={e => this.filterAllocatedTarget(e)}
                 >
                   {TargetStatusList.reverse().map(item => {
-                    return <Select.Option value={item.id}>{item.statusName}</Select.Option>
+                    return (
+                      <Select.Option key={item.id} value={item.id}>
+                        {item.statusName}
+                      </Select.Option>
+                    )
                   })}
                 </Select>
               </div>
@@ -589,7 +625,7 @@ class TargetAllocationToSession extends React.Component {
                             <Button
                               type="dashed"
                               // className={style.detailsButton}
-                              style={{backgroundColor: COLORS.palleteLight, height: 56}}
+                              style={{ backgroundColor: COLORS.palleteLight, height: 56 }}
                               onClick={() => this.showDrawer('Morning')}
                               block
                             >
@@ -614,7 +650,13 @@ class TargetAllocationToSession extends React.Component {
                           </div>
                         </div>
                       </div>
-                      <div className="card py-3 px-2" style={{ border: '2px solid #f4f6f8', backgroundColor: COLORS.palleteLight }}>
+                      <div
+                        className="card py-3 px-2"
+                        style={{
+                          border: '2px solid #f4f6f8',
+                          backgroundColor: COLORS.palleteLight,
+                        }}
+                      >
                         <Sortable
                           key={MorningSessionRandomKey}
                           options={{
@@ -674,7 +716,7 @@ class TargetAllocationToSession extends React.Component {
                             <Button
                               type="dashed"
                               // className={style.detailsButton}
-                              style={{backgroundColor: COLORS.palleteLight, height: 56}}
+                              style={{ backgroundColor: COLORS.palleteLight, height: 56 }}
                               onClick={() => this.showDrawer('Afternoon')}
                               block
                             >
@@ -701,7 +743,13 @@ class TargetAllocationToSession extends React.Component {
                           </div>
                         </div>
                       </div>
-                      <div className="card py-3 px-2" style={{ border: '2px solid #f4f6f8', backgroundColor: COLORS.palleteLight }}>
+                      <div
+                        className="card py-3 px-2"
+                        style={{
+                          border: '2px solid #f4f6f8',
+                          backgroundColor: COLORS.palleteLight,
+                        }}
+                      >
                         <Sortable
                           key={AfternoonSessionRandomKey}
                           options={{
@@ -764,7 +812,7 @@ class TargetAllocationToSession extends React.Component {
                             <Button
                               type="dashed"
                               // className={style.detailsButton}
-                              style={{backgroundColor: COLORS.palleteLight, height: 56}}
+                              style={{ backgroundColor: COLORS.palleteLight, height: 56 }}
                               onClick={() => this.showDrawer('Evening')}
                               block
                             >
@@ -789,7 +837,13 @@ class TargetAllocationToSession extends React.Component {
                           </div>
                         </div>
                       </div>
-                      <div className="card py-3 px-2" style={{ border: '2px solid #f4f6f8', backgroundColor: COLORS.palleteLight }}>
+                      <div
+                        className="card py-3 px-2"
+                        style={{
+                          border: '2px solid #f4f6f8',
+                          backgroundColor: COLORS.palleteLight,
+                        }}
+                      >
                         <Sortable
                           key={EveningSessionRandomKey}
                           options={{
@@ -807,22 +861,6 @@ class TargetAllocationToSession extends React.Component {
                                 return check
                               },
                             },
-                            // onRemove: (node) => {
-                            //     console.log(node.type)
-                            //     console.log(node.item.id)
-                            //     console.log(node.item.innerText)
-                            //     console.log(node)
-
-                            //     const newItems = this.state.eveningSession.filter(item => item.key !== node.item.id);
-                            //     this.setState({ eveningSession: newItems })
-                            // },
-                            // onAdd: (node) => {
-                            //     console.log(node.type)
-                            //     console.log(node.item.id)
-                            //     console.log(node.item.innerText)
-                            //     console.log(node)
-                            //     this.setState({ eveningSession: [...this.state.eveningSession, { key: node.item.id, text: node.item.innerText }] });
-                            // },
                             store: {
                               // Get the order of elements. Called once during initialization.
                               // @param   {Sortable}  sortable
@@ -856,17 +894,6 @@ class TargetAllocationToSession extends React.Component {
                         >
                           {eveningSessionDiv}
                         </Sortable>
-
-                        {/* <div>
-                    <Button
-                      type="dashed"
-                      className={style.clearAllButton}
-                      onClick={() => this.clearAll('Evening')}
-                      block
-                    >
-                      Clear All
-                    </Button>
-                  </div> */}
                       </div>
                     </>
                   ) : (
@@ -882,11 +909,10 @@ class TargetAllocationToSession extends React.Component {
                             <Button
                               type="dashed"
                               // className={style.detailsButton}
-                              style={{backgroundColor: COLORS.palleteLight, height: 56}}
+                              style={{ backgroundColor: COLORS.palleteLight, height: 56 }}
                               onClick={() => this.showDrawer('Default')}
                               block
                             >
-                              {' '}
                               <PlusOutlined /> Add Details
                             </Button>
                           </div>
@@ -907,7 +933,13 @@ class TargetAllocationToSession extends React.Component {
                           </div>
                         </div>
                       </div>
-                      <div className="card py-3 px-2" style={{ border: '2px solid #f4f6f8' , backgroundColor: COLORS.palleteLight}}>
+                      <div
+                        className="card py-3 px-2"
+                        style={{
+                          border: '2px solid #f4f6f8',
+                          backgroundColor: COLORS.palleteLight,
+                        }}
+                      >
                         <Sortable
                           key={DefaultSessionRandomKey}
                           options={{
@@ -925,22 +957,6 @@ class TargetAllocationToSession extends React.Component {
                                 return check
                               },
                             },
-                            // onRemove: (node) => {
-                            //     console.log(node.type)
-                            //     console.log(node.item.id)
-                            //     console.log(node.item.innerText)
-                            //     console.log(node)
-
-                            //     const newItems = this.state.defaultSession.filter(item => item.key !== node.item.id);
-                            //     this.setState({ defaultSession: newItems })
-                            // },
-                            // onAdd: (node) => {
-                            //     console.log(node.type)
-                            //     console.log(node.item.id)
-                            //     console.log(node.item.innerText)
-                            //     console.log(node)
-                            //     this.setState({ defaultSession: [...this.state.defaultSession, { key: node.item.id, text: node.item.innerText }] });
-                            // },
                             store: {
                               // Get the order of elements. Called once during initialization.
                               // @param   {Sortable}  sortable
@@ -974,17 +990,6 @@ class TargetAllocationToSession extends React.Component {
                         >
                           {defaultSessionDiv}
                         </Sortable>
-
-                        {/* <div>
-                    <Button
-                      type="dashed"
-                      className={style.clearAllButton}
-                      onClick={() => this.clearAll('Default')}
-                      block
-                    >
-                      Clear All
-                    </Button>
-                  </div> */}
                       </div>
                     </>
                   ) : (
