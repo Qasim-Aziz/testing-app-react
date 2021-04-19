@@ -374,7 +374,7 @@ export const REMOVE_FEE_ITEM = gql`
   }
 `
 
-const GET_PAYMENT_METHODS = gql`
+export const GET_PAYMENT_METHODS = gql`
   query {
     getPaymentMethods {
       id
@@ -394,8 +394,8 @@ export const GET_INVOICE_STATUS_LIST = gql`
 `
 
 export const GET_INVOICE_PAYMENTS = gql`
-  query {
-    getInvoicePayments {
+  query($invoice: ID) {
+    getInvoicePayments(invoice: $invoice) {
       edges {
         node {
           id
@@ -420,13 +420,9 @@ export const GET_INVOICE_PAYMENTS = gql`
 `
 
 export const CREATE_INVOICE_PAYMENT = gql`
-  mutation {
+  mutation($invoiceId: ID!, $paymentMethod: ID!, $amount: Float!) {
     createInvoicePayments(
-      input: {
-        invoiceId: "SW52b2ljZVR5cGU6NDQ="
-        paymentMethod: "UGF5bWVudE1ldGhvZHNUeXBlOjI="
-        amount: 100.0
-      }
+      input: { invoiceId: $invoiceId, paymentMethod: $paymentMethod, amount: $amount }
     ) {
       details {
         id

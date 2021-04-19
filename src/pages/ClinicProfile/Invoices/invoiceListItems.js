@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useQuery } from 'react-apollo'
 import { Table, Button, Form } from 'antd'
-import { DeleteOutlined } from '@ant-design/icons'
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import { COLORS } from 'assets/styles/globalStyles'
 import LoadingComponent from 'components/LoadingComponent/index'
 import { STUDENT_INVOICE_ITEMS } from './query'
@@ -29,14 +29,18 @@ function InvoiceListItems() {
       title: 'Action',
       render: row => {
         return (
-          <Button type="link" style={{ color: COLORS.danger }}>
-            <DeleteOutlined /> Delete
-          </Button>
+          <>
+            <Button type="link">
+              <EditOutlined />
+            </Button>
+            <Button type="link" style={{ color: COLORS.danger }}>
+              <DeleteOutlined />
+            </Button>
+          </>
         )
       },
     },
   ]
-  console.log(tableData)
   return (
     <div>
       <Table loading={invoiceFeeItemsLoading} columns={columns} dataSource={tableData} bordered />

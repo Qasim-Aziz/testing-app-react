@@ -4,7 +4,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable no-nested-ternary */
 
-import React, { useEffect, useState, useReducer, useRef, useContext } from 'react'
+import React, { useEffect, useState, useRef, useContext } from 'react'
 import {
   Form,
   Select,
@@ -21,8 +21,6 @@ import {
   Popconfirm,
 } from 'antd'
 import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
-import { CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons'
-import gql from 'graphql-tag'
 import moment from 'moment'
 import { COLORS } from 'assets/styles/globalStyles'
 import LoadingComponent from 'components/LoadingComponent'
@@ -218,12 +216,9 @@ const EditableCell = ({
 
 const EditInvoiceForm = ({ form, invoiceId }) => {
   const [subTotal, setSubTotal] = useState(0)
-  const [count, setCount] = useState(-1)
   const [currencySymbol, setCurrencySymbol] = useState('$')
   const [tableData, setTableData] = useState([])
   const [invoiceDetails, setInvoiceDetails] = useState(null)
-  const [perDayRates, setPerDayRates] = useState({})
-  const [updateAssessList, setUpdateAssessList] = useState([])
   const [productList, setProductList] = useState([])
   // const [addCgst, setAddCgst] = useState(rowData.details.country?.name?.toLowerCase() === 'india')
   // const [addSgst, setAddSgst] = useState(rowData.details.country?.name?.toLowerCase() === 'india')
@@ -754,7 +749,7 @@ const EditInvoiceForm = ({ form, invoiceId }) => {
             type="primary"
             style={{ margin: 'auto 10px' }}
           >
-            Create
+            Update
           </Button>
         </div>
 

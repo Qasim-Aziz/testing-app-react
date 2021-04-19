@@ -178,24 +178,19 @@ export default () => {
       title: 'Status',
       dataIndex: 'status',
       render: (text, row) => {
-        console.log(row.colorCode)
         const color = COLORS[row.colorCode]
 
-        if (text === 'Partially Paid' || text === 'Sent' || text === 'Pending') {
-          return (
-            <Tooltip title="Edit status" trigger={['hover']}>
-              <Button
-                type="link"
-                onClick={() => setInvoiceStatusDrawer(row)}
-                style={{ color, fontSize: 16, padding: 0 }}
-              >
-                {text}
-              </Button>
-            </Tooltip>
-          )
-        }
-
-        return <span style={{ color, fontSize: 16 }}>{text}</span>
+        return (
+          <Tooltip title="Edit status" trigger={['hover']}>
+            <Button
+              type="link"
+              onClick={() => setInvoiceStatusDrawer(row)}
+              style={{ color, fontSize: 16, padding: 0 }}
+            >
+              {text}
+            </Button>
+          </Tooltip>
+        )
       },
     },
     {
