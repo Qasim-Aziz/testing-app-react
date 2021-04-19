@@ -65,7 +65,7 @@ export const IISAGetDomains = gql`
   }
 `
 export const clinicAllDetails = gql`
-  query($id: ID!) {
+  query($id: ID) {
     clinicAllDetails(pk: $id) {
       details {
         schoolName
@@ -73,6 +73,28 @@ export const clinicAllDetails = gql`
         address
         logo
       }
+    }
+  }
+`
+
+export const PERCENTAGE = gql`
+  query($id: ID!) {
+    IISAGetAssessmentDetails(id: $id) {
+      percentage
+      socialPercentage
+      emotionalPercentage
+      speechPercentage
+      behaviourPercentage
+      sensoryPercentage
+      cognitivePercentage
+    }
+  }
+`
+
+export const MODULE_PERCENTAGE = gql`
+  query($id: ID!) {
+    IISAGetAssessmentDetails(id: $id) {
+      percentage
     }
   }
 `
