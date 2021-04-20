@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { DatePicker, Typography } from 'antd'
 import gql from 'graphql-tag'
 import Moment from 'moment'
 import { ResponsiveBar } from '@nivo/bar'
 import { useSelector } from 'react-redux'
-import { useQuery } from 'react-apollo'
+import { useQuery, useLazyQuery } from 'react-apollo'
 import Spinner from '../../Spinner'
 
 const { RangePicker } = DatePicker
@@ -45,13 +45,19 @@ const AttendenceGraph = () => {
   )
 
   const therapistId = useSelector(s => s.user.staffId)
-  const { data, loading, error } = useQuery(QUERY, {
-    variables: {
-      therapistId,
-      startDate: graphStartDate,
-      endDate: graphEndDate,
-    },
-  })
+  const [fetchData, { data, loading, error }] = useLazyQuery(QUERY)
+
+  useEffect(() => {
+    if (therapistId) {
+      fetchData({
+        variables: {
+          therapistId,
+          startDate: graphStartDate,
+          endDate: graphEndDate,
+        },
+      })
+    }
+  }, [therapistId])
 
   const onDateChange = date => {
     setGaphStartDate(

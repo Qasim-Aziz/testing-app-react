@@ -52,7 +52,9 @@ import {
 } from '@ant-design/icons'
 import { connect } from 'react-redux'
 import DataTable from 'react-data-table-component'
+import { COLORS } from 'assets/styles/globalStyles'
 import JsPDF from 'jspdf'
+import LoadingComponent from 'components/LoadingComponent'
 import 'jspdf-autotable'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
@@ -114,7 +116,7 @@ class TaskTable extends React.Component {
       payload: {
         SelectedTask: e,
         isSelectedTask: true,
-        updateReminderState: true
+        updateReminderState: true,
       },
     })
     this.setState({
@@ -206,8 +208,8 @@ class TaskTable extends React.Component {
           textToHighlight={text.toString()}
         />
       ) : (
-          text
-        ),
+        text
+      ),
   })
 
   handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -259,7 +261,7 @@ class TaskTable extends React.Component {
     } = this.props
 
     if (loading) {
-      return <div>Loading...</div>
+      return <LoadingComponent />
     }
 
     let filteredList = TaskList
@@ -290,32 +292,32 @@ class TaskTable extends React.Component {
       )
     }
 
-    let status = TaskList.reduce(function (sum, current) {
+    let status = TaskList.reduce(function(sum, current) {
       return sum.concat(current.status ? current.status : [])
     }, [])
 
-    let statusGrouped = status.reduce(function (groups, item) {
+    let statusGrouped = status.reduce(function(groups, item) {
       const val = item.taskStatus
       groups.includes(val) ? null : groups.push(val)
       return groups
     }, [])
 
-    let types = TaskList.reduce(function (sum, current) {
+    let types = TaskList.reduce(function(sum, current) {
       return sum.concat(current.taskType ? current.taskType : [])
     }, [])
 
-    let typesGrouped = types.reduce(function (groups, item) {
+    let typesGrouped = types.reduce(function(groups, item) {
       const val = item.taskType
 
       groups.includes(val) ? null : groups.push(val)
       return groups
     }, [])
 
-    let priorities = TaskList.reduce(function (sum, current) {
+    let priorities = TaskList.reduce(function(sum, current) {
       return sum.concat(current.priority ? current.priority : [])
     }, [])
 
-    let prioritiesGrouped = priorities.reduce(function (groups, item) {
+    let prioritiesGrouped = priorities.reduce(function(groups, item) {
       const val = item.name
 
       groups.includes(val) ? null : groups.push(val)
@@ -333,7 +335,7 @@ class TaskTable extends React.Component {
           borderTopStyle: 'solid',
           borderTopWidth: '1px',
           borderTopColor: '#ddd',
-          backgroundColor: '#f5f5f5',
+          backgroundColor: COLORS.palleteLightBlue,
         },
       },
       headCells: {
@@ -390,10 +392,10 @@ class TaskTable extends React.Component {
               {row.taskName}
             </Button>
           ) : (
-              <span style={{ padding: '0px', fontWeight: 'bold', fontSize: '11px' }}>
-                {row.taskName}
-              </span>
-            ),
+            <span style={{ padding: '0px', fontWeight: 'bold', fontSize: '11px' }}>
+              {row.taskName}
+            </span>
+          ),
       },
       {
         name: 'Description',
@@ -411,12 +413,7 @@ class TaskTable extends React.Component {
       },
       {
         name: 'Priority',
-        cell: e => (
-          <>
-            {e.priority?.name}
-          </>
-        ),
-
+        cell: e => <>{e.priority?.name}</>,
       },
       {
         name: 'Start Date',
@@ -458,7 +455,7 @@ class TaskTable extends React.Component {
 
     const exportToCSV = () => {
       const filename = 'tasks_excel'
-      let formattedData = filteredList.map(function (e) {
+      let formattedData = filteredList.map(function(e) {
         return {
           Name: e.taskName,
           Description: e.description,
@@ -640,26 +637,26 @@ class TaskTable extends React.Component {
             </Button>
 
             {this.state.filterName ||
-              this.state.filterPriority ||
-              this.state.filterStatus ||
-              this.state.filterType ? (
-                <Button
-                  type="link"
-                  style={{ marginLeft: '10px', color: '#FEBB27' }}
-                  onClick={() =>
-                    this.setState({
-                      filterName: '',
-                      filterPriority: '',
-                      filterStatus: '',
-                      filterType: '',
-                    })
-                  }
-                  size="small"
-                >
-                  Clear Filters
-                  <CloseCircleOutlined />
-                </Button>
-              ) : null}
+            this.state.filterPriority ||
+            this.state.filterStatus ||
+            this.state.filterType ? (
+              <Button
+                type="link"
+                style={{ marginLeft: '10px', color: '#FEBB27' }}
+                onClick={() =>
+                  this.setState({
+                    filterName: '',
+                    filterPriority: '',
+                    filterStatus: '',
+                    filterType: '',
+                  })
+                }
+                size="small"
+              >
+                Clear Filters
+                <CloseCircleOutlined />
+              </Button>
+            ) : null}
           </div>
           <div>
             <span style={{ fontSize: '25px', color: '#000' }}>Tasks List</span>
@@ -696,11 +693,7 @@ class TaskTable extends React.Component {
                 </div>
               </div>
             </div>
-
-
           </div>
-
-
         </div>
       </Authorize>
     )

@@ -49,7 +49,12 @@ const { Title, Text } = Typography
 const { Content } = Layout
 const { TabPane } = Tabs
 const { confirm } = Modal
-@connect(({ user, cogniableassessment, student }) => ({ user, cogniableassessment, student }))
+@connect(({ user, cogniableassessment, learnersprogram, student }) => ({
+  user,
+  cogniableassessment,
+  learnersprogram,
+  student,
+}))
 class RightArea extends React.Component {
   constructor(props) {
     super(props)
@@ -65,15 +70,17 @@ class RightArea extends React.Component {
   }
 
   componentDidMount() {
-    const { dispatch } = this.props
+    const { dispatch, learnersprogram } = this.props
+    if (learnersprogram && learnersprogram.Learners?.length === 0) {
+      dispatch({
+        type: 'learnersprogram/LOAD_DATA',
+      })
+    }
     if (localStorage.getItem('studentId')) {
       const studentID = JSON.parse(localStorage.getItem('studentId'))
       if (studentID) {
         dispatch({
           type: 'student/STUDENT_DETAILS',
-        })
-        dispatch({
-          type: 'learnersprogram/LOAD_DATA',
         })
       }
       this.setState({ studentID })

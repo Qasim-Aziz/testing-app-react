@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Typography, Empty } from 'antd'
 import gql from 'graphql-tag'
-import { useQuery } from 'react-apollo'
+import { useQuery, useLazyQuery } from 'react-apollo'
 import moment from 'moment'
 import { useSelector } from 'react-redux'
 import Spinner from '../../Spinner'
@@ -44,13 +44,19 @@ const AttendenceCard = () => {
     .format('YYYY-MM-DD')
   const endDate = moment().format('YYYY-MM-DD')
 
-  const { loading, data, error } = useQuery(ATTENDENCE_QUERY, {
-    variables: {
-      therapistId,
-      startDate,
-      endDate,
-    },
-  })
+  const [fetchData, { loading, data, error }] = useLazyQuery(ATTENDENCE_QUERY)
+
+  useEffect(() => {
+    if (therapistId) {
+      fetchData({
+        variables: {
+          therapistId,
+          startDate,
+          endDate,
+        },
+      })
+    }
+  }, [therapistId])
 
   return (
     <div>

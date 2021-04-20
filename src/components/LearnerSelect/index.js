@@ -39,8 +39,20 @@ class LearnerSelect extends React.Component {
     this.state = {}
   }
 
+  componentDidMount() {
+    const {
+      dispatch,
+      learnersprogram: { Learners },
+    } = this.props
+
+    if (Learners && Learners.length === 0) {
+      dispatch({
+        type: 'learnersprogram/LOAD_DATA',
+      })
+    }
+  }
+
   studentChanged = id => {
-    // console.log(id)
     if (id) {
       localStorage.setItem('studentId', JSON.stringify(id))
       const {

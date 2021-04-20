@@ -29,6 +29,7 @@ import React from 'react'
 import { Helmet } from 'react-helmet'
 import { connect } from 'react-redux'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
+import LoadingComponent from 'components/LoadingComponent'
 import LearnerAssessments from './LearnerAssessments'
 import LearnerGoals from './LearnerGoals'
 import LearnerSession from './LearnerSession'
@@ -69,10 +70,13 @@ class PeakEqvi extends React.Component {
   }
 
   componentDidMount() {
-    const { dispatch } = this.props
-    dispatch({
-      type: 'learnersprogram/LOAD_DATA',
-    })
+    const { dispatch, user, learnersprogram } = this.props
+    console.log(learnersprogram, 'lplp')
+    if (learnersprogram && learnersprogram.Learners?.length === 0) {
+      dispatch({
+        type: 'learnersprogram/LOAD_DATA',
+      })
+    }
 
     dispatch({
       type: 'student/STUDENT_DETAILS',
@@ -140,14 +144,10 @@ class PeakEqvi extends React.Component {
       form,
       user,
       student: { StudentName },
-      learnersprogram: { SelectedLearnerId, TabCheck },
+      learnersprogram: { SelectedLearnerId, TabCheck, Loading },
     } = this.props
 
     const { visibleFilter } = this.state
-
-    // if (Loading) {
-    //     return 'Loading...'
-    // }
 
     const BlockStyle = {
       background: '#FFF',
@@ -187,6 +187,10 @@ class PeakEqvi extends React.Component {
     const pstyle = { marginBottom: 0 }
     const std = localStorage.getItem('studentId')
 
+    if (Loading) {
+      return <LoadingComponent />
+    }
+
     return (
       <>
         <Helmet title="Learners Program" />
@@ -211,11 +215,11 @@ class PeakEqvi extends React.Component {
                 boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
               }}
             >
-              <div style={{ margin: '0px auto', width: '100%', }}>
-
-                <div style={{ padding: '5px 0px', display: 'flex', justifyContent: 'space-between' }}>
+              <div style={{ margin: '0px auto', width: '100%' }}>
+                <div
+                  style={{ padding: '5px 0px', display: 'flex', justifyContent: 'space-between' }}
+                >
                   <div style={{ paddingTop: '5px' }}>&nbsp;</div>
-
 
                   <div
                     style={{
@@ -226,7 +230,6 @@ class PeakEqvi extends React.Component {
                   >
                     {StudentName !== '' && `${StudentName}'s ${TabCheck}`}
                   </div>
-
 
                   <div>
                     {user?.role !== 'parents' && (
@@ -247,7 +250,6 @@ class PeakEqvi extends React.Component {
                   </div>
                 </div>
               </div>
-
             </div>
 
             <Col style={{ paddingRight: 0 }}>
@@ -318,7 +320,7 @@ class PeakEqvi extends React.Component {
                                   <a href="/#/targetsAllocationToSession/">
                                     <Button type="link">
                                       Click here to manage targets in Sessions
-                                  </Button>
+                                    </Button>
                                   </a>
                                 </td>
                               </tr>
@@ -331,52 +333,52 @@ class PeakEqvi extends React.Component {
                           {!localStorage.getItem('isOldSessionUI') ? (
                             <SessionsTabs studentId={SelectedLearnerId} />
                           ) : (
-                              <Row>
-                                <Col span={12}>
-                                  <div style={parentCardStyle}>
-                                    <Title style={{ fontSize: 20, lineHeight: '27px' }}>
-                                      Today&apos;s Sessions
-                                </Title>
-                                    <LearnerSession key={SelectedLearnerId} />
-                                  </div>
-                                </Col>
-                                <Col span={12}>
-                                  <div style={parentCardStyle}>
-                                    <Title style={{ fontSize: 20, lineHeight: '27px' }}>
-                                      Previous Sessions
-                                </Title>
-                                    <a href="/#/sessionDetails">
-                                      <div style={targetMappingStyle}>
-                                        <Title
-                                          style={{
-                                            fontSize: '20px',
-                                            lineHeight: '27px',
-                                            display: 'block',
-                                          }}
-                                        >
-                                          Sessions
-                                    </Title>
-                                        <p
-                                          style={{
-                                            display: 'block',
-                                            marginTop: '5px',
-                                            marginBottom: '-5px',
-                                          }}
-                                        >
-                                          <i>Click here to see previous Sessions </i>
-                                        </p>
-                                      </div>
-                                    </a>
-                                  </div>
-                                </Col>
-                              </Row>
-                            )}
+                            <Row>
+                              <Col span={12}>
+                                <div style={parentCardStyle}>
+                                  <Title style={{ fontSize: 20, lineHeight: '27px' }}>
+                                    Today&apos;s Sessions
+                                  </Title>
+                                  <LearnerSession key={SelectedLearnerId} />
+                                </div>
+                              </Col>
+                              <Col span={12}>
+                                <div style={parentCardStyle}>
+                                  <Title style={{ fontSize: 20, lineHeight: '27px' }}>
+                                    Previous Sessions
+                                  </Title>
+                                  <a href="/#/sessionDetails">
+                                    <div style={targetMappingStyle}>
+                                      <Title
+                                        style={{
+                                          fontSize: '20px',
+                                          lineHeight: '27px',
+                                          display: 'block',
+                                        }}
+                                      >
+                                        Sessions
+                                      </Title>
+                                      <p
+                                        style={{
+                                          display: 'block',
+                                          marginTop: '5px',
+                                          marginBottom: '-5px',
+                                        }}
+                                      >
+                                        <i>Click here to see previous Sessions </i>
+                                      </p>
+                                    </div>
+                                  </a>
+                                </div>
+                              </Col>
+                            </Row>
+                          )}
                         </>
                       )}
                     </>
                   ) : (
-                      <>{this.noLearnerSelected()}</>
-                    )}
+                    <>{this.noLearnerSelected()}</>
+                  )}
                 </Col>
               </Row>
             </Col>
