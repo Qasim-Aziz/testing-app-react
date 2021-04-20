@@ -22,7 +22,7 @@ import {
 } from 'antd'
 import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
 import moment from 'moment'
-import { COLORS } from 'assets/styles/globalStyles'
+import { CANCEL_BUTTON, COLORS, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import LoadingComponent from 'components/LoadingComponent'
 import { CreateProductForm } from 'components/invoice/InvoiceProductsTable'
 import client from 'apollo/config'
@@ -32,6 +32,7 @@ import {
   GET_INVOICE_STATUS_LIST,
   PRODUCT_LIST,
   GENERATE_LINK,
+  UPDATE_STUDENT_INVOICE,
   GET_INVOICE,
   STUDENT_INVOICE_ITEMS,
 } from './query'
@@ -65,42 +66,19 @@ const amStyle = {
   margin: 'auto 0',
 }
 
-const calculatDateAdd = (form, dayNum) => {
-  return moment(form.getFieldValue('issueDate'))
-    .add(dayNum, 'day')
-    .format('YYYY-MM-DD')
-}
-
-function getTotal(subTotal, discount = 0, cgst = 0, sgst = 0, taxableSubtotal = 0) {
-  console.log(subTotal, cgst, sgst, discount, taxableSubtotal)
+function getTotal(subTotal, discount = 0, cgst = 0, sgst = 0, tax = 0) {
   return Number(
     subTotal -
       (subTotal / 100) * parseFloat(discount || 0) +
       (subTotal / 100) * parseFloat(cgst || 0) +
       (subTotal / 100) * parseFloat(sgst || 0) +
-      (subTotal / 100) * parseFloat(taxableSubtotal || 0),
+      (subTotal / 100) * parseFloat(tax || 0),
   ).toFixed(3)
 }
-
-function daysInMonth(month, year) {
-  // Use 1 for January, 2 for February, etc.
-  return new Date(year, month, 0).getDate()
-}
-
-const d = new Date()
-const days = daysInMonth(d.getMonth() === 0 ? 12 : d.getMonth(), d.getFullYear())
 
 const roundNumber = (num, digitFigure) => {
   return Number(Number(num).toFixed(digitFigure))
 }
-
-const essentialServices = [
-  'SW52b2ljZVByb2R1Y3RzVHlwZToxMg==',
-  'SW52b2ljZVByb2R1Y3RzVHlwZToxNg==',
-  'SW52b2ljZVByb2R1Y3RzVHlwZToxNA==',
-  'SW52b2ljZVByb2R1Y3RzVHlwZToxMw==',
-  'SW52b2ljZVByb2R1Y3RzVHlwZToxNQ==',
-]
 
 const EditableContext = React.createContext(null)
 const EditableRow = ({ form, index, ...props }) => {
@@ -214,15 +192,15 @@ const EditableCell = ({
   return <td {...restProps}>{childNode}</td>
 }
 
-const EditInvoiceForm = ({ form, invoiceId }) => {
+const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
   const [subTotal, setSubTotal] = useState(0)
-  const [currencySymbol, setCurrencySymbol] = useState('$')
+  const [currencySymbol, setCurrencySymbol] = useState('₹')
   const [tableData, setTableData] = useState([])
   const [invoiceDetails, setInvoiceDetails] = useState(null)
   const [productList, setProductList] = useState([])
-  // const [addCgst, setAddCgst] = useState(rowData.details.country?.name?.toLowerCase() === 'india')
-  // const [addSgst, setAddSgst] = useState(rowData.details.country?.name?.toLowerCase() === 'india')
-  // const [isIndian, setIsIndian] = useState(rowData.details.country?.name?.toLowerCase() === 'india')
+  const [addCgst, setAddCgst] = useState(true)
+  const [addSgst, setAddSgst] = useState(true)
+  const [isIndian, setIsIndian] = useState(true)
   const { data: statusData, loading: statusLoading } = useQuery(GET_INVOICE_STATUS_LIST)
   const [createProModal, setCreateProModal] = useState(false)
   const [isCreated, setIsCreated] = useState(false)
@@ -236,6 +214,9 @@ const EditInvoiceForm = ({ form, invoiceId }) => {
     PRODUCT_LIST,
   )
   const { data: invoiceFeeItems, loading: invoiceFeeItemsLoading } = useQuery(STUDENT_INVOICE_ITEMS)
+  const [updateStudentInvoice, { loading: updateStudentInvoiceLoading }] = useMutation(
+    UPDATE_STUDENT_INVOICE,
+  )
 
   useEffect(() => {
     if (invoiceData) {
@@ -271,50 +252,53 @@ const EditInvoiceForm = ({ form, invoiceId }) => {
   const submit = e => {
     e.preventDefault()
     form.validateFields((err, values) => {
-      if (!error) {
+      if (!err && invoiceId) {
         console.log(values, values.cgst, values.sgst, tableData, 'rowData in invoice form')
-        // createInvoice({
-        //   variables: {
-        //     clinic: rowData?.details?.id,
-        //     email: values.email,
-        //     status: values.status,
-        //     issueDate: moment(values.issueDate).format('YYYY-MM-DD'),
-        //     dueDate: moment(values.dueDate).format('YYYY-MM-DD'),
-        //     address: values.address,
-        //     taxableSubtotal: parseFloat(values.taxableSubtotal),
-        //     discount: parseFloat(values.discount),
-        //     sgst: parseFloat(values.sgst),
-        //     cgst: parseFloat(values.cgst),
-        //     total: getTotal(
-        //       subTotal,
-        //       form.getFieldValue('discount'),
-        //       form.getFieldValue('cgst'),
-        //       form.getFieldValue('sgst'),
-        //       form.getFieldValue('taxableSubtotal'),
-        //     ),
-        //     due: getTotal(
-        //       subTotal,
-        //       form.getFieldValue('discount'),
-        //       form.getFieldValue('cgst'),
-        //       form.getFieldValue('sgst'),
-        //       form.getFieldValue('taxableSubtotal'),
-        //     ),
-        //     products: tableData.map(item => {
-        //       return {
-        //         product: item.service,
-        //         qty: item.qty,
-        //         rate: item.rate,
-        //         amount: roundNumber(item.qty * item.rate, 3),
-        //       }
-        //     }),
-        //   },
-        // }).then(data => {
-        //   console.log(data.data.createInvoice, 'invoice data')
-        //   setIsCreated(true)
-        //   refetchInvoices()
-        //   generatePaymentLink(data.data.createInvoice.details.id)
-        //   setInvoiceFormDrawer(false)
-        // })
+        updateStudentInvoice({
+          variables: {
+            pk: invoiceId,
+            email: values.email,
+            status: values.status,
+            issueDate: moment(values.issueDate).format('YYYY-MM-DD'),
+            dueDate: moment(values.dueDate).format('YYYY-MM-DD'),
+            address: values.address,
+            taxableSubtotal: parseFloat(values.tax),
+            discount: parseFloat(values.discount),
+            sgst: addSgst ? parseFloat(values.sgst) : 0,
+            cgst: addCgst ? parseFloat(values.cgst) : 0,
+            total: getTotal(
+              subTotal,
+              form.getFieldValue('discount'),
+              form.getFieldValue('cgst'),
+              form.getFieldValue('sgst'),
+              form.getFieldValue('tax'),
+            ),
+            amount: getTotal(
+              subTotal,
+              form.getFieldValue('discount'),
+              form.getFieldValue('cgst'),
+              form.getFieldValue('sgst'),
+              form.getFieldValue('tax'),
+            ),
+            products: tableData.map(item => {
+              return {
+                product: item.service,
+                qty: item.qty,
+                rate: item.rate,
+                amount: roundNumber(item.qty * item.rate, 3),
+              }
+            }),
+          },
+        })
+          .then(res => {
+            console.log(res, 'res')
+            notification.success({
+              message: 'Invoice updated successfully',
+            })
+            refetchInvoices()
+            closeDrawer()
+          })
+          .catch(errr => console.error(errr))
       }
     })
   }
@@ -339,10 +323,8 @@ const EditInvoiceForm = ({ form, invoiceId }) => {
   }
 
   const handleSave = (row, data) => {
-    console.log(row, data, 'row')
     const newData = [...tableData]
     const index = newData.findIndex(item => row.key === item.key)
-    console.log(index, 'index')
     newData[index] = { ...row, ...data }
 
     let tempTotal = 0
@@ -355,7 +337,6 @@ const EditInvoiceForm = ({ form, invoiceId }) => {
 
   const handleDelete = row => {
     const tempTableData = [...tableData]
-    console.log(tempTableData, '11')
     for (let i = 0; i < tempTableData.length; i++) {
       if (tempTableData[i].key === row.key) {
         tempTableData.splice(i, 1)
@@ -384,6 +365,7 @@ const EditInvoiceForm = ({ form, invoiceId }) => {
       title: 'Service',
       dataIndex: 'service',
       align: 'left',
+      width: 250,
       render: obj => {
         return productList.find(({ id }) => obj === id)?.name
       },
@@ -391,14 +373,14 @@ const EditInvoiceForm = ({ form, invoiceId }) => {
     {
       title: 'Quantity',
       dataIndex: 'qty',
-      width: '300px',
+      width: '250px',
       editable: true,
       align: 'right',
     },
     {
       title: 'Rate',
       dataIndex: 'rate',
-      width: '300px',
+      width: '250px',
       editable: true,
       align: 'right',
       render: rate => (rate === 0 ? rate : `${currencySymbol} ${rate}`),
@@ -406,7 +388,7 @@ const EditInvoiceForm = ({ form, invoiceId }) => {
     {
       title: 'Amount',
       dataIndex: 'amount',
-      width: '300px',
+      width: '250px',
       align: 'right',
       render: (text, row) => {
         const amount = parseFloat(row.qty) * parseFloat(row.rate)
@@ -417,16 +399,13 @@ const EditInvoiceForm = ({ form, invoiceId }) => {
       title: 'Operation',
       width: '100px',
       render: (text, row) => {
-        if (essentialServices.indexOf(row.service) === -1) {
-          return (
-            <span>
-              <Popconfirm title="Sure to delete this product?" onConfirm={() => handleDelete(row)}>
-                <Button type="danger">Delete</Button>
-              </Popconfirm>
-            </span>
-          )
-        }
-        return null
+        return (
+          <span>
+            <Popconfirm title="Sure to delete this product?" onConfirm={() => handleDelete(row)}>
+              <Button type="danger">Delete</Button>
+            </Popconfirm>
+          </span>
+        )
       },
     },
   ]
@@ -468,7 +447,7 @@ const EditInvoiceForm = ({ form, invoiceId }) => {
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
             <Form.Item label="Customer" style={{ marginRight: 20 }}>
               {form.getFieldDecorator('clinic', {
-                initialValue: invoiceDetails.customer.firstname,
+                initialValue: invoiceDetails?.customer?.firstname,
                 rules: [{ required: true, message: 'Please select a customer!' }],
               })(
                 <Input
@@ -490,18 +469,6 @@ const EditInvoiceForm = ({ form, invoiceId }) => {
                 />,
               )}
             </Form.Item>
-          </div>
-
-          <div style={{ minWidth: '160px' }}>
-            <Text style={{ fontSize: 20, color: '#000' }}>BALANCE DUE:</Text>
-            <Title style={{ marginTop: 10 }}>
-              {currencySymbol}
-              {getTotal(
-                subTotal,
-                form.getFieldValue('discount'),
-                form.getFieldValue('taxableSubtotal'),
-              )}
-            </Title>
           </div>
         </div>
 
@@ -566,16 +533,6 @@ const EditInvoiceForm = ({ form, invoiceId }) => {
                   alignItems: 'center',
                 }}
               >
-                <Button onClick={handleAdd} type="primary">
-                  Add a Line
-                </Button>
-                <Button
-                  style={{ marginLeft: 15 }}
-                  type="primary"
-                  onClick={() => setCreateProModal(true)}
-                >
-                  Create a new product
-                </Button>
                 <Text
                   style={{
                     marginLeft: 'auto',
@@ -615,12 +572,12 @@ const EditInvoiceForm = ({ form, invoiceId }) => {
               )}
             </span>
           </div>
-          {/* <div style={amParent} className="edit-checkBox">
+          <div style={amParent} className="edit-checkBox">
             <Tooltip
               placement="left"
               title={`It is recommended ${isIndian ? '' : 'not'} to charge cgst from ${
                 isIndian ? 'indian' : 'non-indian'
-              } clinics`}
+              } clients`}
             >
               <Checkbox
                 style={{ margin: 'auto 0' }}
@@ -631,7 +588,7 @@ const EditInvoiceForm = ({ form, invoiceId }) => {
             </Tooltip>
             <span style={{ ...amLabel, color: `${addCgst ? 'black' : '#D9D9D9'}` }}>CGST:</span>
             <Form.Item style={{ margin: 'auto 0' }}>
-              {form.getFieldDecorator('cgst', { initialValue: 0 })(
+              {form.getFieldDecorator('cgst', { initialValue: invoiceDetails.cgst })(
                 <Input
                   placeholder="Give cgst"
                   type="number"
@@ -652,7 +609,7 @@ const EditInvoiceForm = ({ form, invoiceId }) => {
               placement="left"
               title={`It is recommended ${isIndian ? '' : 'not'} to charge sgst from ${
                 isIndian ? 'indian' : 'non-indian'
-              } clinics`}
+              } clients`}
             >
               <Checkbox
                 style={{ margin: 'auto 0' }}
@@ -663,7 +620,7 @@ const EditInvoiceForm = ({ form, invoiceId }) => {
             </Tooltip>
             <span style={{ ...amLabel, color: `${addSgst ? 'black' : '#D9D9D9'}` }}>SGST:</span>
             <Form.Item style={{ margin: 'auto 0' }}>
-              {form.getFieldDecorator('sgst', { initialValue: 0 })(
+              {form.getFieldDecorator('sgst', { initialValue: invoiceDetails.sgst })(
                 <Input
                   placeholder="Give sgst"
                   type="number"
@@ -678,12 +635,12 @@ const EditInvoiceForm = ({ form, invoiceId }) => {
               {currencySymbol}
               {Number((subTotal / 100) * parseFloat(form.getFieldValue('sgst') || 0)).toFixed(3)}
             </span>
-          </div> */}
+          </div>
           <div style={amParent}>
             <span style={amLabel}>Taxable:</span>
             <Form.Item style={{ margin: 'auto 0' }}>
-              {form.getFieldDecorator('taxableSubtotal', {
-                initialValue: invoiceDetails.taxableSubtotal,
+              {form.getFieldDecorator('tax', {
+                initialValue: invoiceDetails.tax ? invoiceDetails.tax : 0,
               })(
                 <Input
                   placeholder="Add tax"
@@ -696,9 +653,7 @@ const EditInvoiceForm = ({ form, invoiceId }) => {
             </Form.Item>
             <span style={amStyle}>
               {currencySymbol}
-              {Number(
-                (subTotal / 100) * parseFloat(form.getFieldValue('taxableSubtotal') || 0),
-              ).toFixed(3)}
+              {Number((subTotal / 100) * parseFloat(form.getFieldValue('tax') || 0)).toFixed(3)}
             </span>
           </div>
           <div style={{ ...amParent, margin: '5px 0', marginTop: '15px' }}>
@@ -710,7 +665,7 @@ const EditInvoiceForm = ({ form, invoiceId }) => {
                 form.getFieldValue('discount'),
                 form.getFieldValue('cgst'),
                 form.getFieldValue('sgst'),
-                form.getFieldValue('taxableSubtotal'),
+                form.getFieldValue('tax'),
               )}
             </span>
           </div>
@@ -723,7 +678,7 @@ const EditInvoiceForm = ({ form, invoiceId }) => {
                 form.getFieldValue('discount'),
                 form.getFieldValue('cgst'),
                 form.getFieldValue('sgst'),
-                form.getFieldValue('taxableSubtotal'),
+                form.getFieldValue('tax'),
               )}
             </span>
           </div>
@@ -741,15 +696,16 @@ const EditInvoiceForm = ({ form, invoiceId }) => {
             borderRadius: 4,
           }}
         >
-          <Button type="danger">Cancel</Button>
-
           <Button
             htmlType="submit"
-            disabled={isCreated}
+            loading={updateStudentInvoiceLoading}
             type="primary"
-            style={{ margin: 'auto 10px' }}
+            style={SUBMITT_BUTTON}
           >
             Update
+          </Button>
+          <Button type="danger" onClick={closeDrawer} style={CANCEL_BUTTON}>
+            Cancel
           </Button>
         </div>
 

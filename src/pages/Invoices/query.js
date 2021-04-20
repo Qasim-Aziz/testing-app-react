@@ -131,6 +131,7 @@ export const ADVANCE_INVOICE = gql`
     $cgst: Float
     $sgst: Float
     $discount: Float
+    $tax: Float
     $generateLink: Boolean
   ) {
     createAdvanceInvoiceByClinic(
@@ -140,6 +141,7 @@ export const ADVANCE_INVOICE = gql`
         cgst: $cgst
         sgst: $sgst
         discount: $discount
+        tax: $tax
         generateLink: $generateLink
       }
     ) {
@@ -196,6 +198,7 @@ export const MONTHLY_INVOICE = gql`
     $cgst: Float
     $sgst: Float
     $discount: Float
+    $tax: Float
     $generateLink: Boolean
   ) {
     createMonthlyInvoiceByClinic(
@@ -205,6 +208,7 @@ export const MONTHLY_INVOICE = gql`
         cgst: $cgst
         sgst: $sgst
         discount: $discount
+        tax: $tax
         generateLink: $generateLink
       }
     ) {

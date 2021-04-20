@@ -18,6 +18,11 @@ const GET_INVOICES = gql`
           clinic {
             id
             schoolName
+            currency {
+              id
+              currency
+              symbol
+            }
           }
           status {
             id
@@ -54,6 +59,75 @@ const GET_INVOICES = gql`
   }
 `
 
+export const CREATE_STUDENT_INVOICE = gql`
+  mutation(
+    $student: ID!
+    $month: String!
+    $cgst: Float
+    $sgst: Float
+    $discount: Float
+    $tax: Float
+  ) {
+    generateMonthlyStudentInvoice(
+      input: {
+        student: $student
+        month: $month
+        cgst: $cgst
+        sgst: $sgst
+        discount: $discount
+        tax: $tax
+      }
+    ) {
+      details {
+        id
+        invoiceNo
+        email
+      }
+      data
+    }
+  }
+`
+
+export const UPDATE_STUDENT_INVOICE = gql`
+  mutation(
+    $pk: ID
+    $email: String
+    $status: ID
+    $issueDate: Date
+    $dueDate: Date
+    $address: String
+    $amount: Float
+    $taxableSubtotal: Float
+    $discount: Float
+    $sgst: Float
+    $cgst: Float
+    $total: Float
+    $products: [FeeInput2]
+  ) {
+    updateInvoice(
+      input: {
+        pk: $pk
+        email: $email
+        status: $status
+        issueDate: $issueDate
+        dueDate: $dueDate
+        amount: $amount
+        address: $address
+        taxableSubtotal: $taxableSubtotal
+        discount: $discount
+        sgst: $sgst
+        cgst: $cgst
+        total: $total
+        products: $products
+      }
+    ) {
+      details {
+        id
+      }
+    }
+  }
+`
+
 const DELETE_INVOICE = gql`
   mutation deleteInvoice($id: ID!) {
     deleteInvoice(input: { pk: $id }) {
@@ -71,6 +145,9 @@ const STUDENTS = gql`
           id
           firstname
           lastname
+          parent {
+            id
+          }
           invoiceSet {
             edges {
               node {
@@ -236,6 +313,19 @@ export const GENERATE_LINK = gql`
   }
 `
 
+export const GET_PAYMENT_RECIEVING_DETIAILS = gql`
+  query {
+    schoolDetail {
+      id
+      schoolName
+      bankName
+      bankAccountNo
+      ifscCode
+      accountHolderName
+    }
+  }
+`
+
 export const GET_INVOICE = gql`
   query($id: ID!) {
     invoiceDetail(id: $id) {
@@ -250,16 +340,16 @@ export const GET_INVOICE = gql`
       discount
       sgst
       cgst
+      tax
       total
+      linkGenerated
+      paymentLink
+      lastAmount
+
       clinic {
         id
         schoolName
         address
-        currency {
-          id
-          currency
-          symbol
-        }
       }
       customer {
         id
@@ -439,6 +529,20 @@ export const CREATE_INVOICE_PAYMENT = gql`
         invoice {
           id
           invoiceNo
+        }
+      }
+    }
+  }
+`
+
+export const UPDATE_INVOICE_STATUS = gql`
+  mutation($pk: ID, $status: ID) {
+    updateInvoice(input: { pk: $pk, status: $status }) {
+      details {
+        id
+        status {
+          id
+          statusName
         }
       }
     }

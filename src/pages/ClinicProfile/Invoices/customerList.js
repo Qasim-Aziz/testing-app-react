@@ -4,7 +4,7 @@ import { Button, notification, Table, Menu, Icon, Dropdown, Drawer, Form } from 
 import { PlusOutlined, MailOutlined } from '@ant-design/icons'
 import { DRAWER, COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 import { useMutation, useQuery } from 'react-apollo'
-import { STUDENTS, STUDENT_INVOICE_ITEMS } from './query'
+import { STUDENTS, STUDENT_INVOICE_ITEMS, CREATE_STUDENT_INVOICE } from './query'
 import CreateInvoiceForm from './createInvoicesForm'
 import LoadingComponent from 'components/LoadingComponent'
 import MaintainRates from './maintainRates'
@@ -23,6 +23,10 @@ function CustomerList() {
   const [invoiceItemsDrawer, setInvoiceItemsDrawer] = useState(false)
   const [maintainRatesDrawer, setMaintainRatesDrawer] = useState(false)
   const [invoiceType, setInvoiceType] = useState('advance')
+  const [createStudentInvoice, { loading: createStudentInvoiceLoading }] = useMutation(
+    CREATE_STUDENT_INVOICE,
+  )
+  console.log(data, 'daya')
 
   // console.log(invoiceItemsData, 'item data')
   useEffect(() => {
@@ -76,6 +80,18 @@ function CustomerList() {
             onClick={() => {
               setMaintainRatesDrawer(true)
               setCurrentRow(row)
+              // createStudentInvoice({
+              //   variables: {
+              //     student: row.key,
+              //     month: 'March',
+              //     cgst: 15,
+              //     sgst: 4,
+              //     tax: 8,
+              //     discount: 5,
+              //   },
+              // })
+              //   .then(res => console.log(res, 'res'))
+              //   .catch(err => console.log(err, 'error'))
             }}
             style={{ padding: 0 }}
             type="link"
@@ -106,7 +122,7 @@ function CustomerList() {
           : null,
       ),
     )
-    // console.log(names, 'names')
+
     setSelectedClinicsName(names)
     if (e.key == 'advanceInvoice') {
       setInvoiceType('advance')
@@ -118,6 +134,8 @@ function CustomerList() {
       setPayReminderModal(true)
     }
   }
+
+  console.log(tableData, 'tabldata')
 
   const menu = (
     <Menu onClick={e => handleMenuActions(e)}>
