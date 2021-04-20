@@ -94,7 +94,7 @@ const UPDATE_COMMENT = gql`
   }
 `
 
-export default Form.create()(({ updateTicketId, form, setUpdateTicketId }) => {
+export default Form.create()(({ updateTicketId, form }) => {
   const { data, loading, error } = useQuery(TICKET_QUERY, {
     variables: {
       id: updateTicketId,
@@ -107,6 +107,7 @@ export default Form.create()(({ updateTicketId, form, setUpdateTicketId }) => {
     data: commentQueryData,
     error: commentQueryError,
     loading: commentQueryLoading,
+    refetch,
   } = useQuery(COMMENT_QUERY, {
     variables: {
       id: updateTicketId,
@@ -130,7 +131,8 @@ export default Form.create()(({ updateTicketId, form, setUpdateTicketId }) => {
         message: 'comment added successfully',
       })
       form.resetFields()
-      setUpdateTicketId(null)
+      refetch()
+      // setUpdateTicketId(null)
     }
   }, [updateCommentData])
 

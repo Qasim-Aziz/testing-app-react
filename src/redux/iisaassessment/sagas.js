@@ -33,9 +33,6 @@ export function* GET_DATA({ payload }) {
   const response = yield call(getData, payload)
 
   if (response) {
-
-
-
     yield put({
       type: actions.SET_STATE,
       payload: {
@@ -118,25 +115,34 @@ export function* LOAD_ASSESSMENT_OBJECT({ payload }) {
     const questions = response.data.IISAGetQuestions.edges
 
     const IISAObject = {}
-    for (let i=0; i<domains.length; i++){
+    for (let i = 0; i < domains.length; i++) {
       IISAObject[domains[i]?.node.id] = []
-      for (let j=0; j<questions.length; j++){
-        if(questions[j].node.domain.id === domains[i].node.id){
+      for (let j = 0; j < questions.length; j++) {
+        if (questions[j].node.domain.id === domains[i].node.id) {
           let objectRec = {}
           let foundRec = false
-          for (let k=0; k<object.responses.edges.length; k++){
-            if (object.responses.edges[k].node.question?.id === questions[j].node.id){
-              objectRec = {recorded: true, response: object.responses.edges[k].node, question: questions[j]}
+          for (let k = 0; k < object.responses.edges.length; k++) {
+            if (object.responses.edges[k].node.question?.id === questions[j].node.id) {
+              objectRec = {
+                recorded: true,
+                response: object.responses.edges[k].node,
+                question: questions[j],
+              }
               foundRec = true
             }
           }
           if (foundRec) IISAObject[domains[i]?.node.id].push(objectRec)
-          else IISAObject[domains[i]?.node.id].push({recorded: false, response: null, question: questions[j] })
+          else
+            IISAObject[domains[i]?.node.id].push({
+              recorded: false,
+              response: null,
+              question: questions[j],
+            })
         }
       }
     }
-    
 
+    const DomainID = localStorage.getItem('domainID')
     yield put({
       type: actions.SET_STATE,
       payload: {
@@ -146,7 +152,7 @@ export function* LOAD_ASSESSMENT_OBJECT({ payload }) {
         IISAOptions: response.data.IISAGetOptions.edges,
         IISAQuestions: response.data.IISAGetQuestions.edges,
         IISAQuestionsListObject: IISAObject,
-        SelectedDomainId: response.data.IISAGetDomains.edges[0]?.node.id,
+        SelectedDomainId: `${DomainID}`,
         SelectedQuestionId: response.data.IISAGetQuestions.edges[0]?.node.id,
         SelectedQuestionIndex: 0,
       },
@@ -161,7 +167,6 @@ export function* LOAD_ASSESSMENT_OBJECT({ payload }) {
   })
 }
 
-
 export function* RECORD_RESPONSE({ payload }) {
   yield put({
     type: actions.SET_STATE,
@@ -175,24 +180,40 @@ export function* RECORD_RESPONSE({ payload }) {
   if (response) {
     notification.success({
       message: 'Success!!',
-      description: "Response Recorded Successfully!",
+      description: 'Response Recorded Successfully!',
     })
 
     const resObject = yield select(state => state.iisaassessment.IISAQuestionsListObject)
     const domianId = yield select(state => state.iisaassessment.SelectedDomainId)
     const questionIndex = yield select(state => state.iisaassessment.SelectedQuestionIndex)
+    const SelectedQuestionIndex = yield select(state => state.iisaassessment.SelectedQuestionIndex)
+    const IISAQuestionsListObject = yield select(
+      state => state.iisaassessment.IISAQuestionsListObject,
+    )
 
-    resObject[domianId][questionIndex] = {...resObject[domianId][questionIndex],
-      recorded: true, 
-      response: response.data.IISARecording.responses[0]
+    resObject[domianId][questionIndex] = {
+      ...resObject[domianId][questionIndex],
+      recorded: true,
+      response: response.data.IISARecording.responses[0],
     }
-    
+
     yield put({
       type: actions.SET_STATE,
       payload: {
         IISAQuestionsListObject: resObject,
       },
     })
+
+    if (IISAQuestionsListObject[domianId].length !== SelectedQuestionIndex + 1) {
+      yield put({
+        type: actions.SET_STATE,
+        payload: {
+          SelectedQuestionIndex: SelectedQuestionIndex + 1,
+          SelectedQuestionId:
+            IISAQuestionsListObject[domianId][SelectedQuestionIndex + 1]?.question.node.id,
+        },
+      })
+    }
   }
 
   yield put({
@@ -219,16 +240,14 @@ export function* MAKE_INACTIVE({ payload }) {
         type: actions.SET_STATE,
         payload: {
           AssessmentObject: null,
-          AssessmentList: listObject.filter(item => item.node.id !== payload.assessmentId)
+          AssessmentList: listObject.filter(item => item.node.id !== payload.assessmentId),
         },
       })
-
-    }
-    else {
+    } else {
       yield put({
         type: actions.SET_STATE,
         payload: {
-          AssessmentList: listObject.filter(item => item.node.id !== payload.assessmentId)
+          AssessmentList: listObject.filter(item => item.node.id !== payload.assessmentId),
         },
       })
     }

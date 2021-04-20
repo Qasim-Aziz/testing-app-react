@@ -28,7 +28,7 @@ import { connect } from 'react-redux'
 import LoadingComponent from 'components/LoadingComponent'
 import actions from 'redux/iisaassessment/actions'
 import { withRouter } from 'react-router-dom'
-import DownloadReport from './downloadReport'
+import IISADownloadReport from './IISADownloadReport'
 import { FONT } from '../../../assets/styles/globalStyles'
 import '../assessment.scss'
 import logo from '../../../images/WhatsApp Image 2020-04-23 at 10.00.40 (1).jpeg'
@@ -138,7 +138,7 @@ class Screeing extends React.Component {
   }
 
   render() {
-    console.log('report')
+    console.log('Report Props')
     console.log(this.props)
     const {
       student: { StudentName },
@@ -171,8 +171,8 @@ class Screeing extends React.Component {
               <>
                 {AssessmentReport && (
                   <>
-                    <DownloadReport
-                      Assessmentscore={this.props.iisaassessment.AssessmentReport.score}
+                    <IISADownloadReport
+                      // Assessmentscore={this.props.iisaassessment.AssessmentReport.score}
                       SelectedAssessmentId={this.props.iisaassessment.SelectedAssessmentId}
                     />
                   </>

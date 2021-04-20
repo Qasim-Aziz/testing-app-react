@@ -139,6 +139,8 @@ const dateFormate = 'YYYY-MM-DD'
 
 export default () => {
   const [createTicketDrawer, setCreateTicketDrawer] = useState(false)
+  const [editTicketDrawer, setEditTicketDrawer] = useState(false)
+  const [commentDrawer, setCommentDrawer] = useState(false)
   const [form, setForm] = useState()
   const [to, setTo] = useState()
   const allTickets = useRef()
@@ -356,12 +358,18 @@ export default () => {
           <div style={{ display: 'flex', width: '100%', justifyContent: 'flex-start' }}>
             <CommentOutlined
               style={{ color: COLORS.palleteBlue, fontSize: FONT.level3, paddingRight: '.9em' }}
-              onClick={() => setUpdateTimeline(data.key)}
+              onClick={() => {
+                setUpdateTimeline(data.key)
+                setCommentDrawer(true)
+              }}
               type="link"
             />
             <EditOutlined
               style={{ color: COLORS.palleteBlue, fontSize: FONT.level3, paddingRight: '.9em' }}
-              onClick={() => setUpdateTicket(data.key)}
+              onClick={() => {
+                setUpdateTicket(data.key)
+                setEditTicketDrawer(true)
+              }}
               type="link"
             />
             <DeleteOutlined
@@ -566,8 +574,8 @@ export default () => {
         </div>
       </Drawer>
       <Drawer
-        visible={updateTicket}
-        onClose={() => setUpdateTicket(null)}
+        visible={editTicketDrawer}
+        onClose={() => setEditTicketDrawer(false)}
         title="Update Support Ticket"
         width={DRAWER.widthL1}
       >
@@ -583,13 +591,13 @@ export default () => {
           <SupportTicketUpdate
             setUpdateTicketData={setUpdateTicketData}
             updateTicketId={updateTicket}
-            setUpdateTicketId={setUpdateTicket}
+            setUpdateTicketId={setEditTicketDrawer}
           />
         </div>
       </Drawer>
       <Drawer
-        visible={updateTimeline}
-        onClose={() => setUpdateTimeline(null)}
+        visible={commentDrawer}
+        onClose={() => setCommentDrawer(false)}
         title="Timeline"
         width={DRAWER.widthL2}
       >
@@ -604,7 +612,7 @@ export default () => {
         >
           <SupportTicketTimeline
             updateTicketId={updateTimeline}
-            setUpdateTicketId={setUpdateTimeline}
+            // setUpdateTicketId={setUpdateTimeline}
           />
         </div>
       </Drawer>
