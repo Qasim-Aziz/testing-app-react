@@ -170,7 +170,7 @@ const CreateGenAssessForm = ({
     })
   }
 
-  console.log(currentRow, 'current row')
+  // console.log(currentRow, 'current row')
 
   const handleSubmit = e => {
     e.preventDefault()
@@ -180,7 +180,7 @@ const CreateGenAssessForm = ({
         if (!hasSubmodules) {
           tempSubmodules = []
         }
-        console.log(values, hasSubmodules, tempSubmodules, 'in submitt')
+        // console.log(values, hasSubmodules, tempSubmodules, 'in submitt')
         createGenAssess({
           variables: {
             name: values.name,

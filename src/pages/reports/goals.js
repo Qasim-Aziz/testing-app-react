@@ -163,7 +163,9 @@ class Goals extends React.Component {
         })
       })
 
-    this.fetchData(studentId)
+    if (studentId) {
+      this.fetchData(studentId)
+    }
   }
 
   componentDidUpdate(prevProps) {
@@ -548,7 +550,7 @@ class Goals extends React.Component {
                 {graphData ? (
                   <ResponsivePie
                     data={graphData}
-                    margin={{ top: 15, right: 0, bottom: 30, left: 0 }}
+                    margin={{ top: 30, right: 0, bottom: 30, left: 0 }}
                     innerRadius={0.5}
                     padAngle={2}
                     cornerRadius={3}

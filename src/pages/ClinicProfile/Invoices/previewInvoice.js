@@ -12,11 +12,9 @@ import { PrinterOutlined, FilePdfOutlined } from '@ant-design/icons'
 import moment from 'moment'
 import { ToWords } from 'to-words'
 import { useQuery } from 'react-apollo'
-import LoadingComponent from '../../pages/staffProfile/LoadingComponent'
+import LoadingComponent from 'components/LoadingComponent'
 import { GET_INVOICE, GET_PAYMENT_RECIEVING_DETIAILS } from './query'
-import './PreviewInvoice.scss'
-
-import logo from '../../images/WhatsApp Image 2020-04-23 at 10.00.40 (1).jpeg'
+import logo from 'images/WhatsApp Image 2020-04-23 at 10.00.40 (1).jpeg'
 
 const general = {
   fontSize: '12px',
@@ -137,11 +135,7 @@ const PreviewInvoice = ({ invoiceId }) => {
       })
       setSubtotal(tempTotal)
       // console.log(invoiceData.invoiceDetail.clinic.currency.currency, 'kkkkk')
-      setCurrencyName(
-        invoiceData?.invoiceDetail?.clinic.currency
-          ? invoiceData?.invoiceDetail.clinic.currency.currency
-          : 'INR',
-      )
+      setCurrencyName('INR')
     }
   }, [invoiceData])
 
@@ -170,7 +164,7 @@ const PreviewInvoice = ({ invoiceId }) => {
     }
   }, [detailsError, invoiceDataErrors])
 
-  if (isInvoiceDataLoading || detailsLoading) return <LoadingComponent />
+  if (isInvoiceDataLoading || detailsLoading || !invoice) return <LoadingComponent />
   if (detailsError || invoiceDataErrors || !invoiceData || !detailsData)
     return (
       <div style={{ marginTop: 80, marginLeft: 60, fontWeight: 700, fontSize: 18 }}>
@@ -179,7 +173,7 @@ const PreviewInvoice = ({ invoiceId }) => {
     )
 
   const { ifscCode, bankName, accountHolderName, bankAccountNo } = detailsData?.schoolDetail
-
+  console.log(invoice, 'invoice number')
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <div className="ant-drawer-header">
@@ -192,7 +186,7 @@ const PreviewInvoice = ({ invoiceId }) => {
             lineHeight: '22px',
           }}
         >
-          {invoice.invoiceNo}
+          {invoice?.invoiceNo}
         </div>
         <Tooltip placement="top" title="Download Pdf">
           <Button
@@ -228,7 +222,7 @@ const PreviewInvoice = ({ invoiceId }) => {
                     textAlign: 'left',
                   }}
                 >
-                  {invoice.clinic.schoolName}
+                  {invoice.clinic?.schoolName}
                 </div>
                 <div
                   style={{
@@ -239,7 +233,7 @@ const PreviewInvoice = ({ invoiceId }) => {
                     fontWeight: '600',
                   }}
                 >
-                  {invoice.clinic.address}
+                  {invoice.clinic?.address}
                 </div>
                 <div
                   style={{
@@ -261,7 +255,7 @@ const PreviewInvoice = ({ invoiceId }) => {
                   padding: '0 20px',
                 }}
               >
-                <div>{invoice.invoiceNo}</div>
+                <div>{invoice?.invoiceNo}</div>
               </div>
             </div>
             <div style={{ ...section, height: '120px', padding: '0' }}>

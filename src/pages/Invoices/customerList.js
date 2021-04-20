@@ -18,7 +18,7 @@ import AdvanceInvoiceForm from './advanceInvoiceForm'
 import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
 import MonthlyInvoiceForm from './monthlyInvoice'
 import BankDetails from './bankDetails'
-import { CLINIC_QUERY } from './query'
+import { CLINIC_QUERY, ITEM } from './query'
 import InvoiceTable from '../allClinicData/invoiceTable'
 
 const { layout, tailLayout } = FORM

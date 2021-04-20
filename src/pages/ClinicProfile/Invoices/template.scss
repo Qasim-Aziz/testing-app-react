@@ -1,3 +1,5 @@
+@import '../../../assets/styles/mixins.scss';
+
 .clearfix:after {
   content: '';
   display: table;
@@ -202,4 +204,8 @@ footer {
   .ant-table {
     border: 1px solid #e8e8e8;
   }
+}
+
+.ant-table.ant-table-bordered .ant-table-footer {
+  background-color: $palete-light-blue;
 }

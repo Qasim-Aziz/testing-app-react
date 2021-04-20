@@ -1,3 +1,4 @@
+/* eslint-disable */
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet'
@@ -7,6 +8,7 @@ import {
   notification,
   Table,
   Menu,
+  Tooltip,
   Popconfirm,
   Dropdown,
   Select,
@@ -29,10 +31,11 @@ import { useQuery, useMutation } from 'react-apollo'
 import moment from 'moment'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import InvoiceForm from 'components/invoice/InvoiceForm'
-import EditInvoice from 'components/invoice/EditInvoice'
+import EditInvoice from './editInvoice'
 import LoadingComponent from '../../staffProfile/LoadingComponent'
-import PreviewInvoice from '../../../components/invoice/PreviewInvoice'
-import { GET_INVOICES, DELETE_INVOICE } from './Queries'
+import UpdateInvoiceStatus from './updateInvoiceStatus'
+import PreviewInvoice from './previewInvoice'
+import { GET_INVOICES, DELETE_INVOICE, GET_INVOICE_STATUS_LIST } from './query'
 import './template.scss'
 
 const dateFormate = 'YYYY-MM-DD'
@@ -45,13 +48,16 @@ export default () => {
   const [data, setData] = useState()
   const [deleteInvoiceId, setDeleteInvoiceId] = useState()
   const [editInvoiceId, setEditInvoiceId] = useState()
+  const [invoiceStatusDrawer, setInvoiceStatusDrawer] = useState(false)
+  const [selectedRowKeys, setSelectedRowKeys] = useState([])
 
-  // invoice filer
   const [from, setFrom] = useState()
   const [to, setTo] = useState()
   const [month, setMonth] = useState()
   const [filterStatus, setFilterStatus] = useState('')
   const [filterCustomer, setFilterCustomer] = useState('')
+
+  const { data: invoiceStatusList } = useQuery(GET_INVOICE_STATUS_LIST)
 
   const { data: invoiceData, error: invoiceError, loading: invoiceLoading, refetch } = useQuery(
     GET_INVOICES,
@@ -73,13 +79,41 @@ export default () => {
           : undefined,
         status: filterStatus,
       },
+      fetchPolicy: 'no-cache',
     },
   )
 
+  console.log(invoiceData, invoiceError, invoiceLoading)
   const [
     deleteInvoice,
     { data: deleteInvoiceData, error: deleteInvoiceError, loading: deleteInvoiceLoading },
   ] = useMutation(DELETE_INVOICE)
+
+  useEffect(() => {
+    if (invoiceData) {
+      const dataList = [...invoiceData.getInvoices.edges]
+      const arrengedData = dataList.map(({ node }) => {
+        return {
+          key: node.id,
+          invoiceNo: node.invoiceNo,
+          amount: node.amount,
+          client: node.customer?.parent?.username,
+          status: node.status.statusName,
+          statusId: node.status.id,
+          colorCode: node.status.colorCode,
+          date: node.issueDate,
+          name: node.customer?.parent
+            ? `${node.customer.parent.firstName} ${
+                node.customer.parent.lastName ? node.customer?.parent?.lastName : ' '
+              }`
+            : null,
+          email: node.email,
+        }
+      })
+      arrengedData.reverse()
+      setData(arrengedData)
+    }
+  }, [invoiceData])
 
   useEffect(() => {
     if (deleteInvoiceData) {
@@ -105,29 +139,6 @@ export default () => {
   }, [deleteInvoiceError])
 
   useEffect(() => {
-    if (invoiceData) {
-      const dataList = [...invoiceData.getInvoices.edges]
-      const arrengedData = dataList.map(({ node }) => {
-        return {
-          key: node.id,
-          invoiceNo: node.invoiceNo,
-          amount: node.amount,
-          client: node.customer?.parent?.username,
-          status: node.status.statusName,
-          date: node.issueDate,
-          name: node.customer?.parent
-            ? `${node.customer.parent.firstName} ${
-                node.customer.parent.lastName ? node.customer?.parent?.lastName : ' '
-              }`
-            : null,
-          email: node.email,
-        }
-      })
-      setData(arrengedData)
-    }
-  }, [invoiceData])
-
-  useEffect(() => {
     if (invoiceError) {
       notification.error({
         message: 'Something went wrong',
@@ -135,6 +146,10 @@ export default () => {
       })
     }
   }, [invoiceError])
+
+  const updateInvoiceStatus = row => {
+    console.log(row)
+  }
 
   const columns = [
     {
@@ -166,6 +181,21 @@ export default () => {
     {
       title: 'Status',
       dataIndex: 'status',
+      render: (text, row) => {
+        const color = COLORS[row.colorCode]
+
+        return (
+          <Tooltip title="Edit status" trigger={['hover']}>
+            <Button
+              type="link"
+              onClick={() => setInvoiceStatusDrawer(row)}
+              style={{ color, fontSize: 16, padding: 0 }}
+            >
+              {text}
+            </Button>
+          </Tooltip>
+        )
+      },
     },
     {
       title: 'Action',
@@ -173,7 +203,7 @@ export default () => {
       render: row => {
         return (
           <div>
-            <Button
+            {/* <Button
               onClick={() => {
                 setSelectedInvoiceId(row.key)
                 setPreviewInvoice(true)
@@ -181,7 +211,7 @@ export default () => {
               type="link"
             >
               <FilePdfOutlined style={{ fontWeight: 600 }} />
-            </Button>
+            </Button> */}
 
             {row.status !== 'Paid' && (
               <>
@@ -214,6 +244,15 @@ export default () => {
       },
     },
   ]
+
+  const onSelectChange = selectedRowKeys => {
+    setSelectedRowKeys(selectedRowKeys)
+  }
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  }
 
   let filteredList = data || []
   filteredList = filteredList.filter(
@@ -332,10 +371,10 @@ export default () => {
             style={{ width: 188, margin: '0px 28px 0 6px' }}
           >
             <Select.Option value="">Select Status</Select.Option>
-            {statusGrouped.map((i, index) => {
+            {invoiceStatusList?.invoiceStatusList.map((item, index) => {
               return (
-                <Select.Option key={i} value={i}>
-                  {i}
+                <Select.Option key={item.id} value={item.id}>
+                  {item.statusName}
                 </Select.Option>
               )
             })}
@@ -421,6 +460,7 @@ export default () => {
           title={() => {
             return filterHeader
           }}
+          rowSelection={rowSelection}
           rowKey={record => record.key}
           size="middle"
           pagination={{
@@ -434,21 +474,42 @@ export default () => {
 
       <Drawer
         visible={isPreviewInvoice}
-        width={DRAWER.widthL3}
+        width={DRAWER.widthL2}
         className="change-invo-drawer"
         onClose={() => setPreviewInvoice(false)}
       >
         <PreviewInvoice invoiceId={selectedInvoiceId} />
       </Drawer>
 
-      <Drawer visible={isEditInvoice} width={DRAWER.widthL1} onClose={() => setEditInvoice(false)}>
+      <Drawer
+        title="Edit Invoice"
+        destroyOnClose
+        visible={isEditInvoice}
+        width={DRAWER.widthL1}
+        onClose={() => setEditInvoice(false)}
+      >
         <EditInvoice
           invoiceId={editInvoiceId}
-          closeDrawer={setEditInvoice}
+          closeDrawer={() => setEditInvoice(false)}
           refetchInvoices={refetch}
         />
       </Drawer>
-
+      <Drawer
+        title="Update invoice status"
+        visible={invoiceStatusDrawer ? true : false}
+        width={DRAWER.widthL2}
+        destroyOnClose
+        onClose={() => setInvoiceStatusDrawer(null)}
+      >
+        {invoiceStatusDrawer && (
+          <UpdateInvoiceStatus
+            invoiceId={editInvoiceId}
+            invoiceObj={invoiceStatusDrawer}
+            closeDrawer={() => setInvoiceStatusDrawer(null)}
+            refetchInvoices={refetch}
+          />
+        )}
+      </Drawer>
       <Drawer
         visible={isCreateInvoice}
         width={DRAWER.widthL1}

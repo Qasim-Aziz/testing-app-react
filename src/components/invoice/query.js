@@ -263,6 +263,7 @@ export const GET_INVOICE = gql`
       discount
       sgst
       cgst
+      tax
       total
       clinic {
         id

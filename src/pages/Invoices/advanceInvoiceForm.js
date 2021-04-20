@@ -36,6 +36,7 @@ function AdvanceInvoiceForm({
                 cgst: values.cgst,
                 sgst: values.sgst,
                 discount: values.discount,
+                tax: values.discount,
                 generateLink: true,
               },
             })
@@ -110,9 +111,14 @@ function AdvanceInvoiceForm({
             rules: [{ required: true, message: 'Please provide SGST!' }],
           })(<Input />)}
         </Form.Item>
+        <Form.Item label="Tax">
+          {form.getFieldDecorator('tax', {
+            rules: [{ required: true, message: 'Please provide Tax!' }],
+          })(<Input />)}
+        </Form.Item>
         <Form.Item label="Discount">
           {form.getFieldDecorator('discount', {
-            rules: [{ required: true, message: 'Please provide Tax!' }],
+            rules: [{ required: true, message: 'Please provide Discount!' }],
           })(<Input />)}
         </Form.Item>
 

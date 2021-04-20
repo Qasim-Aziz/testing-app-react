@@ -4,24 +4,36 @@ import { Button, notification, Table, Menu, Icon, Dropdown, Drawer, Form } from 
 import { PlusOutlined, MailOutlined } from '@ant-design/icons'
 import { DRAWER, COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 import { useMutation, useQuery } from 'react-apollo'
-import { STUDENTS } from './Queries'
+import { STUDENTS, STUDENT_INVOICE_ITEMS, CREATE_STUDENT_INVOICE } from './query'
 import CreateInvoiceForm from './createInvoicesForm'
+import LoadingComponent from 'components/LoadingComponent'
+import MaintainRates from './maintainRates'
+import InvoiceListItems from './invoiceListItems'
 
 const { layout, tailLayout } = FORM
 
 function CustomerList() {
   const { data, loading, error } = useQuery(STUDENTS)
+  const [currentRow, setCurrentRow] = useState(null)
   const [tableData, setTableData] = useState([])
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
   const [createInvoiceDrawer, setCreateInvoiceDrawer] = useState(false)
   const [payReminderModal, setPayReminderModal] = useState(false)
   const [selectedClinicsName, setSelectedClinicsName] = useState(null)
+  const [invoiceItemsDrawer, setInvoiceItemsDrawer] = useState(false)
+  const [maintainRatesDrawer, setMaintainRatesDrawer] = useState(false)
   const [invoiceType, setInvoiceType] = useState('advance')
+  const [createStudentInvoice, { loading: createStudentInvoiceLoading }] = useMutation(
+    CREATE_STUDENT_INVOICE,
+  )
+  console.log(data, 'daya')
 
+  // console.log(invoiceItemsData, 'item data')
   useEffect(() => {
     if (data) {
-      console.log(data, 'THIS IS DATA')
+      // console.log(data, 'THIS IS DATA')
       const tempTable = []
+      // console.log(data.students)
       data.students?.edges.map(item => {
         tempTable.push({
           key: item.node.id,
@@ -60,10 +72,39 @@ function CustomerList() {
     {
       title: 'Credit',
     },
+    {
+      title: 'Actions',
+      render: row => {
+        return (
+          <Button
+            onClick={() => {
+              setMaintainRatesDrawer(true)
+              setCurrentRow(row)
+              // createStudentInvoice({
+              //   variables: {
+              //     student: row.key,
+              //     month: 'March',
+              //     cgst: 15,
+              //     sgst: 4,
+              //     tax: 8,
+              //     discount: 5,
+              //   },
+              // })
+              //   .then(res => console.log(res, 'res'))
+              //   .catch(err => console.log(err, 'error'))
+            }}
+            style={{ padding: 0 }}
+            type="link"
+          >
+            Maintain Rates
+          </Button>
+        )
+      },
+    },
   ]
 
   const onSelectChange = selectedRowKeys => {
-    console.log('selectedRowKeys changed: ', selectedRowKeys)
+    // console.log('selectedRowKeys changed: ', selectedRowKeys)
     setSelectedRowKeys(selectedRowKeys)
   }
 
@@ -81,7 +122,7 @@ function CustomerList() {
           : null,
       ),
     )
-    console.log(names, 'names')
+
     setSelectedClinicsName(names)
     if (e.key == 'advanceInvoice') {
       setInvoiceType('advance')
@@ -93,6 +134,8 @@ function CustomerList() {
       setPayReminderModal(true)
     }
   }
+
+  console.log(tableData, 'tabldata')
 
   const menu = (
     <Menu onClick={e => handleMenuActions(e)}>
@@ -115,7 +158,7 @@ function CustomerList() {
         height: 'fit-content',
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'flex-start',
+        justifyContent: 'space-between',
       }}
     >
       <Dropdown overlay={menu}>
@@ -123,6 +166,7 @@ function CustomerList() {
           Actions <Icon type="down" />
         </Button>
       </Dropdown>
+      <Button onClick={() => setInvoiceItemsDrawer(true)}>Invoice Items</Button>
     </div>
   )
 
@@ -143,7 +187,32 @@ function CustomerList() {
           closeDrawer={() => setCreateInvoiceDrawer(false)}
         />
       </Drawer>
-
+      <Drawer
+        title="Invoice Items"
+        width={DRAWER.widthL2}
+        visible={invoiceItemsDrawer}
+        closable
+        destroyOnClose
+        onClose={() => setInvoiceItemsDrawer(false)}
+      >
+        <InvoiceListItems />
+      </Drawer>
+      <Drawer
+        title={`${currentRow?.firstname}'s - Rates`}
+        width={DRAWER.widthL2}
+        visible={maintainRatesDrawer}
+        closable
+        destroyOnClose
+        onClose={() => setMaintainRatesDrawer(false)}
+      >
+        <MaintainRates
+          selectedClinicsName={selectedClinicsName}
+          selectedRowKeys={selectedRowKeys}
+          invoiceType={invoiceType}
+          currentRow={currentRow}
+          closeDrawer={() => setMaintainRatesDrawer(false)}
+        />
+      </Drawer>
       <Drawer
         title="Send pay reminder"
         visible={payReminderModal}
