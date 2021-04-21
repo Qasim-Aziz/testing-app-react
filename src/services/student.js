@@ -16,6 +16,7 @@ export async function getStudentDetails() {
         query: gql`
           query student($studentId: ID!) {
             student(id: $studentId) {
+              id
               firstname
             }
           }

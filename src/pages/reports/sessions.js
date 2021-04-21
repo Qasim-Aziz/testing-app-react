@@ -59,6 +59,8 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
   const [currentRow, setCurrentRow] = useState(null)
   const [reportPdfDrawer, setReportPdfDrawer] = useState(false)
 
+  const [selectSessionId, setSelectSessionId] = useState()
+
   function compare(a, b) {
     if (a.sessionDate < b.sessionDate) {
       return -1
@@ -360,6 +362,12 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
       row.peakEquPrompt
     )
   }
+
+  const setAndOpenPDFDrawer = (id) => {
+    setSelectSessionId(id)
+    setReportPdfDrawer(true)
+  }
+
   const columns = [
     {
       title: 'Date',
@@ -556,6 +564,15 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
           >
             <LineChartOutlined style={{ fontSize: 26, color: COLORS.graph }} />
           </Button>
+
+          <Button
+            type="link"
+            onClick={() => 
+              setAndOpenPDFDrawer(row.id)
+            }
+          >
+            PDF
+          </Button>
         </span>
       ),
     },
@@ -632,12 +649,12 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
 
       <Drawer
         closable
-        width="100vw"
+        width="80%"
         title="Report Pdf"
         onClose={() => setReportPdfDrawer(false)}
         visible={reportPdfDrawer}
       >
-        <SessionReportPdf />
+        <SessionReportPdf selectSessionId={selectSessionId} />
       </Drawer>
 
       <Drawer
