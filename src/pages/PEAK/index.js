@@ -64,6 +64,22 @@ const PEAK_PROGRAMS = gql`
             total
             totalAttended
           }
+          peakequivalanceSet {
+            edges {
+              node {
+                id
+                scoreReflexivity
+                scoreSymmetry
+                scoreTransivity
+                scoreEquivalance
+                peakType
+                score
+                program {
+                  id
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -313,18 +329,36 @@ export default () => {
     {
       title: 'Response',
       align: 'right',
-      render: (text, obj) => (
-        <>
-          {obj.node.submitpeakresponsesSet.totalAttended > 0
-            ? Number(
-                (obj.node.submitpeakresponsesSet.totalAttended /
-                  obj.node.submitpeakresponsesSet.total) *
-                  100,
-              ).toFixed(2)
-            : 0}
-          &nbsp;%
-        </>
-      ),
+      render: (text, obj) => {
+        if (obj.node.category === 'EQUIVALENCE') {
+          let maxScore = 0
+          let score = 0
+          obj.node.peakequivalanceSet.edges.map(item => {
+            maxScore += 16
+            score += Number(item.node.score)
+          })
+
+          console.log(score, maxScore)
+          if (maxScore === 0) {
+            return <span>0 %</span>
+          } else {
+            return <span>{Number(Number(score * 100) / maxScore).toFixed(2)} %</span>
+          }
+        } else {
+          return (
+            <>
+              {obj.node.submitpeakresponsesSet.totalAttended > 0
+                ? Number(
+                    (obj.node.submitpeakresponsesSet.totalAttended /
+                      obj.node.submitpeakresponsesSet.total) *
+                      100,
+                  ).toFixed(2)
+                : 0}
+              &nbsp;%
+            </>
+          )
+        }
+      },
     },
     {
       title: 'Status',
