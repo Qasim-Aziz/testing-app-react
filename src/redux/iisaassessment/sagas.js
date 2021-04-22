@@ -178,10 +178,10 @@ export function* RECORD_RESPONSE({ payload }) {
   const response = yield call(recordResponse, payload)
 
   if (response) {
-    notification.success({
-      message: 'Success!!',
-      description: 'Response Recorded Successfully!',
-    })
+    // notification.success({
+    //   message: 'Success!!',
+    //   description: 'Response Recorded Successfully!',
+    // })
 
     const resObject = yield select(state => state.iisaassessment.IISAQuestionsListObject)
     const domianId = yield select(state => state.iisaassessment.SelectedDomainId)

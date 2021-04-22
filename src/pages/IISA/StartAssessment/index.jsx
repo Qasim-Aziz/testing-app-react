@@ -78,25 +78,24 @@ const Screeing = props => {
     variables: {
       id: SelectedAssessmentId,
     },
+    fetchPolicy: 'no-cache',
   })
 
   console.log('start iisa console')
   console.log(props)
   console.log(SelectedAssessmentId)
   const startAssessment = domainId => {
-    // const {
-    //   dispatch,
-    //   iisaassessment: { IISAQuestionsListObject },
-    // } = props
+    const {
+      dispatch,
+      iisaassessment: { IISAQuestionsListObject },
+    } = props
 
-    // dispatch({
-    //   type: actions.SET_STATE,
-    //   payload: {
-    //     SelectedDomainId: domainId,
-    //     SelectedQuestionIndex: 0,
-    //     SelectedQuestionId: IISAQuestionsListObject[domainId][0]?.question.node.id,
-    //   },
-    // })
+    dispatch({
+      type: actions.SET_STATE,
+      payload: {
+        SelectedDomainId: domainId,
+      },
+    })
     window.location.href = `/#/startIisaAssessment?domainID=${domainId}`
   }
 
@@ -172,29 +171,30 @@ const Screeing = props => {
             </div>
             <div style={{ width: '75%' }}>
               {IISADomains?.map(({ node: { id, name } }, i = 0) => (
-                <div
-                  style={{
-                    marginBottom: '15px',
-                    marginTop: '5px',
-                    padding: '12px',
-                    boxShadow:
-                      '0px 0px 1px rgba(0, 0, 0, 0.08), 0px 0px 2px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(0, 0, 0, 0.08)',
-                  }}
-                >
-                  <div>
-                    <a
-                      aria-hidden="true"
-                      style={{ fontWeight: 'bold', fontSize: '1.5rem' }}
-                      onClick={() => startAssessment(id)}
-                      key={id}
-                    >
-                      {name}
-                    </a>
+                <a onClick={() => startAssessment(id)} aria-hidden="true">
+                  <div
+                    style={{
+                      marginBottom: '15px',
+                      marginTop: '5px',
+                      padding: '12px',
+                      boxShadow:
+                        '0px 0px 1px rgba(0, 0, 0, 0.08), 0px 0px 2px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(0, 0, 0, 0.08)',
+                    }}
+                  >
+                    <div>
+                      <a
+                        aria-hidden="true"
+                        style={{ fontWeight: 'bold', fontSize: '1.5rem' }}
+                        key={id}
+                      >
+                        {name}
+                      </a>
+                    </div>
+                    <div>
+                      <Progress percent={percentageObject[i]} />
+                    </div>
                   </div>
-                  <div>
-                    <Progress percent={percentageObject[i]} />
-                  </div>
-                </div>
+                </a>
               ))}
             </div>
           </div>

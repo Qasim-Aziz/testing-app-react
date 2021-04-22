@@ -126,6 +126,7 @@ export async function getAssessmentObject(payload) {
         IISAGetAssessmentDetails(id: "${payload.objectId}"){
           id
           title
+          percentage
           date
           time
           status
