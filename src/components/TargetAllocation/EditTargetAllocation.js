@@ -394,7 +394,7 @@ export default Form.create()(
         <Col span="6">
           <Form.Item required={false} key={`sdStatus-${k}`} wrapperCol={{ md: 22 }}>
             {getFieldDecorator(`stimulusStatus[${k}]`, {
-              initialValue: selectedSdStatus[k],
+              initialValue: selectedSdStatus.length > 0 ? selectedSdStatus[k] : (activeAllocatedTarget && activeAllocatedTarget.targetStatus.id),
               validateTrigger: ['onChange', 'onBlur'],
               rules: [
                 {
@@ -421,7 +421,7 @@ export default Form.create()(
         <Col span="6">
           <Form.Item required={false} key={`sdMC-${k}`} wrapperCol={{ md: 22 }}>
             {getFieldDecorator(`stimulusMC[${k}]`, {
-              initialValue: selectedSdMC[k],
+              initialValue: selectedSdMC.length > 0 ? selectedSdMC[k] : (activeAllocatedTarget && activeAllocatedTarget.masteryCriteria.id),
               validateTrigger: ['onChange', 'onBlur'],
               rules: [
                 {
@@ -481,7 +481,7 @@ export default Form.create()(
         <Col span="6">
           <Form.Item required={false} key={`stepStatus-${k}`} wrapperCol={{ md: 22 }}>
             {getFieldDecorator(`stepStatus[${k}]`, {
-              initialValue: selectedStepStatus[k],
+              initialValue: selectedStepStatus.length > 0 ? selectedStepStatus[k] : (activeAllocatedTarget && activeAllocatedTarget.targetStatus.id),
               validateTrigger: ['onChange', 'onBlur'],
               rules: [
                 {
@@ -508,7 +508,7 @@ export default Form.create()(
         <Col span="6">
           <Form.Item required={false} key={`stepMC-${k}`} wrapperCol={{ md: 22 }}>
             {getFieldDecorator(`stepMC[${k}]`, {
-              initialValue: selectedStepMC[k],
+              initialValue: selectedStepMC.length > 0 ? selectedStepMC[k] : (activeAllocatedTarget && activeAllocatedTarget.masteryCriteria.id),
               validateTrigger: ['onChange', 'onBlur'],
               rules: [
                 {
@@ -550,7 +550,7 @@ export default Form.create()(
 
     // start of equivalence class code
 
-    const alphaList = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+    const alphaList = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
     let selectedAlpha = ['A', 'B']
     const initialKeyValue = []
 

@@ -43,7 +43,10 @@ export default Form.create()(
     isDirectGoal,
     defaultShortTermGoalForSelectedProgram,
     selectedShortTermGoal,
+    activeSessionDetails,
   }) => {
+
+    console.log('activeSessionDetails ==========>', activeSessionDetails)
     const [targetInstructions, setTargetInstructions] = useState(targetInstr)
     const [dailyTrials, setDailyTrials] = useState(0)
     const [sessionConsecutiveDays, setSessionConsecutiveDays] = useState(0)
@@ -619,7 +622,7 @@ export default Form.create()(
           </Form.Item>
           <Form.Item label="Domain Name" name="Domain Name">
             {form.getFieldDecorator('domain', {
-              initialValue: domainData?.domain.edges.find(({ node }) => node.domain === 'Others')
+              initialValue: activeSessionDetails && activeSessionDetails?.node?.domain ? activeSessionDetails?.node?.domain.id : domainData?.domain.edges.find(({ node }) => node.domain === 'Others')
                 ?.node.id,
               rules: [{ required: true, message: 'Please select a domain' }],
             })(
