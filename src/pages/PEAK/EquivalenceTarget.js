@@ -4,7 +4,7 @@
 /* eslint-disable react/jsx-boolean-value */
 import { PlusOutlined } from '@ant-design/icons'
 import { Button, Col, Drawer, notification, Radio, Row } from 'antd'
-import { COLORS } from 'assets/styles/globalStyles'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import LoadingComponent from 'components/LoadingComponent'
 import React, { useEffect, useState } from 'react'
 import { useMutation, useQuery } from 'react-apollo'
@@ -24,6 +24,7 @@ export default ({ suggestTarget }) => {
   const [targetInstr, setTargetInstr] = useState()
   const [selectedCategory, setSelectedCategory] = useState('')
   const [equivalenceObject, setEquivalenceObject] = useState(null)
+  const [mainTargetsData, setMainTargetsData] = useState([])
 
   const [
     getTargets,
@@ -31,45 +32,43 @@ export default ({ suggestTarget }) => {
   ] = useMutation(GET_EQUI_TARGET, {
     variables: {
       id: suggestTarget,
-      category: [selectedCategory],
     },
   })
 
-  const { data: categoryData, loading: categoryLoading, error: categoryError } = useQuery(
-    GET_EQUI_CATTEGORY,
-  )
+  // const { data: categoryData, loading: categoryLoading, error: categoryError } = useQuery(
+  //   GET_EQUI_CATTEGORY,
+  // )
 
-  console.log(targetsData, targetsError, targetsLoading, 'kjkkhhkhk')
-  useEffect(() => {
-    console.log(suggestTarget, selectedCategory, 'in')
-    if (selectedCategory !== '') {
-      getTargets().catch(err => {
-        console.log(err, 'ereroier')
-        notification.error({
-          message: 'Something went wrong',
-          description: 'Unable to fetch suggested targets',
-        })
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCategory])
+  // console.log(targetsData, targetsError, targetsLoading, 'kjkkhhkhk')
+
+  // useEffect(() => {
+  // }, [])
 
   useEffect(() => {
-    if (categoryData) {
-      setSelectedCategory(categoryData?.peakEquDomains[0].id)
-    }
-  }, [categoryData])
+    getTargets()
+  }, [])
 
   useEffect(() => {
-    if (categoryError) {
-      notification.error({
-        message: 'Something went wrong',
-        description: 'Unable to fetch equivalence categories',
-      })
+    console.log(targetsData, selectedCategory)
+    if (targetsData && selectedCategory) {
+      console.log('got in main targets')
+      setMainTargetsData(targetsData.suggestPeakTargetsForEquivalence?.codes)
     }
-  }, [categoryError])
+  }, [targetsData, selectedCategory])
 
-  console.log(categoryData, 'ctcct')
+  // console.log(targetsData, 'tgd')
+  // console.log(mainTargetsData, 'main target')
+
+  // useEffect(() => {
+  //   if (categoryError) {
+  //     notification.error({
+  //       message: 'Something went wrong',
+  //       description: 'Unable to fetch equivalence categories',
+  //     })
+  //   }
+  // }, [categoryError])
+
+  // console.log(categoryData, 'ctcct')
 
   const Targets = targetsData?.suggestPeakTargetsForEquivalence.codes?.map(node => {
     return (
@@ -106,7 +105,7 @@ export default ({ suggestTarget }) => {
   console.log(Targets, 'targets')
   return (
     <>
-      {categoryData && (
+      {/* {categoryData && (
         <Radio.Group value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
           {categoryData?.peakEquDomains?.map(item => (
             <Radio.Button key={item.id} value={item.id}>
@@ -114,9 +113,9 @@ export default ({ suggestTarget }) => {
             </Radio.Button>
           ))}
         </Radio.Group>
-      )}
+      )} */}
       <div>
-        {targetsLoading || categoryLoading ? (
+        {targetsLoading ? (
           <LoadingComponent />
         ) : !Targets || Targets.length === 0 ? (
           'No Targets'
@@ -128,25 +127,19 @@ export default ({ suggestTarget }) => {
           visible={selectTarget}
           onClose={() => setSelectTarget(null)}
           title="Target Allocation"
-          width={950}
+          width={DRAWER.widthL2}
         >
-          <div
-            style={{
-              padding: '0px 23px',
-            }}
-          >
-            <TargetAllocationNew
-              key={Math.random()}
-              studentId={selectedStudent}
-              selectedTargetId={selectTarget}
-              targetName={targetName}
-              targetVideo={targetVideo}
-              targetInstr={targetInstr}
-              peakEnable={true}
-              equivalenceEnable={true}
-              equivalenceObject={equivalenceObject}
-            />
-          </div>
+          <TargetAllocationNew
+            key={Math.random()}
+            studentId={selectedStudent}
+            selectedTargetId={selectTarget}
+            targetName={targetName}
+            targetVideo={targetVideo}
+            targetInstr={targetInstr}
+            peakEnable={true}
+            equivalenceEnable={true}
+            equivalenceObject={equivalenceObject}
+          />
         </Drawer>
       </div>
     </>

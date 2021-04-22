@@ -42,11 +42,12 @@ import {
 } from 'antd'
 import { Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import LoadingComponent from 'components/LoadingComponent'
 import moment from 'moment'
 // import DurationGraph from './duration'
 // import FrequencyGraph from './frequency'
-import { COLORS } from 'assets/styles/globalStyles'
+import EquivalenceTargets from '../PEAK/EquivalenceTarget'
 import client from '../../apollo/config'
 
 const { Title, Text } = Typography
@@ -144,6 +145,7 @@ class PeakEqvi extends React.Component {
       visibleModal: true,
       current: 0,
       buttonState: true,
+      suggestTarget: false,
     }
   }
 
@@ -447,6 +449,7 @@ class PeakEqvi extends React.Component {
         ObjectLoaded,
         PEDomainList,
         PEQuestionsList,
+        ProgramId,
         SelectedDomainId,
         SelectedQuestionIndex,
         SelectedQuestionId,
@@ -764,6 +767,18 @@ class PeakEqvi extends React.Component {
                           >
                             View Report
                           </Button>
+                          <Button
+                            onClick={() => this.setState({ suggestTarget: true })}
+                            style={{
+                              width: '100%',
+                              marginTop: '20px',
+                              padding: '8px',
+                              backgroundColor: COLORS.palleteBlue,
+                              color: 'white',
+                            }}
+                          >
+                            Suggest Target
+                          </Button>
                         </Collapse>
                       )}
                     </div>
@@ -784,6 +799,18 @@ class PeakEqvi extends React.Component {
           visible={this.state.visible}
         >
           3
+        </Drawer>
+        <Drawer
+          visible={this.state.suggestTarget}
+          onClose={() => {
+            this.setState({
+              suggestTarget: false,
+            })
+          }}
+          width={DRAWER.widthL2}
+          title="Target Allocation from PEAK Assessment"
+        >
+          <EquivalenceTargets suggestTarget={ProgramId} />
         </Drawer>
       </>
     )

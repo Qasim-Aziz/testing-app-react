@@ -20,7 +20,7 @@ import { useQuery, useMutation } from 'react-apollo'
 import gql from 'graphql-tag'
 import Calendar from 'components/Calander'
 import './index.scss'
-import { DRAWER, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
+import { COLORS, DRAWER, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import { ResponsiveLine } from '@nivo/line'
 import LoadingComponent from 'components/LoadingComponent'
 import FilterComp from '../../components/FilterCard/FilterComp'
@@ -31,8 +31,8 @@ const { Title, Text } = Typography
 const { layout, tailLayout } = FORM
 
 const MAND_DATA = gql`
-  query getMandData($studentId: ID!, $dateGte: Date!, $dateLte: Date!) {
-    getMandData(dailyClick_Student: $studentId, dateGte: $dateGte, dateLte: $dateLte) {
+  query getMandData($studentId: ID!, $date: Date!) {
+    getMandData(dailyClick_Student: $studentId, date: $date) {
       edges {
         node {
           id
@@ -95,12 +95,7 @@ const MandDataPage = props => {
   const [searchVal, setSearchVal] = useState('')
   const [mandData, setMandData] = useState(null)
 
-  const [date, setDate] = useState({
-    gte: moment()
-      .subtract(4, 'weeks')
-      .format('YYYY-MM-DD'),
-    lte: moment().format('YYYY-MM-DD'),
-  })
+  const [date, setDate] = useState(moment())
   const [newMandCreated, setNewMandCreated] = useState(false)
   const [mandTitle, setMandTitle] = useState('')
   const studentId = localStorage.getItem('studentId')
@@ -116,8 +111,7 @@ const MandDataPage = props => {
     fetchPolicy: 'network-only',
     variables: {
       studentId,
-      dateGte: date.gte,
-      dateLte: date.lte,
+      date: date.format('YYYY-MM-DD'),
     },
   })
 
@@ -225,17 +219,43 @@ const MandDataPage = props => {
     } else setMandData(data)
   }, [data, searchVal])
 
+  const container = {
+    background: COLORS.palleteLight,
+    position: 'relative',
+    display: 'flex',
+    height: '50px',
+    padding: '2px 8px',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    width: '100%',
+  }
+  const Headstyle = {
+    fontSize: '16px',
+    paddingTop: '7px',
+    color: 'blaxk',
+    marginRight: '10px',
+  }
+
+  // handleSelectDate={handleSelectDate}
+  // searchVal={searchVal}
+  // searchValHandler={searchValHandler}
+  // startDate={date.gte}
+  // endDate={date.lte}
+  // rangePicker
+
   return (
     <Authorize roles={['school_admin', 'therapist', 'parents']} redirect to="/dashboard/beta">
       <Helmet title="Dashboard Alpha" />
-      <FilterComp
-        handleSelectDate={handleSelectDate}
-        searchVal={searchVal}
-        searchValHandler={searchValHandler}
-        startDate={date.gte}
-        endDate={date.lte}
-        rangePicker
-      />
+      <div style={container}>
+        <span>
+          <span style={Headstyle}>Date: </span>
+          <DatePicker
+            defaultValue={date}
+            onChange={e => (e ? setDate(e) : null)}
+            style={{ width: '240px', marginRight: 40 }}
+          />
+        </span>
+      </div>
       <Layout style={{ padding: '0px' }}>
         <Content
           style={{
