@@ -7,13 +7,11 @@ import gql from 'graphql-tag'
 import { useMutation } from 'react-apollo'
 import moment from 'moment'
 
-
 import { FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 
 const { TextArea } = Input
 const { Option } = Select
 const { layout, tailLayout } = FORM
-
 
 const CREATE_PEAK = gql`
   mutation($studentId: ID!, $title: String!, $category: String!, $note: String, $date: Date!) {
@@ -151,10 +149,9 @@ const CreateAssignmentForm = ({ form, setOpen, PEAK_PROGRAMS }) => {
         )}
       </Form.Item>
 
-
       <Form.Item {...tailLayout}>
         <Button htmlType="submit" type="primary" style={SUBMITT_BUTTON} loading={loading}>
-          Create program
+          Create Assessment
         </Button>
         <Button style={CANCEL_BUTTON} onClick={() => setOpen(false)}>
           Cancel

@@ -41,8 +41,8 @@ export const GET_TARGET = gql`
 `
 
 export const GET_EQUI_TARGET = gql`
-  mutation suggestPeakEquiTargets($id: ID!, $category: [ID]) {
-    suggestPeakTargetsForEquivalence(input: { program: $id, domains: $category }) {
+  mutation suggestPeakEquiTargets($id: ID!) {
+    suggestPeakTargetsForEquivalence(input: { program: $id }) {
       codes {
         id
         code
@@ -53,6 +53,10 @@ export const GET_EQUI_TARGET = gql`
           targetMain {
             id
             targetName
+          }
+          domain {
+            id
+            domain
           }
         }
         classes {

@@ -11,18 +11,20 @@ import apolloClient from '../apollo/config'
 export async function getData() {
   return apolloClient
     .query({
-      query: gql`query{ 
-        peakEquDomains {
-          id
-          name
+      query: gql`
+        query {
+          peakEquDomains {
+            id
+            name
+          }
         }
-      }`,
+      `,
     })
     .then(result => result)
     .catch(error => {
       error.graphQLErrors.map(item => {
         return notification.error({
-          message: 'Somthing went wrong',
+          message: 'Something went wrong',
           description: item.message,
         })
       })
@@ -32,38 +34,32 @@ export async function getData() {
 export async function startAssessment(payload) {
   return apolloClient
     .mutate({
-      mutation: gql`mutation StartPeakEquivalenceAssessment(
-        $programId: ID!
-        $peakType: String!
-      ){
-        startPeakEquivalance(
-            input:{
-                program: $programId
-                peakType: $peakType
-            }
-        ){
-            details{
+      mutation: gql`
+        mutation StartPeakEquivalenceAssessment($programId: ID!, $peakType: String!) {
+          startPeakEquivalance(input: { program: $programId, peakType: $peakType }) {
+            details {
+              id
+              score
+              peakType
+              program {
                 id
-                score
-                peakType
-                program{
-                    id
-                    date
-                    title
-                }
+                date
+                title
+              }
             }
+          }
         }
-      }`,
+      `,
       variables: {
         programId: payload.programId,
-        peakType: payload.assType
-      }
+        peakType: payload.assType,
+      },
     })
     .then(result => result)
     .catch(error => {
       error.graphQLErrors.map(item => {
         return notification.error({
-          message: 'Somthing went wrong',
+          message: 'Something went wrong',
           description: item.message,
         })
       })
@@ -73,24 +69,55 @@ export async function startAssessment(payload) {
 export async function getAssessmentDetails(payload) {
   return apolloClient
     .query({
-      query: gql`query GetAssessmentDetails(
-        $peakType: String!
-        $programId: ID!
-      ){ 
-        peakEquQuestions(questionType: $peakType){
-          edges{
-            node{
-              id
-              questionNum
-              questionText
-              questionType
-              domain{
+      query: gql`
+        query GetAssessmentDetails($peakType: String!, $programId: ID!) {
+          peakEquQuestions(questionType: $peakType) {
+            edges {
+              node {
                 id
-                name
+                questionNum
+                questionText
+                questionType
+                domain {
+                  id
+                  name
+                }
+                test {
+                  edges {
+                    node {
+                      id
+                      no
+                      name
+                    }
+                  }
+                }
               }
-              test{
-                edges{
-                  node{
+            }
+          }
+
+          peakEquData(pk: $programId, peakType: $peakType) {
+            id
+            score
+            peakType
+            program {
+              id
+              date
+              title
+            }
+            records {
+              edges {
+                node {
+                  id
+                  response
+                  question {
+                    id
+                    questionText
+                    domain {
+                      id
+                      name
+                    }
+                  }
+                  test {
                     id
                     no
                     name
@@ -100,54 +127,18 @@ export async function getAssessmentDetails(payload) {
             }
           }
         }
-
-        peakEquData(
-          pk: $programId
-          peakType: $peakType
-        ){
-          id
-          score
-          peakType
-          program{
-            id
-            date
-            title
-          }
-          records{
-            edges{
-              node{
-                id
-                response
-                question{
-                  id
-                  questionText
-                  domain{
-                    id
-                    name
-                  }
-                }
-                test{
-                  id
-                  no
-                  name
-                }
-              }
-            }
-          }
-        }
-
-      }`,
+      `,
       variables: {
         peakType: payload.assType,
-        programId: payload.programId
-
-      }
+        programId: payload.programId,
+      },
+      fetchPolicy: 'network-only',
     })
     .then(result => result)
     .catch(error => {
       error.graphQLErrors.map(item => {
         return notification.error({
-          message: 'Somthing went wrong',
+          message: 'Something went wrong',
           description: item.message,
         })
       })
@@ -157,108 +148,90 @@ export async function getAssessmentDetails(payload) {
 export async function recordResponse(payload) {
   return apolloClient
     .mutate({
-      mutation: gql`mutation recordResponse(
-        $pk: ID!
-        $questionId: ID!
-        $testId: ID!
-        $response: Boolean!
-      ){
-        recordPeakEquivalance(
-          input:{
-            pk: $pk
-            question: $questionId
-            test: $testId
-            response: $response
-          }
-        ){
-          details{
-            id
-            score
-            peakType
-            program{
+      mutation: gql`
+        mutation recordResponse($pk: ID!, $questionId: ID!, $testId: ID!, $response: Boolean!) {
+          recordPeakEquivalance(
+            input: { pk: $pk, question: $questionId, test: $testId, response: $response }
+          ) {
+            details {
               id
-              date
-              title
-            }
-            records{
-              edges{
-                node{
-                  id
-                  response
-                  question{
+              score
+              peakType
+              program {
+                id
+                date
+                title
+              }
+              records {
+                edges {
+                  node {
                     id
-                    questionText
-                  }
-                  test{
-                    id
-                    no
-                    name
+                    response
+                    question {
+                      id
+                      questionText
+                    }
+                    test {
+                      id
+                      no
+                      name
+                    }
                   }
                 }
               }
             }
           }
         }
-      }`,
+      `,
       variables: {
         pk: payload.assessmentId,
         questionId: payload.questionId,
         testId: payload.testId,
-        response: payload.response
-      }
+        response: payload.response,
+      },
+      fetchPolicy: 'no-cache',
     })
     .then(result => result)
-    .catch(error => {
-      error.graphQLErrors.map(item => {
-        return notification.error({
-          message: 'Somthing went wrong',
-          description: item.message,
-        })
-      })
-    })
+    .catch(error => console.error(error))
 }
 
 export async function getAssessmentReport(payload) {
   return apolloClient
     .query({
-      query: gql`query GetAssessmentReport(
-        $peakType: String!
-        $programId: ID!
-      ){
-        peakEquivalance(
-          program: $programId
-          peakType: $peakType
-        ){
-          scoreReflexivity
-          scoreSymmetry
-          scoreTransivity
-          scoreEquivalance
-          score
-          edges{
-            node{
-              id
-              score
-              peakType
-              program{
+      query: gql`
+        query GetAssessmentReport($peakType: String!, $programId: ID!) {
+          peakEquivalance(program: $programId, peakType: $peakType) {
+            scoreReflexivity
+            scoreSymmetry
+            scoreTransivity
+            scoreEquivalance
+            score
+            edges {
+              node {
                 id
-                date
-                title
+                score
+                peakType
+                program {
+                  id
+                  date
+                  title
+                }
               }
             }
           }
         }
-      }`,
+      `,
       variables: {
         peakType: payload.peakType,
-        programId: payload.programId
-
-      }
+        programId: payload.programId,
+      },
+      fetchPolicy: 'network-only',
     })
     .then(result => result)
     .catch(error => {
       error.graphQLErrors.map(item => {
         return notification.error({
-          message: 'Somthing went wrong',
+          message: 'Something went wrong',
           description: item.message,
         })
       })

@@ -167,7 +167,6 @@ export default () => {
 
   useEffect(() => {
     if (data) {
-      console.log(data?.peakPrograms?.edges, 'peak programs data')
       setOriginalData(data?.peakPrograms?.edges)
       setTableData(data?.peakPrograms?.edges)
     }
@@ -499,6 +498,8 @@ export default () => {
     setVisibleFilter(false)
   }
 
+  console.log(tableData)
+
   return (
     <Layout style={{ padding: '0px' }}>
       <Content
@@ -552,7 +553,7 @@ export default () => {
             columns={columns}
             size="small"
             dataSource={tableData}
-            rowKey={record => record.node.id}
+            rowKey="node.id"
             bordered
             title={() => {
               return filterHeader
