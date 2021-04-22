@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Button, Table, Drawer, Form, DatePicker } from 'antd'
-import { useQuery } from '@apollo/react-hooks'
+import { useQuery, useLazyQuery } from '@apollo/react-hooks'
 import { useDispatch } from 'react-redux'
 import moment from 'moment'
-import {getSessionName} from 'utilities'
+import { getSessionName } from 'utilities'
 import SessionInstructionDrawer from 'pages/parent/ParentDashboard/SessionInstructionDrawer'
 import { GET_SESSION_BY_DATE } from './SessionsTabsQuery'
 
@@ -14,15 +14,21 @@ const PreviousSessions = ({ studentId }) => {
   const [selectedSession, setSelectedSession] = useState()
   const [isDrawerVisible, setDrawerVisible] = useState()
 
-  const { data: allSessionData, loading: isSessionLoading, error: sessionError } = useQuery(
-    GET_SESSION_BY_DATE,
-    {
-      variables: {
-        studentId,
-        date: selectedDate.format('YYYY-MM-DD'),
-      },
-    },
-  )
+  const [
+    fetchData,
+    { data: allSessionData, loading: isSessionLoading, error: sessionError },
+  ] = useLazyQuery(GET_SESSION_BY_DATE)
+
+  useEffect(() => {
+    if (studentId && selectedDate) {
+      fetchData({
+        variables: {
+          studentId,
+          date: selectedDate.format('YYYY-MM-DD'),
+        },
+      })
+    }
+  }, [selectedDate])
 
   useEffect(() => {
     if (allSessionData) {
@@ -36,7 +42,7 @@ const PreviousSessions = ({ studentId }) => {
     {
       title: 'Session Name',
       // dataIndex: 'sessionName.name',
-      render: obj =>  getSessionName(obj),
+      render: obj => getSessionName(obj),
     },
     {
       title: 'Duration',

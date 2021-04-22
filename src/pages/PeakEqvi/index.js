@@ -42,6 +42,7 @@ import {
 } from 'antd'
 import { Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
+import LoadingComponent from 'components/LoadingComponent'
 import moment from 'moment'
 // import DurationGraph from './duration'
 // import FrequencyGraph from './frequency'
@@ -142,6 +143,7 @@ class PeakEqvi extends React.Component {
       visible: false,
       visibleModal: true,
       current: 0,
+      buttonState: true,
     }
   }
 
@@ -318,6 +320,20 @@ class PeakEqvi extends React.Component {
       },
     } = this.props
 
+    this.setState({
+      buttonState: response,
+    })
+    console.log(
+      SelectedQuestionIndex,
+      AssessmentObject,
+      PEQuestionsListObject,
+      SelectedDomainId,
+      SelectedTestIndex,
+      'this is',
+    )
+
+    console.log(response, 'response')
+
     dispatch({
       type: 'peakequivalence/RECORD_RESPONSE',
       payload: {
@@ -437,6 +453,7 @@ class PeakEqvi extends React.Component {
         PEQuestionsListObject,
         SelectedTestIndex,
         ResponseObject,
+        ResponseLoading,
         SelectedTestId,
         SelectedPeakType,
       },
@@ -496,39 +513,8 @@ class PeakEqvi extends React.Component {
 
     return (
       <>
-        {/* <Modal
-                    title="Select Assessment Type"
-                    visible={visibleModal}
-                    onOk={this.LoadAssessment}
-                    // onCancel={this.handleCancel}
-                    footer={null}
-                >
-                    <div style={{ textAlign: 'center' }}>
-                        {PeakTypeList.map(item =>
-                            <Button style={{ margin: 4 }} onClick={() => this.LoadAssessment(item)}>{item}</Button>
-                        )}
-                    </div>
-                </Modal> */}
         <Helmet title="Peak Eqvi" />
         <Layout style={{ padding: '0px' }}>
-          {/* <span style={{ float: 'right' }}>
-                        <Affix offsetTop={100} offsetRight={100} style={{ position: 'absolute', left: 0 }}>
-                            <Button type={SelectedPeakType === 'Basic' ? "primary" : 'default'} onClick={() => this.LoadAssessment('Basic')} style={{ borderRadius: 0, width:110 }}>
-                                Basic
-                            </Button>
-                        </Affix>
-                        <Affix offsetTop={135} offsetRight={100} style={{ position: 'absolute', left: 0 }}>
-                            <Button type={SelectedPeakType === 'Intermediate' ? "primary" : 'default'} onClick={() => this.LoadAssessment('Intermediate')} style={{ borderRadius: 0, width:110 }}>
-                                Intermediate
-                            </Button>
-                        </Affix>
-                        <Affix offsetTop={170} offsetRight={100} style={{ position: 'absolute', left: 0 }}>
-                            <Button type={SelectedPeakType === 'Advanced' ? "primary" : 'default'} onClick={() => this.LoadAssessment('Advanced')} style={{ borderRadius: 0, width:110 }}>
-                                Advanced
-                            </Button>
-                        </Affix>
-                    </span> */}
-
           <Content
             style={{
               padding: '0px 20px',
@@ -646,11 +632,12 @@ class PeakEqvi extends React.Component {
                               {
                                 PEQuestionsListObject[SelectedDomainId][SelectedQuestionIndex]?.node
                                   .test.edges[SelectedTestIndex]?.node.name
-                              }{' '}
+                              }
                             </Title>
                             <div style={{ textAlign: 'right', marginTop: '20px' }}>
                               <Button
                                 onClick={() => this.recordResponse(true)}
+                                loading={this.state.buttonState && ResponseLoading}
                                 style={
                                   ResponseObject[SelectedQuestionId][SelectedTestId].recorded &&
                                   ResponseObject[SelectedQuestionId][SelectedTestId].response ===
@@ -664,6 +651,7 @@ class PeakEqvi extends React.Component {
                               <br style={{ marginTop: 20 }} />
                               <Button
                                 onClick={() => this.recordResponse(false)}
+                                loading={!this.state.buttonState && ResponseLoading}
                                 style={
                                   ResponseObject[SelectedQuestionId][SelectedTestId].recorded &&
                                   ResponseObject[SelectedQuestionId][SelectedTestId].response ===
@@ -783,9 +771,7 @@ class PeakEqvi extends React.Component {
                 </Col>
               </Row>
             ) : (
-              <>
-                <p>Loading Assessment Object..</p>
-              </>
+              <LoadingComponent />
             )}
           </Content>
         </Layout>
