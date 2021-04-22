@@ -38,7 +38,9 @@ function FlatRates({ form, closeDrawer, currentRow }) {
   const [createRates, setCreateRates] = useState(false)
   const [objPk, setObjPk] = useState(null)
   const [invoiceItemsList, setInvoiceItemsList] = useState([])
-  const [fetchData, { data, loading, error }] = useLazyQuery(GET_STUDENT_INVOICE_FEE)
+  const [fetchData, { data, loading, error }] = useLazyQuery(GET_STUDENT_INVOICE_FEE, {
+    fetchPolicy: 'no-cache',
+  })
 
   const { data: invoiceItemsData, loading: invoiceItemsLoading } = useQuery(STUDENT_INVOICE_ITEMS)
   const [updateStudentFlatRates, { loading: updateRatesLoading }] = useMutation(

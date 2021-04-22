@@ -527,12 +527,7 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
             bordered
             pagination={false}
             footer={() => (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                }}
-              >
+              <div style={{ display: 'flex', alignItems: 'center' }}>
                 <Text
                   style={{
                     marginLeft: 'auto',

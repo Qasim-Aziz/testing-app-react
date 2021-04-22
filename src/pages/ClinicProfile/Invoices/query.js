@@ -170,6 +170,21 @@ export const STUDENT_INVOICE_ITEMS = gql`
   }
 `
 
+export const CREATE_STUDENT_INVOICE_ITEM = gql`
+  mutation($name: String!) {
+    createStudentInvoiceItem(input: { name: $name }) {
+      details {
+        id
+        name
+        school {
+          id
+          schoolName
+        }
+      }
+    }
+  }
+`
+
 export const GET_STUDENT_INVOICE_FEE = gql`
   query($student: ID, $feeType: String) {
     getStudentInvoiceFee(student: $student, feeType: $feeType) {
@@ -305,7 +320,7 @@ export const CREATE_STUDENT_RATES = gql`
 `
 
 export const GENERATE_LINK = gql`
-  mutation RazorpayGenerateLink($pk: ID!) {
+  mutation($pk: [ID]!) {
     razorpayGenerateLink(input: { pk: $pk }) {
       status
       message
@@ -313,6 +328,14 @@ export const GENERATE_LINK = gql`
   }
 `
 
+export const PAYMENT_REMINDER = gql`
+  mutation($pk: [ID]!) {
+    razorpayInvoiceNotification(input: { pk: $pk }) {
+      status
+      message
+    }
+  }
+`
 export const GET_PAYMENT_RECIEVING_DETIAILS = gql`
   query {
     schoolDetail {
@@ -345,7 +368,6 @@ export const GET_INVOICE = gql`
       linkGenerated
       paymentLink
       lastAmount
-
       clinic {
         id
         schoolName
