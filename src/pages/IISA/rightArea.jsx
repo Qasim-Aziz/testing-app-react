@@ -86,8 +86,8 @@ class RightArea extends React.Component {
         dispatch({
           type: actions.LOAD_DATA,
           payload: {
-            studentId: studentID
-          }
+            studentId: studentID,
+          },
         })
       }
       this.setState({ studentID })
@@ -142,7 +142,6 @@ class RightArea extends React.Component {
     })
   }
 
-
   onCloseFilter = () => {
     this.setState({
       visibleFilter: false,
@@ -156,22 +155,22 @@ class RightArea extends React.Component {
   }
 
   closeReportDrawer = () => {
-    const {dispatch} = this.props
+    const { dispatch } = this.props
     dispatch({
       type: actions.SET_STATE,
       payload: {
-        ReportDrawer: false
-      }
+        ReportDrawer: false,
+      },
     })
   }
 
   openReportDrawer = () => {
-    const {dispatch} = this.props
+    const { dispatch } = this.props
     dispatch({
       type: actions.SET_STATE,
       payload: {
-        ReportDrawer: true
-      }
+        ReportDrawer: true,
+      },
     })
   }
 
@@ -191,8 +190,8 @@ class RightArea extends React.Component {
           type: actions.SET_STATE,
           payload: {
             SelectedAssessmentId: obj.node.id,
-            ReportDrawer: true
-          }
+            ReportDrawer: true,
+          },
         })
         break
       }
@@ -212,8 +211,8 @@ class RightArea extends React.Component {
         dispatch({
           type: actions.SET_STATE,
           payload: {
-            SelectedAssessmentId: obj.node.id
-          }
+            SelectedAssessmentId: obj.node.id,
+          },
         })
         window.location.href = '/#/startIISA'
 
@@ -227,14 +226,13 @@ class RightArea extends React.Component {
   }
 
   render() {
-
     const { newAssessment, suggestTarget, open } = this.state
     const {
       student: { StudentName },
       iisaassessment: { AssessmentList, ReportDrawer, NewAssessmentForm, loading },
       user,
     } = this.props
-
+    console.log(this.props)
     const columns = [
       {
         title: 'Date',
@@ -266,41 +264,40 @@ class RightArea extends React.Component {
         minWidth: '100px',
         maxWidth: '100px',
         render: (text, obj) => {
-
           const seeAssesmentMenu = (
             <Menu.Item key="seeAssesment">
               <CheckSquareFilled /> See Assesment
-              </Menu.Item>
+            </Menu.Item>
           )
 
           const seeReportMenu = (
             <Menu.Item key="seeReport">
               <Icon type="snippets" /> See Report
-              </Menu.Item>
+            </Menu.Item>
           )
 
           const suggestTargetMenu = (
             <Menu.Item key="suggestTarget">
               <Icon type="diff" /> Suggest Target
-              </Menu.Item>
+            </Menu.Item>
           )
 
           const resumeAssesmentMenu = (
             <Menu.Item key="resumeAssesment">
               <PauseOutlined /> Resume Assesment
-              </Menu.Item>
+            </Menu.Item>
           )
 
           const startAssesmentMenu = (
             <Menu.Item key="startAssesment">
               <PlayCircleOutlined /> Start Assesment
-              </Menu.Item>
+            </Menu.Item>
           )
 
           const menuItems = []
 
           if (obj.node.status === 'COMPLETED') {
-            menuItems.push(seeAssesmentMenu)
+            // menuItems.push(seeAssesmentMenu)
             menuItems.push(seeReportMenu)
             // menuItems.push(<Menu.Divider />)
             // menuItems.push(suggestTargetMenu)
@@ -324,7 +321,7 @@ class RightArea extends React.Component {
                 >
                   <Button type="link" style={{ color: 'red' }}>
                     <DeleteOutlined /> Delete
-                    </Button>
+                  </Button>
                 </Popconfirm>
               </Tooltip>
               <span style={{ borderRight: '1px solid #ccc', margin: '0 8px' }} />
@@ -340,7 +337,6 @@ class RightArea extends React.Component {
               </Dropdown>
             </>
           )
-
         },
       },
     ]
@@ -381,7 +377,6 @@ class RightArea extends React.Component {
                   </Button>
                 )}
 
-
                 <Drawer
                   visible={this.state.visibleFilter}
                   onClose={this.onCloseFilter}
@@ -391,7 +386,12 @@ class RightArea extends React.Component {
                 >
                   <LearnerSelect />
                 </Drawer>
-                <Button type="primary" style={{ border: 'none', background: '#3f72af' }} size="large" onClick={() => this.setState({ open: true })}>
+                <Button
+                  type="primary"
+                  style={{ border: 'none', background: '#3f72af' }}
+                  size="large"
+                  onClick={() => this.setState({ open: true })}
+                >
                   <PlusOutlined />
                   New Assessment
                 </Button>
@@ -428,7 +428,9 @@ class RightArea extends React.Component {
                 }}
               >
                 <AssessmentForm
-                  onClose={() => { this.setState({ open: false }) }}
+                  onClose={() => {
+                    this.setState({ open: false })
+                  }}
                 />
               </div>
             </Drawer>
@@ -447,7 +449,9 @@ class RightArea extends React.Component {
                 }}
               >
                 <AssessmentReport
-                  onClose={() => { this.closeReportDrawer() }}
+                  onClose={() => {
+                    this.closeReportDrawer()
+                  }}
                 />
               </div>
             </Drawer>
