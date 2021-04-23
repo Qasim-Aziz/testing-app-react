@@ -1,0 +1,101 @@
+@import '../../assets/styles/mixins.scss';
+
+.file_upload_section {
+  background-color: $backgroundBg;
+  min-height: 90vh;
+
+  .file_upload_header {
+    width: 100%;
+    // background-color: $white;
+
+    .header_container {
+      .header_content {
+        .ant-tabs-top {
+          .ant-tabs-top-bar {
+            background-color: $white;
+
+            .ant-tabs-nav-container {
+              width: 65%;
+              margin: 0 auto;
+
+              .ant-tabs-tab-active {
+                font-weight: 700;
+                color: $text-darken;
+              }
+              .ant-tabs-tab:hover {
+                color: $text-darken;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .file_upload_container {
+    width: 65%;
+    margin: 25px auto;
+
+    .ant-card {
+      -webkit-box-shadow: 0 0 10px $text-darken;
+      box-shadow: 0 0 10px $text-darken;
+      border-radius: 8px;
+    }
+
+    .ant-card-bordered {
+      border: 0;
+    }
+
+    .ant-card-head-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: $text-darken;
+    }
+
+    .location_section {
+      margin-left: 15%;
+
+      .radio_label {
+        content: 'Location';
+        font-weight: 700;
+        font-style: italic;
+        margin: 1%;
+      }
+
+      .location_value {
+        color: $text-darken;
+        font-size: 17px;
+        font-weight: 600;
+      }
+
+      .ant-radio-inner {
+        border-color: $text-darken;
+      }
+
+      .ant-radio-inner::after {
+        background-color: $text-darken;
+      }
+    }
+
+    .drag_drop {
+      .drag_title {
+        margin-left: 15%;
+        color: $blue-darken;
+        font-weight: 700;
+        padding: 2% 0 2% 0;
+      }
+
+      .ant-upload-drag-icon {
+        font-weight: 700;
+        color: $text;
+      }
+
+      .ant-upload-text {
+        color: $text;
+        span {
+          color: $blue-darken;
+        }
+      }
+    }
+  }
+}

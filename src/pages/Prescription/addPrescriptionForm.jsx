@@ -173,6 +173,7 @@ function addNevObject(val) {
 }
 
 const GetComplaints = ({ form }) => {
+  console.log('form', form)
   const [sdText, setSdText] = useState('')
   const { data: sdData, error: sdError, loading: sdLoading } = useQuery(GET_COMPLAINT_QUERY, {
     variables: {
@@ -204,7 +205,7 @@ const GetComplaints = ({ form }) => {
               }}
               loading={sdLoading}
               // disabled={form.getFieldValue('complaints')?.length > 0}
-              placeholder="Search for find more sd"
+              placeholder="Search for find more Complaints"
             >
               {sdData?.getPrescriptionComplaints.edges.map(({ node }) => {
                 return (
@@ -253,7 +254,7 @@ const GetDiagnosis = ({ form }) => {
               }}
               loading={sdLoading}
               // disabled={form.getFieldValue('complaints')?.length > 0}
-              placeholder="Search for find more sd"
+              placeholder="Search for find more diagnosis"
             >
               {sdData?.getPrescriptionDiagnosis.edges.map(({ node }) => {
                 return (
@@ -302,7 +303,7 @@ const GetTest = ({ form }) => {
               }}
               loading={sdLoading}
               // disabled={form.getFieldValue('complaints')?.length > 0}
-              placeholder="Search for find more sd"
+              placeholder="Search for find more tests"
             >
               {sdData?.getPrescriptionTests.edges.map(({ node }) => {
                 return (
