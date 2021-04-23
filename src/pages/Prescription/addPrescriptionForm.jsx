@@ -13,41 +13,51 @@
  *  - NOTE:
  */
 
-import React, { useEffect, useState, useReducer } from 'react'
 import {
-  Form,
-  Button,
-  Input,
-  Select,
-  Layout,
-  Typography,
-  Divider,
-  Switch,
-  Icon,
-  InputNumber,
-  Radio,
-  notification,
-  DatePicker,
-  Popconfirm,
-  Card,
+  faCaretLeft,
+  faCaretSquareDown,
+  faFileMedical,
+  faFileWord,
+} from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import {
+  AutoComplete,
   Avatar,
-  Spin,
-  Row,
+  Button,
+  Card,
   Col,
+  DatePicker,
+  Divider,
+  Form,
+  Icon,
+  Input,
+  InputNumber,
+  Layout,
+  notification,
+  Popconfirm,
+  Radio,
+  Row,
+  Select,
+  Spin,
+  Switch,
+  Typography,
 } from 'antd'
+import React, { useEffect, useReducer, useState } from 'react'
 import { useQuery } from 'react-apollo'
-import { connect, useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import actionPrescription from '../../redux/prescriptions/actions'
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 import { PrescriptionItemContext } from './context'
-import productReducer from './reducer'
-import { GET_COMPLAINT_QUERY, GET_DIAGNOSIS_QUERY, GET_TESTS_QUERY } from './query'
+import './index.scss'
 import PrescriptionItemTable from './prescriptionItemTable'
+import PrescriptionVisitTable from './PrescriptionVisit/PrescriptionVisitTable'
+import { GET_COMPLAINT_QUERY, GET_DIAGNOSIS_QUERY, GET_TESTS_QUERY } from './query'
+import productReducer from './reducer'
 
 const { Header, Content } = Layout
 const { Text, Title } = Typography
 const { Meta } = Card
 const { TextArea } = Input
+const InputGroup = Input.Group
 
 /* Some static css */
 const itemStyle = {
@@ -87,10 +97,37 @@ const inputStyle3 = {
 
 const layout1 = {
   labelCol: {
-    span: 5,
+    span: 3,
   },
   wrapperCol: {
     span: 18,
+  },
+}
+
+const testLayout = {
+  labelCol: {
+    span: 3,
+  },
+  wrapperCol: {
+    span: 14,
+  },
+}
+
+const layout11 = {
+  labelCol: {
+    span: 12,
+  },
+  wrapperCol: {
+    span: 12,
+  },
+}
+
+const layout12 = {
+  labelCol: {
+    span: 12,
+  },
+  wrapperCol: {
+    span: 12,
   },
 }
 
@@ -108,6 +145,11 @@ const inActiveSpanStyle = {
 }
 
 /* The below function is a helper function */
+// const [testDataSource, setTestDataSource] = useState([]);
+// const handleTestChange = ()  => {
+//   setTestDataSource(e.target.value)
+// };
+
 function addNevObject(val) {
   let theMainArray = []
   val.map((item, index) => {
@@ -280,14 +322,15 @@ const GetTest = ({ form }) => {
 const BankDetails = props => {
   const { form, details } = props
   console.log('The state', props)
+  console.log('The form', form)
   const prescriptions = useSelector(state => state.prescriptions)
   const dispatchOfPrescription = useDispatch()
   console.log('THE LOCAL STATE for getting prescription', prescriptions)
   /* productsState ==> holds the array of all the medicines in the list 
-     productsDispatch ==> The local "Reducer" for updating the reducer which will hold each row items 
-     ⭐ NOTE: Here we have defined the initialState of the reducer to an empty array but 
-              we need to pass the latest prescription details.
-  */
+      productsDispatch ==> The local "Reducer" for updating the reducer which will hold each row items 
+      ⭐ NOTE: Here we have defined the initialState of the reducer to an empty array but 
+               we need to pass the latest prescription details.
+   */
 
   const [productsState, productsDispatch] = useReducer(productReducer, [])
 
@@ -317,11 +360,11 @@ const BankDetails = props => {
   }, [])
 
   /*[Explaination]
-    This effect will only run if the prescription values are set.
-    When this run what it does you may think???
-    1. It sets the productState (aka list-of-meds-objects) with the latest prescriptions
-    2. It will then, fill the form page with the latest prescription details
-  */
+     This effect will only run if the prescription values are set.
+     When this run what it does you may think???
+     1. It sets the productState (aka list-of-meds-objects) with the latest prescriptions
+     2. It will then, fill the form page with the latest prescription details
+   */
 
   useEffect(() => {
     console.log('THE PRESCRIPTION VALUE', prescriptions)
@@ -376,6 +419,13 @@ const BankDetails = props => {
         },
       })
     })
+  }
+
+  const [testTime, setTestTime] = useState('')
+  console.log(testTime)
+  const handelTestTime = e => {
+    console.log(e.target.value)
+    setTestTime(e.target.value)
   }
 
   return (
@@ -534,11 +584,11 @@ const BankDetails = props => {
             prescriptions.isSpecificPrescription !== false ? (
               <>
                 {/*[Explaination]
-                  *  The "Global-State" for "PrescriptionItemTable" component is the "productState"
-                  * @productDispatch ==> The setter function of product state
-                  * @totalAmount ==> The count of list item which is initially set to zero
-                      (Further understanding would be mentioned inside the "PrescriptionItemTable")
-                  */}
+                   *  The "Global-State" for "PrescriptionItemTable" component is the "productState"
+                   * @productDispatch ==> The setter function of product state
+                   * @totalAmount ==> The count of list item which is initially set to zero
+                       (Further understanding would be mentioned inside the "PrescriptionItemTable")
+                   */}
                 <PrescriptionItemContext.Provider value={productsDispatch}>
                   <PrescriptionItemTable
                     style={{ marginTop: 25 }}
@@ -568,36 +618,100 @@ const BankDetails = props => {
                 )}
               </>
             )}
-            <Form.Item style={{ marginTop: '1em' }} {...layout1} label="Advice">
-              {form.getFieldDecorator('advice')(
-                <TextArea placeholder="Advice" autoSize={{ minRows: 2, maxRows: 5 }} allowClear />,
-              )}
-            </Form.Item>
-            <Form.Item {...layout1} label="Next Visit">
-              {form.getFieldDecorator('nextVisitNumber')(
-                <InputNumber min={1} max={12} onChange={onChangeInputNumber} />,
-              )}
-            </Form.Item>
-            <Form.Item {...layout1}>
-              {form.getFieldDecorator('nextVisitVal')(
-                <Radio.Group onChange={onChangeNextVisitVal}>
-                  <Radio.Button value="days">days</Radio.Button>
-                  <Radio.Button value="weeks">weeks</Radio.Button>
-                  <Radio.Button value="months">months</Radio.Button>
-                </Radio.Group>,
-              )}
-            </Form.Item>
-            {/* <div {...layout1}>
-              <Row>
-                <Col span={12}></Col>
-                <Col span={12}></Col>
-              </Row>
-            </div> */}
-            {/* <div style={{ display: 'flex' }}></div> */}
+            <div className="prescription_footer_section">
+              <div className="advice_contianer">
+                <Form.Item {...layout1} label="Advice">
+                  {form.getFieldDecorator('advice')(
+                    <TextArea
+                      placeholder="Advice"
+                      autoSize={{ minRows: 1, maxRows: 2 }}
+                      allowClear
+                    />,
+                  )}
+                </Form.Item>
+                <span className="icon_section">
+                  <FontAwesomeIcon className="icon_section_icon" icon={faFileMedical} />
+                  <FontAwesomeIcon className="icon_section_icon" icon={faFileWord} />
+                  <FontAwesomeIcon className="icon_section_icon" icon={faCaretSquareDown} />
+                  <FontAwesomeIcon className="icon_section_icon caret_icon" icon={faCaretLeft} />
+                </span>
+              </div>
+              <div className="test_contianer">
+                <Form.Item {...testLayout} label="Test Requestsed">
+                  {form.getFieldDecorator('testRequested')(
+                    <TextArea
+                      placeholder="Test Requestsed"
+                      autoSize={{ minRows: 1, maxRows: 2 }}
+                      allowClear
+                    />,
+                  )}
+                </Form.Item>
+                <span className="test_icon_section">
+                  <FontAwesomeIcon className="test_icon_section_icon" icon={faFileMedical} />
+                  <FontAwesomeIcon className="test_icon_section_icon" icon={faFileWord} />
+                  <FontAwesomeIcon className="test_icon_section_icon" icon={faCaretSquareDown} />
+                  <FontAwesomeIcon
+                    className="test_icon_section_icon caret_icon"
+                    icon={faCaretLeft}
+                  />
+                </span>
+                <div className="sub_test_container">
+                  <p className="tast_title">Test(when)</p>
+                  <InputGroup compact>
+                    <AutoComplete
+                      dataSource={testTime}
+                      style={{ width: 80 }}
+                      onChange={handelTestTime}
+                    />
+                    <Select
+                      style={{ backgroundColor: '#E5E5E5' }}
+                      className="select_option"
+                      defaultValue="None"
+                    >
+                      <Select.Option value="None">None</Select.Option>
+                      <Select.Option value="Today">Today</Select.Option>
+                      <Select.Option value="Next">Next</Select.Option>
+                    </Select>
+                  </InputGroup>
+                </div>
+              </div>
+            </div>
 
-            <Form.Item {...layout1} label="Next Visit Date">
-              {form.getFieldDecorator('nextVisitDate')(<DatePicker />)}
-            </Form.Item>
+            <Row type="flex" justify="start">
+              <Col span={4}>
+                <Form.Item {...layout11} label="Next Visit">
+                  {form.getFieldDecorator('nextVisitNumber')(
+                    <InputNumber min={1} max={12} onChange={onChangeInputNumber} />,
+                  )}
+                </Form.Item>
+              </Col>
+              <Col span={5}>
+                <Form.Item style={{ marginTop: '-2%' }}>
+                  {form.getFieldDecorator('nextVisitVal')(
+                    <Radio.Group onChange={onChangeNextVisitVal}>
+                      <Radio.Button value="days">days</Radio.Button>
+                      <Radio.Button value="weeks">weeks</Radio.Button>
+                      <Radio.Button value="months">months</Radio.Button>
+                    </Radio.Group>,
+                  )}
+                </Form.Item>
+              </Col>
+              <span
+                style={{
+                  fontWeight: '900',
+                  fontSize: '16px',
+                  marginLeft: '-2%',
+                  marginTop: '0.5%',
+                }}
+              >
+                OR
+              </span>
+              <Col span={5}>
+                <Form.Item {...layout12} label="Next Visit Date">
+                  {form.getFieldDecorator('nextVisitDate')(<DatePicker />)}
+                </Form.Item>
+              </Col>
+            </Row>
             <div
               style={{
                 display: 'flex',
@@ -619,6 +733,39 @@ const BankDetails = props => {
               </Button>
             </div>
           </Form>
+          <div className="visit_history_section">
+            <div className="vist_title">
+              <Title level={2}>14 Visits</Title>
+              <Text>Since14-Mar-2020</Text>
+            </div>
+            <div className="visit_content_body">
+              <div className="visit_content_header">
+                <Title level={4}>17-Mar-2021</Title>
+                <span>By: Dr.Prashantay</span>
+              </div>
+              <div className="content_body">
+                <p>Diagnosis: FEBRILE SEIZURES DEVELOPMETAL DELAY</p>
+                <p>Rx</p>
+                {prescriptions.loadingPrescriptions !== true &&
+                prescriptions.isSpecificPrescription !== false ? (
+                  <>
+                    <PrescriptionItemContext.Provider value={productsDispatch}>
+                      <PrescriptionVisitTable
+                        style={{ marginTop: 25 }}
+                        totalAmount={subTotal}
+                        products={productsState}
+                        dispatch={productsDispatch}
+                      />
+                    </PrescriptionItemContext.Provider>
+                  </>
+                ) : (
+                  <>
+                    <Spin size="large" />
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
         </Content>
       </Layout>
     </div>

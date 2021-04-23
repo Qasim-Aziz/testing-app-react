@@ -3,7 +3,7 @@
 /* ---------------------- Component "PRESCRIPTION LIST" ---------------------- */
 .site-card-wrapper {
   padding: 30px;
-  background: #ececec;
+  background: rgb(236, 236, 236);
 }
 
 .filter_sub_div {
@@ -41,7 +41,7 @@
   }
 
   .ant-table {
-    border: 1px solid #e8e8e8;
+    border: 1px solid rgb(232, 232, 232);
   }
 }
 
@@ -76,7 +76,7 @@
   color: black;
   margin-bottom: 28px;
   padding: 24px 0;
-  border: 1px solid #e8e8e8;
+  border: 1px solid rgb(232, 232, 232);
   box-shadow: 0 1px 1px 0 rgb(242, 242, 242);
 }
 
@@ -87,7 +87,7 @@
 }
 
 .right-border {
-  border-right: 1px solid #e8e8e8;
+  border-right: 1px solid rgb(232, 232, 232);
 }
 
 .midCard {
@@ -99,7 +99,7 @@
   margin-bottom: 0;
   margin-right: 14px;
   color: black;
-  border: 1px solid #e8e8e8;
+  border: 1px solid rgb(232, 232, 232);
   box-shadow: 0 1px 1px 0 rgb(242, 242, 242);
 }
 
@@ -113,6 +113,166 @@
   flex-direction: row;
   height: fit-content;
   margin-bottom: 28px;
+}
+
+// PRESCRIPTION TABLE CSS
+
+#prescription_table_container {
+  .ant-table-thead > tr > th {
+    background-color: rgb(207, 207, 207) !important;
+    padding: 10px;
+    font-weight: 800;
+    border: 1px solid rgb(218, 218, 218);
+  }
+  .ant-table-tbody {
+    font-weight: 600;
+    color: #000;
+    background-color: rgb(245, 245, 245);
+  }
+  .ant-table-tbody > tr > td {
+    border: 0.5px solid rgb(218, 218, 218);
+    padding: 8px;
+  }
+  .ant-table-tbody > tr > td:first-child {
+    background-color: rgb(207, 207, 207);
+    width: 1%;
+  }
+  .ant-table-tbody > tr > td:nth-child(2) {
+    font-weight: 700;
+  }
+  .ant-table-tbody > tr > td:last-child {
+    width: 8%;
+    border: 0;
+  }
+  .ant-table-footer {
+    background-color: rgb(255, 255, 255);
+  }
+}
+
+#prescription_visit_table_container {
+  .ant-table-tbody {
+    font-weight: 600;
+    color: rgb(0, 0, 0);
+  }
+  .ant-table-thead > tr > th {
+    padding: 10px;
+    font-weight: 800;
+  }
+}
+
+.remove_btn {
+  background-color: transparent;
+  border-color: transparent;
+  text-align: center;
+  color: rgb(0, 0, 0);
+  font-size: 24px;
+  font-weight: 400;
+}
+
+.remove_btn:hover {
+  background-color: transparent;
+  border-color: transparent;
+  color: red;
+}
+
+// PRESCRIPTION FOTTER SECTION CSS
+
+.prescription_footer_section {
+  .advice_contianer {
+    width: 100%;
+    margin: 45px auto;
+    position: relative;
+  }
+  .advice_contianer .ant-form-item .ant-form-item-label label {
+    font-size: 20px !important;
+    font-style: italic;
+    margin-top: 4%;
+  }
+  .icon_section,
+  .test_icon_section {
+    // padding: 10px;
+    position: absolute;
+    top: 22%;
+    left: 2%;
+  }
+  .test_icon_section {
+    top: 15%;
+  }
+
+  .icon_section .icon_section_icon,
+  .test_icon_section .test_icon_section_icon {
+    font-size: 16px;
+    margin: 10px;
+    cursor: pointer;
+    color: rgb(0, 0, 0);
+  }
+
+  .icon_section .caret_icon,
+  .test_icon_section .caret_icon {
+    font-size: 22px;
+  }
+
+  .test_contianer {
+    position: relative;
+  }
+
+  .sub_test_container {
+    position: absolute;
+    top: -3%;
+    right: 15%;
+  }
+
+  .test_contianer .sub_test_container p {
+    font-weight: 800;
+    margin-bottom: 1%;
+    margin-left: 48%;
+  }
+
+  .test_contianer .ant-form-item .ant-form-item-label label {
+    font-size: 16px !important;
+    font-style: italic;
+  }
+
+  .test_contianer .sub_test_container .select_option {
+    background-color: rgb(229, 229, 229) !important;
+    font-weight: 600;
+  }
+}
+
+// PRESCRIPTION VISIT SECTION
+
+.visit_history_section {
+  margin-top: 35px;
+  .vist_title {
+    text-align: center;
+    h2 {
+      margin-bottom: 0%;
+    }
+    span {
+      font-weight: 600;
+    }
+  }
+  .visit_content_body {
+    width: 96%;
+    -webkit-box-shadow: 0 0 10px rgb(204, 204, 204);
+    box-shadow: 0 0 10px rgb(204, 204, 204);
+    margin: 15px auto;
+    border-radius: 8px;
+    .visit_content_header {
+      background-color: rgb(238, 238, 238);
+      padding: 0.2%;
+      h4 {
+        display: inline-block;
+        margin-right: 0.3%;
+      }
+    }
+    .content_body {
+      padding: 2%;
+      p {
+        font-weight: 700;
+      }
+    }
+  }
 }
 
 @media screen and (max-width: 1250px) {
@@ -164,7 +324,7 @@
 }
 
 .editable-row:hover .editable-cell-value-wrap {
-  border: 1px solid #d9d9d9;
+  border: 1px solid rgb(217, 217, 217);
   border-radius: 4px;
   padding: 4px 11px;
 }
