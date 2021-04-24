@@ -5,13 +5,12 @@ import { Layout, Row, Col, Typography, Select, Tabs, Radio } from 'antd'
 import gql from 'graphql-tag'
 import { useQuery } from 'react-apollo'
 import { COLORS } from 'assets/styles/globalStyles'
+import LoadingComponent from 'components/LoadingComponent'
 import PeakQuartionsList from './PeakQuartionsList'
 import PeakQuartionView from './PeakQuartionView'
 import { STUDNET_INFO, SUMMERY } from './query'
 
 const { Content } = Layout
-const { Option } = Select
-const { TabPane } = Tabs
 
 const { Text } = Typography
 
@@ -64,7 +63,6 @@ export default () => {
     },
   })
 
-  const arr = []
   useEffect(() => {
     if (selectedQ) {
       // console.log('selectQ', selectedQ)
@@ -78,19 +76,12 @@ export default () => {
     // setCode(data)
   }, [selectedQ, data, summeryData])
 
-  // const getCodeAarray=()=>
-  const onChange = e => {
-    console.log(e)
-    // this.setState({ size: e.target.value });
-  }
-
   const handelSelectQ = (id, index) => () => {
     console.log(id, index)
     setSelectedQ({ id, index })
   }
 
   const handleChange = value => {
-    console.log(value)
     setRadioValue(value)
     if (value === 'no') {
       if (data && summeryData) {
@@ -157,7 +148,6 @@ export default () => {
         })
         marr.forEach(e => {
           const dd = mar.filter((ee, i) => ee.node.id === e.node.id)
-          console.log(dd)
           const index = mar.indexOf(dd[0])
           if (dd[0]) {
             mar.splice(index, 1)
@@ -200,7 +190,7 @@ export default () => {
   }
 
   if (loading) {
-    return <h3>Loading...</h3>
+    return <LoadingComponent />
   }
 
   return (

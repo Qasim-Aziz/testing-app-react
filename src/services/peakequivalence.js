@@ -237,3 +237,34 @@ export async function getAssessmentReport(payload) {
       })
     })
 }
+
+export async function finishAssignment(payload) {
+  return apolloClient
+    .query({
+      query: gql`
+        mutation($programId: ID!) {
+          peakFinishAssessment(input: { program: $programId }) {
+            details {
+              id
+              date
+              title
+              status
+            }
+          }
+        }
+      `,
+      variables: {
+        programId: payload.programId,
+      },
+      fetchPolicy: 'network-only',
+    })
+    .then(result => result)
+    .catch(error => {
+      error.graphQLErrors.map(item => {
+        return notification.error({
+          message: 'Something went wrong',
+          description: item.message,
+        })
+      })
+    })
+}

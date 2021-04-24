@@ -21,11 +21,8 @@ export default ({ selectedQ, data, handelSelectQ, scrollbarRef, type }) => {
     },
   })
   console.log(summeryData)
+
   useEffect(() => {
-    // if(type === true){
-    //   setAllReadyAnswer('2px solid #1208E7')
-    // }
-    // if(type === false){
     if (summeryData) {
       const yes = summeryData.peakDataSummary.edges[0]?.node.yes.edges.find(({ node }) => {
         return node.id === selectedQ.id
@@ -42,7 +39,6 @@ export default ({ selectedQ, data, handelSelectQ, scrollbarRef, type }) => {
           setAllReadyAnswer(`2px solid ${COLORS.palleteBlue}`)
         }
       }
-      console.log(selectedQ, allreadyAnswere, type, 'aaaaaaaaaaaaaaaaaa')
     }
     // }
   })
@@ -63,6 +59,7 @@ export default ({ selectedQ, data, handelSelectQ, scrollbarRef, type }) => {
           return (
             <div
               role="button"
+              key={node.id}
               style={{
                 cursor: 'pointer',
                 boxShadow:

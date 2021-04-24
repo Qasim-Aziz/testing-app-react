@@ -143,10 +143,6 @@ export default () => {
   const learnersprogram = useSelector(state => state.learnersprogram)
 
   useEffect(() => {
-    console.log(studnetInfo)
-  }, [studnetInfo])
-
-  useEffect(() => {
     if (studentId) {
       loadPeakPrograms()
     }
@@ -232,7 +228,6 @@ export default () => {
   }
 
   const makeInactive = id => {
-    console.log('selected id ======> ', id)
     const newData = tableData?.filter(item => item.node.id !== id)
     setTableData(newData)
 
@@ -249,7 +244,11 @@ export default () => {
       case 'seeAssesment': {
         localStorage.setItem('peakId', obj.node.id)
         localStorage.setItem('peakType', obj.node.category)
-        history.push('/peakReport')
+        if (obj.node.category === 'EQUIVALANCE' || obj.node.category === 'EQUIVALENCE') {
+          history.push('/peakEquivalenceReport')
+        } else {
+          history.push('/peakReport')
+        }
         break
       }
 
@@ -258,7 +257,7 @@ export default () => {
         localStorage.setItem('reportDate', obj.node.date)
         localStorage.setItem('peakType', obj.node.category)
         if (obj.node.category === 'EQUIVALANCE' || obj.node.category === 'EQUIVALENCE') {
-          history.push('/peakEquivalenceReport')
+          startPeakEquivalence(obj.node)
         } else {
           history.push('/peakReport')
         }
@@ -338,7 +337,6 @@ export default () => {
             score += Number(item.node.score)
           })
 
-          console.log(score, maxScore)
           if (maxScore === 0) {
             return <span>0 %</span>
           } else {
@@ -418,7 +416,10 @@ export default () => {
             menuItems.push(seeReportMenu)
             menuItems.push(<Menu.Divider />)
             menuItems.push(suggestTargetMenu)
-          } else if (obj.node.submitpeakresponsesSet.totalAttended > 0) {
+          } else if (
+            obj.node.submitpeakresponsesSet.totalAttended > 0 ||
+            obj.node.peakequivalanceSet?.edges.length > 0
+          ) {
             menuItems.push(resumeAssesmentMenu)
             menuItems.push(seeReportMenu)
             menuItems.push(<Menu.Divider />)
@@ -596,7 +597,7 @@ export default () => {
               defaultPageSize: 10,
               showSizeChanger: true,
               pageSizeOptions: ['10', '20', '30', '50'],
-              position: 'top',
+              position: 'bottom',
             }}
             loading={loading}
           />

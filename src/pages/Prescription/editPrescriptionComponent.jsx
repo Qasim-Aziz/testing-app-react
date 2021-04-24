@@ -30,6 +30,7 @@ import actionPrescription from '../../redux/prescriptions/actions'
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 import { PrescriptionItemContext } from './context'
 import productReducer from './reducer'
+import { FORM } from 'assets/styles/globalStyles'
 import { GET_COMPLAINT_QUERY, GET_DIAGNOSIS_QUERY, GET_TESTS_QUERY } from './query'
 import PrescriptionItemTable from './prescriptionItemTable'
 
@@ -52,15 +53,15 @@ const inputStyle2 = {
   border: 'none',
   borderBottom: '2px solid',
 }
-
-const layout1 = {
-  labelCol: {
-    span: 5,
-  },
-  wrapperCol: {
-    span: 18,
-  },
-}
+const { layout1 } = FORM
+// const layout1 = {
+//   labelCol: {
+//     span: 5,
+//   },
+//   wrapperCol: {
+//     span: 18,
+//   },
+// }
 
 const customSpanStyle = {
   backgroundColor: '#52c41a',
