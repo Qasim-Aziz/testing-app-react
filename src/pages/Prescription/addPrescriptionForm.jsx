@@ -34,6 +34,7 @@ import {
   Switch,
   Typography,
 } from 'antd'
+import moment from 'moment'
 import React, { useEffect, useReducer, useState } from 'react'
 import { useQuery } from 'react-apollo'
 import { useDispatch, useSelector } from 'react-redux'
@@ -391,7 +392,7 @@ const BankDetails = props => {
         ),
         tests: prescriptions.SpecificPrescription.tests.edges.map(element => element.node.id),
         advice: prescriptions.SpecificPrescription.advice,
-        testDate: prescriptions.SpecificPrescription.testDate,
+        testDate: moment(prescriptions.SpecificPrescription.testDate),
       })
     }
   }, [prescriptions.SpecificPrescription])
