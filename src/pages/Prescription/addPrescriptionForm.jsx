@@ -45,6 +45,7 @@ import {
 import React, { useEffect, useReducer, useState } from 'react'
 import { useQuery } from 'react-apollo'
 import { useDispatch, useSelector } from 'react-redux'
+import { FORM } from '../../assets/styles/globalStyles'
 import actionPrescription from '../../redux/prescriptions/actions'
 import { PrescriptionItemContext } from './context'
 import './index.scss'
@@ -192,7 +193,7 @@ const GetComplaints = ({ form }) => {
   return (
     <>
       {(form.getFieldValue('complaints') || !form.getFieldValue('complaints')) && (
-        <Form.Item {...layout1} label="MAIN Complaints">
+        <Form.Item {...FORM.layout} label="MAIN Complaints">
           {form.getFieldDecorator('complaints')(
             <Select
               mode="tags"
@@ -241,7 +242,7 @@ const GetDiagnosis = ({ form }) => {
   return (
     <>
       {(form.getFieldValue('diagnosis') || !form.getFieldValue('diagnosis')) && (
-        <Form.Item {...layout1} label="MAIN diagnosis">
+        <Form.Item {...FORM.layout} label="MAIN diagnosis">
           {form.getFieldDecorator('diagnosis')(
             <Select
               mode="tags"
@@ -290,7 +291,7 @@ const GetTest = ({ form }) => {
   return (
     <>
       {(form.getFieldValue('tests') || !form.getFieldValue('tests')) && (
-        <Form.Item {...layout1} label="MAIN tests">
+        <Form.Item {...FORM.layout} label="MAIN tests">
           {form.getFieldDecorator('tests')(
             <Select
               mode="tags"
@@ -518,61 +519,38 @@ const BankDetails = props => {
             </div>
             <br />
             <Divider orientation="left">Vitals</Divider>
-            <div style={{ display: 'flow-root' }}>
-              <div
-                style={{
-                  display: 'inline-block',
-                  float: 'left',
-                  width: '250px',
-                }}
-              >
-                <Form.Item style={itemStyle2} label="Height">
-                  {form.getFieldDecorator('height')(
-                    <Input placeholder="cm" style={inputStyle2}></Input>,
-                  )}
-                </Form.Item>
+            <div className="vitals_container">
+              <div>
+                <div>
+                  <Form.Item {...FORM.layout1} label="Height">
+                    {form.getFieldDecorator('height')(
+                      <Input className="vital_input" placeholder="cm" />,
+                    )}
+                  </Form.Item>
+                </div>
+                <div>
+                  <Form.Item {...FORM.layout1} label="Weight">
+                    {form.getFieldDecorator('weight')(
+                      <Input className="vital_input" placeholder="Kg" />,
+                    )}
+                  </Form.Item>
+                </div>
               </div>
-              <div
-                style={{
-                  display: 'inline-block',
-                  float: 'left',
-                  width: '250px',
-                }}
-              >
-                <Form.Item style={itemStyle2} label="Weight">
-                  {form.getFieldDecorator('weight')(
-                    <Input placeholder="Kg" style={inputStyle2}></Input>,
-                  )}
-                </Form.Item>
-              </div>
-              <div
-                style={{
-                  display: 'inline-block',
-                  float: 'left',
-                  width: '300px',
-                }}
-              >
-                <Form.Item style={itemStyle2} label="Temperature">
-                  {form.getFieldDecorator('temperature')(
-                    <Input
-                      placeholder="Celcious"
-                      style={{ ...inputStyle2, marginLeft: '15px' }}
-                    ></Input>,
-                  )}
-                </Form.Item>
-              </div>
-              <div
-                style={{
-                  display: 'inline-block',
-                  float: 'left',
-                  width: '350px',
-                }}
-              >
-                <Form.Item style={itemStyle2} label="Head Circumference">
-                  {form.getFieldDecorator('headCircumference')(
-                    <Input placeholder="cm" style={inputStyle2}></Input>,
-                  )}
-                </Form.Item>
+              <div>
+                <div>
+                  <Form.Item {...FORM.layout1} label="Temperature">
+                    {form.getFieldDecorator('temperature')(
+                      <Input className="vital_input" placeholder="Celcious" />,
+                    )}
+                  </Form.Item>
+                </div>
+                <div>
+                  <Form.Item style={{ display: 'flex' }} label="Head Circumference">
+                    {form.getFieldDecorator('headCircumference')(
+                      <Input className="vital_input" placeholder="cm" />,
+                    )}
+                  </Form.Item>
+                </div>
               </div>
             </div>
             {/* The complaints list */}
@@ -621,42 +599,39 @@ const BankDetails = props => {
             )}
             <div className="prescription_footer_section">
               <div className="advice_contianer">
-                <Form.Item {...layout1} label="Advice">
-                  {form.getFieldDecorator('advice')(
-                    <TextArea
-                      placeholder="Advice"
-                      autoSize={{ minRows: 1, maxRows: 2 }}
-                      allowClear
-                    />,
-                  )}
-                </Form.Item>
-                <span className="icon_section">
+                <div style={{ width: '85%' }}>
+                  <Form.Item {...layout1} label="Advice">
+                    {form.getFieldDecorator('advice')(
+                      <TextArea
+                        placeholder="Advice"
+                        autoSize={{ minRows: 1, maxRows: 2 }}
+                        allowClear
+                      />,
+                    )}
+                  </Form.Item>
+                </div>
+                <div style={{ width: '15%' }} className="icon_section">
                   <FontAwesomeIcon className="icon_section_icon" icon={faFileMedical} />
                   <FontAwesomeIcon className="icon_section_icon" icon={faFileWord} />
                   <FontAwesomeIcon className="icon_section_icon" icon={faCaretSquareDown} />
                   <FontAwesomeIcon className="icon_section_icon caret_icon" icon={faCaretLeft} />
-                </span>
+                </div>
               </div>
+
               <div className="test_contianer">
-                <Form.Item {...testLayout} label="Test Requestsed">
-                  {form.getFieldDecorator('testRequested')(
-                    <TextArea
-                      placeholder="Test Requestsed"
-                      autoSize={{ minRows: 1, maxRows: 2 }}
-                      allowClear
-                    />,
-                  )}
-                </Form.Item>
-                <span className="test_icon_section">
-                  <FontAwesomeIcon className="test_icon_section_icon" icon={faFileMedical} />
-                  <FontAwesomeIcon className="test_icon_section_icon" icon={faFileWord} />
-                  <FontAwesomeIcon className="test_icon_section_icon" icon={faCaretSquareDown} />
-                  <FontAwesomeIcon
-                    className="test_icon_section_icon caret_icon"
-                    icon={faCaretLeft}
-                  />
-                </span>
-                <div className="sub_test_container">
+                <div style={{ width: '70%' }}>
+                  <Form.Item {...testLayout} label="Test Requestsed">
+                    {form.getFieldDecorator('testRequested')(
+                      <TextArea
+                        placeholder="Test Requestsed"
+                        autoSize={{ minRows: 1, maxRows: 2 }}
+                        allowClear
+                      />,
+                    )}
+                  </Form.Item>
+                </div>
+
+                <div style={{ width: '16%' }} className="sub_test_container">
                   <p className="tast_title">Test(when)</p>
                   <InputGroup compact>
                     <AutoComplete
@@ -675,18 +650,32 @@ const BankDetails = props => {
                     </Select>
                   </InputGroup>
                 </div>
+
+                <div style={{ width: '15%' }} className="test_icon_section">
+                  <FontAwesomeIcon
+                    title="add"
+                    className="test_icon_section_icon"
+                    icon={faFileMedical}
+                  />
+                  <FontAwesomeIcon className="test_icon_section_icon" icon={faFileWord} />
+                  <FontAwesomeIcon className="test_icon_section_icon" icon={faCaretSquareDown} />
+                  <FontAwesomeIcon
+                    className="test_icon_section_icon caret_icon"
+                    icon={faCaretLeft}
+                  />
+                </div>
               </div>
             </div>
 
             <Row type="flex" justify="start">
-              <Col span={4}>
+              <Col span={5}>
                 <Form.Item {...layout11} label="Next Visit">
                   {form.getFieldDecorator('nextVisitNumber')(
                     <InputNumber min={1} max={12} onChange={onChangeInputNumber} />,
                   )}
                 </Form.Item>
               </Col>
-              <Col span={5}>
+              <Col span={7}>
                 <Form.Item style={{ marginTop: '-2%' }}>
                   {form.getFieldDecorator('nextVisitVal')(
                     <Radio.Group onChange={onChangeNextVisitVal}>
@@ -707,7 +696,7 @@ const BankDetails = props => {
               >
                 OR
               </span>
-              <Col span={5}>
+              <Col span={8}>
                 <Form.Item {...layout12} label="Next Visit Date">
                   {form.getFieldDecorator('nextVisitDate')(<DatePicker />)}
                 </Form.Item>

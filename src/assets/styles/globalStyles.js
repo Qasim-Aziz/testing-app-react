@@ -81,6 +81,15 @@ export const FORM = {
     },
   },
 
+  layout1: {
+    labelCol: {
+      span: 7,
+    },
+    wrapperCol: {
+      span: 17,
+    },
+  },
+
   tailLayout: {
     wrapperCol: {
       offset: 5,

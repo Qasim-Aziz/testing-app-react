@@ -119,10 +119,10 @@
 
 #prescription_table_container {
   .ant-table-thead > tr > th {
-    background-color: rgb(207, 207, 207) !important;
+    background-color: $palete-light-blue !important;
     padding: 10px;
     font-weight: 800;
-    border: 1px solid rgb(218, 218, 218);
+    border: 1px solid $palete-light-blue;
   }
   .ant-table-tbody {
     font-weight: 600;
@@ -134,14 +134,14 @@
     padding: 8px;
   }
   .ant-table-tbody > tr > td:first-child {
-    background-color: rgb(207, 207, 207);
+    background-color: $palete-light-blue;
     width: 1%;
   }
   .ant-table-tbody > tr > td:nth-child(2) {
     font-weight: 700;
   }
   .ant-table-tbody > tr > td:last-child {
-    width: 8%;
+    width: 95px;
     border: 0;
   }
   .ant-table-footer {
@@ -180,21 +180,29 @@
 .prescription_footer_section {
   .advice_contianer {
     width: 100%;
-    margin: 45px auto;
-    position: relative;
+    margin-top: 45px;
+    display: flex;
+    justify-content: space-around;
+  }
+  .advice_contianer .ant-form-item .ant-form-item-label {
+    width: 10%;
+  }
+  .advice_contianer .ant-form-item .ant-form-item-control-wrapper {
+    width: 90%;
   }
   .advice_contianer .ant-form-item .ant-form-item-label label {
     font-size: 20px !important;
     font-style: italic;
     margin-top: 4%;
   }
-  .icon_section,
-  .test_icon_section {
-    // padding: 10px;
-    position: absolute;
-    top: 22%;
-    left: 2%;
+
+  .test_contianer {
+    width: 100%;
+    margin-top: 45px;
+    display: flex;
+    justify-content: space-between;
   }
+
   .test_icon_section {
     top: 15%;
   }
@@ -212,20 +220,24 @@
     font-size: 22px;
   }
 
-  .test_contianer {
-    position: relative;
-  }
-
-  .sub_test_container {
-    position: absolute;
-    top: -3%;
-    right: 15%;
-  }
+  // .sub_test_container {
+  //   position: absolute;
+  //   top: -3%;
+  //   right: 15%;
+  // }
 
   .test_contianer .sub_test_container p {
     font-weight: 800;
     margin-bottom: 1%;
     margin-left: 48%;
+  }
+
+  .test_contianer .ant-form-item .ant-form-item-label {
+    width: 20%;
+  }
+
+  .test_contianer .ant-form-item .ant-form-item-control-wrapper {
+    width: 78%;
   }
 
   .test_contianer .ant-form-item .ant-form-item-label label {
@@ -236,6 +248,26 @@
   .test_contianer .sub_test_container .select_option {
     background-color: rgb(229, 229, 229) !important;
     font-weight: 600;
+  }
+}
+
+//VITALS SECTION CSS
+.vitals_container {
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-around;
+
+  .ant-form-item-label {
+    white-space: nowrap;
+  }
+
+  .vital_input {
+    width: 100%;
+    margin-left: 3%;
+    border: 0;
+    border-bottom: 1px solid;
+    border-radius: 0;
   }
 }
 
@@ -259,7 +291,7 @@
     margin: 15px auto;
     border-radius: 8px;
     .visit_content_header {
-      background-color: rgb(238, 238, 238);
+      background-color: $palete-light-blue;
       padding: 0.2%;
       h4 {
         display: inline-block;
