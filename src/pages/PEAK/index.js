@@ -143,10 +143,6 @@ export default () => {
   const learnersprogram = useSelector(state => state.learnersprogram)
 
   useEffect(() => {
-    console.log(studnetInfo)
-  }, [studnetInfo])
-
-  useEffect(() => {
     if (studentId) {
       loadPeakPrograms()
     }
@@ -232,7 +228,6 @@ export default () => {
   }
 
   const makeInactive = id => {
-    console.log('selected id ======> ', id)
     const newData = tableData?.filter(item => item.node.id !== id)
     setTableData(newData)
 
@@ -342,7 +337,6 @@ export default () => {
             score += Number(item.node.score)
           })
 
-          console.log(score, maxScore)
           if (maxScore === 0) {
             return <span>0 %</span>
           } else {

@@ -77,8 +77,6 @@ export default ({ suggestTarget }) => {
       const tempList = targetsData.suggestPeakTargetsForEquivalence?.codes.filter(item => {
         const alpha = item.code[item.code.length - 1]
         const numa = Number(item.code.slice(0, item.code.length - 1))
-        console.log(selectedCategory, numa1, alpha1, '----------', numa2, alpha2)
-        console.log(numa1 < numa, numa < numa2)
         if (numa1 < numa && numa < numa2) {
           return true
         } else if (numa1 === numa) {
@@ -95,20 +93,6 @@ export default ({ suggestTarget }) => {
       setMainTargetsData(tempList)
     }
   }, [targetsData, selectedCategory])
-
-  // console.log(targetsData, 'tgd')
-  // console.log(mainTargetsData, 'main target')
-
-  // useEffect(() => {
-  //   if (categoryError) {
-  //     notification.error({
-  //       message: 'Something went wrong',
-  //       description: 'Unable to fetch equivalence categories',
-  //     })
-  //   }
-  // }, [categoryError])
-
-  // console.log(categoryData, 'ctcct')
 
   const Targets = mainTargetsData?.map(node => {
     return (
@@ -144,7 +128,11 @@ export default ({ suggestTarget }) => {
 
   return (
     <>
-      <Radio.Group value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
+      <Radio.Group
+        style={{ marginBottom: 16 }}
+        value={selectedCategory}
+        onChange={e => setSelectedCategory(e.target.value)}
+      >
         <Radio.Button value="reflexivity">Reflexivity</Radio.Button>
         <Radio.Button value="symmetry">Symmetry</Radio.Button>
         <Radio.Button value="transitivity">Transitivity</Radio.Button>

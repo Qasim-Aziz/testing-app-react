@@ -339,16 +339,6 @@ class PeakEqvi extends React.Component {
     this.setState({
       buttonState: response,
     })
-    console.log(
-      SelectedQuestionIndex,
-      AssessmentObject,
-      PEQuestionsListObject,
-      SelectedDomainId,
-      SelectedTestIndex,
-      'this is',
-    )
-
-    console.log(response, 'response')
 
     dispatch({
       type: 'peakequivalence/RECORD_RESPONSE',
@@ -380,7 +370,6 @@ class PeakEqvi extends React.Component {
   }
 
   changeActiveDomian = domainId => {
-    console.log(domainId)
     if (domainId === 'report') {
       window.location.href = '/#/peakEquivalenceReport'
     } else if (domainId && domainId !== 'report') {
@@ -455,7 +444,6 @@ class PeakEqvi extends React.Component {
   }
 
   onChange = current => {
-    console.log('onChange:', current)
     let aType = 'Basic'
     if (current === 0) aType = 'Basic'
     if (current === 1) aType = 'Intermediate'
@@ -493,11 +481,6 @@ class PeakEqvi extends React.Component {
     if (!studId) {
       return <Redirect to="/" />
     }
-
-    console.log(PEDomainList, 'pre domainLIst')
-    console.log(PEQuestionsListObject, 'pre domainLIst')
-    console.log(PEQuestionsList, 'pre domainLIst')
-    console.log(ResponseObject, 'response objct')
 
     const buttonDefaultStyle = {
       padding: '20px auto',
@@ -741,7 +724,7 @@ class PeakEqvi extends React.Component {
                               fontWeight: 'bold',
                               backgroundColor: COLORS.danger,
                             }}
-                            onClick={() => this.finishAssessment(ProgramId)}
+                            onClick={() => this.showReport(ProgramId)}
                           >
                             Quit
                           </Button>
