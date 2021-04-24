@@ -130,7 +130,9 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
               }}
               name={record.dataIndex}
             >
-              {form.getFieldDecorator(title.toLowerCase())(
+              {form.getFieldDecorator(title.toLowerCase(), {
+                initialValue: record[title.toLowerCase()],
+              })(
                 <Input
                   ref={inputRef}
                   // loading={false}

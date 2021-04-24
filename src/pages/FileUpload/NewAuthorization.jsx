@@ -1,5 +1,6 @@
-import { Button, Form, Input, InputNumber } from 'antd'
+import { Button, Card, Form, Input } from 'antd'
 import React from 'react'
+import DragFile from './DragFile'
 
 const NewAuthorization = () => {
   const layout = {
@@ -20,32 +21,36 @@ const NewAuthorization = () => {
   return (
     <>
       <div className="authorization_container">
-        <Form {...layout} name="nest-messages" validateMessages={validateMessages}>
-          <Form.Item name={['user', 'name']} label="Name" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name={['user', 'email']} label="Email" rules={[{ type: 'email' }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name={['user', 'age']}
-            label="Age"
-            rules={[{ type: 'number', min: 0, max: 99 }]}
-          >
-            <InputNumber />
-          </Form.Item>
-          <Form.Item name={['user', 'website']} label="Website">
-            <Input />
-          </Form.Item>
-          <Form.Item name={['user', 'introduction']} label="Introduction">
-            <Input.TextArea />
-          </Form.Item>
-          <Form.Item wrapperCol={{ ...layout.wrapperCol, offset: 8 }}>
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
-          </Form.Item>
-        </Form>
+        <Card>
+          <Form {...layout} name="nest-messages" validateMessages={validateMessages}>
+            <Form.Item name={['user', 'name']} label="Contact Name" rules={[{ required: true }]}>
+              <Input />
+            </Form.Item>
+            <Form.Item
+              name={['user', 'document']}
+              label="Name of Ducument"
+              rules={[{ required: true }]}
+            >
+              <Input />
+            </Form.Item>
+            <Form.Item name={['user', 'description']} label="description">
+              <Input.TextArea />
+            </Form.Item>
+            <hr style={{ marginTop: '30px', marginBottom: '30px' }} />
+            <DragFile />
+            <Form.Item
+              style={{ marginTop: '30px' }}
+              wrapperCol={{ ...layout.wrapperCol, offset: 8 }}
+            >
+              <Button className="btn" type="secondari" htmlType="submit">
+                Continue Without a Document
+              </Button>
+            </Form.Item>
+          </Form>
+          <p className="toMore">
+            <span>!</span> Click here for a video walkthrough of entering an authorization
+          </p>
+        </Card>
       </div>
     </>
   )

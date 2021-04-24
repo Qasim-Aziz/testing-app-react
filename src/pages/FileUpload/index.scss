@@ -102,5 +102,25 @@
   .authorization_container {
     width: 65%;
     margin: 25px auto;
+
+    .btn {
+      font-weight: 600;
+    }
+
+    .toMore {
+      text-align: center;
+      font-size: 17px;
+      color: $blue-darken;
+      cursor: pointer;
+
+      span {
+        width: 22px;
+        height: 22px;
+        background-color: $blue-darken;
+        color: $white;
+        display: inline-block;
+        border-radius: 50%;
+      }
+    }
   }
 }

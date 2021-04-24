@@ -14,14 +14,6 @@
  */
 
 import {
-  faCaretLeft,
-  faCaretSquareDown,
-  faFileMedical,
-  faFileWord,
-} from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  AutoComplete,
   Avatar,
   Button,
   Card,
@@ -125,6 +117,15 @@ const layout11 = {
 
 const layout12 = {
   labelCol: {
+    span: 4,
+  },
+  wrapperCol: {
+    span: 20,
+  },
+}
+
+const layout13 = {
+  labelCol: {
     span: 12,
   },
   wrapperCol: {
@@ -198,7 +199,6 @@ const GetComplaints = ({ form }) => {
             <Select
               mode="tags"
               allowClear
-              size="large"
               notFoundContent={sdLoading ? <Spin size="small" /> : null}
               filterOption={false}
               onSearch={v => {
@@ -247,7 +247,6 @@ const GetDiagnosis = ({ form }) => {
             <Select
               mode="tags"
               allowClear
-              size="large"
               notFoundContent={sdLoading ? <Spin size="small" /> : null}
               filterOption={false}
               onSearch={v => {
@@ -296,7 +295,6 @@ const GetTest = ({ form }) => {
             <Select
               mode="tags"
               allowClear
-              size="large"
               notFoundContent={sdLoading ? <Spin size="small" /> : null}
               filterOption={false}
               onSearch={v => {
@@ -322,6 +320,9 @@ const GetTest = ({ form }) => {
 }
 
 const BankDetails = props => {
+  function onDateChange(date, dateString) {
+    console.log(date, dateString)
+  }
   const { form, details } = props
   console.log('The state', props)
   console.log('The form', form)
@@ -604,70 +605,20 @@ const BankDetails = props => {
                     {form.getFieldDecorator('advice')(
                       <TextArea
                         placeholder="Advice"
-                        autoSize={{ minRows: 1, maxRows: 2 }}
+                        autoSize={{ minRows: 4, maxRows: 6 }}
                         allowClear
                       />,
                     )}
                   </Form.Item>
-                </div>
-                <div style={{ width: '15%' }} className="icon_section">
-                  <FontAwesomeIcon className="icon_section_icon" icon={faFileMedical} />
-                  <FontAwesomeIcon className="icon_section_icon" icon={faFileWord} />
-                  <FontAwesomeIcon className="icon_section_icon" icon={faCaretSquareDown} />
-                  <FontAwesomeIcon className="icon_section_icon caret_icon" icon={faCaretLeft} />
-                </div>
-              </div>
-
-              <div className="test_contianer">
-                <div style={{ width: '70%' }}>
-                  <Form.Item {...testLayout} label="Test Requestsed">
-                    {form.getFieldDecorator('testRequested')(
-                      <TextArea
-                        placeholder="Test Requestsed"
-                        autoSize={{ minRows: 1, maxRows: 2 }}
-                        allowClear
-                      />,
-                    )}
-                  </Form.Item>
-                </div>
-
-                <div style={{ width: '16%' }} className="sub_test_container">
-                  <p className="tast_title">Test(when)</p>
-                  <InputGroup compact>
-                    <AutoComplete
-                      dataSource={testTime}
-                      style={{ width: 80 }}
-                      onChange={handelTestTime}
-                    />
-                    <Select
-                      style={{ backgroundColor: '#E5E5E5' }}
-                      className="select_option"
-                      defaultValue="None"
-                    >
-                      <Select.Option value="None">None</Select.Option>
-                      <Select.Option value="Today">Today</Select.Option>
-                      <Select.Option value="Next">Next</Select.Option>
-                    </Select>
-                  </InputGroup>
-                </div>
-
-                <div style={{ width: '15%' }} className="test_icon_section">
-                  <FontAwesomeIcon
-                    title="add"
-                    className="test_icon_section_icon"
-                    icon={faFileMedical}
-                  />
-                  <FontAwesomeIcon className="test_icon_section_icon" icon={faFileWord} />
-                  <FontAwesomeIcon className="test_icon_section_icon" icon={faCaretSquareDown} />
-                  <FontAwesomeIcon
-                    className="test_icon_section_icon caret_icon"
-                    icon={faCaretLeft}
-                  />
                 </div>
               </div>
             </div>
-
-            <Row type="flex" justify="start">
+            <div>
+              <Form.Item {...layout12} label="Test Date">
+                {form.getFieldDecorator('testDate')(<DatePicker test />)}
+              </Form.Item>
+            </div>
+            <Row type="flex" justify="center">
               <Col span={5}>
                 <Form.Item {...layout11} label="Next Visit">
                   {form.getFieldDecorator('nextVisitNumber')(
@@ -697,7 +648,7 @@ const BankDetails = props => {
                 OR
               </span>
               <Col span={8}>
-                <Form.Item {...layout12} label="Next Visit Date">
+                <Form.Item {...layout13} label="Next Visit Date">
                   {form.getFieldDecorator('nextVisitDate')(<DatePicker />)}
                 </Form.Item>
               </Col>
