@@ -36,11 +36,11 @@ import {
   Form,
   DatePicker,
   Collapse,
-  Modal,
-  Radio,
   Steps,
 } from 'antd'
 import { Redirect } from 'react-router-dom'
+import gql from 'graphql-tag'
+import { useMutation } from 'react-apollo'
 import { connect } from 'react-redux'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import LoadingComponent from 'components/LoadingComponent'
@@ -195,6 +195,8 @@ class PeakEqvi extends React.Component {
     })
   }
 
+  // meeting and appointment
+
   LoadAssessment = assType => {
     const { dispatch } = this.props
 
@@ -202,6 +204,18 @@ class PeakEqvi extends React.Component {
       type: 'peakequivalence/START_ASSESSMENT',
       payload: {
         assessmentType: assType,
+      },
+    })
+    dispatch({
+      type: 'peakequivalence/START_ASSESSMENT',
+      payload: {
+        assessmentType: 'Intermediate',
+      },
+    })
+    dispatch({
+      type: 'peakequivalence/START_ASSESSMENT',
+      payload: {
+        assessmentType: 'Advanced',
       },
     })
 
@@ -350,6 +364,17 @@ class PeakEqvi extends React.Component {
     })
   }
 
+  finishAssessment = pg => {
+    const { dispatch } = this.props
+
+    dispatch({
+      type: 'peakequivalence/FINISH_ASSESSMENT',
+      payload: {
+        programId: pg,
+      },
+    })
+  }
+
   showReport = () => {
     window.location.href = '/#/peakEquivalenceReport'
   }
@@ -464,14 +489,15 @@ class PeakEqvi extends React.Component {
 
     const { loading, visibleModal, current } = this.state
 
-    // if (Loading) {
-    //     return 'Loading...'
-    // }
-
     const studId = localStorage.getItem('studentId')
     if (!studId) {
       return <Redirect to="/" />
     }
+
+    console.log(PEDomainList, 'pre domainLIst')
+    console.log(PEQuestionsListObject, 'pre domainLIst')
+    console.log(PEQuestionsList, 'pre domainLIst')
+    console.log(ResponseObject, 'response objct')
 
     const buttonDefaultStyle = {
       padding: '20px auto',
@@ -669,7 +695,14 @@ class PeakEqvi extends React.Component {
                           </div>
                         )}
 
-                        <div style={{ textAlign: 'right', marginTop: '50px' }}>
+                        <div
+                          style={{
+                            textAlign: 'right',
+                            marginTop: '50px',
+                            display: 'flex',
+                            justifyContent: 'flex-end',
+                          }}
+                        >
                           <span style={{ float: 'right' }}>
                             {SelectedTestIndex === 0 ? (
                               <Button disabled>
@@ -698,6 +731,20 @@ class PeakEqvi extends React.Component {
                               </Button>
                             )}
                           </span>
+                          <Button
+                            type="danger"
+                            style={{
+                              marginLeft: 6,
+                              height: 35,
+                              width: 100,
+                              fontSize: 14,
+                              fontWeight: 'bold',
+                              backgroundColor: COLORS.danger,
+                            }}
+                            onClick={() => this.finishAssessment(ProgramId)}
+                          >
+                            Quit
+                          </Button>
                         </div>
                       </>
                     )}
@@ -771,7 +818,7 @@ class PeakEqvi extends React.Component {
                             onClick={() => this.setState({ suggestTarget: true })}
                             style={{
                               width: '100%',
-                              marginTop: '20px',
+                              marginTop: '10px',
                               padding: '8px',
                               backgroundColor: COLORS.palleteBlue,
                               color: 'white',

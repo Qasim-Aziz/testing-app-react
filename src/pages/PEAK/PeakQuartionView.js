@@ -73,6 +73,8 @@ export default ({ selectedQ, data, setSelectedQ, learner }) => {
     },
   })
 
+  console.log(finishRes, finishError, quitLoading, 'quit data')
+
   useEffect(() => {
     if (quartionData && summeryData) {
       const yes = summeryData.peakDataSummary.edges[0]?.node.yes.edges.find(({ node }) => {
@@ -189,17 +191,6 @@ export default ({ selectedQ, data, setSelectedQ, learner }) => {
         {!quartionLoading && !quartionError && quartionData && selectedQ && (
           <div style={{ minHeight: 350 }}>
             <Row>
-              {/* <Col span={10}>
-                <img
-                  src={cardImg}
-                  alt=""
-                  style={{
-                    height: 200,
-                    borderRadius: 10,
-                    width: '100%',
-                  }}
-                />
-              </Col> */}
               {!quartionLoading && (
                 <Col span={24}>
                   <div
@@ -291,8 +282,7 @@ export default ({ selectedQ, data, setSelectedQ, learner }) => {
                     margin: 0,
                   }}
                 >
-                  {`${learner}`}
-                  {'  '}gives an Unexpected Response
+                  {`${learner}`} gives an Unexpected Response
                 </Text>
               </Button>
             </div>

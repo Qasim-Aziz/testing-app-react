@@ -583,7 +583,10 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
                 style={{ margin: 'auto 0' }}
                 checked={addCgst}
                 defaultChecked={addCgst}
-                onChange={e => setAddCgst(e.target.checked)}
+                onChange={e => {
+                  setAddCgst(e.target.checked)
+                  form.setFieldsValue({ cgst: 0 })
+                }}
               />
             </Tooltip>
             <span style={{ ...amLabel, color: `${addCgst ? 'black' : '#D9D9D9'}` }}>CGST:</span>
@@ -615,7 +618,10 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
                 style={{ margin: 'auto 0' }}
                 checked={addSgst}
                 defaultChecked={addSgst}
-                onChange={e => setAddSgst(e.target.checked)}
+                onChange={e => {
+                  setAddSgst(e.target.checked)
+                  form.setFieldsValue({ sgst: 0 })
+                }}
               />
             </Tooltip>
             <span style={{ ...amLabel, color: `${addSgst ? 'black' : '#D9D9D9'}` }}>SGST:</span>

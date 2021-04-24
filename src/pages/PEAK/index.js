@@ -249,7 +249,11 @@ export default () => {
       case 'seeAssesment': {
         localStorage.setItem('peakId', obj.node.id)
         localStorage.setItem('peakType', obj.node.category)
-        history.push('/peakReport')
+        if (obj.node.category === 'EQUIVALANCE' || obj.node.category === 'EQUIVALENCE') {
+          history.push('/peakEquivalenceReport')
+        } else {
+          history.push('/peakReport')
+        }
         break
       }
 
@@ -258,7 +262,7 @@ export default () => {
         localStorage.setItem('reportDate', obj.node.date)
         localStorage.setItem('peakType', obj.node.category)
         if (obj.node.category === 'EQUIVALANCE' || obj.node.category === 'EQUIVALENCE') {
-          history.push('/peakEquivalenceReport')
+          startPeakEquivalence(obj.node)
         } else {
           history.push('/peakReport')
         }
@@ -418,7 +422,10 @@ export default () => {
             menuItems.push(seeReportMenu)
             menuItems.push(<Menu.Divider />)
             menuItems.push(suggestTargetMenu)
-          } else if (obj.node.submitpeakresponsesSet.totalAttended > 0) {
+          } else if (
+            obj.node.submitpeakresponsesSet.totalAttended > 0 ||
+            obj.node.peakequivalanceSet?.edges.length > 0
+          ) {
             menuItems.push(resumeAssesmentMenu)
             menuItems.push(seeReportMenu)
             menuItems.push(<Menu.Divider />)
@@ -596,7 +603,7 @@ export default () => {
               defaultPageSize: 10,
               showSizeChanger: true,
               pageSizeOptions: ['10', '20', '30', '50'],
-              position: 'top',
+              position: 'bottom',
             }}
             loading={loading}
           />
