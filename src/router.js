@@ -683,8 +683,8 @@ const routes = [
     exact: true,
   },
   {
-    path: '/fileUpload',
-    component: loadable(() => import('pages/FileUpload/index')),
+    path: '/upload',
+    component: loadable(() => import('pages/documentUpload')),
     exact: true,
   },
 ]

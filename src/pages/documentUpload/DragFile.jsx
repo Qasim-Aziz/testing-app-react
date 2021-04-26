@@ -19,13 +19,13 @@ const props = {
   },
 }
 
-const DragFile = () => {
+const DragFile = ({ text }) => {
   return (
     <>
       <Dragger {...props}>
-        <h1 className="ant-upload-drag-icon">Deop files here to upload</h1>
+        <h1 className="ant-upload-drag-icon">Drop files here to upload</h1>
         <p className="ant-upload-text">
-          or <span>Select up to 20 Files</span>
+          or <span>{text || `Select up to 20 Files`}</span>
         </p>
       </Dragger>
     </>

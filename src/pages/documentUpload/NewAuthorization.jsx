@@ -37,7 +37,7 @@ const NewAuthorization = () => {
               <Input.TextArea />
             </Form.Item>
             <hr style={{ marginTop: '30px', marginBottom: '30px' }} />
-            <DragFile />
+            <DragFile text="Select Files" />
             <Form.Item
               style={{ marginTop: '30px' }}
               wrapperCol={{ ...layout.wrapperCol, offset: 8 }}

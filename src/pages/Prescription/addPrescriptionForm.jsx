@@ -118,10 +118,10 @@ const layout11 = {
 
 const layout12 = {
   labelCol: {
-    span: 4,
+    span: 3,
   },
   wrapperCol: {
-    span: 20,
+    span: 21,
   },
 }
 
@@ -614,12 +614,12 @@ const BankDetails = props => {
                 </div>
               </div>
             </div>
-            <div>
+            <div style={{ marginLeft: '4%' }}>
               <Form.Item {...layout12} label="Test Date">
                 {form.getFieldDecorator('testDate')(<DatePicker test />)}
               </Form.Item>
             </div>
-            <Row type="flex" justify="center">
+            <Row style={{ marginLeft: '6%' }} type="flex" justify="start">
               <Col span={5}>
                 <Form.Item {...layout11} label="Next Visit">
                   {form.getFieldDecorator('nextVisitNumber')(

@@ -198,7 +198,7 @@ const Index = props => {
               filterName: e.target.value,
             })
           }
-          style={{ width: '348px' }} //  ...tableFilterStyles,
+          style={{ width: '180px' }} //  ...tableFilterStyles,
         />
       </span>
 
@@ -210,7 +210,7 @@ const Index = props => {
           placeholder="Search Email"
           value={learnerState.filterEmail}
           onChange={e => setLearnerState({ ...learnerState, filterEmail: e.target.value })}
-          style={{ width: '348px' }} // ...tableFilterStyles,
+          style={{ width: '180px' }} // ...tableFilterStyles,
         />
       </span>
     </div>
