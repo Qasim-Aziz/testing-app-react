@@ -94,22 +94,24 @@ export default ({ selectedQ, data, setSelectedQ, learner }) => {
   }, [quartionData, summeryData])
 
   useEffect(() => {
-    if (summeryData && data && !selectedQ) {
+    if (summeryData) {
       if (summeryData.peakDataSummary.total === summeryData.peakDataSummary.totalAttended) {
         finishAssignment()
       } else {
-        if (summeryData?.peakDataSummary?.lastRecord) {
-          let selectFullData
-          if (selectFullData?.id) {
-            setSelectedQ(selectFullData)
+        if (data && !selectedQ) {
+          if (summeryData.peakDataSummary?.lastRecord) {
+            let selectFullData
+            if (selectFullData?.id) {
+              setSelectedQ(selectFullData)
+            } else {
+              setSelectedQ({
+                id: data?.peakGetCodes?.edges[0]?.node.id,
+                index: 0,
+              })
+            }
           } else {
-            setSelectedQ({
-              id: data?.peakGetCodes?.edges[0]?.node.id,
-              index: 0,
-            })
+            setSelectedQ({ id: data?.peakGetCodes?.edges[0]?.node.id, index: 0 })
           }
-        } else {
-          setSelectedQ({ id: data?.peakGetCodes?.edges[0]?.node.id, index: 0 })
         }
       }
     }
@@ -117,7 +119,7 @@ export default ({ selectedQ, data, setSelectedQ, learner }) => {
 
   useEffect(() => {
     if (finishRes) {
-      history.push('/peakResult')
+      history.push('/peakReport')
     }
     if (finishError) {
       notification.error({

@@ -45,7 +45,6 @@ export default Form.create()(
     selectedShortTermGoal,
     activeSessionDetails,
   }) => {
-
     console.log('activeSessionDetails ==========>', activeSessionDetails)
     const [targetInstructions, setTargetInstructions] = useState(targetInstr)
     const [dailyTrials, setDailyTrials] = useState(0)
@@ -597,7 +596,7 @@ export default Form.create()(
           </Form.Item>
           <Form.Item label="Short Term Goal">
             {form.getFieldDecorator('stg', {
-              initialValue: !isDirectGoal && selectedShortTermGoal.node.id,
+              initialValue: !isDirectGoal && selectedShortTermGoal?.node.id,
             })(
               <Select
                 loading={shortGoalLoading}
@@ -622,8 +621,10 @@ export default Form.create()(
           </Form.Item>
           <Form.Item label="Domain Name" name="Domain Name">
             {form.getFieldDecorator('domain', {
-              initialValue: activeSessionDetails && activeSessionDetails?.node?.domain ? activeSessionDetails?.node?.domain.id : domainData?.domain.edges.find(({ node }) => node.domain === 'Others')
-                ?.node.id,
+              initialValue:
+                activeSessionDetails && activeSessionDetails?.node?.domain
+                  ? activeSessionDetails?.node?.domain.id
+                  : domainData?.domain.edges.find(({ node }) => node.domain === 'Others')?.node.id,
               rules: [{ required: true, message: 'Please select a domain' }],
             })(
               <Select name="domain" {...searchableDropDownOption} loading={isDomainLoading}>

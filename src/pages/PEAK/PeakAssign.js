@@ -37,13 +37,12 @@ export default () => {
   const studentId = localStorage.getItem('studentId')
   const peakType = localStorage.getItem('peakType')
   const [answeredQuCount, setAnsweredQuCount] = useState(0)
-  const [selecteFilter, setSelectedFilter] = useState('all')
+  const [selecteFilter, setSelectedFilter] = useState('unanswered')
   const [code, setCode] = useState([])
-  const [alldata, setAllData] = useState(null)
   const scrollbarRef = useRef()
   const [load, setLoad] = useState(false)
   const [type, setType] = useState(false)
-  const [radioValue, setRadioValue] = useState('all')
+  const [radioValue, setRadioValue] = useState('unanswered')
 
   const { data, error, loading } = useQuery(GET_PEAK_CODES, {
     variables: {
@@ -56,6 +55,7 @@ export default () => {
       studentId,
     },
   })
+
   const { data: summeryData, loading: summeryLoading, refetch } = useQuery(SUMMERY, {
     fetchPolicy: 'network-only',
     variables: {
@@ -65,19 +65,14 @@ export default () => {
 
   useEffect(() => {
     if (selectedQ) {
-      // console.log('selectQ', selectedQ)
       scrollbarRef.current.scrollTop(selectedQ.index * 86 - 250)
     }
     if (data && summeryData) {
-      setAllData(data)
       handleChange(selecteFilter)
     }
-
-    // setCode(data)
   }, [selectedQ, data, summeryData])
 
   const handelSelectQ = (id, index) => () => {
-    console.log(id, index)
     setSelectedQ({ id, index })
   }
 
@@ -87,7 +82,6 @@ export default () => {
       if (data && summeryData) {
         if (summeryData?.peakDataSummary?.edges[0]?.node?.no?.edges?.length > 0) {
           const ar = []
-          console.log(data, summeryData)
           const dd = summeryData?.peakDataSummary?.edges[0]?.node.no.edges.forEach(e => {
             const d = data?.peakGetCodes?.edges.filter(el => el.node.id === e.node.id)
             if (d) {
@@ -95,10 +89,7 @@ export default () => {
             }
           })
           const r = ar.filter(eee => eee?.node?.id === selectedQ?.id)
-          if (!r[0]) {
-            setSelectedQ({ id: ar[0]?.node?.id, index: 0 })
-          }
-          if (!selectedQ) {
+          if (!r[0] || !selectedQ) {
             setSelectedQ({ id: ar[0]?.node?.id, index: 0 })
           }
 
@@ -111,7 +102,6 @@ export default () => {
       if (data && summeryData) {
         if (summeryData?.peakDataSummary?.edges[0]?.node?.yes?.edges?.length > 0) {
           const ar = []
-          console.log(data, summeryData)
           const dd = summeryData?.peakDataSummary?.edges[0]?.node.yes.edges.forEach(e => {
             const d = data?.peakGetCodes?.edges.filter(el => el.node.id === e.node.id)
             if (d) {
@@ -119,10 +109,7 @@ export default () => {
             }
           })
           const r = ar.filter(eee => eee.node.id === selectedQ.id)
-          if (!r[0]) {
-            setSelectedQ({ id: ar[0]?.node?.id, index: 0 })
-          }
-          if (!selectedQ) {
+          if (!r[0] || !selectedQ) {
             setSelectedQ({ id: ar[0]?.node?.id, index: 0 })
           }
 
@@ -132,7 +119,7 @@ export default () => {
       }
     }
 
-    if (value === 'all') {
+    if (value === 'unanswered') {
       if (data && summeryData) {
         const ar = []
         const mar = []
@@ -154,10 +141,7 @@ export default () => {
           }
         })
         const r = mar.filter(eee => eee.node.id === selectedQ?.id)
-        if (!r[0]) {
-          setSelectedQ({ id: mar[0]?.node?.id, index: 0 })
-        }
-        if (!selectedQ) {
+        if (!r[0] || !selectedQ) {
           setSelectedQ({ id: mar[0]?.node?.id, index: 0 })
         }
 
@@ -166,7 +150,7 @@ export default () => {
         setType(false)
       }
     }
-    if (value === 'alll') {
+    if (value === 'all') {
       if (data && summeryData) {
         const ar = []
         const mar = []
@@ -214,8 +198,8 @@ export default () => {
             >
               <Radio.Button value="yes">Correct</Radio.Button>
               <Radio.Button value="no">Incorrect</Radio.Button>
-              <Radio.Button value="all">Unanswered</Radio.Button>
-              <Radio.Button value="alll">All</Radio.Button>
+              <Radio.Button value="unanswered">Unanswered</Radio.Button>
+              <Radio.Button value="all">All</Radio.Button>
             </Radio.Group>
           </Col>
           <Col sm={17}>
