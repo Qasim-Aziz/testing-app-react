@@ -12,9 +12,9 @@ import { PrinterOutlined, FilePdfOutlined } from '@ant-design/icons'
 import moment from 'moment'
 import { ToWords } from 'to-words'
 import { useQuery } from 'react-apollo'
+import logo from 'images/WhatsApp Image 2020-04-23 at 10.00.40 (1).jpeg'
 import LoadingComponent from 'components/LoadingComponent'
 import { GET_INVOICE, GET_PAYMENT_RECIEVING_DETIAILS } from './query'
-import logo from 'images/WhatsApp Image 2020-04-23 at 10.00.40 (1).jpeg'
 
 const general = {
   fontSize: '12px',
@@ -131,10 +131,8 @@ const PreviewInvoice = ({ invoiceId }) => {
       invoiceData?.invoiceDetail.invoiceFee.edges.map(item => {
         let am = Number(Number(item.node.quantity * item.node.rate).toFixed(3))
         tempTotal += am
-        console.log(tempTotal)
       })
       setSubtotal(tempTotal)
-      // console.log(invoiceData.invoiceDetail.clinic.currency.currency, 'kkkkk')
       setCurrencyName('INR')
     }
   }, [invoiceData])
@@ -173,7 +171,7 @@ const PreviewInvoice = ({ invoiceId }) => {
     )
 
   const { ifscCode, bankName, accountHolderName, bankAccountNo } = detailsData?.schoolDetail
-  console.log(invoice, 'invoice number')
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <div className="ant-drawer-header">
@@ -222,7 +220,7 @@ const PreviewInvoice = ({ invoiceId }) => {
                     textAlign: 'left',
                   }}
                 >
-                  {invoice.clinic?.schoolName}
+                  {invoice.customer?.school?.schoolName}
                 </div>
                 <div
                   style={{
@@ -233,7 +231,7 @@ const PreviewInvoice = ({ invoiceId }) => {
                     fontWeight: '600',
                   }}
                 >
-                  {invoice.clinic?.address}
+                  {invoice.customer?.school?.address}
                 </div>
                 <div
                   style={{

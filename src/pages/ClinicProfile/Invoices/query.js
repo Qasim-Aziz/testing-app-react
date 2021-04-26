@@ -377,6 +377,13 @@ export const GET_INVOICE = gql`
         id
         firstname
         lastname
+        school {
+          id
+          schoolName
+          email
+          address
+          logo
+        }
       }
       status {
         id

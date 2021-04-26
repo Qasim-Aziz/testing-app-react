@@ -212,6 +212,7 @@ export default () => {
                             return invoice.key !== deleteInvoiceId
                           })
                         })
+                        refetch()
                         setDeleteInvoiceId(null)
                       })
                       .catch(err => {
@@ -237,6 +238,8 @@ export default () => {
     },
   ]
 
+  // Allocate target target suggestion create program
+
   const onSelectChange = key => {
     setSelectedRowKeys(key)
   }
@@ -253,7 +256,8 @@ export default () => {
       item => item.client && item.client.toLowerCase().includes(filterCustomer.toLowerCase()),
     )
   }
-  console.log(filteredList, 'filteredList')
+
+  // console.log(filteredList, 'filteredList')
 
   const status =
     data && data.length > 0
@@ -320,7 +324,7 @@ export default () => {
     FileSaver.saveAs(data1, fileName + fileExtension)
   }
 
-  console.log(selectedRowKeys, 'sele')
+  // console.log(selectedRowKeys, 'sele')
 
   const handleMenuActions = e => {
     const names = []

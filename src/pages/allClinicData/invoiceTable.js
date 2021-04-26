@@ -299,7 +299,7 @@ function InvoiceTable({ rowData }) {
           <Drawer
             visible={viewInvoice}
             onClose={() => setViewInvoice(false)}
-            width={DRAWER.widthL3}
+            width={DRAWER.widthL2}
             placement="right"
             closable="true"
             destroyOnClose="true"

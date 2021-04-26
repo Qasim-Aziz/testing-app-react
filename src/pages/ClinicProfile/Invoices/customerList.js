@@ -87,7 +87,7 @@ function CustomerList() {
             >
               Maintain Rates
             </Button>
-            <Button
+            {/* <Button
               onClick={() => {
                 createStudentInvoice({
                   variables: {
@@ -105,8 +105,8 @@ function CustomerList() {
               style={{ padding: 0 }}
               type="link"
             >
-              Create{' '}
-            </Button>
+              Create
+            </Button> */}
           </>
         )
       },
@@ -114,7 +114,6 @@ function CustomerList() {
   ]
 
   const onSelectChange = selectedRowKeys => {
-    // console.log('selectedRowKeys changed: ', selectedRowKeys)
     setSelectedRowKeys(selectedRowKeys)
   }
 
