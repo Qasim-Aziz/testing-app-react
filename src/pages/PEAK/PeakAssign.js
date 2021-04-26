@@ -55,6 +55,7 @@ export default () => {
       studentId,
     },
   })
+
   const { data: summeryData, loading: summeryLoading, refetch } = useQuery(SUMMERY, {
     fetchPolicy: 'network-only',
     variables: {
@@ -64,18 +65,14 @@ export default () => {
 
   useEffect(() => {
     if (selectedQ) {
-      // console.log('selectQ', selectedQ)
       scrollbarRef.current.scrollTop(selectedQ.index * 86 - 250)
     }
     if (data && summeryData) {
       handleChange(selecteFilter)
     }
-
-    // setCode(data)
   }, [selectedQ, data, summeryData])
 
   const handelSelectQ = (id, index) => () => {
-    console.log(id, index)
     setSelectedQ({ id, index })
   }
 
@@ -85,7 +82,6 @@ export default () => {
       if (data && summeryData) {
         if (summeryData?.peakDataSummary?.edges[0]?.node?.no?.edges?.length > 0) {
           const ar = []
-          console.log(data, summeryData)
           const dd = summeryData?.peakDataSummary?.edges[0]?.node.no.edges.forEach(e => {
             const d = data?.peakGetCodes?.edges.filter(el => el.node.id === e.node.id)
             if (d) {
@@ -106,7 +102,6 @@ export default () => {
       if (data && summeryData) {
         if (summeryData?.peakDataSummary?.edges[0]?.node?.yes?.edges?.length > 0) {
           const ar = []
-          console.log(data, summeryData)
           const dd = summeryData?.peakDataSummary?.edges[0]?.node.yes.edges.forEach(e => {
             const d = data?.peakGetCodes?.edges.filter(el => el.node.id === e.node.id)
             if (d) {

@@ -119,7 +119,7 @@ export default ({ selectedQ, data, setSelectedQ, learner }) => {
 
   useEffect(() => {
     if (finishRes) {
-      history.push('/peakResult')
+      history.push('/peakReport')
     }
     if (finishError) {
       notification.error({
