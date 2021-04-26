@@ -232,6 +232,7 @@ class RightArea extends React.Component {
       iisaassessment: { AssessmentList, ReportDrawer, NewAssessmentForm, loading },
       user,
     } = this.props
+    console.log('check heereee')
     console.log(this.props)
     const columns = [
       {
@@ -283,7 +284,7 @@ class RightArea extends React.Component {
           )
 
           const resumeAssesmentMenu = (
-            <Menu.Item key="resumeAssesment">
+            <Menu.Item key="startAssesment">
               <PauseOutlined /> Resume Assesment
             </Menu.Item>
           )
@@ -296,20 +297,25 @@ class RightArea extends React.Component {
 
           const menuItems = []
 
-          if (obj.node.status === 'COMPLETED') {
+          if (obj.node.percentage === 100) {
             // menuItems.push(seeAssesmentMenu)
             menuItems.push(seeReportMenu)
             // menuItems.push(<Menu.Divider />)
             // menuItems.push(suggestTargetMenu)
           } else {
-            menuItems.push(startAssesmentMenu)
+            if (obj.node.percentage === 0) {
+              menuItems.push(startAssesmentMenu)
+            } else {
+              menuItems.push(resumeAssesmentMenu)
+            }
             menuItems.push(seeReportMenu)
             // menuItems.push(<Menu.Divider />)
             // menuItems.push(suggestTargetMenu)
           }
 
           const menu = <Menu onClick={e => this.handleMenuActions(e, obj)}>{menuItems}</Menu>
-
+          console.log('hrer')
+          console.log(obj.node)
           return (
             <>
               <Tooltip placement="topRight" title="Delete Assessment">

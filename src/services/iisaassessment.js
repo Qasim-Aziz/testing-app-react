@@ -19,6 +19,7 @@ export async function getData(payload) {
                 time
                 status
                 isActive
+                percentage
                 notes
                 student {
                   id
