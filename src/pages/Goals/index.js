@@ -25,7 +25,7 @@ const useSideBarStyles = createUseStyles(() => ({
   },
 }))
 
-// key is mandatory and mast me uniq
+// key is mandatory and must be unique
 const settingOptionViewList = [
   {
     key: 1,

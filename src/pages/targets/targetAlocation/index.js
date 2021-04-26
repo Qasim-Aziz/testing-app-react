@@ -136,11 +136,6 @@ const TargetAllocation = () => {
       setSelectedDefaultShortTermGoal(defaultShortTermGoals[selectedProgramInDefaultTab])
   }, [selectedProgramInDefaultTab, defaultShortTermGoals])
 
-  useEffect(() => {
-    if (selectedProgramInDefaultTab && defaultShortTermGoals)
-      setSelectedDefaultShortTermGoal(defaultShortTermGoals[selectedProgramInDefaultTab])
-  }, [selectedProgramInDefaultTab, defaultShortTermGoals])
-
   const getDefaultGoalsQuery = async studentId => {
     const defaultGoalResponse = await getDefaultGoals(studentId)
     if (notNull(defaultGoalResponse)) {
@@ -229,7 +224,7 @@ const TargetAllocation = () => {
         'MMMM DD, YYYY',
       )}` +
       `, ${years > 0 ? `${years} Year` : ''} ${months > 0 ? `${months} Months` : ''} ${
-      days > 0 ? `${days} Days` : ''
+        days > 0 ? `${days} Days` : ''
       }`
     return date
   }
@@ -639,7 +634,7 @@ const TargetAllocation = () => {
                     key={ltGoal.node.id}
                     style={{
                       background: '#fff',
-                      border: '1px solid #E4E9F0',                      
+                      border: '1px solid #E4E9F0',
                       borderRadius: 5,
                       // margin: 5,
                       alignItems: 'center',
@@ -723,7 +718,7 @@ const TargetAllocation = () => {
       </Col>
 
       {selectedShortTermGoal && (
-        <Col md={8} sm={24} style={{backgroundColor: COLORS.palleteLightBlue}}>
+        <Col md={8} sm={24} style={{ backgroundColor: COLORS.palleteLightBlue }}>
           {selectedShortTermGoal && editAble && (
             <div
               style={{
@@ -820,12 +815,12 @@ const TargetAllocation = () => {
       <Helmet title="Target allocation to goals" />
       <Layout>
         <Content>
-
           {/* Goals Drawer */}
           <Drawer
             title={addHeading}
             placement="right"
             closable
+            destroyOnClose
             width={DRAWER.widthL1}
             onClose={handleCloseAddGoal}
             visible={isAddGoalVisible}
@@ -863,13 +858,15 @@ const TargetAllocation = () => {
               addTargetMode={addTargetMode}
               onSuccessTargetAllocation={onSuccessTargetAllocation}
               selectedTargetId={activeSessionDetails ? activeSessionDetails.node.id : null}
-              targetName={activeSessionDetails ? activeSessionDetails.node.targetMain.targetName : null}
+              targetName={
+                activeSessionDetails ? activeSessionDetails.node.targetMain.targetName : null
+              }
               targetVideo={activeSessionDetails ? activeSessionDetails.node.video : null}
               targetInstr={activeSessionDetails ? activeSessionDetails.node.targetInstr : null}
               peakEnable={isPeak}
               equivalenceEnable={isEquivalence}
               equivalenceObject={equivalenceObject}
-            // setOpen={setSelectTarget}
+              // setOpen={setSelectTarget}
             />
           </Drawer>
 
@@ -960,7 +957,7 @@ const TargetAllocation = () => {
               boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
             }}
           >
-            <div style={{ padding: 8 }}>              
+            <div style={{ padding: 8 }}>
               {studentName && (
                 <Title
                   style={{
@@ -978,30 +975,27 @@ const TargetAllocation = () => {
             {loading ? (
               <LoadingComponent />
             ) : (
-                <Tabs
-                  className="targetTabs" 
-                  style={{
-                    backgroundColor: COLORS.palleteLight,
-                    marginTop: 8,
-                    borderTop: 'none',
-                  }} 
-                  tabBarStyle={{
-                    backgroundColor: '#fff',
-                    
-                  }}
-                  onChange={setActiveTabKey}
-                >
-                  <TabPane tab="Goal(s)" key="customGoalTab">
-                    {customGoalTab}
-                  </TabPane>
-                  <TabPane tab="Directly" key="defaultGoalTab">
-                    {defaultGoalTab}
-                  </TabPane>
-                </Tabs>
-              )}
+              <Tabs
+                className="targetTabs"
+                style={{
+                  backgroundColor: COLORS.palleteLight,
+                  marginTop: 8,
+                  borderTop: 'none',
+                }}
+                tabBarStyle={{
+                  backgroundColor: '#fff',
+                }}
+                onChange={setActiveTabKey}
+              >
+                <TabPane tab="Goal(s)" key="customGoalTab">
+                  {customGoalTab}
+                </TabPane>
+                <TabPane tab="Directly" key="defaultGoalTab">
+                  {defaultGoalTab}
+                </TabPane>
+              </Tabs>
+            )}
           </div>
-
-
         </Content>
       </Layout>
     </>
