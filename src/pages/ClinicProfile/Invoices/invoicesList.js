@@ -82,6 +82,7 @@ export default () => {
               .format(dateFormate)
           : undefined,
         status: filterStatus,
+        customer_School: localStorage.getItem('userId'),
       },
       fetchPolicy: 'no-cache',
     },

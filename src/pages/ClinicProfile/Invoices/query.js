@@ -1,8 +1,13 @@
 import gql from 'graphql-tag'
 
 const GET_INVOICES = gql`
-  query getInvoices($from: Date, $to: Date, $status: ID) {
-    getInvoices(date_Gte: $from, date_Lte: $to, status: $status) {
+  query getInvoices($from: Date, $to: Date, $status: ID, $customer_School: ID) {
+    getInvoices(
+      date_Gte: $from
+      date_Lte: $to
+      status: $status
+      customer_School: $customer_School
+    ) {
       edges {
         node {
           id

@@ -92,13 +92,13 @@ const monthNames = [
   'December',
 ]
 
-function getTotal(subTotal, discount = 0, gst = 0, sgst = 0, taxableSubtotal = 0) {
+function getTotal(subTotal, discount = 0, gst = 0, sgst = 0, tax = 0) {
   return Number(
     subTotal -
       (subTotal / 100) * parseFloat(discount || 0) +
       (subTotal / 100) * parseFloat(gst || 0) +
       (subTotal / 100) * parseFloat(sgst || 0) +
-      (subTotal / 100) * parseFloat(taxableSubtotal || 0),
+      (subTotal / 100) * parseFloat(tax || 0),
   ).toFixed(2)
 }
 
@@ -121,6 +121,7 @@ const PreviewInvoice = ({ invoiceId }) => {
   const [invoice, setInvoice] = useState(null)
   const [currencyName, setCurrencyName] = useState(null)
   const [subTotal, setSubtotal] = useState(0)
+  const [isValidImage, setIsValidImage] = useState(false)
   const history = useHistory()
 
   console.log(invoiceData, 'invoiceData')
@@ -132,6 +133,8 @@ const PreviewInvoice = ({ invoiceId }) => {
         let am = Number(Number(item.node.quantity * item.node.rate).toFixed(3))
         tempTotal += am
       })
+      const check = imageExists()
+      setIsValidImage(check)
       setSubtotal(tempTotal)
       setCurrencyName('INR')
     }
@@ -170,6 +173,17 @@ const PreviewInvoice = ({ invoiceId }) => {
       </div>
     )
 
+  function imageExists() {
+    var http = new XMLHttpRequest()
+    const temp = invoiceData.invoiceDetail.customer?.school?.logo
+      ? invoiceData.invoiceDetail.customer?.school?.logo
+      : 're'
+    http.open('HEAD', temp, false)
+    http.send()
+
+    return http.status != 404
+  }
+
   const { ifscCode, bankName, accountHolderName, bankAccountNo } = detailsData?.schoolDetail
 
   return (
@@ -201,7 +215,22 @@ const PreviewInvoice = ({ invoiceId }) => {
         <div style={{ width: '600px', height: 'fit-content' }}>
           <div style={sectionMain}>
             <div style={{ ...section, height: '100px' }}>
-              <img alt="logog" src={logo} style={{ width: '30%', alignSelf: 'center' }} />
+              <div style={{ width: '30%', alignSelf: 'center' }}>
+                {isValidImage ? (
+                  <img
+                    alt="Logo"
+                    src={invoice.customer?.school?.logo}
+                    style={{
+                      maxWidth: '100%',
+                      maxHeight: '100%',
+                      display: 'block',
+                      alignSelf: 'center',
+                    }}
+                  />
+                ) : (
+                  'logo'
+                )}
+              </div>
               <div
                 style={{
                   textAlign: 'center',
@@ -506,22 +535,16 @@ const PreviewInvoice = ({ invoiceId }) => {
                   }}
                 >
                   <div style={taxSection}>
-                    {Number((subTotal / 100) * parseFloat(invoice.taxableSubtotal || 0)).toFixed(2)}{' '}
+                    {Number((subTotal / 100) * parseFloat(invoice.tax || 0)).toFixed(2)}{' '}
                     {currencyName}
                   </div>
                   <div style={{ ...taxSection, fontWeight: '600' }}>
-                    Taxes({invoice.taxableSubtotal || 0}%) :
+                    Taxes({invoice.tax || 0}%) :
                   </div>
                 </div>
                 <div style={{ ...flexSection, flexDirection: 'row-reverse' }}>
                   <div style={taxSection}>
-                    {getTotal(
-                      subTotal,
-                      invoice.discount,
-                      invoice.cgst,
-                      invoice.sgst,
-                      invoice.taxableSubtotal,
-                    )}
+                    {getTotal(subTotal, invoice.discount, invoice.cgst, invoice.sgst, invoice.tax)}
                     {currencyName}
                   </div>
                   <div style={{ ...taxSection, fontWeight: '600' }}>Total :</div>

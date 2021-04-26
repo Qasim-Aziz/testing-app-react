@@ -93,20 +93,20 @@ const monthNames = [
   'December',
 ]
 
-function getTotal(subTotal, discount = 0, gst = 0, sgst = 0, taxableSubtotal = 0) {
+function getTotal(subTotal, discount = 0, gst = 0, sgst = 0, tax = 0) {
   return Number(
     subTotal -
       (subTotal / 100) * parseFloat(discount || 0) +
       (subTotal / 100) * parseFloat(gst || 0) +
       (subTotal / 100) * parseFloat(sgst || 0) +
-      (subTotal / 100) * parseFloat(taxableSubtotal || 0),
+      (subTotal / 100) * parseFloat(tax || 0),
   ).toFixed(2)
 }
 
 function ViewInvoice({ invoice }) {
   const [subTotal, setSubtotal] = useState(0)
   const history = useHistory()
-  const currentCurrencyName = invoice.clinic.currency ? invoice.clinic.currency.currency : 'USD'
+  const currentCurrencyName = invoice.clinic.currency ? invoice.clinic.currency.currency : 'INR'
   const { data, loading, error } = useQuery(GET_PAYMENT_DETAILS)
 
   console.log(invoice, 'invoice')
@@ -129,7 +129,7 @@ function ViewInvoice({ invoice }) {
   }, [])
 
   const toWords = new ToWords({
-    localeCode: currentCurrencyName === 'INR' ? 'en-IN' : 'en-US',
+    localeCode: currentCurrencyName === 'USD' ? 'en-US' : 'en-IN',
     converterOptions: {
       currency: true,
       ignoreDecimal: false,
@@ -137,13 +137,7 @@ function ViewInvoice({ invoice }) {
     },
   })
 
-  const total = getTotal(
-    subTotal,
-    invoice.discount,
-    invoice.gst,
-    invoice.sgst,
-    invoice.taxableSubtotal,
-  )
+  const total = getTotal(subTotal, invoice.discount, invoice.gst, invoice.sgst, invoice.tax)
 
   const invoke = () => {
     localStorage.setItem('currentInvoice', JSON.stringify(invoice))
@@ -341,7 +335,7 @@ function ViewInvoice({ invoice }) {
                       .subtract(1, 'M')
                       .format('MM') - 1
                   ]
-                }{' '}
+                }
                 {new Date(invoice.issueDate).getFullYear()}
               </div>
             </div>
@@ -545,22 +539,16 @@ function ViewInvoice({ invoice }) {
                   }}
                 >
                   <div style={taxSection}>
-                    {Number((subTotal / 100) * parseFloat(invoice.taxableSubtotal || 0)).toFixed(2)}{' '}
+                    {Number((subTotal / 100) * parseFloat(invoice.tax || 0)).toFixed(2)}{' '}
                     {currentCurrencyName}
                   </div>
                   <div style={{ ...taxSection, fontWeight: '600' }}>
-                    Taxes({invoice.taxableSubtotal || 0}%) :
+                    Taxes({invoice.tax || 0}%) :
                   </div>
                 </div>
                 <div style={{ ...flexSection, flexDirection: 'row-reverse' }}>
                   <div style={taxSection}>
-                    {getTotal(
-                      subTotal,
-                      invoice.discount,
-                      invoice.cgst,
-                      invoice.sgst,
-                      invoice.taxableSubtotal,
-                    )}{' '}
+                    {getTotal(subTotal, invoice.discount, invoice.cgst, invoice.sgst, invoice.tax)}{' '}
                     {currentCurrencyName}
                   </div>
                   <div style={{ ...taxSection, fontWeight: '600' }}>Total :</div>
