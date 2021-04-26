@@ -619,7 +619,7 @@ class Reports extends React.Component {
                       >
                         <span style={HeadStyle}>Goals</span>
                       </div>
-                      <div
+                      {/* <div
                         style={TabCheck === 'IEP Report' ? ActiveStyle : BlockStyle}
                         onClick={() => {
                           this.SetTabFunction('IEP Report')
@@ -627,7 +627,7 @@ class Reports extends React.Component {
                         }}
                       >
                         <span style={HeadStyle}>IEP Report</span>
-                      </div>
+                      </div> */}
 
                       <div
                         style={TabCheck === 'Celeration Chart' ? ActiveStyle : BlockStyle}
