@@ -39,6 +39,7 @@ import {
   getPatients,
 } from './TargetAllocation.query'
 import TargetAvailableDrawer from './TargetAllocationDrawer'
+import AssessmentContent from './AssessmentContent'
 import './style.scss'
 
 const { Title, Text } = Typography
@@ -996,6 +997,9 @@ const TargetAllocation = () => {
                   </TabPane>
                   <TabPane tab="Directly" key="defaultGoalTab">
                     {defaultGoalTab}
+                  </TabPane>
+                  <TabPane tab="Assessments" key="assessments">
+                    <AssessmentContent />
                   </TabPane>
                 </Tabs>
               )}

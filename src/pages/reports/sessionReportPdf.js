@@ -118,6 +118,45 @@ const STUDENT_DETAILS = gql`
         urination
         prompted
       }
+
+      behData{
+        id
+        note
+        intensity
+        irt
+        frequency{
+          edges{
+            node{
+              id
+              time
+              count
+            }
+          }
+        }
+        duration
+        environment{
+          id
+          name
+        }
+        template{
+          id
+          behavior{
+            id
+            behaviorName
+          }
+        }
+      }
+
+      mandData{
+        dailyClick{
+          id
+          measurments
+        }
+        data
+        date
+        createdAt
+      }
+
       edges{
         node{
           id
@@ -145,6 +184,15 @@ const STUDENT_DETAILS = gql`
             verbal
             gestural
             textual
+
+            edges{
+              node{
+                user{
+                  id
+                  username
+                }
+              }
+            }
           }
           peak{
             totalCorrect
@@ -157,8 +205,19 @@ const STUDENT_DETAILS = gql`
 
     childSessionDetails(id: $childSessionId){
       id
+      sessionDate
+      duration
       feedback
       rating
+      createdAt
+    }
+
+    getTargetTypesInSession(session: $childSessionId){
+      insideSession
+      targetType{
+        id
+        typeTar
+      }
     }
   }
 `
@@ -170,6 +229,9 @@ const PrintableInvoice = ({ selectSessionId }) => {
   const [IncorrectTrials, setIncorrectTrials] = useState(0)
   const [NoTrials, setNoTrials] = useState(0)
   const [PromptedTrials, setPromptedTrials] = useState(0)
+  const [behaviorData, setBehaviorData] = useState([])
+  const [toiletData, setToiletData] = useState([])
+  const [mandData, setMandData] = useState([])
 
   const ad = [
     {
@@ -199,18 +261,18 @@ const PrintableInvoice = ({ selectSessionId }) => {
       t2: 'Restricted interests',
       s3: NoTrials,
       t3: 'No Trials',
-      s4: '',
-      t4: '',
+      s4: '-',
+      t4: '-',
     },
     {
-      s1: '',
-      t1: 'Social inter. deficits',
-      s2: '',
-      t2: 'Problematic behavior',
-      s3: '',
-      t3: '',
-      s4: '',
-      t4: '',
+      s1: '-',
+      t1: '-',
+      s2: '-',
+      t2: '-',
+      s3: '-',
+      t3: '-',
+      s4: '-',
+      t4: '-\n-',
     },
   ]
   const acquisitionSkills1 = [
@@ -300,7 +362,11 @@ const PrintableInvoice = ({ selectSessionId }) => {
 
   useEffect(() => {
     if (studentData && studentData.getSessionDataRecording) {
-      console.log(studentData)
+
+      setBehaviorData(studentData.getSessionDataRecording?.behData)
+      setToiletData(studentData.getSessionDataRecording?.toiletData)
+      setMandData(studentData.getSessionDataRecording?.mandData)
+      console.log("studentData ============> ", studentData)
 
       const item = studentData.getSessionDataRecording.edges
       const Mand = studentData.getSessionDataRecording.mandCount
@@ -363,7 +429,7 @@ const PrintableInvoice = ({ selectSessionId }) => {
             <View style={{ width: '100%', height: '100%', margin: 'auto' }}>
               <View style={sectionMain}>
                 <View style={{ ...section }}>
-                  <View style={col}>
+                  <View style={{...col, width: '10%'}}>
                     <Text style={sText}>Client details</Text>
                     <Text style={sText}>{' '}</Text>
                   </View>
@@ -376,7 +442,7 @@ const PrintableInvoice = ({ selectSessionId }) => {
                   </View>
                   <View style={{ ...col, width: '12%' }}>
                     <Text style={headerTextBorder}>Date</Text>
-                    <Text style={mText}> 04/06/2020</Text>
+                    <Text style={mText}>{studentData?.childSessionDetails?.sessionDate}</Text>
                   </View>
                   <View style={{ ...col, width: '25%' }}>
                     <Text style={headerTextBorder}>Location</Text>
@@ -384,11 +450,11 @@ const PrintableInvoice = ({ selectSessionId }) => {
                   </View>
                   <View style={{ ...col, width: '12%' }}>
                     <Text style={headerTextBorder}>Start Time</Text>
-                    <Text style={mText}> 8:45</Text>
+                    <Text style={mText}>{moment(studentData?.childSessionDetails?.createdAt).format('HH:mm:ss',{trim:false})}</Text>
                   </View>
                   <View style={{ ...col }}>
-                    <Text style={headerTextBorder}>End Time</Text>
-                    <Text style={mText}> 10:45</Text>
+                    <Text style={headerTextBorder}>Duration</Text>
+                    <Text style={mText}>{moment.duration(studentData?.childSessionDetails?.duration, 'milliseconds').format('HH:mm:ss',{trim:false})}</Text>
                   </View>
                   <View style={{ ...col, borderRight: 'none' }}>
                     <Text style={headerTextBorder}>Targets</Text>
@@ -400,13 +466,10 @@ const PrintableInvoice = ({ selectSessionId }) => {
                   <View style={{ ...col, width: '10%', backgroundColor: '#e8e8e8' }}>
                     <Text style={headerText}>Provider </Text>
                   </View>
-                  <View style={{ ...col, width: '29%' }}>
-                    <Text style={{ ...mText, textAlign: 'left', paddingLeft: 4 }}>
-                      Allison Olmstead ha ha what do you adya dude
+                  <View style={{ ...col, width: '51%' }}>
+                    <Text style={{ ...mText, textAlign: 'center' }}>
+                      {studentData.getSessionDataRecording.edges[0]?.node.sessionRecord?.edges[0]?.node.user?.username}
                     </Text>
-                  </View>
-                  <View style={{ ...col, width: '22%' }}>
-                    <Text style={mText}>__BCBA __RBT </Text>
                   </View>
                   <View style={{ ...col, width: '10%', backgroundColor: '#e8e8e8' }}>
                     <Text style={headerText}>Category </Text>
@@ -427,72 +490,82 @@ const PrintableInvoice = ({ selectSessionId }) => {
                   </View>
                 </View>
 
-                {/* {ad.map(item => {
-                  return (
-                    <View style={section}>
-                      <View style={{ ...col, width: '4%', ...bg }}>
-                        <Text>{item.srNo1}</Text>
-                      </View>
-                      <View style={{ ...col, width: '21%' }}>
-                        <Text style={sText}>{item.t1}</Text>
-                      </View>
-                      <View style={{ ...col, width: '4%', ...bg }}>
-                        <Text>{item.s2}</Text>
-                      </View>
-                      <View style={{ ...col, width: '21%' }}>
-                        <Text style={sText}>{item.t2}</Text>
-                      </View>
-                      <View style={{ ...col, width: '4%', ...bg }}>
-                        <Text>{item.s3}</Text>
-                      </View>
-                      <View style={{ ...col, width: '21%' }}>
-                        <Text style={sText}>{item.t3}</Text>
-                      </View>
-                      <View style={{ ...col, width: '4%', ...bg }}>
-                        <Text>{item.s4}</Text>
-                      </View>
-                      <View style={{ ...col, width: '21%' }}>
-                        <Text style={sText}>{item.t4}</Text>
-                      </View>
-                    </View>
-                  )
-                })} */}
-
                 <View style={{ ...section, borderBottom: 'none' }}>
                   <View style={{ width: '50%', flexDirection: 'column' }}>
-                    {ad.map(item => {
-                      return (
-                        <View style={section}>
-                          <View style={{ ...col, width: '8%', ...bg }}>
-                            <Text>{item.s1}</Text>
-                          </View>
-                          <View style={{ ...col, width: '42%' }}>
-                            <Text style={sText}>{item.t1}</Text>
-                          </View>
-                          <View style={{ ...col, width: '8%', ...bg }}>
-                            <Text>{item.s2}</Text>
-                          </View>
-                          <View style={{ ...col, width: '42%' }}>
-                            <Text style={sText}>{item.t2}</Text>
-                          </View>
-                        </View>
-                      )
-                    })}
+                    <View style={section}>
+                      <View style={{ ...col, width: '8%', }}>
+                        <Text style={sText}>{studentData?.getTargetTypesInSession[0]?.insideSession === true ? 'T': 'F'}</Text>
+                      </View>
+                      <View style={{ ...col, width: '42%' }}>
+                        <Text style={sText}>{studentData?.getTargetTypesInSession[0]?.targetType.typeTar}</Text>
+                      </View>
+                      <View style={{ ...col, width: '8%', }}>
+                        <Text style={sText}>{studentData?.getTargetTypesInSession[1]?.insideSession === true ? 'T': 'F'}</Text>
+                      </View>
+                      <View style={{ ...col, width: '42%' }}>
+                        <Text style={sText}>{studentData?.getTargetTypesInSession[1]?.targetType.typeTar}</Text>
+                      </View>
+                    </View>
+                    <View style={section}>
+                      <View style={{ ...col, width: '8%', }}>
+                        <Text style={sText}>{studentData?.getTargetTypesInSession[2]?.insideSession === true ? 'T': 'F'}</Text>
+                      </View>
+                      <View style={{ ...col, width: '42%' }}>
+                        <Text style={sText}>{studentData?.getTargetTypesInSession[2]?.targetType.typeTar}</Text>
+                      </View>
+                      <View style={{ ...col, width: '8%', }}>
+                        <Text style={sText}>{studentData?.getTargetTypesInSession[3]?.insideSession === true ? 'T': 'F'}</Text>
+                      </View>
+                      <View style={{ ...col, width: '42%' }}>
+                        <Text style={sText}>{studentData?.getTargetTypesInSession[3]?.targetType.typeTar}</Text>
+                      </View>
+                    </View>
+                    <View style={section}>
+                      <View style={{ ...col, width: '8%', }}>
+                        <Text style={sText}>{studentData?.getTargetTypesInSession[6]?.insideSession === true ? 'T': 'F'}</Text>
+                      </View>
+                      <View style={{ ...col, width: '42%' }}>
+                        <Text style={sText}>{studentData?.getTargetTypesInSession[6]?.targetType.typeTar}</Text>
+                      </View>
+                      <View style={{ ...col, width: '8%', }}>
+                        <Text style={sText}>{studentData?.getTargetTypesInSession[7]?.insideSession === true ? 'T': 'F'}</Text>
+                      </View>
+                      <View style={{ ...col, width: '42%' }}>
+                        <Text style={sText}>{studentData?.getTargetTypesInSession[7]?.targetType.typeTar}</Text>
+                      </View>
+                    </View>
+                    <View style={section}>
+                      <View style={{ ...col, width: '8%', }}>
+                        <Text style={sText}>{studentData?.getTargetTypesInSession[4]?.insideSession === true ? 'T': 'F'}</Text>
+                      </View>
+                      <View style={{ ...col, width: '42%' }}>
+                        <Text style={sText}>{studentData?.getTargetTypesInSession[4]?.targetType.typeTar}</Text>
+                      </View>
+                      <View style={{ ...col, width: '8%', }}>
+                        <Text style={sText}>{studentData?.getTargetTypesInSession[5]?.insideSession === true ? 'T': 'F'}</Text>
+                      </View>
+                      <View style={{ ...col, width: '42%' }}>
+                        <Text style={sText}>{studentData?.getTargetTypesInSession[5]?.targetType.typeTar}</Text>
+                      </View>
+                    </View>
+                    
+                    
+                     
                   </View>
                   <View style={{ width: '50%', flexDirection: 'column' }}>
                     {ad.map(item => {
                       return (
                         <View style={section}>
-                          <View style={{ ...col, width: '8%', ...bg }}>
-                            <Text>{item.s3}</Text>
+                          <View style={{ ...col, width: '8%', }}>
+                            <Text style={sText}>{item.s3}</Text>
                           </View>
                           <View style={{ ...col, width: '42%' }}>
                             <Text style={sText}>{item.t3}</Text>
                           </View>
-                          <View style={{ ...col, width: '8%', ...bg }}>
-                            <Text>{item.s4}</Text>
+                          <View style={{ ...col, width: '8%', }}>
+                            <Text style={sText}>{item.s4}</Text>
                           </View>
-                          <View style={{ ...col, width: '42%' }}>
+                          <View style={{ ...col, width: '42%', borderRight: 'none' }}>
                             <Text style={sText}>{item.t4}</Text>
                           </View>
                         </View>
@@ -523,16 +596,18 @@ const PrintableInvoice = ({ selectSessionId }) => {
                       <Text>L</Text>
                     </View>
                     <View style={{ flexDirection: 'column', width: '50%' }}>
+                      <Text>{' '}</Text>
                       <Text>T</Text>
                       <Text>A</Text>
                       <Text>R</Text>
                       <Text>G</Text>
                       <Text>E</Text>
                       <Text>T</Text>
+                      <Text>{' '}</Text>
                     </View>
                   </View>
 
-                  <View style={{ width: '80%', flexDirection: 'column' }}>
+                  <View style={{ width: '96%', flexDirection: 'column' }}>
                     <View style={{ ...section, backgroundColor: '#e8e8e8' }}>
                       <View style={{ ...col, width: '3%' }}>
                         <Text style={headerText}>#</Text>
@@ -540,107 +615,164 @@ const PrintableInvoice = ({ selectSessionId }) => {
                       <View style={{ ...col, width: '28%' }}>
                         <Text style={headerText}>BEHAVIOR</Text>
                       </View>
-                      <View style={{ ...col, width: '7%' }}>
-                        <Text style={headerText}>DATA</Text>
+                      <View style={{ ...col, width: '23%' }}>
+                        <Text style={headerText}>INTENSITY</Text>
                       </View>
-                      <View style={{ ...col, width: '12%' }}>
-                        <Text style={headerText}>PROGRESS</Text>
+                      <View style={{ ...col, width: '23%' }}>
+                        <Text style={headerText}>FREQUENCY</Text>
                       </View>
-                      <View style={{ ...col, width: '3%' }}>
-                        <Text style={headerText}>#</Text>
+                      <View style={{ ...col, width: '23%' }}>
+                        <Text style={headerText}>DURATION</Text>
                       </View>
-                      <View style={{ ...col, width: '28%' }}>
-                        <Text style={headerText}>BEHAVIOR</Text>
-                      </View>
-                      <View style={{ ...col, width: '7%' }}>
-                        <Text style={headerText}>DATA</Text>
-                      </View>
-                      <View style={{ ...col, width: '12%' }}>
-                        <Text style={headerText}>PROGRESS</Text>
+                      <View style={{ ...col, width: '16%', borderRight: 'none' }}>
+                        <Text style={headerText}>IRT</Text>
                       </View>
                     </View>
-                    {behave1.map(item => {
+                    {behaviorData.map((item, index) => {
                       return (
                         <View style={{ ...section }}>
                           <View style={{ ...col, width: '3%' }}>
-                            <Text style={mText}>{item.srNo1}</Text>
+                            <Text style={mText}>{index + 1}</Text>
                           </View>
                           <View style={{ ...col, width: '28%' }}>
-                            <Text style={sText}>{item.behaviour1}</Text>
+                            <Text style={sText}>{item.template.behavior.behaviorName}</Text>
                           </View>
-                          <View style={{ ...col, width: '7%' }}>
-                            <Text style={sText}>{item.data1}</Text>
+                          <View style={{ ...col, width: '23%' }}>
+                            <Text style={sText}>{item.intensity}</Text>
                           </View>
-                          <View style={{ ...col, width: '12%' }}>
-                            <Text style={sText}>{item.progress1}</Text>
+                          <View style={{ ...col, width: '23%' }}>
+                            <Text style={sText}>{item.irt}</Text>
                           </View>
-                          <View style={{ ...col, width: '3%' }}>
-                            <Text style={mText}>{item.srNo2}</Text>
+                          <View style={{ ...col, width: '23%' }}>
+                            <Text style={mText}>{moment.duration(item.duration, 'milliseconds').format('HH:mm:ss',{trim:false})}</Text>
                           </View>
-                          <View style={{ ...col, width: '28%' }}>
-                            <Text style={sText}>{item.behaviour2}</Text>
-                          </View>
-                          <View style={{ ...col, width: '7%' }}>
-                            <Text style={sText}>{item.data2}</Text>
-                          </View>
-                          <View style={{ ...col, width: '12%' }}>
-                            <Text style={sText}>{item.progress2}</Text>
+                          <View style={{ ...col, width: '16%', borderRight: 'none' }}>
+                            <Text style={mText}>{item.irt}</Text>
                           </View>
                         </View>
                       )
                     })}
-                  </View>
+                  </View>                  
 
+                </View>
+
+                <View style={{ ...section, borderBottom: 'none' }}>
                   <View
                     style={{
                       ...col,
                       ...bg,
-                      width: '3%',
-                      display: 'flex',
-                      flexDirection: 'column',
+                      ...borderBottom,
                       justifyContent: 'center',
-                      backgroundColor: '#e8e8e8',
-                      fontSize: 10,
-                      borderBottom: '1px solid black',
+                      flexDirection: 'row',
+                      width: '4%',
+                      alignItems: 'center',
+                      fontSize: 9,
                     }}
                   >
-                    <Text>K</Text>
-                    <Text>E</Text>
-                    <Text>Y</Text>
+                    <View style={{ flexDirection: 'column', width: '50%', margin: 'auto 0' }}>
+                      <Text>D</Text>
+                      <Text>A</Text>
+                      <Text>I</Text>
+                      <Text>L</Text>
+                      <Text>Y</Text>
+                    </View>
+                    <View style={{ flexDirection: 'column', width: '50%' }}>
+                      <Text>{' '}</Text>
+                      <Text>V</Text>
+                      <Text>I</Text>
+                      <Text>T</Text>
+                      <Text>A</Text>
+                      <Text>L</Text>
+                      <Text>S</Text>
+                      <Text>{' '}</Text>
+                    </View>
                   </View>
 
-                  <View style={{ width: '13%', flexDirection: 'column' }}>
-                    <View style={{ ...section, height: 20 }}>
-                      <View style={{ ...col, width: 20 }}>
-                        <Text style={mText}>P</Text>
+                  <View style={{ width: '96%', flexDirection: 'column' }}>
+                    <View style={{ ...section, ...bg }}>
+                      <View style={{ ...col, width: '35%', ...bg }}>
+                        <Text style={headerText}>MAND DATA </Text>
                       </View>
-                      <Text style={mText}>Progress</Text>
-                    </View>
-                    <View style={{ ...section, height: 20 }}>
-                      <View style={{ ...col, width: 20 }}>
-                        <Text style={mText}>M</Text>
+                      <View style={{ ...col, width: '65%', ...bg, borderRight: 'none' }}>
+                        <Text style={headerText}>TOILET DATA</Text>
                       </View>
-                      <Text style={mText}>Maintaining</Text>
                     </View>
-                    <View style={{ ...section, height: 20 }}>
-                      <View style={{ ...col, width: 20 }}>
-                        <Text style={mText}>N</Text>
+                    <View style={{ ...section, borderBottom: 'none' }}>
+                      <View style={{ ...col, width: '35%', ...bg }}>
+                        <View style={{ ...section, ...bg }}>
+                          <View style={{ ...col }}>
+                            <Text style={headerText}>#</Text>
+                          </View>
+                          <View style={{ ...col, width: '72%' }}>
+                            <Text style={headerText}>MAND NAME</Text>
+                          </View>
+                          <View style={{ ...col, width: '20%', borderRight: 'none' }}>
+                            <Text style={headerText}>COUNT</Text>
+                          </View>
+                        </View>
                       </View>
-                      <Text style={mText}>No Progress</Text>
-                    </View>
-                    <View style={{ ...section, height: 20 }}>
-                      <View style={{ ...col, width: 20 }}>
-                        <Text style={mText}>{}</Text>
+                      <View style={{ ...col, width: '65%', ...bg, borderRight: 'none' }}>
+                        <View style={{ ...section, ...bg }}>
+                          <View style={{ ...col }}>
+                            <Text style={headerText}>#</Text>
+                          </View>
+                          <View style={{ ...col, width: '30%' }}>
+                            <Text style={headerText}>URINATION TIME</Text>
+                          </View>
+                          <View style={{ ...col, width: '30%' }}>
+                            <Text style={headerText}>PROMPTED</Text>
+                          </View>
+                          <View style={{ ...col, width: '30%', borderRight: 'none' }}>
+                            <Text style={headerText}>BOWEL MOVEMENT</Text>
+                          </View>
+                        </View>
                       </View>
-                      <Text style={mText}>{}</Text>
                     </View>
-                    <View style={{ ...section, height: 20 }}>
-                      <View style={{ ...col, width: 20 }}>
-                        <Text style={mText}>{}</Text>
+
+                    <View style={{ ...section, borderBottom: 'none' }}>
+                      <View style={{ width: '35%', flexDirection: 'column' }}>
+                        {mandData.map((item, index) => {
+                          return (
+                            <View style={section}>
+                              <View style={{ ...col, ...bg }}>
+                                <Text style={sText}>{index + 1}</Text>
+                              </View>
+                              <View style={{ ...col, width: '72%' }}>
+                                <Text style={sText}>{item.dailyClick?.measurments}</Text>
+                              </View>
+                              <View style={{ ...col, width: '20%' }}>
+                                <Text style={sText}>{item.data}</Text>
+                              </View>
+                            </View>
+                          )
+                        })}
                       </View>
-                      <Text style={mText}>{}</Text>
+                      <View style={{ width: '65%', flexDirection: 'column' }}>
+                        {toiletData.map((item, index) => {
+                          return (
+                            <View style={section}>
+                              <View style={{ ...col, ...bg }}>
+                                <Text style={sText}>{index + 1}</Text>
+                              </View>
+                              <View style={{ ...col, width: '30%' }}>
+                                <Text style={sText}>{item.time}</Text>
+                              </View>
+                              <View style={{ ...col, width: '30%' }}>
+                                <Text style={sText}>{item.prompted === true ? 'YES' : 'NO'}</Text>
+                              </View>
+                              <View style={{ ...col, width: '30%', borderRight: 'none' }}>
+                                <Text style={sText}>{item.bowel === true ? 'YES' : 'NO'}</Text>
+                              </View>
+                            </View>
+                          )
+                        })}
+                      </View>
+
                     </View>
+
                   </View>
+
+
                 </View>
 
                 <View style={{ ...section, textAlign: 'center' }}>
@@ -654,34 +786,34 @@ const PrintableInvoice = ({ selectSessionId }) => {
                   <View style={{ ...col, width: '72%' }}>
                     <Text style={headerText}>Objective</Text>
                   </View>
-                  <View style={{ ...col, width: '20%' }}>
+                  <View style={{ ...col, width: '20%', borderRight: 'none' }}>
                     <Text style={headerText}>Correct Trials</Text>
                   </View>
                 </View>
-                {studentData.getSessionDataRecording.edges.map((item, index)=> {
+                {studentData.getSessionDataRecording.edges.map((item, index) => {
                   return (
                     <View style={{ ...section }}>
                       {item.node.targets.targetAllcatedDetails.targetType.id === peakId ?
                         <>
                           <View style={{ ...col }}>
-                            <Text style={sText}>{index+1}</Text>
+                            <Text style={sText}>{index + 1}</Text>
                           </View>
                           <View style={{ ...col, width: '72%' }}>
                             <Text style={sText}>{item.node.targets.targetAllcatedDetails.targetName}</Text>
                           </View>
-                          <View style={{ ...col, width: '20%' }}>
+                          <View style={{ ...col, width: '20%', borderRight: 'none' }}>
                             <Text style={sText}>{item.node.peak.totalCorrect}</Text>
                           </View>
                         </>
                         :
                         <>
                           <View style={{ ...col }}>
-                            <Text style={sText}>{index+1}</Text>
+                            <Text style={sText}>{index + 1}</Text>
                           </View>
                           <View style={{ ...col, width: '72%' }}>
                             <Text style={sText}>{item.node.targets.targetAllcatedDetails.targetName}</Text>
                           </View>
-                          <View style={{ ...col, width: '20%' }}>
+                          <View style={{ ...col, width: '20%', borderRight: 'none' }}>
                             <Text style={sText}>{item.node.sessionRecord.totalCorrect}</Text>
                           </View>
                         </>
@@ -828,11 +960,11 @@ const PrintableInvoice = ({ selectSessionId }) => {
                       <Text style={headerTextBorder}>DATE</Text>
                     </View>
                     <View style={{ width: '100%', borderBottom: '1px solid black' }}>
-                      <Text style={mText}>20/04/2021</Text>
+                      <Text style={mText}>{moment().format('YYYY-MM-DD')}</Text>
                     </View>
                     <View style={{ width: '100%' }}>
                       <Text style={mText}>
-                        {'_ '} BCBA {'_ '} RBT
+                        {' '}
                     </Text>
                     </View>
                   </View>
