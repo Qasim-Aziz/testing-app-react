@@ -34,13 +34,12 @@ const roundNumber = (num, digitFigure) => {
 function InvoicePayments({ form, invoiceObj, closeDrawer }) {
   const statusList = [
     { key: 'SW52b2ljZVN0YXR1c1R5cGU6Mg==', name: 'Pending' },
+    { key: 'SW52b2ljZVN0YXR1c1R5cGU6NA==', name: 'Sent' },
     { key: 'SW52b2ljZVN0YXR1c1R5cGU6Mw==', name: 'Paid' },
     { key: 'SW52b2ljZVN0YXR1c1R5cGU6Ng==', name: 'Partially Paid' },
   ]
 
   const [selectedStatus, setSelectedStatus] = useState(invoiceObj.statusId)
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState()
-  const [amount, setAmount] = useState()
   const [tableData, setTableData] = useState([])
   const [total, setTotal] = useState(0)
 
@@ -68,13 +67,11 @@ function InvoicePayments({ form, invoiceObj, closeDrawer }) {
   )
 
   useEffect(() => {
-    console.log(invoicePayments, 'inv')
     if (invoicePayments) {
       const tempTable = []
       let tempTotal = 0
       invoicePayments.getInvoicePayments.edges.map(item => {
         tempTable.push(item.node)
-        console.log(item.node.amount)
         tempTotal += Number(item.node.amount)
       })
       setTableData(tempTable)
@@ -82,16 +79,10 @@ function InvoicePayments({ form, invoiceObj, closeDrawer }) {
     }
   }, [invoicePayments])
 
-  console.log(invoiceObj)
-  console.log(paymentMethods)
-  console.log(invoicePayments)
-  console.log(tableData, 'tableData')
-
   const handleSubmit = e => {
     e.preventDefault()
     form.validateFields((error, values) => {
       if (!error && invoiceObj.key) {
-        console.log(values)
         updateInvoiceStatus({
           variables: {
             pk: invoiceObj.key,
@@ -105,20 +96,20 @@ function InvoicePayments({ form, invoiceObj, closeDrawer }) {
           })
           .catch(err => console.error(err))
 
-        createInvoicePayment({
-          variables: {
-            invoiceId: invoiceObj.key,
-            paymentMethod: values.paymentMethod,
-            amount: values.amount,
-          },
-        })
-          .then(res => {
-            notification.success({
-              message: 'Payment added successfully',
-            })
-            closeDrawer()
-          })
-          .catch(err => console.error(err))
+        // createInvoicePayment({
+        //   variables: {
+        //     invoiceId: invoiceObj.key,
+        //     paymentMethod: values.paymentMethod,
+        //     amount: values.amount,
+        //   },
+        // })
+        //   .then(res => {
+        //     notification.success({
+        //       message: 'Payment added successfully',
+        //     })
+        //     closeDrawer()
+        //   })
+        //   .catch(err => console.error(err))
       }
     })
   }
@@ -216,7 +207,7 @@ function InvoicePayments({ form, invoiceObj, closeDrawer }) {
       <Table columns={columns} dataSource={tableData} rowKey="id" bordered pagination={false} />
       <div style={{ padding: 16 }}>
         <div style={{ display: 'flex', marginLeft: 'auto', width: 'fit-content' }}>
-          <Text style={{ fontSize: 18, fontWeight: 600 }}>Total</Text>
+          <Text style={{ fontSize: 18, fontWeight: 600 }}>Total :</Text>
           <Text
             style={{
               width: 100,
@@ -230,7 +221,7 @@ function InvoicePayments({ form, invoiceObj, closeDrawer }) {
           </Text>
         </div>
         <div style={{ display: 'flex', marginLeft: 'auto', width: 'fit-content' }}>
-          <Text style={{ fontSize: 18, fontWeight: 600 }}>Invoice Amount</Text>
+          <Text style={{ fontSize: 18, fontWeight: 600 }}>Invoice Amount :</Text>
           <Text
             style={{
               width: 100,
@@ -244,7 +235,7 @@ function InvoicePayments({ form, invoiceObj, closeDrawer }) {
           </Text>
         </div>
         <div style={{ display: 'flex', marginLeft: 'auto', width: 'fit-content' }}>
-          <Text style={{ fontSize: 18, fontWeight: 600 }}>Remaining</Text>
+          <Text style={{ fontSize: 18, fontWeight: 600 }}>Remaining :</Text>
           <Text
             style={{
               width: 100,
@@ -260,7 +251,7 @@ function InvoicePayments({ form, invoiceObj, closeDrawer }) {
         {invoiceObj.status === 'Paid' ? (
           <div style={{ display: 'flex', marginLeft: 'auto', width: 'fit-content' }}>
             <Text style={{ fontSize: 18, fontWeight: 600, color: COLORS.success }}>
-              Paid <CheckCircleOutlined />{' '}
+              Paid <CheckCircleOutlined />
             </Text>
           </div>
         ) : null}

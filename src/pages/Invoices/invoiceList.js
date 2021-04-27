@@ -32,60 +32,7 @@ import InvoiceForm from 'components/invoice/InvoiceForm'
 import EditInvoice from 'components/invoice/EditInvoice'
 import PreviewInvoice from '../allClinicData/viewInvoice'
 import './invoices.scss'
-
-const GET_INVOICES = gql`
-  query getInvoices($from: Date, $to: Date, $status: ID) {
-    getInvoices(date_Gte: $from, date_Lte: $to, status: $status) {
-      edges {
-        node {
-          id
-          invoiceNo
-          email
-          issueDate
-          dueDate
-          amount
-          address
-          taxableSubtotal
-          discount
-          total
-          clinic {
-            id
-            schoolName
-          }
-          status {
-            id
-            statusName
-          }
-          invoiceFee {
-            edges {
-              node {
-                id
-                quantity
-                rate
-                amount
-                tax
-                schoolServices {
-                  id
-                  name
-                  description
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`
-
-const DELETE_INVOICE = gql`
-  mutation deleteInvoice($id: ID!) {
-    deleteInvoice(input: { pk: $id }) {
-      status
-      message
-    }
-  }
-`
+import { GET_INVOICES, DELETE_INVOICE } from './query'
 
 const dateFormate = 'YYYY-MM-DD'
 
@@ -437,24 +384,6 @@ export default () => {
   return (
     <div style={{ marginTop: 10 }}>
       <Helmet title="Dashboard Alpha" />
-
-      {/* <div
-        style={{
-          display: 'flex',
-          flexDirection: '',
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          marginTop: 10,
-          marginBottom: 10,
-        }}
-      >
-       
-        <Button type="primary" onClick={() => setCreateInvoice(true)}>
-          ADD INVOICE
-          <PlusOutlined />
-        </Button>
-      </div> */}
-
       <div className="table-outer-border">
         <Table
           columns={columns}
@@ -476,28 +405,12 @@ export default () => {
 
       <Drawer
         visible={isPreviewInvoice}
-        width={DRAWER.widthL3}
+        width={DRAWER.widthL2}
         className="change-invo-drawer"
         onClose={() => setPreviewInvoice(false)}
       >
         <PreviewInvoice invoice={currentInvoice} />
       </Drawer>
-
-      {/* <Drawer visible={isEditInvoice} width={DRAWER.widthL1} onClose={() => setEditInvoice(false)}>
-        <EditInvoice
-          invoiceId={editInvoiceId}
-          closeDrawer={setEditInvoice}
-          refetchInvoices={refetch}
-        />
-      </Drawer> */}
-
-      {/* <Drawer
-        visible={isCreateInvoice}
-        width={DRAWER.widthL1}
-        onClose={() => setCreateInvoice(false)}
-      >
-        <InvoiceForm setNewInvDrawer={setCreateInvoice} refetchInvoices={refetch} />
-      </Drawer> */}
     </div>
   )
 }

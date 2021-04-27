@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* eslint-disable no-unneeded-ternary */
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet'
@@ -20,8 +20,8 @@ import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import JsPDF from 'jspdf'
 import {
-  PlusOutlined,
   CloudDownloadOutlined,
+  MailOutlined,
   CloseCircleOutlined,
   FilePdfOutlined,
   EditOutlined,
@@ -32,11 +32,11 @@ import moment from 'moment'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import InvoiceForm from 'components/invoice/InvoiceForm'
 import EditInvoice from './editInvoice'
-import LoadingComponent from '../../staffProfile/LoadingComponent'
 import UpdateInvoiceStatus from './updateInvoiceStatus'
 import PreviewInvoice from './previewInvoice'
 import { GET_INVOICES, DELETE_INVOICE, GET_INVOICE_STATUS_LIST } from './query'
 import './template.scss'
+import SendPaymentLinks from './sendPaymentLinks'
 
 const dateFormate = 'YYYY-MM-DD'
 
@@ -50,6 +50,8 @@ export default () => {
   const [editInvoiceId, setEditInvoiceId] = useState()
   const [invoiceStatusDrawer, setInvoiceStatusDrawer] = useState(false)
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
+  const [payReminderDrawer, setPayReminderDrawer] = useState(false)
+  const [payReminderData, setPayReminderData] = useState([])
 
   const [from, setFrom] = useState()
   const [to, setTo] = useState()
@@ -59,6 +61,7 @@ export default () => {
 
   const { data: invoiceStatusList } = useQuery(GET_INVOICE_STATUS_LIST)
 
+  console.log(invoiceStatusList)
   const { data: invoiceData, error: invoiceError, loading: invoiceLoading, refetch } = useQuery(
     GET_INVOICES,
     {
@@ -78,16 +81,14 @@ export default () => {
               .format(dateFormate)
           : undefined,
         status: filterStatus,
+        customer_School: localStorage.getItem('userId'),
       },
       fetchPolicy: 'no-cache',
     },
   )
 
-  console.log(invoiceData, invoiceError, invoiceLoading)
-  const [
-    deleteInvoice,
-    { data: deleteInvoiceData, error: deleteInvoiceError, loading: deleteInvoiceLoading },
-  ] = useMutation(DELETE_INVOICE)
+  // console.log(invoiceData, invoiceError, invoiceLoading)
+  const [deleteInvoice, { oading: deleteInvoiceLoading }] = useMutation(DELETE_INVOICE)
 
   useEffect(() => {
     if (invoiceData) {
@@ -97,46 +98,24 @@ export default () => {
           key: node.id,
           invoiceNo: node.invoiceNo,
           amount: node.amount,
+          total: node.total,
           client: node.customer?.parent?.username,
           status: node.status.statusName,
           statusId: node.status.id,
           colorCode: node.status.colorCode,
           date: node.issueDate,
-          name: node.customer?.parent
-            ? `${node.customer.parent.firstName} ${
-                node.customer.parent.lastName ? node.customer?.parent?.lastName : ' '
-              }`
+          name: node.customer
+            ? `${node.customer.firstname} ${node.customer.lastname ? node.customer.lastname : ' '}`
             : null,
           email: node.email,
+          linkGenerated: node.linkGenerated,
         }
       })
-      arrengedData.reverse()
+      arrengedData.sort((a, b) => new Date(b.date) - new Date(a.date))
       setData(arrengedData)
+      setSelectedRowKeys([])
     }
   }, [invoiceData])
-
-  useEffect(() => {
-    if (deleteInvoiceData) {
-      notification.success({
-        message: 'Delete invoice sucessfully',
-      })
-      setData(state => {
-        return state.filter(invoice => {
-          return invoice.key !== deleteInvoiceId
-        })
-      })
-      setDeleteInvoiceId(null)
-    }
-  }, [deleteInvoiceData])
-
-  useEffect(() => {
-    if (deleteInvoiceError) {
-      notification.error({
-        message: 'opps error on delete invoice',
-      })
-      setDeleteInvoiceId(null)
-    }
-  }, [deleteInvoiceError])
 
   useEffect(() => {
     if (invoiceError) {
@@ -146,10 +125,6 @@ export default () => {
       })
     }
   }, [invoiceError])
-
-  const updateInvoiceStatus = row => {
-    console.log(row)
-  }
 
   const columns = [
     {
@@ -176,7 +151,7 @@ export default () => {
     },
     {
       title: 'Amount',
-      dataIndex: 'amount',
+      dataIndex: 'total',
     },
     {
       title: 'Status',
@@ -203,7 +178,7 @@ export default () => {
       render: row => {
         return (
           <div>
-            {/* <Button
+            <Button
               onClick={() => {
                 setSelectedInvoiceId(row.key)
                 setPreviewInvoice(true)
@@ -211,7 +186,7 @@ export default () => {
               type="link"
             >
               <FilePdfOutlined style={{ fontWeight: 600 }} />
-            </Button> */}
+            </Button>
 
             {row.status !== 'Paid' && (
               <>
@@ -228,6 +203,24 @@ export default () => {
                   title="Are you sure to delete this invoice?"
                   onConfirm={() => {
                     deleteInvoice({ variables: { id: row.key } })
+                      .then(res => {
+                        notification.success({
+                          message: 'Delete invoice sucessfully',
+                        })
+                        setData(state => {
+                          return state.filter(invoice => {
+                            return invoice.key !== deleteInvoiceId
+                          })
+                        })
+                        refetch()
+                        setDeleteInvoiceId(null)
+                      })
+                      .catch(err => {
+                        notification.error({
+                          message: 'opps error on delete invoice',
+                        })
+                        setDeleteInvoiceId(null)
+                      })
                     setDeleteInvoiceId(row.key)
                   }}
                   okText="Yes"
@@ -245,8 +238,10 @@ export default () => {
     },
   ]
 
-  const onSelectChange = selectedRowKeys => {
-    setSelectedRowKeys(selectedRowKeys)
+  // Allocate target target suggestion create program
+
+  const onSelectChange = key => {
+    setSelectedRowKeys(key)
   }
 
   const rowSelection = {
@@ -255,13 +250,10 @@ export default () => {
   }
 
   let filteredList = data || []
-  filteredList = filteredList.filter(
-    item => item.status && item.status.toLowerCase().includes(filterStatus.toLowerCase()),
-  )
 
   if (filterCustomer) {
     filteredList = filteredList.filter(
-      item => item.client && item.client.toLowerCase().includes(filterCustomer.toLowerCase()),
+      item => item.name && item.name.toLowerCase().includes(filterCustomer.toLowerCase()),
     )
   }
 
@@ -317,7 +309,7 @@ export default () => {
       return {
         InvoiceNo: e.invoiceNo,
         Amount: e.amount,
-        Client: e.client,
+        Client: e.name,
         Status: e.status,
         Date: e.date,
       }
@@ -330,6 +322,31 @@ export default () => {
     FileSaver.saveAs(data1, fileName + fileExtension)
   }
 
+  // console.log(selectedRowKeys, 'sele')
+
+  const handleMenuActions = e => {
+    const names = []
+    filteredList.map(item =>
+      selectedRowKeys.map(key =>
+        key === item.key
+          ? names.push({
+              key: item.key,
+              linkGenerated: item.linkGenerated,
+              invNo: item.invoiceNo,
+              name: item.name,
+              email: item.email,
+              amount: item.amount,
+              status: item.status,
+            })
+          : null,
+      ),
+    )
+
+    if (e.key === 'payReminder') {
+      setPayReminderDrawer(true)
+      setPayReminderData(names)
+    }
+  }
   const menu = (
     <Menu>
       <Menu.Item key="0">
@@ -345,6 +362,13 @@ export default () => {
     </Menu>
   )
 
+  const actions = (
+    <Menu onClick={e => handleMenuActions(e)}>
+      <Menu.Item key="payReminder">
+        <MailOutlined /> Send Reminder
+      </Menu.Item>
+    </Menu>
+  )
   const filterHeader = (
     <div
       style={{
@@ -363,6 +387,12 @@ export default () => {
           alignItems: 'center',
         }}
       >
+        <Dropdown overlay={actions}>
+          <Button style={{ margin: '0px 28px 0 6px' }}>
+            Actions <Icon type="down" />
+          </Button>
+        </Dropdown>
+
         <div>
           <span>Status :</span>
           <Select
@@ -431,27 +461,11 @@ export default () => {
     </div>
   )
 
+  console.log(filteredList)
+
   return (
     <div style={{ marginTop: 10 }}>
       <Helmet title="Dashboard Alpha" />
-
-      {/* <div
-        style={{
-          display: 'flex',
-          flexDirection: '',
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          marginTop: 10,
-          marginBottom: 10,
-        }}
-      >
-       
-        <Button type="primary" onClick={() => setCreateInvoice(true)}>
-          ADD INVOICE
-          <PlusOutlined />
-        </Button>
-      </div> */}
-
       <div className="table-outer-border">
         <Table
           columns={columns}
@@ -479,6 +493,19 @@ export default () => {
         onClose={() => setPreviewInvoice(false)}
       >
         <PreviewInvoice invoiceId={selectedInvoiceId} />
+      </Drawer>
+
+      <Drawer
+        title="Send Invoices"
+        visible={payReminderDrawer}
+        width={DRAWER.widthL2}
+        onClose={() => setPayReminderDrawer(false)}
+      >
+        <SendPaymentLinks
+          selectedRowKeys={selectedRowKeys}
+          payReminderData={payReminderData}
+          closeDrawer={() => setPayReminderDrawer(false)}
+        />
       </Drawer>
 
       <Drawer

@@ -304,6 +304,7 @@ export const GET_INVOICES = gql`
           sgst
           cgst
           discount
+          tax
           total
           id
           dueDate

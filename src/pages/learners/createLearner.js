@@ -133,9 +133,7 @@ class BasicInformationForm extends React.Component {
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="Last Name" style={itemStyle}>
-          {form.getFieldDecorator('lastName', {
-            rules: [{ required: false, message: 'Please provide lastName!' }],
-          })(<Input style={{ borderRadius: 0 }} />)}
+          {form.getFieldDecorator('lastName')(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
         <Form.Item label="Email" style={itemStyle}>
           {form.getFieldDecorator('email', {
