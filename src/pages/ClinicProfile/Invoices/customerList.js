@@ -87,7 +87,7 @@ function CustomerList() {
             >
               Maintain Rates
             </Button>
-            {/* <Button
+            <Button
               onClick={() => {
                 createStudentInvoice({
                   variables: {
@@ -106,7 +106,7 @@ function CustomerList() {
               type="link"
             >
               Create
-            </Button> */}
+            </Button>
           </>
         )
       },

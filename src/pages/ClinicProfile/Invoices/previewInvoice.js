@@ -6,18 +6,19 @@
 /* eslint-disable radix */
 /* eslint-disable */
 import React, { useState, useEffect } from 'react'
-import { useHistory } from 'react-router-dom'
-import { Button, notification, Tooltip } from 'antd'
+import { Button, Drawer, notification, Tooltip } from 'antd'
 import { PrinterOutlined, FilePdfOutlined } from '@ant-design/icons'
 import moment from 'moment'
 import { ToWords } from 'to-words'
 import { useQuery } from 'react-apollo'
 import logo from 'images/WhatsApp Image 2020-04-23 at 10.00.40 (1).jpeg'
 import LoadingComponent from 'components/LoadingComponent'
-import { GET_INVOICE, GET_PAYMENT_RECIEVING_DETIAILS } from './query'
+import { GET_INVOICE, GET_PAYMENT_RECIEVING_DETIAILS, GET_SCHOOL_DETAILS } from './query'
+import PrintableInvoice from './printableInvoice'
+import { DRAWER } from 'assets/styles/globalStyles'
 
 const general = {
-  fontSize: '12px',
+  fontSize: '14px',
   padding: '5px 8px',
   color: 'black',
   fontWeight: '500',
@@ -45,7 +46,7 @@ const flexSection = {
 }
 const dateSection = {
   width: '40%',
-  fontSize: 12,
+  fontSize: 14,
   alignSelf: 'flex-start',
   textAlign: 'left',
   fontWeight: '500',
@@ -77,20 +78,6 @@ const taxSection = {
   textAlign: 'right',
   minWidth: '120px',
 }
-const monthNames = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-]
 
 function getTotal(subTotal, discount = 0, gst = 0, sgst = 0, tax = 0) {
   return Number(
@@ -113,16 +100,14 @@ const PreviewInvoice = ({ invoiceId }) => {
   )
 
   const { data: detailsData, loading: detailsLoading, error: detailsError } = useQuery(
-    GET_PAYMENT_RECIEVING_DETIAILS,
+    GET_SCHOOL_DETAILS,
   )
 
-  // console.log(invoiceData, isInvoiceDataLoading, invoiceDataErrors, 'invoice Data')
-  // console.log(detailsData, detailsLoading, detailsError, 'details')
   const [invoice, setInvoice] = useState(null)
   const [currencyName, setCurrencyName] = useState(null)
   const [subTotal, setSubtotal] = useState(0)
+  const [printInvoiceDrawer, setPrintInvoiceDrawer] = useState(false)
   const [isValidImage, setIsValidImage] = useState(false)
-  const history = useHistory()
 
   console.log(invoiceData, 'invoiceData')
   useEffect(() => {
@@ -150,11 +135,6 @@ const PreviewInvoice = ({ invoiceId }) => {
   })
 
   const total = 0
-
-  const invoke = () => {
-    localStorage.setItem('currentInvoice', JSON.stringify(invoice))
-    history.push('/printInvoice')
-  }
 
   useEffect(() => {
     if (detailsError || invoiceDataErrors) {
@@ -184,7 +164,18 @@ const PreviewInvoice = ({ invoiceId }) => {
     return http.status != 404
   }
 
-  const { ifscCode, bankName, accountHolderName, bankAccountNo } = detailsData?.schoolDetail
+  const {
+    schoolName,
+    address,
+    ifscCode,
+    bankName,
+    accountHolderName,
+    bankAccountNo,
+    country,
+    upi,
+    gpay,
+    paytm,
+  } = detailsData.schoolDetail
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -205,7 +196,7 @@ const PreviewInvoice = ({ invoiceId }) => {
             className=" ant-drawer-close"
             style={{ right: '45px' }}
             type="link"
-            onClick={invoke}
+            onClick={() => setPrintInvoiceDrawer(true)}
           >
             <PrinterOutlined />
           </Button>
@@ -219,7 +210,7 @@ const PreviewInvoice = ({ invoiceId }) => {
                 {isValidImage ? (
                   <img
                     alt="Logo"
-                    src={invoice.customer?.school?.logo}
+                    src={logo}
                     style={{
                       maxWidth: '100%',
                       maxHeight: '100%',
@@ -243,28 +234,28 @@ const PreviewInvoice = ({ invoiceId }) => {
               >
                 <div
                   style={{
-                    fontSize: 14,
+                    fontSize: 16,
                     width: '100%',
                     alignSelf: 'flex-start',
                     textAlign: 'left',
                   }}
                 >
-                  {invoice.customer?.school?.schoolName}
+                  {schoolName}
                 </div>
                 <div
                   style={{
-                    fontSize: 11,
+                    fontSize: 13,
                     width: '100%',
                     alignSelf: 'flex-start',
                     textAlign: 'left',
                     fontWeight: '600',
                   }}
                 >
-                  {invoice.customer?.school?.address}
+                  {address}
                 </div>
                 <div
                   style={{
-                    fontSize: 11,
+                    fontSize: 13,
                     width: '100%',
                     alignSelf: 'flex-start',
                     textAlign: 'left',
@@ -280,6 +271,7 @@ const PreviewInvoice = ({ invoiceId }) => {
                   width: '200px',
                   alignSelf: 'center',
                   padding: '0 20px',
+                  fontSize: 18,
                 }}
               >
                 <div>{invoice?.invoiceNo}</div>
@@ -365,15 +357,8 @@ const PreviewInvoice = ({ invoiceId }) => {
                 Subject
               </div>
               <div style={{ ...general, alignSelf: 'flex-start', width: '300px' }}>
-                : Cogniable Service Invoice for{' '}
-                {
-                  monthNames[
-                    moment(invoice.issueDate)
-                      .subtract(1, 'M')
-                      .format('MM') - 1
-                  ]
-                }{' '}
-                {new Date(invoice.issueDate).getFullYear()}
+                : Cogniable Service Invoice for {moment(invoice.issueDate).format('MMMM')}{' '}
+                {moment(invoice.issueDate).format('YYYY')}
               </div>
             </div>
             <div style={{ ...rowStyle, backgroundColor: '#fafafa' }}>
@@ -554,6 +539,14 @@ const PreviewInvoice = ({ invoiceId }) => {
           </div>
         </div>
       </div>
+      <Drawer
+        title={invoice.invoiceNo}
+        visible={printInvoiceDrawer}
+        width={DRAWER.widthL2}
+        onClose={() => setPrintInvoiceDrawer(false)}
+      >
+        <PrintableInvoice invoiceId={invoiceId} />
+      </Drawer>
     </div>
   )
 }

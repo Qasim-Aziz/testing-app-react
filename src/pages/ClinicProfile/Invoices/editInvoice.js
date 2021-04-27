@@ -28,6 +28,7 @@ import { CreateProductForm } from 'components/invoice/InvoiceProductsTable'
 import client from 'apollo/config'
 import 'components/invoice/invoiceForm.scss'
 import '../../allClinicData/allClinicData.scss'
+import './template.scss'
 import {
   GET_INVOICE_STATUS_LIST,
   PRODUCT_LIST,
@@ -103,6 +104,9 @@ const EditableCell = ({
   const [editing, setEditing] = useState(false)
   const inputRef = useRef(null)
   const form = useContext(EditableContext)
+  const { data: productData, loading: productLoading, refetch: productRefetch } = useQuery(
+    PRODUCT_LIST,
+  )
 
   useEffect(() => {
     if (editing) {
@@ -133,8 +137,36 @@ const EditableCell = ({
 
   if (editable) {
     childNode = editing ? (
-      <div>
-        {title === 'Quantity' ? (
+      <div className="table-input-field">
+        {title === 'Service' ? (
+          <Form.Item
+            style={{
+              margin: 0,
+            }}
+            name={dataIndex}
+          >
+            {form.getFieldDecorator(title.toLowerCase(), {
+              initialValue: record[title.toLowerCase()],
+              rules: [{ required: true, message: 'Please give service' }],
+            })(
+              <Select
+                ref={inputRef}
+                loading={productLoading}
+                placeholder="Please select a product"
+                onPressEnter={save}
+                onBlur={save}
+              >
+                {productData?.invoiceProductsList.map(({ id, name }) => {
+                  return (
+                    <Option key={id} value={id}>
+                      {name}
+                    </Option>
+                  )
+                })}
+              </Select>,
+            )}
+          </Form.Item>
+        ) : title === 'Quantity' ? (
           <Form.Item style={{ textAlign: 'right', alignSelf: 'flex-end' }}>
             {form.getFieldDecorator('qty', {
               initialValue: record.qty,
@@ -172,7 +204,6 @@ const EditableCell = ({
                 style={{ width: '100%', textAlign: 'right', alignSelf: 'flex-end' }}
                 ref={inputRef}
                 type="number"
-                // step={false}
                 min={0}
                 onPressEnter={save}
                 onBlur={save}
@@ -213,22 +244,20 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
   const { data: productData, loading: productLoading, refetch: productRefetch } = useQuery(
     PRODUCT_LIST,
   )
-  const { data: invoiceFeeItems, loading: invoiceFeeItemsLoading } = useQuery(STUDENT_INVOICE_ITEMS)
+
   const [updateStudentInvoice, { loading: updateStudentInvoiceLoading }] = useMutation(
     UPDATE_STUDENT_INVOICE,
   )
 
+  console.log(productData, 'this is sprofy data')
   useEffect(() => {
     if (invoiceData) {
       setInvoiceDetails(invoiceData.invoiceDetail)
-
       if (
         invoiceData.invoiceDetail.invoiceFee &&
         invoiceData.invoiceDetail.invoiceFee.edges.length > 0
       ) {
-        let tempTotal = 0
         const tempList = invoiceData.invoiceDetail.invoiceFee.edges.map(({ node }) => {
-          tempTotal += roundNumber(Number(node.quantity) * Number(node.rate), 3)
           return {
             key: Math.random(),
             service: node.schoolServices?.id,
@@ -237,7 +266,7 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
             amount: roundNumber(Number(node.quantity) * Number(node.rate), 3),
           }
         })
-        setSubTotal(tempTotal)
+        calculateTotal(tempList)
         setTableData(tempList)
       }
     }
@@ -335,6 +364,15 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
     setTableData(newData)
   }
 
+  const calculateTotal = tempList => {
+    let tempTotal = 0
+    tempList.forEach(node => {
+      console.log(node, 'this is node')
+      tempTotal += roundNumber(Number(node.qty) * Number(node.rate), 3)
+    })
+    setSubTotal(tempTotal)
+  }
+
   const handleDelete = row => {
     const tempTableData = [...tableData]
     for (let i = 0; i < tempTableData.length; i++) {
@@ -342,12 +380,14 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
         tempTableData.splice(i, 1)
       }
     }
+    calculateTotal(tempTableData)
     setTableData(tempTableData)
   }
 
   const handleAdd = () => {
     const newProductData = {
       key: Math.random(),
+      service: productList[0].id,
       qty: 1,
       rate: 0,
       amount: roundNumber(1 * 0, 3),
@@ -365,6 +405,7 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
       title: 'Service',
       dataIndex: 'service',
       align: 'left',
+      editable: true,
       width: 250,
       render: obj => {
         return productList.find(({ id }) => obj === id)?.name
@@ -441,7 +482,7 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
   console.log(invoiceDetails, 'invoiceDetilas')
   console.log(tableData, 'tavleData')
   return (
-    <div style={{ padding: '0 100px' }}>
+    <div style={{ padding: '0 60px' }}>
       <Form onSubmit={submit}>
         <div style={{ display: 'flex', marginTop: 50, justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
@@ -528,6 +569,9 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
             pagination={false}
             footer={() => (
               <div style={{ display: 'flex', alignItems: 'center' }}>
+                <Button onClick={handleAdd} type="primary">
+                  Add a Line
+                </Button>
                 <Text
                   style={{
                     marginLeft: 'auto',

@@ -63,6 +63,7 @@ export default () => {
 
   const { data: invoiceStatusList } = useQuery(GET_INVOICE_STATUS_LIST)
 
+  console.log(invoiceStatusList)
   const { data: invoiceData, error: invoiceError, loading: invoiceLoading, refetch } = useQuery(
     GET_INVOICES,
     {
@@ -99,20 +100,20 @@ export default () => {
           key: node.id,
           invoiceNo: node.invoiceNo,
           amount: node.amount,
+          total: node.total,
           client: node.customer?.parent?.username,
           status: node.status.statusName,
           statusId: node.status.id,
           colorCode: node.status.colorCode,
           date: node.issueDate,
-          name: node.customer?.parent
-            ? `${node.customer.parent.firstName} ${
-                node.customer.parent.lastName ? node.customer?.parent?.lastName : ' '
-              }`
+          name: node.customer
+            ? `${node.customer.firstname} ${node.customer.lastname ? node.customer.lastname : ' '}`
             : null,
           email: node.email,
+          linkGenerated: node.linkGenerated,
         }
       })
-      arrengedData.reverse()
+      arrengedData.sort((a, b) => new Date(b.date) - new Date(a.date))
       setData(arrengedData)
       setSelectedRowKeys([])
     }
@@ -152,7 +153,7 @@ export default () => {
     },
     {
       title: 'Amount',
-      dataIndex: 'amount',
+      dataIndex: 'total',
     },
     {
       title: 'Status',
@@ -254,11 +255,9 @@ export default () => {
 
   if (filterCustomer) {
     filteredList = filteredList.filter(
-      item => item.client && item.client.toLowerCase().includes(filterCustomer.toLowerCase()),
+      item => item.name && item.name.toLowerCase().includes(filterCustomer.toLowerCase()),
     )
   }
-
-  // console.log(filteredList, 'filteredList')
 
   const status =
     data && data.length > 0
@@ -312,7 +311,7 @@ export default () => {
       return {
         InvoiceNo: e.invoiceNo,
         Amount: e.amount,
-        Client: e.client,
+        Client: e.name,
         Status: e.status,
         Date: e.date,
       }
@@ -334,6 +333,7 @@ export default () => {
         key === item.key
           ? names.push({
               key: item.key,
+              linkGenerated: item.linkGenerated,
               invNo: item.invoiceNo,
               name: item.name,
               email: item.email,
@@ -462,6 +462,8 @@ export default () => {
       </div>
     </div>
   )
+
+  console.log(filteredList)
 
   return (
     <div style={{ marginTop: 10 }}>

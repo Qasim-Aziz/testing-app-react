@@ -1,6 +1,32 @@
 import gql from 'graphql-tag'
 
-const GET_INVOICES = gql`
+export const GET_SCHOOL_DETAILS = gql`
+  query {
+    schoolDetail {
+      id
+      schoolName
+      contactNo
+      email
+      address
+      country {
+        id
+        name
+      }
+      currency {
+        id
+        currency
+        symbol
+      }
+      logo
+      bankName
+      bankAccountNo
+      ifscCode
+      accountHolderName
+    }
+  }
+`
+
+export const GET_INVOICES = gql`
   query getInvoices($from: Date, $to: Date, $status: ID, $customer_School: ID) {
     getInvoices(
       date_Gte: $from
@@ -20,6 +46,7 @@ const GET_INVOICES = gql`
           taxableSubtotal
           discount
           total
+          linkGenerated
           clinic {
             id
             schoolName
@@ -36,6 +63,8 @@ const GET_INVOICES = gql`
           }
           customer {
             id
+            firstname
+            lastname
             parent {
               firstName
               lastName
@@ -133,7 +162,7 @@ export const UPDATE_STUDENT_INVOICE = gql`
   }
 `
 
-const DELETE_INVOICE = gql`
+export const DELETE_INVOICE = gql`
   mutation deleteInvoice($id: ID!) {
     deleteInvoice(input: { pk: $id }) {
       status
@@ -142,7 +171,7 @@ const DELETE_INVOICE = gql`
   }
 `
 
-const STUDENTS = gql`
+export const STUDENTS = gql`
   query {
     students(isActive: true) {
       edges {
@@ -171,6 +200,16 @@ export const STUDENT_INVOICE_ITEMS = gql`
     getStudentInvoiceItems {
       id
       name
+    }
+  }
+`
+
+export const PRODUCT_LIST = gql`
+  query {
+    invoiceProductsList {
+      id
+      name
+      description
     }
   }
 `
@@ -413,15 +452,6 @@ export const GET_INVOICE = gql`
     }
   }
 `
-export const PRODUCT_LIST = gql`
-  query {
-    invoiceProductsList {
-      id
-      name
-      description
-    }
-  }
-`
 
 export const UPDATE_STUDENT_RATES = gql`
   mutation($pk: ID!, $flatItems: [FlatItemsInput], $hourlyItems: [HourlyItemsInput]) {
@@ -631,5 +661,3 @@ export const DELETE_ALL_INVOICE_PAYMENTS = gql`
     }
   }
 `
-
-export { GET_INVOICES, DELETE_INVOICE, STUDENTS }

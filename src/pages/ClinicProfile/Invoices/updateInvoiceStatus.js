@@ -34,6 +34,7 @@ const roundNumber = (num, digitFigure) => {
 function InvoicePayments({ form, invoiceObj, closeDrawer }) {
   const statusList = [
     { key: 'SW52b2ljZVN0YXR1c1R5cGU6Mg==', name: 'Pending' },
+    { key: 'SW52b2ljZVN0YXR1c1R5cGU6NA==', name: 'Sent' },
     { key: 'SW52b2ljZVN0YXR1c1R5cGU6Mw==', name: 'Paid' },
     { key: 'SW52b2ljZVN0YXR1c1R5cGU6Ng==', name: 'Partially Paid' },
   ]

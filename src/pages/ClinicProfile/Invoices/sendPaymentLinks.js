@@ -16,19 +16,36 @@ function SendPaymentLinks({ selectedRowKeys, payReminderData, closeDrawer }) {
     if (payReminderData && payReminderData.length > 0) {
       const createIds = []
       const sendNotiIds = []
-      payReminderData.map(item => (item.status === 'Pending' ? createIds.push(item.key) : null))
+      payReminderData.map(item => (item.linkGenerated === false ? createIds.push(item.key) : null))
       payReminderData.map(item =>
         item.status === 'Sent' || item.status === 'Partially Paid' || item.status === 'Pending'
           ? sendNotiIds.push(item.key)
           : null,
       )
+      // console.log(createIds, sendNotiIds)
+
       try {
-        generatePaymentLink({
-          variables: {
-            pk: createIds,
-          },
-        }).then(res => {
-          console.log(res, 'res1')
+        if (createIds.length > 0) {
+          generatePaymentLink({
+            variables: {
+              pk: createIds,
+            },
+          }).then(res => {
+            console.log(res, 'res1')
+            if (sendNotiIds.length > 0) {
+              sendPaymentReminder({
+                variables: {
+                  pk: sendNotiIds,
+                },
+              }).then(resp => {
+                console.log(resp, 'res2')
+                notification.success({
+                  message: resp.message,
+                })
+              })
+            }
+          })
+        } else if (sendNotiIds.length > 0) {
           sendPaymentReminder({
             variables: {
               pk: sendNotiIds,
@@ -36,16 +53,17 @@ function SendPaymentLinks({ selectedRowKeys, payReminderData, closeDrawer }) {
           }).then(resp => {
             console.log(resp, 'res2')
             notification.success({
-              message: 'Invoices send successfully',
+              message: resp.message,
             })
           })
-        })
+        }
       } catch (e) {
         console.error(e)
       }
     }
   }
 
+  console.log(payReminderData, 'payremindeer data')
   return (
     <div>
       {payReminderData && payReminderData?.length > 0 ? (
