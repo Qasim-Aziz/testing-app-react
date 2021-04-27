@@ -3,12 +3,13 @@
 /* eslint-disable no-var */
 /* eslint-disable no-unused-vars */
 import { all, put, takeEvery, call, select } from 'redux-saga/effects'
-import { 
-  getData, 
+import {
+  getData,
   startAssessment,
   getAssessmentDetails,
   recordResponse,
-  getAssessmentReport
+  getAssessmentReport,
+  finishAssignment,
 } from 'services/peakequivalence'
 import actions from './actions'
 
@@ -24,13 +25,12 @@ export function* LOAD_DATA() {
       PEQuestionsList: [],
       ResponseObject: {},
       SelectedDomainId: null,
-      SelectedQuestionId: null, 
+      SelectedQuestionId: null,
       SelectedQuestionIndex: 0,
       PEQuestionsListObject: {},
       SelectedTestIndex: 0,
       SelectedTestId: null,
       ResponseLoading: false,
-
     },
   })
 
@@ -41,13 +41,12 @@ export function* LOAD_DATA() {
       payload: {
         PEDomainList: response.data.peakEquDomains,
         SelectedDomainId: response.data.peakEquDomains[0]?.id,
-
       },
     })
   }
 }
 
-export function* START_ASSESSMENT({payload}) {
+export function* START_ASSESSMENT({ payload }) {
   yield put({
     type: 'peakequivalence/SET_STATE',
     payload: {
@@ -55,7 +54,10 @@ export function* START_ASSESSMENT({payload}) {
     },
   })
   const AssId = yield select(state => state.peakequivalence.ProgramId)
-  const response = yield call(startAssessment, {programId: AssId, assType: payload.assessmentType})
+  const response = yield call(startAssessment, {
+    programId: AssId,
+    assType: payload.assessmentType,
+  })
   if (response && response.data) {
     yield put({
       type: 'peakequivalence/SET_STATE',
@@ -65,9 +67,12 @@ export function* START_ASSESSMENT({payload}) {
       },
     })
 
-    const assDetails = yield call(getAssessmentDetails, {programId: response.data.startPeakEquivalance.details.id, assType: payload.assessmentType})
+    const assDetails = yield call(getAssessmentDetails, {
+      programId: response.data.startPeakEquivalance.details.id,
+      assType: payload.assessmentType,
+    })
 
-    if (assDetails && assDetails.data){
+    if (assDetails && assDetails.data) {
       console.log(assDetails)
       const responseQuestions = assDetails.data.peakEquQuestions.edges
       const recordedResponse = assDetails.data.peakEquData
@@ -75,25 +80,32 @@ export function* START_ASSESSMENT({payload}) {
       const respObject = {}
       const domainList = yield select(state => state.peakequivalence.PEDomainList)
 
-      for (let i=0; i< domainList.length; i++){
-        questionListObject[domainList[i].id] = responseQuestions.filter(item => item.node.domain.id === domainList[i].id)
+      for (let i = 0; i < domainList.length; i++) {
+        questionListObject[domainList[i].id] = responseQuestions.filter(
+          item => item.node.domain.id === domainList[i].id,
+        )
       }
 
-      for (let j=0; j< responseQuestions.length; j++){
+      for (let j = 0; j < responseQuestions.length; j++) {
         respObject[responseQuestions[j]?.node.id] = {}
-        for (let k=0; k< responseQuestions[j]?.node.test.edges.length; k++){
-          respObject[responseQuestions[j]?.node.id][responseQuestions[j]?.node.test.edges[k]?.node.id] = {recorded: false, response: null, responseObject: null}
+        for (let k = 0; k < responseQuestions[j]?.node.test.edges.length; k++) {
+          respObject[responseQuestions[j]?.node.id][
+            responseQuestions[j]?.node.test.edges[k]?.node.id
+          ] = { recorded: false, response: null, responseObject: null }
         }
       }
 
-      if (recordedResponse.length > 0){
+      if (recordedResponse.length > 0) {
         const zeroObject = recordedResponse[0]?.records.edges
 
-        for (let l=0; l< zeroObject.length; l++){
-          respObject[zeroObject[l].node.question.id][zeroObject[l].node.test.id] = {recorded: true, response: zeroObject[l].node.response, responseObject: zeroObject[l].node}
+        for (let l = 0; l < zeroObject.length; l++) {
+          respObject[zeroObject[l].node.question.id][zeroObject[l].node.test.id] = {
+            recorded: true,
+            response: zeroObject[l].node.response,
+            responseObject: zeroObject[l].node,
+          }
         }
       }
-
 
       yield put({
         type: 'peakequivalence/SET_STATE',
@@ -106,12 +118,9 @@ export function* START_ASSESSMENT({payload}) {
           SelectedTestId: responseQuestions[0]?.node.test.edges[0]?.node.id,
           ResponseObject: respObject,
           ObjectLoaded: true,
-          
         },
       })
     }
-
-
   }
   yield put({
     type: 'peakequivalence/SET_STATE',
@@ -121,11 +130,11 @@ export function* START_ASSESSMENT({payload}) {
   })
 }
 
-export function* RECORD_RESPONSE({payload}) {
+export function* RECORD_RESPONSE({ payload }) {
   yield put({
     type: 'peakequivalence/SET_STATE',
     payload: {
-      ResponseLoading: true
+      ResponseLoading: true,
     },
   })
   const response = yield call(recordResponse, payload)
@@ -133,9 +142,13 @@ export function* RECORD_RESPONSE({payload}) {
     const respObject = yield select(state => state.peakequivalence.ResponseObject)
 
     const records = response.data.recordPeakEquivalance.details.records.edges
-    if (records.length > 0){
-      for (let l=0; l< records.length; l++){
-        respObject[records[l].node.question.id][records[l].node.test.id] = {recorded: true, response: records[l].node.response, responseObject: records[l].node}
+    if (records.length > 0) {
+      for (let l = 0; l < records.length; l++) {
+        respObject[records[l].node.question.id][records[l].node.test.id] = {
+          recorded: true,
+          response: records[l].node.response,
+          responseObject: records[l].node,
+        }
       }
     }
     yield put({
@@ -148,30 +161,39 @@ export function* RECORD_RESPONSE({payload}) {
   yield put({
     type: 'peakequivalence/SET_STATE',
     payload: {
-      ResponseLoading: false
+      ResponseLoading: false,
     },
   })
 }
 
-export function* GET_REPORT({payload}) {
+export function* GET_REPORT({ payload }) {
   yield put({
     type: 'peakequivalence/SET_STATE',
     payload: {
-      ReportLoading: true
+      ReportLoading: true,
     },
   })
   // const pk = yield select(state => state.peakequivalence.AssessmentObject?.id)
   const pk = localStorage.getItem('peakId')
-  const response = yield call(getAssessmentReport, {programId: pk, peakType: payload.peakType})
+  const response = yield call(getAssessmentReport, { programId: pk, peakType: payload.peakType })
   if (response && response.data) {
     console.log(response)
 
     const rList = []
-    rList.push({domain: "Reflexivity", domainScore: response.data.peakEquivalance?.scoreReflexivity})
-    rList.push({domain: "Symmetry", domainScore: response.data.peakEquivalance?.scoreSymmetry})
-    rList.push({domain: "Transivity", domainScore: response.data.peakEquivalance?.scoreTransivity})
-    rList.push({domain: "Equivalance", domainScore: response.data.peakEquivalance?.scoreEquivalance})
-    rList.push({domain: "Total", domainScore: response.data.peakEquivalance?.score})
+    rList.push({
+      domain: 'Reflexivity',
+      domainScore: response.data.peakEquivalance?.scoreReflexivity,
+    })
+    rList.push({ domain: 'Symmetry', domainScore: response.data.peakEquivalance?.scoreSymmetry })
+    rList.push({
+      domain: 'Transivity',
+      domainScore: response.data.peakEquivalance?.scoreTransivity,
+    })
+    rList.push({
+      domain: 'Equivalance',
+      domainScore: response.data.peakEquivalance?.scoreEquivalance,
+    })
+    rList.push({ domain: 'Total', domainScore: response.data.peakEquivalance?.score })
 
     yield put({
       type: 'peakequivalence/SET_STATE',
@@ -183,9 +205,15 @@ export function* GET_REPORT({payload}) {
   yield put({
     type: 'peakequivalence/SET_STATE',
     payload: {
-      ReportLoading: false
+      ReportLoading: false,
     },
   })
+}
+
+export function* FINISH_ASSESSMENT({ payload }) {
+  console.log(payload)
+  const response = yield call(finishAssignment, payload)
+  console.log(response)
 }
 
 export default function* rootSaga() {
@@ -194,5 +222,6 @@ export default function* rootSaga() {
     takeEvery(actions.START_ASSESSMENT, START_ASSESSMENT),
     takeEvery(actions.RECORD_RESPONSE, RECORD_RESPONSE),
     takeEvery(actions.GET_REPORT, GET_REPORT),
+    takeEvery(actions.FINISH_ASSESSMENT, FINISH_ASSESSMENT),
   ])
 }

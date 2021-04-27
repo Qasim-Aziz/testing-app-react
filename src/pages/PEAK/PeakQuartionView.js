@@ -12,9 +12,9 @@ import { SUMMERY, GET_CODE_DETAILS, SEND_RESPONSE, QUIT } from './query'
 const { Text } = Typography
 
 export default ({ selectedQ, data, setSelectedQ, learner }) => {
-  console.log(selectedQ, '.........................................')
   const peakId = localStorage.getItem('peakId')
   const [allreadyAnswere, setAllReadyAnswer] = useState(null)
+  const [responseButtons, setResponseButtons] = useState(null)
 
   const { data: summeryData, loading: summeryLoading, refetch } = useQuery(SUMMERY, {
     fetchPolicy: 'network-only',
@@ -94,34 +94,32 @@ export default ({ selectedQ, data, setSelectedQ, learner }) => {
   }, [quartionData, summeryData])
 
   useEffect(() => {
-    if (summeryData && data && !selectedQ) {
-      if (summeryData?.peakDataSummary?.lastRecord) {
-        let selectFullData
-        // const s = data?.peakGetCodes?.edges.forEach(({ node }, index) => {
-        //   if (node.id === summeryData.peakDataSummary.lastRecord.id) {
-        //     selectFullData = {
-        //       id: data?.peakGetCodes?.edges[index + 1]?.node.id,
-        //       index: index + 1,
-        //     }
-        //   }
-        // })
-        if (selectFullData?.id) {
-          setSelectedQ(selectFullData)
-        } else {
-          setSelectedQ({
-            id: data?.peakGetCodes?.edges[0]?.node.id,
-            index: 0,
-          })
-        }
+    if (summeryData) {
+      if (summeryData.peakDataSummary.total === summeryData.peakDataSummary.totalAttended) {
+        finishAssignment()
       } else {
-        setSelectedQ({ id: data?.peakGetCodes?.edges[0]?.node.id, index: 0 })
+        if (data && !selectedQ) {
+          if (summeryData.peakDataSummary?.lastRecord) {
+            let selectFullData
+            if (selectFullData?.id) {
+              setSelectedQ(selectFullData)
+            } else {
+              setSelectedQ({
+                id: data?.peakGetCodes?.edges[0]?.node.id,
+                index: 0,
+              })
+            }
+          } else {
+            setSelectedQ({ id: data?.peakGetCodes?.edges[0]?.node.id, index: 0 })
+          }
+        }
       }
     }
   }, [summeryData, data, selectedQ, setSelectedQ])
 
   useEffect(() => {
     if (finishRes) {
-      history.push('/peakResult')
+      history.push('/peakReport')
     }
     if (finishError) {
       notification.error({
@@ -130,18 +128,8 @@ export default ({ selectedQ, data, setSelectedQ, learner }) => {
     }
   }, [finishRes, finishError])
 
-  useEffect(() => {
-    if (sendResponseError) {
-      notification.error({
-        message: "Their are something wrong. Can't send response",
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sendResponseError])
-
   const nextQua = nowIndex => {
     const id = data[nowIndex + 1]?.node.id
-    // console.log(id,'idddddddddddddddddddd');
     if (id) {
       setSelectedQ({ id, index: nowIndex + 1 })
     }
@@ -155,14 +143,16 @@ export default ({ selectedQ, data, setSelectedQ, learner }) => {
   }
 
   const handleSendRes = ans => () => {
+    setResponseButtons(ans)
     sendResponse({
       variables: {
         programId: peakId,
         yes: ans === 'y' ? [selectedQ.id] : [],
         no: ans === 'n' ? [selectedQ.id] : [],
       },
-    })
+    }).catch(err => console.error(err))
   }
+
   return (
     <>
       <div style={{ position: 'relative' }}>
@@ -189,17 +179,6 @@ export default ({ selectedQ, data, setSelectedQ, learner }) => {
         {!quartionLoading && !quartionError && quartionData && selectedQ && (
           <div style={{ minHeight: 350 }}>
             <Row>
-              {/* <Col span={10}>
-                <img
-                  src={cardImg}
-                  alt=""
-                  style={{
-                    height: 200,
-                    borderRadius: 10,
-                    width: '100%',
-                  }}
-                />
-              </Col> */}
               {!quartionLoading && (
                 <Col span={24}>
                   <div
@@ -242,23 +221,14 @@ export default ({ selectedQ, data, setSelectedQ, learner }) => {
                 textAlign: 'right',
               }}
             >
-              <div
-                style={{
-                  width: '100%',
-                  height: '30px',
-                  color: '#000',
-                  padding: '3px',
-                }}
-              >
-                {sendResponseLoading && 'Recording response...'}
-              </div>
               <Button
+                type="ghost"
                 style={{
-                  padding: '5px 20px',
                   borderRadius: 4,
                   height: 60,
                   background: allreadyAnswere === 'y' ? '#4BAEA0' : '#fff',
                 }}
+                loading={responseButtons === 'y' && sendResponseLoading}
                 onClick={handleSendRes('y')}
               >
                 <Text
@@ -268,20 +238,19 @@ export default ({ selectedQ, data, setSelectedQ, learner }) => {
                     margin: 0,
                   }}
                 >
-                  &nbsp;&nbsp;{learner}
-                  {'  '}gives an Expected Response &nbsp;&nbsp;
+                  &nbsp;&nbsp;{learner} gives an Expected Response &nbsp;&nbsp;
                 </Text>
               </Button>
               <br />
               <Button
+                type="ghost"
                 style={{
                   height: 60,
-                  // width: 300,
-                  padding: '5px 20px',
                   borderRadius: 4,
                   marginTop: 10,
                   background: allreadyAnswere === 'n' ? '#FF8080' : '#fff',
                 }}
+                loading={responseButtons === 'n' && sendResponseLoading}
                 onClick={handleSendRes('n')}
               >
                 <Text
@@ -291,8 +260,7 @@ export default ({ selectedQ, data, setSelectedQ, learner }) => {
                     margin: 0,
                   }}
                 >
-                  {`${learner}`}
-                  {'  '}gives an Unexpected Response
+                  {`${learner}`} gives an Unexpected Response
                 </Text>
               </Button>
             </div>

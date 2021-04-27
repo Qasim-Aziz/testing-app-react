@@ -5,13 +5,12 @@ import { Layout, Row, Col, Typography, Select, Tabs, Radio } from 'antd'
 import gql from 'graphql-tag'
 import { useQuery } from 'react-apollo'
 import { COLORS } from 'assets/styles/globalStyles'
+import LoadingComponent from 'components/LoadingComponent'
 import PeakQuartionsList from './PeakQuartionsList'
 import PeakQuartionView from './PeakQuartionView'
 import { STUDNET_INFO, SUMMERY } from './query'
 
 const { Content } = Layout
-const { Option } = Select
-const { TabPane } = Tabs
 
 const { Text } = Typography
 
@@ -38,13 +37,12 @@ export default () => {
   const studentId = localStorage.getItem('studentId')
   const peakType = localStorage.getItem('peakType')
   const [answeredQuCount, setAnsweredQuCount] = useState(0)
-  const [selecteFilter, setSelectedFilter] = useState('all')
+  const [selecteFilter, setSelectedFilter] = useState('unanswered')
   const [code, setCode] = useState([])
-  const [alldata, setAllData] = useState(null)
   const scrollbarRef = useRef()
   const [load, setLoad] = useState(false)
   const [type, setType] = useState(false)
-  const [radioValue, setRadioValue] = useState('all')
+  const [radioValue, setRadioValue] = useState('unanswered')
 
   const { data, error, loading } = useQuery(GET_PEAK_CODES, {
     variables: {
@@ -57,6 +55,7 @@ export default () => {
       studentId,
     },
   })
+
   const { data: summeryData, loading: summeryLoading, refetch } = useQuery(SUMMERY, {
     fetchPolicy: 'network-only',
     variables: {
@@ -64,39 +63,25 @@ export default () => {
     },
   })
 
-  const arr = []
   useEffect(() => {
     if (selectedQ) {
-      // console.log('selectQ', selectedQ)
       scrollbarRef.current.scrollTop(selectedQ.index * 86 - 250)
     }
     if (data && summeryData) {
-      setAllData(data)
       handleChange(selecteFilter)
     }
-
-    // setCode(data)
   }, [selectedQ, data, summeryData])
 
-  // const getCodeAarray=()=>
-  const onChange = e => {
-    console.log(e)
-    // this.setState({ size: e.target.value });
-  }
-
   const handelSelectQ = (id, index) => () => {
-    console.log(id, index)
     setSelectedQ({ id, index })
   }
 
   const handleChange = value => {
-    console.log(value)
     setRadioValue(value)
     if (value === 'no') {
       if (data && summeryData) {
         if (summeryData?.peakDataSummary?.edges[0]?.node?.no?.edges?.length > 0) {
           const ar = []
-          console.log(data, summeryData)
           const dd = summeryData?.peakDataSummary?.edges[0]?.node.no.edges.forEach(e => {
             const d = data?.peakGetCodes?.edges.filter(el => el.node.id === e.node.id)
             if (d) {
@@ -104,10 +89,7 @@ export default () => {
             }
           })
           const r = ar.filter(eee => eee?.node?.id === selectedQ?.id)
-          if (!r[0]) {
-            setSelectedQ({ id: ar[0]?.node?.id, index: 0 })
-          }
-          if (!selectedQ) {
+          if (!r[0] || !selectedQ) {
             setSelectedQ({ id: ar[0]?.node?.id, index: 0 })
           }
 
@@ -120,7 +102,6 @@ export default () => {
       if (data && summeryData) {
         if (summeryData?.peakDataSummary?.edges[0]?.node?.yes?.edges?.length > 0) {
           const ar = []
-          console.log(data, summeryData)
           const dd = summeryData?.peakDataSummary?.edges[0]?.node.yes.edges.forEach(e => {
             const d = data?.peakGetCodes?.edges.filter(el => el.node.id === e.node.id)
             if (d) {
@@ -128,10 +109,7 @@ export default () => {
             }
           })
           const r = ar.filter(eee => eee.node.id === selectedQ.id)
-          if (!r[0]) {
-            setSelectedQ({ id: ar[0]?.node?.id, index: 0 })
-          }
-          if (!selectedQ) {
+          if (!r[0] || !selectedQ) {
             setSelectedQ({ id: ar[0]?.node?.id, index: 0 })
           }
 
@@ -141,7 +119,7 @@ export default () => {
       }
     }
 
-    if (value === 'all') {
+    if (value === 'unanswered') {
       if (data && summeryData) {
         const ar = []
         const mar = []
@@ -157,17 +135,13 @@ export default () => {
         })
         marr.forEach(e => {
           const dd = mar.filter((ee, i) => ee.node.id === e.node.id)
-          console.log(dd)
           const index = mar.indexOf(dd[0])
           if (dd[0]) {
             mar.splice(index, 1)
           }
         })
         const r = mar.filter(eee => eee.node.id === selectedQ?.id)
-        if (!r[0]) {
-          setSelectedQ({ id: mar[0]?.node?.id, index: 0 })
-        }
-        if (!selectedQ) {
+        if (!r[0] || !selectedQ) {
           setSelectedQ({ id: mar[0]?.node?.id, index: 0 })
         }
 
@@ -176,7 +150,7 @@ export default () => {
         setType(false)
       }
     }
-    if (value === 'alll') {
+    if (value === 'all') {
       if (data && summeryData) {
         const ar = []
         const mar = []
@@ -200,7 +174,7 @@ export default () => {
   }
 
   if (loading) {
-    return <h3>Loading...</h3>
+    return <LoadingComponent />
   }
 
   return (
@@ -224,8 +198,8 @@ export default () => {
             >
               <Radio.Button value="yes">Correct</Radio.Button>
               <Radio.Button value="no">Incorrect</Radio.Button>
-              <Radio.Button value="all">Unanswered</Radio.Button>
-              <Radio.Button value="alll">All</Radio.Button>
+              <Radio.Button value="unanswered">Unanswered</Radio.Button>
+              <Radio.Button value="all">All</Radio.Button>
             </Radio.Group>
           </Col>
           <Col sm={17}>
