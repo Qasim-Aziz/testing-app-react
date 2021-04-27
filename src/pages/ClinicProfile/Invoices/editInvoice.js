@@ -14,7 +14,6 @@ import {
   Button,
   notification,
   DatePicker,
-  InputNumber,
   Modal,
   Checkbox,
   Tooltip,
@@ -62,8 +61,8 @@ const amLabel = {
 }
 const amStyle = {
   ...gen,
-  marginLeft: 30,
-  minWidth: '140px',
+  marginLeft: 20,
+  minWidth: '150px',
   margin: 'auto 0',
 }
 
@@ -74,7 +73,7 @@ function getTotal(subTotal, discount = 0, cgst = 0, sgst = 0, tax = 0) {
       (subTotal / 100) * parseFloat(cgst || 0) +
       (subTotal / 100) * parseFloat(sgst || 0) +
       (subTotal / 100) * parseFloat(tax || 0),
-  ).toFixed(3)
+  ).toFixed(2)
 }
 
 const roundNumber = (num, digitFigure) => {
@@ -104,9 +103,8 @@ const EditableCell = ({
   const [editing, setEditing] = useState(false)
   const inputRef = useRef(null)
   const form = useContext(EditableContext)
-  const { data: productData, loading: productLoading, refetch: productRefetch } = useQuery(
-    PRODUCT_LIST,
-  )
+  const { data: productDataNew, loading: productLoadingNew } = useQuery(STUDENT_INVOICE_ITEMS)
+  const { data: productDataOld, loading: productLoadingOld } = useQuery(PRODUCT_LIST)
 
   useEffect(() => {
     if (editing) {
@@ -151,18 +149,26 @@ const EditableCell = ({
             })(
               <Select
                 ref={inputRef}
-                loading={productLoading}
+                loading={productLoadingNew || productLoadingOld}
                 placeholder="Please select a product"
                 onPressEnter={save}
                 onBlur={save}
               >
-                {productData?.invoiceProductsList.map(({ id, name }) => {
-                  return (
-                    <Option key={id} value={id}>
-                      {name}
-                    </Option>
-                  )
-                })}
+                {record.newItem
+                  ? productDataNew?.getStudentInvoiceItems.map(({ id, name }) => {
+                      return (
+                        <Option key={id} value={id}>
+                          {name}
+                        </Option>
+                      )
+                    })
+                  : productDataOld?.invoiceProductsList.map(({ id, name }) => {
+                      return (
+                        <Option key={id} value={id}>
+                          {name}
+                        </Option>
+                      )
+                    })}
               </Select>,
             )}
           </Form.Item>
@@ -234,22 +240,21 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
   const [isIndian, setIsIndian] = useState(true)
   const { data: statusData, loading: statusLoading } = useQuery(GET_INVOICE_STATUS_LIST)
   const [createProModal, setCreateProModal] = useState(false)
-  const [isCreated, setIsCreated] = useState(false)
+  const [lastInvoiceAmount, setLastInvoiceAmount] = useState(null)
 
   const { data: invoiceData, loading, error } = useQuery(GET_INVOICE, {
     variables: {
       id: invoiceId,
     },
   })
-  const { data: productData, loading: productLoading, refetch: productRefetch } = useQuery(
-    PRODUCT_LIST,
-  )
+
+  const { data: productDataNew, loading: productLoadingNew } = useQuery(STUDENT_INVOICE_ITEMS)
+  const { data: productDataOld, loading: productLoadingOld } = useQuery(PRODUCT_LIST)
 
   const [updateStudentInvoice, { loading: updateStudentInvoiceLoading }] = useMutation(
     UPDATE_STUDENT_INVOICE,
   )
 
-  console.log(productData, 'this is sprofy data')
   useEffect(() => {
     if (invoiceData) {
       setInvoiceDetails(invoiceData.invoiceDetail)
@@ -273,64 +278,13 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
   }, [invoiceData])
 
   useEffect(() => {
-    if (productData) {
-      setProductList(productData?.invoiceProductsList)
+    if (productDataNew && productDataOld) {
+      setProductList([
+        ...productDataNew?.getStudentInvoiceItems,
+        ...productDataOld.invoiceProductsList,
+      ])
     }
-  }, [productData])
-
-  const submit = e => {
-    e.preventDefault()
-    form.validateFields((err, values) => {
-      if (!err && invoiceId) {
-        console.log(values, values.cgst, values.sgst, tableData, 'rowData in invoice form')
-        updateStudentInvoice({
-          variables: {
-            pk: invoiceId,
-            email: values.email,
-            status: values.status,
-            issueDate: moment(values.issueDate).format('YYYY-MM-DD'),
-            dueDate: moment(values.dueDate).format('YYYY-MM-DD'),
-            address: values.address,
-            taxableSubtotal: parseFloat(values.tax),
-            discount: parseFloat(values.discount),
-            sgst: addSgst ? parseFloat(values.sgst) : 0,
-            cgst: addCgst ? parseFloat(values.cgst) : 0,
-            total: getTotal(
-              subTotal,
-              form.getFieldValue('discount'),
-              form.getFieldValue('cgst'),
-              form.getFieldValue('sgst'),
-              form.getFieldValue('tax'),
-            ),
-            amount: getTotal(
-              subTotal,
-              form.getFieldValue('discount'),
-              form.getFieldValue('cgst'),
-              form.getFieldValue('sgst'),
-              form.getFieldValue('tax'),
-            ),
-            products: tableData.map(item => {
-              return {
-                product: item.service,
-                qty: item.qty,
-                rate: item.rate,
-                amount: roundNumber(item.qty * item.rate, 3),
-              }
-            }),
-          },
-        })
-          .then(res => {
-            console.log(res, 'res')
-            notification.success({
-              message: 'Invoice updated successfully',
-            })
-            refetchInvoices()
-            closeDrawer()
-          })
-          .catch(errr => console.error(errr))
-      }
-    })
-  }
+  }, [productDataNew, productDataOld])
 
   const generatePaymentLink = id => {
     try {
@@ -364,12 +318,19 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
     setTableData(newData)
   }
 
+  // console.log(productList, 'prl list')
+
   const calculateTotal = tempList => {
     let tempTotal = 0
     tempList.forEach(node => {
-      console.log(node, 'this is node')
       tempTotal += roundNumber(Number(node.qty) * Number(node.rate), 3)
     })
+    if (lastInvoiceAmount === null) {
+      const { discount: ds, cgst: cg, sgst: sg, tax: tx, total } = invoiceData.invoiceDetail
+      const tt = total - getTotal(tempTotal, ds, cg, sg, tx)
+      const dd = tt < 1 && tt > -1 ? 0 : tt
+      setLastInvoiceAmount(roundNumber(dd, 2))
+    }
     setSubTotal(tempTotal)
   }
 
@@ -390,9 +351,64 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
       service: productList[0].id,
       qty: 1,
       rate: 0,
+      newItem: true,
       amount: roundNumber(1 * 0, 3),
     }
     setTableData(row => [...row, newProductData])
+  }
+
+  const handleSubmit = e => {
+    e.preventDefault()
+    form.validateFields((err, values) => {
+      if (!err && invoiceId) {
+        // console.log(values, values.cgst, values.sgst, tableData, 'rowData in invoice form')
+        updateStudentInvoice({
+          variables: {
+            pk: invoiceId,
+            email: values.email,
+            status: values.status,
+            issueDate: moment(values.issueDate).format('YYYY-MM-DD'),
+            dueDate: moment(values.dueDate).format('YYYY-MM-DD'),
+            address: values.address,
+            taxableSubtotal: parseFloat(subTotal),
+            discount: parseFloat(values.discount),
+            sgst: addSgst ? parseFloat(values.sgst) : 0,
+            cgst: addCgst ? parseFloat(values.cgst) : 0,
+            total: getTotal(
+              subTotal,
+              form.getFieldValue('discount'),
+              form.getFieldValue('cgst'),
+              form.getFieldValue('sgst'),
+              form.getFieldValue('tax'),
+            ),
+            amount: getTotal(
+              subTotal,
+              form.getFieldValue('discount'),
+              form.getFieldValue('cgst'),
+              form.getFieldValue('sgst'),
+              form.getFieldValue('tax'),
+            ),
+            products: tableData.map(item => {
+              return {
+                product: item.service,
+                qty: item.qty,
+                rate: item.rate,
+                newItem: item.newItem === true,
+                amount: roundNumber(item.qty * item.rate, 2),
+              }
+            }),
+          },
+        })
+          .then(res => {
+            notification.success({
+              message: 'Invoice updated successfully',
+            })
+            refetchInvoices()
+            closeDrawer()
+          })
+          .catch(errr => console.error(errr))
+      }
+    })
   }
 
   const dataColumns = [
@@ -470,6 +486,7 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
         editable: col.editable,
         dataIndex: col.dataIndex,
         title: col.title,
+        productList,
         handleSave,
       }),
     }
@@ -479,11 +496,12 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
     return <LoadingComponent />
   }
 
+  console.log(productDataNew, productDataOld)
   console.log(invoiceDetails, 'invoiceDetilas')
   console.log(tableData, 'tavleData')
   return (
     <div style={{ padding: '0 60px' }}>
-      <Form onSubmit={submit}>
+      <Form onSubmit={handleSubmit}>
         <div style={{ display: 'flex', marginTop: 50, justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
             <Form.Item label="Customer" style={{ marginRight: 20 }}>
@@ -575,14 +593,13 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
                 <Text
                   style={{
                     marginLeft: 'auto',
-                    marginRight: '10%',
                     fontSize: 18,
                     fontWeight: 600,
                   }}
                 >
                   Subtotal
                 </Text>
-                <Text style={{ fontSize: 18, fontWeight: 600 }}>
+                <Text style={{ ...amStyle, fontSize: 18, fontWeight: 600 }}>
                   {currencySymbol} {subTotal}
                 </Text>
               </div>
@@ -592,7 +609,7 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
 
         <div style={{ marginTop: 30, padding: '0 16px' }}>
           <div style={amParent}>
-            <span style={amLabel}>Discount Percent:</span>
+            <span style={amLabel}>Discount Percent :</span>
             <Form.Item style={{ margin: 'auto 0' }}>
               {form.getFieldDecorator('discount', { initialValue: invoiceDetails.discount })(
                 <Input
@@ -607,7 +624,7 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
             <span style={amStyle}>
               {currencySymbol} -
               {Number((subTotal / 100) * parseFloat(form.getFieldValue('discount') || 0)).toFixed(
-                3,
+                2,
               )}
             </span>
           </div>
@@ -625,7 +642,7 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
                 onChange={e => setAddCgst(e.target.checked)}
               />
             </Tooltip>
-            <span style={{ ...amLabel, color: `${addCgst ? 'black' : '#D9D9D9'}` }}>CGST:</span>
+            <span style={{ ...amLabel, color: `${addCgst ? 'black' : '#D9D9D9'}` }}>CGST :</span>
             <Form.Item style={{ margin: 'auto 0' }}>
               {form.getFieldDecorator('cgst', { initialValue: invoiceDetails.cgst })(
                 <Input
@@ -639,8 +656,8 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
               )}
             </Form.Item>
             <span style={{ ...amStyle, color: `${addCgst ? 'black' : '#D9D9D9'}` }}>
-              {currencySymbol}
-              {Number((subTotal / 100) * parseFloat(form.getFieldValue('cgst') || 0)).toFixed(3)}
+              {currencySymbol}{' '}
+              {Number((subTotal / 100) * parseFloat(form.getFieldValue('cgst') || 0)).toFixed(2)}
             </span>
           </div>
           <div style={amParent} className="edit-checkBox">
@@ -657,7 +674,7 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
                 onChange={e => setAddSgst(e.target.checked)}
               />
             </Tooltip>
-            <span style={{ ...amLabel, color: `${addSgst ? 'black' : '#D9D9D9'}` }}>SGST:</span>
+            <span style={{ ...amLabel, color: `${addSgst ? 'black' : '#D9D9D9'}` }}>SGST :</span>
             <Form.Item style={{ margin: 'auto 0' }}>
               {form.getFieldDecorator('sgst', { initialValue: invoiceDetails.sgst })(
                 <Input
@@ -671,12 +688,12 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
               )}
             </Form.Item>
             <span style={{ ...amStyle, color: `${addSgst ? 'black' : '#D9D9D9'}` }}>
-              {currencySymbol}
-              {Number((subTotal / 100) * parseFloat(form.getFieldValue('sgst') || 0)).toFixed(3)}
+              {currencySymbol}{' '}
+              {Number((subTotal / 100) * parseFloat(form.getFieldValue('sgst') || 0)).toFixed(2)}
             </span>
           </div>
           <div style={amParent}>
-            <span style={amLabel}>Taxable:</span>
+            <span style={amLabel}>Tax :</span>
             <Form.Item style={{ margin: 'auto 0' }}>
               {form.getFieldDecorator('tax', {
                 initialValue: invoiceDetails.tax ? invoiceDetails.tax : 0,
@@ -691,12 +708,19 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
               )}
             </Form.Item>
             <span style={amStyle}>
-              {currencySymbol}
-              {Number((subTotal / 100) * parseFloat(form.getFieldValue('tax') || 0)).toFixed(3)}
+              {currencySymbol}{' '}
+              {Number((subTotal / 100) * parseFloat(form.getFieldValue('tax') || 0)).toFixed(2)}
             </span>
           </div>
           <div style={{ ...amParent, margin: '5px 0', marginTop: '15px' }}>
-            <span style={{ ...amLabel, fontSize: '20px' }}>Total:</span>
+            <span style={{ ...amLabel, fontSize: '20px' }}>Lat Invoice Amount :</span>
+            <span style={{ ...amStyle, fontSize: '20px' }}>
+              {currencySymbol}
+              {lastInvoiceAmount}
+            </span>
+          </div>
+          <div style={{ ...amParent, margin: '5px 0', marginTop: '15px' }}>
+            <span style={{ ...amLabel, fontSize: '20px' }}>Total :</span>
             <span style={{ ...amStyle, fontSize: '20px' }}>
               {currencySymbol}
               {getTotal(
@@ -708,10 +732,10 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
               )}
             </span>
           </div>
-          <div style={{ ...amParent, margin: '5px 0' }}>
+          {/* <div style={{ ...amParent, margin: '5px 0' }}>
             <span style={{ ...amLabel, fontSize: '20px' }}>Balance Due:</span>
             <span style={{ ...amStyle, fontSize: '20px' }}>
-              {currencySymbol}
+              {currencySymbol}{' '}
               {getTotal(
                 subTotal,
                 form.getFieldValue('discount'),
@@ -720,7 +744,7 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
                 form.getFieldValue('tax'),
               )}
             </span>
-          </div>
+          </div> */}
         </div>
 
         <div

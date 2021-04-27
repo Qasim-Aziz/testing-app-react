@@ -15,11 +15,11 @@ export default () => {
       <Helmet title="Dashboard Alpha" />
       <Layout style={{ padding: '0px' }}>
         <Tabs>
-          <TabPane tab="Invoices" key="Invoices">
-            <InvoiceList />
-          </TabPane>
           <TabPane tab="Customer" key="Customer">
             <CustomerList />
+          </TabPane>
+          <TabPane tab="Invoices" key="Invoices">
+            <InvoiceList />
           </TabPane>
         </Tabs>
       </Layout>

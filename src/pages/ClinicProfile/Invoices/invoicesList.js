@@ -20,7 +20,6 @@ import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
 import JsPDF from 'jspdf'
 import {
-  PlusOutlined,
   CloudDownloadOutlined,
   MailOutlined,
   CloseCircleOutlined,
@@ -33,7 +32,6 @@ import moment from 'moment'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import InvoiceForm from 'components/invoice/InvoiceForm'
 import EditInvoice from './editInvoice'
-import LoadingComponent from '../../staffProfile/LoadingComponent'
 import UpdateInvoiceStatus from './updateInvoiceStatus'
 import PreviewInvoice from './previewInvoice'
 import { GET_INVOICES, DELETE_INVOICE, GET_INVOICE_STATUS_LIST } from './query'
@@ -89,7 +87,7 @@ export default () => {
     },
   )
 
-  console.log(invoiceData, invoiceError, invoiceLoading)
+  // console.log(invoiceData, invoiceError, invoiceLoading)
   const [deleteInvoice, { oading: deleteInvoiceLoading }] = useMutation(DELETE_INVOICE)
 
   useEffect(() => {
