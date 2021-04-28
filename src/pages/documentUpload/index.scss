@@ -6,7 +6,6 @@
 
   .file_upload_header {
     width: 100%;
-    // background-color: $white;
 
     .header_container {
       .header_content {
@@ -122,5 +121,99 @@
         border-radius: 50%;
       }
     }
+  }
+
+  .all_file_container {
+    .ant-tabs-top .ant-tabs-top-bar .ant-tabs-nav-container {
+      width: 100% !important;
+    }
+
+    .tab_main_content {
+      min-height: 100vh;
+      background-color: $white;
+      padding: 0.5%;
+      border-right: 2px solid $white;
+      .tab_content {
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+
+    .all_file_search_container {
+      .all_file_search {
+        width: 100%;
+        background-color: $white;
+        padding: 0.2%;
+      }
+
+      .ant-btn-primary {
+        margin-left: 15%;
+      }
+
+      .ant-input {
+        border: 0;
+      }
+    }
+    // .all_file_header{
+    //   display: flex;
+    //   justify-content: space-between;
+    //   background-color: $white;
+    //   align-items: center;
+    // padding: 4px;
+
+    // .all_file_tap_section{
+    //   border-right: 1px solid $gray-lighten;
+    //   width: 22%;
+    //   display: flex;
+    //   justify-content: space-around;
+    //   align-items: flex-end;
+
+    //   .tab_active {
+    //     color: $text-darken-more;
+    //     border-bottom: 2px solid #DD7E77;
+    //   }
+
+    //   p {
+    //     color: $text-lighten;
+    //     font-weight: 600;
+    //     cursor: pointer;
+    //     margin-top: 1%;
+    //   }
+    //   p:hover,
+    //   .all_file_tap_section:focus-within p,
+    //   p:active {
+    //     color: $text-darken-more;
+    //   }
+
+    //   .tap_icon{
+    //       font-size: 18px;
+    //   }
+    // }
+
+    // .all_file_search_section{
+    //   display: flex;
+    //   justify-content: space-around;
+    //   width: 78%;
+
+    //   .search_input {
+    //     width: 75%;
+    //     .ant-input{
+    //       width: 100%;
+    //       border: 0;
+    //       border-radius: 0;
+    //       border-bottom: 1px solid #d9d9d9;
+    //     }
+    //   }
+
+    //   .anticon-search {
+    //     font-size: 22px;
+    //     color: $text-lighten;
+    //     cursor: pointer;
+    //     position: absolute;
+    //     z-index: 1111;
+    //     top: 0;
+    //   }
+    // }
+    // }
   }
 }

@@ -12,7 +12,7 @@ function callback(key) {
 }
 
 const index = () => {
-  const isAuthorization = true
+  const isAuthorization = false
   return (
     <>
       <div className="file_upload_section">

@@ -5,10 +5,10 @@
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable object-shorthand */
 
+import { Button, Checkbox, DatePicker, Divider, Form, Input, Select, Tag } from 'antd'
+import { CANCEL_BUTTON, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import React from 'react'
-import { Form, Input, Button, Select, DatePicker, Checkbox, Divider, message, Tag } from 'antd'
 import { connect } from 'react-redux'
-import { CANCEL_BUTTON, COLORS, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import AntdTag from '../staffs/antdTag'
 
 const { TextArea } = Input
@@ -42,6 +42,7 @@ class BasicInformationForm extends React.Component {
   }
 
   componentDidMount() {
+    console.log('Arif console===>', this.props)
     const { dispatch } = this.props
     dispatch({
       type: 'learners/GET_LEARNERS_DROPDOWNS',
