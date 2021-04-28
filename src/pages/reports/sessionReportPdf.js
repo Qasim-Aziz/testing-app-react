@@ -120,6 +120,7 @@ const STUDENT_DETAILS = gql`
       }
 
       behData{
+        behFrequency
         id
         note
         intensity
@@ -641,7 +642,7 @@ const PrintableInvoice = ({ selectSessionId }) => {
                             <Text style={sText}>{item.intensity}</Text>
                           </View>
                           <View style={{ ...col, width: '23%' }}>
-                            <Text style={sText}>{item.irt}</Text>
+                            <Text style={sText}>{item.behFrequency}</Text>
                           </View>
                           <View style={{ ...col, width: '23%' }}>
                             <Text style={mText}>{moment.duration(item.duration, 'milliseconds').format('HH:mm:ss',{trim:false})}</Text>
