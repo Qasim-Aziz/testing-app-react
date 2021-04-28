@@ -129,7 +129,6 @@ export default () => {
       })
 
       console.log(cacheData)
-      console.log('area', data)
       cache.writeQuery({
         query: AREAS,
         data: {
@@ -236,7 +235,7 @@ export default () => {
   }, [sync_program.data])
 
   useEffect(() => {
-    if (areasData) {
+    if (areasData && areasData.programArea?.edges > 0) {
       setSelectProgramArea(areasData.programArea.edges[0].node.id)
     }
   }, [areasData])
