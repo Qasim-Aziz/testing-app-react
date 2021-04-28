@@ -115,7 +115,6 @@ function PrintableInvoice({ invoiceId }) {
 
   const currentCurrencyName = 'INR'
   const { data: detailsData, loading, error } = useQuery(GET_SCHOOL_DETAILS)
-
   const { data: invoiceData, loading: isInvoiceDataLoading, error: invoiceDataErrors } = useQuery(
     GET_INVOICE,
     {

@@ -5,7 +5,13 @@
 import React, { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet'
 import { Button, Layout, PageHeader, Table, Drawer, Tooltip, Popconfirm, notification } from 'antd'
-import { PlusOutlined, DeleteOutlined, EyeOutlined, MailOutlined } from '@ant-design/icons'
+import {
+  PlusOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  MailOutlined,
+  FilePdfOutlined,
+} from '@ant-design/icons'
 import { createUseStyles } from 'react-jss'
 import { useHistory, Link } from 'react-router-dom'
 import { useQuery, useMutation } from 'react-apollo'
@@ -202,7 +208,7 @@ function InvoiceTable({ rowData }) {
                   setViewInvoice(true)
                 }}
               >
-                <EyeOutlined />
+                <FilePdfOutlined />
               </Button>
             </Tooltip>
             <Tooltip placement="top" title="Send pay reminder">

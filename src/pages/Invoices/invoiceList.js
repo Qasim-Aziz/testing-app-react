@@ -37,13 +37,13 @@ import { GET_INVOICES, DELETE_INVOICE } from './query'
 const dateFormate = 'YYYY-MM-DD'
 
 export default () => {
-  const [isCreateInvoice, setCreateInvoice] = useState(false)
   const [isPreviewInvoice, setPreviewInvoice] = useState(false)
   const [isEditInvoice, setEditInvoice] = useState(false)
   const [selectedInvoiceId, setSelectedInvoiceId] = useState()
   const [data, setData] = useState()
   const [deleteInvoiceId, setDeleteInvoiceId] = useState()
   const [editInvoiceId, setEditInvoiceId] = useState()
+  const [currentClinicRow, setCurrentClinicRow] = useState()
   const [currentInvoice, setCurrentInvoice] = useState(null)
 
   // invoice filer
@@ -168,7 +168,7 @@ export default () => {
 
             {row.status !== 'Paid' && (
               <>
-                {/* <Button
+                <Button
                   type="link"
                   onClick={() => {
                     setEditInvoice(true)
@@ -176,7 +176,7 @@ export default () => {
                   }}
                 >
                   <EditOutlined style={{ fontWeight: 600 }} />
-                </Button> */}
+                </Button>
                 <Popconfirm
                   title="Are you sure to delete this invoice?"
                   onConfirm={() => {
@@ -409,7 +409,7 @@ export default () => {
         className="change-invo-drawer"
         onClose={() => setPreviewInvoice(false)}
       >
-        <PreviewInvoice invoice={currentInvoice} />
+        <PreviewInvoice invoiceId={currentInvoice?.id} />
       </Drawer>
     </div>
   )

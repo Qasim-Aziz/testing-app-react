@@ -1,24 +1,14 @@
-/* eslint-disable */
-import React, { useEffect, useState, useReducer } from 'react'
-import {
-  Button,
-  notification,
-  Table,
-  Menu,
-  Icon,
-  Dropdown,
-  Drawer,
-  Modal,
-  DatePicker,
-  Form,
-} from 'antd'
+/* eslint-disable array-callback-return */
+import React, { useEffect, useState } from 'react'
+import { Button, notification, Table, Menu, Icon, Dropdown, Drawer, Form } from 'antd'
+import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
 import { PlusOutlined, MailOutlined } from '@ant-design/icons'
 import { DRAWER, COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 import AdvanceInvoiceForm from './advanceInvoiceForm'
-import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
 import MonthlyInvoiceForm from './monthlyInvoice'
 import BankDetails from './bankDetails'
-import { CLINIC_QUERY, ITEM } from './query'
+import UpdateClinicRates from '../allClinicData/updateClinicRates'
+import { CLINIC_QUERY } from './query'
 import InvoiceTable from '../allClinicData/invoiceTable'
 
 const { layout, tailLayout } = FORM
@@ -36,7 +26,9 @@ function CustomerList() {
   const [drawerTitle, setDrawerTitle] = useState(null)
   const [bankDetailsDrawer, setBankDetailsDrawer] = useState(false)
   const [selectedClinicsName, setSelectedClinicsName] = useState(null)
+  const [currentClinicRow, setCurrentClinicRow] = useState()
   const [invoiceType, setInvoiceType] = useState('advance')
+  const [ratesDrawer, setRatesDrawer] = useState(false)
 
   useEffect(() => {
     if (data) {
@@ -68,6 +60,12 @@ function CustomerList() {
       title: 'Billing Name',
     },
     {
+      title: 'Debit',
+    },
+    {
+      title: 'Credit',
+    },
+    {
       title: 'Invoices',
       dataIndex: 'invoice',
       render: (e, row) => (
@@ -85,16 +83,25 @@ function CustomerList() {
       ),
     },
     {
-      title: 'Debit',
-    },
-    {
-      title: 'Credit',
+      title: 'Action',
+      render: (text, row) => (
+        <Button
+          onClick={() => {
+            setCurrentClinicRow(row)
+            setDrawerTitle(row.details.schoolName)
+            setRatesDrawer(true)
+          }}
+          type="link"
+          style={{ padding: '0px', fontWeight: 'bold', fontSize: '13px' }}
+        >
+          Maintain Rates
+        </Button>
+      ),
     },
   ]
 
-  const onSelectChange = selectedRowKeys => {
-    console.log('selectedRowKeys changed: ', selectedRowKeys)
-    setSelectedRowKeys(selectedRowKeys)
+  const onSelectChange = selectedKeys => {
+    setSelectedRowKeys(selectedKeys)
   }
 
   const rowSelection = {
@@ -103,19 +110,19 @@ function CustomerList() {
   }
 
   const handleMenuActions = e => {
-    let names = []
+    const names = []
     tableData.map(item =>
       selectedRowKeys.map(key => (key === item.key ? names.push(item.details?.schoolName) : null)),
     )
     console.log(names, 'names')
     setSelectedClinicsName(names)
-    if (e.key == 'advanceInvoice') {
+    if (e.key === 'advanceInvoice') {
       setInvoiceType('advance')
       setAdvanceInvoiceModal(true)
-    } else if (e.key == 'monthlyInvoice') {
+    } else if (e.key === 'monthlyInvoice') {
       setInvoiceType('monthly')
       setAdvanceInvoiceModal(true)
-    } else if (e.key == 'payReminder') {
+    } else if (e.key === 'payReminder') {
       setPayReminderModal(true)
     }
   }
@@ -240,6 +247,21 @@ function CustomerList() {
           rowData={currentRow}
           invoiceFormDrawer={monthlyInvForm}
           setInvoiceFormDrawer={setMonthlyInvForm}
+        />
+      </Drawer>
+      <Drawer
+        title={`${drawerTitle}: Maintain Rates`}
+        width={DRAWER.widthL3}
+        placement="right"
+        closable="true"
+        onClose={() => setRatesDrawer(false)}
+        visible={ratesDrawer}
+        destroyOnClose="true"
+      >
+        <UpdateClinicRates
+          rowData={currentClinicRow}
+          ratesDrawer={ratesDrawer}
+          closeDrawer={() => setRatesDrawer(false)}
         />
       </Drawer>
       <Drawer

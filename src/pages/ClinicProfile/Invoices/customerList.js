@@ -63,14 +63,14 @@ function CustomerList() {
       ),
     },
     {
-      title: 'Invoices',
-      dataIndex: 'invoices',
-    },
-    {
       title: 'Debit',
     },
     {
       title: 'Credit',
+    },
+    {
+      title: 'Invoices',
+      dataIndex: 'invoices',
     },
     {
       title: 'Actions',

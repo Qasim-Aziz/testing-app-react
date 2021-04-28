@@ -183,13 +183,14 @@ const PreviewInvoice = ({ invoiceId }) => {
         <div
           style={{
             margin: 0,
-            color: 'rgba(0, 0, 0, 0.85)',
-            fontWeight: 500,
-            fontSize: '16px',
+            color: 'rgba(0, 0, 0)',
+            fontWeight: 700,
+            fontSize: '18px',
+            textAlign: 'center',
             lineHeight: '22px',
           }}
         >
-          {invoice?.invoiceNo}
+          View Invoice - {invoice?.invoiceNo}
         </div>
         <Tooltip placement="top" title="Download Pdf">
           <Button
@@ -540,7 +541,7 @@ const PreviewInvoice = ({ invoiceId }) => {
         </div>
       </div>
       <Drawer
-        title={invoice.invoiceNo}
+        title={`Print Invoice - ${invoice?.invoiceNo}`}
         visible={printInvoiceDrawer}
         width={DRAWER.widthL2}
         onClose={() => setPrintInvoiceDrawer(false)}

@@ -1,3 +1,5 @@
+/* eslint-disable consistent-return */
+/* eslint-disable no-unused-expressions */
 /* eslint-disable prefer-template */
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable no-array-constructor */
@@ -14,7 +16,7 @@ import moment from 'moment'
 import LoadingComponent from 'components/VBMappReport/LoadingComponent'
 import s1 from 'assets/fonts/SourceSerifPro/SourceSerifPro-Regular.ttf'
 import s2 from 'assets/fonts/SourceSerifPro/SourceSerifPro-SemiBold.ttf'
-import { GET_PAYMENT_DETAILS } from './query'
+import { GET_PAYMENT_DETAILS, GET_INVOICE_DETAIL } from './query'
 import logo from '../../images/CogniableLogo.jpeg'
 
 Font.register({
@@ -109,30 +111,55 @@ const monthNames = [
   'December',
 ]
 
-function getTotal(subTotal, discount = 0, cgst = 0, sgst = 0, taxableSubtotal = 0) {
+function getTotal(subTotal, discount = 0, cgst = 0, sgst = 0, tax = 0) {
   return Number(
     subTotal -
       (subTotal / 100) * parseFloat(discount || 0) +
       (subTotal / 100) * parseFloat(cgst || 0) +
       (subTotal / 100) * parseFloat(sgst || 0) +
-      (subTotal / 100) * parseFloat(taxableSubtotal || 0),
+      (subTotal / 100) * parseFloat(tax || 0),
   ).toFixed(2)
 }
 
-function PrintableInvoice() {
-  const invoice = JSON.parse(localStorage.getItem('currentInvoice'))
+function PrintableInvoice({ invoiceId }) {
   const [subTotal, setSubtotal] = useState(0)
-  const currentCurrencyName = invoice.clinic.currency ? invoice.clinic.currency.currency : 'USD'
+  const currentCurrencyName = 'INR'
+  const [currencyName, setCurrencyName] = useState(null)
+  const [invoice, setInvoice] = useState(null)
+
   const { data, loading, error } = useQuery(GET_PAYMENT_DETAILS)
+  const { data: invoiceData, loading: isInvoiceDataLoading, error: invoiceDataErrors } = useQuery(
+    GET_INVOICE_DETAIL,
+    {
+      variables: {
+        id: invoiceId,
+      },
+    },
+  )
+
+  console.log(invoiceData, 'invoiceData')
+  useEffect(() => {
+    if (invoiceData) {
+      setInvoice(invoiceData?.invoiceDetail)
+      let tempTotal = 0
+      invoiceData?.invoiceDetail.invoiceFee.edges.forEach(item => {
+        const am = Number(Number(item.node.quantity * item.node.rate).toFixed(2))
+        tempTotal += am
+        return null
+      })
+      setSubtotal(Number(Number(tempTotal).toFixed(2)))
+      setCurrencyName('INR')
+    }
+  }, [invoiceData])
 
   useEffect(() => {
-    let tempSubTotal = 0
-    invoice.invoiceFee.edges.map(item => {
-      const tempTotal = Number(item.node.quantity * item.node.rate).toFixed(3)
-      tempSubTotal = (Number(tempSubTotal) + Number(tempTotal)).toFixed(3)
-    })
-    setSubtotal(tempSubTotal)
-  }, [])
+    if (error || invoiceDataErrors) {
+      return notification.error({
+        message: 'Something went wrong',
+        description: 'Unable to fetch invoice data',
+      })
+    }
+  }, [error, invoiceDataErrors])
 
   const toWords = new ToWords({
     localeCode: currentCurrencyName === 'INR' ? 'en-IN' : 'en-US',
@@ -143,16 +170,20 @@ function PrintableInvoice() {
     },
   })
 
-  const total = getTotal(
-    subTotal,
-    invoice.discount,
-    invoice.cgst,
-    invoice.sgst,
-    invoice.taxableSubtotal,
-  )
+  if (isInvoiceDataLoading || loading || !invoice) return <LoadingComponent />
+  if (error || invoiceDataErrors || !invoiceData)
+    return (
+      <div style={{ marginTop: 80, marginLeft: 60, fontWeight: 700, fontSize: 18 }}>
+        Opps, something went wrong
+      </div>
+    )
+
+  const total = getTotal(subTotal, invoice.discount, invoice.cgst, invoice.sgst, invoice.tax)
+
   if (loading) {
     return <LoadingComponent />
   }
+
   console.log(data)
   console.log(invoice, 'invoice ')
 
@@ -195,13 +226,12 @@ function PrintableInvoice() {
                     textAlign: 'center',
                     width: '250px',
                     alignSelf: 'center',
-
                     marginLeft: '20px',
                   }}
                 >
                   <Text
                     style={{
-                      fontSize: 12,
+                      fontSize: 14,
                       marginBottom: '4px',
                       width: '100%',
                       alignSelf: 'flex-start',
@@ -213,7 +243,7 @@ function PrintableInvoice() {
                   <Text
                     style={{
                       marginBottom: '4px',
-                      fontSize: 10,
+                      fontSize: 12,
                       width: '100%',
                       alignSelf: 'flex-start',
                       textAlign: 'left',
@@ -224,7 +254,7 @@ function PrintableInvoice() {
                   <Text
                     style={{
                       marginBottom: '4px',
-                      fontSize: 10,
+                      fontSize: 12,
                       width: '100%',
                       alignSelf: 'flex-start',
                       textAlign: 'left',
@@ -571,16 +601,12 @@ function PrintableInvoice() {
                   >
                     <View style={taxSection}>
                       <Text style={{ ...rightText }}>
-                        {Number(
-                          (subTotal / 100) * parseFloat(invoice.taxableSubtotal || 0),
-                        ).toFixed(2)}{' '}
+                        {Number((subTotal / 100) * parseFloat(invoice.tax || 0)).toFixed(2)}{' '}
                         {currentCurrencyName}
                       </Text>
                     </View>
                     <View style={taxSection}>
-                      <Text style={{ ...rightText }}>
-                        Taxes ({invoice.taxableSubtotal || 0}%) :
-                      </Text>
+                      <Text style={{ ...rightText }}>Taxes ({invoice.tax || 0}%) :</Text>
                     </View>
                   </View>
                   <View style={{ ...flexSection, flexDirection: 'row-reverse' }}>

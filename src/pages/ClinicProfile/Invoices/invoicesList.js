@@ -45,6 +45,7 @@ export default () => {
   const [isPreviewInvoice, setPreviewInvoice] = useState(false)
   const [isEditInvoice, setEditInvoice] = useState(false)
   const [selectedInvoiceId, setSelectedInvoiceId] = useState()
+  const [currentInvoice, setCurrentInvoice] = useState(null)
   const [data, setData] = useState()
   const [deleteInvoiceId, setDeleteInvoiceId] = useState()
   const [editInvoiceId, setEditInvoiceId] = useState()
@@ -88,7 +89,7 @@ export default () => {
   )
 
   // console.log(invoiceData, invoiceError, invoiceLoading)
-  const [deleteInvoice, { oading: deleteInvoiceLoading }] = useMutation(DELETE_INVOICE)
+  const [deleteInvoice, { loading: deleteInvoiceLoading }] = useMutation(DELETE_INVOICE)
 
   useEffect(() => {
     if (invoiceData) {
@@ -182,6 +183,7 @@ export default () => {
               onClick={() => {
                 setSelectedInvoiceId(row.key)
                 setPreviewInvoice(true)
+                setCurrentInvoice(row)
               }}
               type="link"
             >
@@ -195,6 +197,7 @@ export default () => {
                   onClick={() => {
                     setEditInvoice(true)
                     setEditInvoiceId(row.key)
+                    setCurrentInvoice(row)
                   }}
                 >
                   <EditOutlined style={{ fontWeight: 600 }} />
@@ -509,7 +512,7 @@ export default () => {
       </Drawer>
 
       <Drawer
-        title="Edit Invoice"
+        title={`Edit Invoice - ${currentInvoice?.invoiceNo}`}
         destroyOnClose
         visible={isEditInvoice}
         width={DRAWER.widthL1}
