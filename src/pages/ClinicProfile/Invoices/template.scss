@@ -209,3 +209,9 @@ footer {
 .ant-table.ant-table-bordered .ant-table-footer {
   background-color: $palete-light-blue;
 }
+
+.table-input-field {
+  .ant-form-item {
+    margin-bottom: 0;
+  }
+}

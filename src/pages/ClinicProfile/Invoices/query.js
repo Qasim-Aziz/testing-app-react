@@ -1,8 +1,39 @@
 import gql from 'graphql-tag'
 
-const GET_INVOICES = gql`
-  query getInvoices($from: Date, $to: Date, $status: ID) {
-    getInvoices(date_Gte: $from, date_Lte: $to, status: $status) {
+export const GET_SCHOOL_DETAILS = gql`
+  query {
+    schoolDetail {
+      id
+      schoolName
+      contactNo
+      email
+      address
+      country {
+        id
+        name
+      }
+      currency {
+        id
+        currency
+        symbol
+      }
+      logo
+      bankName
+      bankAccountNo
+      ifscCode
+      accountHolderName
+    }
+  }
+`
+
+export const GET_INVOICES = gql`
+  query getInvoices($from: Date, $to: Date, $status: ID, $customer_School: ID) {
+    getInvoices(
+      date_Gte: $from
+      date_Lte: $to
+      status: $status
+      customer_School: $customer_School
+    ) {
       edges {
         node {
           id
@@ -15,6 +46,7 @@ const GET_INVOICES = gql`
           taxableSubtotal
           discount
           total
+          linkGenerated
           clinic {
             id
             schoolName
@@ -31,6 +63,8 @@ const GET_INVOICES = gql`
           }
           customer {
             id
+            firstname
+            lastname
             parent {
               firstName
               lastName
@@ -128,7 +162,7 @@ export const UPDATE_STUDENT_INVOICE = gql`
   }
 `
 
-const DELETE_INVOICE = gql`
+export const DELETE_INVOICE = gql`
   mutation deleteInvoice($id: ID!) {
     deleteInvoice(input: { pk: $id }) {
       status
@@ -137,7 +171,7 @@ const DELETE_INVOICE = gql`
   }
 `
 
-const STUDENTS = gql`
+export const STUDENTS = gql`
   query {
     students(isActive: true) {
       edges {
@@ -166,6 +200,31 @@ export const STUDENT_INVOICE_ITEMS = gql`
     getStudentInvoiceItems {
       id
       name
+    }
+  }
+`
+
+export const PRODUCT_LIST = gql`
+  query {
+    invoiceProductsList {
+      id
+      name
+      description
+    }
+  }
+`
+
+export const CREATE_STUDENT_INVOICE_ITEM = gql`
+  mutation($name: String!) {
+    createStudentInvoiceItem(input: { name: $name }) {
+      details {
+        id
+        name
+        school {
+          id
+          schoolName
+        }
+      }
     }
   }
 `
@@ -305,7 +364,7 @@ export const CREATE_STUDENT_RATES = gql`
 `
 
 export const GENERATE_LINK = gql`
-  mutation RazorpayGenerateLink($pk: ID!) {
+  mutation($pk: [ID]!) {
     razorpayGenerateLink(input: { pk: $pk }) {
       status
       message
@@ -313,6 +372,14 @@ export const GENERATE_LINK = gql`
   }
 `
 
+export const PAYMENT_REMINDER = gql`
+  mutation($pk: [ID]!) {
+    razorpayInvoiceNotification(input: { pk: $pk }) {
+      status
+      message
+    }
+  }
+`
 export const GET_PAYMENT_RECIEVING_DETIAILS = gql`
   query {
     schoolDetail {
@@ -345,7 +412,6 @@ export const GET_INVOICE = gql`
       linkGenerated
       paymentLink
       lastAmount
-
       clinic {
         id
         schoolName
@@ -355,6 +421,13 @@ export const GET_INVOICE = gql`
         id
         firstname
         lastname
+        school {
+          id
+          schoolName
+          email
+          address
+          logo
+        }
       }
       status {
         id
@@ -376,15 +449,6 @@ export const GET_INVOICE = gql`
           }
         }
       }
-    }
-  }
-`
-export const PRODUCT_LIST = gql`
-  query {
-    invoiceProductsList {
-      id
-      name
-      description
     }
   }
 `
@@ -597,5 +661,3 @@ export const DELETE_ALL_INVOICE_PAYMENTS = gql`
     }
   }
 `
-
-export { GET_INVOICES, DELETE_INVOICE, STUDENTS }

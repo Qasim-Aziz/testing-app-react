@@ -322,193 +322,190 @@ export async function updateLearner(payload) {
 }
 
 export async function createLearner(payload) {
-  // const authStaffList = []
-  // if (payload.values.authStaff.length > 0) {
-  //   payload.values.authStaff.map(item => authStaffList.push(`"${item}"`))
-  // }
   console.log(payload.values, 'payload values are')
   console.log(payload.data)
   console.log(payload.data.get('file'))
-  return apolloClient
-    .mutate({
-      mutation: gql`
-        mutation CreateLearner(
-          $clientId: String!
-          $category: ID!
-          $email: String!
-          $gender: String!
-          $dob: Date!
-          $dateOfDiagnosis: Date
-          $clinicLocation: ID
-          $firstName: String!
-          $lastName: String
-          $authStaffList: [ID]
-          $parentFirstName: String
-          $parentMobileNumber: String
-          $ssnCard: String
-          $mobileNo: String
-          $address: String
-          $caseManager: ID
-          $isActive: Boolean
-          $defaultProgram: Boolean
-          $learnerLanguage: ID
-          $researchParticipant: Boolean
-          $streetAddress: String
-          $state: String
-          $city: String
-          $country: String
-          $zipCode: String
-          $tags: [String]
-        ) {
-          createStudent(
-            input: {
-              studentData: {
-                clientId: $clientId
-                category: $category
-                email: $email
-                gender: $gender
-                dob: $dob
-                dateOfDiagnosis: $dateOfDiagnosis
-                clinicLocation: $clinicLocation
-                firstname: $firstName
-                lastname: $lastName
-                authStaff: $authStaffList
-                parentName: $parentFirstName
-                parentMobile: $parentMobileNumber
-                ssnAadhar: $ssnCard
-                mobileno: $mobileNo
-                address: $address
-                caseManager: $caseManager
-                isActive: $isActive
-                defaultProgram: $defaultProgram
-                language: $learnerLanguage
-                researchParticipant: $researchParticipant
-                streetAddress: $streetAddress
-                city: $city
-                state: $state
-                country: $country
-                zipCode: $zipCode
-                tags: $tags
-              }
-            }
-          ) {
-            student {
-              id
-              firstname
-              email
-              dob
-              mobileno
-              lastname
-              gender
-              currentAddress
-              clientId
-              ssnAadhar
-              parentMobile
-              parentName
-              dateOfDiagnosis
-              diagnoses {
-                edges {
-                  node {
-                    id
-                    name
-                  }
-                }
-              }
-              learnermedicationSet {
-                edges {
-                  node {
-                    id
-                    date
-                    condition
-                  }
-                }
-              }
-              category {
-                id
-                category
-              }
-              clinicLocation {
-                id
-                location
-              }
-              caseManager {
-                id
-                name
-              }
-              language {
-                id
-                name
-              }
-              authStaff {
-                edges {
-                  node {
-                    id
-                    name
-                  }
-                }
-              }
-              allergicTo {
-                edges {
-                  node {
-                    id
-                    name
-                  }
-                }
-              }
-              tags {
-                edges {
-                  node {
-                    id
-                    name
-                  }
-                }
-              }
-              isActive
-              researchParticipant
-            }
-          }
-        }
-      `,
-      variables: {
-        clientId: payload.values.clientId,
-        category: payload.values.category,
-        email: payload.values.email,
-        gender: payload.values.gender,
-        dob: moment(payload.values.dob).format('YYYY-MM-DD'),
-        dateOfDiagnosis: payload.values.dateOfDiagnosis
-          ? moment(payload.values.dob).format('YYYY-MM-DD')
-          : null,
-        clinicLocation: payload.values.clinicLocation,
-        firstName: payload.values.firstName,
-        lastName: payload.values.lastName,
-        authStaffList: payload.values.authStaff ? payload.values.authStaff : [],
-        parentFirstName: payload.values.parentFirstName,
-        parentMobileNumber: payload.values.parentMobileNumber,
-        ssnCard: payload.values.ssnCard,
-        mobileNo: payload.values.mobileNo,
-        address: payload.values.address,
-        caseManager: payload.values.caseManager,
-        learnerLanguage: payload.values.learnerLanguage,
-        isActive: payload.values.isActive,
-        defaultProgram: payload.values.defaultProgram,
-        researchParticipant: payload.values.researchParticipant,
-        tags: payload.values.tags,
-        streetAddress: payload.values.street,
-        state: payload.values.state,
-        country: payload.values.country,
-        city: payload.values.city,
-        zipCode: payload.values.pincode,
-      },
-    })
-    .then(result => result)
-    .catch(error => {
-      error.graphQLErrors.map(item => {
-        return notification.error({
-          message: 'Somthing went wrong',
-          description: item.message,
-        })
-      })
-    })
+  return null
+  // return apolloClient
+  //   .mutate({
+  //     mutation: gql`
+  //       mutation CreateLearner(
+  //         $clientId: String!
+  //         $category: ID!
+  //         $email: String!
+  //         $gender: String!
+  //         $dob: Date!
+  //         $dateOfDiagnosis: Date
+  //         $clinicLocation: ID
+  //         $firstName: String!
+  //         $lastName: String
+  //         $authStaffList: [ID]
+  //         $parentFirstName: String
+  //         $parentMobileNumber: String
+  //         $ssnCard: String
+  //         $mobileNo: String
+  //         $address: String
+  //         $caseManager: ID
+  //         $isActive: Boolean
+  //         $defaultProgram: Boolean
+  //         $learnerLanguage: ID
+  //         $researchParticipant: Boolean
+  //         $streetAddress: String
+  //         $state: String
+  //         $city: String
+  //         $country: String
+  //         $zipCode: String
+  //         $tags: [String]
+  //       ) {
+  //         createStudent(
+  //           input: {
+  //             studentData: {
+  //               clientId: $clientId
+  //               category: $category
+  //               email: $email
+  //               gender: $gender
+  //               dob: $dob
+  //               dateOfDiagnosis: $dateOfDiagnosis
+  //               clinicLocation: $clinicLocation
+  //               firstname: $firstName
+  //               lastname: $lastName
+  //               authStaff: $authStaffList
+  //               parentName: $parentFirstName
+  //               parentMobile: $parentMobileNumber
+  //               ssnAadhar: $ssnCard
+  //               mobileno: $mobileNo
+  //               address: $address
+  //               caseManager: $caseManager
+  //               isActive: $isActive
+  //               defaultProgram: $defaultProgram
+  //               language: $learnerLanguage
+  //               researchParticipant: $researchParticipant
+  //               streetAddress: $streetAddress
+  //               city: $city
+  //               state: $state
+  //               country: $country
+  //               zipCode: $zipCode
+  //               tags: $tags
+  //             }
+  //           }
+  //         ) {
+  //           student {
+  //             id
+  //             firstname
+  //             email
+  //             dob
+  //             mobileno
+  //             lastname
+  //             gender
+  //             currentAddress
+  //             clientId
+  //             ssnAadhar
+  //             parentMobile
+  //             parentName
+  //             dateOfDiagnosis
+  //             diagnoses {
+  //               edges {
+  //                 node {
+  //                   id
+  //                   name
+  //                 }
+  //               }
+  //             }
+  //             learnermedicationSet {
+  //               edges {
+  //                 node {
+  //                   id
+  //                   date
+  //                   condition
+  //                 }
+  //               }
+  //             }
+  //             category {
+  //               id
+  //               category
+  //             }
+  //             clinicLocation {
+  //               id
+  //               location
+  //             }
+  //             caseManager {
+  //               id
+  //               name
+  //             }
+  //             language {
+  //               id
+  //               name
+  //             }
+  //             authStaff {
+  //               edges {
+  //                 node {
+  //                   id
+  //                   name
+  //                 }
+  //               }
+  //             }
+  //             allergicTo {
+  //               edges {
+  //                 node {
+  //                   id
+  //                   name
+  //                 }
+  //               }
+  //             }
+  //             tags {
+  //               edges {
+  //                 node {
+  //                   id
+  //                   name
+  //                 }
+  //               }
+  //             }
+  //             isActive
+  //             researchParticipant
+  //           }
+  //         }
+  //       }
+  //     `,
+  //     variables: {
+  //       clientId: payload.values.clientId,
+  //       category: payload.values.category,
+  //       email: payload.values.email,
+  //       gender: payload.values.gender,
+  //       dob: moment(payload.values.dob).format('YYYY-MM-DD'),
+  //       dateOfDiagnosis: payload.values.dateOfDiagnosis
+  //         ? moment(payload.values.dob).format('YYYY-MM-DD')
+  //         : null,
+  //       clinicLocation: payload.values.clinicLocation,
+  //       firstName: payload.values.firstName,
+  //       lastName: payload.values.lastName ? payload.values.lastName : '',
+  //       authStaffList: payload.values.authStaff ? payload.values.authStaff : [],
+  //       parentFirstName: payload.values.parentFirstName,
+  //       parentMobileNumber: payload.values.parentMobileNumber,
+  //       ssnCard: payload.values.ssnCard,
+  //       mobileNo: payload.values.mobileNo,
+  //       address: payload.values.address,
+  //       caseManager: payload.values.caseManager,
+  //       learnerLanguage: payload.values.learnerLanguage,
+  //       isActive: payload.values.isActive,
+  //       defaultProgram: payload.values.defaultProgram,
+  //       researchParticipant: payload.values.researchParticipant,
+  //       tags: payload.values.tags,
+  //       streetAddress: payload.values.street,
+  //       state: payload.values.state,
+  //       country: payload.values.country,
+  //       city: payload.values.city,
+  //       zipCode: payload.values.pincode,
+  //     },
+  //   })
+  //   .then(result => result)
+  //   .catch(error => {
+  //     error.graphQLErrors.map(item => {
+  //       return notification.error({
+  //         message: 'Somthing went wrong',
+  //         description: item.message,
+  //       })
+  //     })
+  //   })
 }
 
 export async function createLearnersProgram(payload) {

@@ -76,35 +76,44 @@ function CustomerList() {
       title: 'Actions',
       render: row => {
         return (
-          <Button
-            onClick={() => {
-              setMaintainRatesDrawer(true)
-              setCurrentRow(row)
-              // createStudentInvoice({
-              //   variables: {
-              //     student: row.key,
-              //     month: 'March',
-              //     cgst: 15,
-              //     sgst: 4,
-              //     tax: 8,
-              //     discount: 5,
-              //   },
-              // })
-              //   .then(res => console.log(res, 'res'))
-              //   .catch(err => console.log(err, 'error'))
-            }}
-            style={{ padding: 0 }}
-            type="link"
-          >
-            Maintain Rates
-          </Button>
+          <>
+            <Button
+              onClick={() => {
+                setMaintainRatesDrawer(true)
+                setCurrentRow(row)
+              }}
+              style={{ padding: 0 }}
+              type="link"
+            >
+              Maintain Rates
+            </Button>
+            {/* <Button
+              onClick={() => {
+                createStudentInvoice({
+                  variables: {
+                    student: row.key,
+                    month: 'March',
+                    cgst: 15,
+                    sgst: 4,
+                    tax: 8,
+                    discount: 5,
+                  },
+                })
+                  .then(res => console.log(res, 'res'))
+                  .catch(err => console.log(err, 'error'))
+              }}
+              style={{ padding: 0 }}
+              type="link"
+            >
+              Create
+            </Button> */}
+          </>
         )
       },
     },
   ]
 
   const onSelectChange = selectedRowKeys => {
-    // console.log('selectedRowKeys changed: ', selectedRowKeys)
     setSelectedRowKeys(selectedRowKeys)
   }
 
@@ -158,14 +167,14 @@ function CustomerList() {
         height: 'fit-content',
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-end',
       }}
     >
-      <Dropdown overlay={menu}>
+      {/* <Dropdown overlay={menu}>
         <Button>
           Actions <Icon type="down" />
         </Button>
-      </Dropdown>
+      </Dropdown> */}
       <Button onClick={() => setInvoiceItemsDrawer(true)}>Invoice Items</Button>
     </div>
   )
@@ -195,7 +204,7 @@ function CustomerList() {
         destroyOnClose
         onClose={() => setInvoiceItemsDrawer(false)}
       >
-        <InvoiceListItems />
+        <InvoiceListItems closeDrawer={() => setInvoiceItemsDrawer(false)} />
       </Drawer>
       <Drawer
         title={`${currentRow?.firstname}'s - Rates`}
