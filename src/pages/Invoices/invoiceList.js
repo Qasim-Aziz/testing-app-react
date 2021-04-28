@@ -47,8 +47,12 @@ export default () => {
   const [currentInvoice, setCurrentInvoice] = useState(null)
 
   // invoice filer
-  const [from, setFrom] = useState()
-  const [to, setTo] = useState()
+  const [from, setFrom] = useState(
+    moment()
+      .subtract(2, 'M')
+      .startOf('M'),
+  )
+  const [to, setTo] = useState(moment().endOf('M'))
   const [month, setMonth] = useState()
   const [filterStatus, setFilterStatus] = useState('')
   const [filterCustomer, setFilterCustomer] = useState('')
@@ -147,6 +151,14 @@ export default () => {
     {
       title: 'Status',
       dataIndex: 'status.statusName',
+      render: (text, row) => {
+        const color = COLORS[row.status.colorCode]
+        return (
+          <Button type="link" style={{ color, fontSize: 16, padding: 0 }}>
+            {text}
+          </Button>
+        )
+      },
     },
     {
       title: 'Action',
@@ -354,15 +366,13 @@ export default () => {
         />
       </div>
       <div style={{ marginLeft: 'auto' }}>
-        {filterStatus || filterCustomer || from || to ? (
+        {filterStatus || filterCustomer ? (
           <Button
             type="link"
             style={{ marginLeft: '10px', color: '#FEBB27' }}
             onClick={() => {
               setFilterStatus('')
               setFilterCustomer('')
-              setFrom()
-              setTo()
             }}
             size="small"
           >
@@ -379,7 +389,7 @@ export default () => {
     </div>
   )
 
-  console.log(data, 'data')
+  console.log(filteredList, 'data')
   console.log(invoiceData)
   return (
     <div style={{ marginTop: 10 }}>

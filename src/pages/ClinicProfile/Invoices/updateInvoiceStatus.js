@@ -53,6 +53,7 @@ function InvoicePayments({ form, invoiceObj, closeDrawer }) {
     data: invoicePayments,
     loading: invoicePaymentsLoading,
     error: invoicePaymentsError,
+    refetch: refetchInvoicePayments,
   } = useQuery(GET_INVOICE_PAYMENTS, {
     variables: { invoice: invoiceObj.key },
     fetchPolicy: 'network-only',
@@ -96,20 +97,20 @@ function InvoicePayments({ form, invoiceObj, closeDrawer }) {
           })
           .catch(err => console.error(err))
 
-        // createInvoicePayment({
-        //   variables: {
-        //     invoiceId: invoiceObj.key,
-        //     paymentMethod: values.paymentMethod,
-        //     amount: values.amount,
-        //   },
-        // })
-        //   .then(res => {
-        //     notification.success({
-        //       message: 'Payment added successfully',
-        //     })
-        //     closeDrawer()
-        //   })
-        //   .catch(err => console.error(err))
+        createInvoicePayment({
+          variables: {
+            invoiceId: invoiceObj.key,
+            paymentMethod: values.paymentMethod,
+            amount: values.amount,
+          },
+        })
+          .then(res => {
+            notification.success({
+              message: 'Payment added successfully',
+            })
+            refetchInvoicePayments()
+          })
+          .catch(err => console.error(err))
       }
     })
   }
@@ -204,7 +205,14 @@ function InvoicePayments({ form, invoiceObj, closeDrawer }) {
       ) : null}
 
       <Divider orientation="left">Payment History</Divider>
-      <Table columns={columns} dataSource={tableData} rowKey="id" bordered pagination={false} />
+      <Table
+        columns={columns}
+        dataSource={tableData}
+        loading={invoicePaymentsLoading}
+        rowKey="id"
+        bordered
+        pagination={false}
+      />
       <div style={{ padding: 16 }}>
         <div style={{ display: 'flex', marginLeft: 'auto', width: 'fit-content' }}>
           <Text style={{ fontSize: 18, fontWeight: 600 }}>Total :</Text>

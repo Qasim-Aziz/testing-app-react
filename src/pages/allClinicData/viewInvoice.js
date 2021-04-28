@@ -139,10 +139,10 @@ function ViewInvoice({ invoiceId }) {
       setInvoice(invoiceData?.invoiceDetail)
       let tempTotal = 0
       invoiceData?.invoiceDetail.invoiceFee.edges.map(item => {
-        const am = Number(Number(item.node.quantity * item.node.rate).toFixed(3))
+        const am = Number(Number(item.node.quantity * item.node.rate).toFixed(2))
         tempTotal += am
       })
-      setSubtotal(tempTotal)
+      setSubtotal(Number(Number(tempTotal).toFixed(2)))
       setCurrencyName('INR')
     }
   }, [invoiceData])

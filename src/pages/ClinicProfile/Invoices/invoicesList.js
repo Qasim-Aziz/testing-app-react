@@ -62,7 +62,6 @@ export default () => {
 
   const { data: invoiceStatusList } = useQuery(GET_INVOICE_STATUS_LIST)
 
-  console.log(invoiceStatusList)
   const { data: invoiceData, error: invoiceError, loading: invoiceLoading, refetch } = useQuery(
     GET_INVOICES,
     {
@@ -88,7 +87,7 @@ export default () => {
     },
   )
 
-  // console.log(invoiceData, invoiceError, invoiceLoading)
+  console.log(invoiceData, invoiceError, invoiceLoading)
   const [deleteInvoice, { loading: deleteInvoiceLoading }] = useMutation(DELETE_INVOICE)
 
   useEffect(() => {
@@ -159,7 +158,6 @@ export default () => {
       dataIndex: 'status',
       render: (text, row) => {
         const color = COLORS[row.colorCode]
-
         return (
           <Tooltip title="Edit status" trigger={['hover']}>
             <Button
@@ -324,8 +322,6 @@ export default () => {
     const data1 = new Blob([excelBuffer], { type: fileType })
     FileSaver.saveAs(data1, fileName + fileExtension)
   }
-
-  // console.log(selectedRowKeys, 'sele')
 
   const handleMenuActions = e => {
     const names = []
@@ -507,6 +503,7 @@ export default () => {
         <SendPaymentLinks
           selectedRowKeys={selectedRowKeys}
           payReminderData={payReminderData}
+          refetch={refetch}
           closeDrawer={() => setPayReminderDrawer(false)}
         />
       </Drawer>
@@ -520,6 +517,7 @@ export default () => {
       >
         <EditInvoice
           invoiceId={editInvoiceId}
+          refetch={refetch}
           closeDrawer={() => setEditInvoice(false)}
           refetchInvoices={refetch}
         />
@@ -535,6 +533,7 @@ export default () => {
           <UpdateInvoiceStatus
             invoiceId={editInvoiceId}
             invoiceObj={invoiceStatusDrawer}
+            refetch={refetch}
             closeDrawer={() => setInvoiceStatusDrawer(null)}
             refetchInvoices={refetch}
           />
@@ -545,7 +544,11 @@ export default () => {
         width={DRAWER.widthL1}
         onClose={() => setCreateInvoice(false)}
       >
-        <InvoiceForm setNewInvDrawer={setCreateInvoice} refetchInvoices={refetch} />
+        <InvoiceForm
+          refetch={refetch}
+          setNewInvDrawer={setCreateInvoice}
+          refetchInvoices={refetch}
+        />
       </Drawer>
     </div>
   )

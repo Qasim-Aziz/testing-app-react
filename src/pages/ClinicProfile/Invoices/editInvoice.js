@@ -577,6 +577,10 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
             )}
           </Form.Item>
         </div>
+        <div style={{ fontSize: 16, color: 'black' }}>
+          <span style={{ fontWeight: 700 }}>Hours Used : </span>
+          <span style={{ fontWeight: 600 }}>{invoiceDetails.hoursUsed} hrs</span>
+        </div>
 
         <div style={{ marginTop: '15px' }}>
           <Table
@@ -721,14 +725,13 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
           <div style={{ ...amParent, margin: '5px 0', marginTop: '15px' }}>
             <span style={{ ...amLabel, fontSize: '20px' }}>Lat Invoice Amount :</span>
             <span style={{ ...amStyle, fontSize: '20px' }}>
-              {currencySymbol}
-              {lastInvoiceAmount}
+              {currencySymbol} {lastInvoiceAmount}
             </span>
           </div>
           <div style={{ ...amParent, margin: '5px 0', marginTop: '15px' }}>
             <span style={{ ...amLabel, fontSize: '20px' }}>Total :</span>
             <span style={{ ...amStyle, fontSize: '20px' }}>
-              {currencySymbol}
+              {currencySymbol}{' '}
               {getTotal(
                 subTotal,
                 form.getFieldValue('discount'),

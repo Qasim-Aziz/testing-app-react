@@ -27,8 +27,13 @@ export const GET_SCHOOL_DETAILS = gql`
 `
 
 export const GET_INVOICES = gql`
-  query getInvoices($from: Date, $to: Date, $status: ID) {
-    getInvoices(date_Gte: $from, date_Lte: $to, status: $status) {
+  query getInvoices($from: Date, $to: Date, $status: ID, $customer_School: ID) {
+    getInvoices(
+      date_Gte: $from
+      date_Lte: $to
+      status: $status
+      customer_School: $customer_School
+    ) {
       edges {
         node {
           id
@@ -42,6 +47,11 @@ export const GET_INVOICES = gql`
           discount
           total
           linkGenerated
+          customer {
+            id
+            firstname
+            lastname
+          }
           clinic {
             id
             schoolName
@@ -397,6 +407,7 @@ export const GET_INVOICE = gql`
       linkGenerated
       paymentLink
       lastAmount
+      hoursUsed
       clinic {
         id
         schoolName

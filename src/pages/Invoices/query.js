@@ -290,6 +290,7 @@ export const GET_INVOICES = gql`
           status {
             id
             statusName
+            colorCode
           }
           invoiceFee {
             edges {

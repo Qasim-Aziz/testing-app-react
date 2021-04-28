@@ -1,7 +1,7 @@
 /* eslint-disable */
 import React, { useEffect, useState } from 'react'
-import { Button, notification, Table, Menu, Icon, Dropdown, Drawer, Form } from 'antd'
-import { PlusOutlined, MailOutlined } from '@ant-design/icons'
+import { Button, notification, Table, Menu, Icon, Dropdown, Drawer, Form, Tooltip } from 'antd'
+import { PlusOutlined, MailOutlined, TransactionOutlined } from '@ant-design/icons'
 import { DRAWER, COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 import { useMutation, useQuery } from 'react-apollo'
 import { STUDENTS, STUDENT_INVOICE_ITEMS, CREATE_STUDENT_INVOICE } from './query'
@@ -23,9 +23,7 @@ function CustomerList() {
   const [invoiceItemsDrawer, setInvoiceItemsDrawer] = useState(false)
   const [maintainRatesDrawer, setMaintainRatesDrawer] = useState(false)
   const [invoiceType, setInvoiceType] = useState('advance')
-  const [createStudentInvoice, { loading: createStudentInvoiceLoading }] = useMutation(
-    CREATE_STUDENT_INVOICE,
-  )
+
   console.log(data, 'daya')
 
   // console.log(invoiceItemsData, 'item data')
@@ -77,36 +75,28 @@ function CustomerList() {
       render: row => {
         return (
           <>
+            <Tooltip title="Maintain Rates" trigger="hover">
+              <Button
+                onClick={() => {
+                  setMaintainRatesDrawer(true)
+                  setCurrentRow(row)
+                }}
+                style={{ padding: 0, marginRight: 10 }}
+                type="link"
+              >
+                Maintain Rates
+              </Button>
+            </Tooltip>
             <Button
               onClick={() => {
-                setMaintainRatesDrawer(true)
                 setCurrentRow(row)
+                setCreateInvoiceDrawer(true)
               }}
               style={{ padding: 0 }}
               type="link"
             >
-              Maintain Rates
+              + Add Invoice
             </Button>
-            {/* <Button
-              onClick={() => {
-                createStudentInvoice({
-                  variables: {
-                    student: row.key,
-                    month: 'March',
-                    cgst: 15,
-                    sgst: 4,
-                    tax: 8,
-                    discount: 5,
-                  },
-                })
-                  .then(res => console.log(res, 'res'))
-                  .catch(err => console.log(err, 'error'))
-              }}
-              style={{ padding: 0 }}
-              type="link"
-            >
-              Create
-            </Button> */}
           </>
         )
       },
@@ -190,9 +180,7 @@ function CustomerList() {
         onClose={() => setCreateInvoiceDrawer(false)}
       >
         <CreateInvoiceForm
-          selectedClinicsName={selectedClinicsName}
-          selectedRowKeys={selectedRowKeys}
-          invoiceType={invoiceType}
+          studentId={currentRow?.key}
           closeDrawer={() => setCreateInvoiceDrawer(false)}
         />
       </Drawer>
