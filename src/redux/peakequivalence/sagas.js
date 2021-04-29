@@ -99,6 +99,9 @@ export function* START_ASSESSMENT({ payload }) {
         const zeroObject = recordedResponse[0]?.records.edges
 
         for (let l = 0; l < zeroObject.length; l++) {
+          console.log(l)
+          console.log(zeroObject[l])
+          console.log(respObject)
           respObject[zeroObject[l].node.question.id][zeroObject[l].node.test.id] = {
             recorded: true,
             response: zeroObject[l].node.response,
