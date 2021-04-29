@@ -4,85 +4,37 @@ import moment from 'moment'
 import { useQuery, useMutation } from 'react-apollo'
 import { FORM, DRAWER, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 import { Form, Input, DatePicker, Drawer, Button, notification, Popconfirm } from 'antd'
+import { CREATE_STUDENT_INVOICE } from './query'
 
 const { layout, tailLayout } = FORM
 
-function AdvanceInvoiceForm({
-  form,
-  selectedClinicsName,
-  selectedRowKeys,
-  invoiceType,
-  closeDrawer,
-}) {
-  const [advMonth, setAdvMonth] = useState(
-    invoiceType === 'advance' ? moment() : moment().subtract(1, 'M'),
+function AdvanceInvoiceForm({ form, studentId, closeDrawer }) {
+  const [createStudentInvoice, { loading: createStudentInvoiceLoading }] = useMutation(
+    CREATE_STUDENT_INVOICE,
   )
-
-  //   const [createAdvanceInvoice, { loading: advanceLoading }] = useMutation(ADVANCE_INVOICE)
-  //   const [createMonthlyInvoice, { loading: monthlyLoading }] = useMutation(MONTHLY_INVOICE)
-
   const handleSubmitt = e => {
     e.preventDefault()
 
     form.validateFields((error, values) => {
-      if (selectedRowKeys && selectedRowKeys.length > 0) {
-        if (!error) {
-          if (invoiceType === 'advance') {
-            //     createAdvanceInvoice({
-            //       variables: {
-            //         month: values.month?.format('YYYY'),
-            //         clinics: selectedRowKeys,
-            //         cgst: values.cgst,
-            //         sgst: values.sgst,
-            //         discount: values.discount,
-            //         generateLink: true,
-            //       },
-            //     })
-            //       .then(res => {
-            //         if (res) {
-            //           notification.success({
-            //             message: 'Request sent successsfully',
-            //             description: 'Invoices are generating, wait for some time',
-            //           })
-            //         }
-            //       })
-            //       .catch(err => {
-            //         notification.error({
-            //           message: 'Something went wrong',
-            //           description: 'Unable to send request to create invoices',
-            //         })
-            //       })
-            //   } else if (invoiceType === 'monthly') {
-            //     createMonthlyInvoice({
-            //       variables: {
-            //         month: values.month?.format('YYYY'),
-            //         clinics: selectedRowKeys,
-            //         cgst: values.cgst,
-            //         sgst: values.sgst,
-            //         discount: values.discount,
-            //         generateLink: true,
-            //       },
-            //     })
-            //       .then(res => {
-            //         if (res) {
-            //           notification.success({
-            //             message: 'Request sent successsfully',
-            //             description: 'Invoices are generating, wait for some time',
-            //           })
-            //         }
-            //       })
-            //       .catch(err => {
-            //         notification.error({
-            //           message: 'Something went wrong',
-            //           description: 'Unable to send request to create invoices',
-            //         })
-            //       })
-          }
-        }
-      } else {
-        notification.warning({
-          message: 'Please select at least one clinic to create invoice',
+      if (!error && studentId) {
+        console.log(values, studentId)
+        createStudentInvoice({
+          variables: {
+            student: studentId,
+            month: moment(values.month).format('MMM'),
+            cgst: values.cgst,
+            sgst: values.sgst,
+            tax: values.tax ? Number(values.tax) : 0,
+            discount: values.discount ? Number(values.discount) : 0,
+          },
         })
+          .then(res => {
+            notification.success({
+              message: 'Invoice generated successfully',
+            })
+            closeDrawer()
+          })
+          .catch(err => console.error(err, 'error'))
       }
     })
   }
@@ -92,58 +44,39 @@ function AdvanceInvoiceForm({
       <Form {...layout}>
         <Form.Item label="Month">
           {form.getFieldDecorator('month', {
-            initialValue: advMonth,
+            initialValue: moment(),
             rules: [{ required: true, message: 'Please provide Month!' }],
-          })(<DatePicker.MonthPicker onChange={e => setAdvMonth(e)} />)}
+          })(<DatePicker.MonthPicker />)}
+        </Form.Item>
+        <Form.Item label="Discount">
+          {form.getFieldDecorator('discount', {
+            rules: [{ required: false, message: 'Please provide Discount!' }],
+          })(<Input />)}
         </Form.Item>
         <Form.Item label="CGST">
           {form.getFieldDecorator('cgst', {
+            initialValue: 9,
             rules: [{ required: true, message: 'Please provide CGST!' }],
           })(<Input />)}
         </Form.Item>
         <Form.Item label="SGST">
           {form.getFieldDecorator('sgst', {
+            initialValue: 9,
             rules: [{ required: true, message: 'Please provide SGST!' }],
           })(<Input />)}
         </Form.Item>
         <Form.Item label="Tax">
           {form.getFieldDecorator('tax', {
-            rules: [{ required: true, message: 'Please provide Tax!' }],
+            rules: [{ required: false, message: 'Please provide Tax!' }],
           })(<Input />)}
         </Form.Item>
 
-        <Form.Item label="Selected Clinics">
-          {selectedClinicsName && selectedClinicsName?.length > 0 ? (
-            <>
-              <div>
-                <ol style={{ display: 'grid', gridTemplateColumns: 'auto auto' }}>
-                  {selectedClinicsName &&
-                    selectedClinicsName.map((item, index) => (
-                      <li style={{ width: 340 }}>{item}</li>
-                    ))}
-                </ol>
-              </div>
-            </>
-          ) : (
-            <b>None, Please select at least one clinic</b>
-          )}
-          <div style={{ alignItems: 'center' }}>
-            <div>
-              Create <strong>{invoiceType === 'advance' ? 'Advance' : 'Monthly'}</strong> invoice
-              for selected clinics for month of <b>{advMonth.format('MMMM')}</b>.
-            </div>
-          </div>
-        </Form.Item>
         <Form.Item {...tailLayout}>
           <Popconfirm
             title="Make sure all the filled details are correct."
             onConfirm={e => handleSubmitt(e)}
           >
-            <Button
-              type="default"
-              //   loading={advanceLoading || monthlyLoading}
-              style={SUBMITT_BUTTON}
-            >
+            <Button type="default" loading={createStudentInvoiceLoading} style={SUBMITT_BUTTON}>
               Create Invoice
             </Button>
           </Popconfirm>

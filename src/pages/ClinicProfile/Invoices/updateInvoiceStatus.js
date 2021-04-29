@@ -31,7 +31,7 @@ const roundNumber = (num, digitFigure) => {
   return Number(Number(num).toFixed(digitFigure))
 }
 
-function InvoicePayments({ form, invoiceObj, closeDrawer }) {
+function InvoicePayments({ form, invoiceObj, closeDrawer, refetchInvoices }) {
   const statusList = [
     { key: 'SW52b2ljZVN0YXR1c1R5cGU6Mg==', name: 'Pending' },
     { key: 'SW52b2ljZVN0YXR1c1R5cGU6NA==', name: 'Sent' },
@@ -53,6 +53,7 @@ function InvoicePayments({ form, invoiceObj, closeDrawer }) {
     data: invoicePayments,
     loading: invoicePaymentsLoading,
     error: invoicePaymentsError,
+    refetch: refetchInvoicePayments,
   } = useQuery(GET_INVOICE_PAYMENTS, {
     variables: { invoice: invoiceObj.key },
     fetchPolicy: 'network-only',
@@ -93,23 +94,24 @@ function InvoicePayments({ form, invoiceObj, closeDrawer }) {
             notification.success({
               message: 'Status Updated successfully',
             })
+            refetchInvoices()
           })
           .catch(err => console.error(err))
 
-        // createInvoicePayment({
-        //   variables: {
-        //     invoiceId: invoiceObj.key,
-        //     paymentMethod: values.paymentMethod,
-        //     amount: values.amount,
-        //   },
-        // })
-        //   .then(res => {
-        //     notification.success({
-        //       message: 'Payment added successfully',
-        //     })
-        //     closeDrawer()
-        //   })
-        //   .catch(err => console.error(err))
+        createInvoicePayment({
+          variables: {
+            invoiceId: invoiceObj.key,
+            paymentMethod: values.paymentMethod,
+            amount: values.amount,
+          },
+        })
+          .then(res => {
+            notification.success({
+              message: 'Payment added successfully',
+            })
+            refetchInvoicePayments()
+          })
+          .catch(err => console.error(err))
       }
     })
   }
@@ -204,7 +206,14 @@ function InvoicePayments({ form, invoiceObj, closeDrawer }) {
       ) : null}
 
       <Divider orientation="left">Payment History</Divider>
-      <Table columns={columns} dataSource={tableData} rowKey="id" bordered pagination={false} />
+      <Table
+        columns={columns}
+        dataSource={tableData}
+        loading={invoicePaymentsLoading}
+        rowKey="id"
+        bordered
+        pagination={false}
+      />
       <div style={{ padding: 16 }}>
         <div style={{ display: 'flex', marginLeft: 'auto', width: 'fit-content' }}>
           <Text style={{ fontSize: 18, fontWeight: 600 }}>Total :</Text>
@@ -231,7 +240,7 @@ function InvoicePayments({ form, invoiceObj, closeDrawer }) {
               marginBottom: 10,
             }}
           >
-            {roundNumber(invoiceObj.amount, 3)}
+            {roundNumber(invoiceObj.total, 3)}
           </Text>
         </div>
         <div style={{ display: 'flex', marginLeft: 'auto', width: 'fit-content' }}>
@@ -245,7 +254,7 @@ function InvoicePayments({ form, invoiceObj, closeDrawer }) {
               marginBottom: 10,
             }}
           >
-            {roundNumber(invoiceObj.amount - total, 3)}
+            {roundNumber(invoiceObj.total - total, 3)}
           </Text>
         </div>
         {invoiceObj.status === 'Paid' ? (

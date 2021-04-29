@@ -343,6 +343,66 @@ export const GET_INVOICES = gql`
   }
 `
 
+export const GET_INVOICE_DETAIL = gql`
+  query($id: ID!) {
+    invoiceDetail(id: $id) {
+      id
+      invoiceNo
+      email
+      issueDate
+      dueDate
+      amount
+      address
+      taxableSubtotal
+      discount
+      sgst
+      cgst
+      tax
+      total
+      linkGenerated
+      paymentLink
+      lastAmount
+      clinic {
+        id
+        schoolName
+        address
+      }
+      customer {
+        id
+        firstname
+        lastname
+        school {
+          id
+          schoolName
+          email
+          address
+          logo
+        }
+      }
+      status {
+        id
+        statusName
+      }
+      invoiceFee {
+        edges {
+          node {
+            id
+            quantity
+            rate
+            amount
+            tax
+            schoolServices {
+              id
+              name
+              description
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 export const DELETE_INVOICE = gql`
   mutation deleteInvoice($id: ID!) {
     deleteInvoice(input: { pk: $id }) {
@@ -361,7 +421,7 @@ export const INVOICE_STATUS = gql`
   }
 `
 export const GENERATE_LINK = gql`
-  mutation RazorpayGenerateLink($pk: ID!) {
+  mutation RazorpayGenerateLink($pk: [ID]!) {
     razorpayGenerateLink(input: { pk: $pk }) {
       status
       message
@@ -370,7 +430,7 @@ export const GENERATE_LINK = gql`
 `
 
 export const NOTIFICATION = gql`
-  mutation RazorpayInvoiceNotification($pk: ID!) {
+  mutation RazorpayInvoiceNotification($pk: [ID]!) {
     razorpayInvoiceNotification(input: { pk: $pk }) {
       status
       message

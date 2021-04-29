@@ -6,7 +6,7 @@ import { GENERATE_LINK, PAYMENT_REMINDER } from './query'
 
 const { layout, tailLayout } = FORM
 
-function SendPaymentLinks({ selectedRowKeys, payReminderData, closeDrawer }) {
+function SendPaymentLinks({ selectedRowKeys, payReminderData, closeDrawer, refetch }) {
   const [generatePaymentLink, { loading: generatePaymentLinkLoading }] = useMutation(GENERATE_LINK)
   const [sendPaymentReminder, { loading: sendPaymentReminderLoading }] = useMutation(
     PAYMENT_REMINDER,
@@ -22,7 +22,6 @@ function SendPaymentLinks({ selectedRowKeys, payReminderData, closeDrawer }) {
           ? sendNotiIds.push(item.key)
           : null,
       )
-      // console.log(createIds, sendNotiIds)
 
       try {
         if (createIds.length > 0) {
@@ -31,17 +30,19 @@ function SendPaymentLinks({ selectedRowKeys, payReminderData, closeDrawer }) {
               pk: createIds,
             },
           }).then(res => {
-            console.log(res, 'res1')
+            console.log(res, 'this is res')
             if (sendNotiIds.length > 0) {
               sendPaymentReminder({
                 variables: {
                   pk: sendNotiIds,
                 },
               }).then(resp => {
-                console.log(resp, 'res2')
+                console.log(resp, 'this is resp')
+                refetch()
                 notification.success({
-                  message: resp.message,
+                  message: 'Invoice sent successully',
                 })
+                closeDrawer()
               })
             }
           })
@@ -51,10 +52,12 @@ function SendPaymentLinks({ selectedRowKeys, payReminderData, closeDrawer }) {
               pk: sendNotiIds,
             },
           }).then(resp => {
-            console.log(resp, 'res2')
+            refetch()
+            console.log(resp, 'this is resp')
             notification.success({
-              message: resp.message,
+              message: 'Invoice sent successully',
             })
+            closeDrawer()
           })
         }
       } catch (e) {
@@ -70,7 +73,14 @@ function SendPaymentLinks({ selectedRowKeys, payReminderData, closeDrawer }) {
         <>
           <Form.Item {...layout} label="Selected Invoices">
             <div>
-              <ol style={{ display: 'grid', gridTemplateColumns: 'auto auto' }}>
+              <ol
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'auto auto',
+                  fontSize: 15,
+                  fontWeight: 600,
+                }}
+              >
                 {payReminderData &&
                   payReminderData.map((item, index) => (
                     <li key={item.key} style={{ width: 340 }}>

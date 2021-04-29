@@ -528,7 +528,7 @@ const AllClinicsData = () => {
           <UpdateClinicRates
             rowData={currentClinicRow}
             ratesDrawer={ratesDrawer}
-            setRatesDrawer={setRatesDrawer}
+            closeDrawer={() => setRatesDrawer(false)}
           />
         </Drawer>
         <Drawer

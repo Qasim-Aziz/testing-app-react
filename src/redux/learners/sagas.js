@@ -429,7 +429,7 @@ export function* CREATE_LEARNER({ payload }) {
       },
     })
 
-    if (payload.values.program !== '') {
+    if (payload.values.program && payload.values.program !== '') {
       const programResponse = yield call(createLearnersProgram, {
         id: response.data.createStudent.student.id,
         program: payload.values.program,

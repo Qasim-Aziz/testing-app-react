@@ -47,6 +47,11 @@ export const GET_INVOICES = gql`
           discount
           total
           linkGenerated
+          customer {
+            id
+            firstname
+            lastname
+          }
           clinic {
             id
             schoolName
@@ -60,16 +65,6 @@ export const GET_INVOICES = gql`
             id
             statusName
             colorCode
-          }
-          customer {
-            id
-            firstname
-            lastname
-            parent {
-              firstName
-              lastName
-              username
-            }
           }
           invoiceFee {
             edges {
@@ -135,6 +130,7 @@ export const UPDATE_STUDENT_INVOICE = gql`
     $discount: Float
     $sgst: Float
     $cgst: Float
+    $tax: Float
     $total: Float
     $products: [FeeInput2]
   ) {
@@ -151,12 +147,18 @@ export const UPDATE_STUDENT_INVOICE = gql`
         discount: $discount
         sgst: $sgst
         cgst: $cgst
+        tax: $tax
         total: $total
         products: $products
       }
     ) {
       details {
         id
+        linkGenerated
+        status {
+          id
+          statusName
+        }
       }
     }
   }
@@ -412,6 +414,7 @@ export const GET_INVOICE = gql`
       linkGenerated
       paymentLink
       lastAmount
+      hoursUsed
       clinic {
         id
         schoolName

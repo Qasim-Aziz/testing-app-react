@@ -1,3 +1,5 @@
+/* eslint-disable consistent-return */
+/* eslint-disable no-unused-expressions */
 /* eslint-disable prefer-template */
 /* eslint-disable  react-hooks/rules-of-hooks */
 /* eslint-disable no-array-constructor */
@@ -7,18 +9,20 @@
 /* eslint-disable array-callback-return */
 
 import React, { useEffect, useState } from 'react'
-import { Tooltip, Button, notification } from 'antd'
+import { Tooltip, Button, notification, Drawer } from 'antd'
 import { PrinterOutlined } from '@ant-design/icons'
 import moment from 'moment'
 import { ToWords } from 'to-words'
 import { useHistory } from 'react-router-dom'
 import { useQuery } from 'react-apollo'
 import LoadingComponent from 'components/VBMappReport/LoadingComponent'
-import { GET_PAYMENT_DETAILS } from './query'
+import { DRAWER } from 'assets/styles/globalStyles'
+import PrintableInvoice from './printableInvoice'
+import { GET_PAYMENT_DETAILS, GET_INVOICE_DETAIL } from './query'
 import logo from '../../images/WhatsApp Image 2020-04-23 at 10.00.40 (1).jpeg'
 
 const general = {
-  fontSize: '12px',
+  fontSize: 13,
   padding: '5px 8px',
   color: 'black',
   fontWeight: '500',
@@ -46,7 +50,7 @@ const flexSection = {
 }
 const dateSection = {
   width: '50%',
-  fontSize: 12,
+  fontSize: 13,
   alignSelf: 'flex-start',
   textAlign: 'left',
   fontWeight: '500',
@@ -103,12 +107,23 @@ function getTotal(subTotal, discount = 0, gst = 0, sgst = 0, tax = 0) {
   ).toFixed(2)
 }
 
-function ViewInvoice({ invoice }) {
+function ViewInvoice({ invoiceId }) {
+  const [invoice, setInvoice] = useState(null)
+  const [currencyName, setCurrencyName] = useState(null)
   const [subTotal, setSubtotal] = useState(0)
-  const history = useHistory()
-  const currentCurrencyName = invoice.clinic.currency ? invoice.clinic.currency.currency : 'INR'
-  const { data, loading, error } = useQuery(GET_PAYMENT_DETAILS)
+  const [printInvoiceDrawer, setPrintInvoiceDrawer] = useState(false)
+  const [isValidImage, setIsValidImage] = useState(false)
 
+  const currentCurrencyName = 'INR'
+  const { data, loading, error } = useQuery(GET_PAYMENT_DETAILS)
+  const { data: invoiceData, loading: isInvoiceDataLoading, error: invoiceDataErrors } = useQuery(
+    GET_INVOICE_DETAIL,
+    {
+      variables: {
+        id: invoiceId,
+      },
+    },
+  )
   console.log(invoice, 'invoice')
   useEffect(() => {
     if (error) {
@@ -120,13 +135,17 @@ function ViewInvoice({ invoice }) {
   }, [error])
 
   useEffect(() => {
-    let tempSubTotal = 0
-    invoice.invoiceFee.edges.map(item => {
-      const tempTotal = Number(item.node.quantity * item.node.rate).toFixed(3)
-      tempSubTotal = (Number(tempSubTotal) + Number(tempTotal)).toFixed(3)
-    })
-    setSubtotal(tempSubTotal)
-  }, [])
+    if (invoiceData) {
+      setInvoice(invoiceData?.invoiceDetail)
+      let tempTotal = 0
+      invoiceData?.invoiceDetail.invoiceFee.edges.map(item => {
+        const am = Number(Number(item.node.quantity * item.node.rate).toFixed(2))
+        tempTotal += am
+      })
+      setSubtotal(Number(Number(tempTotal).toFixed(2)))
+      setCurrencyName('INR')
+    }
+  }, [invoiceData])
 
   const toWords = new ToWords({
     localeCode: currentCurrencyName === 'USD' ? 'en-US' : 'en-IN',
@@ -137,12 +156,24 @@ function ViewInvoice({ invoice }) {
     },
   })
 
-  const total = getTotal(subTotal, invoice.discount, invoice.gst, invoice.sgst, invoice.tax)
+  useEffect(() => {
+    if (error || invoiceDataErrors) {
+      return notification.error({
+        message: 'Something went wrong',
+        description: 'Unable to fetch invoice data',
+      })
+    }
+  }, [error, invoiceDataErrors])
 
-  const invoke = () => {
-    localStorage.setItem('currentInvoice', JSON.stringify(invoice))
-    history.push('/printInvoice')
-  }
+  if (isInvoiceDataLoading || loading || !invoice) return <LoadingComponent />
+  if (error || invoiceDataErrors || !invoiceData)
+    return (
+      <div style={{ marginTop: 80, marginLeft: 60, fontWeight: 700, fontSize: 18 }}>
+        Opps, something went wrong
+      </div>
+    )
+
+  const total = getTotal(subTotal, invoice.discount, invoice.gst, invoice.sgst, invoice.tax)
 
   if (loading) {
     return <LoadingComponent />
@@ -172,19 +203,20 @@ function ViewInvoice({ invoice }) {
           style={{
             margin: 0,
             color: 'rgba(0, 0, 0, 0.85)',
-            fontWeight: 500,
-            fontSize: '16px',
+            fontWeight: 700,
+            fontSize: 18,
             lineHeight: '22px',
+            textAlign: 'center',
           }}
         >
-          {invoice.invoiceNo}
+          View Invoice - {invoice.invoiceNo}
         </div>
         <Tooltip placement="top" title="Download Pdf">
           <Button
             className=" ant-drawer-close"
             style={{ right: '45px' }}
             type="link"
-            onClick={invoke}
+            onClick={() => setPrintInvoiceDrawer(true)}
           >
             <PrinterOutlined />
           </Button>
@@ -207,7 +239,7 @@ function ViewInvoice({ invoice }) {
               >
                 <div
                   style={{
-                    fontSize: 12,
+                    fontSize: 14,
                     width: '100%',
                     alignSelf: 'flex-start',
                     textAlign: 'left',
@@ -217,7 +249,7 @@ function ViewInvoice({ invoice }) {
                 </div>
                 <div
                   style={{
-                    fontSize: 10,
+                    fontSize: 12,
                     width: '100%',
                     alignSelf: 'flex-start',
                     textAlign: 'left',
@@ -228,7 +260,7 @@ function ViewInvoice({ invoice }) {
                 </div>
                 <div
                   style={{
-                    fontSize: 10,
+                    fontSize: 12,
                     width: '100%',
                     alignSelf: 'flex-start',
                     textAlign: 'left',
@@ -243,13 +275,14 @@ function ViewInvoice({ invoice }) {
                   textAlign: 'center',
                   width: '200px',
                   alignSelf: 'center',
+                  fontSize: 18,
                 }}
               >
                 <div>{invoice.invoiceNo}</div>
               </div>
             </div>
-            <div style={{ ...section, height: '120px', padding: '0' }}>
-              <div style={{ width: '50%', height: '100%', borderRight: '1px solid black' }}>
+            <div style={{ ...section, minHeight: '120px', height: 'fit-content', padding: '0' }}>
+              <div style={{ width: '50%', height: '100%' }}>
                 <div style={{ ...flexSection, paddingBottom: '0' }}>
                   <div style={{ ...dateSection, widh: '40%', fontWeight: '600' }}> #INV</div>
                   <div style={{ ...dateSection, width: '60%' }}> : {invoice.invoiceNo}</div>
@@ -263,7 +296,7 @@ function ViewInvoice({ invoice }) {
                   <div style={{ ...dateSection, width: '60%' }}> : {invoice.dueDate}</div>
                 </div>
               </div>
-              <div style={{ width: '50%' }}>
+              <div style={{ width: '50%', borderLeft: '1px solid black' }}>
                 <div style={{ ...flexSection, paddingBottom: '0' }}>
                   <div style={{ ...dateSection, width: '40%', fontWeight: '600' }}>
                     Place of supply
@@ -275,7 +308,8 @@ function ViewInvoice({ invoice }) {
             <div
               style={{
                 borderBottom: '1px solid black',
-                height: '75px',
+                minHeight: '75px',
+                height: 'fit-content',
                 display: 'flex',
                 flexDirection: 'column',
                 backgroundColor: '#fafafa',
@@ -558,6 +592,14 @@ function ViewInvoice({ invoice }) {
           </div>
         </div>
       </div>
+      <Drawer
+        title={`Print Invoice - ${invoice?.invoiceNo}`}
+        visible={printInvoiceDrawer}
+        width={DRAWER.widthL2}
+        onClose={() => setPrintInvoiceDrawer(false)}
+      >
+        <PrintableInvoice invoiceId={invoice.id} />
+      </Drawer>
     </div>
   )
 }

@@ -29,7 +29,7 @@ const tailLayout = {
   },
 }
 
-function UpdateClinicRates({ form, rowData, ratesDrawer, setRatesDrawer }) {
+function UpdateClinicRates({ form, rowData, closeDrawer }) {
   const [rates, setRates] = useState(null)
   const [ratesExist, setRatesExist] = useState(false)
   const { data: ratesData, loading: ratesLoading } = useQuery(CLINIC_RATES, {
@@ -78,9 +78,9 @@ function UpdateClinicRates({ form, rowData, ratesDrawer, setRatesDrawer }) {
               message: 'Clinic Rates Updated',
               description: 'Clinic rates updated successfully',
             })
+            closeDrawer()
           })
           .catch(error1 => error1)
-        setRatesDrawer(false)
       }
     })
 
@@ -175,7 +175,7 @@ function UpdateClinicRates({ form, rowData, ratesDrawer, setRatesDrawer }) {
           <Button type="primary" htmlType="submit" style={SUBMITT_BUTTON}>
             Save
           </Button>
-          <Button type="ghost" style={CANCEL_BUTTON} onClick={() => setRatesDrawer(false)}>
+          <Button type="ghost" style={CANCEL_BUTTON} onClick={() => closeDrawer()}>
             Cancel
           </Button>
         </Form.Item>

@@ -28,8 +28,9 @@ import {
 import { useQuery, useMutation } from 'react-apollo'
 import moment from 'moment'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
+import UpdateInvoiceStatus from 'pages/ClinicProfile/Invoices/updateInvoiceStatus'
 import InvoiceForm from 'components/invoice/InvoiceForm'
-import EditInvoice from 'components/invoice/EditInvoice'
+import EditInvoice from './editInvoice'
 import PreviewInvoice from '../allClinicData/viewInvoice'
 import './invoices.scss'
 import { GET_INVOICES, DELETE_INVOICE } from './query'
@@ -37,21 +38,26 @@ import { GET_INVOICES, DELETE_INVOICE } from './query'
 const dateFormate = 'YYYY-MM-DD'
 
 export default () => {
-  const [isCreateInvoice, setCreateInvoice] = useState(false)
   const [isPreviewInvoice, setPreviewInvoice] = useState(false)
   const [isEditInvoice, setEditInvoice] = useState(false)
   const [selectedInvoiceId, setSelectedInvoiceId] = useState()
   const [data, setData] = useState()
   const [deleteInvoiceId, setDeleteInvoiceId] = useState()
   const [editInvoiceId, setEditInvoiceId] = useState()
+  const [currentClinicRow, setCurrentClinicRow] = useState()
   const [currentInvoice, setCurrentInvoice] = useState(null)
 
   // invoice filer
-  const [from, setFrom] = useState()
-  const [to, setTo] = useState()
+  const [from, setFrom] = useState(
+    moment()
+      .subtract(2, 'M')
+      .startOf('M'),
+  )
+  const [to, setTo] = useState(moment().endOf('M'))
   const [month, setMonth] = useState()
   const [filterStatus, setFilterStatus] = useState('')
   const [filterCustomer, setFilterCustomer] = useState('')
+  const [invoiceStatusDrawer, setInvoiceStatusDrawer] = useState(false)
 
   const { data: invoiceData, error: invoiceError, loading: invoiceLoading, refetch } = useQuery(
     GET_INVOICES,
@@ -72,6 +78,7 @@ export default () => {
               .format(dateFormate)
           : undefined,
         status: filterStatus,
+        allclinics: true,
       },
     },
   )
@@ -80,16 +87,6 @@ export default () => {
     deleteInvoice,
     { data: deleteInvoiceData, error: deleteInvoiceError, loading: deleteInvoiceLoading },
   ] = useMutation(DELETE_INVOICE)
-
-  useEffect(() => {
-    if (deleteInvoiceData) {
-      notification.success({
-        message: 'Delete invoice sucessfully',
-      })
-      refetch()
-      setDeleteInvoiceId(null)
-    }
-  }, [deleteInvoiceData])
 
   useEffect(() => {
     if (deleteInvoiceError) {
@@ -104,8 +101,15 @@ export default () => {
     if (invoiceData) {
       const dataList = [...invoiceData.getInvoices.edges]
       const arrengedData = dataList.map(({ node }) => {
-        return node
+        return {
+          ...node,
+          key: node.id,
+          status: node.status.statusName,
+          colorCode: node.status.colorCode,
+          statusId: node.status.id,
+        }
       })
+      console.log(arrengedData, 'sdfff')
       arrengedData.reverse()
       setData(arrengedData)
     }
@@ -142,17 +146,31 @@ export default () => {
     },
     {
       title: 'Amount',
-      dataIndex: 'amount',
+      dataIndex: 'total',
     },
     {
       title: 'Status',
-      dataIndex: 'status.statusName',
+      dataIndex: 'status',
+      render: (text, row) => {
+        const color = COLORS[row.colorCode]
+        return (
+          <Button
+            onClick={() => {
+              setCurrentInvoice(row)
+              setInvoiceStatusDrawer(true)
+            }}
+            type="link"
+            style={{ color, fontSize: 16, padding: 0 }}
+          >
+            {text}
+          </Button>
+        )
+      },
     },
     {
       title: 'Action',
       width: 260,
       render: row => {
-        console.log(row)
         return (
           <div>
             <Button
@@ -168,19 +186,25 @@ export default () => {
 
             {row.status !== 'Paid' && (
               <>
-                {/* <Button
+                <Button
                   type="link"
                   onClick={() => {
                     setEditInvoice(true)
-                    setEditInvoiceId(row.key)
+                    setCurrentInvoice(row)
                   }}
                 >
                   <EditOutlined style={{ fontWeight: 600 }} />
-                </Button> */}
+                </Button>
                 <Popconfirm
                   title="Are you sure to delete this invoice?"
                   onConfirm={() => {
-                    deleteInvoice({ variables: { id: row.id } })
+                    deleteInvoice({ variables: { id: row.id } }).then(res => {
+                      notification.success({
+                        message: 'Delete invoice sucessfully',
+                      })
+                      refetch()
+                      setDeleteInvoiceId(null)
+                    })
                     setDeleteInvoiceId(row.id)
                   }}
                   okText="Yes"
@@ -200,9 +224,7 @@ export default () => {
 
   let filteredList = data || []
   filteredList = filteredList.filter(
-    item =>
-      item.status?.statusName &&
-      item.status?.statusName.toLowerCase().includes(filterStatus.toLowerCase()),
+    item => item.status && item.status.toLowerCase().includes(filterStatus.toLowerCase()),
   )
 
   if (filterCustomer) {
@@ -354,15 +376,13 @@ export default () => {
         />
       </div>
       <div style={{ marginLeft: 'auto' }}>
-        {filterStatus || filterCustomer || from || to ? (
+        {filterStatus || filterCustomer ? (
           <Button
             type="link"
             style={{ marginLeft: '10px', color: '#FEBB27' }}
             onClick={() => {
               setFilterStatus('')
               setFilterCustomer('')
-              setFrom()
-              setTo()
             }}
             size="small"
           >
@@ -379,7 +399,7 @@ export default () => {
     </div>
   )
 
-  console.log(data, 'data')
+  console.log(filteredList, 'data')
   console.log(invoiceData)
   return (
     <div style={{ marginTop: 10 }}>
@@ -392,7 +412,7 @@ export default () => {
           title={() => {
             return filterHeader
           }}
-          rowKey={record => record.key}
+          rowKey="id"
           size="middle"
           pagination={{
             defaultPageSize: 20,
@@ -409,7 +429,33 @@ export default () => {
         className="change-invo-drawer"
         onClose={() => setPreviewInvoice(false)}
       >
-        <PreviewInvoice invoice={currentInvoice} />
+        <PreviewInvoice invoiceId={currentInvoice?.id} />
+      </Drawer>
+      <Drawer
+        title={`Edit Invoice - ${currentInvoice?.invoiceNo}`}
+        visible={isEditInvoice}
+        width={DRAWER.widthL1}
+        onClose={() => setEditInvoice(false)}
+      >
+        <EditInvoice
+          rowData={currentInvoice}
+          refetchInvoices={refetch}
+          closeDrawer={() => setEditInvoice(false)}
+        />
+      </Drawer>
+      <Drawer
+        title={`Add Payment - ${currentInvoice?.invoiceNo}`}
+        visible={invoiceStatusDrawer}
+        width={DRAWER.widthL2}
+        destroyOnClose
+        onClose={() => setInvoiceStatusDrawer(null)}
+      >
+        <UpdateInvoiceStatus
+          invoiceId={currentInvoice?.id}
+          invoiceObj={currentInvoice}
+          closeDrawer={() => setInvoiceStatusDrawer(null)}
+          refetchInvoices={refetch}
+        />
       </Drawer>
     </div>
   )

@@ -1,3 +1,5 @@
+@import '../../assets/styles/mixins.scss';
+
 .filter-parent {
   display: flex;
   background-color: 'red';
@@ -25,6 +27,17 @@
     border: 1px solid #e8e8e8;
   }
 }
+
+.table-input-field {
+  .ant-form-item {
+    margin-bottom: 0;
+  }
+}
+
+.ant-table.ant-table-bordered .ant-table-footer {
+  background-color: $palete-light-blue;
+}
+
 @media screen and (max-width: 1000px) {
   .filter-parent {
     flex-wrap: wrap;

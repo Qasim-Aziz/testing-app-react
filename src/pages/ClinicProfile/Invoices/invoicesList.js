@@ -45,6 +45,7 @@ export default () => {
   const [isPreviewInvoice, setPreviewInvoice] = useState(false)
   const [isEditInvoice, setEditInvoice] = useState(false)
   const [selectedInvoiceId, setSelectedInvoiceId] = useState()
+  const [currentInvoice, setCurrentInvoice] = useState(null)
   const [data, setData] = useState()
   const [deleteInvoiceId, setDeleteInvoiceId] = useState()
   const [editInvoiceId, setEditInvoiceId] = useState()
@@ -61,7 +62,6 @@ export default () => {
 
   const { data: invoiceStatusList } = useQuery(GET_INVOICE_STATUS_LIST)
 
-  console.log(invoiceStatusList)
   const { data: invoiceData, error: invoiceError, loading: invoiceLoading, refetch } = useQuery(
     GET_INVOICES,
     {
@@ -87,8 +87,8 @@ export default () => {
     },
   )
 
-  // console.log(invoiceData, invoiceError, invoiceLoading)
-  const [deleteInvoice, { oading: deleteInvoiceLoading }] = useMutation(DELETE_INVOICE)
+  console.log(invoiceData, invoiceError, invoiceLoading)
+  const [deleteInvoice, { loading: deleteInvoiceLoading }] = useMutation(DELETE_INVOICE)
 
   useEffect(() => {
     if (invoiceData) {
@@ -158,7 +158,6 @@ export default () => {
       dataIndex: 'status',
       render: (text, row) => {
         const color = COLORS[row.colorCode]
-
         return (
           <Tooltip title="Edit status" trigger={['hover']}>
             <Button
@@ -182,6 +181,7 @@ export default () => {
               onClick={() => {
                 setSelectedInvoiceId(row.key)
                 setPreviewInvoice(true)
+                setCurrentInvoice(row)
               }}
               type="link"
             >
@@ -195,6 +195,7 @@ export default () => {
                   onClick={() => {
                     setEditInvoice(true)
                     setEditInvoiceId(row.key)
+                    setCurrentInvoice(row)
                   }}
                 >
                   <EditOutlined style={{ fontWeight: 600 }} />
@@ -321,8 +322,6 @@ export default () => {
     const data1 = new Blob([excelBuffer], { type: fileType })
     FileSaver.saveAs(data1, fileName + fileExtension)
   }
-
-  // console.log(selectedRowKeys, 'sele')
 
   const handleMenuActions = e => {
     const names = []
@@ -504,12 +503,13 @@ export default () => {
         <SendPaymentLinks
           selectedRowKeys={selectedRowKeys}
           payReminderData={payReminderData}
+          refetch={refetch}
           closeDrawer={() => setPayReminderDrawer(false)}
         />
       </Drawer>
 
       <Drawer
-        title="Edit Invoice"
+        title={`Edit Invoice - ${currentInvoice?.invoiceNo}`}
         destroyOnClose
         visible={isEditInvoice}
         width={DRAWER.widthL1}
@@ -517,6 +517,7 @@ export default () => {
       >
         <EditInvoice
           invoiceId={editInvoiceId}
+          refetch={refetch}
           closeDrawer={() => setEditInvoice(false)}
           refetchInvoices={refetch}
         />
@@ -542,7 +543,11 @@ export default () => {
         width={DRAWER.widthL1}
         onClose={() => setCreateInvoice(false)}
       >
-        <InvoiceForm setNewInvDrawer={setCreateInvoice} refetchInvoices={refetch} />
+        <InvoiceForm
+          refetch={refetch}
+          setNewInvDrawer={setCreateInvoice}
+          refetchInvoices={refetch}
+        />
       </Drawer>
     </div>
   )
