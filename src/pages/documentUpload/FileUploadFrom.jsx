@@ -3,9 +3,8 @@ import React, { useState } from 'react'
 import DragFile from './DragFile'
 
 const FileUploadFrom = () => {
-  const [value, setValue] = useState(1)
+  const [value, setValue] = useState('')
   const handleChange = e => {
-    console.log('radio checked', e.target.value)
     setValue(e.target.value)
   }
 
@@ -21,13 +20,13 @@ const FileUploadFrom = () => {
           <div className="location_section">
             <p className="radio_label">Location</p>
             <Radio.Group onChange={handleChange} value={value}>
-              <Radio style={radioStyle} value={1}>
+              <Radio style={radioStyle} value="To my accaount">
                 <span className="location_value">To my accaount</span>
               </Radio>
-              <Radio style={radioStyle} value={2}>
+              <Radio style={radioStyle} value="To someone else`s accaount">
                 <span className="location_value">To someone else`s accaount</span>
               </Radio>
-              <Radio style={radioStyle} value={3}>
+              <Radio style={radioStyle} value="Lock File(s) after uploading">
                 <span className="location_value">Lock File(s) after uploading</span>
               </Radio>
             </Radio.Group>
@@ -36,7 +35,7 @@ const FileUploadFrom = () => {
           <div className="drag_drop">
             <p className="drag_title">Override Filename</p>
             <hr />
-            <DragFile />
+            <DragFile value={value} />
           </div>
         </Card>
       </div>

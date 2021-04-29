@@ -3,19 +3,16 @@
 /* eslint-disable react/jsx-indent-props */
 /* eslint-disable react/jsx-boolean-value */
 /* eslint-disable */
-import React, { useState, useEffect, useCallback, useRef } from 'react'
-// import { renderToString } from 'react-dom/server'
-import { connect, useSelector, useDispatch } from 'react-redux'
-import { Redirect } from 'react-router-dom'
-import JsPDF from 'jspdf'
-import { Button, Table, Drawer, Divider, Tag, notification } from 'antd'
 // import Authorize from '../LayoutComponents/Authorize'
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
-import { COLORS } from 'assets/styles/globalStyles'
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
+import { Button, Divider, Drawer, Table, Tag } from 'antd'
+import JsPDF from 'jspdf'
+import React, { useEffect, useState } from 'react'
+// import { renderToString } from 'react-dom/server'
+import { useDispatch, useSelector } from 'react-redux'
 import actionPrescription from '../../redux/prescriptions/actions'
-
-import './index.scss'
 import EditPrescription from './editPrescriptionComponent'
+import './index.scss'
 
 // Every individual prescription
 export const History = props => {
@@ -219,15 +216,15 @@ export const History = props => {
                 <p> : {props.data.node.advice ? props.data.node.advice : ''}</p>
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                <p style={labelHead}>nextVisit</p>
+                <p style={labelHead}>Next Visit</p>
                 <p> : {props.data.node.nextVisit}</p>
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                <p style={labelHead}>nextVisitDate</p>
+                <p style={labelHead}>Next Visit Date</p>
                 <p> : {props.data.node.nextVisitDate}</p>
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                <p style={labelHead}>testDate</p>
+                <p style={labelHead}>Test Date</p>
                 <p> : {props.data.node.testDate}</p>
               </div>
             </div>
@@ -237,7 +234,9 @@ export const History = props => {
                 <p>
                   :{' '}
                   {props.data.node.diagnosis.edges.map((item, index) => (
-                    <Tag key={item.node.id}>{item.node.name}</Tag>
+                    <Tag style={{ marginTop: '6px' }} key={item.node.id}>
+                      {item.node.name}
+                    </Tag>
                   ))}
                   {/* <TagComponent diagnosisList={props.data.node.diagnosis.edges} /> */}
                   {/* 🔴 NOTE: create a list of tags for diagnosis */}
@@ -248,7 +247,9 @@ export const History = props => {
                 <p>
                   :{' '}
                   {props.data.node.tests.edges.map((item, index) => (
-                    <Tag key={item.node.id}>{item.node.name}</Tag>
+                    <Tag style={{ marginTop: '6px' }} key={item.node.id}>
+                      {item.node.name}
+                    </Tag>
                   ))}
                 </p>
               </div>
@@ -257,7 +258,9 @@ export const History = props => {
                 <p>
                   :{' '}
                   {props.data.node.complaints.edges.map((item, index) => (
-                    <Tag key={item.node.id}>{item.node.name}</Tag>
+                    <Tag style={{ marginTop: '6px' }} key={item.node.id}>
+                      {item.node.name}
+                    </Tag>
                   ))}
                 </p>
               </div>

@@ -83,16 +83,26 @@
         font-weight: 700;
         padding: 2% 0 2% 0;
       }
+      .input_label {
+        width: 75%;
+        border: 1px dashed $gray;
+        padding: 5%;
+        margin: 0 auto;
+        cursor: pointer;
 
-      .ant-upload-drag-icon {
-        font-weight: 700;
-        color: $text;
-      }
+        .ant-upload-drag-icon {
+          font-weight: 700;
+          font-size: 50px;
+          color: $text;
+        }
 
-      .ant-upload-text {
-        color: $text;
-        span {
-          color: $blue-darken;
+        .ant-upload-text {
+          color: $text;
+          font-size: 20px;
+          span {
+            color: $blue-darken;
+            font-size: 15px;
+          }
         }
       }
     }
