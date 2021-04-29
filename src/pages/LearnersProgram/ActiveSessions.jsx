@@ -58,7 +58,13 @@ const ActiveSessions = ({ studentId }) => {
       align: 'center',
       render: (text, record) => (
         <Button type="primary" size="small" onClick={() => startSession(record)}>
-          Start Session
+          {record.childsessionSet.edges.length > 0
+          && record.childsessionSet.edges[0].node.status === 'PROGRESS' && ('Resume Session')}
+          {record.childsessionSet.edges.length > 0
+          && record.childsessionSet.edges[0].node.status === 'COMPLETED' && ('See Session')}
+          {record.childsessionSet.edges.length > 0
+          && record.childsessionSet.edges[0].node.status === 'PENDING' && ('Start Session')}
+          {record.childsessionSet.edges.length === 0 && ('Start Session')}
         </Button>
       ),
     },
