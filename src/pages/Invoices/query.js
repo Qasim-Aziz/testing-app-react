@@ -259,6 +259,47 @@ export const MONTHLY_INVOICE = gql`
   }
 `
 
+export const UPDATE_INVOICE = gql`
+  mutation(
+    $pk: ID
+    $email: String
+    $status: ID
+    $issueDate: Date
+    $dueDate: Date
+    $address: String
+    $tax: Float
+    $discount: Float
+    $sgst: Float
+    $cgst: Float
+    $amount: Float
+    $taxableSubtotal: Float
+    $products: [FeeInput2]
+  ) {
+    updateInvoice(
+      input: {
+        pk: $pk
+        email: $email
+        status: $status
+        issueDate: $issueDate
+        dueDate: $dueDate
+        taxableSubtotal: $taxableSubtotal
+        address: $address
+        tax: $tax
+        discount: $discount
+        sgst: $sgst
+        cgst: $cgst
+        amount: $amount
+        products: $products
+      }
+    ) {
+      details {
+        id
+        linkGenerated
+      }
+    }
+  }
+`
+
 export const PAYMENT_REMINDER = gql`
   mutation($invoices: [ID], $clinics: [ID]) {
     sendPaymentReminders(input: { invoices: $invoices, clinics: $clinics }) {
@@ -268,9 +309,70 @@ export const PAYMENT_REMINDER = gql`
   }
 `
 
+export const GET_INVOICE_DETAIL = gql`
+  query($id: ID!) {
+    invoiceDetail(id: $id) {
+      id
+      invoiceNo
+      email
+      issueDate
+      dueDate
+      amount
+      address
+      taxableSubtotal
+      discount
+      sgst
+      cgst
+      tax
+      total
+      linkGenerated
+      paymentLink
+      lastAmount
+      hoursUsed
+      clinic {
+        id
+        schoolName
+        address
+      }
+      customer {
+        id
+        firstname
+        lastname
+        school {
+          id
+          schoolName
+          email
+          address
+          logo
+        }
+      }
+      status {
+        id
+        statusName
+      }
+      invoiceFee {
+        edges {
+          node {
+            id
+            quantity
+            rate
+            amount
+            tax
+            schoolServices {
+              id
+              name
+              description
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 export const GET_INVOICES = gql`
-  query getInvoices($from: Date, $to: Date, $status: ID) {
-    getInvoices(date_Gte: $from, date_Lte: $to, status: $status) {
+  query getInvoices($from: Date, $to: Date, $status: ID, $allclinics: Boolean) {
+    getInvoices(date_Gte: $from, date_Lte: $to, status: $status, allclinics: $allclinics) {
       edges {
         node {
           id
@@ -279,9 +381,7 @@ export const GET_INVOICES = gql`
           issueDate
           dueDate
           amount
-          address
           taxableSubtotal
-          discount
           total
           clinic {
             id
@@ -291,22 +391,6 @@ export const GET_INVOICES = gql`
             id
             statusName
             colorCode
-          }
-          invoiceFee {
-            edges {
-              node {
-                id
-                quantity
-                rate
-                amount
-                tax
-                schoolServices {
-                  id
-                  name
-                  description
-                }
-              }
-            }
           }
         }
       }

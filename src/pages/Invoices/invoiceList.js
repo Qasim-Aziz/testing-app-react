@@ -29,7 +29,7 @@ import { useQuery, useMutation } from 'react-apollo'
 import moment from 'moment'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import InvoiceForm from 'components/invoice/InvoiceForm'
-import EditInvoice from 'components/invoice/EditInvoice'
+import EditInvoice from './editInvoice'
 import PreviewInvoice from '../allClinicData/viewInvoice'
 import './invoices.scss'
 import { GET_INVOICES, DELETE_INVOICE } from './query'
@@ -76,6 +76,7 @@ export default () => {
               .format(dateFormate)
           : undefined,
         status: filterStatus,
+        allclinics: true,
       },
     },
   )
@@ -84,16 +85,6 @@ export default () => {
     deleteInvoice,
     { data: deleteInvoiceData, error: deleteInvoiceError, loading: deleteInvoiceLoading },
   ] = useMutation(DELETE_INVOICE)
-
-  useEffect(() => {
-    if (deleteInvoiceData) {
-      notification.success({
-        message: 'Delete invoice sucessfully',
-      })
-      refetch()
-      setDeleteInvoiceId(null)
-    }
-  }, [deleteInvoiceData])
 
   useEffect(() => {
     if (deleteInvoiceError) {
@@ -146,7 +137,7 @@ export default () => {
     },
     {
       title: 'Amount',
-      dataIndex: 'amount',
+      dataIndex: 'total',
     },
     {
       title: 'Status',
@@ -164,7 +155,6 @@ export default () => {
       title: 'Action',
       width: 260,
       render: row => {
-        console.log(row)
         return (
           <div>
             <Button
@@ -184,7 +174,7 @@ export default () => {
                   type="link"
                   onClick={() => {
                     setEditInvoice(true)
-                    setEditInvoiceId(row.key)
+                    setCurrentInvoice(row)
                   }}
                 >
                   <EditOutlined style={{ fontWeight: 600 }} />
@@ -192,7 +182,13 @@ export default () => {
                 <Popconfirm
                   title="Are you sure to delete this invoice?"
                   onConfirm={() => {
-                    deleteInvoice({ variables: { id: row.id } })
+                    deleteInvoice({ variables: { id: row.id } }).then(res => {
+                      notification.success({
+                        message: 'Delete invoice sucessfully',
+                      })
+                      refetch()
+                      setDeleteInvoiceId(null)
+                    })
                     setDeleteInvoiceId(row.id)
                   }}
                   okText="Yes"
@@ -402,7 +398,7 @@ export default () => {
           title={() => {
             return filterHeader
           }}
-          rowKey={record => record.key}
+          rowKey="id"
           size="middle"
           pagination={{
             defaultPageSize: 20,
@@ -420,6 +416,18 @@ export default () => {
         onClose={() => setPreviewInvoice(false)}
       >
         <PreviewInvoice invoiceId={currentInvoice?.id} />
+      </Drawer>
+      <Drawer
+        title={`Edit Invoice - ${currentInvoice?.invoiceNo}`}
+        visible={isEditInvoice}
+        width={DRAWER.widthL1}
+        onClose={() => setEditInvoice(false)}
+      >
+        <EditInvoice
+          rowData={currentInvoice}
+          refetchInvoices={refetch}
+          closeDrawer={() => setEditInvoice(false)}
+        />
       </Drawer>
     </div>
   )
