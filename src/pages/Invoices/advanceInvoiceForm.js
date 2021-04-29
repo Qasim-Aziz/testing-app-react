@@ -33,10 +33,10 @@ function AdvanceInvoiceForm({
               variables: {
                 month: values.month?.format('MMMM'),
                 clinic: selectedRowKeys,
-                cgst: values.cgst,
-                sgst: values.sgst,
-                discount: values.discount,
-                tax: values.discount,
+                cgst: Number(values.cgst),
+                sgst: Number(values.sgst),
+                discount: Number(values.discount),
+                tax: Number(values.tax),
                 generateLink: true,
               },
             })
@@ -64,6 +64,7 @@ function AdvanceInvoiceForm({
                 cgst: Number(values.cgst),
                 sgst: Number(values.sgst),
                 discount: Number(values.discount),
+                tax: Number(values.tax),
                 generateLink: true,
               },
             })
@@ -101,24 +102,26 @@ function AdvanceInvoiceForm({
             rules: [{ required: true, message: 'Please provide Month!' }],
           })(<DatePicker.MonthPicker onChange={e => setAdvMonth(e)} />)}
         </Form.Item>
+        <Form.Item label="Discount">
+          {form.getFieldDecorator('discount', {
+            rules: [{ required: true, message: 'Please provide Discount!' }],
+          })(<Input />)}
+        </Form.Item>
         <Form.Item label="CGST">
           {form.getFieldDecorator('cgst', {
+            initialValue: 9,
             rules: [{ required: true, message: 'Please provide CGST!' }],
           })(<Input />)}
         </Form.Item>
         <Form.Item label="SGST">
           {form.getFieldDecorator('sgst', {
+            initialValue: 9,
             rules: [{ required: true, message: 'Please provide SGST!' }],
           })(<Input />)}
         </Form.Item>
         <Form.Item label="Tax">
           {form.getFieldDecorator('tax', {
             rules: [{ required: true, message: 'Please provide Tax!' }],
-          })(<Input />)}
-        </Form.Item>
-        <Form.Item label="Discount">
-          {form.getFieldDecorator('discount', {
-            rules: [{ required: true, message: 'Please provide Discount!' }],
           })(<Input />)}
         </Form.Item>
 

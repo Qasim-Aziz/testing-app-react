@@ -130,6 +130,7 @@ export const UPDATE_STUDENT_INVOICE = gql`
     $discount: Float
     $sgst: Float
     $cgst: Float
+    $tax: Float
     $total: Float
     $products: [FeeInput2]
   ) {
@@ -146,12 +147,18 @@ export const UPDATE_STUDENT_INVOICE = gql`
         discount: $discount
         sgst: $sgst
         cgst: $cgst
+        tax: $tax
         total: $total
         products: $products
       }
     ) {
       details {
         id
+        linkGenerated
+        status {
+          id
+          statusName
+        }
       }
     }
   }

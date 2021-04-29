@@ -360,7 +360,7 @@ const EditInvoice = ({ form, rowData, refetchInvoices, closeDrawer }) => {
       const res = client.mutate({
         mutation: GENERATE_LINK,
         variables: {
-          pk: invoiceId,
+          pk: [invoiceId],
         },
       })
       notification.success({

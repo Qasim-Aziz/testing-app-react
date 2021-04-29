@@ -421,7 +421,7 @@ export const INVOICE_STATUS = gql`
   }
 `
 export const GENERATE_LINK = gql`
-  mutation RazorpayGenerateLink($pk: ID!) {
+  mutation RazorpayGenerateLink($pk: [ID]!) {
     razorpayGenerateLink(input: { pk: $pk }) {
       status
       message
@@ -430,7 +430,7 @@ export const GENERATE_LINK = gql`
 `
 
 export const NOTIFICATION = gql`
-  mutation RazorpayInvoiceNotification($pk: ID!) {
+  mutation RazorpayInvoiceNotification($pk: [ID]!) {
     razorpayInvoiceNotification(input: { pk: $pk }) {
       status
       message

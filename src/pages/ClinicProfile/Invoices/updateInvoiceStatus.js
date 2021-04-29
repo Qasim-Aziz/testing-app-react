@@ -31,7 +31,7 @@ const roundNumber = (num, digitFigure) => {
   return Number(Number(num).toFixed(digitFigure))
 }
 
-function InvoicePayments({ form, invoiceObj, closeDrawer }) {
+function InvoicePayments({ form, invoiceObj, closeDrawer, refetchInvoices }) {
   const statusList = [
     { key: 'SW52b2ljZVN0YXR1c1R5cGU6Mg==', name: 'Pending' },
     { key: 'SW52b2ljZVN0YXR1c1R5cGU6NA==', name: 'Sent' },
@@ -94,6 +94,7 @@ function InvoicePayments({ form, invoiceObj, closeDrawer }) {
             notification.success({
               message: 'Status Updated successfully',
             })
+            refetchInvoices()
           })
           .catch(err => console.error(err))
 
@@ -239,7 +240,7 @@ function InvoicePayments({ form, invoiceObj, closeDrawer }) {
               marginBottom: 10,
             }}
           >
-            {roundNumber(invoiceObj.amount, 3)}
+            {roundNumber(invoiceObj.total, 3)}
           </Text>
         </div>
         <div style={{ display: 'flex', marginLeft: 'auto', width: 'fit-content' }}>
@@ -253,7 +254,7 @@ function InvoicePayments({ form, invoiceObj, closeDrawer }) {
               marginBottom: 10,
             }}
           >
-            {roundNumber(invoiceObj.amount - total, 3)}
+            {roundNumber(invoiceObj.total - total, 3)}
           </Text>
         </div>
         {invoiceObj.status === 'Paid' ? (

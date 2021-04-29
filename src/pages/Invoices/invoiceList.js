@@ -28,6 +28,7 @@ import {
 import { useQuery, useMutation } from 'react-apollo'
 import moment from 'moment'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
+import UpdateInvoiceStatus from 'pages/ClinicProfile/Invoices/updateInvoiceStatus'
 import InvoiceForm from 'components/invoice/InvoiceForm'
 import EditInvoice from './editInvoice'
 import PreviewInvoice from '../allClinicData/viewInvoice'
@@ -56,6 +57,7 @@ export default () => {
   const [month, setMonth] = useState()
   const [filterStatus, setFilterStatus] = useState('')
   const [filterCustomer, setFilterCustomer] = useState('')
+  const [invoiceStatusDrawer, setInvoiceStatusDrawer] = useState(false)
 
   const { data: invoiceData, error: invoiceError, loading: invoiceLoading, refetch } = useQuery(
     GET_INVOICES,
@@ -99,8 +101,15 @@ export default () => {
     if (invoiceData) {
       const dataList = [...invoiceData.getInvoices.edges]
       const arrengedData = dataList.map(({ node }) => {
-        return node
+        return {
+          ...node,
+          key: node.id,
+          status: node.status.statusName,
+          colorCode: node.status.colorCode,
+          statusId: node.status.id,
+        }
       })
+      console.log(arrengedData, 'sdfff')
       arrengedData.reverse()
       setData(arrengedData)
     }
@@ -141,11 +150,18 @@ export default () => {
     },
     {
       title: 'Status',
-      dataIndex: 'status.statusName',
+      dataIndex: 'status',
       render: (text, row) => {
-        const color = COLORS[row.status.colorCode]
+        const color = COLORS[row.colorCode]
         return (
-          <Button type="link" style={{ color, fontSize: 16, padding: 0 }}>
+          <Button
+            onClick={() => {
+              setCurrentInvoice(row)
+              setInvoiceStatusDrawer(true)
+            }}
+            type="link"
+            style={{ color, fontSize: 16, padding: 0 }}
+          >
             {text}
           </Button>
         )
@@ -208,9 +224,7 @@ export default () => {
 
   let filteredList = data || []
   filteredList = filteredList.filter(
-    item =>
-      item.status?.statusName &&
-      item.status?.statusName.toLowerCase().includes(filterStatus.toLowerCase()),
+    item => item.status && item.status.toLowerCase().includes(filterStatus.toLowerCase()),
   )
 
   if (filterCustomer) {
@@ -427,6 +441,20 @@ export default () => {
           rowData={currentInvoice}
           refetchInvoices={refetch}
           closeDrawer={() => setEditInvoice(false)}
+        />
+      </Drawer>
+      <Drawer
+        title={`Add Payment - ${currentInvoice?.invoiceNo}`}
+        visible={invoiceStatusDrawer}
+        width={DRAWER.widthL2}
+        destroyOnClose
+        onClose={() => setInvoiceStatusDrawer(null)}
+      >
+        <UpdateInvoiceStatus
+          invoiceId={currentInvoice?.id}
+          invoiceObj={currentInvoice}
+          closeDrawer={() => setInvoiceStatusDrawer(null)}
+          refetchInvoices={refetch}
         />
       </Drawer>
     </div>

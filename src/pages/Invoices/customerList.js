@@ -5,7 +5,6 @@ import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
 import { PlusOutlined, MailOutlined } from '@ant-design/icons'
 import { DRAWER, COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 import AdvanceInvoiceForm from './advanceInvoiceForm'
-import MonthlyInvoiceForm from './monthlyInvoice'
 import BankDetails from './bankDetails'
 import UpdateClinicRates from '../allClinicData/updateClinicRates'
 import { CLINIC_QUERY } from './query'
@@ -221,34 +220,6 @@ function CustomerList() {
         </div>
       </Drawer>
 
-      <Drawer
-        visible={advInvForm}
-        onClose={() => setAdvInvForm(false)}
-        width="100vw"
-        placement="right"
-        closable="true"
-        destroyOnClose="true"
-      >
-        <AdvanceInvoiceForm
-          rowData={currentRow}
-          invoiceFormDrawer={advInvForm}
-          setInvoiceFormDrawer={setAdvInvForm}
-        />
-      </Drawer>
-      <Drawer
-        visible={monthlyInvForm}
-        onClose={() => setMonthlyInvForm(false)}
-        width="100vw"
-        placement="right"
-        closable="true"
-        destroyOnClose="true"
-      >
-        <MonthlyInvoiceForm
-          rowData={currentRow}
-          invoiceFormDrawer={monthlyInvForm}
-          setInvoiceFormDrawer={setMonthlyInvForm}
-        />
-      </Drawer>
       <Drawer
         title={`${drawerTitle}: Maintain Rates`}
         width={DRAWER.widthL3}

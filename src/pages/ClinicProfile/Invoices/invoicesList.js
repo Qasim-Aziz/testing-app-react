@@ -533,7 +533,6 @@ export default () => {
           <UpdateInvoiceStatus
             invoiceId={editInvoiceId}
             invoiceObj={invoiceStatusDrawer}
-            refetch={refetch}
             closeDrawer={() => setInvoiceStatusDrawer(null)}
             refetchInvoices={refetch}
           />

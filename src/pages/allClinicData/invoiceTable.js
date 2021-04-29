@@ -62,6 +62,7 @@ function InvoiceTable({ rowData }) {
       error: deleteAssessChargeError,
     },
   ] = useMutation(tt)
+
   const { data: invoiceData, error: invoiceError, loading: invoiceLoading, refetch } = useQuery(
     GET_INVOICES,
     {
@@ -251,21 +252,6 @@ function InvoiceTable({ rowData }) {
             margin: '0px auto',
           }}
         >
-          {/* <PageHeader
-            className="site-page-header"
-            title="INVOICES"
-            extra={[
-              <Button
-                key="1"
-                type="primary"
-                shape="round"
-                className={classes.headIconBut}
-                onClick={() => setInvoiceFormDrawer(true)}
-              >
-                <PlusOutlined className={classes.headIcon} style={{ marginLeft: -3.5 }} />
-              </Button>,
-            ]}
-          /> */}
           <FilterCard
             statusSelect={statusSelect}
             setStatusSelect={setStatusSelect}
@@ -311,7 +297,7 @@ function InvoiceTable({ rowData }) {
             destroyOnClose="true"
             className="change-invo-drawer"
           >
-            <ViewInvoice invoice={currentInvoice} rowData={rowData} />
+            <ViewInvoice invoiceId={currentInvoice?.id} rowData={rowData} />
           </Drawer>
         </Content>
       </Layout>

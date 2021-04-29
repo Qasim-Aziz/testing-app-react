@@ -291,7 +291,7 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
       const res = client.mutate({
         mutation: GENERATE_LINK,
         variables: {
-          pk: id,
+          pk: [id],
         },
       })
       notification.success({
@@ -366,22 +366,21 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
           variables: {
             pk: invoiceId,
             email: values.email,
-            status: values.status,
+            status:
+              values.status === 'SW52b2ljZVN0YXR1c1R5cGU6Mg==' &&
+              invoiceDetails.linkGenerated === true
+                ? 'SW52b2ljZVN0YXR1c1R5cGU6NA=='
+                : values.status,
             issueDate: moment(values.issueDate).format('YYYY-MM-DD'),
             dueDate: moment(values.dueDate).format('YYYY-MM-DD'),
             address: values.address,
             taxableSubtotal: parseFloat(subTotal),
+            amount: parseFloat(subTotal),
             discount: parseFloat(values.discount),
             sgst: addSgst ? parseFloat(values.sgst) : 0,
             cgst: addCgst ? parseFloat(values.cgst) : 0,
+            tax: parseFloat(values.tax),
             total: getTotal(
-              subTotal,
-              form.getFieldValue('discount'),
-              form.getFieldValue('cgst'),
-              form.getFieldValue('sgst'),
-              form.getFieldValue('tax'),
-            ),
-            amount: getTotal(
               subTotal,
               form.getFieldValue('discount'),
               form.getFieldValue('cgst'),
@@ -405,6 +404,10 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
             })
             refetchInvoices()
             closeDrawer()
+
+            if (!res.data.updateInvoice.details?.linkGenerated) {
+              generatePaymentLink(invoiceDetails.id)
+            }
           })
           .catch(errr => console.error(errr))
       }
