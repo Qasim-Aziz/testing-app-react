@@ -290,7 +290,7 @@ class RightArea extends React.Component {
 
           const resumeAssesmentMenu = (
             <Menu.Item key="startAssesment">
-              <PauseOutlined /> Resumes Assesment
+              <PauseOutlined /> Resume Assesment
             </Menu.Item>
           )
 
