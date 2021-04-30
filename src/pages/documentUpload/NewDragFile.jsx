@@ -6,50 +6,31 @@ const { Dragger } = Upload
 
 const NewDragFile = () => {
   const studentId = localStorage.getItem('studentId')
+
+  let token = ''
+  if (!(localStorage.getItem('token') === null) && localStorage.getItem('token')) {
+    token = JSON.parse(localStorage.getItem('token'))
+  }
+
+  const headers = {
+    Accept: 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    database: 'india',
+    'content-type': 'multipart/form-data',
+    Authorization: token ? `JWT ${token}` : '',
+  }
   const draggerProps = {
-    name: 'file',
-    multiple: false,
-    showUploadList: false,
-    customRequest: ({ onSuccess, onError, file }) => {
-      console.log(file)
-      fetch('https://application.cogniable.us/apis/student-docs/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        body: {
-          pk: studentId,
-          file,
-        },
-      })
-        .then(res => console.log(res))
-        .catch(err => console.log(err))
+    onChange({ file, fileList }) {
+      console.log(file, fileList)
+      if (file.status !== 'uploading') {
+        console.log(file, fileList)
+      }
     },
   }
-  // name: "file",
-  //     multiple: false,
-  //     showUploadList: false,
-  //     customRequest: ({onSuccess, onError, file}) => {
-  //         fetch('https://application.cogniable.us/apis/student-docs/', {
-  //         method: 'POST',
-  //         headers: {
-  //             'Content-Type' : 'multipart/form-data; boundary=<calculated when request is sent>'
-  //         },
-  //         body: {
-  //             pk: studentId,
-  //             file
-  //         },
-  //         success: (resp) => {
-  //           onSuccess()
-  //         },
-  //         failure: (err) => {
-  //           onError()
-  //         }
-  //       )
-  //     }
+
   return (
     <>
-      <Dragger {...draggerProps}>
+      <Upload {...draggerProps}>
         <p className="ant-upload-drag-icon">
           <InboxOutlined />
         </p>
@@ -58,7 +39,7 @@ const NewDragFile = () => {
           Support for a single or bulk upload. Strictly prohibit from uploading company data or
           other band files
         </p>
-      </Dragger>
+      </Upload>
     </>
   )
 }

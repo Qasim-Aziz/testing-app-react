@@ -1,53 +1,62 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/label-has-for */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Icon, message } from 'antd'
-import { post } from 'axios'
+/* eslint-disable */
+import { Icon, message, Button } from 'antd'
+import axios, { post } from 'axios'
 import React, { useCallback, useEffect, useState } from 'react'
 
 const DragFile = ({ value }) => {
-  const studentId = localStorage.getItem('studentId')
-  const [file, setFile] = useState(null)
+  const studentId = JSON.parse(localStorage.getItem('studentId'))
+  const [selectedFile, setFile] = useState(null)
 
   const onChange = e => {
     setFile({ file: e.target.files[0] })
   }
 
-  const fileUpload = (f, pk, descreption) => {
+  const handleClick = () => {
     const url = 'https://application.cogniable.us/apis/student-docs/'
-    const formData = new FormData()
-    // console.log(formData)
-    formData.append('pk', pk)
-    formData.append('file', f)
-    formData.append('file_description', descreption)
-    console.log(f)
-    console.log(pk)
-    console.log(descreption)
-    // console.log(formData)
-    const config = {
-      headers: {
-        'content-type': 'multipart/form-data',
-      },
+    const data = new FormData()
+    data.append('file', selectedFile.file)
+
+    let token = ''
+    if (!(localStorage.getItem('token') === null) && localStorage.getItem('token')) {
+      token = JSON.parse(localStorage.getItem('token'))
     }
-    // console.log(formData)
-    return post(url, formData, config)
+
+    const headers = {
+      Accept: 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      database: 'india',
+      Authorization: token ? `JWT ${token}` : '',
+    }
+
+    data.append('pk', studentId)
+    console.log(studentId, selectedFile, 'this is upload')
+
+    for (var key of data.entries()) {
+      console.log(key[0] + ', ' + key[1])
+    }
+
+    axios
+      .post(url, data, { headers: headers })
+      .then(res => {
+        console.log(res, 'this iis respionse')
+        // then print response status
+        message.success('Upload Successfully.')
+      })
+      .catch(err1 => {
+        console.error({ err1 })
+        message.error('upload Failed.')
+        return false
+      })
   }
 
-  const onFormSubmit = useCallback(() => {
-    fileUpload(file, studentId, value).then(response => {
-      message.success(response.data.msg)
-      console.log(response.data)
-    })
-  })
-  useEffect(() => {
-    if (file !== null) {
-      onFormSubmit()
-    }
-  }, [file, onFormSubmit])
+  console.log(selectedFile)
 
   return (
     <>
-      <form style={{ width: '100%' }} onSubmit={onFormSubmit}>
+      <form style={{ width: '100%' }}>
         <h1 style={{ textAlign: 'center' }}>File Upload</h1>
         <label style={{ width: '100%', textAlign: 'center' }} htmlFor="file_upload">
           <div className="input_label">
@@ -59,13 +68,8 @@ const DragFile = ({ value }) => {
             </p>
           </div>
         </label>
-        <input
-          multiple
-          style={{ display: 'none' }}
-          id="file_upload"
-          type="file"
-          onChange={onChange}
-        />
+        <input style={{ display: 'none' }} id="file_upload" type="file" onChange={onChange} />
+        <Button onClick={() => handleClick()}>Submitt</Button>
       </form>
     </>
   )
