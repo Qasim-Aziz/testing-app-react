@@ -148,7 +148,16 @@ export async function updateLeader(payload) {
               details {
                 id
                 name
-                surname
+                projectName
+                leadStatus
+                phone
+                createdAt
+                user {
+                  id
+                  email
+                  firstName
+                  lastName
+                }
               }
             }
           }

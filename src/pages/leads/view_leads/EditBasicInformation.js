@@ -111,7 +111,7 @@ class EditBasicInformation extends React.Component {
         },
       })
     })
-    this.props.onCloseEdit()
+    // this.props.onCloseEdit()
   }
 
   render() {

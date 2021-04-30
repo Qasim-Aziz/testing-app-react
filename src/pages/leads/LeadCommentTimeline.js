@@ -56,6 +56,7 @@ const COMMENT_QUERY = gql`
 `
 
 export default Form.create()(({ updateLeadId, form, leadStatus, name, projectName }) => {
+  console.log('lead iD', updateLeadId)
   const [
     updateLead,
     { data: updateCommentData, error: updateCommentError, loading: updateCommentLoading },
@@ -82,8 +83,8 @@ export default Form.create()(({ updateLeadId, form, leadStatus, name, projectNam
       notification.success({
         message: 'comment added successfully',
       })
-      // form.resetFields()
-      // refetch()
+      form.resetFields()
+      refetch()
     }
   }, [updateCommentData])
 
@@ -106,7 +107,7 @@ export default Form.create()(({ updateLeadId, form, leadStatus, name, projectNam
             comment: values.comment,
           },
         })
-        refetch()
+        // refetch()
       }
     })
   }

@@ -60,6 +60,7 @@ import CreateLeader from '../createLeader'
 import LeadCommentTimeline from '../LeadCommentTimeline'
 // import client from '../../../apollo/config'
 import './style.scss'
+import { COLORS } from '../../../assets/styles/globalStyles'
 
 /* *************************** THE STEP PROGRESS BAR COMPONENT *************************** */
 
@@ -554,7 +555,7 @@ class LeaderTable extends React.Component {
           return (
             <div style={{ display: 'flex', width: '100%', justifyContent: 'flex-start' }}>
               <CommentOutlined
-                style={{ color: 'blue', fontSize: 24, paddingRight: '.9em' }}
+                style={{ color: COLORS.palleteDarkBlue, fontSize: 24, paddingRight: '.9em' }}
                 onClick={() => {
                   // setComment(data.key)
                   // setCommentDrawer(true)

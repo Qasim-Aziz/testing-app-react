@@ -95,6 +95,17 @@ export function* CREATE_LEADER({ payload }) {
       message: 'Leader Created Successfully',
     })
   }
+  const resObject = yield call(getLeaders, payload)
+  console.log('leader list', resObject.data.leads)
+
+  yield put({
+    type: 'leaders/SET_STATE',
+    payload: {
+      LeadersList: resObject.data.leads,
+      TotalLeaders: 6, //random value
+      PageInfo: 'I dont know what this is', //random value
+    },
+  })
 }
 
 export function* EDIT_LEADER({ payload }) {
@@ -104,23 +115,36 @@ export function* EDIT_LEADER({ payload }) {
     notification.success({
       message: 'LEADER UPDATED SUCCESSFULLY',
     })
-    let updatedLeader = response.data.updateLead.lead
-    console.log('THE REsponse', updatedLeader)
-    // Destructuring the all the values from the response
-    // var created_leader = response.data.createLead.lead
-    console.log('THE updated_leader', updatedLeader)
-    yield put({
-      type: 'leaders/UPDATE_LEADERS_LIST',
-      payload: {
-        object: updatedLeader,
-      },
-    })
+    console.log('edit response', response)
+
+    const resObject = yield call(getLeaders, payload)
+    console.log('leader list', resObject.data.leads)
+
     yield put({
       type: 'leaders/SET_STATE',
       payload: {
-        UserProfile: updatedLeader,
+        LeadersList: resObject.data.leads,
+        TotalLeaders: 6, //random value
+        PageInfo: 'I dont know what this is', //random value
       },
     })
+    // let updatedLeader = response.data.updateLead.lead
+    // console.log('THE REsponse', updatedLeader)
+    // // Destructuring the all the values from the response
+    // // var created_leader = response.data.createLead.lead
+    // console.log('THE updated_leader', updatedLeader)
+    // yield put({
+    //   type: 'leaders/UPDATE_LEADERS_LIST',
+    //   payload: {
+    //     object: updatedLeader,
+    //   },
+    // })
+    // yield put({
+    //   type: 'leaders/SET_STATE',
+    //   payload: {
+    //     UserProfile: updatedLeader,
+    //   },
+    // })
   }
 }
 
