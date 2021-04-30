@@ -9,6 +9,7 @@ import { notification, message } from 'antd'
 import { getLeaders, createLeader, updateLeader } from 'services/leaders'
 import axios from 'axios'
 import actions from './actions'
+import { responsePathAsArray } from 'graphql'
 
 export function* GET_DATA() {
   yield put({
@@ -29,12 +30,12 @@ export function* GET_DATA() {
 
   yield put({
     type: 'leaders/GET_LEADERS',
-    payload: {
-      isActive: true,
-      first: 10,
-      after: null,
-      before: null,
-    },
+    // payload: {
+    //   isActive: true,
+    //   first: 10,
+    //   after: null,
+    //   before: null,
+    // },
   })
 
   yield put({
@@ -53,9 +54,9 @@ export function* GET_LEADERS({ payload }) {
     },
   })
   const response = yield call(getLeaders, payload)
-  console.log('THE RESPONSE')
+
   if (response) {
-    console.log('THE RESPONSE')
+    console.log('THE RESPONSE', response)
     let leaders = []
     let i = 0
     console.log('response data inside sagas', response.data)
@@ -92,15 +93,6 @@ export function* CREATE_LEADER({ payload }) {
   if (response && response.data) {
     notification.success({
       message: 'Leader Created Successfully',
-    })
-    // Destructuring the all the values from the response
-    var created_leader = response.data.createLead.lead
-    console.log('THE created_leader', created_leader)
-    yield put({
-      type: 'leaders/APPEND_LEADERS_LIST',
-      payload: {
-        lead: created_leader,
-      },
     })
   }
 }

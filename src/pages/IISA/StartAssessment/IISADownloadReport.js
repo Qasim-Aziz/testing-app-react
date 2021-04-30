@@ -96,6 +96,7 @@ const IISADownloadReport = ({ SelectedAssessmentId }) => {
     return `${error}`
   }
   let globalScore = null
+  let totalScore = 0
   const { lastname, firstname, caseManger, dob, gender } = data.IISAGetAssessmentDetails.student
   console.log('data here')
   console.log(SelectedAssessmentId)
@@ -122,6 +123,7 @@ const IISADownloadReport = ({ SelectedAssessmentId }) => {
     const value = scoreData.find(key => key.id === id)
     if (value !== undefined) {
       globalScore = value.score
+      totalScore += globalScore
     }
   }
 
@@ -473,7 +475,7 @@ const IISADownloadReport = ({ SelectedAssessmentId }) => {
                     style={{
                       width: '20%',
                       borderRight: '1px solid black',
-                      backgroundColor: Assessmentscore < 70 ? 'green' : 'white',
+                      backgroundColor: totalScore < 70 ? 'green' : 'white',
                     }}
                   >
                     {null}
@@ -482,8 +484,7 @@ const IISADownloadReport = ({ SelectedAssessmentId }) => {
                     style={{
                       width: '20%',
                       borderRight: '1px solid black',
-                      backgroundColor:
-                        Assessmentscore < 106 && Assessmentscore > 70 ? 'orange' : 'white',
+                      backgroundColor: totalScore < 106 && totalScore > 70 ? 'orange' : 'white',
                     }}
                   >
                     {null}
@@ -492,8 +493,7 @@ const IISADownloadReport = ({ SelectedAssessmentId }) => {
                     style={{
                       width: '20%',
                       borderRight: '1px solid black',
-                      backgroundColor:
-                        Assessmentscore < 153 && Assessmentscore > 107 ? 'red' : 'white',
+                      backgroundColor: totalScore < 153 && totalScore > 107 ? 'red' : 'white',
                     }}
                   >
                     {null}
@@ -501,7 +501,7 @@ const IISADownloadReport = ({ SelectedAssessmentId }) => {
                   <View
                     style={{
                       width: '20%',
-                      backgroundColor: Assessmentscore > 153 ? 'red' : 'white',
+                      backgroundColor: totalScore > 153 ? 'red' : 'white',
                     }}
                   >
                     {null}

@@ -69,7 +69,7 @@ class BasicInformationForm extends React.Component {
 
   handleSubmit = e => {
     e.preventDefault()
-
+    console.log('FORM VALUE', e)
     const { form, dispatch } = this.props
     const data = new FormData()
     data.append('file', this.state.selectedFile)
@@ -84,6 +84,7 @@ class BasicInformationForm extends React.Component {
           },
         })
         form.resetFields()
+        this.props.CloseDrawer()
       }
     })
   }
@@ -130,7 +131,18 @@ class BasicInformationForm extends React.Component {
             rules: [{ required: true, message: 'Please provide Mobile No!' }],
           })(<Input style={{ borderRadius: 0 }} />)}
         </Form.Item>
-
+        <Form.Item label="Type" style={itemStyle}>
+          {form.getFieldDecorator('leadType', {
+            rules: [{ required: true, message: 'Please provide Lead Type' }],
+          })(
+            <Select placeholder="Type" allowClear>
+              <Select.Option value="B2B-CLINIC">B2b -clinic</Select.Option>
+              <Select.Option value="B2B-SPL-SCHOOL">B2B - spl school</Select.Option>
+              <Select.Option value="B2B-INCL-SCHOOL">B2b - Incl school</Select.Option>
+              <Select.Option value="B2C-PARENT">B2c - parent</Select.Option>
+            </Select>,
+          )}
+        </Form.Item>
         <Form.Item label="Status" style={itemStyle}>
           {form.getFieldDecorator('leadStatus', {
             rules: [{ required: true, message: 'Please provide Status' }],

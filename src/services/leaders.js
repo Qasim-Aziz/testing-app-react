@@ -31,6 +31,7 @@ export async function getLeaders(payload) {
           }
         }
       `,
+      fetchPolicy: 'network-only',
     })
     .then(result => {
       console.log('THE RESULT in services', result)
@@ -58,23 +59,36 @@ export async function createLeader(payload) {
   return apolloClient
     .mutate({
       mutation: gql`
-        mutation Create_New_Leader($name: String, $leadStatus: String, $projectName: String) {
+        mutation Create_New_Leader(
+          $name: String!
+          $leadStatus: String!
+          $projectName: String!
+          $phone: String!
+          $surname: String!
+          $email: String
+          $leadType: String!
+        ) {
           createLead(
-            input: { id: 14, name: $name, leadStatus: $leadStatus, projectName: $projectName }
+            name: $name
+            leadStatus: $leadStatus
+            projectName: $projectName
+            email: $email
+            leadType: $leadType
+            phone: $phone
+            surname: $surname
           ) {
-            ok
-            lead {
+            details {
               id
               name
-              leadStatus
               projectName
+              leadStatus
               phone
               createdAt
               user {
                 id
+                email
                 firstName
                 lastName
-                email
               }
             }
           }
@@ -84,6 +98,10 @@ export async function createLeader(payload) {
         name: payload.values.firstName,
         leadStatus: payload.values.leadStatus,
         projectName: payload.values.projectName,
+        email: payload.values.email,
+        leadType: payload.values.leadType,
+        phone: payload.values.mobileNo,
+        surname: payload.values.lastName,
       },
     })
     .then(result => {
@@ -108,60 +126,41 @@ export async function updateLeader(payload) {
       .mutate({
         mutation: gql`
           mutation Update_The_Leader(
-            $id: Int!
-            $user_id: ID
+            $id: ID!
             $projectName: String
             $leadStatus: String
+            $leadType: String
+            $phone: String
             $name: String
-            $mobile: String
-            $firstName: String
-            $lastName: String
+            $surname: String
             $email: String
           ) {
             updateLead(
-              id: $id #leadId
-              input: {
-                id: $user_id
-                projectName: $projectName #"Project_1"
-                leadStatus: $leadStatus #"Contact_Later"
-                name: $name #"Tielmans22222222222"
-                mobile: $mobile #"4862159753"
-              }
-              userVal: {
-                firstName: $firstName # "Roshan"
-                lastName: $lastName # "Kewat"
-                name: $name # user-Name # "roShaKeWat"
-                email: $email # "roshan@gmail.com"
-              }
+              pk: $id
+              projectName: $projectName
+              leadStatus: $leadStatus
+              leadType: $leadType
+              phone: $phone
+              name: $name
+              surname: $surname
+              email: $email
             ) {
-              ok
-              lead {
+              details {
                 id
                 name
-                projectName
-                leadStatus
-                phone #same attribute mobile
-                createdAt
-                user {
-                  id
-                  email
-                  isActive
-                  firstName
-                  lastName
-                }
+                surname
               }
             }
           }
         `,
         variables: {
-          id: lead_id, // id of Lead
-          user_id: user_id,
+          id: payload.id, // id of Lead
           projectName: payload.values.projectName,
           leadStatus: payload.values.leadStatus,
+          leadType: payload.values.leadType,
+          phone: payload.values.mobileNo,
           name: payload.values.firstName,
-          mobile: payload.values.mobileNo,
-          firstName: payload.values.firstName,
-          lastName: payload.values.lastName,
+          surname: payload.values.lastName,
           email: payload.values.email,
         },
       })
