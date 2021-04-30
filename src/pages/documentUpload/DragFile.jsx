@@ -13,17 +13,23 @@ const DragFile = ({ value }) => {
     setFile({ file: e.target.files[0] })
   }
 
-  const fileUpload = (f, pk, discription) => {
+  const fileUpload = (f, pk, descreption) => {
     const url = 'https://application.cogniable.us/apis/student-docs/'
     const formData = new FormData()
+    // console.log(formData)
     formData.append('pk', pk)
     formData.append('file', f)
-    formData.append('file_description', discription)
+    formData.append('file_description', descreption)
+    console.log(f)
+    console.log(pk)
+    console.log(descreption)
+    // console.log(formData)
     const config = {
       headers: {
         'content-type': 'multipart/form-data',
       },
     }
+    // console.log(formData)
     return post(url, formData, config)
   }
 

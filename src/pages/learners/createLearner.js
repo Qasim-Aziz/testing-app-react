@@ -42,7 +42,6 @@ class BasicInformationForm extends React.Component {
   }
 
   componentDidMount() {
-    console.log('Arif console===>', this.props)
     const { dispatch } = this.props
     dispatch({
       type: 'learners/GET_LEARNERS_DROPDOWNS',
