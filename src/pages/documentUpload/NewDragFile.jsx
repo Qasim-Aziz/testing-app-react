@@ -22,8 +22,8 @@ const NewDragFile = () => {
           file,
         },
       })
-        .then(res => console.log(res))
-        .catch(err => console.log(err))
+        .then(res => onSuccess())
+        .catch(err => onError())
     },
   }
   // name: "file",
