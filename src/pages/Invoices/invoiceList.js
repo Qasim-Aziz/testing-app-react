@@ -23,13 +23,14 @@ import {
   CloseCircleOutlined,
   FilePdfOutlined,
   EditOutlined,
+  MailOutlined,
   DeleteOutlined,
 } from '@ant-design/icons'
 import { useQuery, useMutation } from 'react-apollo'
 import moment from 'moment'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import UpdateInvoiceStatus from 'pages/ClinicProfile/Invoices/updateInvoiceStatus'
-import InvoiceForm from 'components/invoice/InvoiceForm'
+import SendPaymentLinks from './sendPaymentLinks'
 import EditInvoice from './editInvoice'
 import PreviewInvoice from '../allClinicData/viewInvoice'
 import './invoices.scss'
@@ -46,6 +47,9 @@ export default () => {
   const [editInvoiceId, setEditInvoiceId] = useState()
   const [currentClinicRow, setCurrentClinicRow] = useState()
   const [currentInvoice, setCurrentInvoice] = useState(null)
+  const [payReminderDrawer, setPayReminderDrawer] = useState(false)
+  const [selectedRowKeys, setSelectedRowKeys] = useState([])
+  const [payReminderData, setPayReminderData] = useState([])
 
   // invoice filer
   const [from, setFrom] = useState(
@@ -83,19 +87,7 @@ export default () => {
     },
   )
 
-  const [
-    deleteInvoice,
-    { data: deleteInvoiceData, error: deleteInvoiceError, loading: deleteInvoiceLoading },
-  ] = useMutation(DELETE_INVOICE)
-
-  useEffect(() => {
-    if (deleteInvoiceError) {
-      notification.error({
-        message: 'opps error on delete invoice',
-      })
-      setDeleteInvoiceId(null)
-    }
-  }, [deleteInvoiceError])
+  const [deleteInvoice, { loading: deleteInvoiceLoading }] = useMutation(DELETE_INVOICE)
 
   useEffect(() => {
     if (invoiceData) {
@@ -109,7 +101,6 @@ export default () => {
           statusId: node.status.id,
         }
       })
-      console.log(arrengedData, 'sdfff')
       arrengedData.reverse()
       setData(arrengedData)
     }
@@ -198,13 +189,20 @@ export default () => {
                 <Popconfirm
                   title="Are you sure to delete this invoice?"
                   onConfirm={() => {
-                    deleteInvoice({ variables: { id: row.id } }).then(res => {
-                      notification.success({
-                        message: 'Delete invoice sucessfully',
+                    deleteInvoice({ variables: { id: row.id } })
+                      .then(res => {
+                        notification.success({
+                          message: 'Delete invoice sucessfully',
+                        })
+                        refetch()
+                        setDeleteInvoiceId(null)
                       })
-                      refetch()
-                      setDeleteInvoiceId(null)
-                    })
+                      .catch(err => {
+                        notification.error({
+                          message: 'opps error on delete invoice',
+                        })
+                        setDeleteInvoiceId(null)
+                      })
                     setDeleteInvoiceId(row.id)
                   }}
                   okText="Yes"
@@ -300,6 +298,47 @@ export default () => {
     FileSaver.saveAs(data1, fileName + fileExtension)
   }
 
+  const handleMenuActions = e => {
+    const names = []
+    filteredList.map(item =>
+      selectedRowKeys.map(key =>
+        key === item.key
+          ? names.push({
+              key: item.key,
+              linkGenerated: item.linkGenerated,
+              invNo: item.invoiceNo,
+              name: item.clinic?.schoolName,
+              email: item.email,
+              amount: item.amount,
+              status: item.status,
+            })
+          : null,
+      ),
+    )
+
+    if (e.key === 'payReminder') {
+      setPayReminderDrawer(true)
+      setPayReminderData(names)
+    }
+  }
+
+  const onSelectChange = key => {
+    setSelectedRowKeys(key)
+  }
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  }
+
+  const actions = (
+    <Menu onClick={e => handleMenuActions(e)}>
+      <Menu.Item key="payReminder">
+        <MailOutlined /> Send Reminder
+      </Menu.Item>
+    </Menu>
+  )
+
   const menu = (
     <Menu>
       <Menu.Item key="0">
@@ -333,6 +372,12 @@ export default () => {
           alignItems: 'center',
         }}
       >
+        <Dropdown overlay={actions}>
+          <Button style={{ margin: '0px 28px 0 6px' }}>
+            Actions <Icon type="down" />
+          </Button>
+        </Dropdown>
+
         <div>
           <span>Status :</span>
           <Select
@@ -400,7 +445,7 @@ export default () => {
   )
 
   console.log(filteredList, 'data')
-  console.log(invoiceData)
+
   return (
     <div style={{ marginTop: 10 }}>
       <Helmet title="Dashboard Alpha" />
@@ -413,6 +458,7 @@ export default () => {
             return filterHeader
           }}
           rowKey="id"
+          rowSelection={rowSelection}
           size="middle"
           pagination={{
             defaultPageSize: 20,
@@ -443,6 +489,22 @@ export default () => {
           closeDrawer={() => setEditInvoice(false)}
         />
       </Drawer>
+
+      <Drawer
+        title="Send Invoices"
+        visible={payReminderDrawer}
+        width={DRAWER.widthL2}
+        onClose={() => setPayReminderDrawer(false)}
+        destroyOnClose
+      >
+        <SendPaymentLinks
+          selectedRowKeys={selectedRowKeys}
+          payReminderData={payReminderData}
+          refetchInvoices={refetch}
+          closeDrawer={() => setPayReminderDrawer(false)}
+        />
+      </Drawer>
+
       <Drawer
         title={`Add Payment - ${currentInvoice?.invoiceNo}`}
         visible={invoiceStatusDrawer}

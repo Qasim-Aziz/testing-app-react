@@ -7,7 +7,7 @@ import { DRAWER, COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styl
 import AdvanceInvoiceForm from './advanceInvoiceForm'
 import BankDetails from './bankDetails'
 import UpdateClinicRates from '../allClinicData/updateClinicRates'
-import { CLINIC_QUERY } from './query'
+import { CLINIC_QUERY, PAYMENT_REMINDER } from './query'
 import InvoiceTable from '../allClinicData/invoiceTable'
 
 const { layout, tailLayout } = FORM
@@ -29,9 +29,12 @@ function CustomerList() {
   const [invoiceType, setInvoiceType] = useState('advance')
   const [ratesDrawer, setRatesDrawer] = useState(false)
 
+  const [sendPaymentReminder, { loading: sendPaymentReminderLoading }] = useMutation(
+    PAYMENT_REMINDER,
+  )
+
   useEffect(() => {
     if (data) {
-      console.log(data)
       const tempTable = []
       data.clinicAllDetails.map(item => {
         tempTable.push({
@@ -108,12 +111,28 @@ function CustomerList() {
     onChange: onSelectChange,
   }
 
+  const handlePaymentReminder = () => {
+    const clinicIds = selectedClinicsName.map(item => item.key)
+    sendPaymentReminder({
+      variables: {
+        clinics: clinicIds,
+      },
+    })
+      .then(res => {
+        notification.success({
+          message: 'Payment reminders send successfully',
+        })
+      })
+      .catch(err => console.error(err))
+  }
+
   const handleMenuActions = e => {
     const names = []
     tableData.map(item =>
-      selectedRowKeys.map(key => (key === item.key ? names.push(item.details?.schoolName) : null)),
+      selectedRowKeys.map(key =>
+        key === item.key ? names.push({ name: item.details?.schoolName, key: item.key }) : null,
+      ),
     )
-    console.log(names, 'names')
     setSelectedClinicsName(names)
     if (e.key === 'advanceInvoice') {
       setInvoiceType('advance')
@@ -188,35 +207,46 @@ function CustomerList() {
         width={DRAWER.widthL2}
       >
         <div>
-          <Form.Item {...layout} label="Selected Clinics">
-            {selectedClinicsName && selectedClinicsName?.length > 0 ? (
-              <>
+          {selectedClinicsName && selectedClinicsName?.length > 0 ? (
+            <>
+              <Form.Item {...layout} label="Selected Clinics">
                 <div>
                   <ol style={{ display: 'grid', gridTemplateColumns: 'auto auto' }}>
                     {selectedClinicsName &&
                       selectedClinicsName.map((item, index) => (
-                        <li style={{ width: 340 }}>{item}</li>
+                        <li key={item.id} style={{ width: 340 }}>
+                          {item.name}
+                        </li>
                       ))}
                   </ol>
                 </div>
-              </>
-            ) : (
-              <b>None, Please select at least one clinic</b>
-            )}
-            <div style={{ alignItems: 'center' }}>
-              <div>
-                <b>Send Pay reminder to the selected clinics for the last invoice </b>
-              </div>
-            </div>
-          </Form.Item>
-          <Form.Item {...tailLayout}>
-            <Button type="default" style={SUBMITT_BUTTON}>
-              Send Reminder
-            </Button>
-            <Button onClick={() => setPayReminderModal(false)} type="ghost" style={CANCEL_BUTTON}>
-              Cancel
-            </Button>
-          </Form.Item>
+                <div style={{ alignItems: 'center' }}>
+                  <div>
+                    <b>Send Pay reminder to the selected clinics for the last invoice </b>
+                  </div>
+                </div>
+              </Form.Item>
+              <Form.Item {...tailLayout}>
+                <Button
+                  loading={sendPaymentReminderLoading}
+                  type="default"
+                  onClick={() => handlePaymentReminder()}
+                  style={SUBMITT_BUTTON}
+                >
+                  Send Reminder
+                </Button>
+                <Button
+                  onClick={() => setPayReminderModal(false)}
+                  type="ghost"
+                  style={CANCEL_BUTTON}
+                >
+                  Cancel
+                </Button>
+              </Form.Item>
+            </>
+          ) : (
+            <b>None, Please select at least one clinic</b>
+          )}
         </div>
       </Drawer>
 

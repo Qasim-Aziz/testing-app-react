@@ -36,7 +36,7 @@ import UpdateInvoiceStatus from './updateInvoiceStatus'
 import PreviewInvoice from './previewInvoice'
 import { GET_INVOICES, DELETE_INVOICE, GET_INVOICE_STATUS_LIST } from './query'
 import './template.scss'
-import SendPaymentLinks from './sendPaymentLinks'
+import SendPaymentLinks from '../../Invoices/sendPaymentLinks'
 
 const dateFormate = 'YYYY-MM-DD'
 
@@ -95,7 +95,6 @@ export default () => {
     },
   )
 
-  console.log(invoiceData, invoiceError, invoiceLoading)
   const [deleteInvoice, { loading: deleteInvoiceLoading }] = useMutation(DELETE_INVOICE)
 
   useEffect(() => {
@@ -450,8 +449,6 @@ export default () => {
             onClick={() => {
               setFilterStatus('')
               setFilterCustomer('')
-              setFrom()
-              setTo()
             }}
             size="small"
           >
@@ -513,7 +510,7 @@ export default () => {
         <SendPaymentLinks
           selectedRowKeys={selectedRowKeys}
           payReminderData={payReminderData}
-          refetch={refetch}
+          refetchInvoices={refetch}
           closeDrawer={() => setPayReminderDrawer(false)}
         />
       </Drawer>

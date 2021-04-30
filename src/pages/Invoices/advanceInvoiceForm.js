@@ -104,6 +104,7 @@ function AdvanceInvoiceForm({
         </Form.Item>
         <Form.Item label="Discount">
           {form.getFieldDecorator('discount', {
+            initialValue: 0,
             rules: [{ required: true, message: 'Please provide Discount!' }],
           })(<Input />)}
         </Form.Item>
@@ -121,6 +122,7 @@ function AdvanceInvoiceForm({
         </Form.Item>
         <Form.Item label="Tax">
           {form.getFieldDecorator('tax', {
+            initialValue: 0,
             rules: [{ required: true, message: 'Please provide Tax!' }],
           })(<Input />)}
         </Form.Item>
@@ -132,7 +134,7 @@ function AdvanceInvoiceForm({
                 <ol style={{ display: 'grid', gridTemplateColumns: 'auto auto' }}>
                   {selectedClinicsName &&
                     selectedClinicsName.map((item, index) => (
-                      <li style={{ width: 340 }}>{item}</li>
+                      <li style={{ width: 340 }}>{item.name}</li>
                     ))}
                 </ol>
               </div>

@@ -309,6 +309,15 @@ export const PAYMENT_REMINDER = gql`
   }
 `
 
+export const GENERATE_LINK = gql`
+  mutation($pk: [ID]!) {
+    razorpayGenerateLink(input: { pk: $pk }) {
+      status
+      message
+    }
+  }
+`
+
 export const GET_INVOICE_DETAIL = gql`
   query($id: ID!) {
     invoiceDetail(id: $id) {
@@ -383,6 +392,7 @@ export const GET_INVOICES = gql`
           amount
           taxableSubtotal
           total
+          linkGenerated
           clinic {
             id
             schoolName

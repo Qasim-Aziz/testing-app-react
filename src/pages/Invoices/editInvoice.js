@@ -262,9 +262,6 @@ const EditInvoice = ({ form, rowData, refetchInvoices, closeDrawer }) => {
     },
   )
 
-  console.log(rowData, 'rowData')
-  console.log(statusData, 'status data')
-
   useEffect(() => {
     if (invoiceData) {
       if (
@@ -312,7 +309,6 @@ const EditInvoice = ({ form, rowData, refetchInvoices, closeDrawer }) => {
     e.preventDefault()
     form.validateFields((error, values) => {
       if (!error && invoiceDetails.id) {
-        console.log(values, invoiceDetails.id, subTotal, tableData, 'rowData in invoice form')
         updateInvoice({
           variables: {
             pk: invoiceDetails.id,
@@ -341,7 +337,6 @@ const EditInvoice = ({ form, rowData, refetchInvoices, closeDrawer }) => {
             }),
           },
         }).then(data => {
-          console.log(data, 'invoice data')
           setIsCreated(true)
           refetchInvoices()
           notification.success({
@@ -383,7 +378,7 @@ const EditInvoice = ({ form, rowData, refetchInvoices, closeDrawer }) => {
     newData.map(item => {
       tempTotal += roundNumber(Number(item.rate) * Number(item.qty), 2)
     })
-    setSubTotal(roundNumber(tempTotal, 3))
+    setSubTotal(roundNumber(tempTotal, 2))
     setTableData(newData)
   }
 
@@ -444,8 +439,7 @@ const EditInvoice = ({ form, rowData, refetchInvoices, closeDrawer }) => {
       width: '220px',
       align: 'right',
       render: (text, row) => {
-        const amount = parseFloat(row.qty) * parseFloat(row.rate)
-        return <span>{amount === 0 ? amount : `${currencySymbol} ${amount}`}</span>
+        return <span>{text === 0 ? text : `${currencySymbol} ${text}`}</span>
       },
     },
     {
@@ -491,6 +485,8 @@ const EditInvoice = ({ form, rowData, refetchInvoices, closeDrawer }) => {
     return <LoadingComponent />
   }
 
+  console.log(tableData, 'table Dta')
+
   return (
     <div style={{ padding: '0 60px' }} className="table-input-field">
       <Form onSubmit={submit}>
@@ -522,13 +518,19 @@ const EditInvoice = ({ form, rowData, refetchInvoices, closeDrawer }) => {
             </Form.Item>
           </div>
 
-          <div style={{ minWidth: '160px' }}>
+          {/* <div style={{ minWidth: '160px' }}>
             <Text style={{ fontSize: 20, color: '#000' }}>BALANCE DUE : </Text>
             <Title style={{ marginTop: 10 }}>
               {currencySymbol}{' '}
-              {getTotal(subTotal, form.getFieldValue('discount'), form.getFieldValue('tax'))}
+              {getTotal(
+                subTotal,
+                form.getFieldValue('discount'),
+                form.getFieldValue('cgst'),
+                form.getFieldValue('sgst'),
+                form.getFieldValue('tax'),
+              )}
             </Title>
-          </div>
+          </div> */}
         </div>
 
         <div style={{ display: 'flex', flexWrap: 'wrap' }}>
