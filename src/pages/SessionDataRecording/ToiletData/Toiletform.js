@@ -261,9 +261,9 @@ const ToiletForm = ({ style, handleNewToiletDate, setNewToiletCreated, selectDat
             defaultChecked
             onChange={e => {
               if (e.target.checked) {
-                setPrompted(true)
-              } else {
                 setPrompted(false)
+              } else {
+                setPrompted(true)
               }
             }}
             style={{ lineHeight: '32px' }}

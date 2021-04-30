@@ -30,20 +30,26 @@ function SendPaymentLinks({ selectedRowKeys, payReminderData, closeDrawer, refet
               pk: createIds,
             },
           }).then(res => {
-            console.log(res, 'this is res')
+            console.log(res, 'this is res1')
             if (sendNotiIds.length > 0) {
               sendPaymentReminder({
                 variables: {
                   pk: sendNotiIds,
                 },
               }).then(resp => {
-                console.log(resp, 'this is resp')
+                console.log(resp, 'this is res2')
                 refetch()
                 notification.success({
                   message: 'Invoice sent successully',
                 })
                 closeDrawer()
               })
+            } else {
+              refetch()
+              notification.success({
+                message: 'Invoice sent successully',
+              })
+              closeDrawer()
             }
           })
         } else if (sendNotiIds.length > 0) {
@@ -66,7 +72,6 @@ function SendPaymentLinks({ selectedRowKeys, payReminderData, closeDrawer, refet
     }
   }
 
-  console.log(payReminderData, 'payremindeer data')
   return (
     <div>
       {payReminderData && payReminderData?.length > 0 ? (

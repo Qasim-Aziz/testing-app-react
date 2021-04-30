@@ -122,6 +122,7 @@ function ViewInvoice({ invoiceId }) {
       variables: {
         id: invoiceId,
       },
+      fetchPolicy: 'network-only',
     },
   )
   console.log(invoice, 'invoice')
@@ -596,6 +597,7 @@ function ViewInvoice({ invoiceId }) {
         title={`Print Invoice - ${invoice?.invoiceNo}`}
         visible={printInvoiceDrawer}
         width={DRAWER.widthL2}
+        destroyOnClose
         onClose={() => setPrintInvoiceDrawer(false)}
       >
         <PrintableInvoice invoiceId={invoice.id} />

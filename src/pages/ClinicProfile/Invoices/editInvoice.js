@@ -726,7 +726,7 @@ const EditInvoiceForm = ({ form, invoiceId, closeDrawer, refetchInvoices }) => {
             </span>
           </div>
           <div style={{ ...amParent, margin: '5px 0', marginTop: '15px' }}>
-            <span style={{ ...amLabel, fontSize: '20px' }}>Lat Invoice Amount :</span>
+            <span style={{ ...amLabel, fontSize: '20px' }}>Last Invoice Amount :</span>
             <span style={{ ...amStyle, fontSize: '20px' }}>
               {currencySymbol} {lastInvoiceAmount}
             </span>

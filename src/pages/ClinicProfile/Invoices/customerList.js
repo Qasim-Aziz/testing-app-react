@@ -13,7 +13,7 @@ import InvoiceListItems from './invoiceListItems'
 const { layout, tailLayout } = FORM
 
 function CustomerList() {
-  const { data, loading, error } = useQuery(STUDENTS)
+  const { data, loading, error, refetch: refetchStudents } = useQuery(STUDENTS)
   const [currentRow, setCurrentRow] = useState(null)
   const [tableData, setTableData] = useState([])
   const [selectedRowKeys, setSelectedRowKeys] = useState([])
@@ -182,6 +182,7 @@ function CustomerList() {
         <CreateInvoiceForm
           studentId={currentRow?.key}
           closeDrawer={() => setCreateInvoiceDrawer(false)}
+          refetchStudents={refetchStudents}
         />
       </Drawer>
       <Drawer

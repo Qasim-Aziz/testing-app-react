@@ -8,7 +8,7 @@ import { CREATE_STUDENT_INVOICE } from './query'
 
 const { layout, tailLayout } = FORM
 
-function AdvanceInvoiceForm({ form, studentId, closeDrawer }) {
+function AdvanceInvoiceForm({ form, studentId, closeDrawer, refetchStudents }) {
   const [createStudentInvoice, { loading: createStudentInvoiceLoading }] = useMutation(
     CREATE_STUDENT_INVOICE,
   )
@@ -17,11 +17,11 @@ function AdvanceInvoiceForm({ form, studentId, closeDrawer }) {
 
     form.validateFields((error, values) => {
       if (!error && studentId) {
-        console.log(values, studentId)
+        // console.log(values, moment(values.month).format('MMMM'), studentId)
         createStudentInvoice({
           variables: {
             student: studentId,
-            month: moment(values.month).format('MMM'),
+            month: moment(values.month).format('MMMM'),
             cgst: values.cgst,
             sgst: values.sgst,
             tax: values.tax ? Number(values.tax) : 0,
@@ -29,6 +29,7 @@ function AdvanceInvoiceForm({ form, studentId, closeDrawer }) {
           },
         })
           .then(res => {
+            refetchStudents()
             notification.success({
               message: 'Invoice generated successfully',
             })
@@ -50,8 +51,9 @@ function AdvanceInvoiceForm({ form, studentId, closeDrawer }) {
         </Form.Item>
         <Form.Item label="Discount">
           {form.getFieldDecorator('discount', {
+            initialValue: 0,
             rules: [{ required: false, message: 'Please provide Discount!' }],
-          })(<Input />)}
+          })(<Input min={0} />)}
         </Form.Item>
         <Form.Item label="CGST">
           {form.getFieldDecorator('cgst', {
@@ -67,8 +69,9 @@ function AdvanceInvoiceForm({ form, studentId, closeDrawer }) {
         </Form.Item>
         <Form.Item label="Tax">
           {form.getFieldDecorator('tax', {
+            initialValue: 0,
             rules: [{ required: false, message: 'Please provide Tax!' }],
-          })(<Input />)}
+          })(<Input min={0} />)}
         </Form.Item>
 
         <Form.Item {...tailLayout}>

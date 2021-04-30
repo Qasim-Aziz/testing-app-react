@@ -96,6 +96,7 @@ const PreviewInvoice = ({ invoiceId }) => {
       variables: {
         id: invoiceId,
       },
+      fetchPolicy: 'network-only',
     },
   )
 
@@ -545,6 +546,7 @@ const PreviewInvoice = ({ invoiceId }) => {
         visible={printInvoiceDrawer}
         width={DRAWER.widthL2}
         onClose={() => setPrintInvoiceDrawer(false)}
+        destroyOnClose
       >
         <PrintableInvoice invoiceId={invoiceId} />
       </Drawer>

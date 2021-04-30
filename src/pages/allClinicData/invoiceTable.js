@@ -153,10 +153,8 @@ function InvoiceTable({ rowData }) {
       notification.success({
         message: 'Reminder sent successfully',
       })
-      console.log(reminder)
       return reminder
     } catch (error) {
-      console.log(error, 'from remainer errororor er')
       return notification.error({
         message: 'Unable to send reminder',
       })
@@ -278,7 +276,7 @@ function InvoiceTable({ rowData }) {
             width="100vw"
             placement="right"
             closable="true"
-            destroyOnClose="true"
+            destroyOnClose
           >
             <InvoiceForm
               rowData={rowData}
@@ -294,7 +292,7 @@ function InvoiceTable({ rowData }) {
             width={DRAWER.widthL2}
             placement="right"
             closable="true"
-            destroyOnClose="true"
+            destroyOnClose
             className="change-invo-drawer"
           >
             <ViewInvoice invoiceId={currentInvoice?.id} rowData={rowData} />
