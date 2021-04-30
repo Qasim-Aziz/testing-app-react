@@ -225,6 +225,7 @@ class Screeing extends React.Component {
         AssessmentObject,
         IISAQuestionsListObject,
         SelectedDomainId,
+        SelectedAssessmentId,
       },
     } = this.props
 
@@ -237,7 +238,27 @@ class Screeing extends React.Component {
         optionId: optionObj.node.id,
       },
     })
-    // this.goToNextQuestion
+
+    //   const keys = Object.keys(IISAQuestionsListObject)
+    //   const nextIndex = keys.indexOf(SelectedDomainId) + 1
+    //   const nextItem = keys[nextIndex]
+    //   console.log(nextItem)
+    //   let count = 0;
+    //   console.log('up iisa', this.props.iisaassessment.IISAQuestionsListObject[SelectedDomainId])
+    //   console.log(JSON.parse(JSON.stringify(IISAQuestionsListObject[SelectedDomainId])))
+    //  IISAQuestionsListObject[SelectedDomainId].forEach((itemObject)=>{
+
+    //     if(itemObject.recorded=== true){
+    //       count++
+    //     }
+
+    //   })
+    //   console.log(nextIndex)
+    //   console.log(count)
+    //   if(count-1 === IISAQuestionsListObject[SelectedDomainId].length ){
+    //     this.changeActiveDomian(nextItem)
+    //   }
+    //   count=0
   }
 
   closeReportDrawer = () => {
@@ -286,7 +307,30 @@ class Screeing extends React.Component {
       return <LoadingComponent />
     }
 
-    console.log(this.props, 'iisa domain')
+    // console.log(this.props, 'iisa domain')
+    // console.log(JSON.parse(JSON.stringify(this.props)), 'iisa secinb')
+
+    // const globalObj = JSON.parse(JSON.stringify(this.props))
+    // const nextDomain = () => {
+    //   const keys = Object.keys(globalObj.iisaassessment.IISAQuestionsListObject)
+    //   const nextIndex = keys.indexOf(this.state.IdFromURL) + 1
+    //   const nextItem = keys[nextIndex]
+    //   console.log(nextItem)
+    //   let count = 0;
+    //   console.log('up iisa', globalObj.iisaassessment.IISAQuestionsListObject[SelectedDomainId])
+    //   console.log(JSON.parse(JSON.stringify(IISAQuestionsListObject[SelectedDomainId])))
+    //   globalObj.iisaassessment.IISAQuestionsListObject[SelectedDomainId].forEach((itemObject)=>{
+
+    //     console.log(itemObject)
+
+    //   })
+    //   console.log(nextIndex)
+    //   console.log(count)
+    //   if(count === IISAQuestionsListObject[SelectedDomainId].length ){
+    //     this.changeActiveDomian(nextItem)
+    //   }
+    //   count=0
+    // }
 
     return (
       <>
@@ -387,6 +431,7 @@ class Screeing extends React.Component {
                               disabled={responseLoading}
                               onClick={() => {
                                 this.recordResponse(item)
+                                // nextDomain()
                               }}
                               style={buttonDefaultStyle}
                             >

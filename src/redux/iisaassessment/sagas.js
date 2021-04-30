@@ -216,6 +216,40 @@ export function* RECORD_RESPONSE({ payload }) {
     }
   }
 
+  const resObject = yield select(state => state.iisaassessment.IISAQuestionsListObject)
+  const domianId = yield select(state => state.iisaassessment.SelectedDomainId)
+  if (domianId !== 'SUlTQURvbWFpbnNUeXBlOjY=') {
+    const keys = Object.keys(resObject)
+    const nextIndex = keys.indexOf(domianId) + 1
+    const nextItem = keys[nextIndex]
+    console.log(nextItem)
+    let count = 0
+    // console.log('up iisa', this.props.iisaassessment.IISAQuestionsListObject[SelectedDomainId])
+    // console.log(JSON.parse(JSON.stringify(IISAQuestionsListObject[SelectedDomainId])))
+    resObject[domianId].forEach(itemObject => {
+      if (itemObject.recorded === true) {
+        count++
+      }
+      console.log('recordd: ', count)
+      console.log('res', resObject)
+    })
+    // console.log(nextIndex)
+    // console.log(count)
+    if (count === resObject[domianId].length) {
+      yield put({
+        type: actions.SET_STATE,
+        payload: {
+          IISAQuestionsListObject: resObject,
+          SelectedDomainId: `${nextItem}`,
+          SelectedQuestionId: resObject[nextItem][0].question.node.id,
+          SelectedQuestionIndex: 0,
+        },
+      })
+      // console.log(resObject)
+    }
+    count = 0
+  }
+
   yield put({
     type: actions.SET_STATE,
     payload: {

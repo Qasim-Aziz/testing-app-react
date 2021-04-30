@@ -9,6 +9,7 @@ import { notification, message } from 'antd'
 import { getLeaders, createLeader, updateLeader } from 'services/leaders'
 import axios from 'axios'
 import actions from './actions'
+import { responsePathAsArray } from 'graphql'
 
 export function* GET_DATA() {
   yield put({
@@ -29,12 +30,12 @@ export function* GET_DATA() {
 
   yield put({
     type: 'leaders/GET_LEADERS',
-    payload: {
-      isActive: true,
-      first: 10,
-      after: null,
-      before: null,
-    },
+    // payload: {
+    //   isActive: true,
+    //   first: 10,
+    //   after: null,
+    //   before: null,
+    // },
   })
 
   yield put({
@@ -53,9 +54,9 @@ export function* GET_LEADERS({ payload }) {
     },
   })
   const response = yield call(getLeaders, payload)
-  console.log('THE RESPONSE')
+
   if (response) {
-    console.log('THE RESPONSE')
+    console.log('THE RESPONSE', response)
     let leaders = []
     let i = 0
     console.log('response data inside sagas', response.data)
@@ -93,16 +94,18 @@ export function* CREATE_LEADER({ payload }) {
     notification.success({
       message: 'Leader Created Successfully',
     })
-    // Destructuring the all the values from the response
-    var created_leader = response.data.createLead.lead
-    console.log('THE created_leader', created_leader)
-    yield put({
-      type: 'leaders/APPEND_LEADERS_LIST',
-      payload: {
-        lead: created_leader,
-      },
-    })
   }
+  const resObject = yield call(getLeaders, payload)
+  console.log('leader list', resObject.data.leads)
+
+  yield put({
+    type: 'leaders/SET_STATE',
+    payload: {
+      LeadersList: resObject.data.leads,
+      TotalLeaders: 6, //random value
+      PageInfo: 'I dont know what this is', //random value
+    },
+  })
 }
 
 export function* EDIT_LEADER({ payload }) {
@@ -112,23 +115,36 @@ export function* EDIT_LEADER({ payload }) {
     notification.success({
       message: 'LEADER UPDATED SUCCESSFULLY',
     })
-    let updatedLeader = response.data.updateLead.lead
-    console.log('THE REsponse', updatedLeader)
-    // Destructuring the all the values from the response
-    // var created_leader = response.data.createLead.lead
-    console.log('THE updated_leader', updatedLeader)
-    yield put({
-      type: 'leaders/UPDATE_LEADERS_LIST',
-      payload: {
-        object: updatedLeader,
-      },
-    })
+    console.log('edit response', response)
+
+    const resObject = yield call(getLeaders, payload)
+    console.log('leader list', resObject.data.leads)
+
     yield put({
       type: 'leaders/SET_STATE',
       payload: {
-        UserProfile: updatedLeader,
+        LeadersList: resObject.data.leads,
+        TotalLeaders: 6, //random value
+        PageInfo: 'I dont know what this is', //random value
       },
     })
+    // let updatedLeader = response.data.updateLead.lead
+    // console.log('THE REsponse', updatedLeader)
+    // // Destructuring the all the values from the response
+    // // var created_leader = response.data.createLead.lead
+    // console.log('THE updated_leader', updatedLeader)
+    // yield put({
+    //   type: 'leaders/UPDATE_LEADERS_LIST',
+    //   payload: {
+    //     object: updatedLeader,
+    //   },
+    // })
+    // yield put({
+    //   type: 'leaders/SET_STATE',
+    //   payload: {
+    //     UserProfile: updatedLeader,
+    //   },
+    // })
   }
 }
 

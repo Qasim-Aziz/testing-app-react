@@ -19,6 +19,7 @@ export async function getData(payload) {
                 time
                 status
                 isActive
+                percentage
                 notes
                 student {
                   id
@@ -32,6 +33,7 @@ export async function getData(payload) {
       variables: {
         studentId: payload.studentId,
       },
+      fetchPolicy: 'network-only',
     })
     .then(result => result)
     .catch(error => {
@@ -158,6 +160,7 @@ export async function getAssessmentObject(payload) {
           }
         }
       }`,
+      fetchPolicy: 'network-only',
     })
     .then(result => result)
     .catch(error => {

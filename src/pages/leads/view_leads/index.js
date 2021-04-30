@@ -48,6 +48,7 @@ import {
   FilePdfOutlined,
   FileExcelOutlined,
   DownOutlined,
+  CommentOutlined,
   CloudDownloadOutlined,
 } from '@ant-design/icons'
 import moment from 'moment'
@@ -56,8 +57,10 @@ import moment from 'moment'
 import { FilterCard } from '../../../components/FilterCard/FilterTable'
 import EditBasicInformation from './EditBasicInformation'
 import CreateLeader from '../createLeader'
+import LeadCommentTimeline from '../LeadCommentTimeline'
 // import client from '../../../apollo/config'
 import './style.scss'
+import { COLORS } from '../../../assets/styles/globalStyles'
 
 /* *************************** THE STEP PROGRESS BAR COMPONENT *************************** */
 
@@ -249,6 +252,11 @@ class LeaderTable extends React.Component {
     filterName: '',
     filterEmail: '',
     filterProject: '', // instead of tags, we have project-name
+    commentDrawer: false,
+    updateLead: null,
+    leadStatus: '',
+    name: '',
+    projectName: '',
   }
 
   filterRef = React.createRef()
@@ -540,6 +548,32 @@ class LeaderTable extends React.Component {
           return <span>{row.createdAt ? new Date(row.createdAt).toDateString() : ''} </span>
         },
       },
+      {
+        name: 'Action',
+        maxWidth: '90px',
+        cell: data => {
+          return (
+            <div style={{ display: 'flex', width: '100%', justifyContent: 'flex-start' }}>
+              <CommentOutlined
+                style={{ color: COLORS.palleteDarkBlue, fontSize: 24, paddingRight: '.9em' }}
+                onClick={() => {
+                  // setComment(data.key)
+                  // setCommentDrawer(true)
+                  this.setState({
+                    commentDrawer: true,
+                    updateLead: data.id,
+                    leadStatus: data.leadStatus,
+                    projectName: data.projectName,
+                    name: data.name,
+                  })
+                  console.log(data)
+                }}
+                type="link"
+              />
+            </div>
+          )
+        },
+      },
     ]
 
     const exportPDF = () => {
@@ -587,7 +621,7 @@ class LeaderTable extends React.Component {
 
         {/* DRAWER FOR Create-lEADER  */}
         <Drawer
-          title="CREATE LEADER"
+          title="CREATE LEAD"
           width="75%"
           placement="right"
           closable={true}
@@ -600,7 +634,7 @@ class LeaderTable extends React.Component {
 
         {/* DRAWER FOR EDIT-LEADER */}
         <Drawer
-          title="EDIT LEADER"
+          title="EDIT LEAD"
           width="80%"
           placement="right"
           closable={true}
@@ -628,7 +662,9 @@ class LeaderTable extends React.Component {
                 </div>
                 {/* End of step progress bar */}
                 <div id="basic_form_div" style={{ marginTop: '100px' }}>
-                  {isUserProfile ? <EditBasicInformation key={UserProfile.id} /> : null}
+                  {isUserProfile ? (
+                    <EditBasicInformation key={UserProfile.id} onCloseEdit={this.onCloseEdit} />
+                  ) : null}
                 </div>
               </div>
             </div>
@@ -646,7 +682,7 @@ class LeaderTable extends React.Component {
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '0px 10px',
-            marginTop: '20px',
+            // marginTop: '20px',
             backgroundColor: '#FFF',
             boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
           }}
@@ -681,7 +717,7 @@ class LeaderTable extends React.Component {
           </div>
           {/* On the top you can see the Title of page */}
           <div>
-            <span style={{ fontSize: '25px', color: '#000' }}>Leaders List</span>
+            <span style={{ fontSize: '25px', color: '#000' }}>Leads List</span>
           </div>
           {/* This div comprise of downloading stuff & button on the top right */}
           <div style={{ padding: '5px 0px' }}>
@@ -693,7 +729,7 @@ class LeaderTable extends React.Component {
             </Dropdown>
             {/* This is the blue button to add Learners */}
             <Button onClick={this.showDrawer} type="primary">
-              <PlusOutlined /> ADD LEADER
+              <PlusOutlined /> ADD LEAD
             </Button>
           </div>
         </div>
@@ -839,6 +875,30 @@ class LeaderTable extends React.Component {
             {/* ************* END OF DIV FOR DATA-TABLE ************ */}
           </div>
         </div>
+        <Drawer
+          visible={this.state.commentDrawer}
+          onClose={() => this.setState({ commentDrawer: false })}
+          title="Timeline"
+          width="50%"
+        >
+          <div
+            style={{
+              width: '100%',
+              height: '100%',
+              background: '#fff',
+              padding: 30,
+              paddingTop: 0,
+            }}
+          >
+            <LeadCommentTimeline
+              updateLeadId={this.state.updateLead}
+              leadStatus={this.state.leadStatus}
+              name={this.state.name}
+              projectName={this.state.projectName}
+              // setUpdateTicketId={setUpdateTimeline}
+            />
+          </div>
+        </Drawer>
       </>
     )
   }

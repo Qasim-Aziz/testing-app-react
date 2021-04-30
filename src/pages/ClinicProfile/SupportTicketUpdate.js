@@ -168,6 +168,10 @@ const SUBMODULE = gql`
 `
 
 export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpdateTicketData }) => {
+  console.log('ticket arguments')
+  console.log(updateTicketId)
+  console.log(setUpdateTicketId)
+  console.log(setUpdateTicketData)
   const { data, loading, error, refetch } = useQuery(TICKET_QUERY, {
     variables: {
       id: updateTicketId,
@@ -281,7 +285,6 @@ export default Form.create()(({ form, updateTicketId, setUpdateTicketId, setUpda
         </Form.Item>
         <Form.Item label="Sub Module" style={ItemStyle} className="Form-field-container">
           {form.getFieldDecorator('submodule', {
-
             initialValue: data.ticket.submodule?.id,
 
             rules: [{ message: 'Please select a sub module!' }],

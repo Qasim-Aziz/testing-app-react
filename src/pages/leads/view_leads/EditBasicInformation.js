@@ -72,6 +72,7 @@ class EditBasicInformation extends React.Component {
     } = this.props
 
     console.log('THE IS USERPROFILE', UserProfile)
+    console.log('THE IS US', this.props)
     form.setFieldsValue({
       email: UserProfile.user.email,
       firstName: UserProfile.user.firstName,
@@ -110,6 +111,7 @@ class EditBasicInformation extends React.Component {
         },
       })
     })
+    // this.props.onCloseEdit()
   }
 
   render() {
@@ -159,6 +161,7 @@ class EditBasicInformation extends React.Component {
                 <Select.Option value="NEW">NEW</Select.Option>
                 <Select.Option value="CONTACTED">CONTACTED</Select.Option>
                 <Select.Option value="INTRESTED">INTRESTED</Select.Option>
+                <Select.Option value="UNDER_REVIEW">UNDER REVIEW</Select.Option>
                 <Select.Option value="DEMO">DEMO</Select.Option>
                 <Select.Option value="CONVERTED">CONVERTED</Select.Option>
               </Select>,

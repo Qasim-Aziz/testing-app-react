@@ -99,6 +99,9 @@ class RightArea extends React.Component {
     if (this.props.student.StudentName !== prevProps.student.StudentName) {
       this.getAssessmentData(studentID)
     }
+    console.log('prev props')
+    console.log(prevProps)
+    console.log(this.props)
   }
 
   getAssessmentData = id => {
@@ -196,16 +199,16 @@ class RightArea extends React.Component {
         break
       }
 
-      case 'resumeAssesment': {
-        localStorage.setItem('peakId', obj.node.id)
-        localStorage.setItem('peakType', obj.node.category)
-        if (obj.node.category === 'TRANSFORMATION') {
-          history.push('/classPage')
-        } else {
-          history.push('/peakAssign')
-        }
-        break
-      }
+      // case 'resumeAssesment': {
+      //   localStorage.setItem('peakId', obj.node.id)
+      //   localStorage.setItem('peakType', obj.node.category)
+      //   if (obj.node.category === 'TRANSFORMATION') {
+      //     history.push('/classPage')
+      //   } else {
+      //     history.push('/peakAssign')
+      //   }
+      //   break
+      // }
 
       case 'startAssesment': {
         dispatch({
@@ -226,12 +229,15 @@ class RightArea extends React.Component {
   }
 
   render() {
+    console.log('props inside rightArea')
+    console.log(this.props)
     const { newAssessment, suggestTarget, open } = this.state
     const {
       student: { StudentName },
       iisaassessment: { AssessmentList, ReportDrawer, NewAssessmentForm, loading },
       user,
     } = this.props
+    console.log('check heereee')
     console.log(this.props)
     const columns = [
       {
@@ -283,7 +289,7 @@ class RightArea extends React.Component {
           )
 
           const resumeAssesmentMenu = (
-            <Menu.Item key="resumeAssesment">
+            <Menu.Item key="startAssesment">
               <PauseOutlined /> Resume Assesment
             </Menu.Item>
           )
@@ -295,21 +301,27 @@ class RightArea extends React.Component {
           )
 
           const menuItems = []
-
-          if (obj.node.status === 'COMPLETED') {
+          console.log(obj.node, 'object in node')
+          // eslint-disable-next-line no-use-before-define
+          if (obj.node.percentage === undefined) {
+            menuItems.push(startAssesmentMenu)
+            menuItems.push(seeReportMenu)
+          } else if (obj.node.percentage === 100) {
             // menuItems.push(seeAssesmentMenu)
             menuItems.push(seeReportMenu)
             // menuItems.push(<Menu.Divider />)
             // menuItems.push(suggestTargetMenu)
+          } else if (obj.node.percentage !== 0) {
+            menuItems.push(resumeAssesmentMenu)
+            menuItems.push(seeReportMenu)
           } else {
             menuItems.push(startAssesmentMenu)
             menuItems.push(seeReportMenu)
-            // menuItems.push(<Menu.Divider />)
-            // menuItems.push(suggestTargetMenu)
           }
 
           const menu = <Menu onClick={e => this.handleMenuActions(e, obj)}>{menuItems}</Menu>
-
+          console.log('hrer')
+          console.log(obj.node)
           return (
             <>
               <Tooltip placement="topRight" title="Delete Assessment">
