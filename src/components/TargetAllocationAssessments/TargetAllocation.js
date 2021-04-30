@@ -3,6 +3,9 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable prefer-template */
 /* eslint-disable no-unused-expressions */
+/* eslint-disable react/jsx-closing-tag-location */
+/* eslint-disable react/jsx-indent */
+/* eslint-disable no-unused-expressions */
 
 import { Button, Col, Divider, Form, Icon, Input, notification, Row, Select, Switch } from 'antd'
 import moment from 'moment'
@@ -632,25 +635,25 @@ export default Form.create()(
               )}
             </Form.Item>
           ) : (
-            <Form.Item label="Target Type" name="Target Type">
-              {form.getFieldDecorator('type', {
-                initialValue:
-                  targetOptions &&
-                  settingData?.getAllocateTargetSettings.edges[0]?.node.targetType.id,
-                rules: [{ required: true, message: 'Please select a target type' }],
-              })(
-                <Select name="targetType" {...searchableDropDownOption}>
-                  {targetOptions?.types.map(({ id, typeTar }) => {
-                    return (
-                      <Select.Option key={id} value={id}>
-                        {typeTar}
-                      </Select.Option>
-                    )
-                  })}
-                </Select>,
-              )}
-            </Form.Item>
-          )}
+              <Form.Item label="Target Type" name="Target Type">
+                {form.getFieldDecorator('type', {
+                  initialValue:
+                    targetOptions &&
+                    settingData?.getAllocateTargetSettings.edges[0]?.node.targetType.id,
+                  rules: [{ required: true, message: 'Please select a target type' }],
+                })(
+                  <Select name="targetType" {...searchableDropDownOption}>
+                    {targetOptions?.types.map(({ id, typeTar }) => {
+                      return (
+                        <Select.Option key={id} value={id}>
+                          {typeTar}
+                        </Select.Option>
+                      )
+                    })}
+                  </Select>,
+                )}
+              </Form.Item>
+            )}
           <Form.Item label="Mastery Criteria" name="masteryCriteria">
             {form.getFieldDecorator('masteryCriteria', {
               initialValue:
@@ -712,10 +715,10 @@ export default Form.create()(
             style={
               form.getFieldValue('type') === 'VGFyZ2V0RGV0YWlsVHlwZTo4'
                 ? {
-                    display: 'block',
-                    // marginTop: 10,
-                    marginLeft: 5,
-                  }
+                  display: 'block',
+                  // marginTop: 10,
+                  marginLeft: 5,
+                }
                 : { display: 'none' }
             }
           >
@@ -756,35 +759,35 @@ export default Form.create()(
                 )}
               </Form.Item>
             ) : (
-              <Form.Item label="Category">
-                {form.getFieldDecorator('category', {
-                  initialValue: selectedTargetCategory
-                    ? selectedTargetCategory.charAt(0).toUpperCase() +
+                <Form.Item label="Category">
+                  {form.getFieldDecorator('category', {
+                    initialValue: selectedTargetCategory
+                      ? selectedTargetCategory.charAt(0).toUpperCase() +
                       selectedTargetCategory.slice(1).toLowerCase()
-                    : 'Direct',
-                  rules: [{ required: true, message: 'Please select a category' }],
-                })(
-                  <Select
-                    style={{ width: '100%' }}
-                    placeholder="Select a category"
-                    {...searchableDropDownOption}
-                  >
-                    <Option key="1" value="Direct">
-                      Direct
+                      : 'Direct',
+                    rules: [{ required: true, message: 'Please select a category' }],
+                  })(
+                    <Select
+                      style={{ width: '100%' }}
+                      placeholder="Select a category"
+                      {...searchableDropDownOption}
+                    >
+                      <Option key="1" value="Direct">
+                        Direct
                     </Option>
-                    <Option key="2" value="Generalization">
-                      Generalization
+                      <Option key="2" value="Generalization">
+                        Generalization
                     </Option>
-                    <Option key="3" value="Transformation">
-                      Transformation
+                      <Option key="3" value="Transformation">
+                        Transformation
                     </Option>
-                    <Option key="4" value="Equivalence">
-                      Equivalence
+                      <Option key="4" value="Equivalence">
+                        Equivalence
                     </Option>
-                  </Select>,
-                )}
-              </Form.Item>
-            )}
+                    </Select>,
+                  )}
+                </Form.Item>
+              )}
           </div>
           <Form.Item label="Status">
             {form.getFieldDecorator('status', {
@@ -816,40 +819,52 @@ export default Form.create()(
               </Form.Item>
             </>
           ) : (
-            <>
-              <Divider orientation="left">Stimulus</Divider>
-              {formItemsForStimulus}
-              {form.getFieldValue('stepKeys')?.length > 0 ? (
-                <Form.Item style={{ textAlign: 'center' }} wrapperCol={{ sm: 24, md: 24 }}>
-                  <Button type="dashed" disabled style={{ width: '60%' }}>
-                    <Icon type="plus" /> Add field
-                  </Button>
-                </Form.Item>
-              ) : (
-                <Form.Item style={{ textAlign: 'center' }} wrapperCol={{ sm: 24, md: 24 }}>
-                  <Button type="dashed" onClick={add} style={{ width: '60%' }}>
-                    <Icon type="plus" /> Add field
-                  </Button>
-                </Form.Item>
-              )}
+              <>
+                <Divider orientation="left">Stimulus</Divider>
+                {formItemsForStimulus}
+                {form.getFieldValue('stepKeys')?.length > 0 ? (
+                  <Form.Item style={{ textAlign: 'center' }} wrapperCol={{ sm: 24, md: 24 }}>
+                    <Button type="dashed" disabled style={{ width: '60%' }}>
+                      <Icon type="plus" /> Add field
+                    </Button>
+                  </Form.Item>
+                ) : (
+                    <Form.Item style={{ textAlign: 'center' }} wrapperCol={{ sm: 24, md: 24 }}>
+                      <Button type="dashed" onClick={add} style={{ width: '60%' }}>
+                        <Icon type="plus" /> Add field
+                      </Button>
+                    </Form.Item>
+                  )}
 
-              <Divider orientation="left">Steps</Divider>
-              {formItemsForSteps}
-              {form.getFieldValue('keys')?.length > 0 ? (
-                <Form.Item style={{ textAlign: 'center' }} wrapperCol={{ sm: 24, md: 24 }}>
-                  <Button type="dashed" disabled style={{ width: '60%' }}>
-                    <Icon type="plus" /> Add field
-                  </Button>
-                </Form.Item>
-              ) : (
-                <Form.Item style={{ textAlign: 'center' }} wrapperCol={{ sm: 24, md: 24 }}>
-                  <Button type="dashed" onClick={addStep} style={{ width: '60%' }}>
-                    <Icon type="plus" /> Add field
-                  </Button>
-                </Form.Item>
-              )}
-            </>
-          )}
+                <div
+                  style={
+                    form.getFieldValue('type') !== 'VGFyZ2V0RGV0YWlsVHlwZTo4'
+                      ? {
+                        display: 'block',
+                        // marginTop: 10,
+                        marginLeft: 5,
+                      }
+                      : { display: 'none' }
+                  }
+                >
+                  <Divider orientation="left">Steps</Divider>
+                  {formItemsForSteps}
+                  {form.getFieldValue('keys')?.length > 0 ? (
+                    <Form.Item style={{ textAlign: 'center' }} wrapperCol={{ sm: 24, md: 24 }}>
+                      <Button type="dashed" disabled style={{ width: '60%' }}>
+                        <Icon type="plus" /> Add field
+                      </Button>
+                    </Form.Item>
+                  ) : (
+                      <Form.Item style={{ textAlign: 'center' }} wrapperCol={{ sm: 24, md: 24 }}>
+                        <Button type="dashed" onClick={addStep} style={{ width: '60%' }}>
+                          <Icon type="plus" /> Add field
+                        </Button>
+                      </Form.Item>
+                    )}
+                </div>
+              </>
+            )}
           <Divider orientation="left">Misc</Divider>
           <Form.Item label="Target Instructions" name="Target Instructions">
             <CKEditor

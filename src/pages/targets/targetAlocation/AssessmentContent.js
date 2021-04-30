@@ -29,7 +29,7 @@ import GoalCard from 'components/GoalCard'
 import EditTargetAllocationNewDrawer from 'components/TargetAllocation/EditTargetAllocation'
 import TargetAllocationNewDrawer from 'components/TargetAllocation/TargetAllocation'
 import { arrayNotNull, capitalize, notNull } from 'utilities'
-import { LineChartOutlined } from '@ant-design/icons'
+import { LineChartOutlined, PlusOutlined } from '@ant-design/icons'
 import { COLORS, DRAWER, FONT } from 'assets/styles/globalStyles'
 import LoadingComponent from '../../staffProfile/LoadingComponent'
 import AddLongAndShortGoal from '../AddLongAndShortGoal'
@@ -101,10 +101,13 @@ const AssessmentContent = () => {
   const [targetAllocationDrawer, setTargetAllocationDrawer] = useState(false)
   const [selectedTargetId, setSelectedTargetId] = useState('')
   const [selectTarget, setSelectTarget] = useState(null)
-  const [selectTargetDrawer, setSelectTargetDrawer] = useState(false)
+  const [targetsDrawer, setTargetsDrawer] = useState(false)
+  const [assessmentTargetsList, setAssessmentsTargetsList] = useState([])
   const [targetName, setTargetName] = useState('')
   const [targetVideo, setTargetVideo] = useState()
   const [targetInstr, setTargetInstr] = useState()
+  const [loadingDetails, setLoadingDetails] = useState()
+
 
   const [getMlData, { data: mlData, loading: mlLoading, error: mlError }] = useMutation(GET_DATA, {
     variables: {
@@ -137,15 +140,18 @@ const AssessmentContent = () => {
         const node = targetData.targetGet
         setTargetName(node.targetMain.targetName)
         setSelectTarget(node.id)
-        setTargetAllocationDrawer(true)
+
         setTargetInstr(node.targetInstr)
         setTargetVideo(node.video)
+        setLoadingDetails(false)
       }
     }
   }, [targetData])
 
 
   const allocateTarget = (row) => {
+    setTargetAllocationDrawer(true)
+    setLoadingDetails(true)
     setSelectedTargetId(row.id)
     targetRefetch()
   }
@@ -253,7 +259,14 @@ const AssessmentContent = () => {
           {assessmentData.map(item =>
             <div>
               <Title level={3} style={{ margin: '10px  0px', display: 'inline-block' }}>{item.assessment}</Title>
-              <Button style={{ float: 'right', margin: '10px  0px', }}>Suggest Target</Button>
+              <Button
+                style={{ float: 'right', margin: '10px  0px', }}
+                onClick={() => {
+                  setAssessmentsTargetsList(item.targets)
+                  setTargetsDrawer(true)
+                }
+                }
+              >Suggest Target</Button>
               <Table
                 className="frequencyTable"
                 rowKey="learner"
@@ -275,23 +288,72 @@ const AssessmentContent = () => {
           )}
 
           <Drawer
-            title="Basic Drawer"
-            width={DRAWER.widthL1}
+            title="Target Allocation Drawer"
+            width={DRAWER.widthL2}
             placement="right"
             closable={true}
+            style={{ zIndex: 10001 }}
             onClose={() => setTargetAllocationDrawer(false)}
             visible={targetAllocationDrawer}
           >
-            <TargetAllocationNew
-              key={Math.random()}
-              studentId={selectedStudent}
-              selectedTargetId={selectTarget}
-              targetName={targetName}
-              targetVideo={targetVideo}
-              targetInstr={targetInstr}
-            // selectedTargetCategory={selectedTargetCategory}
-            // peakEnable={false}
-            />
+            {loadingDetails && (
+              <LoadingComponent />
+            )}
+            {!loadingDetails && (
+              <TargetAllocationNew
+                key={Math.random()}
+                studentId={selectedStudent}
+                selectedTargetId={selectTarget}
+                targetName={targetName}
+                targetVideo={targetVideo}
+                targetInstr={targetInstr}
+              // selectedTargetCategory={selectedTargetCategory}
+              // peakEnable={false}
+              />
+            )}
+
+
+
+          </Drawer>
+
+          <Drawer
+            title="Suggested Targets"
+            width={DRAWER.widthL1}
+            placement="right"
+            closable={true}
+            onClose={() => setTargetsDrawer(false)}
+            visible={targetsDrawer}
+          >
+            {assessmentTargetsList.map(item =>
+              <Row
+                key={item.id}
+                style={{
+                  border: '1px solid #d9d9d9',
+                  borderRadius: 10,
+                  background: COLORS.palleteLight,
+                  padding: '10px 20px 10px 10px',
+                  margin: '8px 0px',
+                  fontSize: '18px',
+                  color: 'black',
+                }}
+              >
+                <Col span={22}>{item.name}</Col>
+                <Col span={2}>
+                  <Button
+                    style={{ backgroundColor: COLORS.palleteLightBlue }}
+                    onClick={() => allocateTarget(item)}
+                  >
+                    <PlusOutlined
+                      style={{
+                        fontSize: 20,
+                        color: '#000',
+                        marginTop: 5,
+                      }}
+                    />
+                  </Button>
+                </Col>
+              </Row>
+            )}
           </Drawer>
 
 
