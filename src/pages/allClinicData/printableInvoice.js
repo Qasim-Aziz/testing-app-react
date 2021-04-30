@@ -134,6 +134,7 @@ function PrintableInvoice({ invoiceId }) {
       variables: {
         id: invoiceId,
       },
+      fetchPolicy: 'network-only',
     },
   )
 

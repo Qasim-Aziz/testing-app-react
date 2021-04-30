@@ -41,7 +41,7 @@ import SendPaymentLinks from './sendPaymentLinks'
 const dateFormate = 'YYYY-MM-DD'
 
 export default () => {
-  const [isCreateInvoice, setCreateInvoice] = useState(false)
+  // const [isCreateInvoice, setCreateInvoice] = useState(false)
   const [isPreviewInvoice, setPreviewInvoice] = useState(false)
   const [isEditInvoice, setEditInvoice] = useState(false)
   const [selectedInvoiceId, setSelectedInvoiceId] = useState()
@@ -54,8 +54,16 @@ export default () => {
   const [payReminderDrawer, setPayReminderDrawer] = useState(false)
   const [payReminderData, setPayReminderData] = useState([])
 
-  const [from, setFrom] = useState()
-  const [to, setTo] = useState()
+  const [from, setFrom] = useState(
+    moment()
+      .subtract(4, 'M')
+      .startOf('M'),
+  )
+  const [to, setTo] = useState(
+    moment()
+      .add(1, 'M')
+      .endOf('M'),
+  )
   const [month, setMonth] = useState()
   const [filterStatus, setFilterStatus] = useState('')
   const [filterCustomer, setFilterCustomer] = useState('')
@@ -490,6 +498,7 @@ export default () => {
         width={DRAWER.widthL2}
         className="change-invo-drawer"
         onClose={() => setPreviewInvoice(false)}
+        destroyOnClose
       >
         <PreviewInvoice invoiceId={selectedInvoiceId} />
       </Drawer>
@@ -499,6 +508,7 @@ export default () => {
         visible={payReminderDrawer}
         width={DRAWER.widthL2}
         onClose={() => setPayReminderDrawer(false)}
+        destroyOnClose
       >
         <SendPaymentLinks
           selectedRowKeys={selectedRowKeys}
@@ -538,17 +548,18 @@ export default () => {
           />
         )}
       </Drawer>
-      <Drawer
+      {/* <Drawer
         visible={isCreateInvoice}
         width={DRAWER.widthL1}
         onClose={() => setCreateInvoice(false)}
+        destroyOnClose
       >
         <InvoiceForm
           refetch={refetch}
           setNewInvDrawer={setCreateInvoice}
           refetchInvoices={refetch}
         />
-      </Drawer>
+      </Drawer> */}
     </div>
   )
 }

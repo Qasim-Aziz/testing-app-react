@@ -206,18 +206,6 @@ class PeakEqvi extends React.Component {
         assessmentType: assType,
       },
     })
-    dispatch({
-      type: 'peakequivalence/START_ASSESSMENT',
-      payload: {
-        assessmentType: 'Intermediate',
-      },
-    })
-    dispatch({
-      type: 'peakequivalence/START_ASSESSMENT',
-      payload: {
-        assessmentType: 'Advanced',
-      },
-    })
 
     this.setState({
       visibleModal: false,

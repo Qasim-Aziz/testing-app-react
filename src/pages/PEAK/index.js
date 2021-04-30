@@ -51,7 +51,7 @@ const { Text } = Typography
 
 const PEAK_PROGRAMS = gql`
   query($studentId: ID!) {
-    peakPrograms(student: $studentId) {
+    peakPrograms(student: $studentId, isActive: true) {
       edges {
         node {
           id
@@ -64,6 +64,8 @@ const PEAK_PROGRAMS = gql`
             total
             totalAttended
           }
+          equivalenceTotal
+          equivalenceTotalAttended
           peakequivalanceSet {
             edges {
               node {
@@ -166,16 +168,17 @@ export default () => {
   useEffect(() => {
     if (selectedIdForDelete) {
       finishAssignment()
+        .then(res => {
+          refetch()
+          notification.success({
+            message: 'Assessment Deleted Successfully',
+          })
+        })
+        .catch(err => {
+          console.error(err)
+        })
     }
   }, [selectedIdForDelete])
-
-  useEffect(() => {
-    if (deleteRes) {
-      notification.success({
-        message: 'Assessment Deleted Successfully',
-      })
-    }
-  }, [deleteRes])
 
   useEffect(() => {
     if (data) {
@@ -230,7 +233,6 @@ export default () => {
   const makeInactive = id => {
     const newData = tableData?.filter(item => item.node.id !== id)
     setTableData(newData)
-
     // write make assessment inActive code below
     setSelectedIdForDelete(id)
   }
@@ -329,18 +331,14 @@ export default () => {
       title: 'Response',
       align: 'right',
       render: (text, obj) => {
+        console.log(obj.node)
         if (obj.node.category === 'EQUIVALENCE') {
-          let maxScore = 0
-          let score = 0
-          obj.node.peakequivalanceSet.edges.map(item => {
-            maxScore += 16
-            score += Number(item.node.score)
-          })
-
-          if (maxScore === 0) {
+          const total = obj.node.equivalenceTotal
+          const x = obj.node.equivalenceTotalAttended
+          if (total === 0 || x === 0 || total === null || x === null) {
             return <span>0 %</span>
           } else {
-            return <span>{Number(Number(score * 100) / maxScore).toFixed(2)} %</span>
+            return <span>{Number(Number(x * 100) / total).toFixed(2)} %</span>
           }
         } else {
           return (
