@@ -338,3 +338,15 @@ export const QUIT = gql`
     }
   }
 `
+export const UPDATE_PEAK_ASSESS_STATUS = gql`
+  mutation($program: ID!, $status: String) {
+    updatePeakProgram(input: { program: $program, status: $status }) {
+      details {
+        id
+        date
+        title
+        status
+      }
+    }
+  }
+`

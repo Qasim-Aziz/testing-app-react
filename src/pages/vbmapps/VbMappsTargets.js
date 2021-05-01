@@ -39,7 +39,6 @@ export default ({ target, milestoneId }) => {
   useEffect(() => {
     if (data) {
       const suggestTargets = data.vbmappTargetSuggest.targets.filter((value, index, array) => {
-        console.log(value)
         return array.findIndex(node => node.id === value.id) === index
       })
       setTargetSuggation(suggestTargets)

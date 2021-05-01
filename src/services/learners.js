@@ -562,6 +562,8 @@ export async function learnerActiveInactive(payload) {
     })
 }
 
+// activity and call log yuvraj
+
 export async function getLearner(payload) {
   return apolloClient
     .query({
@@ -585,7 +587,16 @@ export async function getLearner(payload) {
             isDefaultProgram
             dob
             image
-            file
+            files {
+              edges {
+                node {
+                  id
+                  file
+                  fileName
+                  fileDescription
+                }
+              }
+            }
             report
             createdAt
             fatherName

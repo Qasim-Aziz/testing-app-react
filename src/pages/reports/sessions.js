@@ -19,6 +19,7 @@ import {
   Dropdown,
   Row,
 } from 'antd'
+import gql from 'graphql-tag'
 import { usePrevious } from 'react-delta'
 import { ResponsivePie } from '@nivo/pie'
 import * as FileSaver from 'file-saver'
@@ -43,6 +44,51 @@ const filterCardStyle = {
   overflow: 'hidden',
   backgroundColor: COLORS.palleteLight,
 }
+
+// const SESSION_DATA = gql`
+//  query() {
+//   getSessionDataRecording(){
+//     totalTarget
+//     mandCount
+//     behCount
+//     toiletData {
+//       id
+//       date
+//       time
+//       bowel
+//       urination
+//       prompted
+//     }
+
+//     behData{
+//       behFrequency
+//       id
+//       note
+//     intensity
+//     irt
+//     frequency{
+//       edges{
+//         node{
+//           id
+//           time
+//           count
+//         }
+//       }
+//     }
+//     duration
+//     environment{
+//       id
+//       name
+//     }
+//     template{
+//       id
+//       behavior{
+//         id
+//         behaviorName
+//       }
+//     }
+// }
+// }`
 
 const parentDiv = { display: 'flex', margin: 'auto 30px auto 0' }
 const parentLabel = { fontSize: '15px', color: '#000', margin: 'auto 8px auto' }
@@ -363,7 +409,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     )
   }
 
-  const setAndOpenPDFDrawer = (id) => {
+  const setAndOpenPDFDrawer = id => {
     setSelectSessionId(id)
     setReportPdfDrawer(true)
   }
@@ -565,12 +611,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
             <LineChartOutlined style={{ fontSize: 26, color: COLORS.graph }} />
           </Button>
 
-          <Button
-            type="link"
-            onClick={() => 
-              setAndOpenPDFDrawer(row.id)
-            }
-          >
+          <Button type="link" onClick={() => setAndOpenPDFDrawer(row.id)}>
             PDF
           </Button>
         </span>

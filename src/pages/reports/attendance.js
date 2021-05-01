@@ -74,9 +74,6 @@ const ATTENDANCE = gql`
       staff {
         id
         name
-        school {
-          schoolName
-        }
       }
       data {
         date
