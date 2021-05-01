@@ -390,11 +390,11 @@ class LeaderTable extends React.Component {
     })
   }
 
-  filterHandler = ({ name, email, mobile, gender, caseMngr, address, tags }) => {
+  filterHandler = ({ name, email, mobile, gender, caseMngr, address, projectName, status }) => {
     let filteredList = this.state.mainData
     let tempFilterActive = false
-    console.log('Leader filter', name, email)
-    if (!name && !email && !mobile && !gender && !caseMngr && !address) {
+    console.log('Leader filter', status)
+    if (!name && !email && !mobile && !gender && !caseMngr && !address && !projectName) {
       tempFilterActive = false
     }
     if (name) {
@@ -405,9 +405,8 @@ class LeaderTable extends React.Component {
         filteredList.filter(item => {
           console.log('WHAT ITEMS', item)
           return (
-            // item.name?.toLowerCase().includes(name.toLowerCase()) ||
-            item.user.firstName?.toLowerCase().includes(name.toLowerCase()) ||
-            item.user.lastname?.toLowerCase().includes(name.toLowerCase())
+            item.name?.toLowerCase().includes(name.toLowerCase()) ||
+            item.surname?.toLowerCase().includes(name.toLowerCase())
           )
         })
     }
@@ -416,8 +415,17 @@ class LeaderTable extends React.Component {
       filteredList =
         filteredList &&
         filteredList.filter(
-          item => item.user.email && item.user.email.toLowerCase().includes(email.toLowerCase()),
+          item => item.email && item.email.toLowerCase().includes(email.toLowerCase()),
         )
+    }
+    if (projectName) {
+      tempFilterActive = true
+      filteredList =
+        filteredList &&
+        filteredList.filter(item => {
+          console.log('project items', item)
+          return item.projectName?.toLowerCase().includes(projectName.toLowerCase())
+        })
     }
     this.setState({
       tableData: filteredList,
@@ -480,7 +488,7 @@ class LeaderTable extends React.Component {
         sortable: true,
         // maxWidth: '120px',
         cell: row => {
-          // console.log('ROW', row)
+          console.log('ROW', row)
           // console.log('ROW', row.user)
 
           row.user === null ? <span> </span> : <></>
@@ -497,7 +505,7 @@ class LeaderTable extends React.Component {
             >
               {/* {console.log('THE NAMES', row.user.firstName)} */}
               {/* {console.log('THE NAMES', row.user.lastname)} */}
-              {row.user.firstName} {row.user.lastName}
+              {row.name} {row.surname}
             </Button>
           )
         },
@@ -512,7 +520,7 @@ class LeaderTable extends React.Component {
             return <span> </span>
           }
           // console.log('ROW', row.user.email)
-          return <span>{row.user.email ? row.user.email : ''} </span>
+          return <span>{row.email ? row.email : ''} </span>
         },
       },
       {
@@ -529,7 +537,7 @@ class LeaderTable extends React.Component {
         },
       },
       {
-        name: 'project Name',
+        name: 'Project Name',
         selector: 'projectName',
         // maxWidth: '120px',
         cell: row => <span>{row.projectName ? row.projectName : ''} </span>,
@@ -577,11 +585,62 @@ class LeaderTable extends React.Component {
     ]
 
     const exportPDF = () => {
-      console.log('PRINT TO PDF FUNCTIONALITY')
+      const unit = 'pt'
+      const size = 'A4' // Use A1, A2, A3 or A4
+      const orientation = 'landscape' // portrait or landscape
+      const lineHeight = 6
+      const doc = new JsPDF(orientation, unit, size, lineHeight)
+
+      doc.setFontSize(20)
+
+      const title = 'Leads List'
+      const headers = [['Name', 'Email', 'Mobile', 'Project Name', 'Lead Status', 'Created At']]
+
+      const data = this.state.tableData.map(e => [
+        e.name,
+        e.email ? e.email : '',
+        e.phone,
+        e.projectName,
+        e.leadStatus,
+        e.createdAt ? new Date(e.createdAt).toDateString() : '',
+      ])
+
+      let content = {
+        startY: 20,
+        head: headers,
+        body: data,
+      }
+
+      doc
+        .text(title, 420, 15, 'center')
+        .setFontSize(40)
+        .setLineHeightFactor(6)
+      doc.autoTable(content)
+      doc.save('leads.pdf')
     }
 
+    const fileType =
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+    const fileExtension = '.xlsx'
+
     const exportToCSV = () => {
-      console.log('PRINT TO EXCEL SHEET FUNCTIONALITY')
+      const filename = 'leads_excel'
+      let formattedData = this.state.tableData.map(function(e) {
+        return {
+          Name: e.name,
+          Email: e.email ? e.email : '',
+          Mobile: e.phone,
+          ProjectName: e.projectName,
+          LeadStatus: e.leadStatus,
+          CreatedAt: e.createdAt ? new Date(e.createdAt).toDateString() : '',
+        }
+      })
+
+      const ws = XLSX.utils.json_to_sheet(formattedData)
+      const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
+      const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+      const data = new Blob([excelBuffer], { type: fileType })
+      FileSaver.saveAs(data, filename + fileExtension)
     }
 
     const menu = (
@@ -786,7 +845,7 @@ class LeaderTable extends React.Component {
               </span>
               {/* Search bar for project */}
               <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span>project :</span>
+                <span>Project :</span>
                 <Input
                   size="small"
                   name="name"
@@ -797,14 +856,14 @@ class LeaderTable extends React.Component {
                       filterProject: e.target.value,
                       isFilterActive: e.target.value && true,
                     })
-                    this.filterHandler({ email: e.target.value })
+                    this.filterHandler({ projectName: e.target.value })
                   }}
                   style={{ ...tableFilterStyles, width: '148px' }}
                 />
               </span>
               {/* Different kinds of status */}
               <span style={{ display: 'flex', alignItems: 'center' }}>
-                <span>STATUS :</span>
+                <span>Status :</span>
                 {/* DO NOT DELETE */}
                 {/* <Radio.Group
                   size="small"
@@ -824,14 +883,15 @@ class LeaderTable extends React.Component {
                 </Radio.Group> */}
                 <Select
                   placeholder="Status"
-                  // allowClear
+                  allowClear
                   value={this.state.filterStatus}
                   onChange={e => {
                     console.log('-----------------------------------------------', e)
                     this.selectActiveStatus(e)
                     this.setState({ filterStatus: e, isFilterActive: true })
+                    this.filterHandler({ status: e })
                   }}
-                  style={{ width: '120px' }}
+                  style={{ ...tableFilterStyles, width: '120px' }}
                 >
                   <Select.Option value="NEW">NEW</Select.Option>
                   <Select.Option value="CONTACTED">CONTACTED</Select.Option>
@@ -843,9 +903,11 @@ class LeaderTable extends React.Component {
             </div>
             {/* ************* END OF DIV FOR filtering ************ */}
             {/* ************* DIV FOR DATA-TABLE ************ */}
+            {console.log('list fiiiiii', filteredList)}
             <div className="modify-data-table">
               <DataTable
                 title="Leaders List"
+                className="dataTablee"
                 columns={columns}
                 theme="default"
                 dense={true}

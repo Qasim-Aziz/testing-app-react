@@ -74,9 +74,9 @@ class EditBasicInformation extends React.Component {
     console.log('THE IS USERPROFILE', UserProfile)
     console.log('THE IS US', this.props)
     form.setFieldsValue({
-      email: UserProfile.user.email,
-      firstName: UserProfile.user.firstName,
-      lastName: UserProfile.user.lastName,
+      email: UserProfile.email,
+      firstName: UserProfile.name,
+      lastName: UserProfile.surname,
       mobileNo: UserProfile.phone,
       leadStatus: UserProfile.leadStatus,
       projectName: UserProfile.projectName,
