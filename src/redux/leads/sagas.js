@@ -92,7 +92,7 @@ export function* CREATE_LEADER({ payload }) {
   console.log('THE RESPONSE ONCE THE LEAD IS CREATED', response)
   if (response && response.data) {
     notification.success({
-      message: 'Leader Created Successfully',
+      message: 'Lead Created Successfully',
     })
   }
   const resObject = yield call(getLeaders, payload)
@@ -113,7 +113,7 @@ export function* EDIT_LEADER({ payload }) {
   const response = yield call(updateLeader, payload)
   if (response && response.data) {
     notification.success({
-      message: 'LEADER UPDATED SUCCESSFULLY',
+      message: 'Lead Update Successfully',
     })
     console.log('edit response', response)
 

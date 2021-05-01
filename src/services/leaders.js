@@ -18,8 +18,11 @@ export async function getLeaders(payload) {
           leads {
             id
             name
+            surname
+            email
             projectName
             leadStatus
+            leadType
             phone
             createdAt
             user {
