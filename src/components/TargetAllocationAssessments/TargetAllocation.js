@@ -197,12 +197,17 @@ export default Form.create()(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [allocateTargetData])
 
-    if (allocateTargetError) {
-      notification.error({
-        message: 'Target allocation failed',
-        // description: allocateTargetError?.message,
-      })
-    }
+    useEffect(() => {
+      if (allocateTargetError) {
+        notification.error({
+          message: 'Target allocation failed',
+          // description: allocateTargetError?.message,
+        })
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [allocateTargetError])
+
+    
 
     useEffect(() => {
       if (settingData && !sessionConsecutiveDays && !dailyTrials) {
@@ -588,7 +593,7 @@ export default Form.create()(
 
     return (
       <div className="targetAllocationForm">
-        <Form {...layout} onSubmit={handleSubmit}>
+        <Form {...layout} onSubmit={(e) => handleSubmit(e)}>
           <Divider orientation="left">Basic Details</Divider>
           <Form.Item label="Allocate target directly">
             <Switch
