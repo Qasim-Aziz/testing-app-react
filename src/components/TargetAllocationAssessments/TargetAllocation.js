@@ -98,22 +98,15 @@ export default Form.create()(
     ] = useMutation(CREATE_TARGET)
 
     const add = () => {
-      // const { form } = this.props;
-      // can use data-binding to get
       const keys = form.getFieldValue('keys')
       const nextKeys = keys.concat(id++)
-      // can use data-binding to set
-      // important! notify form to detect changes
       form.setFieldsValue({
         keys: nextKeys,
       })
     }
 
     const remove = k => {
-      // const { form } = this.props;
-      // can use data-binding to get
       const keys = form.getFieldValue('keys')
-      // We need at least one passenger
       if (keys.length === 0) {
         return
       }
@@ -125,64 +118,55 @@ export default Form.create()(
     }
 
     const addStep = () => {
-      // const { form } = this.props;
-      // can use data-binding to get
       const stepKeys = form.getFieldValue('stepKeys')
       const nextKeys = stepKeys.concat(stepId++)
-      // can use data-binding to set
-      // important! notify form to detect changes
       form.setFieldsValue({
         stepKeys: nextKeys,
       })
     }
 
     const stepRemove = k => {
-      // const { form } = this.props;
-      // can use data-binding to get
       const stepKeys = form.getFieldValue('stepKeys')
-      // We need at least one passenger
       if (stepKeys.length === 0) {
         return
       }
 
-      // can use data-binding to set
       form.setFieldsValue({
         stepKeys: stepKeys.filter(key => key !== k),
       })
     }
 
     const classAdd = () => {
-      // const { form } = this.props;
-      // can use data-binding to get
       const keys = form.getFieldValue('Classkeys')
       const nextKeys = keys.concat(classId++)
-      // can use data-binding to set
-      // important! notify form to detect changes
       form.setFieldsValue({
         Classkeys: nextKeys,
       })
     }
 
     const classRemove = k => {
-      // const { form } = this.props;
-      // can use data-binding to get
       const keys = form.getFieldValue('Classkeys')
-      // We need at least one passenger
       if (keys.length === 0) {
         return
       }
 
-      // can use data-binding to set
       form.setFieldsValue({
         Classkeys: keys.filter(key => key !== k),
       })
     }
 
     useEffect(() => {
-      if (defaultShortGoals) {
+      console.log(defaultShortGoals, 'default Short goasl')
+      if (defaultShortGoals && defaultShortGoals.shortTerm) {
+        // let dfGoal = null
         defaultShortGoals.shortTerm.edges.forEach(({ node }) => {
           if (node.longTerm.program.name === 'ABA') setDefaultShortTermGoalIdForABA(node.id)
         })
+        // if (dfGoal) {
+        //   setDefaultShortTermGoalIdForABA(dfGoal)
+        // } else {
+        //   setDefaultShortTermGoalIdForABA(defaultShortGoals.shortTerm.edges[0].node.id)
+        // }
       }
     }, [defaultShortGoals])
 
@@ -206,8 +190,6 @@ export default Form.create()(
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [allocateTargetError])
-
-    
 
     useEffect(() => {
       if (settingData && !sessionConsecutiveDays && !dailyTrials) {
@@ -274,6 +256,7 @@ export default Form.create()(
         })
 
         if (!error) {
+          // console.log(values.stg, 'short term goal')
           // Other custom validations
           let validationMessage = null
           if (
@@ -297,12 +280,16 @@ export default Form.create()(
             validationMessage = 'Target Instruction is mandatory'
           }
 
+          if (useDefaultGoal && !defaultShortTermGoalIdForABA)
+            validationMessage = 'No default short term goal is available'
+
           if (!useDefaultGoal && !values.stg) validationMessage = 'Select short term Goal.'
 
           if (validationMessage) {
             notification.info({ message: validationMessage })
           } else {
             try {
+              // console.log(studentId, useDefaultGoal, defaultShortTermGoalIdForABA)
               allocateTarget({
                 variables: {
                   studentId,
@@ -593,7 +580,7 @@ export default Form.create()(
 
     return (
       <div className="targetAllocationForm">
-        <Form {...layout} onSubmit={(e) => handleSubmit(e)}>
+        <Form {...layout} onSubmit={e => handleSubmit(e)}>
           <Divider orientation="left">Basic Details</Divider>
           <Form.Item label="Allocate target directly">
             <Switch
@@ -604,7 +591,9 @@ export default Form.create()(
             />
           </Form.Item>
           <Form.Item label="Short Term Goal">
-            {form.getFieldDecorator('stg')(
+            {form.getFieldDecorator('stg', {
+              rules: [{ required: !useDefaultGoal, message: 'Please give a target name' }],
+            })(
               <Select
                 loading={shortGoalLoading}
                 disabled={useDefaultGoal}
@@ -640,25 +629,25 @@ export default Form.create()(
               )}
             </Form.Item>
           ) : (
-              <Form.Item label="Target Type" name="Target Type">
-                {form.getFieldDecorator('type', {
-                  initialValue:
-                    targetOptions &&
-                    settingData?.getAllocateTargetSettings.edges[0]?.node.targetType.id,
-                  rules: [{ required: true, message: 'Please select a target type' }],
-                })(
-                  <Select name="targetType" {...searchableDropDownOption}>
-                    {targetOptions?.types.map(({ id, typeTar }) => {
-                      return (
-                        <Select.Option key={id} value={id}>
-                          {typeTar}
-                        </Select.Option>
-                      )
-                    })}
-                  </Select>,
-                )}
-              </Form.Item>
-            )}
+            <Form.Item label="Target Type" name="Target Type">
+              {form.getFieldDecorator('type', {
+                initialValue:
+                  targetOptions &&
+                  settingData?.getAllocateTargetSettings.edges[0]?.node.targetType.id,
+                rules: [{ required: true, message: 'Please select a target type' }],
+              })(
+                <Select name="targetType" {...searchableDropDownOption}>
+                  {targetOptions?.types.map(({ id, typeTar }) => {
+                    return (
+                      <Select.Option key={id} value={id}>
+                        {typeTar}
+                      </Select.Option>
+                    )
+                  })}
+                </Select>,
+              )}
+            </Form.Item>
+          )}
           <Form.Item label="Mastery Criteria" name="masteryCriteria">
             {form.getFieldDecorator('masteryCriteria', {
               initialValue:
@@ -720,10 +709,10 @@ export default Form.create()(
             style={
               form.getFieldValue('type') === 'VGFyZ2V0RGV0YWlsVHlwZTo4'
                 ? {
-                  display: 'block',
-                  // marginTop: 10,
-                  marginLeft: 5,
-                }
+                    display: 'block',
+                    // marginTop: 10,
+                    marginLeft: 5,
+                  }
                 : { display: 'none' }
             }
           >
@@ -764,35 +753,35 @@ export default Form.create()(
                 )}
               </Form.Item>
             ) : (
-                <Form.Item label="Category">
-                  {form.getFieldDecorator('category', {
-                    initialValue: selectedTargetCategory
-                      ? selectedTargetCategory.charAt(0).toUpperCase() +
+              <Form.Item label="Category">
+                {form.getFieldDecorator('category', {
+                  initialValue: selectedTargetCategory
+                    ? selectedTargetCategory.charAt(0).toUpperCase() +
                       selectedTargetCategory.slice(1).toLowerCase()
-                      : 'Direct',
-                    rules: [{ required: true, message: 'Please select a category' }],
-                  })(
-                    <Select
-                      style={{ width: '100%' }}
-                      placeholder="Select a category"
-                      {...searchableDropDownOption}
-                    >
-                      <Option key="1" value="Direct">
-                        Direct
+                    : 'Direct',
+                  rules: [{ required: true, message: 'Please select a category' }],
+                })(
+                  <Select
+                    style={{ width: '100%' }}
+                    placeholder="Select a category"
+                    {...searchableDropDownOption}
+                  >
+                    <Option key="1" value="Direct">
+                      Direct
                     </Option>
-                      <Option key="2" value="Generalization">
-                        Generalization
+                    <Option key="2" value="Generalization">
+                      Generalization
                     </Option>
-                      <Option key="3" value="Transformation">
-                        Transformation
+                    <Option key="3" value="Transformation">
+                      Transformation
                     </Option>
-                      <Option key="4" value="Equivalence">
-                        Equivalence
+                    <Option key="4" value="Equivalence">
+                      Equivalence
                     </Option>
-                    </Select>,
-                  )}
-                </Form.Item>
-              )}
+                  </Select>,
+                )}
+              </Form.Item>
+            )}
           </div>
           <Form.Item label="Status">
             {form.getFieldDecorator('status', {
@@ -824,52 +813,52 @@ export default Form.create()(
               </Form.Item>
             </>
           ) : (
-              <>
-                <Divider orientation="left">Stimulus</Divider>
-                {formItemsForStimulus}
-                {form.getFieldValue('stepKeys')?.length > 0 ? (
+            <>
+              <Divider orientation="left">Stimulus</Divider>
+              {formItemsForStimulus}
+              {form.getFieldValue('stepKeys')?.length > 0 ? (
+                <Form.Item style={{ textAlign: 'center' }} wrapperCol={{ sm: 24, md: 24 }}>
+                  <Button type="dashed" disabled style={{ width: '60%' }}>
+                    <Icon type="plus" /> Add field
+                  </Button>
+                </Form.Item>
+              ) : (
+                <Form.Item style={{ textAlign: 'center' }} wrapperCol={{ sm: 24, md: 24 }}>
+                  <Button type="dashed" onClick={add} style={{ width: '60%' }}>
+                    <Icon type="plus" /> Add field
+                  </Button>
+                </Form.Item>
+              )}
+
+              <div
+                style={
+                  form.getFieldValue('type') !== 'VGFyZ2V0RGV0YWlsVHlwZTo4'
+                    ? {
+                        display: 'block',
+                        // marginTop: 10,
+                        marginLeft: 5,
+                      }
+                    : { display: 'none' }
+                }
+              >
+                <Divider orientation="left">Steps</Divider>
+                {formItemsForSteps}
+                {form.getFieldValue('keys')?.length > 0 ? (
                   <Form.Item style={{ textAlign: 'center' }} wrapperCol={{ sm: 24, md: 24 }}>
                     <Button type="dashed" disabled style={{ width: '60%' }}>
                       <Icon type="plus" /> Add field
                     </Button>
                   </Form.Item>
                 ) : (
-                    <Form.Item style={{ textAlign: 'center' }} wrapperCol={{ sm: 24, md: 24 }}>
-                      <Button type="dashed" onClick={add} style={{ width: '60%' }}>
-                        <Icon type="plus" /> Add field
-                      </Button>
-                    </Form.Item>
-                  )}
-
-                <div
-                  style={
-                    form.getFieldValue('type') !== 'VGFyZ2V0RGV0YWlsVHlwZTo4'
-                      ? {
-                        display: 'block',
-                        // marginTop: 10,
-                        marginLeft: 5,
-                      }
-                      : { display: 'none' }
-                  }
-                >
-                  <Divider orientation="left">Steps</Divider>
-                  {formItemsForSteps}
-                  {form.getFieldValue('keys')?.length > 0 ? (
-                    <Form.Item style={{ textAlign: 'center' }} wrapperCol={{ sm: 24, md: 24 }}>
-                      <Button type="dashed" disabled style={{ width: '60%' }}>
-                        <Icon type="plus" /> Add field
-                      </Button>
-                    </Form.Item>
-                  ) : (
-                      <Form.Item style={{ textAlign: 'center' }} wrapperCol={{ sm: 24, md: 24 }}>
-                        <Button type="dashed" onClick={addStep} style={{ width: '60%' }}>
-                          <Icon type="plus" /> Add field
-                        </Button>
-                      </Form.Item>
-                    )}
-                </div>
-              </>
-            )}
+                  <Form.Item style={{ textAlign: 'center' }} wrapperCol={{ sm: 24, md: 24 }}>
+                    <Button type="dashed" onClick={addStep} style={{ width: '60%' }}>
+                      <Icon type="plus" /> Add field
+                    </Button>
+                  </Form.Item>
+                )}
+              </div>
+            </>
+          )}
           <Divider orientation="left">Misc</Divider>
           <Form.Item label="Target Instructions" name="Target Instructions">
             <CKEditor

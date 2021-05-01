@@ -129,7 +129,7 @@ const urinationReducer = (state, action) => {
   }
 }
 
-const ToiletForm = ({ style, handleNewToiletDate, setNewToiletCreated, selectDate }) => {
+const ToiletForm = ({ form, style, handleNewToiletDate, setNewToiletCreated, selectDate }) => {
   const [waterIntake, setWaterIntake] = useState()
   const [waterIntakeTime, setwaterIntakeTime] = useState(moment())
   const [urination, setUrination] = useState(true)
@@ -148,19 +148,7 @@ const ToiletForm = ({ style, handleNewToiletDate, setNewToiletCreated, selectDat
     { time: moment(), status: undefined },
   ])
 
-  const [mutate, { data, error, loading }] = useMutation(CREATE_TOILET_DATA, {
-    variables: {
-      session: sessionId,
-      student: studentId,
-      date: selectDate,
-      time: moment().format(TimeFormat),
-      waterIntake: waterIntake && `${waterIntake} ml`,
-      waterIntakeTime: moment(waterIntakeTime).format(TimeFormat),
-      urination,
-      bowel,
-      prompted,
-    },
-  })
+  const [mutate, { data, error, loading }] = useMutation(CREATE_TOILET_DATA)
 
   const SubmitForm = e => {
     e.preventDefault()
@@ -187,11 +175,25 @@ const ToiletForm = ({ style, handleNewToiletDate, setNewToiletCreated, selectDat
         })
       }
     })
-    mutate({
-      variables: {
-        remainders: reminder ? modefiRemainderState : null,
-        urinationRecord: modefiUrinationState,
-      },
+    form.validateFields((er, values) => {
+      if (!er) {
+        console.log(values, 'val')
+        mutate({
+          variables: {
+            session: sessionId,
+            student: studentId,
+            date: selectDate,
+            time: moment().format(TimeFormat),
+            waterIntake: waterIntake && `${waterIntake} ml`,
+            waterIntakeTime: moment(waterIntakeTime).format(TimeFormat),
+            remainders: reminder ? modefiRemainderState : null,
+            urinationRecord: modefiUrinationState,
+            urination: values.urination,
+            bowel: values.bowel,
+            prompted: values.prompted,
+          },
+        })
+      }
     })
   }
 
@@ -218,6 +220,8 @@ const ToiletForm = ({ style, handleNewToiletDate, setNewToiletCreated, selectDat
     }
   }, [error])
 
+  console.log(urination, bowel, prompted, 'prpr')
+
   return (
     <Form
       onSubmit={e => SubmitForm(e, this)}
@@ -229,45 +233,24 @@ const ToiletForm = ({ style, handleNewToiletDate, setNewToiletCreated, selectDat
         style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' }}
       >
         <Form.Item style={{ display: 'flex' }} label="Urination">
-          <Checkbox
-            defaultChecked
-            onChange={e => {
-              if (e.target.checked) {
-                setUrination(true)
-              } else {
-                setUrination(false)
-              }
-            }}
-            style={{ lineHeight: '32px' }}
-          />
+          {form.getFieldDecorator('urination', {
+            initialValue: true,
+            rules: [{ required: true, message: 'Please select a customer!' }],
+          })(<Checkbox defaultChecked style={{ lineHeight: '32px' }} />)}
         </Form.Item>
 
         <Form.Item style={{ display: 'flex' }} label="Bowel Movement">
-          <Checkbox
-            defaultChecked
-            onChange={e => {
-              if (e.target.checked) {
-                setBowel(true)
-              } else {
-                setBowel(false)
-              }
-            }}
-            style={{ lineHeight: '32px' }}
-          />
+          {form.getFieldDecorator('bowel', {
+            initialValue: true,
+            rules: [{ required: true, message: 'Please select a customer!' }],
+          })(<Checkbox defaultChecked style={{ lineHeight: '32px' }} />)}
         </Form.Item>
 
         <Form.Item style={{ display: 'flex' }} label="Prompted to Request">
-          <Checkbox
-            defaultChecked
-            onChange={e => {
-              if (e.target.checked) {
-                setPrompted(false)
-              } else {
-                setPrompted(true)
-              }
-            }}
-            style={{ lineHeight: '32px' }}
-          />
+          {form.getFieldDecorator('prompted', {
+            initialValue: true,
+            rules: [{ required: true, message: 'Please select a customer!' }],
+          })(<Checkbox defaultChecked style={{ lineHeight: '32px' }} />)}
         </Form.Item>
       </div>
 
@@ -405,4 +388,4 @@ const ToiletForm = ({ style, handleNewToiletDate, setNewToiletCreated, selectDat
   )
 }
 
-export default ToiletForm
+export default Form.create()(ToiletForm)

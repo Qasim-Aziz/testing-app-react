@@ -10,7 +10,7 @@ import {
   MessageOutlined,
 } from '@ant-design/icons'
 import moment from 'moment'
-import { useQuery } from 'react-apollo'
+import { useQuery, useLazyQuery } from 'react-apollo'
 import gql from 'graphql-tag'
 import Calendar from 'components/Calander'
 import TimeCard from './TimeCard'
@@ -44,13 +44,18 @@ const TIME_SHEET_DATA = gql`
 export default () => {
   const [date, setDate] = useState(moment())
   const [newLogCreated, setNewLogCreated] = useState(false)
-  const { data, loading, error, refetch } = useQuery(TIME_SHEET_DATA, {
-    variables: {
-      date: date.format('YYYY-MM-DD'),
-    },
-  })
+  const [fetchData, { data, loading, error, refetch }] = useLazyQuery(TIME_SHEET_DATA)
   const [cardData, setCardData] = useState(null)
 
+  useEffect(() => {
+    if (date) {
+      fetchData({
+        variables: {
+          date: date.format('YYYY-MM-DD'),
+        },
+      })
+    }
+  }, [date])
   useEffect(() => {
     if (data && data?.timesheets) {
       const temp = []

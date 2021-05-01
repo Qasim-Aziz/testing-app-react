@@ -82,21 +82,21 @@ const DashboardTab = () => {
       style: { borderTop: '2px solid brown' },
       component: <ChatMessageCard />,
     },
-    {
-      title: 'Invoices',
-      path: '/invoices',
-      color: 'purple',
-      enableAdd: true,
-      labelForAddButton: 'Add Invoice',
-      style: { borderTop: '2px solid purple' },
-      component: <InvoicesCard />,
-      dropDown: (
-        <StatusDropDown
-          statuses={['All', 'Pending', 'Overdue', 'Paid', 'Canceled']}
-          onStatusChange={setInvoiceStatus}
-        />
-      ),
-    },
+    // {
+    //   title: 'Invoices',
+    //   path: '/invoices',
+    //   color: 'purple',
+    //   enableAdd: true,
+    //   labelForAddButton: 'Add Invoice',
+    //   style: { borderTop: '2px solid purple' },
+    //   component: <InvoicesCard />,
+    //   dropDown: (
+    //     <StatusDropDown
+    //       statuses={['All', 'Pending', 'Overdue', 'Paid', 'Canceled']}
+    //       onStatusChange={setInvoiceStatus}
+    //     />
+    //   ),
+    // },
     {
       title: 'Activity & Call log',
       path: '/activitylog',

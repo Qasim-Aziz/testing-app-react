@@ -16,7 +16,6 @@ export function* LOAD_DATA() {
   })
 
   const response = yield call(getData)
-  console.log(response, 'learner resonse got called caleed')
   if (response && response.data) {
     yield put({
       type: 'learnersprogram/SET_STATE',

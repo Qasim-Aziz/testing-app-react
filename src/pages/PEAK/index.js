@@ -42,7 +42,7 @@ import CreateAssignmentForm from './CreateAssignmentForm'
 import EquivalenceTargets from './EquivalenceTarget'
 import './index.scss'
 import PeakTargets from './PeakTargets'
-import { STUDNET_INFO } from './query'
+import { STUDNET_INFO, UPDATE_PEAK_ASSESS_STATUS } from './query'
 
 const { TabPane } = Tabs
 
@@ -134,11 +134,8 @@ export default () => {
   const [
     finishAssignment,
     { data: deleteRes, error: deleteError, loading: deleteLoading },
-  ] = useMutation(DISABLE_PEAK_PROGRAMS, {
-    variables: {
-      id: selectedIdForDelete,
-    },
-  })
+  ] = useMutation(DISABLE_PEAK_PROGRAMS, {})
+  const [updateAssessStatus] = useMutation(UPDATE_PEAK_ASSESS_STATUS)
 
   const user = useSelector(state => state.user)
   const student = useSelector(state => state.student)
@@ -181,9 +178,35 @@ export default () => {
   }, [selectedIdForDelete])
 
   useEffect(() => {
-    if (data) {
-      setOriginalData(data?.peakPrograms?.edges)
-      setTableData(data?.peakPrograms?.edges)
+    if (data && data.peakPrograms) {
+      const completedAssess = []
+      data.peakPrograms.edges.map(({ node }) => {
+        if (node.category === 'EQUIVALENCE' && node.equivalenceTotal) {
+          if (node.equivalenceTotal === node.equivalenceTotalAttended) {
+            completedAssess.push(node.id)
+          }
+        } else if (node.submitpeakresponsesSet?.total) {
+          if (node.submitpeakresponsesSet.total === node.submitpeakresponsesSet.totalAttended) {
+            completedAssess.push(node.id)
+          }
+        }
+      })
+      setOriginalData(data.peakPrograms.edges)
+      setTableData(data.peakPrograms.edges)
+      completedAssess.map(async item => {
+        try {
+          const dt = await updateAssessStatus({
+            variables: {
+              program: item,
+              status: 'Completed',
+            },
+          }).catch(err => console.error(err, 'err'))
+        } catch (e) {
+          notification.error({
+            message: 'Unable to update assess type',
+          })
+        }
+      })
     }
   }, [data])
 
@@ -234,7 +257,20 @@ export default () => {
     const newData = tableData?.filter(item => item.node.id !== id)
     setTableData(newData)
     // write make assessment inActive code below
-    setSelectedIdForDelete(id)
+    finishAssignment({
+      variables: {
+        id: selectedIdForDelete,
+      },
+    })
+      .then(res => {
+        refetch()
+        notification.success({
+          message: 'Assessment Deleted Successfully',
+        })
+      })
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   if (error) {
@@ -331,7 +367,6 @@ export default () => {
       title: 'Response',
       align: 'right',
       render: (text, obj) => {
-        console.log(obj.node)
         if (obj.node.category === 'EQUIVALENCE') {
           const total = obj.node.equivalenceTotal
           const x = obj.node.equivalenceTotalAttended

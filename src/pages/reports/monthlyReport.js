@@ -1,20 +1,8 @@
 /* eslint-disable  */
 import React, { useState, useEffect } from 'react'
-import {
-  Layout,
-  Row,
-  Col,
-  Button,
-  Form,
-  notification,
-  Select,
-  DatePicker,
-  Empty,
-  Input,
-  Drawer,
-} from 'antd'
+import { Row, Col, Button, Form, notification, DatePicker, Empty, Input, Drawer } from 'antd'
 import html2canvas from 'html2canvas'
-import { gql } from 'graphql-tag'
+import gql from 'graphql-tag'
 import { ResponsiveBar } from '@nivo/bar'
 import { ResponsiveLine } from '@nivo/line'
 import moment from 'moment'
@@ -37,6 +25,22 @@ import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 
 const { RangePicker, MonthPicker } = DatePicker
 const { TextArea } = Input
+
+const RT = gql`
+  mutation($student: ID!, $programArea: ID!, $targetStatus: ID!, $dateGte: Date!, $dateLte: Date!) {
+    generateMonthlyReport(
+      input: {
+        student: $student
+        programArea: $programArea
+        targetStatus: $targetStatus
+        dateGte: $dateGte
+        dateLte: $dateLte
+      }
+    ) {
+      report
+    }
+  }
+`
 
 const filterCardStyle = {
   display: 'flex',
@@ -476,12 +480,12 @@ function Goals({ selectedStudentId, studentName }) {
             </span>
             <Button
               loading={loadingPdf}
-              onClick={() => {
-                setloadingPdf(val => {
-                  return !val
-                })
-                generatePdf()
-              }}
+              // onClick={() => {
+              //   setloadingPdf(val => {
+              //     return !val
+              //   })
+              //   generatePdf()
+              // }}
             >
               Download Pdf{' '}
             </Button>

@@ -18,10 +18,8 @@ import { MinusOutlined, PlusOutlined, LineChartOutlined } from '@ant-design/icon
 import moment from 'moment'
 import { useQuery, useMutation } from 'react-apollo'
 import gql from 'graphql-tag'
-import Calendar from 'components/Calander'
 import './index.scss'
 import { COLORS, DRAWER, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
-import { ResponsiveLine } from '@nivo/line'
 import LoadingComponent from 'components/LoadingComponent'
 import FilterComp from '../../components/FilterCard/FilterComp'
 import GraphComponent from './graphComponent'
@@ -65,7 +63,7 @@ const RECORD_MAND_DATA = gql`
 `
 
 const CREATE_NEW_MAND = gql`
-  mutation createDailyClick($studentId: ID!, $mandTitle: String!) {
+  mutation($studentId: ID!, $mandTitle: String!) {
     createDailyClick(input: { clickData: { student: $studentId, measurments: $mandTitle } }) {
       details {
         id
@@ -148,6 +146,7 @@ const MandDataPage = props => {
         message: 'Mand Data',
         description: 'New Mand Created Successfully',
       })
+      refetch()
       setMandTitle('')
       setNewMandCreated(true)
       closeDrawer()
@@ -235,13 +234,6 @@ const MandDataPage = props => {
     color: 'blaxk',
     marginRight: '10px',
   }
-
-  // handleSelectDate={handleSelectDate}
-  // searchVal={searchVal}
-  // searchValHandler={searchValHandler}
-  // startDate={date.gte}
-  // endDate={date.lte}
-  // rangePicker
 
   return (
     <Authorize roles={['school_admin', 'therapist', 'parents']} redirect to="/dashboard/beta">
