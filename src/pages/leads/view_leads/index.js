@@ -588,10 +588,10 @@ class LeaderTable extends React.Component {
       const unit = 'pt'
       const size = 'A4' // Use A1, A2, A3 or A4
       const orientation = 'landscape' // portrait or landscape
+      const lineHeight = 6
+      const doc = new JsPDF(orientation, unit, size, lineHeight)
 
-      const doc = new JsPDF(orientation, unit, size)
-
-      doc.setFontSize(7)
+      doc.setFontSize(20)
 
       const title = 'Leads List'
       const headers = [['Name', 'Email', 'Mobile', 'Project Name', 'Lead Status', 'Created At']]
@@ -611,7 +611,10 @@ class LeaderTable extends React.Component {
         body: data,
       }
 
-      doc.text(title, 15, 15)
+      doc
+        .text(title, 420, 15, 'center')
+        .setFontSize(40)
+        .setLineHeightFactor(6)
       doc.autoTable(content)
       doc.save('leads.pdf')
     }
