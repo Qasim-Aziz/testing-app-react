@@ -34,7 +34,7 @@ const CREATE_PEAK = gql`
   }
 `
 
-const CreateAssignmentForm = ({ form, setOpen, PEAK_PROGRAMS }) => {
+const CreateAssignmentForm = ({ form, setOpen, refetchPeakPrograms, PEAK_PROGRAMS }) => {
   const studentId = localStorage.getItem('studentId')
   const [createPeak, { data, error, loading }] = useMutation(CREATE_PEAK, {
     update(cache, { data }) {
@@ -73,6 +73,7 @@ const CreateAssignmentForm = ({ form, setOpen, PEAK_PROGRAMS }) => {
       notification.success({
         message: 'Create new Assessment succesfully',
       })
+      refetchPeakPrograms()
       setOpen(false)
       form.resetFields()
     }

@@ -22,21 +22,14 @@ import ReportPdf from './monthlyReportPdf'
 import client from '../../apollo/config'
 import { calculateAge } from '../../utilities'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
+import { useMutation } from 'react-apollo'
 
 const { RangePicker, MonthPicker } = DatePicker
 const { TextArea } = Input
 
 const RT = gql`
-  mutation($student: ID!, $programArea: ID!, $targetStatus: ID!, $dateGte: Date!, $dateLte: Date!) {
-    generateMonthlyReport(
-      input: {
-        student: $student
-        programArea: $programArea
-        targetStatus: $targetStatus
-        dateGte: $dateGte
-        dateLte: $dateLte
-      }
-    ) {
+  mutation($student: ID!, $start: Date!, $end: Date!) {
+    generateMonthlyReport(input: { student: $student, dateGte: $start, dateLte: $end }) {
       report
     }
   }
@@ -113,6 +106,8 @@ function Goals({ selectedStudentId, studentName }) {
     mand: false,
     behavior: false,
   })
+
+  const [generateMonthlyReport, { loading: generateMonthlyReportLoading }] = useMutation(RT)
 
   useEffect(() => {
     fetchStudentDetails(localStudentId)
@@ -464,6 +459,18 @@ function Goals({ selectedStudentId, studentName }) {
     setTextBoxObj(tempTextBox)
   }
 
+  const handleGenerateReport = () => {
+    if (studentId && start && end) {
+      generateMonthlyReport({
+        variables: {
+          student: studentId,
+          start: moment(start).format(dateFormat),
+          end: moment(end).format(dateFormat),
+        },
+      })
+    }
+  }
+
   console.log(goalsDetails, 'goalsDetails')
   return (
     <div style={{ marginBottom: '100px' }}>
@@ -478,16 +485,8 @@ function Goals({ selectedStudentId, studentName }) {
                 onChange={handleMonthChange}
               />
             </span>
-            <Button
-              loading={loadingPdf}
-              // onClick={() => {
-              //   setloadingPdf(val => {
-              //     return !val
-              //   })
-              //   generatePdf()
-              // }}
-            >
-              Download Pdf{' '}
+            <Button loading={generateMonthlyReportLoading} onClick={() => handleGenerateReport()}>
+              Download Pdf
             </Button>
           </div>
         </Col>

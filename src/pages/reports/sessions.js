@@ -45,57 +45,84 @@ const filterCardStyle = {
   backgroundColor: COLORS.palleteLight,
 }
 
-// const SESSION_DATA = gql`
-//  query() {
-//   getSessionDataRecording(){
-//     totalTarget
-//     mandCount
-//     behCount
-//     toiletData {
-//       id
-//       date
-//       time
-//       bowel
-//       urination
-//       prompted
-//     }
+const SESSION_DATA = gql`
+  query($targets_StudentId: ID, $date_Gte: Date, $date_Lte: Date) {
+    getSessionDataRecording(
+      targets_StudentId: $targets_StudentId
+      date_Gte: $date_Gte
+      date_Lte: $date_Lte
+    ) {
+      edges {
+        node {
+          targets {
+            id
+            targetAllcatedDetails {
+              id
+              targetName
+            }
+          }
+          sessionRecord {
+            edges {
+              node {
+                entryTime
+              }
+            }
+            totalCorrect
+            totalIncorrect
+            totalError
+            totalPrompt
+            totalTrial
+            totalNr
+            physical
+            verbal
+            gestural
+            textual
+          }
+          peak {
+            totalCorrect
+            totalError
+            totalPrompt
+            totalTrial
+          }
+          peakEquivalance {
+            edges {
+              node {
+                score
+              }
+            }
+          }
+          durationStart
+          durationEnd
+          isPeak
+          isPeakEquivalance
+        }
+      }
+      totalTarget
+      edgeCount
+      perCorrect
+      perError
+      perPrompt
+      mandCount
+      behCount
+      toiletData {
+        id
+        time
+      }
 
-//     behData{
-//       behFrequency
-//       id
-//       note
-//     intensity
-//     irt
-//     frequency{
-//       edges{
-//         node{
-//           id
-//           time
-//           count
-//         }
-//       }
-//     }
-//     duration
-//     environment{
-//       id
-//       name
-//     }
-//     template{
-//       id
-//       behavior{
-//         id
-//         behaviorName
-//       }
-//     }
-// }
-// }`
+      mandData {
+        id
+        data
+      }
+    }
+  }
+`
 
 const parentDiv = { display: 'flex', margin: 'auto 30px auto 0' }
 const parentLabel = { fontSize: '15px', color: '#000', margin: 'auto 8px auto' }
 
 export default Form.create()(({ studentName, showDrawerFilter }) => {
   const [selectSession, setSelectSession] = useState()
-  const [range, setRange] = useState([moment(Date.now()).subtract(21, 'days'), moment(Date.now())])
+  const [range, setRange] = useState([moment(), moment(Date.now())])
   const [session, setSession] = useState('Morning')
   const studentId = localStorage.getItem('studentId')
   const prevSelectSession = usePrevious(selectSession)
@@ -125,6 +152,22 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     },
   })
 
+  const { data: dt, error: er, loading: ld } = useQuery(SESSION_DATA, {
+    variables: {
+      targets_StudentId: studentId,
+      date_Gte: moment(range[0]).format('YYYY-MM-DD'),
+      date_Lte: moment(range[1]).format('YYYY-MM-DD'),
+    },
+  })
+
+  console.log(dt, er, ld, 'dt er ld')
+
+  useEffect(() => {
+    if (dt) {
+      console.log(dt.getSessionDataRecording.edges, 'dt')
+    }
+  }, [dt])
+
   const getBehaviourList = behaviour => {
     if (behaviour === 'No behaviour performed!') {
       return []
@@ -147,6 +190,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     getFreDisTarget,
     { data: freDisData, error: freDisError, loading: freDisLoading },
   ] = useLazyQuery(FREQUENCY_DIS_TARGET)
+
   useEffect(() => {
     if (data && data.sessionSummary && session) {
       let filterData = []

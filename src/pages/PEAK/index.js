@@ -644,7 +644,11 @@ export default () => {
         width={DRAWER.widthL2}
         title="Create New Assessment"
       >
-        <CreateAssignmentForm setOpen={setOpen} PEAK_PROGRAMS={PEAK_PROGRAMS} />
+        <CreateAssignmentForm
+          setOpen={setOpen}
+          refetchPeakPrograms={refetch}
+          PEAK_PROGRAMS={PEAK_PROGRAMS}
+        />
       </Drawer>
       <Drawer
         visible={suggestTarget ? true : false}
