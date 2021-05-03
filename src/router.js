@@ -1,22 +1,17 @@
-import React from 'react'
-import { Route, Switch, Redirect } from 'react-router-dom'
-import { ConnectedRouter } from 'connected-react-router'
-import Loadable from 'react-loadable'
-
 import Loader from 'components/LayoutComponents/Loader'
+import { ConnectedRouter } from 'connected-react-router'
 import IndexLayout from 'layouts'
 import NotFoundPage from 'pages/404'
-
 import invCom from 'pages/Invoices'
-import sessionR from 'pages/sessionrecording'
-import peakCom from './pages/PEAK'
-import tastCom from './pages/Tasks/view_Task'
-import peakReprotCom from './pages/PEAK/PeakDGReport'
-import Reportss from './pages/reports'
-import AppData from './pages/appointmentdata'
+import React from 'react'
+import Loadable from 'react-loadable'
+import { Redirect, Route, Switch } from 'react-router-dom'
+import PrintTableInvoice from './pages/allClinicData/printableInvoice'
 import clinicDash from './pages/Dashboard/Clinic'
 import payorCom from './pages/payor'
-import PrintTableInvoice from './pages/allClinicData/printableInvoice'
+import peakReprotCom from './pages/PEAK/PeakDGReport'
+import Reportss from './pages/reports'
+
 // import DownloadReport from './pages/IISA/StartAssessment/downloadReport'
 
 const loadable = loader =>
@@ -621,6 +616,11 @@ const routes = [
     exact: true,
   },
   {
+    path: '/therapist/activitylog',
+    component: loadable(() => import('pages/activity/TherapistActivityList')),
+    exact: true,
+  },
+  {
     path: '/allClinicData',
     component: loadable(() => import('pages/allClinicData')),
     exact: true,
@@ -686,6 +686,11 @@ const routes = [
   {
     path: '/startIisaAssessment',
     component: loadable(() => import('pages/IISA/StartAssessment/start')),
+    exact: true,
+  },
+  {
+    path: '/upload',
+    component: loadable(() => import('pages/documentUpload')),
     exact: true,
   },
 ]

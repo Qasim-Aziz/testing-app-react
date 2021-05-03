@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
-import { Typography, Empty } from 'antd'
+import { Empty, Typography } from 'antd'
 import gql from 'graphql-tag'
+import React, { useEffect, useState } from 'react'
 import { useQuery } from 'react-apollo'
 import Spinner from '../../Spinner'
 
@@ -24,7 +24,7 @@ const GET_ACTIVITIES_QUERY = gql`
 
 const SingleRecord = ({ title, date, note }) => {
   return (
-    <a className="hover_me_item single-row" href="#/activitylog">
+    <a className="hover_me_item single-row" href="#/therapist/activitylog">
       <div style={{ flex: 3 }}>
         <span style={{ fontWeight: 'bold', color: '#333' }}>{title}</span>
         <span style={{ color: '#888' }}> - {note}</span>
@@ -65,7 +65,7 @@ const ActivityCard = ({ status }) => {
         })}
       {filtered && filtered.length > 5 && (
         <div className="more-row">
-          <a href="#/activitylog">
+          <a href="#/therapist/activitylog">
             <span style={{ fontWeight: 'bold', fontSize: 12 }}>More...</span>
           </a>
         </div>

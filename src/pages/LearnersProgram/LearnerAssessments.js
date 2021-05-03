@@ -1,3 +1,5 @@
+/* eslint-disable no-nested-ternary */
+/* eslint-disable react/no-unused-state */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable react/jsx-closing-tag-location */
@@ -5,22 +7,10 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable no-unused-expressions */
 /* eslint-disable react/jsx-indent-props */
-import React, { Component } from 'react'
-import {
-  Button,
-  Progress,
-  Drawer,
-  Card,
-  Layout,
-  Row,
-  Col,
-  Typography,
-  Switch,
-  Icon,
-  notification,
-} from 'antd'
-import { connect } from 'react-redux'
+import { Button, Icon, Layout, notification, Switch, Typography } from 'antd'
 import { gql } from 'apollo-boost'
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
 import apolloClient from '../../apollo/config'
 
 const { Content } = Layout
@@ -228,7 +218,7 @@ class StudentDrawer extends Component {
   }
 
   render() {
-    const { isVBMAPPActive, studentDetails } = this.state
+    const { studentDetails, isVBMAPPActive } = this.state
 
     const tdStyle = { border: '1px solid #dddddd', padding: 8, textAlign: 'center' }
 

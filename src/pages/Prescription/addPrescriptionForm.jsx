@@ -13,41 +13,45 @@
  *  - NOTE:
  */
 
-import React, { useEffect, useState, useReducer } from 'react'
 import {
-  Form,
-  Button,
-  Input,
-  Select,
-  Layout,
-  Typography,
-  Divider,
-  Switch,
-  Icon,
-  InputNumber,
-  Radio,
-  notification,
-  DatePicker,
-  Popconfirm,
-  Card,
   Avatar,
-  Spin,
-  Row,
+  Button,
+  Card,
   Col,
+  DatePicker,
+  Divider,
+  Form,
+  Icon,
+  Input,
+  InputNumber,
+  Layout,
+  notification,
+  Popconfirm,
+  Radio,
+  Row,
+  Select,
+  Spin,
+  Switch,
+  Typography,
 } from 'antd'
+import moment from 'moment'
+import React, { useEffect, useReducer, useState } from 'react'
 import { useQuery } from 'react-apollo'
-import { connect, useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { FORM } from '../../assets/styles/globalStyles'
 import actionPrescription from '../../redux/prescriptions/actions'
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 import { PrescriptionItemContext } from './context'
-import productReducer from './reducer'
-import { GET_COMPLAINT_QUERY, GET_DIAGNOSIS_QUERY, GET_TESTS_QUERY } from './query'
+import './index.scss'
 import PrescriptionItemTable from './prescriptionItemTable'
+import PrescriptionVisitTable from './PrescriptionVisit/PrescriptionVisitTable'
+import { GET_COMPLAINT_QUERY, GET_DIAGNOSIS_QUERY, GET_TESTS_QUERY } from './query'
+import productReducer from './reducer'
 
 const { Header, Content } = Layout
 const { Text, Title } = Typography
 const { Meta } = Card
 const { TextArea } = Input
+const InputGroup = Input.Group
 
 /* Some static css */
 const itemStyle = {
@@ -87,10 +91,46 @@ const inputStyle3 = {
 
 const layout1 = {
   labelCol: {
-    span: 5,
+    span: 3,
   },
   wrapperCol: {
     span: 18,
+  },
+}
+
+const testLayout = {
+  labelCol: {
+    span: 3,
+  },
+  wrapperCol: {
+    span: 14,
+  },
+}
+
+const layout11 = {
+  labelCol: {
+    span: 12,
+  },
+  wrapperCol: {
+    span: 12,
+  },
+}
+
+const layout12 = {
+  labelCol: {
+    span: 3,
+  },
+  wrapperCol: {
+    span: 21,
+  },
+}
+
+const layout13 = {
+  labelCol: {
+    span: 12,
+  },
+  wrapperCol: {
+    span: 12,
   },
 }
 
@@ -108,6 +148,11 @@ const inActiveSpanStyle = {
 }
 
 /* The below function is a helper function */
+// const [testDataSource, setTestDataSource] = useState([]);
+// const handleTestChange = ()  => {
+//   setTestDataSource(e.target.value)
+// };
+
 function addNevObject(val) {
   let theMainArray = []
   val.map((item, index) => {
@@ -131,6 +176,7 @@ function addNevObject(val) {
 }
 
 const GetComplaints = ({ form }) => {
+  console.log('form', form)
   const [sdText, setSdText] = useState('')
   const { data: sdData, error: sdError, loading: sdLoading } = useQuery(GET_COMPLAINT_QUERY, {
     variables: {
@@ -149,12 +195,11 @@ const GetComplaints = ({ form }) => {
   return (
     <>
       {(form.getFieldValue('complaints') || !form.getFieldValue('complaints')) && (
-        <Form.Item {...layout1} label="MAIN Complaints">
+        <Form.Item {...FORM.layout} label="MAIN Complaints">
           {form.getFieldDecorator('complaints')(
             <Select
               mode="tags"
               allowClear
-              size="large"
               notFoundContent={sdLoading ? <Spin size="small" /> : null}
               filterOption={false}
               onSearch={v => {
@@ -162,7 +207,7 @@ const GetComplaints = ({ form }) => {
               }}
               loading={sdLoading}
               // disabled={form.getFieldValue('complaints')?.length > 0}
-              placeholder="Search for find more sd"
+              placeholder="Search for find more Complaints"
             >
               {sdData?.getPrescriptionComplaints.edges.map(({ node }) => {
                 return (
@@ -198,12 +243,11 @@ const GetDiagnosis = ({ form }) => {
   return (
     <>
       {(form.getFieldValue('diagnosis') || !form.getFieldValue('diagnosis')) && (
-        <Form.Item {...layout1} label="MAIN diagnosis">
+        <Form.Item {...FORM.layout} label="MAIN diagnosis">
           {form.getFieldDecorator('diagnosis')(
             <Select
               mode="tags"
               allowClear
-              size="large"
               notFoundContent={sdLoading ? <Spin size="small" /> : null}
               filterOption={false}
               onSearch={v => {
@@ -211,7 +255,7 @@ const GetDiagnosis = ({ form }) => {
               }}
               loading={sdLoading}
               // disabled={form.getFieldValue('complaints')?.length > 0}
-              placeholder="Search for find more sd"
+              placeholder="Search for find more diagnosis"
             >
               {sdData?.getPrescriptionDiagnosis.edges.map(({ node }) => {
                 return (
@@ -247,12 +291,11 @@ const GetTest = ({ form }) => {
   return (
     <>
       {(form.getFieldValue('tests') || !form.getFieldValue('tests')) && (
-        <Form.Item {...layout1} label="MAIN tests">
+        <Form.Item {...FORM.layout} label="MAIN tests">
           {form.getFieldDecorator('tests')(
             <Select
               mode="tags"
               allowClear
-              size="large"
               notFoundContent={sdLoading ? <Spin size="small" /> : null}
               filterOption={false}
               onSearch={v => {
@@ -260,7 +303,7 @@ const GetTest = ({ form }) => {
               }}
               loading={sdLoading}
               // disabled={form.getFieldValue('complaints')?.length > 0}
-              placeholder="Search for find more sd"
+              placeholder="Search for find more tests"
             >
               {sdData?.getPrescriptionTests.edges.map(({ node }) => {
                 return (
@@ -278,16 +321,20 @@ const GetTest = ({ form }) => {
 }
 
 const BankDetails = props => {
+  function onDateChange(date, dateString) {
+    console.log(date, dateString)
+  }
   const { form, details } = props
   console.log('The state', props)
+  console.log('The form', form)
   const prescriptions = useSelector(state => state.prescriptions)
   const dispatchOfPrescription = useDispatch()
   console.log('THE LOCAL STATE for getting prescription', prescriptions)
   /* productsState ==> holds the array of all the medicines in the list 
-     productsDispatch ==> The local "Reducer" for updating the reducer which will hold each row items 
-     ⭐ NOTE: Here we have defined the initialState of the reducer to an empty array but 
-              we need to pass the latest prescription details.
-  */
+      productsDispatch ==> The local "Reducer" for updating the reducer which will hold each row items 
+      ⭐ NOTE: Here we have defined the initialState of the reducer to an empty array but 
+               we need to pass the latest prescription details.
+   */
 
   const [productsState, productsDispatch] = useReducer(productReducer, [])
 
@@ -317,11 +364,11 @@ const BankDetails = props => {
   }, [])
 
   /*[Explaination]
-    This effect will only run if the prescription values are set.
-    When this run what it does you may think???
-    1. It sets the productState (aka list-of-meds-objects) with the latest prescriptions
-    2. It will then, fill the form page with the latest prescription details
-  */
+     This effect will only run if the prescription values are set.
+     When this run what it does you may think???
+     1. It sets the productState (aka list-of-meds-objects) with the latest prescriptions
+     2. It will then, fill the form page with the latest prescription details
+   */
 
   useEffect(() => {
     console.log('THE PRESCRIPTION VALUE', prescriptions)
@@ -345,7 +392,7 @@ const BankDetails = props => {
         ),
         tests: prescriptions.SpecificPrescription.tests.edges.map(element => element.node.id),
         advice: prescriptions.SpecificPrescription.advice,
-        testDate: prescriptions.SpecificPrescription.testDate,
+        testDate: moment(prescriptions.SpecificPrescription.testDate),
       })
     }
   }, [prescriptions.SpecificPrescription])
@@ -376,6 +423,13 @@ const BankDetails = props => {
         },
       })
     })
+  }
+
+  const [testTime, setTestTime] = useState('')
+  console.log(testTime)
+  const handelTestTime = e => {
+    console.log(e.target.value)
+    setTestTime(e.target.value)
   }
 
   return (
@@ -467,61 +521,38 @@ const BankDetails = props => {
             </div>
             <br />
             <Divider orientation="left">Vitals</Divider>
-            <div style={{ display: 'flow-root' }}>
-              <div
-                style={{
-                  display: 'inline-block',
-                  float: 'left',
-                  width: '250px',
-                }}
-              >
-                <Form.Item style={itemStyle2} label="Height">
-                  {form.getFieldDecorator('height')(
-                    <Input placeholder="cm" style={inputStyle2}></Input>,
-                  )}
-                </Form.Item>
+            <div className="vitals_container">
+              <div>
+                <div>
+                  <Form.Item {...FORM.layout1} label="Height">
+                    {form.getFieldDecorator('height')(
+                      <Input className="vital_input" placeholder="cm" />,
+                    )}
+                  </Form.Item>
+                </div>
+                <div>
+                  <Form.Item {...FORM.layout1} label="Weight">
+                    {form.getFieldDecorator('weight')(
+                      <Input className="vital_input" placeholder="Kg" />,
+                    )}
+                  </Form.Item>
+                </div>
               </div>
-              <div
-                style={{
-                  display: 'inline-block',
-                  float: 'left',
-                  width: '250px',
-                }}
-              >
-                <Form.Item style={itemStyle2} label="Weight">
-                  {form.getFieldDecorator('weight')(
-                    <Input placeholder="Kg" style={inputStyle2}></Input>,
-                  )}
-                </Form.Item>
-              </div>
-              <div
-                style={{
-                  display: 'inline-block',
-                  float: 'left',
-                  width: '300px',
-                }}
-              >
-                <Form.Item style={itemStyle2} label="Temperature">
-                  {form.getFieldDecorator('temperature')(
-                    <Input
-                      placeholder="Celcious"
-                      style={{ ...inputStyle2, marginLeft: '15px' }}
-                    ></Input>,
-                  )}
-                </Form.Item>
-              </div>
-              <div
-                style={{
-                  display: 'inline-block',
-                  float: 'left',
-                  width: '350px',
-                }}
-              >
-                <Form.Item style={itemStyle2} label="Head Circumference">
-                  {form.getFieldDecorator('headCircumference')(
-                    <Input placeholder="cm" style={inputStyle2}></Input>,
-                  )}
-                </Form.Item>
+              <div>
+                <div>
+                  <Form.Item {...FORM.layout1} label="Temperature">
+                    {form.getFieldDecorator('temperature')(
+                      <Input className="vital_input" placeholder="Celcious" />,
+                    )}
+                  </Form.Item>
+                </div>
+                <div>
+                  <Form.Item style={{ display: 'flex' }} label="Head Circumference">
+                    {form.getFieldDecorator('headCircumference')(
+                      <Input className="vital_input" placeholder="cm" />,
+                    )}
+                  </Form.Item>
+                </div>
               </div>
             </div>
             {/* The complaints list */}
@@ -534,11 +565,11 @@ const BankDetails = props => {
             prescriptions.isSpecificPrescription !== false ? (
               <>
                 {/*[Explaination]
-                  *  The "Global-State" for "PrescriptionItemTable" component is the "productState"
-                  * @productDispatch ==> The setter function of product state
-                  * @totalAmount ==> The count of list item which is initially set to zero
-                      (Further understanding would be mentioned inside the "PrescriptionItemTable")
-                  */}
+                   *  The "Global-State" for "PrescriptionItemTable" component is the "productState"
+                   * @productDispatch ==> The setter function of product state
+                   * @totalAmount ==> The count of list item which is initially set to zero
+                       (Further understanding would be mentioned inside the "PrescriptionItemTable")
+                   */}
                 <PrescriptionItemContext.Provider value={productsDispatch}>
                   <PrescriptionItemTable
                     style={{ marginTop: 25 }}
@@ -568,36 +599,61 @@ const BankDetails = props => {
                 )}
               </>
             )}
-            <Form.Item style={{ marginTop: '1em' }} {...layout1} label="Advice">
-              {form.getFieldDecorator('advice')(
-                <TextArea placeholder="Advice" autoSize={{ minRows: 2, maxRows: 5 }} allowClear />,
-              )}
-            </Form.Item>
-            <Form.Item {...layout1} label="Next Visit">
-              {form.getFieldDecorator('nextVisitNumber')(
-                <InputNumber min={1} max={12} onChange={onChangeInputNumber} />,
-              )}
-            </Form.Item>
-            <Form.Item {...layout1}>
-              {form.getFieldDecorator('nextVisitVal')(
-                <Radio.Group onChange={onChangeNextVisitVal}>
-                  <Radio.Button value="days">days</Radio.Button>
-                  <Radio.Button value="weeks">weeks</Radio.Button>
-                  <Radio.Button value="months">months</Radio.Button>
-                </Radio.Group>,
-              )}
-            </Form.Item>
-            {/* <div {...layout1}>
-              <Row>
-                <Col span={12}></Col>
-                <Col span={12}></Col>
-              </Row>
-            </div> */}
-            {/* <div style={{ display: 'flex' }}></div> */}
-
-            <Form.Item {...layout1} label="Next Visit Date">
-              {form.getFieldDecorator('nextVisitDate')(<DatePicker />)}
-            </Form.Item>
+            <div className="prescription_footer_section">
+              <div className="advice_contianer">
+                <div style={{ width: '85%' }}>
+                  <Form.Item {...layout1} label="Advice">
+                    {form.getFieldDecorator('advice')(
+                      <TextArea
+                        placeholder="Advice"
+                        autoSize={{ minRows: 4, maxRows: 6 }}
+                        allowClear
+                      />,
+                    )}
+                  </Form.Item>
+                </div>
+              </div>
+            </div>
+            <div style={{ marginLeft: '4%' }}>
+              <Form.Item {...layout12} label="Test Date">
+                {form.getFieldDecorator('testDate')(<DatePicker test />)}
+              </Form.Item>
+            </div>
+            <Row style={{ marginLeft: '6%' }} type="flex" justify="start">
+              <Col span={5}>
+                <Form.Item {...layout11} label="Next Visit">
+                  {form.getFieldDecorator('nextVisitNumber')(
+                    <InputNumber min={1} max={12} onChange={onChangeInputNumber} />,
+                  )}
+                </Form.Item>
+              </Col>
+              <Col span={7}>
+                <Form.Item style={{ marginTop: '-2%' }}>
+                  {form.getFieldDecorator('nextVisitVal')(
+                    <Radio.Group onChange={onChangeNextVisitVal}>
+                      <Radio.Button value="days">days</Radio.Button>
+                      <Radio.Button value="weeks">weeks</Radio.Button>
+                      <Radio.Button value="months">months</Radio.Button>
+                    </Radio.Group>,
+                  )}
+                </Form.Item>
+              </Col>
+              <span
+                style={{
+                  fontWeight: '900',
+                  fontSize: '16px',
+                  marginLeft: '-2%',
+                  marginTop: '0.5%',
+                }}
+              >
+                OR
+              </span>
+              <Col span={8}>
+                <Form.Item {...layout13} label="Next Visit Date">
+                  {form.getFieldDecorator('nextVisitDate')(<DatePicker />)}
+                </Form.Item>
+              </Col>
+            </Row>
             <div
               style={{
                 display: 'flex',
@@ -619,6 +675,39 @@ const BankDetails = props => {
               </Button>
             </div>
           </Form>
+          <div className="visit_history_section">
+            <div className="vist_title">
+              <Title level={2}>14 Visits</Title>
+              <Text>Since14-Mar-2020</Text>
+            </div>
+            <div className="visit_content_body">
+              <div className="visit_content_header">
+                <Title level={4}>17-Mar-2021</Title>
+                <span>By: Dr.Prashantay</span>
+              </div>
+              <div className="content_body">
+                <p>Diagnosis: FEBRILE SEIZURES DEVELOPMETAL DELAY</p>
+                <p>Rx</p>
+                {prescriptions.loadingPrescriptions !== true &&
+                prescriptions.isSpecificPrescription !== false ? (
+                  <>
+                    <PrescriptionItemContext.Provider value={productsDispatch}>
+                      <PrescriptionVisitTable
+                        style={{ marginTop: 25 }}
+                        totalAmount={subTotal}
+                        products={productsState}
+                        dispatch={productsDispatch}
+                      />
+                    </PrescriptionItemContext.Provider>
+                  </>
+                ) : (
+                  <>
+                    <Spin size="large" />
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
         </Content>
       </Layout>
     </div>

@@ -23,13 +23,26 @@
 /* eslint-disable react/jsx-closing-bracket-location */
 
 import { FilterOutlined } from '@ant-design/icons'
-import { Button, Card, Col, Drawer, Form, Layout, Row, Typography } from 'antd'
+import {
+  Button,
+  Card,
+  Col,
+  Drawer,
+  Dropdown,
+  Form,
+  Icon,
+  Layout,
+  Menu,
+  Row,
+  Typography,
+} from 'antd'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import LearnerSelect from 'components/LearnerSelect'
+import LoadingComponent from 'components/LoadingComponent'
 import React from 'react'
 import { Helmet } from 'react-helmet'
 import { connect } from 'react-redux'
-import { COLORS, DRAWER } from 'assets/styles/globalStyles'
-import LoadingComponent from 'components/LoadingComponent'
+import { NavLink } from 'react-router-dom'
 import LearnerAssessments from './LearnerAssessments'
 import LearnerGoals from './LearnerGoals'
 import LearnerSession from './LearnerSession'
@@ -191,8 +204,54 @@ class PeakEqvi extends React.Component {
       return <LoadingComponent />
     }
 
+    const assesmentMenu = (
+      <Menu>
+        <Menu.Item>
+          <NavLink to="/cogniableAssessment">
+            <span>Cogniable</span>
+          </NavLink>
+        </Menu.Item>
+
+        <Menu.Item>
+          <NavLink to="/therapy/vbmapps/list">
+            <span>VBMAPP</span>
+          </NavLink>
+        </Menu.Item>
+        <Menu.Item>
+          <NavLink to="/peak">
+            <span>PEAK</span>
+          </NavLink>
+        </Menu.Item>
+        <Menu.Item>
+          <NavLink to="/iisaAssessment">
+            <span>IISA</span>
+          </NavLink>
+        </Menu.Item>
+        <Menu.Item>
+          <NavLink to="/genAssessment/">
+            <span>Assessment Scoring</span>
+          </NavLink>
+        </Menu.Item>
+      </Menu>
+    )
+
+    const goalsMenu = (
+      <Menu>
+        <Menu.Item>
+          <NavLink to="/target/allocation">
+            <span>Goal(s)</span>
+          </NavLink>
+        </Menu.Item>
+        <Menu.Item>
+          <NavLink to="/target/allocation">
+            <span>Directly</span>
+          </NavLink>
+        </Menu.Item>
+      </Menu>
+    )
+
     return (
-      <>
+      <Menu>
         <Helmet title="Learners Program" />
         <Layout style={{ padding: '0px' }}>
           <Content
@@ -270,20 +329,58 @@ class PeakEqvi extends React.Component {
                         style={TabCheck === 'Assessments' ? ActiveStyle : BlockStyle}
                         onClick={() => this.SetTabFunction('Assessments')}
                       >
-                        <span style={HeadStyle}>Assessments</span>
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            width: '100%',
+                          }}
+                        >
+                          <div>
+                            <span style={HeadStyle}>Assessments</span>
+                          </div>
+                          <div style={{ marginTop: '2%', fontSize: '16px' }}>
+                            <Dropdown overlay={assesmentMenu} placement="bottomCenter">
+                              <span>
+                                <Icon type="setting" />
+                                <Icon style={{ marginLeft: '2px' }} type="caret-down" />
+                              </span>
+                            </Dropdown>
+                          </div>
+                        </div>
                       </div>
                       <div
                         style={TabCheck === 'Goals' ? ActiveStyle : BlockStyle}
                         onClick={() => this.SetTabFunction('Goals')}
                       >
-                        <span style={HeadStyle}>Goals</span>
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            width: '100%',
+                          }}
+                        >
+                          <div>
+                            <span style={HeadStyle}>Goals</span>
+                          </div>
+                          <div style={{ marginTop: '2%', fontSize: '16px' }}>
+                            <Dropdown overlay={goalsMenu} placement="bottomCenter">
+                              <span>
+                                <Icon type="setting" />
+                                <Icon style={{ marginLeft: '2px' }} type="caret-down" />
+                              </span>
+                            </Dropdown>
+                          </div>
+                        </div>
                       </div>
-                      <div
-                        style={TabCheck === 'Build Sessions' ? ActiveStyle : BlockStyle}
-                        onClick={() => this.SetTabFunction('Build Sessions')}
-                      >
-                        <span style={HeadStyle}>Build Sessions</span>
-                      </div>
+                      <NavLink to="/targetsAllocationToSession/">
+                        <div
+                          style={TabCheck === 'Build Sessions' ? ActiveStyle : BlockStyle}
+                          onClick={() => this.SetTabFunction('Build Sessions')}
+                        >
+                          <span style={HeadStyle}>Build Sessions</span>
+                        </div>
+                      </NavLink>
                       <div
                         style={TabCheck === 'Sessions' ? ActiveStyle : BlockStyle}
                         onClick={() => this.SetTabFunction('Sessions')}
@@ -384,7 +481,7 @@ class PeakEqvi extends React.Component {
             </Col>
           </Content>
         </Layout>
-      </>
+      </Menu>
     )
   }
 }

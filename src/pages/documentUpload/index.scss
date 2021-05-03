@@ -1,0 +1,209 @@
+@import '../../assets/styles/mixins.scss';
+
+.file_upload_section {
+  // background-color: $backgroundBg;
+  min-height: 90vh;
+
+  .file_upload_header {
+    width: 100%;
+
+    .header_container {
+      .header_content {
+        .filter_container {
+          display: flex;
+          padding: 1%;
+
+          .name_filter_section {
+            display: flex;
+
+            .name_filter_label {
+              font-weight: 600;
+              margin-top: 2%;
+              margin-right: 6px;
+            }
+
+            .name_filter_input > input {
+              height: 25px;
+            }
+          }
+
+          .description_filter_section {
+            display: flex;
+            margin-left: 8px;
+
+            .description_filter_label {
+              font-weight: 600;
+              margin-top: 2%;
+              margin-right: 6px;
+            }
+
+            .description_filter_input > input {
+              height: 25px;
+            }
+          }
+        }
+
+        .ant-tabs-top {
+          .ant-tabs-top-bar {
+            background-color: $white;
+
+            .ant-tabs-nav-container {
+              width: 100%;
+              margin: 0 auto;
+
+              .ant-tabs-tab-active {
+                font-weight: 700;
+                color: $text-darken;
+              }
+              .ant-tabs-tab:hover {
+                color: $text-darken;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .file_upload_container {
+    width: 65%;
+    margin: 8px auto;
+
+    .description_container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 3%;
+
+      .file_input {
+        width: 65%;
+      }
+
+      .desc_label {
+        margin-right: 2px;
+        font-size: 16px;
+        font-weight: 600;
+
+        .file_desc {
+          cursor: pointer;
+        }
+      }
+    }
+
+    .ant-card {
+      -webkit-box-shadow: 0 0 10px $text-darken;
+      box-shadow: 0 0 10px $text-darken;
+      border-radius: 8px;
+    }
+
+    .ant-card-bordered {
+      border: 0;
+    }
+
+    .ant-card-head-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: $text-darken;
+    }
+
+    .drag_title {
+      margin-left: 15%;
+      color: $blue-darken;
+      font-weight: 700;
+      padding: 2% 0 2% 0;
+    }
+
+    .submit_btn {
+      width: 80px;
+      margin: 10px auto;
+    }
+    .input_label {
+      width: 80%;
+      border: 1px dashed $gray;
+      padding: 1%;
+      margin: 0 auto;
+      cursor: pointer;
+
+      .ant-upload-drag-icon {
+        font-weight: 700;
+        font-size: 50px;
+        color: $text;
+        margin-bottom: -1%;
+      }
+
+      .ant-upload-text {
+        color: $text;
+        font-size: 20px;
+      }
+    }
+  }
+
+  .authorization_container {
+    width: 65%;
+    margin: 25px auto;
+
+    .btn {
+      font-weight: 600;
+    }
+
+    .toMore {
+      text-align: center;
+      font-size: 17px;
+      color: $blue-darken;
+      cursor: pointer;
+
+      span {
+        width: 22px;
+        height: 22px;
+        background-color: $blue-darken;
+        color: $white;
+        display: inline-block;
+        border-radius: 50%;
+      }
+    }
+  }
+
+  .all_file_container {
+    .ant-tabs-top .ant-tabs-top-bar .ant-tabs-nav-container {
+      width: 100% !important;
+    }
+
+    .tab_main_content {
+      min-height: 100vh;
+      background-color: $white;
+      padding: 0.5%;
+      border-right: 2px solid $white;
+      .tab_content {
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+
+    .all_file_search_container {
+      .all_file_search {
+        width: 100%;
+        background-color: $white;
+        padding: 0.2%;
+      }
+
+      .ant-btn-primary {
+        margin-left: 15%;
+      }
+
+      .ant-input {
+        border: 0;
+      }
+    }
+
+    .all_files_data_container {
+      .ant-table-tbody {
+        background-color: $white;
+        font-size: 14px;
+        font-weight: 700;
+      }
+      .ant-table-tbody > tr > td {
+        padding: 6px 10px;
+        overflow-wrap: break-word;
+      }
+    }
+  }
+}

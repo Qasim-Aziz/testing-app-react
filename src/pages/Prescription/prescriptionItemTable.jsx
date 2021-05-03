@@ -5,12 +5,14 @@
 /* eslint-disable react/no-access-state-in-setstate */
 /* eslint-disable lines-between-class-members */
 /* eslint-disable react/destructuring-assignment */
-import React, { useEffect, useState } from 'react'
+import { faTrashAlt } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Button, Form, Table } from 'antd'
 import 'antd/dist/antd.css'
-import { Table, Button, Form } from 'antd'
-import PrescriptionItemCell from './prescriptionItemCell'
-import './index.scss'
+import React from 'react'
 import { PrescriptionFormContext } from './context'
+import './index.scss'
+import PrescriptionItemCell from './prescriptionItemCell'
 
 const EditableRow = ({ form, index, ...props }) => (
   <PrescriptionFormContext.Provider value={form} key={index}>
@@ -112,6 +114,7 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount, ...props }) =>
               {val.pk ? (
                 <>
                   <Button
+                    className="remove_btn"
                     type="danger"
                     onClick={() => {
                       // Remove the row from the table
@@ -124,11 +127,12 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount, ...props }) =>
                       props.setDeleteProduct(arr => [...arr, val.pk])
                     }}
                   >
-                    Delete
+                    <FontAwesomeIcon icon={faTrashAlt} />
                   </Button>
                 </>
               ) : (
                 <Button
+                  className="remove_btn"
                   style={{ backgroundColor: '#ffbb33' }}
                   onClick={() => {
                     dispatch({
@@ -137,12 +141,13 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount, ...props }) =>
                     })
                   }}
                 >
-                  Delete
+                  <FontAwesomeIcon icon={faTrashAlt} />
                 </Button>
               )}
             </>
           ) : (
             <Button
+              className="remove_btn"
               type="danger"
               onClick={() => {
                 dispatch({
@@ -151,7 +156,7 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount, ...props }) =>
                 })
               }}
             >
-              Delete
+              <FontAwesomeIcon icon={faTrashAlt} />
             </Button>
           )}
         </>
@@ -191,7 +196,7 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount, ...props }) =>
   })
 
   return (
-    <div>
+    <div id="prescription_table_container">
       <Table
         components={components}
         columns={columns}

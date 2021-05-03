@@ -3,15 +3,14 @@
 /* eslint-disable react/jsx-indent-props */
 /* eslint-disable react/jsx-boolean-value */
 /* eslint-disable */
-import React, { useState, useEffect, useCallback } from 'react'
-import { connect, useSelector, useDispatch } from 'react-redux'
+import { CloseCircleOutlined, PlusOutlined } from '@ant-design/icons'
+import { Button, Drawer, Input, Table } from 'antd'
+import React, { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet'
-import { Button, Table, Layout, Drawer, Tabs, Input } from 'antd'
-import { PlusOutlined, CloseCircleOutlined } from '@ant-design/icons'
-import Authorize from '../../components/LayoutComponents/Authorize'
+import { useDispatch, useSelector } from 'react-redux'
 import actionLearners from '../../redux/learners/actions'
-import PrescriptionList from './prescriptionList'
 import AddPrescription from './addPrescriptionForm'
+import PrescriptionList from './prescriptionList'
 
 const Index = props => {
   /**the local state of the application is similar to learners but written in hooks
@@ -185,10 +184,10 @@ const Index = props => {
         padding: '4px 12px',
       }}
     >
-      <span style={{ display: 'flex', alignItems: 'center' }}>
-        <span>Name :</span>
+      <span style={{ display: 'flex', alignItems: 'center', marginRight: '10px' }}>
+        <span style={{ marginRight: '7px' }}>Name :</span>
         <Input
-          size="default"
+          size="small"
           name="name"
           placeholder="Search Name"
           value={learnerState.filterName}
@@ -199,19 +198,19 @@ const Index = props => {
               filterName: e.target.value,
             })
           }
-          style={{ width: '112px' }} //  ...tableFilterStyles,
+          style={{ width: '180px' }} //  ...tableFilterStyles,
         />
       </span>
 
       <span style={{ display: 'flex', alignItems: 'center' }}>
-        <span>Email :</span>
+        <span style={{ marginRight: '7px' }}>Email :</span>
         <Input
-          size="default"
+          size="small"
           name="email"
           placeholder="Search Email"
           value={learnerState.filterEmail}
           onChange={e => setLearnerState({ ...learnerState, filterEmail: e.target.value })}
-          style={{ width: '148px' }} // ...tableFilterStyles,
+          style={{ width: '180px' }} // ...tableFilterStyles,
         />
       </span>
     </div>
@@ -223,7 +222,7 @@ const Index = props => {
       {console.log('SPECIFIC LEARNER', learnerState.specificLearner)}
       {/* If someone clicks on add then this drawer will open and hydrate the latest values in a prescription of that specific learner */}
       <Drawer
-        width="90%"
+        width="80%"
         title="Add Prescription"
         closable={true}
         visible={learnerState.addPrescriptionDrawer}

@@ -2,10 +2,10 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable */
 
-import React, { useEffect, useRef, useContext, useState } from 'react'
-import { Form, Select, Input } from 'antd'
-import { PrescriptionFormContext } from './context'
+import { Form, Input, Select } from 'antd'
 import 'antd/dist/antd.css'
+import React, { useContext, useEffect, useRef, useState } from 'react'
+import { PrescriptionFormContext } from './context'
 import './index.scss'
 
 /**[Explanation]
@@ -34,7 +34,7 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
   //   console.log('THE USE EFFECT ☑☑☑☑☑☑☑☑☑☑☑☑☑🚀🚀🚀🚀🚀')
   //   console.log('CHECK HOW THE COMPONENT MOUNTS', title)
   // }, [])
-
+  console.log('record', record)
   useEffect(() => {
     if (editing) {
       // console.log('THE inputRef inside useEffect', inputRef)
@@ -51,6 +51,7 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
     form.setFieldsValue({
       [dataIndex]: record[dataIndex],
     })
+    console.log(form.setFieldsValue)
   }
 
   const save = async () => {
@@ -109,7 +110,9 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
             }}
             name={record.dataIndex}
           >
-            {form.getFieldDecorator('medicineType')(
+            {form.getFieldDecorator('medicineType', {
+              initialValue: record.medicineType,
+            })(
               <Select placeholder="Medicine Type" allowClear onSelect={save}>
                 <Select.Option value="SYP">SYP</Select.Option>
                 <Select.Option value="TAB">TAB</Select.Option>
@@ -127,7 +130,9 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
               }}
               name={record.dataIndex}
             >
-              {form.getFieldDecorator(title.toLowerCase())(
+              {form.getFieldDecorator(title.toLowerCase(), {
+                initialValue: record[title.toLowerCase()],
+              })(
                 <Input
                   ref={inputRef}
                   // loading={false}
