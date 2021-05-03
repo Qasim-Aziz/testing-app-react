@@ -1,17 +1,16 @@
 /* eslint-disable react/jsx-closing-tag-location */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 
-import React, { useState, useEffect } from 'react'
-import { useQuery } from 'react-apollo'
-import gql from 'graphql-tag'
-import { Button, Drawer, Form, Input, Select, DatePicker, notification } from 'antd'
-import DataTable from 'react-data-table-component'
-import Authorize from 'components/LayoutComponents/Authorize'
 import { PlusOutlined } from '@ant-design/icons'
+import { Button, DatePicker, Drawer, Form, Input, notification, Select } from 'antd'
+import Authorize from 'components/LayoutComponents/Authorize'
+import gql from 'graphql-tag'
 import moment from 'moment'
+import React, { useEffect, useState } from 'react'
+import { useQuery } from 'react-apollo'
+import DataTable from 'react-data-table-component'
 import client from '../../apollo/config'
-import { FORM, SUBMITT_BUTTON, COLORS, DRAWER } from '../../assets/styles/globalStyles'
-
+import { COLORS, DRAWER, FORM, SUBMITT_BUTTON } from '../../assets/styles/globalStyles'
 import '../../components/Calander.scss'
 
 const { Option } = Select
@@ -106,8 +105,10 @@ const GET_ACTIVITY_TYPES_QUERY = gql`
 `
 
 const ActivityList = ({ form }) => {
+  console.log(form)
   const { data, loading, error, refetch } = useQuery(GET_ACTIVITIES_QUERY)
   const { data: actTypes } = useQuery(GET_ACTIVITY_TYPES_QUERY)
+  console.log(data)
 
   const [clinicsList, setClinicsList] = useState([])
   const [visible, setVisible] = useState(false)

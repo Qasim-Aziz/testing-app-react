@@ -1,14 +1,16 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
+/* eslint-disable jsx-a11y/label-has-for */
 /* eslint-disable no-plusplus */
-import { Icon, Table } from 'antd'
-import React from 'react'
+import { Icon, Input, Table } from 'antd'
+import React, { useState } from 'react'
 
 const AllFilesData = ({ studentData }) => {
-  const studentId = JSON.parse(localStorage.getItem('studentId'))
   const StudentName = studentData?.studentData?.firstname
-  console.log(studentData.studentData?.files.edges)
   const files = studentData.studentData?.files.edges
   const filesLength = studentData.studentData?.files.edges.length
-  console.log(StudentName)
+  const [filteredData, setFilteredData] = useState([])
+  const [isFiltered, setIsFiltered] = useState(false)
+
   const columns = [
     {
       title: 'Id',
@@ -24,7 +26,7 @@ const AllFilesData = ({ studentData }) => {
     },
     {
       title: 'Preview',
-      render: (text, record) => (
+      render: text => (
         <a
           style={{ fontSize: '22px', textAlign: 'center', display: 'inline-block' }}
           target="_blank"
@@ -45,7 +47,6 @@ const AllFilesData = ({ studentData }) => {
   const data = []
   for (let i = 0; i < filesLength || 0; i++) {
     const item = files[i]
-    console.log(item.node)
     data.push({
       key: i,
       id: i + 1,
@@ -57,59 +58,59 @@ const AllFilesData = ({ studentData }) => {
       upload: StudentName && StudentName,
     })
   }
-  // useEffect(() => {
 
-  // }, [data])
-  // const [selectedRowKeys, setSelectedRowKeys] = useState([])
-  // // state = {
-  // //     selectedRowKeys: [], // Check here to configure the default column
-  // //   };
-  //  const onSelectChange = rowKeys => {
-  //     console.log('selectedRowKeys changed: ', rowKeys);
-  //     setSelectedRowKeys(rowKeys);
-  //   };
-  // const rowSelection = {
-  //     selectedRowKeys,
-  //     onChange: onSelectChange,
-  //     selections: [
-  //       Table.SELECTION_ALL,
-  //       Table.SELECTION_INVERT,
-  //       Table.SELECTION_NONE,
-  //       {
-  //         key: 'odd',
-  //         text: 'Select Odd Row',
-  //         onSelect: changableRowKeys => {
-  //           let newSelectedRowKeys = [];
-  //           newSelectedRowKeys = changableRowKeys.filter((key, index) => {
-  //             if (index % 2 !== 0) {
-  //               return false;
-  //             }
-  //             return true;
-  //           });
-  //           setSelectedRowKeys(newSelectedRowKeys);
-  //         },
-  //       },
-  //       {
-  //         key: 'even',
-  //         text: 'Select Even Row',
-  //         onSelect: changableRowKeys => {
-  //           let newSelectedRowKeys = [];
-  //           newSelectedRowKeys = changableRowKeys.filter((key, index) => {
-  //             if (index % 2 !== 0) {
-  //               return true;
-  //             }
-  //             return false;
-  //           });
-  //           setSelectedRowKeys(newSelectedRowKeys);
-  //         },
-  //       },
-  //     ],
-  // }
+  const filterHandler = ({ name, description }) => {
+    let filteredList = []
+    if (name) {
+      setIsFiltered(true)
+      filteredList = data.filter(item => item.fileName?.toLowerCase().includes(name.toLowerCase()))
+    }
+    if (description) {
+      setIsFiltered(true)
+      filteredList = data.filter(item =>
+        item.fileDescription?.toLowerCase().includes(description.toLowerCase()),
+      )
+    }
+    if (!name && !description) {
+      setIsFiltered(false)
+    }
+    setFilteredData(filteredList)
+  }
 
   return (
     <>
+      <div className="filter_container">
+        <div className="name_filter_section">
+          <div className="name_filter">
+            <label className="name_filter_label" htmlFor="name">
+              Name:
+            </label>
+          </div>
+          <div className="name_filter_input">
+            <Input
+              onChange={e => filterHandler({ name: e.target.value })}
+              id="name"
+              placeholder="Search Name"
+            />
+          </div>
+        </div>
+        <div className="description_filter_section">
+          <div className="description_filter">
+            <label className="description_filter_label" htmlFor="description">
+              Description:
+            </label>
+          </div>
+          <div className="description_filter_input">
+            <Input
+              onChange={e => filterHandler({ description: e.target.value })}
+              id="description"
+              placeholder="Search Description"
+            />
+          </div>
+        </div>
+      </div>
       <div className="all_files_data_container">
-        <Table bordered columns={columns} dataSource={data} />
+        <Table columns={columns} dataSource={isFiltered ? filteredData : data} />
       </div>
     </>
   )

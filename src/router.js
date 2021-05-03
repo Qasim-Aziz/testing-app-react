@@ -615,6 +615,11 @@ const routes = [
     exact: true,
   },
   {
+    path: '/therapist/activitylog',
+    component: loadable(() => import('pages/activity/TherapistActivityList')),
+    exact: true,
+  },
+  {
     path: '/allClinicData',
     component: loadable(() => import('pages/allClinicData')),
     exact: true,

@@ -9,12 +9,46 @@
 
     .header_container {
       .header_content {
+        .filter_container {
+          display: flex;
+          padding: 1%;
+
+          .name_filter_section {
+            display: flex;
+
+            .name_filter_label {
+              font-weight: 600;
+              margin-top: 2%;
+              margin-right: 6px;
+            }
+
+            .name_filter_input > input {
+              height: 25px;
+            }
+          }
+
+          .description_filter_section {
+            display: flex;
+            margin-left: 8px;
+
+            .description_filter_label {
+              font-weight: 600;
+              margin-top: 2%;
+              margin-right: 6px;
+            }
+
+            .description_filter_input > input {
+              height: 25px;
+            }
+          }
+        }
+
         .ant-tabs-top {
           .ant-tabs-top-bar {
             background-color: $white;
 
             .ant-tabs-nav-container {
-              width: 65%;
+              width: 100%;
               margin: 0 auto;
 
               .ant-tabs-tab-active {
@@ -35,6 +69,26 @@
     width: 65%;
     margin: 8px auto;
 
+    .description_container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 3%;
+
+      .file_input {
+        width: 65%;
+      }
+
+      .desc_label {
+        margin-right: 2px;
+        font-size: 16px;
+        font-weight: 600;
+
+        .file_desc {
+          cursor: pointer;
+        }
+      }
+    }
+
     .ant-card {
       -webkit-box-shadow: 0 0 10px $text-darken;
       box-shadow: 0 0 10px $text-darken;
@@ -51,61 +105,34 @@
       color: $text-darken;
     }
 
-    .location_section {
+    .drag_title {
       margin-left: 15%;
-
-      .radio_label {
-        content: 'Location';
-        font-weight: 700;
-        font-style: italic;
-        margin: 1%;
-      }
-
-      .location_value {
-        color: $text-darken;
-        font-size: 17px;
-        font-weight: 600;
-      }
-
-      .ant-radio-inner {
-        border-color: $text-darken;
-      }
-
-      .ant-radio-inner::after {
-        background-color: $text-darken;
-      }
+      color: $blue-darken;
+      font-weight: 700;
+      padding: 2% 0 2% 0;
     }
 
-    .drag_drop {
-      .drag_title {
-        margin-left: 15%;
-        color: $blue-darken;
+    .submit_btn {
+      width: 80px;
+      margin: 10px auto;
+    }
+    .input_label {
+      width: 80%;
+      border: 1px dashed $gray;
+      padding: 1%;
+      margin: 0 auto;
+      cursor: pointer;
+
+      .ant-upload-drag-icon {
         font-weight: 700;
-        padding: 2% 0 2% 0;
+        font-size: 50px;
+        color: $text;
+        margin-bottom: -1%;
       }
 
-      .submit_btn {
-        width: 80px;
-        margin: 10px auto;
-      }
-      .input_label {
-        width: 75%;
-        border: 1px dashed $gray;
-        padding: 1%;
-        margin: 0 auto;
-        cursor: pointer;
-
-        .ant-upload-drag-icon {
-          font-weight: 700;
-          font-size: 50px;
-          color: $text;
-          margin-bottom: -1%;
-        }
-
-        .ant-upload-text {
-          color: $text;
-          font-size: 20px;
-        }
+      .ant-upload-text {
+        color: $text;
+        font-size: 20px;
       }
     }
   }
@@ -172,6 +199,10 @@
         background-color: $white;
         font-size: 14px;
         font-weight: 700;
+      }
+      .ant-table-tbody > tr > td {
+        padding: 6px 10px;
+        overflow-wrap: break-word;
       }
     }
   }
