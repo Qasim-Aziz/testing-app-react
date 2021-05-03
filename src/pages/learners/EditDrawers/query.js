@@ -89,7 +89,16 @@ export const GEN_INFO = gql`
         email
         dob
         image
-        file
+        files {
+          edges {
+            node {
+              id
+              file
+              fileName
+              fileDescription
+            }
+          }
+        }
         report
         createdAt
         fatherName

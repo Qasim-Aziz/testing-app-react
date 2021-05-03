@@ -1,5 +1,6 @@
 /* eslint-disable  */
 import React, { useState, useEffect } from 'react'
+import { Redirect } from 'react-router-dom'
 import { Row, Col, Button, Form, notification, DatePicker, Empty, Input, Drawer } from 'antd'
 import html2canvas from 'html2canvas'
 import gql from 'graphql-tag'
@@ -468,6 +469,16 @@ function Goals({ selectedStudentId, studentName }) {
           end: moment(end).format(dateFormat),
         },
       })
+        .then(res => {
+          console.log(res.data.generateMonthlyReport.report, 'res')
+          window.location.href = `${res.data.generateMonthlyReport.report}`
+          notification.success({
+            message: 'Your report is available a following link',
+          })
+        })
+        .catch(err => {
+          console.error(err, 'fg')
+        })
     }
   }
 
