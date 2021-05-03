@@ -1,8 +1,14 @@
 /* eslint-disable no-plusplus */
-import { Table } from 'antd'
+import { Icon, Table } from 'antd'
 import React from 'react'
 
-const AllFilesData = () => {
+const AllFilesData = ({ studentData }) => {
+  const studentId = JSON.parse(localStorage.getItem('studentId'))
+  const StudentName = studentData?.studentData?.firstname
+  console.log(studentData.studentData?.files.edges)
+  const files = studentData.studentData?.files.edges
+  const filesLength = studentData.studentData?.files.edges.length
+  console.log(StudentName)
   const columns = [
     {
       title: 'Id',
@@ -13,12 +19,22 @@ const AllFilesData = () => {
       dataIndex: 'fileName',
     },
     {
-      title: 'Labels',
-      dataIndex: 'labels',
+      title: 'Description',
+      dataIndex: 'fileDescription',
     },
     {
-      title: 'Size',
-      dataIndex: 'size',
+      title: 'Preview',
+      render: (text, record) => (
+        <a
+          style={{ fontSize: '22px', textAlign: 'center', display: 'inline-block' }}
+          target="_blank"
+          rel="noopener noreferrer"
+          href={text}
+        >
+          <Icon type="eye" />
+        </a>
+      ),
+      dataIndex: 'file',
     },
     {
       title: 'Upload',
@@ -27,14 +43,18 @@ const AllFilesData = () => {
   ]
 
   const data = []
-  for (let i = 0; i < 46; i++) {
+  for (let i = 0; i < filesLength || 0; i++) {
+    const item = files[i]
+    console.log(item.node)
     data.push({
       key: i,
-      id: i,
-      fileName: `London, Park Lane no. ${i}`,
-      labels: i,
-      size: `${i + 30} KB`,
-      upload: `Edward King ${i}`,
+      id: i + 1,
+      fileName: item.node.fileName ? item.node.fileName : 'No File Name !',
+      fileDescription: item.node.fileDescription
+        ? item.node.fileDescription
+        : 'No File Description!',
+      file: item.node.file ? item.node.file : '',
+      upload: StudentName && StudentName,
     })
   }
   // useEffect(() => {

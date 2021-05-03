@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-else-return */
 /* eslint-disable react/jsx-boolean-value */
 /* eslint-disable react/jsx-indent */
@@ -5,7 +6,7 @@
 /* eslint-disable react/jsx-closing-bracket-location */
 /* eslint-disable array-callback-return */
 /* eslint-disable no-unused-expressions */
-import { DeleteOutlined, PlusOutlined, FilterOutlined } from '@ant-design/icons'
+import { DeleteOutlined, FilterOutlined, PlusOutlined } from '@ant-design/icons'
 import {
   Button,
   Drawer,
@@ -15,24 +16,23 @@ import {
   notification,
   Popconfirm,
   Table,
-  Tooltip,
   Typography,
 } from 'antd'
-import React, { useEffect, useState } from 'react'
-import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
-import { useDispatch, useSelector } from 'react-redux'
-import LearnerSelect from 'components/LearnerSelect'
 import { DRAWER } from 'assets/styles/globalStyles'
+import LearnerSelect from 'components/LearnerSelect'
 import moment from 'moment'
+import React, { useCallback, useEffect, useState } from 'react'
+import { useLazyQuery } from 'react-apollo'
+import { useDispatch, useSelector } from 'react-redux'
 import client from '../../apollo/config'
-import RecordAssessmentForm from './recordAssessmentForm'
-import { STUDNET_INFO, GET_GENERAL_DATA, DELETE_GENERAL_DATA } from './query'
 import './index.scss'
+import { DELETE_GENERAL_DATA, GET_GENERAL_DATA, STUDNET_INFO } from './query'
+import RecordAssessmentForm from './recordAssessmentForm'
 
 const { Content } = Layout
 const { Text } = Typography
 
-export default () => {
+const Index = () => {
   const [open, setOpen] = useState(false)
   const studentId = localStorage.getItem('studentId')
   const [originalData, setOriginalData] = useState([])
@@ -68,7 +68,7 @@ export default () => {
     dispatch({
       type: 'learnersprogram/LOAD_DATA',
     })
-  }, [])
+  }, [dispatch, updateTableData])
 
   useEffect(() => {
     if (studentId) {
@@ -78,13 +78,13 @@ export default () => {
         },
       })
     }
-  }, [studentId])
+  }, [fetchAssessmentRecords, studentId])
 
   useEffect(() => {
     updateTableData()
-  }, [data])
+  }, [data, updateTableData])
 
-  const updateTableData = () => {
+  const updateTableData = useCallback(() => {
     if (data) {
       try {
         const tempTable = []
@@ -132,13 +132,13 @@ export default () => {
         })
       }
     }
-  }
+  })
 
   useEffect(() => {
     if (studentId) {
       loadStudentData()
     }
-  }, [studentId])
+  }, [loadStudentData, studentId])
 
   console.log(currentRow)
   useEffect(() => {
@@ -409,3 +409,5 @@ export default () => {
     </Layout>
   )
 }
+
+export default Index

@@ -1,6 +1,6 @@
 import { Card, Radio } from 'antd'
 import React, { useState } from 'react'
-import NewDragFile from './NewDragFile'
+import DragFile from './DragFile'
 
 const FileUploadFrom = () => {
   const [value, setValue] = useState('')
@@ -35,8 +35,7 @@ const FileUploadFrom = () => {
           <div className="drag_drop">
             <p className="drag_title">Override Filename</p>
             <hr />
-            {/* <DragFile value={value} /> */}
-            <NewDragFile />
+            <DragFile value={value} />
           </div>
         </Card>
       </div>

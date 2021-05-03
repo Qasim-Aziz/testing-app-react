@@ -1,7 +1,7 @@
 @import '../../assets/styles/mixins.scss';
 
 .file_upload_section {
-  background-color: $backgroundBg;
+  // background-color: $backgroundBg;
   min-height: 90vh;
 
   .file_upload_header {
@@ -33,7 +33,7 @@
 
   .file_upload_container {
     width: 65%;
-    margin: 25px auto;
+    margin: 8px auto;
 
     .ant-card {
       -webkit-box-shadow: 0 0 10px $text-darken;
@@ -83,10 +83,15 @@
         font-weight: 700;
         padding: 2% 0 2% 0;
       }
+
+      .submit_btn {
+        width: 80px;
+        margin: 10px auto;
+      }
       .input_label {
         width: 75%;
         border: 1px dashed $gray;
-        padding: 5%;
+        padding: 1%;
         margin: 0 auto;
         cursor: pointer;
 
@@ -94,15 +99,12 @@
           font-weight: 700;
           font-size: 50px;
           color: $text;
+          margin-bottom: -1%;
         }
 
         .ant-upload-text {
           color: $text;
           font-size: 20px;
-          span {
-            color: $blue-darken;
-            font-size: 15px;
-          }
         }
       }
     }
@@ -164,66 +166,13 @@
         border: 0;
       }
     }
-    // .all_file_header{
-    //   display: flex;
-    //   justify-content: space-between;
-    //   background-color: $white;
-    //   align-items: center;
-    // padding: 4px;
 
-    // .all_file_tap_section{
-    //   border-right: 1px solid $gray-lighten;
-    //   width: 22%;
-    //   display: flex;
-    //   justify-content: space-around;
-    //   align-items: flex-end;
-
-    //   .tab_active {
-    //     color: $text-darken-more;
-    //     border-bottom: 2px solid #DD7E77;
-    //   }
-
-    //   p {
-    //     color: $text-lighten;
-    //     font-weight: 600;
-    //     cursor: pointer;
-    //     margin-top: 1%;
-    //   }
-    //   p:hover,
-    //   .all_file_tap_section:focus-within p,
-    //   p:active {
-    //     color: $text-darken-more;
-    //   }
-
-    //   .tap_icon{
-    //       font-size: 18px;
-    //   }
-    // }
-
-    // .all_file_search_section{
-    //   display: flex;
-    //   justify-content: space-around;
-    //   width: 78%;
-
-    //   .search_input {
-    //     width: 75%;
-    //     .ant-input{
-    //       width: 100%;
-    //       border: 0;
-    //       border-radius: 0;
-    //       border-bottom: 1px solid #d9d9d9;
-    //     }
-    //   }
-
-    //   .anticon-search {
-    //     font-size: 22px;
-    //     color: $text-lighten;
-    //     cursor: pointer;
-    //     position: absolute;
-    //     z-index: 1111;
-    //     top: 0;
-    //   }
-    // }
-    // }
+    .all_files_data_container {
+      .ant-table-tbody {
+        background-color: $white;
+        font-size: 14px;
+        font-weight: 700;
+      }
+    }
   }
 }
