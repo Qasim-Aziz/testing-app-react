@@ -83,10 +83,10 @@ export const FORM = {
 
   layout1: {
     labelCol: {
-      span: 7,
+      span: 5,
     },
     wrapperCol: {
-      span: 17,
+      span: 19,
     },
   },
 
