@@ -460,10 +460,10 @@ function Goals({ selectedStudentId, studentName }) {
   }
 
   const handleGenerateReport = () => {
-    if (studentId && start && end) {
+    if (localStudentId && start && end) {
       generateMonthlyReport({
         variables: {
-          student: studentId,
+          student: JSON.parse(localStudentId),
           start: moment(start).format(dateFormat),
           end: moment(end).format(dateFormat),
         },
