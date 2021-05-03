@@ -4,6 +4,7 @@
 /* eslint-disable react/jsx-indent */
 /* eslint-disable-next-line react-hooks/exhaustive-deps */
 /* eslint-disable array-callback-return */
+/* eslint-disable */
 import React, { useEffect, useState } from 'react'
 import { useQuery, useLazyQuery } from 'react-apollo'
 import {
@@ -45,57 +46,104 @@ const filterCardStyle = {
   backgroundColor: COLORS.palleteLight,
 }
 
-// const SESSION_DATA = gql`
-//  query() {
-//   getSessionDataRecording(){
-//     totalTarget
-//     mandCount
-//     behCount
-//     toiletData {
-//       id
-//       date
-//       time
-//       bowel
-//       urination
-//       prompted
-//     }
-
-//     behData{
-//       behFrequency
-//       id
-//       note
-//     intensity
-//     irt
-//     frequency{
-//       edges{
-//         node{
-//           id
-//           time
-//           count
-//         }
-//       }
-//     }
-//     duration
-//     environment{
-//       id
-//       name
-//     }
-//     template{
-//       id
-//       behavior{
-//         id
-//         behaviorName
-//       }
-//     }
-// }
-// }`
+const SESSION_DATA = gql`
+  query($targets_StudentId: ID, $date_Gte: Date, $date_Lte: Date) {
+    getSessionDataRecording(
+      targets_StudentId: $targets_StudentId
+      date_Gte: $date_Gte
+      date_Lte: $date_Lte
+    ) {
+      edges {
+        node {
+          id
+          targets {
+            id
+            targetAllcatedDetails {
+              id
+              targetName
+            }
+          }
+          ChildSession {
+            id
+            sessionDate
+            createdAt
+            duration
+            sessions {
+              id
+              name
+              sessionName {
+                id
+                name
+              }
+            }
+          }
+          sessionRecord {
+            edges {
+              node {
+                entryTime
+              }
+            }
+            totalCorrect
+            totalIncorrect
+            totalError
+            totalPrompt
+            totalTrial
+            totalNr
+            physical
+            verbal
+            gestural
+            textual
+          }
+          peak {
+            totalCorrect
+            totalError
+            totalPrompt
+            totalTrial
+          }
+          peakEquivalance {
+            edges {
+              node {
+                score
+              }
+            }
+          }
+          durationStart
+          durationEnd
+          isPeak
+          isPeakEquivalance
+        }
+      }
+      totalTarget
+      edgeCount
+      perCorrect
+      perError
+      perPrompt
+      mandCount
+      behCount
+      toiletData {
+        id
+        time
+        date
+      }
+      behData {
+        id
+        date
+      }
+      mandData {
+        id
+        data
+        date
+      }
+    }
+  }
+`
 
 const parentDiv = { display: 'flex', margin: 'auto 30px auto 0' }
 const parentLabel = { fontSize: '15px', color: '#000', margin: 'auto 8px auto' }
 
 export default Form.create()(({ studentName, showDrawerFilter }) => {
   const [selectSession, setSelectSession] = useState()
-  const [range, setRange] = useState([moment(Date.now()).subtract(21, 'days'), moment(Date.now())])
+  const [range, setRange] = useState([moment().subtract(4, 'd'), moment(Date.now())])
   const [session, setSession] = useState('Morning')
   const studentId = localStorage.getItem('studentId')
   const prevSelectSession = usePrevious(selectSession)
@@ -125,6 +173,119 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     },
   })
 
+  const { data: dt, error: er, loading: ld } = useQuery(SESSION_DATA, {
+    variables: {
+      targets_StudentId: JSON.parse(studentId),
+      date_Gte: moment(range[0]).format('YYYY-MM-DD'),
+      date_Lte: moment(range[1]).format('YYYY-MM-DD'),
+    },
+  })
+
+  useEffect(() => {
+    const tempTable = []
+    if (dt && session !== 'All') {
+      dt.getSessionDataRecording.edges.map(({ node }) => {
+        let exist = false
+        let objIdx = -1
+        const objDate = node.ChildSession.sessionDate
+        const sessionObj = node.ChildSession.sessions.sessionName
+        // console.log(node, sessionObj)
+        if (sessionObj.name === session) {
+          for (let i = 0; i < tempTable.length; i++) {
+            if (tempTable[i].sessionDate === objDate) {
+              exist = true
+              objIdx = i
+              break
+            }
+          }
+          if (exist) {
+            tempTable[objIdx] = {
+              ...tempTable[objIdx],
+              duration: tempTable[objIdx].duration + node.ChildSession.duration,
+              correctCount: tempTable[objIdx].correctCount + node.sessionRecord.totalCorrect,
+              promptCount: tempTable[objIdx].promptCount + node.sessionRecord.totalPrompt,
+              errorCount: tempTable[objIdx].errorCount + node.sessionRecord.totalError,
+              peakCorrect: tempTable[objIdx].peakCorrect + node.peak.totalCorrect,
+              peakError: tempTable[objIdx].peakError + node.peak.totalError,
+              peakPrompt: tempTable[objIdx].peakPrompt + node.peak.totalPrompt,
+            }
+          } else {
+            tempTable.push({
+              sessionDate: objDate,
+              sessions: node.ChildSession.sessions,
+              id: node.ChildSession.id,
+              key: node.ChildSession.id,
+              duration: node.ChildSession.duration,
+              correctCount: node.sessionRecord.totalCorrect,
+              promptCount: node.sessionRecord.totalPrompt,
+              errorCount: node.sessionRecord.totalError,
+              peakCorrect: node.peak.totalCorrect,
+              peakError: node.peak.totalError,
+              peakPrompt: node.peak.totalPrompt,
+              peakEquCorrect: 0,
+              peakEquError: 0,
+              peakEquPrompt: 0,
+              behCount: 0,
+              behaviour: 'No behaviour performed!',
+              mand: 'No mand performed!',
+              toilet: 'No',
+              toiletCount: 0,
+            })
+          }
+        }
+      })
+    } else if (dt && session) {
+      dt.getSessionDataRecording.edges.map(({ node }) => {
+        let exist = false
+        let objIdx = -1
+        const objDate = node.ChildSession.sessionDate
+        const sessionObj = node.ChildSession.sessions.sessionName
+        for (let i = 0; i < tempTable.length; i++) {
+          if (tempTable[i].sessionDate === objDate) {
+            exist = true
+            objIdx = i
+            break
+          }
+        }
+        if (exist) {
+          tempTable[objIdx] = {
+            ...tempTable[objIdx],
+            duration: tempTable[objIdx].duration + node.ChildSession.duration,
+            correctCount: tempTable[objIdx].correctCount + node.sessionRecord.totalCorrect,
+            promptCount: tempTable[objIdx].promptCount + node.sessionRecord.totalPrompt,
+            errorCount: tempTable[objIdx].errorCount + node.sessionRecord.totalError,
+            peakCorrect: tempTable[objIdx].peakCorrect + node.peak.totalCorrect,
+            peakError: tempTable[objIdx].peakError + node.peak.totalError,
+            peakPrompt: tempTable[objIdx].peakPrompt + node.peak.totalPrompt,
+          }
+        } else {
+          tempTable.push({
+            sessionDate: objDate,
+            sessions: node.ChildSession.sessions,
+            id: node.ChildSession.id,
+            key: node.ChildSession.id,
+            duration: node.ChildSession.duration,
+            correctCount: node.sessionRecord.totalCorrect,
+            promptCount: node.sessionRecord.totalPrompt,
+            errorCount: node.sessionRecord.totalError,
+            peakCorrect: node.peak.totalCorrect,
+            peakError: node.peak.totalError,
+            peakPrompt: node.peak.totalPrompt,
+            peakEquCorrect: 0,
+            peakEquError: 0,
+            peakEquPrompt: 0,
+            behCount: 0,
+            behaviour: 'No behaviour performed!',
+            mand: 'No mand performed!',
+            toilet: 'No',
+            toiletCount: 0,
+          })
+        }
+      })
+    }
+    setTableData(tempTable)
+  }, [dt, session])
+
   const getBehaviourList = behaviour => {
     if (behaviour === 'No behaviour performed!') {
       return []
@@ -147,77 +308,77 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     getFreDisTarget,
     { data: freDisData, error: freDisError, loading: freDisLoading },
   ] = useLazyQuery(FREQUENCY_DIS_TARGET)
-  useEffect(() => {
-    if (data && data.sessionSummary && session) {
-      let filterData = []
-      console.log(data, 'data')
-      if (session === 'All') {
-        data.sessionSummary.map(item => {
-          let itemExist = false
-          let itemIdx = -1
-          for (let i = 0; i < filterData.length; i += 1) {
-            if (filterData[i].sessionDate === item.sessionDate) {
-              itemExist = true
-              itemIdx = i
-            }
-          }
 
-          if (itemExist) {
-            filterData[itemIdx] = {
-              ...filterData[itemIdx],
-              key: filterData[itemIdx].id,
-              behCount: filterData[itemIdx].behCount + item.behCount,
-              behaviour:
-                filterData[itemIdx].behaviour === 'No behaviour performed!'
-                  ? item.behaviour
-                  : filterData[itemIdx].behaviour +
-                    (item.behaviour === 'No behaviour performed!' ? '' : item.behaviour),
-              correctCount: filterData[itemIdx].correctCount + item.correctCount,
-              duration: filterData[itemIdx].duration + item.duration,
-              errorCount: filterData[itemIdx].errorCount + item.errorCount,
-              mand:
-                filterData[itemIdx].mand === 'No mand performed!'
-                  ? item.mand
-                  : filterData[itemIdx].mand +
-                    (item.mand === 'No mand performed!' ? '' : `, ${item.mand}`),
-              peakCorrect: filterData[itemIdx].peakCorrect + item.peakCorrect,
-              peakError: filterData[itemIdx].peakError + item.peakError,
-              peakPrompt: filterData[itemIdx].peakPrompt + item.peakPrompt,
-              peakEquCorrect: filterData[itemIdx].peakEquCorrect + item.peakEquCorrect,
-              peakEquError: filterData[itemIdx].peakEquError + item.peakEquError,
-              peakEquPrompt: filterData[itemIdx].peakEquPrompt + item.peakEquPrompt,
-              promptCount: filterData[itemIdx].promptCount + item.promptCount,
-              toilet: item.toilet === 'No' ? 'No' : 'Yes',
-              toiletCount: filterData[itemIdx].toiletCount + item.toiletCount,
-            }
-          } else {
-            filterData.push({
-              ...item,
-              sessions: {
-                id: item.sessions.id,
-                key: item.sessions.id,
-                sessionName: {
-                  id: item.sessions.sessionName.id,
-                  key: item.sessions.sessionName.id,
-                  name: 'All',
-                },
-              },
-            })
-          }
-        })
-      } else {
-        filterData = data.sessionSummary.filter(item => item.sessions.sessionName.name === session)
-        filterData = filterData.map(item => {
-          return {
-            ...item,
-            key: item.id,
-          }
-        })
-      }
-      filterData.sort(compare)
-      setTableData(filterData)
-    }
-  }, [data, session])
+  // useEffect(() => {
+  //   if (data && data.sessionSummary && session) {
+  //     let filterData = []
+  //     if (session === 'All') {
+  //       data.sessionSummary.map(item => {
+  //         let itemExist = false
+  //         let itemIdx = -1
+  //         for (let i = 0; i < filterData.length; i += 1) {
+  //           if (filterData[i].sessionDate === item.sessionDate) {
+  //             itemExist = true
+  //             itemIdx = i
+  //           }
+  //         }
+
+  //         if (itemExist) {
+  //           filterData[itemIdx] = {
+  //             ...filterData[itemIdx],
+  //             key: filterData[itemIdx].id,
+  //             behCount: filterData[itemIdx].behCount + item.behCount,
+  //             behaviour:
+  //               filterData[itemIdx].behaviour === 'No behaviour performed!'
+  //                 ? item.behaviour
+  //                 : filterData[itemIdx].behaviour +
+  //                   (item.behaviour === 'No behaviour performed!' ? '' : item.behaviour),
+  //             correctCount: filterData[itemIdx].correctCount + item.correctCount,
+  //             duration: filterData[itemIdx].duration + item.duration,
+  //             errorCount: filterData[itemIdx].errorCount + item.errorCount,
+  //             mand:
+  //               filterData[itemIdx].mand === 'No mand performed!'
+  //                 ? item.mand
+  //                 : filterData[itemIdx].mand +
+  //                   (item.mand === 'No mand performed!' ? '' : `, ${item.mand}`),
+  //             peakCorrect: filterData[itemIdx].peakCorrect + item.peakCorrect,
+  //             peakError: filterData[itemIdx].peakError + item.peakError,
+  //             peakPrompt: filterData[itemIdx].peakPrompt + item.peakPrompt,
+  //             peakEquCorrect: filterData[itemIdx].peakEquCorrect + item.peakEquCorrect,
+  //             peakEquError: filterData[itemIdx].peakEquError + item.peakEquError,
+  //             peakEquPrompt: filterData[itemIdx].peakEquPrompt + item.peakEquPrompt,
+  //             promptCount: filterData[itemIdx].promptCount + item.promptCount,
+  //             toilet: item.toilet === 'No' ? 'No' : 'Yes',
+  //             toiletCount: filterData[itemIdx].toiletCount + item.toiletCount,
+  //           }
+  //         } else {
+  //           filterData.push({
+  //             ...item,
+  //             sessions: {
+  //               id: item.sessions.id,
+  //               key: item.sessions.id,
+  //               sessionName: {
+  //                 id: item.sessions.sessionName.id,
+  //                 key: item.sessions.sessionName.id,
+  //                 name: 'All',
+  //               },
+  //             },
+  //           })
+  //         }
+  //       })
+  //     } else {
+  //       filterData = data.sessionSummary.filter(item => item.sessions.sessionName.name === session)
+  //       filterData = filterData.map(item => {
+  //         return {
+  //           ...item,
+  //           key: item.id,
+  //         }
+  //       })
+  //     }
+  //     filterData.sort(compare)
+  //     // setTableData(filterData)
+  //   }
+  // }, [])
 
   useEffect(() => {
     if (freDisData) {
@@ -424,7 +585,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     {
       title: 'Session',
       dataIndex: 'sessions',
-      render: (text, row) => <span>{row.sessions.sessionName.name}</span>,
+      render: (text, row) => <span>{row.sessions?.sessionName.name}</span>,
       width: '100px',
     },
     {
@@ -628,7 +789,6 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
       </Menu.Item>
     </Menu>
   )
-  console.log(tableData)
 
   return (
     <div>
@@ -675,7 +835,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
         <Table
           columns={columns}
           dataSource={tableData}
-          loading={loading}
+          loading={ld}
           bordered
           rowKey="id"
           scroll={{ x: 1950 }}

@@ -1,57 +1,40 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { Button } from 'antd'
-import { EditOutlined, CameraOutlined } from '@ant-design/icons'
+import { EditOutlined } from '@ant-design/icons'
 import { COLORS } from 'assets/styles/globalStyles'
 import gql from 'graphql-tag'
 import { useQuery } from 'react-apollo'
-import LoadingComponent from '../../../components/LoadingComponent'
-// import UploadLogoModal from '../../../components/LogoModal/UploadLogoModal'
 
 const CLINIC_QUERY = gql`
-  query($id: ID!) {
-    clinicAllDetails(pk: $id) {
-      details {
+  query {
+    schooldetail: schoolDetail {
+      id
+      schoolName
+      address
+      email
+      contactNo
+      country {
+        name
+      }
+      schoolMail {
+        parentMail
+        staffMail
+      }
+      currency {
         id
-        schoolName
-        email
-        address
-        contactNo
-        country {
-          id
-          name
-        }
-        schoolMail {
-          id
-          parentMail
-          staffMail
-        }
-        currency {
-          id
-          currency
-          symbol
-        }
+        currency
+        symbol
       }
     }
   }
 `
 
 const LeftSidePanel = ({ onActiveProfileTabChange }) => {
-  const clinicID = localStorage.getItem('userId')
-  const { data: clinicInfo, loading } = useQuery(CLINIC_QUERY, {
-    variables: {
-      id: clinicID,
-    },
-  })
-  // const { country, schoolName, address, email, contactNo, schoolMail, currency } = clinicInfo
-  //   ? clinicInfo.schooldetail
-  //   : { country: null }
-  if (loading) {
-    return <LoadingComponent />
-  }
-  const clinicObj = clinicInfo?.clinicAllDetails[0].details
-  console.log('clinic info', clinicInfo?.clinicAllDetails[0].details)
-  // console.log('check orro', clinicInfo.schooldetail)
-  // const [isModalVisible, setIsModalVisible] = useState(false)
+  const { data: clinicInfo } = useQuery(CLINIC_QUERY)
+  const { country, schoolName, address, email, contactNo, schoolMail, currency } = clinicInfo
+    ? clinicInfo.schooldetail
+    : { country: null }
+
   return (
     <div
       style={{ minWidth: '280', width: '386px', backgroundColor: COLORS.palleteLight }}
@@ -66,10 +49,7 @@ const LeftSidePanel = ({ onActiveProfileTabChange }) => {
           className="profile-avtar"
           src="https://www.thewodge.com/wp-content/uploads/2019/11/avatar-icon.png"
         />
-        {/* <a onClick={()=> setIsModalVisible(true)} aria-hidden="true">
-          <CameraOutlined style={{ position: 'absolute', top: '6px', right: '79px', fontSize: '1.7rem', color: '#0190fe'}} />
-          </a> */}
-        <span style={{ fontFamily: 'bolder' }}>{clinicObj?.schoolName}</span>
+        <span style={{ fontFamily: 'bolder' }}>{clinicInfo?.schooldetail?.schoolName}</span>
       </div>
 
       <div style={{ padding: '17px' }}>
@@ -90,19 +70,19 @@ const LeftSidePanel = ({ onActiveProfileTabChange }) => {
             </tr>
             <tr>
               <td className="title">Name:</td>
-              <td className="value">{clinicObj.schoolName}</td>
+              <td className="value">{schoolName}</td>
             </tr>
             <tr>
               <td className="title">Email:</td>
-              <td className="value">{clinicObj.email}</td>
+              <td className="value">{email}</td>
             </tr>
             <tr>
               <td className="title">Address:</td>
-              <td className="value">{clinicObj.address}</td>
+              <td className="value">{address}</td>
             </tr>
             <tr>
               <td className="title">Country</td>
-              <td className="value">{clinicObj?.country?.name}</td>
+              <td className="value">{country?.name}</td>
             </tr>
           </tbody>
         </table>
@@ -125,13 +105,13 @@ const LeftSidePanel = ({ onActiveProfileTabChange }) => {
             <tr>
               <td className="title">Parent Emails</td>
               <td className="value">
-                {clinicObj.schoolMail && clinicObj.schoolMail.parentMail ? 'Enabled' : 'Disabled'}
+                {schoolMail && schoolMail.parentMail ? 'Enabled' : 'Disabled'}
               </td>
             </tr>
             <tr>
               <td className="title">Therapist Emails</td>
               <td className="value">
-                {clinicObj.schoolMail && clinicObj.schoolMail.staffMail ? 'Enabled' : 'Disabled'}
+                {schoolMail && schoolMail.staffMail ? 'Enabled' : 'Disabled'}
               </td>
             </tr>
           </tbody>
@@ -154,7 +134,7 @@ const LeftSidePanel = ({ onActiveProfileTabChange }) => {
             </tr>
             <tr>
               <td className="title">Invoice Currency</td>
-              <td className="value">{clinicObj.currency?.currency}</td>
+              <td className="value">{currency?.currency}</td>
             </tr>
           </tbody>
         </table>
@@ -176,7 +156,6 @@ const LeftSidePanel = ({ onActiveProfileTabChange }) => {
           </tbody>
         </table>
       </div>
-      {/* <UploadLogoModal isModalVisible={isModalVisible} setIsModalVisible={setIsModalVisible} /> */}
     </div>
   )
 }

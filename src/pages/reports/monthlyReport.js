@@ -1,5 +1,6 @@
 /* eslint-disable  */
 import React, { useState, useEffect } from 'react'
+import { Redirect } from 'react-router-dom'
 import { Row, Col, Button, Form, notification, DatePicker, Empty, Input, Drawer } from 'antd'
 import html2canvas from 'html2canvas'
 import gql from 'graphql-tag'
@@ -22,21 +23,14 @@ import ReportPdf from './monthlyReportPdf'
 import client from '../../apollo/config'
 import { calculateAge } from '../../utilities'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
+import { useMutation } from 'react-apollo'
 
 const { RangePicker, MonthPicker } = DatePicker
 const { TextArea } = Input
 
 const RT = gql`
-  mutation($student: ID!, $programArea: ID!, $targetStatus: ID!, $dateGte: Date!, $dateLte: Date!) {
-    generateMonthlyReport(
-      input: {
-        student: $student
-        programArea: $programArea
-        targetStatus: $targetStatus
-        dateGte: $dateGte
-        dateLte: $dateLte
-      }
-    ) {
+  mutation($student: ID!, $start: Date!, $end: Date!) {
+    generateMonthlyReport(input: { student: $student, dateGte: $start, dateLte: $end }) {
       report
     }
   }
@@ -113,6 +107,8 @@ function Goals({ selectedStudentId, studentName }) {
     mand: false,
     behavior: false,
   })
+
+  const [generateMonthlyReport, { loading: generateMonthlyReportLoading }] = useMutation(RT)
 
   useEffect(() => {
     fetchStudentDetails(localStudentId)
@@ -464,6 +460,28 @@ function Goals({ selectedStudentId, studentName }) {
     setTextBoxObj(tempTextBox)
   }
 
+  const handleGenerateReport = () => {
+    if (localStudentId && start && end) {
+      generateMonthlyReport({
+        variables: {
+          student: JSON.parse(localStudentId),
+          start: moment(start).format(dateFormat),
+          end: moment(end).format(dateFormat),
+        },
+      })
+        .then(res => {
+          console.log(res.data.generateMonthlyReport.report, 'res')
+          window.location.href = `${res.data.generateMonthlyReport.report}`
+          notification.success({
+            message: 'Your report is available a following link',
+          })
+        })
+        .catch(err => {
+          console.error(err, 'fg')
+        })
+    }
+  }
+
   console.log(goalsDetails, 'goalsDetails')
   return (
     <div style={{ marginBottom: '100px' }}>
@@ -478,16 +496,8 @@ function Goals({ selectedStudentId, studentName }) {
                 onChange={handleMonthChange}
               />
             </span>
-            <Button
-              loading={loadingPdf}
-              // onClick={() => {
-              //   setloadingPdf(val => {
-              //     return !val
-              //   })
-              //   generatePdf()
-              // }}
-            >
-              Download Pdf{' '}
+            <Button loading={generateMonthlyReportLoading} onClick={() => handleGenerateReport()}>
+              Download Pdf
             </Button>
           </div>
         </Col>

@@ -122,8 +122,9 @@ class StudentDrawer extends Component {
     notification.info({
       message: 'Attention!',
       description: 'Please check with your clinic administrator this will be chargeable',
-      duration: 10,
+      duration: 5,
     })
+    console.log('hj g fh', isActive)
     const std = JSON.parse(localStorage.getItem('studentId'))
     if (isActive) {
       apolloClient
@@ -295,7 +296,8 @@ class StudentDrawer extends Component {
                   unCheckedChildren={<Icon type="close" />}
                   checked={isVBMAPPActive}
                   onChange={event => {
-                    this.activeInactiveVbMapp(event)
+                    console.log('gotcha')
+                    this.activeInactiveVbMapp(isVBMAPPActive)
                   }}
                 />
               </td>

@@ -71,7 +71,7 @@ const SingleRecord = ({ invoiceNo, schoolName, status, issueDate }) => {
   }
 
   return (
-    <a className="hover_me_item single-row" href="#/invoices">
+    <a className="hover_me_item single-row" href="#/clinicInvoice">
       <div style={{ flex: 3 }}>
         <span style={{ fontWeight: 'bold', color: '#333' }}>{invoiceNo}</span>
         <span style={{ color: '#888' }}> - {schoolName}</span>
@@ -122,7 +122,7 @@ const InvoicesCard = ({ status }) => {
         })}
       {filtered && filtered.length > 5 && (
         <div className="more-row">
-          <a href="#/clinicProfile">
+          <a href="#/clinicInvoice/">
             <span style={{ fontWeight: 'bold', fontSize: 12 }}>More...</span>
           </a>
         </div>

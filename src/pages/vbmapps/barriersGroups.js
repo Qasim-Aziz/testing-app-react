@@ -489,7 +489,7 @@ class BarriersGroups extends Component {
                       style={{
                         marginVertical: 10,
                         display: 'flex',
-                        backgroundColor: '#4BAEA0',
+                        backgroundColor: '#',
                         border: '2px solid #000',
                         width: 40,
                         height: 40,
@@ -519,8 +519,8 @@ class BarriersGroups extends Component {
                       style={{
                         marginVertical: 10,
                         display: 'flex',
-                        backgroundColor: '#4BAEA0',
-                        border: '1px solid #4BAEA0',
+                        backgroundColor: '#F47E7F',
+                        border: '1px solid #F47E7F',
                         width: 40,
                         height: 40,
                         padding: 5,
@@ -779,8 +779,8 @@ class BarriersGroups extends Component {
                       style={{
                         marginVertical: 10,
                         display: 'flex',
-                        backgroundColor: '#FF8080',
-                        border: '1px solid #FF8080',
+                        backgroundColor: '#4BAEA0',
+                        border: '1px solid #4BAEA0',
                         width: 40,
                         height: 40,
                         borderRadius: 10,
