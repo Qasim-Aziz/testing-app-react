@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet'
 import Authorize from 'components/LayoutComponents/Authorize'
@@ -108,7 +109,7 @@ const MandDataPage = props => {
   const [searchVal, setSearchVal] = useState('')
   const [mandData, setMandData] = useState(null)
   const [mandCards, setMandCards] = useState(null)
-
+  const [originalMandCards, setOriginalMandCards] = useState(null)
   const [date, setDate] = useState(moment())
   const [newMandCreated, setNewMandCreated] = useState(false)
   const [mandTitle, setMandTitle] = useState('')
@@ -129,22 +130,17 @@ const MandDataPage = props => {
     },
   })
 
-  console.log(data, 'dddd')
+  const [recodeMandData] = useMutation(RECORD_MAND_DATA)
 
-  const [recodeMandData, { data: mandNewData, error: mandNewDataError }] = useMutation(
-    RECORD_MAND_DATA,
-  )
-  console.log(mandNewData, 'mand new data')
-
-  const [
-    createNewMand,
-    { data: newMandRes, error: newMandError, loading: newMandLoading },
-  ] = useMutation(CREATE_NEW_MAND, {
-    variables: {
-      studentId,
-      mandTitle,
+  const [createNewMand, { data: newMandRes, loading: newMandLoading }] = useMutation(
+    CREATE_NEW_MAND,
+    {
+      variables: {
+        studentId,
+        mandTitle,
+      },
     },
-  })
+  )
 
   const { data: clickData, loading: clickDataLoading, error: clickDataError } = useQuery(
     GET_CLICK_DATA,
@@ -155,21 +151,6 @@ const MandDataPage = props => {
       },
     },
   )
-
-  console.log(clickData, 'click data')
-
-  useEffect(() => {
-    if (mandNewData || newMandCreated) {
-      refetch()
-      setNewMandCreated(false)
-    }
-  }, [mandNewData, newMandCreated, refetch])
-
-  useEffect(() => {
-    if (mandNewData) {
-      console.log(mandNewData)
-    }
-  }, [mandNewData])
 
   useEffect(() => {
     if (newMandRes) {
@@ -185,32 +166,6 @@ const MandDataPage = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newMandRes])
 
-  useEffect(() => {
-    if (newMandError) {
-      notification.error({
-        message: 'Opps I cant create new mand for some reson',
-      })
-    }
-  }, [newMandError])
-
-  useEffect(() => {
-    if (mandNewDataError) {
-      console.log(mandNewDataError)
-    }
-  }, [mandNewDataError])
-
-  const handleSelectDate = (newDate, value) => {
-    setDate({
-      gte: moment(value[0]).format('YYYY-MM-DD'),
-      lte: moment(value[1]).format('YYYY-MM-DD'),
-    })
-  }
-
-  const searchValHandler = e => {
-    console.log(e.target.value)
-    setSearchVal(e.target.value)
-  }
-
   const SubmitForm = e => {
     e.preventDefault()
     createNewMand()
@@ -223,39 +178,45 @@ const MandDataPage = props => {
     }
   }
 
-  const showDrawer = () => {
-    updateDrawerForm(true)
-  }
-
-  const onClickClose = () => {
-    updateDrawerForm(false)
-  }
-
   useEffect(() => {
     updateDrawerForm(openRightdrawer)
   }, [openRightdrawer])
 
   useEffect(() => {
-    if (data && searchVal) {
+    if (data) {
       const filteredData = data?.getMandData.edges.filter(item =>
         item.node.dailyClick.measurments.toLowerCase().includes(searchVal),
       )
-      console.log(filteredData)
-      setMandData({
-        getMandData: {
-          edges: filteredData,
-        },
-      })
-    } else setMandData(data)
+      setMandData(filteredData)
+    } else {
+      setMandData(data?.getMandData.edges)
+    }
+    if (originalMandCards && originalMandCards.length > 0) {
+      const ftd = originalMandCards.filter(item =>
+        item.node.measurments.toLowerCase().includes(searchVal),
+      )
+      setMandCards(ftd)
+    } else {
+      setMandCards(originalMandCards)
+    }
   }, [data, searchVal])
 
   useEffect(() => {
-    if (clickData) {
-      console.log(data)
-      console.log(clickData)
-      setMandCards(clickData.getClickData.edges)
+    if (clickData?.getClickData && data?.getMandData) {
+      const gg = clickData.getClickData.edges.filter(item => {
+        const tt = data.getMandData.edges
+        for (let i = 0; i < tt.length; i++) {
+          if (tt[i].node.dailyClick.id === item.node.id) {
+            return false
+          }
+        }
+        return true
+      })
+
+      setMandCards(gg)
+      setOriginalMandCards(gg)
     }
-  }, [clickData])
+  }, [clickData, data])
 
   const container = {
     background: COLORS.palleteLight,
@@ -279,11 +240,20 @@ const MandDataPage = props => {
       <Helmet title="Dashboard Alpha" />
       <div style={container}>
         <span>
-          <span style={Headstyle}>Date: </span>
+          <span style={Headstyle}>Date : </span>
           <DatePicker
             defaultValue={date}
             onChange={e => (e ? setDate(e) : null)}
             style={{ width: '240px', marginRight: 40 }}
+          />
+        </span>
+        <span>
+          <span style={Headstyle}>Mand : </span>
+          <Input.Search
+            allowClear
+            style={{ width: '200px', marginRight: 40 }}
+            placeholder="Search..."
+            onChange={e => setSearchVal(e.target.value)}
           />
         </span>
       </div>
@@ -307,7 +277,7 @@ const MandDataPage = props => {
                       <>
                         {error && <pre>{JSON.stringify(error, null, 2)}</pre>}
                         {mandData &&
-                          mandData.getMandData.edges.map(({ node }, index) => {
+                          mandData.map(({ node }, index) => {
                             // eslint-disable-next-line no-shadow
                             const dailyClickData = node.data
                             return (
@@ -325,18 +295,8 @@ const MandDataPage = props => {
                                   border: '2px solid #2a8ff7',
                                 }}
                               >
-                                <div
-                                  style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                  }}
-                                >
-                                  <div
-                                    style={{
-                                      fontSize: 16,
-                                      margin: 0,
-                                    }}
-                                  >
+                                <div style={{ display: 'flex', alignItems: 'center' }}>
+                                  <div style={{ fontSize: 16, margin: 0 }}>
                                     {studnetInfo && studnetInfo.student.firstname}&apos;s requests
                                     for {node.dailyClick.measurments}
                                   </div>
@@ -354,6 +314,14 @@ const MandDataPage = props => {
                                             date: node.date,
                                           },
                                         })
+                                          .then(res => {
+                                            notification.success({
+                                              message: 'Data recorded successfully',
+                                            })
+                                            refetch()
+                                            setNewMandCreated(false)
+                                          })
+                                          .catch(err => console.error(err, 'err'))
                                       }
                                     }}
                                   >
@@ -372,11 +340,10 @@ const MandDataPage = props => {
                                   </Text>
                                   <Button
                                     onClick={() => {
-                                      console.log(node)
                                       recodeMandData({
                                         variables: {
                                           id: node.dailyClick.id,
-                                          date: moment().format('YYYY-MM-DD'),
+                                          date: node.date,
                                           data: dailyClickData + 1,
                                         },
                                       })
@@ -410,7 +377,7 @@ const MandDataPage = props => {
                 </Tabs.TabPane>
                 <Tabs.TabPane tab="Mand" key="Mand">
                   <div style={{ marginTop: 17 }}>
-                    {loading ? (
+                    {clickDataLoading ? (
                       <LoadingComponent />
                     ) : (
                       <>
@@ -441,12 +408,7 @@ const MandDataPage = props => {
                                     alignItems: 'center',
                                   }}
                                 >
-                                  <div
-                                    style={{
-                                      fontSize: 16,
-                                      margin: 0,
-                                    }}
-                                  >
+                                  <div style={{ fontSize: 16, margin: 0 }}>
                                     {studnetInfo && studnetInfo.student.firstname}&apos;s requests
                                     for {node.measurments}
                                   </div>
