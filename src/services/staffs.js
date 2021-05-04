@@ -336,8 +336,16 @@ export async function updateStaff(payload) {
             image
             resume
             joiningLetter
-            fileName
-            fileDescription
+            files {
+              edges {
+                node {
+                  id
+                  file
+                  fileName
+                  fileDescription
+                }
+              }
+            }
             isActive
             school {
               id
@@ -442,8 +450,16 @@ export async function getStaffProfile(payload) {
             image
             resume
             joiningLetter
-            fileName
-            fileDescription
+            files {
+              edges {
+                node {
+                  id
+                  fileName
+                  fileDescription
+                  file
+                }
+              }
+            }
             isActive
             school {
               id
