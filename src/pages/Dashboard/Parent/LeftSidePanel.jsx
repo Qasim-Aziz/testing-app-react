@@ -5,6 +5,7 @@ import gql from 'graphql-tag'
 import { useQuery } from 'react-apollo'
 import { useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
+import { COLORS } from 'assets/styles/globalStyles'
 
 const STUDENT_QUERY = gql`
   query parentDashboard($studentId: ID!) {
@@ -82,7 +83,7 @@ const LeftSidePanel = ({ onActiveProfileTabChange }) => {
   console.log(student, 'student student')
   return (
     <div
-      style={{ minWidth: '240px', width: '386px', backgroundColor: '#dbe2ef' }}
+      style={{ minWidth: '240px', width: '386px', backgroundColor: COLORS.palleteLight }}
       className="border-right profile-details"
     >
       <div className="profile-title">Profile</div>

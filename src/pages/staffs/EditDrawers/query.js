@@ -95,8 +95,16 @@ export const UPDATE_STAFF = gql`
         image
         resume
         joiningLetter
-        fileName
-        fileDescription
+        files {
+          edges {
+            node {
+              id
+              file
+              fileName
+              fileDescription
+            }
+          }
+        }
         isActive
         school {
           id

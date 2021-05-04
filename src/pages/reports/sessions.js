@@ -100,13 +100,7 @@ const SESSION_DATA = gql`
             totalPrompt
             totalTrial
           }
-          peakEquivalance {
-            edges {
-              node {
-                score
-              }
-            }
-          }
+
           durationStart
           durationEnd
           isPeak
@@ -133,6 +127,97 @@ const SESSION_DATA = gql`
         id
         data
         date
+      }
+    }
+  }
+`
+
+const DECEL_DATA = gql`
+  query($targets_StudentId: ID, $date_Gte: Date, $date_Lte: Date) {
+    getDecelData(template_Student: $targets_StudentId, date_Gte: $date_Gte, date_Lte: $date_Lte) {
+      edges {
+        node {
+          id
+          date
+          createdAt
+          duration
+          template {
+            id
+            behavior {
+              id
+              time
+              behaviorName
+              definition
+            }
+          }
+          session {
+            id
+            sessionDate
+            duration
+            sessions {
+              id
+              sessionName {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+const GET_MAND = gql`
+  query($targets_StudentId: ID, $date_Gte: Date, $date_Lte: Date) {
+    getMandData(dailyClick_Student: $targets_StudentId, dateGte: $date_Gte, dateLte: $date_Lte) {
+      edges {
+        node {
+          id
+          data
+          date
+          dailyClick {
+            id
+            measurments
+          }
+          session {
+            id
+            sessionDate
+            duration
+            sessions {
+              id
+              sessionName {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+const TOILET_DATA = gql`
+  query($targets_StudentId: ID, $date_Gte: Date, $date_Lte: Date) {
+    getToiletData(student: $targets_StudentId, date_Lte: $date_Lte, date_Gte: $date_Gte) {
+      edges {
+        node {
+          id
+          date
+          session {
+            id
+            sessionDate
+            duration
+            sessions {
+              id
+              sessionName {
+                id
+                name
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -180,16 +265,37 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
       date_Lte: moment(range[1]).format('YYYY-MM-DD'),
     },
   })
-
+  const { data: decel, error: deer, loading: deld } = useQuery(DECEL_DATA, {
+    variables: {
+      targets_StudentId: JSON.parse(studentId),
+      date_Gte: moment(range[0]).format('YYYY-MM-DD'),
+      date_Lte: moment(range[1]).format('YYYY-MM-DD'),
+    },
+  })
+  const { data: mand, error: mander, loading: mandld } = useQuery(GET_MAND, {
+    variables: {
+      targets_StudentId: JSON.parse(studentId),
+      date_Gte: moment(range[0]).format('YYYY-MM-DD'),
+      date_Lte: moment(range[1]).format('YYYY-MM-DD'),
+    },
+  })
+  const { data: toilet, error: toileter, loading: toiletld } = useQuery(TOILET_DATA, {
+    variables: {
+      targets_StudentId: JSON.parse(studentId),
+      date_Gte: moment(range[0]).format('YYYY-MM-DD'),
+      date_Lte: moment(range[1]).format('YYYY-MM-DD'),
+    },
+  })
+  console.log(mand, 'mand mand')
+  console.log(decel, 'decel')
   useEffect(() => {
     const tempTable = []
-    if (dt && session !== 'All') {
+    if (dt && toilet && session !== 'All') {
       dt.getSessionDataRecording.edges.map(({ node }) => {
         let exist = false
         let objIdx = -1
         const objDate = node.ChildSession.sessionDate
         const sessionObj = node.ChildSession.sessions.sessionName
-        // console.log(node, sessionObj)
         if (sessionObj.name === session) {
           for (let i = 0; i < tempTable.length; i++) {
             if (tempTable[i].sessionDate === objDate) {
@@ -204,7 +310,10 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
               duration: tempTable[objIdx].duration + node.ChildSession.duration,
               correctCount: tempTable[objIdx].correctCount + node.sessionRecord.totalCorrect,
               promptCount: tempTable[objIdx].promptCount + node.sessionRecord.totalPrompt,
-              errorCount: tempTable[objIdx].errorCount + node.sessionRecord.totalError,
+              errorCount:
+                tempTable[objIdx].errorCount +
+                node.sessionRecord.totalIncorrect +
+                node.sessionRecord.totalNr,
               peakCorrect: tempTable[objIdx].peakCorrect + node.peak.totalCorrect,
               peakError: tempTable[objIdx].peakError + node.peak.totalError,
               peakPrompt: tempTable[objIdx].peakPrompt + node.peak.totalPrompt,
@@ -218,7 +327,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
               duration: node.ChildSession.duration,
               correctCount: node.sessionRecord.totalCorrect,
               promptCount: node.sessionRecord.totalPrompt,
-              errorCount: node.sessionRecord.totalError,
+              errorCount: node.sessionRecord.totalIncorrect + node.sessionRecord.totalNr,
               peakCorrect: node.peak.totalCorrect,
               peakError: node.peak.totalError,
               peakPrompt: node.peak.totalPrompt,
@@ -227,10 +336,63 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
               peakEquPrompt: 0,
               behCount: 0,
               behaviour: 'No behaviour performed!',
-              mand: 'No mand performed!',
+              mand: [],
               toilet: 'No',
               toiletCount: 0,
             })
+          }
+        }
+      })
+      toilet.getToiletData.edges.map(({ node }) => {
+        let exist = false
+        let objIdx = -1
+        const objDate = node.session?.sessionDate
+        const sessionObj = node.session?.sessions
+        // console.log(objDate, sessionObj, 'seee')
+        if (sessionObj?.sessionName.name === session) {
+          for (let i = 0; i < tempTable.length; i++) {
+            if (tempTable[i].sessionDate === objDate) {
+              exist = true
+              objIdx = i
+              break
+            }
+          }
+
+          if (exist) {
+            tempTable[objIdx] = {
+              ...tempTable[objIdx],
+              toiletCount: tempTable[objIdx].toiletCount + 1,
+            }
+          } else {
+            console.log('else')
+          }
+        }
+      })
+      mand.getMandData.edges.map(({ node }) => {
+        let exist = false
+        let objIdx = -1
+        const objDate = node.session?.sessionDate
+        const sessionObj = node.session?.sessions
+        console.log(node, 'noe')
+        console.log(objDate, sessionObj, 'mand')
+        if (sessionObj?.sessionName.name === session) {
+          for (let i = 0; i < tempTable.length; i++) {
+            if (tempTable[i].sessionDate === objDate) {
+              exist = true
+              objIdx = i
+              break
+            }
+          }
+
+          if (exist) {
+            console.log('gotcha')
+            console.log(tempTable[objIdx], objIdx, 'oj')
+            tempTable[objIdx].mand.push({
+              measurments: node.dailyClick.measurments,
+              data: node.data,
+            })
+          } else {
+            console.log('else')
           }
         }
       })
@@ -253,7 +415,10 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
             duration: tempTable[objIdx].duration + node.ChildSession.duration,
             correctCount: tempTable[objIdx].correctCount + node.sessionRecord.totalCorrect,
             promptCount: tempTable[objIdx].promptCount + node.sessionRecord.totalPrompt,
-            errorCount: tempTable[objIdx].errorCount + node.sessionRecord.totalError,
+            errorCount:
+              tempTable[objIdx].errorCount +
+              node.sessionRecord.totalIncorrect +
+              node.sessionRecord.totalNr,
             peakCorrect: tempTable[objIdx].peakCorrect + node.peak.totalCorrect,
             peakError: tempTable[objIdx].peakError + node.peak.totalError,
             peakPrompt: tempTable[objIdx].peakPrompt + node.peak.totalPrompt,
@@ -267,7 +432,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
             duration: node.ChildSession.duration,
             correctCount: node.sessionRecord.totalCorrect,
             promptCount: node.sessionRecord.totalPrompt,
-            errorCount: node.sessionRecord.totalError,
+            errorCount: node.sessionRecord.totalIncorrect + node.sessionRecord.totalNr,
             peakCorrect: node.peak.totalCorrect,
             peakError: node.peak.totalError,
             peakPrompt: node.peak.totalPrompt,
@@ -283,6 +448,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
         }
       })
     }
+    console.log(tempTable, 'tempTable')
     setTableData(tempTable)
   }, [dt, session])
 
@@ -545,7 +711,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
           ? 0
           : Math.round((e.peakEquPrompt * 100) / getTotal(e)),
         Behavior_count: e.behaviour,
-        Mand_Count: e.mand,
+        Mand_Count: 5,
         Toilet_Count: e.toilet,
       }
     })
@@ -746,12 +912,19 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     {
       title: 'Mand',
       dataIndex: 'mand',
-      render: text => {
-        if (text === null || text === '' || text === 'null' || text === 'No mand performed!') {
+      render: md => {
+        if (md && md.length === 0) {
           return 'None'
+        } else {
+          return md.map(item => {
+            return (
+              <div>
+                <span>{item.measurments}: </span>
+                <span>{item.data}</span>
+              </div>
+            )
+          })
         }
-
-        return <span>{text}</span>
       },
     },
     {
@@ -790,6 +963,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     </Menu>
   )
 
+  console.log(tableData, 'tableDta')
   return (
     <div>
       <div style={filterCardStyle}>

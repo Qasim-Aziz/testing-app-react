@@ -1,9 +1,11 @@
 import React from 'react'
-import { Button } from 'antd'
-import { EditOutlined } from '@ant-design/icons'
+import { Button, Spin } from 'antd'
+import { EditOutlined, LoadingOutlined } from '@ant-design/icons'
 import { COLORS } from 'assets/styles/globalStyles'
 import gql from 'graphql-tag'
 import { useQuery } from 'react-apollo'
+
+const antIcon = <LoadingOutlined style={{ fontSize: 12 }} spin />
 
 const CLINIC_QUERY = gql`
   query {
@@ -30,7 +32,9 @@ const CLINIC_QUERY = gql`
 `
 
 const LeftSidePanel = ({ onActiveProfileTabChange }) => {
-  const { data: clinicInfo } = useQuery(CLINIC_QUERY)
+  const { data: clinicInfo, loading: clinicInfoLoading } = useQuery(CLINIC_QUERY, {
+    fetchPolicy: 'no-cache',
+  })
   const { country, schoolName, address, email, contactNo, schoolMail, currency } = clinicInfo
     ? clinicInfo.schooldetail
     : { country: null }
@@ -64,7 +68,7 @@ const LeftSidePanel = ({ onActiveProfileTabChange }) => {
                   size="small"
                   onClick={() => onActiveProfileTabChange('contact-details')}
                 >
-                  <EditOutlined />
+                  {clinicInfoLoading ? <Spin indicator={antIcon} /> : <EditOutlined />}
                 </Button>
               </th>
             </tr>
@@ -98,7 +102,7 @@ const LeftSidePanel = ({ onActiveProfileTabChange }) => {
                   size="small"
                   onClick={() => onActiveProfileTabChange('email-notification')}
                 >
-                  <EditOutlined />
+                  {clinicInfoLoading ? <Spin indicator={antIcon} /> : <EditOutlined />}
                 </Button>
               </th>
             </tr>
@@ -128,7 +132,7 @@ const LeftSidePanel = ({ onActiveProfileTabChange }) => {
                   size="small"
                   onClick={() => onActiveProfileTabChange('invoice-currency')}
                 >
-                  <EditOutlined />
+                  {clinicInfoLoading ? <Spin indicator={antIcon} /> : <EditOutlined />}
                 </Button>
               </th>
             </tr>
@@ -149,7 +153,7 @@ const LeftSidePanel = ({ onActiveProfileTabChange }) => {
                   size="small"
                   onClick={() => onActiveProfileTabChange('change-password')}
                 >
-                  <EditOutlined />
+                  {clinicInfoLoading ? <Spin indicator={antIcon} /> : <EditOutlined />}
                 </Button>
               </th>
             </tr>

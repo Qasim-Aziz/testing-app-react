@@ -33,7 +33,7 @@ export const GEN_INFO = gql`
     $parentMobile: String
     $ssnAadhar: String
     $language: ID
-    $category: ID!
+    $category: ID
     $clinicLocation: ID
     $authStaff: [ID]
     $caseManager: ID
