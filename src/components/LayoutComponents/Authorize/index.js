@@ -1,7 +1,7 @@
+import { notification } from 'antd'
 import React from 'react'
 import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
-import { notification } from 'antd'
 
 @connect(({ user }) => ({ user }))
 class Authorize extends React.Component {
@@ -11,6 +11,7 @@ class Authorize extends React.Component {
     } = this.props // current user role
     const { children, redirect = false, to = '/404', roles = [1] } = this.props
     const authorized = roles.includes(role)
+    console.log('authorized', authorized)
     const AuthorizedChildren = () => {
       // if user not equal needed role and if component is a page - make redirect to needed route
       if (!authorized && redirect) {

@@ -71,8 +71,8 @@ const customStyles = {
 }
 
 const GET_ACTIVITIES_QUERY = gql`
-  query {
-    getActivity {
+  query($clinic: ID) {
+    getActivity(clinic: $clinic) {
       edges {
         node {
           activityType {
@@ -105,8 +105,21 @@ const GET_ACTIVITY_TYPES_QUERY = gql`
 `
 
 const ActivityList = ({ form }) => {
-  console.log(form)
-  const { data, loading, error, refetch } = useQuery(GET_ACTIVITIES_QUERY)
+  const [clinicId, setClinicId] = useState('')
+  const userRole = JSON.parse(localStorage.getItem('role'))
+
+  useEffect(() => {
+    if (userRole === 'school_admin') {
+      const id = JSON.parse(localStorage.getItem('userId'))
+      setClinicId(id)
+    }
+  }, [userRole])
+
+  const { data, loading, error, refetch } = useQuery(GET_ACTIVITIES_QUERY, {
+    variables: {
+      clinic: clinicId,
+    },
+  })
   const { data: actTypes } = useQuery(GET_ACTIVITY_TYPES_QUERY)
   console.log(data)
 
@@ -288,7 +301,7 @@ const ActivityList = ({ form }) => {
       <Drawer
         destroyOnClose
         title={selectedActivity ? 'Update Activity' : 'Create Activity'}
-        width={DRAWER.widthL1}
+        width={DRAWER.widthL2}
         placement="right"
         closable="true"
         onClose={() => setVisible(false)}
