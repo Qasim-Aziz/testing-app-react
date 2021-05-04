@@ -2,13 +2,20 @@ import { PlusOutlined } from '@ant-design/icons'
 import { Button, DatePicker, Drawer, Form, Input, notification, Select } from 'antd'
 import TextArea from 'antd/lib/input/TextArea'
 import Authorize from 'components/LayoutComponents/Authorize'
+import LoadingComponent from 'components/LoadingComponent'
 import gql from 'graphql-tag'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
-import { useQuery } from 'react-apollo'
+import { useMutation, useQuery } from 'react-apollo'
 import DataTable from 'react-data-table-component'
 import client from '../../apollo/config'
-import { COLORS, DRAWER, FORM, SUBMITT_BUTTON } from '../../assets/styles/globalStyles'
+import {
+  CANCEL_BUTTON,
+  COLORS,
+  DRAWER,
+  FORM,
+  SUBMITT_BUTTON,
+} from '../../assets/styles/globalStyles'
 
 const { Option } = Select
 
@@ -23,7 +30,7 @@ const customStyles = {
       borderTopStyle: 'solid',
       borderTopWidth: '1px',
       borderTopColor: '#ddd',
-      backgroundColor: '#f5f5f5',
+      backgroundColor: COLORS.palleteLightBlue,
     },
   },
   headCells: {
@@ -63,6 +70,58 @@ const customStyles = {
     },
   },
 }
+
+const ADD_ACTIVITY = gql`
+  mutation($activityType: ID!, $subject: String, $date: Date, $length: Int, $addNote: String) {
+    addActivity(
+      input: {
+        activityType: $activityType
+        subject: $subject
+        date: $date
+        length: $length
+        addNote: $addNote
+      }
+    ) {
+      act {
+        id
+        subject
+        date
+        length
+        addNote
+      }
+    }
+  }
+`
+
+const UPDATE_ACTIVITY = gql`
+  mutation(
+    $pk: ID!
+    $activityType: ID
+    $subject: String
+    $date: Date
+    $length: Int
+    $addNote: String
+  ) {
+    updateActivity(
+      input: {
+        pk: $pk
+        activityType: $activityType
+        subject: $subject
+        date: $date
+        length: $length
+        addNote: $addNote
+      }
+    ) {
+      act {
+        id
+        subject
+        date
+        length
+        addNote
+      }
+    }
+  }
+`
 
 const GET_ACTIVITIES_QUERY = gql`
   query($user: ID) {
@@ -109,7 +168,7 @@ const TherapistActivityList = ({ form }) => {
     }
   }, [userRole])
 
-  const { data, refetch } = useQuery(GET_ACTIVITIES_QUERY, {
+  const { data, loading, refetch } = useQuery(GET_ACTIVITIES_QUERY, {
     variables: {
       user: userId,
     },
@@ -127,14 +186,13 @@ const TherapistActivityList = ({ form }) => {
   const [date, setDate] = useState(moment())
   const [length, setLength] = useState('')
   const [drawerTitle, setDrawerTitle] = useState('')
-  console.log('drawerTitle', drawerTitle)
 
-  console.log('selectedActivity', selectedActivity)
+  const [addActivityMutation, { loading: addActivityLoading }] = useMutation(ADD_ACTIVITY)
+  const [updateActivityMutation, { loading: updateActivityLoading }] = useMutation(UPDATE_ACTIVITY)
 
   useEffect(() => {
     if (data) {
       const therapist = data.getActivity.edges.length > 0 && data.getActivity.edges.map(i => i.node)
-      console.log(therapist)
       setTherapists(therapist)
     }
   }, [data])
@@ -144,28 +202,15 @@ const TherapistActivityList = ({ form }) => {
     form.validateFields((formError, values) => {
       if (!formError) {
         console.log(formError, values)
-        client
-          .mutate({
-            mutation: gql`mutation {
-            addActivity (
-              input:{
-                activityType:"${values.type}",
-                subject: "${values.subject}",
-                date: "${moment(values.date).format('YYYY-MM-DD')}",
-                length: ${values.length},
-                addNote: "${values.addNote}",
-              })
-              {
-                act{
-                  id
-                  subject
-                  date
-                  length
-                  addNote
-                }
-              }
-            }`,
-          })
+        addActivityMutation({
+          variables: {
+            activityType: values.type,
+            subject: values.subject,
+            date: moment(values.date).format('YYYY-MM-DD'),
+            length: values.length,
+            addNote: values.addNote,
+          },
+        })
           .then(result => {
             console.log(result, 'te')
             refetch()
@@ -192,29 +237,16 @@ const TherapistActivityList = ({ form }) => {
     form.validateFields((formError, values) => {
       console.log(formError, values)
       if (!formError) {
-        client
-          .mutate({
-            mutation: gql`mutation {     
-          updateActivity (         
-            input:{            
-              pk: "${selectedActivity}", 
-              activityType:"${values.type}", 
-              subject: "${values.subject}",             
-              date: "${moment(values.date).format('YYYY-MM-DD')}",             
-              length: ${values.length},             
-              addNote: "${values.addNote}",         
-            })
-            {         
-              act{             
-                id             
-                subject            
-                date             
-                length             
-                addNote         
-              }     
-            } 
-          }`,
-          })
+        updateActivityMutation({
+          variables: {
+            pk: selectedActivity,
+            activityType: values.type,
+            subject: values.subject,
+            date: moment(values.date).format('YYYY-MM-DD'),
+            length: values.length,
+            addNote: values.addNote,
+          },
+        })
           .then(result => {
             refetch()
             setVisible(false)
@@ -370,8 +402,16 @@ const TherapistActivityList = ({ form }) => {
               })(<TextArea style={{ borderRadius: 0 }} />)}
             </Form.Item>
             <Form.Item {...FORM.tailLayout}>
-              <Button type="primary" htmlType="submit" style={SUBMITT_BUTTON}>
+              <Button
+                type="primary"
+                loading={updateActivityLoading || addActivityLoading}
+                htmlType="submit"
+                style={SUBMITT_BUTTON}
+              >
                 Submit
+              </Button>
+              <Button type="danger" onClick={() => setVisible(false)} style={CANCEL_BUTTON}>
+                Cancel
               </Button>
             </Form.Item>
           </Form>
@@ -402,22 +442,26 @@ const TherapistActivityList = ({ form }) => {
 
         <div className="row">
           <div className="col-sm-12">
-            <div
-              style={{ margin: '5px', marginBottom: '50px' }}
-              className="modify-activity-data-table"
-            >
-              <DataTable
-                title="All therapist List"
-                columns={columns}
-                keyField="id"
-                theme="default"
-                pagination
-                data={therapists}
-                customStyles={customStyles}
-                noHeader
-                paginationRowsPerPageOptions={[10, 50, 100, 200, 500, 1000]}
-              />
-            </div>
+            {loading ? (
+              <LoadingComponent />
+            ) : (
+              <div
+                style={{ margin: '5px', marginBottom: '50px' }}
+                className="modify-activity-data-table"
+              >
+                <DataTable
+                  title="All therapist List"
+                  columns={columns}
+                  keyField="id"
+                  theme="default"
+                  pagination
+                  data={therapists}
+                  customStyles={customStyles}
+                  noHeader
+                  paginationRowsPerPageOptions={[10, 50, 100, 200, 500, 1000]}
+                />
+              </div>
+            )}
           </div>
         </div>
       </Authorize>
