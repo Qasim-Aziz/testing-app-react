@@ -176,6 +176,183 @@ export const FOOD_TYPE = gql`
   }
 `
 
+export const SESSION_DATA = gql`
+  query($targets_StudentId: ID, $date_Gte: Date, $date_Lte: Date) {
+    getSessionDataRecording(
+      targets_StudentId: $targets_StudentId
+      date_Gte: $date_Gte
+      date_Lte: $date_Lte
+    ) {
+      edges {
+        node {
+          id
+          targets {
+            id
+            targetAllcatedDetails {
+              id
+              targetName
+            }
+          }
+          ChildSession {
+            id
+            sessionDate
+            createdAt
+            duration
+            sessions {
+              id
+              name
+              sessionName {
+                id
+                name
+              }
+            }
+          }
+          sessionRecord {
+            edges {
+              node {
+                entryTime
+              }
+            }
+            totalCorrect
+            totalIncorrect
+            totalError
+            totalPrompt
+            totalTrial
+            totalNr
+            physical
+            verbal
+            gestural
+            textual
+          }
+          peak {
+            totalCorrect
+            totalError
+            totalPrompt
+            totalTrial
+          }
+
+          durationStart
+          durationEnd
+          isPeak
+          isPeakEquivalance
+        }
+      }
+      totalTarget
+      edgeCount
+      perCorrect
+      perError
+      perPrompt
+      mandCount
+      behCount
+      toiletData {
+        id
+        time
+        date
+      }
+      behData {
+        id
+        date
+      }
+      mandData {
+        id
+        data
+        date
+      }
+    }
+  }
+`
+
+export const DECEL_DATA = gql`
+  query($targets_StudentId: ID, $date_Gte: Date, $date_Lte: Date) {
+    getDecelData(template_Student: $targets_StudentId, date_Gte: $date_Gte, date_Lte: $date_Lte) {
+      edges {
+        node {
+          id
+          date
+          createdAt
+          duration
+          template {
+            id
+            behavior {
+              id
+              time
+              behaviorName
+              definition
+            }
+          }
+          session {
+            id
+            sessionDate
+            duration
+            sessions {
+              id
+              sessionName {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+export const GET_MAND = gql`
+  query($targets_StudentId: ID, $date_Gte: Date, $date_Lte: Date) {
+    getMandData(dailyClick_Student: $targets_StudentId, dateGte: $date_Gte, dateLte: $date_Lte) {
+      edges {
+        node {
+          id
+          data
+          date
+          dailyClick {
+            id
+            measurments
+          }
+          session {
+            id
+            sessionDate
+            duration
+            sessions {
+              id
+              sessionName {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+export const SESSION_TOILET_DATA = gql`
+  query($targets_StudentId: ID, $date_Gte: Date, $date_Lte: Date) {
+    getToiletData(student: $targets_StudentId, date_Lte: $date_Lte, date_Gte: $date_Gte) {
+      edges {
+        node {
+          id
+          date
+          session {
+            id
+            sessionDate
+            duration
+            sessions {
+              id
+              sessionName {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 export const SESSIONS_SUMMERY = gql`
   query($studentId: ID!, $startDate: Date!, $endDate: Date!) {
     sessionSummary(studentId: $studentId, dateGte: $startDate, dateLte: $endDate) {

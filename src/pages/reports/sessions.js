@@ -30,7 +30,14 @@ import { FaDownload } from 'react-icons/fa'
 import moment from 'moment'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import SessionReportPdf from './sessionReportPdf'
-import { SESSIONS_SUMMERY, FREQUENCY_DIS_TARGET } from './query'
+import {
+  SESSIONS_SUMMERY,
+  GET_MAND,
+  SESSION_TOILET_DATA,
+  DECEL_DATA,
+  SESSION_DATA,
+  FREQUENCY_DIS_TARGET,
+} from './query'
 import './form.scss'
 import './table.scss'
 
@@ -46,189 +53,12 @@ const filterCardStyle = {
   backgroundColor: COLORS.palleteLight,
 }
 
-const SESSION_DATA = gql`
-  query($targets_StudentId: ID, $date_Gte: Date, $date_Lte: Date) {
-    getSessionDataRecording(
-      targets_StudentId: $targets_StudentId
-      date_Gte: $date_Gte
-      date_Lte: $date_Lte
-    ) {
-      edges {
-        node {
-          id
-          targets {
-            id
-            targetAllcatedDetails {
-              id
-              targetName
-            }
-          }
-          ChildSession {
-            id
-            sessionDate
-            createdAt
-            duration
-            sessions {
-              id
-              name
-              sessionName {
-                id
-                name
-              }
-            }
-          }
-          sessionRecord {
-            edges {
-              node {
-                entryTime
-              }
-            }
-            totalCorrect
-            totalIncorrect
-            totalError
-            totalPrompt
-            totalTrial
-            totalNr
-            physical
-            verbal
-            gestural
-            textual
-          }
-          peak {
-            totalCorrect
-            totalError
-            totalPrompt
-            totalTrial
-          }
-
-          durationStart
-          durationEnd
-          isPeak
-          isPeakEquivalance
-        }
-      }
-      totalTarget
-      edgeCount
-      perCorrect
-      perError
-      perPrompt
-      mandCount
-      behCount
-      toiletData {
-        id
-        time
-        date
-      }
-      behData {
-        id
-        date
-      }
-      mandData {
-        id
-        data
-        date
-      }
-    }
-  }
-`
-
-const DECEL_DATA = gql`
-  query($targets_StudentId: ID, $date_Gte: Date, $date_Lte: Date) {
-    getDecelData(template_Student: $targets_StudentId, date_Gte: $date_Gte, date_Lte: $date_Lte) {
-      edges {
-        node {
-          id
-          date
-          createdAt
-          duration
-          template {
-            id
-            behavior {
-              id
-              time
-              behaviorName
-              definition
-            }
-          }
-          session {
-            id
-            sessionDate
-            duration
-            sessions {
-              id
-              sessionName {
-                id
-                name
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`
-
-const GET_MAND = gql`
-  query($targets_StudentId: ID, $date_Gte: Date, $date_Lte: Date) {
-    getMandData(dailyClick_Student: $targets_StudentId, dateGte: $date_Gte, dateLte: $date_Lte) {
-      edges {
-        node {
-          id
-          data
-          date
-          dailyClick {
-            id
-            measurments
-          }
-          session {
-            id
-            sessionDate
-            duration
-            sessions {
-              id
-              sessionName {
-                id
-                name
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`
-
-const TOILET_DATA = gql`
-  query($targets_StudentId: ID, $date_Gte: Date, $date_Lte: Date) {
-    getToiletData(student: $targets_StudentId, date_Lte: $date_Lte, date_Gte: $date_Gte) {
-      edges {
-        node {
-          id
-          date
-          session {
-            id
-            sessionDate
-            duration
-            sessions {
-              id
-              sessionName {
-                id
-                name
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`
-
 const parentDiv = { display: 'flex', margin: 'auto 30px auto 0' }
 const parentLabel = { fontSize: '15px', color: '#000', margin: 'auto 8px auto' }
 
 export default Form.create()(({ studentName, showDrawerFilter }) => {
   const [selectSession, setSelectSession] = useState()
-  const [range, setRange] = useState([moment().subtract(4, 'd'), moment(Date.now())])
+  const [range, setRange] = useState([moment().subtract(10, 'd'), moment(Date.now())])
   const [session, setSession] = useState('Morning')
   const studentId = localStorage.getItem('studentId')
   const prevSelectSession = usePrevious(selectSession)
@@ -250,13 +80,13 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     return 0
   }
 
-  const { data, error, loading } = useQuery(SESSIONS_SUMMERY, {
-    variables: {
-      studentId,
-      startDate: moment(range[0]).format('YYYY-MM-DD'),
-      endDate: moment(range[1]).format('YYYY-MM-DD'),
-    },
-  })
+  // const { data, error, loading } = useQuery(SESSIONS_SUMMERY, {
+  //   variables: {
+  //     studentId,
+  //     startDate: moment(range[0]).format('YYYY-MM-DD'),
+  //     endDate: moment(range[1]).format('YYYY-MM-DD'),
+  //   },
+  // })
 
   const { data: dt, error: er, loading: ld } = useQuery(SESSION_DATA, {
     variables: {
@@ -265,32 +95,34 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
       date_Lte: moment(range[1]).format('YYYY-MM-DD'),
     },
   })
-  const { data: decel, error: deer, loading: deld } = useQuery(DECEL_DATA, {
+  const { data: decel, error: decelError, loading: decelLoading } = useQuery(DECEL_DATA, {
     variables: {
       targets_StudentId: JSON.parse(studentId),
       date_Gte: moment(range[0]).format('YYYY-MM-DD'),
       date_Lte: moment(range[1]).format('YYYY-MM-DD'),
     },
   })
-  const { data: mand, error: mander, loading: mandld } = useQuery(GET_MAND, {
+  const { data: mand, error: mandError, loading: mandLoading } = useQuery(GET_MAND, {
     variables: {
       targets_StudentId: JSON.parse(studentId),
       date_Gte: moment(range[0]).format('YYYY-MM-DD'),
       date_Lte: moment(range[1]).format('YYYY-MM-DD'),
     },
   })
-  const { data: toilet, error: toileter, loading: toiletld } = useQuery(TOILET_DATA, {
-    variables: {
-      targets_StudentId: JSON.parse(studentId),
-      date_Gte: moment(range[0]).format('YYYY-MM-DD'),
-      date_Lte: moment(range[1]).format('YYYY-MM-DD'),
+  const { data: toilet, error: toiletError, loading: toiletLoading } = useQuery(
+    SESSION_TOILET_DATA,
+    {
+      variables: {
+        targets_StudentId: JSON.parse(studentId),
+        date_Gte: moment(range[0]).format('YYYY-MM-DD'),
+        date_Lte: moment(range[1]).format('YYYY-MM-DD'),
+      },
     },
-  })
-  console.log(mand, 'mand mand')
-  console.log(decel, 'decel')
+  )
+
   useEffect(() => {
     const tempTable = []
-    if (dt && toilet && session !== 'All') {
+    if (dt && toilet && mand && decel && session !== 'All') {
       dt.getSessionDataRecording.edges.map(({ node }) => {
         let exist = false
         let objIdx = -1
@@ -335,20 +167,20 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
               peakEquError: 0,
               peakEquPrompt: 0,
               behCount: 0,
-              behaviour: 'No behaviour performed!',
-              mand: [],
+              behaviour: {},
+              mand: {},
               toilet: 'No',
               toiletCount: 0,
             })
           }
         }
       })
+
       toilet.getToiletData.edges.map(({ node }) => {
         let exist = false
         let objIdx = -1
         const objDate = node.session?.sessionDate
         const sessionObj = node.session?.sessions
-        // console.log(objDate, sessionObj, 'seee')
         if (sessionObj?.sessionName.name === session) {
           for (let i = 0; i < tempTable.length; i++) {
             if (tempTable[i].sessionDate === objDate) {
@@ -363,18 +195,15 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
               ...tempTable[objIdx],
               toiletCount: tempTable[objIdx].toiletCount + 1,
             }
-          } else {
-            console.log('else')
           }
         }
       })
+
       mand.getMandData.edges.map(({ node }) => {
         let exist = false
         let objIdx = -1
         const objDate = node.session?.sessionDate
         const sessionObj = node.session?.sessions
-        console.log(node, 'noe')
-        console.log(objDate, sessionObj, 'mand')
         if (sessionObj?.sessionName.name === session) {
           for (let i = 0; i < tempTable.length; i++) {
             if (tempTable[i].sessionDate === objDate) {
@@ -384,19 +213,52 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
             }
           }
 
+          const dailyClick = node.dailyClick.measurments
+          const data = node.data
+
           if (exist) {
-            console.log('gotcha')
-            console.log(tempTable[objIdx], objIdx, 'oj')
-            tempTable[objIdx].mand.push({
-              measurments: node.dailyClick.measurments,
-              data: node.data,
-            })
-          } else {
-            console.log('else')
+            if (tempTable[objIdx].mand[dailyClick]) {
+              tempTable[objIdx].mand[dailyClick] += data
+            } else {
+              tempTable[objIdx].mand = {
+                ...tempTable[objIdx].mand,
+                [dailyClick]: data,
+              }
+            }
           }
         }
       })
-    } else if (dt && session) {
+
+      decel.getDecelData.edges.map(({ node }) => {
+        let exist = false
+        let objIdx = -1
+        const objDate = node.session?.sessionDate
+        const sessionObj = node.session?.sessions
+        if (sessionObj?.sessionName.name === session) {
+          for (let i = 0; i < tempTable.length; i++) {
+            if (tempTable[i].sessionDate === objDate) {
+              exist = true
+              objIdx = i
+              break
+            }
+          }
+
+          const behav = node.template.behavior?.behaviorName
+          const duration = Number(node.duration)
+
+          if (exist) {
+            if (tempTable[objIdx].behaviour[behav]) {
+              tempTable[objIdx].behaviour[behav] += duration
+            } else {
+              tempTable[objIdx].behaviour = {
+                ...tempTable[objIdx].behaviour,
+                [behav]: duration,
+              }
+            }
+          }
+        }
+      })
+    } else if (dt && mand && decel && toilet && session) {
       dt.getSessionDataRecording.edges.map(({ node }) => {
         let exist = false
         let objIdx = -1
@@ -440,35 +302,113 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
             peakEquError: 0,
             peakEquPrompt: 0,
             behCount: 0,
-            behaviour: 'No behaviour performed!',
-            mand: 'No mand performed!',
+            behaviour: {},
+            mand: {},
             toilet: 'No',
             toiletCount: 0,
           })
         }
       })
+
+      toilet.getToiletData.edges.map(({ node }) => {
+        let exist = false
+        let objIdx = -1
+        const objDate = node.session?.sessionDate
+        const sessionObj = node.session?.sessions
+        for (let i = 0; i < tempTable.length; i++) {
+          if (tempTable[i].sessionDate === objDate) {
+            exist = true
+            objIdx = i
+            break
+          }
+        }
+
+        if (exist) {
+          tempTable[objIdx] = {
+            ...tempTable[objIdx],
+            toiletCount: tempTable[objIdx].toiletCount + 1,
+          }
+        }
+      })
+
+      mand.getMandData.edges.map(({ node }) => {
+        let exist = false
+        let objIdx = -1
+        const objDate = node.session?.sessionDate
+        const sessionObj = node.session?.sessions
+        for (let i = 0; i < tempTable.length; i++) {
+          if (tempTable[i].sessionDate === objDate) {
+            exist = true
+            objIdx = i
+            break
+          }
+        }
+
+        const dailyClick = node.dailyClick.measurments
+        const data = node.data
+
+        if (exist) {
+          if (tempTable[objIdx].mand[dailyClick]) {
+            tempTable[objIdx].mand[dailyClick] += data
+          } else {
+            tempTable[objIdx].mand = {
+              ...tempTable[objIdx].mand,
+              [dailyClick]: data,
+            }
+          }
+        }
+      })
+
+      decel.getDecelData.edges.map(({ node }) => {
+        let exist = false
+        let objIdx = -1
+        const objDate = node.session?.sessionDate
+        const sessionObj = node.session?.sessions
+        for (let i = 0; i < tempTable.length; i++) {
+          if (tempTable[i].sessionDate === objDate) {
+            exist = true
+            objIdx = i
+            break
+          }
+        }
+
+        const behav = node.template.behavior?.behaviorName
+        const duration = Number(node.duration)
+
+        if (exist) {
+          if (tempTable[objIdx].behaviour[behav]) {
+            tempTable[objIdx].behaviour[behav] += duration
+          } else {
+            tempTable[objIdx].behaviour = {
+              ...tempTable[objIdx].behaviour,
+              [behav]: duration,
+            }
+          }
+        }
+      })
     }
-    console.log(tempTable, 'tempTable')
+
+    tempTable.sort(compare)
     setTableData(tempTable)
   }, [dt, session])
 
-  const getBehaviourList = behaviour => {
-    if (behaviour === 'No behaviour performed!') {
-      return []
-    }
-    const behaviorItems = behaviour.split(',')
-    const res = []
-    behaviorItems.map(item => {
-      const b = item.split(':')
-      if (!isNaN(Number(b[1]) / 1000))
-        res.push({
-          behaviour: b[0].trim(),
-          duration: Number(Number(Number(b[1]) / 1000).toFixed(0)),
-        })
-    })
+  // const getBehaviourList = behaviour => {
+  //   if (behaviour === 'No behaviour performed!') {
+  //     return []
+  //   }
+  //   const behaviorItems = behaviour.split(',')
+  //   const res = []
+  //   behaviorItems.map(item => {
+  //     const b = item.split(':')
+  //     if (!isNaN(Number(b[1]) / 1000))
+  //       res.push({
+  //         behaviour: b[0].trim(),
+  //         duration: Number(Number(Number(b[1]) / 1000).toFixed(0)),
+  //       })
+  //   })
 
-    return res
-  }
+  //   return res
+  // }
 
   const [
     getFreDisTarget,
@@ -559,12 +499,12 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
   }, [freDisData])
 
   useEffect(() => {
-    if (error) {
+    if (er) {
       notification.error({
         message: 'Error to load sessions summery data',
       })
     }
-  }, [error])
+  }, [er])
 
   useEffect(() => {
     if (freDisError) {
@@ -887,40 +827,35 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
     {
       title: 'Behavior',
       dataIndex: 'behaviour',
-      render: text => {
-        if (text === null || text === '' || text === 'null' || text === 'No behaviour performed!') {
+      render: behav => {
+        if (Object.keys(behav).length === 0 && behav.constructor === Object) {
           return 'None'
-        }
-        const behaviorItems = text.split(',')
-        const tt = []
-        behaviorItems.map(item => {
-          const b = item.split(':')
-          if (!isNaN(Number(Number(b[1]) / 1000).toFixed(0)))
-            tt.push({ behaviour: b[0], duration: Number(Number(b[1]) / 1000).toFixed(0) })
-        })
-        return (
-          <div>
-            {tt.map(item => (
-              <div key={Math.random()}>
-                {item.behaviour}: {item.duration}
+        } else {
+          return Object.entries(behav).map(item => {
+            return (
+              <div>
+                <span>
+                  {item[0]}: {Number(item[1] / 1000).toFixed(2)}
+                </span>
               </div>
-            ))}
-          </div>
-        )
+            )
+          })
+        }
       },
     },
     {
       title: 'Mand',
       dataIndex: 'mand',
       render: md => {
-        if (md && md.length === 0) {
+        if (Object.keys(md).length === 0 && md.constructor === Object) {
           return 'None'
         } else {
-          return md.map(item => {
+          return Object.entries(md).map(item => {
             return (
               <div>
-                <span>{item.measurments}: </span>
-                <span>{item.data}</span>
+                <span>
+                  {item[0]}: {Number(item[1])}
+                </span>
               </div>
             )
           })
@@ -1009,7 +944,7 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
         <Table
           columns={columns}
           dataSource={tableData}
-          loading={ld}
+          loading={ld || toiletLoading || decelLoading || mandLoading}
           bordered
           rowKey="id"
           scroll={{ x: 1950 }}
