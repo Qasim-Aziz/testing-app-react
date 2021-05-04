@@ -7,8 +7,8 @@ import Spinner from '../../Spinner'
 const { Text } = Typography
 
 const GET_ACTIVITIES_QUERY = gql`
-  query {
-    getActivity {
+  query($user: ID) {
+    getActivity(user: $user) {
       edges {
         node {
           id
@@ -35,7 +35,23 @@ const SingleRecord = ({ title, date, note }) => {
 }
 
 const ActivityCard = ({ status }) => {
-  const { loading, data, error } = useQuery(GET_ACTIVITIES_QUERY)
+  const [userId, setUserId] = useState('')
+  const userRole = JSON.parse(localStorage.getItem('role'))
+
+  console.log(userRole)
+
+  useEffect(() => {
+    if (userRole === 'therapist') {
+      const id = JSON.parse(localStorage.getItem('userId'))
+      setUserId(id)
+    }
+  }, [userRole])
+
+  const { loading, data, error } = useQuery(GET_ACTIVITIES_QUERY, {
+    variables: {
+      user: userId,
+    },
+  })
 
   const [filtered, setFiltered] = useState([])
 
