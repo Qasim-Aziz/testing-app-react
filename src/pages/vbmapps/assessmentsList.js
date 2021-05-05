@@ -255,20 +255,24 @@ class AssessmentsList extends Component {
             style={{ marginRight: 10, padding: 0 }}
             type="link"
             onClick={() => {
+              console.log(id, 'this is id')
               client
                 .mutate({
                   mutation: gql`
-                  mutation {
-                    vbmappIepReport(input: { pk: "${id}" }) {
-                      status
-                      data
-                      file
+                    mutation($pk: String) {
+                      vbmappIepReport(input: { pk: $pk }) {
+                        status
+                        file
+                        data
+                      }
                     }
-                  }
-                `,
+                  `,
+                  variables: {
+                    pk: id,
+                  },
                 })
                 .then(result => {
-                  // console.log(result)
+                  console.log(result, 'result')
                   window.open(result.data.vbmappIepReport.file)
                 })
             }}

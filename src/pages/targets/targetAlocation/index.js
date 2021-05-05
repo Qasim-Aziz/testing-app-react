@@ -139,12 +139,14 @@ const TargetAllocation = () => {
 
   const getDefaultGoalsQuery = async studentId => {
     const defaultGoalResponse = await getDefaultGoals(studentId)
+    console.log(defaultGoalResponse, 'response')
     if (notNull(defaultGoalResponse)) {
       const allDefaultGoals = []
       defaultGoalResponse.data.longTerm.edges.forEach(({ node: longTermGoal }) => {
         // eslint-disable-next-line prefer-destructuring
         allDefaultGoals[longTermGoal.program.id] = longTermGoal.shorttermgoalSet.edges[0]
       })
+      console.log(allDefaultGoals, 'all default goasl')
       setDefaultShortTermGoals(allDefaultGoals)
     }
   }
@@ -976,30 +978,29 @@ const TargetAllocation = () => {
             {loading ? (
               <LoadingComponent />
             ) : (
-                <Tabs
-                  className="targetTabs" 
-                  style={{
-                    backgroundColor: COLORS.palleteLight,
-                    marginTop: 8,
-                    borderTop: 'none',
-                  }} 
-                  tabBarStyle={{
-                    backgroundColor: '#fff',
-                    
-                  }}
-                  onChange={setActiveTabKey}
-                >
-                  <TabPane tab="Goal(s)" key="customGoalTab">
-                    {customGoalTab}
-                  </TabPane>
-                  <TabPane tab="Directly" key="defaultGoalTab">
-                    {defaultGoalTab}
-                  </TabPane>
-                  <TabPane tab="Assessments" key="assessments">
-                    <AssessmentContent />
-                  </TabPane>
-                </Tabs>
-              )}
+              <Tabs
+                className="targetTabs"
+                style={{
+                  backgroundColor: COLORS.palleteLight,
+                  marginTop: 8,
+                  borderTop: 'none',
+                }}
+                tabBarStyle={{
+                  backgroundColor: '#fff',
+                }}
+                onChange={setActiveTabKey}
+              >
+                <TabPane tab="Goal(s)" key="customGoalTab">
+                  {customGoalTab}
+                </TabPane>
+                <TabPane tab="Directly" key="defaultGoalTab">
+                  {defaultGoalTab}
+                </TabPane>
+                <TabPane tab="Assessments" key="assessments">
+                  <AssessmentContent />
+                </TabPane>
+              </Tabs>
+            )}
           </div>
         </Content>
       </Layout>

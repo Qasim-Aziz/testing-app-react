@@ -25,6 +25,7 @@ import moment from 'moment'
 import { connect } from 'react-redux'
 import axios from 'axios'
 import AntdTag from '../../staffs/antdTag'
+import { CANCEL_BUTTON, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 
 const { TextArea } = Input
 const { Option } = Select
@@ -51,7 +52,7 @@ const tailLayout = {
   },
 }
 
-@connect(({ user, leaders }) => ({ user, leaders }))
+@connect(({ user, leaders, staffs }) => ({ user, leaders, staffs }))
 class EditBasicInformation extends React.Component {
   constructor(props) {
     super(props)
@@ -65,21 +66,21 @@ class EditBasicInformation extends React.Component {
   }
 
   componentDidMount() {
-    console.log('THE PROPS ')
     const {
       form,
       leaders: { UserProfile },
     } = this.props
 
-    console.log('THE IS USERPROFILE', UserProfile)
-    console.log('THE IS US', this.props)
+    console.log(this.props, 'this props')
+    const tempTherapist = UserProfile.therapist.edges.map(({ node }) => node.id)
+    console.log(tempTherapist, 'temp Therpoa')
     form.setFieldsValue({
       email: UserProfile.email,
       firstName: UserProfile.name,
       lastName: UserProfile.surname,
       mobileNo: UserProfile.phone,
       leadStatus: UserProfile.leadStatus,
-      projectName: UserProfile.projectName,
+      therapist: tempTherapist,
     })
 
     this.setState({
@@ -95,12 +96,9 @@ class EditBasicInformation extends React.Component {
     } = this.props
     e.preventDefault()
     const data = new FormData()
-    // data.append('file', this.state.selectedFile)
     data.append('pk', this.state.userProfileID)
-    console.log('THE DATA', data)
     form.validateFields((err, values) => {
-      console.log('THE VALUES in edit form', err, values)
-      // values = { ...values, tags: this.state.tagArray }
+      console.log(values, 'values')
       message.success('Upload Successfully.')
       dispatch({
         type: 'leaders/EDIT_LEADER',
@@ -115,17 +113,16 @@ class EditBasicInformation extends React.Component {
   }
 
   render() {
-    console.log('THE PROPS in EDIT-BASIC-INFO====> initially in render \n', this.props)
-    console.log('THE STATE in EDIT-BASIC-INFO====> initially in render \n', this.state)
     const itemStyle = { marginBottom: '5px', fontWeight: 'bold' }
     const {
       form,
       leaders: { clinicLocationList, categoryList, staffDropdownList, languageList },
+      staffs: { StaffList },
     } = this.props
     const itemStyle1 = { marginBottom: '5px', fontWeight: 'bold' }
-    // console.log(this.props.form, 'pppp')
-    console.log('THE PROPS in EDIT-BASIC-INFO====> END of render \n', this.props)
-    console.log('THE STATE in EDIT-BASIC-INFO====> END of render \n', this.state)
+
+    console.log()
+    console.log(StaffList, 'stafflisr')
     return (
       <div>
         <Form {...layout} onSubmit={e => this.handleSubmit(e)}>
@@ -168,25 +165,29 @@ class EditBasicInformation extends React.Component {
             )}
           </Form.Item>
 
-          <Form.Item label="Project Name" style={itemStyle}>
-            {form.getFieldDecorator('projectName', {
+          <Form.Item label="Therapist" style={itemStyle}>
+            {form.getFieldDecorator('therapist', {
               rules: [{ required: true, message: 'Please provide Project Name' }],
             })(
-              <Select placeholder="Project Name" allowClear>
-                <Option value="PROJECT_1">Project_1</Option>
-                <Option value="PROJECT_2">Project_2</Option>
-                <Option value="PROJECT_3">Project_3</Option>
+              <Select placeholder="Select therapist" mode="multiple" allowClear>
+                {StaffList.map(item => {
+                  return (
+                    <Option value={item.id} key={item.id}>
+                      {item.name}
+                    </Option>
+                  )
+                })}
               </Select>,
             )}
           </Form.Item>
 
           <Form.Item {...tailLayout}>
-            <Button style={{ width: '100%' }} type="primary" htmlType="submit">
+            <Button style={SUBMITT_BUTTON} type="primary" htmlType="submit">
               Save
             </Button>
-            {/* <Button htmlType="primary" onClick={this.onReset} className="ml-4">
-            cancel
-          </Button> */}
+            <Button onClick={this.onReset} style={CANCEL_BUTTON}>
+              cancel
+            </Button>
           </Form.Item>
         </Form>
       </div>

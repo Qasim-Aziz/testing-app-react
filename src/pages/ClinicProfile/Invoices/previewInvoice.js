@@ -466,6 +466,42 @@ const PreviewInvoice = ({ invoiceId }) => {
                 >
                   <b>A/C Holder Name:</b> {accountHolderName}
                 </div>
+                {upi ? (
+                  <div
+                    style={{
+                      ...general,
+                      paddingBottom: '1px',
+                      alignSelf: 'flex-start',
+                      width: '100%',
+                    }}
+                  >
+                    <b>UPI:</b> {upi}
+                  </div>
+                ) : null}
+                {gpay ? (
+                  <div
+                    style={{
+                      ...general,
+                      padding: '1px 8px',
+                      alignSelf: 'flex-start',
+                      width: '100%',
+                    }}
+                  >
+                    <b>Google Pay: </b> {gpay}
+                  </div>
+                ) : null}
+                {paytm ? (
+                  <div
+                    style={{
+                      ...general,
+                      padding: '1px 8px 5px',
+                      alignSelf: 'flex-start',
+                      width: '100%',
+                    }}
+                  >
+                    <b>Paytm:</b> {paytm}
+                  </div>
+                ) : null}
               </div>
               <div
                 style={{

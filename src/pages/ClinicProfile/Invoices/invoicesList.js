@@ -26,6 +26,7 @@ import {
   FilePdfOutlined,
   EditOutlined,
   DeleteOutlined,
+  ToolTwoTone,
 } from '@ant-design/icons'
 import { useQuery, useMutation } from 'react-apollo'
 import moment from 'moment'
@@ -34,7 +35,13 @@ import InvoiceForm from 'components/invoice/InvoiceForm'
 import EditInvoice from './editInvoice'
 import UpdateInvoiceStatus from './updateInvoiceStatus'
 import PreviewInvoice from './previewInvoice'
-import { GET_INVOICES, DELETE_INVOICE, GET_INVOICE_STATUS_LIST } from './query'
+import {
+  GET_INVOICES,
+  DELETE_INVOICE,
+  GET_INVOICE_STATUS_LIST,
+  GENERATE_LINK,
+  PAYMENT_REMINDER,
+} from './query'
 import './template.scss'
 import SendPaymentLinks from '../../Invoices/sendPaymentLinks'
 
@@ -95,6 +102,8 @@ export default () => {
     },
   )
 
+  const [generateInvoiceLink, { loading: invoiceLinkLoading }] = useMutation(GENERATE_LINK)
+  const [sendReminder, { loading: sendReminderLoading }] = useMutation(PAYMENT_REMINDER)
   const [deleteInvoice, { loading: deleteInvoiceLoading }] = useMutation(DELETE_INVOICE)
 
   useEffect(() => {
@@ -132,6 +141,36 @@ export default () => {
       })
     }
   }, [invoiceError])
+
+  const handleSendInvoice = row => {
+    if (row && row.key && row.linkGenerated) {
+      sendReminder({
+        variables: {
+          pk: [row.key],
+        },
+      })
+        .then(res => {
+          refetch()
+          notification.success({
+            message: 'Payment link generated and send successfully',
+          })
+        })
+        .catch(rr => console.error(rr))
+    } else if (row && row.key) {
+      generateInvoiceLink({
+        variables: {
+          pk: [row.key],
+        },
+      })
+        .then(res => {
+          refetch()
+          notification.success({
+            message: 'Payment reminder send successfully',
+          })
+        })
+        .catch(rr => console.error(rr))
+    }
+  }
 
   const columns = [
     {
@@ -184,29 +223,39 @@ export default () => {
       render: row => {
         return (
           <div>
-            <Button
-              onClick={() => {
-                setSelectedInvoiceId(row.key)
-                setPreviewInvoice(true)
-                setCurrentInvoice(row)
-              }}
-              type="link"
-            >
-              <FilePdfOutlined style={{ fontWeight: 600 }} />
-            </Button>
+            <Tooltip title="View Invoice">
+              <Button
+                onClick={() => {
+                  setSelectedInvoiceId(row.key)
+                  setPreviewInvoice(true)
+                  setCurrentInvoice(row)
+                }}
+                type="link"
+              >
+                <FilePdfOutlined style={{ fontWeight: 600 }} />
+              </Button>
+            </Tooltip>
 
             {row.status !== 'Paid' && (
               <>
-                <Button
-                  type="link"
-                  onClick={() => {
-                    setEditInvoice(true)
-                    setEditInvoiceId(row.key)
-                    setCurrentInvoice(row)
-                  }}
-                >
-                  <EditOutlined style={{ fontWeight: 600 }} />
-                </Button>
+                <Tooltip title="Edit">
+                  <Button
+                    type="link"
+                    onClick={() => {
+                      setEditInvoice(true)
+                      setEditInvoiceId(row.key)
+                      setCurrentInvoice(row)
+                    }}
+                  >
+                    <EditOutlined style={{ fontWeight: 600 }} />
+                  </Button>
+                </Tooltip>
+
+                <Tooltip title="Send Invoice">
+                  <Button onClick={() => handleSendInvoice(row)} type="link">
+                    <MailOutlined style={{ fontWeight: 600 }} />
+                  </Button>
+                </Tooltip>
                 <Popconfirm
                   title="Are you sure to delete this invoice?"
                   onConfirm={() => {

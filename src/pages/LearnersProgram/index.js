@@ -266,7 +266,6 @@ class PeakEqvi extends React.Component {
                 display: 'flex',
                 flexDirection: 'row',
                 justifyContent: 'space-between',
-
                 width: '100%',
                 alignItems: 'center',
                 padding: '0px 10px',
@@ -285,6 +284,7 @@ class PeakEqvi extends React.Component {
                       fontSize: 25,
                       marginRight: '9px',
                       marginTop: '2px',
+                      lineHeight: '36px',
                     }}
                   >
                     {StudentName !== '' && `${StudentName}'s ${TabCheck}`}

@@ -1,16 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react'
-import { Button, Form, Row, Col, Select, notification, Input, Tabs } from 'antd'
+import { Button, Form, Row, Col, Select, notification, Input } from 'antd'
 import gql from 'graphql-tag'
 import { useQuery, useMutation } from 'react-apollo'
 import LoadingComponent from 'components/LoadingComponent'
-import BankDetails from './Invoices/bankDetails'
-import OtherPaymentMethods from './Invoices/otherPaymentMethods'
-import './clinicProfile.scss'
-import GeneralInfoProfile from './Invoices/generalInfoProfile'
 
 const { Option } = Select
-const { TabPane } = Tabs
 
 const UPDATE_CLINIC = gql`
   mutation(
@@ -18,8 +13,6 @@ const UPDATE_CLINIC = gql`
     $bankAccountNo: String
     $ifscCode: String
     $accountHolderName: String
-    $billingName: String
-    $currency: ID
   ) {
     updateClinic(
       input: {
@@ -27,8 +20,6 @@ const UPDATE_CLINIC = gql`
         bankAccountNo: $bankAccountNo
         ifscCode: $ifscCode
         accountHolderName: $accountHolderName
-        billingName: $billingName
-        currency: $currency
       }
     ) {
       school {
@@ -90,7 +81,7 @@ const ADD_CURRENCY = gql`
   }
 `
 
-const InvoiceRelated = ({ form }) => {
+function BankDetails({ form }) {
   const [newCurrency, setNewCurrency] = useState()
   const schoolId = localStorage.getItem('userId')
   const { data, error, loading, refetch } = useQuery(SCHOOL_CURRENCY, {
@@ -148,23 +139,14 @@ const InvoiceRelated = ({ form }) => {
             accountHolderName: values.accountHolderName,
             bankAccountNo: values.accountNo,
             ifscCode: values.ifscCode,
-            currency: values.currency,
-            billingName: values.billingName,
           },
         })
           .then(res => {
-            console.log(res, 'res')
             notification.success({
               message: 'Details updated successfully',
             })
           })
-          .catch(errDt => {
-            console.log(errDt, 'err')
-            notification.error({
-              message: 'Something went wrong',
-              description: 'Unable to update bank details',
-            })
-          })
+          .catch(errDt => console.log(errDt, 'err'))
       }
     })
   }
@@ -177,23 +159,55 @@ const InvoiceRelated = ({ form }) => {
   }
 
   return (
-    <div className="profileForm invoice-related">
-      <div className="profileTab-heading">
-        <p>Invoice</p>
+    <div>
+      <Form.Item
+        label="Bank Name"
+        labelCol={{ span: 24 }}
+        wrapperCol={{ span: 24 }}
+        style={{ paddingTop: '2em' }}
+      >
+        {form.getFieldDecorator('bankName', {
+          initialValue: data.school.bankName,
+          rules: [{ required: true, message: 'Please provide bank name' }],
+        })(<Input style={{ width: '80%' }} />)}
+      </Form.Item>
+      <div style={{ display: 'flex' }}>
+        <Form.Item
+          label="A/C No"
+          labelCol={{ span: 24 }}
+          wrapperCol={{ span: 24 }}
+          style={{ width: '40%', paddingRight: '1em' }}
+        >
+          {form.getFieldDecorator('accountNo', {
+            initialValue: data.school.bankAccountNo,
+            rules: [{ required: true, message: 'Please provide account number' }],
+          })(<Input style={{ width: '100%' }} />)}
+        </Form.Item>
+        <Form.Item
+          label="IFSC Code"
+          labelCol={{ span: 24 }}
+          wrapperCol={{ span: 24 }}
+          style={{ width: '40%' }}
+        >
+          {form.getFieldDecorator('ifscCode', {
+            initialValue: data.school.ifscCode,
+            rules: [{ required: true, message: "Please provide bank's IFSC code" }],
+          })(<Input style={{ width: '100%' }} />)}
+        </Form.Item>
       </div>
-      <Tabs>
-        <TabPane tab="General Info" key="gg">
-          <GeneralInfoProfile />
-        </TabPane>
-        <TabPane tab="Bank Details" key="bg">
-          <BankDetails />
-        </TabPane>
-        <TabPane tab="Other Methods" key="tg">
-          <OtherPaymentMethods />
-        </TabPane>
-      </Tabs>
+      <Form.Item label="A/C Holder's Name" labelCol={{ span: 24 }} wrapperCol={{ span: 24 }}>
+        {form.getFieldDecorator('accountHolderName', {
+          initialValue: data.school.accountHolderName,
+          rules: [{ required: true, message: 'Please provide account holder name' }],
+        })(<Input style={{ width: '80%' }} />)}
+      </Form.Item>
+      <div style={{ display: 'flex' }}>
+        <Button loading={updateInvoiceDetailLoading} type="primary" onClick={handleSubmit}>
+          Save
+        </Button>
+      </div>
     </div>
   )
 }
 
-export default Form.create()(InvoiceRelated)
+export default Form.create()(BankDetails)

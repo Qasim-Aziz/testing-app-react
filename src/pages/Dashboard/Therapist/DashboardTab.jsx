@@ -15,7 +15,7 @@ import ChatMessageCard from './Cards/ChatMessageCard'
 const DashboardTab = () => {
   const history = useHistory()
 
-  const [taskStatus, setTaskStatus] = useState('All')
+  const [taskStatus, setTaskStatus] = useState('Open')
   const [appointmentStatus, setAppointmentStatus] = useState('All')
   const [invoiceStatus, setInvoiceStatus] = useState('All')
 

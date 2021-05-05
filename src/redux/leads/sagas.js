@@ -59,15 +59,8 @@ export function* GET_LEADERS({ payload }) {
     console.log('THE RESPONSE', response)
     let leaders = []
     let i = 0
-    console.log('response data inside sagas', response.data)
-    console.log('SINCE IT EXPECTS OBJs', typeof response.data)
-    console.log('SINCE IT EXPECTS OBJs of leads', typeof response.data.leads)
     let res_array = response.data.leads
-    // console.log('SINCE IT EXPECTS OBJs of leads check', x[0])
-    // leaders.push(res_array[0])
     leaders = response.data.leads
-    console.log('THE VALUES OF LEADERS', leaders)
-    console.log('TYPE OF LEADER', typeof leaders)
 
     yield put({
       type: 'leaders/SET_STATE',
@@ -87,16 +80,13 @@ export function* GET_LEADERS({ payload }) {
 }
 
 export function* CREATE_LEADER({ payload }) {
-  console.log('THE PAYLOAD', payload)
   const response = yield call(createLeader, payload)
-  console.log('THE RESPONSE ONCE THE LEAD IS CREATED', response)
   if (response && response.data) {
     notification.success({
       message: 'Lead Created Successfully',
     })
   }
   const resObject = yield call(getLeaders, payload)
-  console.log('leader list', resObject.data.leads)
 
   yield put({
     type: 'leaders/SET_STATE',
@@ -109,16 +99,13 @@ export function* CREATE_LEADER({ payload }) {
 }
 
 export function* EDIT_LEADER({ payload }) {
-  console.log('THE PAYLOAD in EDIT', payload)
   const response = yield call(updateLeader, payload)
   if (response && response.data) {
     notification.success({
       message: 'Lead Update Successfully',
     })
-    console.log('edit response', response)
 
     const resObject = yield call(getLeaders, payload)
-    console.log('leader list', resObject.data.leads)
 
     yield put({
       type: 'leaders/SET_STATE',
@@ -128,23 +115,6 @@ export function* EDIT_LEADER({ payload }) {
         PageInfo: 'I dont know what this is', //random value
       },
     })
-    // let updatedLeader = response.data.updateLead.lead
-    // console.log('THE REsponse', updatedLeader)
-    // // Destructuring the all the values from the response
-    // // var created_leader = response.data.createLead.lead
-    // console.log('THE updated_leader', updatedLeader)
-    // yield put({
-    //   type: 'leaders/UPDATE_LEADERS_LIST',
-    //   payload: {
-    //     object: updatedLeader,
-    //   },
-    // })
-    // yield put({
-    //   type: 'leaders/SET_STATE',
-    //   payload: {
-    //     UserProfile: updatedLeader,
-    //   },
-    // })
   }
 }
 

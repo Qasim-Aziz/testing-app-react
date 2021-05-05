@@ -20,9 +20,7 @@ class Goals extends React.Component {
       <div className="card border-white" style={{ backgroundColor: 'black' }}>
         <div className="card-header" style={{ backgroundColor: 'black', color: 'white' }}>
           <p style={{ fontWeight: 'bold' }}>Bahaviour & Development</p>
-          <p style={{ fontSize: '10px', lineHeight: '0px' }}>
-            March 1 - December 1, 2020 . 9 Months
-          </p>
+          <p style={{ fontSize: '10px' }}>March 1 - December 1, 2020 . 9 Months</p>
         </div>
         <div className="card-body">
           <div
