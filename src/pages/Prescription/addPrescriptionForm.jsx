@@ -14,14 +14,12 @@
  */
 
 import {
-  Avatar,
   Button,
   Card,
   Col,
   DatePicker,
   Divider,
   Form,
-  Icon,
   Input,
   InputNumber,
   Layout,
@@ -31,7 +29,6 @@ import {
   Row,
   Select,
   Spin,
-  Switch,
   Typography,
 } from 'antd'
 import moment from 'moment'
@@ -438,8 +435,11 @@ const BankDetails = props => {
         <Content>
           {/* onSubmit={e => handleFormSubmit(e)} */}
           <Form className="update-bank-details">
-            <Divider orientation="left">General Details</Divider>
-            <div>
+            <h2 style={{ marginTop: '20px' }}>
+              {details ? details.firstname : ''} {details ? details.lastname : ''}
+            </h2>
+            {/* <Divider orientation="left">General Details</Divider> */}
+            {/* <div>
               <Card
                 style={{
                   textAlign: 'center',
@@ -519,7 +519,7 @@ const BankDetails = props => {
                 />
               </Card>
             </div>
-            <br />
+            <br /> */}
             <Divider orientation="left">Vitals</Divider>
             <div className="vitals_container">
               <div>

@@ -6,12 +6,21 @@
 
   .file_upload_header {
     width: 100%;
-
     .header_container {
       .header_content {
+        position: relative;
         .filter_container {
           display: flex;
           padding: 1%;
+
+          .student_name {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            font-size: 25px;
+            font-weight: 500;
+            color: black;
+          }
 
           .name_filter_section {
             display: flex;
@@ -61,6 +70,27 @@
             }
           }
         }
+      }
+    }
+
+    .filter_as_clinic {
+      display: flex;
+      padding: 15px;
+      font-size: 16px;
+      font-weight: 600;
+      position: absolute;
+      top: 0;
+      right: 0;
+
+      .staffs_title {
+        margin-right: 15px;
+        cursor: pointer;
+      }
+
+      .learners_title {
+        margin-left: 10px;
+        margin-right: 15px;
+        cursor: pointer;
       }
     }
   }
@@ -204,6 +234,21 @@
         padding: 6px 10px;
         overflow-wrap: break-word;
       }
+    }
+
+    .remove_btn {
+      background-color: transparent;
+      border-color: transparent;
+      text-align: center;
+      color: rgb(0, 0, 0);
+      font-size: 24px;
+      font-weight: 400;
+    }
+
+    .remove_btn:hover {
+      background-color: transparent;
+      border-color: transparent;
+      color: red;
     }
   }
 }

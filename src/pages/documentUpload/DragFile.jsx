@@ -8,27 +8,29 @@ import React, { useEffect, useState } from 'react'
 
 const DragFile = ({ value }) => {
   const studentId = JSON.parse(localStorage.getItem('studentId'))
+  const therapistId = JSON.parse(localStorage.getItem('therapistId'))
   const userRole = JSON.parse(localStorage.getItem('role'))
   const [selectedFile, setFile] = useState(null)
   const fileName = selectedFile?.file?.name
   const fileDescription = value
   const [isLoading, setIsLoading] = useState('')
   const [url, setUrl] = useState('')
+  const [userPk, setUserPk] = useState('')
 
   useEffect(() => {
     if (userRole === 'therapist') {
       setUrl('https://application.cogniable.us/apis/staff-docs/')
+      setUserPk(therapistId)
     }
     if (userRole === 'parents') {
       setUrl('https://application.cogniable.us/apis/student-docs/')
+      setUserPk(studentId)
     }
   }, [])
 
   const onChange = e => {
     setFile({ file: e.target.files[0] })
   }
-
-  console.log(fileName)
 
   const handleClick = () => {
     setIsLoading('loading')
@@ -48,7 +50,7 @@ const DragFile = ({ value }) => {
       Authorization: token ? `JWT ${token}` : '',
     }
 
-    data.append('pk', studentId)
+    data.append('pk', userPk)
     data.set('file_name', fileName)
     data.append('file_description', fileDescription)
     // console.log(studentId, selectedFile, 'this is upload')
