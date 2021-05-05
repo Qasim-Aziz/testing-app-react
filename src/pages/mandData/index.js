@@ -23,7 +23,6 @@ import gql from 'graphql-tag'
 import './index.scss'
 import { COLORS, DRAWER, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import LoadingComponent from 'components/LoadingComponent'
-import FilterComp from '../../components/FilterCard/FilterComp'
 import GraphComponent from './graphComponent'
 
 const { Content } = Layout
@@ -183,19 +182,12 @@ const MandDataPage = props => {
   }, [openRightdrawer])
 
   useEffect(() => {
-    if (data) {
-      const filteredData = data?.getMandData.edges.filter(item =>
-        item.node.dailyClick.measurments.toLowerCase().includes(searchVal),
+    if (originalMandCards && searchVal) {
+      const filteredData = originalMandCards.filter(item =>
+        item.measurments.toLowerCase().includes(searchVal),
       )
-      setMandData(filteredData)
-    } else {
-      setMandData(data?.getMandData.edges)
-    }
-    if (originalMandCards && originalMandCards.length > 0) {
-      const ftd = originalMandCards.filter(item =>
-        item.node.measurments.toLowerCase().includes(searchVal),
-      )
-      setMandCards(ftd)
+
+      setMandCards(filteredData)
     } else {
       setMandCards(originalMandCards)
     }
@@ -203,16 +195,35 @@ const MandDataPage = props => {
 
   useEffect(() => {
     if (clickData?.getClickData && data?.getMandData) {
-      const gg = clickData.getClickData.edges.filter(item => {
+      const tempData = []
+      const gg = clickData.getClickData.edges.map(item => {
         const tt = data.getMandData.edges
+        let exist = false
+        let obj = null
         for (let i = 0; i < tt.length; i++) {
           if (tt[i].node.dailyClick.id === item.node.id) {
-            return false
+            exist = true
+            obj = tt[i]
+            break
           }
         }
-        return true
-      })
 
+        if (exist) {
+          return {
+            id: item.node.id,
+            data: obj.node.data,
+            measurments: item.node.measurments,
+            date: obj.node.date,
+          }
+        } else {
+          return {
+            id: item.node.id,
+            data: 0,
+            measurments: item.node.measurments,
+            date: moment().format('YYYY-MM-DD'),
+          }
+        }
+      })
       setMandCards(gg)
       setOriginalMandCards(gg)
     }
@@ -268,172 +279,118 @@ const MandDataPage = props => {
         >
           <Row gutter={[46, 0]}>
             <Col span={24}>
-              <Tabs>
-                <Tabs.TabPane tab="Records" key="Records">
-                  <div style={{ marginTop: 17 }}>
-                    {loading ? (
-                      <LoadingComponent />
-                    ) : (
-                      <>
-                        {error && <pre>{JSON.stringify(error, null, 2)}</pre>}
-                        {mandData &&
-                          mandData.map(({ node }, index) => {
-                            // eslint-disable-next-line no-shadow
-                            const dailyClickData = node.data
-                            return (
-                              <div
-                                id={node.id}
-                                key={node.id}
-                                style={{
-                                  background: '#FFFFFF',
-                                  boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
-                                  borderRadius: 10,
-                                  padding: '10px',
-                                  position: 'relative',
-                                  marginTop: index !== 0 ? 10 : 0,
-                                  width: '1108px',
-                                  border: '2px solid #2a8ff7',
-                                }}
-                              >
-                                <div style={{ display: 'flex', alignItems: 'center' }}>
-                                  <div style={{ fontSize: 16, margin: 0 }}>
-                                    {studnetInfo && studnetInfo.student.firstname}&apos;s requests
-                                    for {node.dailyClick.measurments}
-                                  </div>
-
-                                  <Button
-                                    style={{ marginLeft: 'auto' }}
-                                    onClick={() => {
-                                      let newDailyClickData = dailyClickData
-                                      if (dailyClickData > 0) {
-                                        newDailyClickData -= 1
-                                        recodeMandData({
-                                          variables: {
-                                            id: node.dailyClick.id,
-                                            data: newDailyClickData,
-                                            date: node.date,
-                                          },
-                                        })
-                                          .then(res => {
-                                            notification.success({
-                                              message: 'Data recorded successfully',
-                                            })
-                                            refetch()
-                                            setNewMandCreated(false)
-                                          })
-                                          .catch(err => console.error(err, 'err'))
-                                      }
-                                    }}
-                                  >
-                                    <MinusOutlined />
-                                  </Button>
-                                  <Text
-                                    style={{
-                                      fontSize: 14,
-                                      lineHeight: '19px',
-                                      color: '#2E2E2E',
-                                      marginLeft: 9,
-                                      marginRight: 19,
-                                    }}
-                                  >
-                                    {dailyClickData}
-                                  </Text>
-                                  <Button
-                                    onClick={() => {
-                                      recodeMandData({
-                                        variables: {
-                                          id: node.dailyClick.id,
-                                          date: node.date,
-                                          data: dailyClickData + 1,
-                                        },
-                                      })
-                                    }}
-                                  >
-                                    <PlusOutlined />
-                                  </Button>
-                                  <Tooltip title="Mand Graph">
-                                    <Button
-                                      style={{
-                                        marginLeft: 9,
-                                      }}
-                                      onClick={() => {
-                                        openGraphDrawer({
-                                          variables: {
-                                            mandId: node.id,
-                                          },
-                                        })
-                                      }}
-                                    >
-                                      <LineChartOutlined />
-                                    </Button>
-                                  </Tooltip>
-                                </div>
+              <div style={{ marginTop: 17 }}>
+                {loading ? (
+                  <LoadingComponent />
+                ) : (
+                  <>
+                    {error && <pre>{JSON.stringify(error, null, 2)}</pre>}
+                    {mandCards &&
+                      mandCards.map((node, index) => {
+                        // eslint-disable-next-line no-shadow
+                        const dailyClickData = node.data
+                        return (
+                          <div
+                            id={node.id}
+                            key={node.id}
+                            style={{
+                              background: '#FFFFFF',
+                              boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
+                              borderRadius: 10,
+                              padding: '10px',
+                              position: 'relative',
+                              marginTop: index !== 0 ? 10 : 0,
+                              width: '1108px',
+                              border: '2px solid #2a8ff7',
+                            }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                              <div style={{ fontSize: 16, margin: 0 }}>
+                                {studnetInfo && studnetInfo.student.firstname}&apos;s requests for{' '}
+                                {node.measurments}
                               </div>
-                            )
-                          })}
-                      </>
-                    )}
-                  </div>
-                </Tabs.TabPane>
-                <Tabs.TabPane tab="Mand" key="Mand">
-                  <div style={{ marginTop: 17 }}>
-                    {clickDataLoading ? (
-                      <LoadingComponent />
-                    ) : (
-                      <>
-                        {error && <pre>{JSON.stringify(error, null, 2)}</pre>}
-                        {mandCards &&
-                          mandCards.map(({ node }, index) => {
-                            // eslint-disable-next-line no-shadow
-                            const dailyClickData = 0
-                            return (
-                              <div
-                                id={node.id}
-                                key={node.id}
-                                style={{
-                                  background: '#FFFFFF',
-                                  boxShadow: '0px 0px 4px rgba(53, 53, 53, 0.1)',
-                                  borderRadius: 10,
-                                  padding: '10px',
-                                  position: 'relative',
-                                  marginTop: index !== 0 ? 10 : 0,
-                                  width: '1108px',
-                                  border: '2px solid #2a8ff7',
+
+                              <Button
+                                style={{ marginLeft: 'auto' }}
+                                onClick={() => {
+                                  let newDailyClickData = dailyClickData
+                                  if (dailyClickData > 0) {
+                                    newDailyClickData -= 1
+                                    recodeMandData({
+                                      variables: {
+                                        id: node.id,
+                                        data: newDailyClickData,
+                                        date: node.date,
+                                      },
+                                    })
+                                      .then(res => {
+                                        notification.success({
+                                          message: 'Data recorded successfully',
+                                        })
+                                        refetch()
+                                        setNewMandCreated(false)
+                                      })
+                                      .catch(err => console.error(err, 'err'))
+                                  }
                                 }}
                               >
-                                <div
+                                <MinusOutlined />
+                              </Button>
+                              <Text
+                                style={{
+                                  fontSize: 14,
+                                  lineHeight: '19px',
+                                  color: '#2E2E2E',
+                                  marginLeft: 9,
+                                  marginRight: 19,
+                                }}
+                              >
+                                {dailyClickData}
+                              </Text>
+                              <Button
+                                onClick={() => {
+                                  recodeMandData({
+                                    variables: {
+                                      id: node.id,
+                                      date: node.date,
+                                      data: dailyClickData + 1,
+                                    },
+                                  })
+                                    .then(res => {
+                                      notification.success({
+                                        message: 'Data recorded successfully',
+                                      })
+                                      refetch()
+                                      setNewMandCreated(false)
+                                    })
+                                    .catch(err => console.error(err, 'err'))
+                                }}
+                              >
+                                <PlusOutlined />
+                              </Button>
+                              <Tooltip title="Mand Graph">
+                                <Button
                                   style={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
+                                    marginLeft: 9,
+                                  }}
+                                  onClick={() => {
+                                    openGraphDrawer({
+                                      variables: {
+                                        mandId: node.id,
+                                      },
+                                    })
                                   }}
                                 >
-                                  <div style={{ fontSize: 16, margin: 0 }}>
-                                    {studnetInfo && studnetInfo.student.firstname}&apos;s requests
-                                    for {node.measurments}
-                                  </div>
-                                  <Button
-                                    onClick={() => {
-                                      recodeMandData({
-                                        variables: {
-                                          id: node.id,
-                                          date: moment().format('YYYY-MM-DD'),
-                                          data: dailyClickData + 1,
-                                        },
-                                      })
-                                    }}
-                                  >
-                                    Record
-                                  </Button>
-                                </div>
-                              </div>
-                            )
-                          })}
-                      </>
-                    )}
-                  </div>
-                </Tabs.TabPane>
-              </Tabs>
+                                  <LineChartOutlined />
+                                </Button>
+                              </Tooltip>
+                            </div>
+                          </div>
+                        )
+                      })}
+                  </>
+                )}
+              </div>
             </Col>
             <Drawer
               title="New Mand Data"
