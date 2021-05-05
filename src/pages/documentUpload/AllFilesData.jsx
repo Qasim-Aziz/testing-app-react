@@ -139,6 +139,7 @@ const AllFilesData = ({
           : 'No File Description!',
         file: item.node.file ? item.node.file : '',
         upload: StudentName && StudentName,
+        delete: item.node.id,
       })
     }
   } else if (userRole === 'therapist') {
@@ -185,6 +186,7 @@ const AllFilesData = ({
             : 'No File Description!',
           file: item.node.file ? item.node.file : '',
           upload: StudentName && StudentName,
+          delete: item.node.id,
         })
       }
     }
