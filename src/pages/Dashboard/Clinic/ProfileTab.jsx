@@ -47,7 +47,7 @@ const ProfileTab = ({ activeProfileTab, onProfileTabChange }) => {
     },
     {
       key: 'invoice-currency',
-      title: 'Invoice',
+      title: 'Payment Details',
       component: <InvCurrency />,
       iconName: <FileOutlined />,
     },

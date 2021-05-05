@@ -22,6 +22,9 @@ export const GET_SCHOOL_DETAILS = gql`
       bankAccountNo
       ifscCode
       accountHolderName
+      upi
+      gpay
+      paytm
     }
   }
 `

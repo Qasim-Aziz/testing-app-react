@@ -5,29 +5,33 @@ import { notification } from 'antd'
 import apolloClient from '../../../apollo/config'
 
 export const getEquivalenceCategory = () => {
-    return apolloClient.query({
-        query: gql`query {
-            peakEquDomains{
-                id
-                name
-            }
-        }`,
-        fetchPolicy: 'network-only',
+  return apolloClient
+    .query({
+      query: gql`
+        query {
+          peakEquDomains {
+            id
+            name
+          }
+        }
+      `,
+      fetchPolicy: 'network-only',
     })
-        .then(result => result)
-        .catch(error => {
-            error.graphQLErrors.map(item => {
-                return notification.error({
-                    message: 'Somthing went wrong',
-                    description: item.message,
-                })
-            })
+    .then(result => result)
+    .catch(error => {
+      error.graphQLErrors.map(item => {
+        return notification.error({
+          message: 'Somthing went wrong',
+          description: item.message,
         })
+      })
+    })
 }
 
 export const getTargetsByCategory = category => {
-    return apolloClient.query({
-        query: gql`query{
+  return apolloClient
+    .query({
+      query: gql`query{
             getPeakEquCodes(codetype:"${category}"){
                 edges{
                     node{
@@ -64,61 +68,58 @@ export const getTargetsByCategory = category => {
                 }
             }
         }`,
-        fetchPolicy: 'network-only',
+      fetchPolicy: 'network-only',
     })
-        .then(result => result)
-        .catch(error => {
-            error.graphQLErrors.map(item => {
-                return notification.error({
-                    message: 'Somthing went wrong',
-                    description: item.message,
-                })
-            })
+    .then(result => result)
+    .catch(error => {
+      error.graphQLErrors.map(item => {
+        return notification.error({
+          message: 'Somthing went wrong',
+          description: item.message,
         })
+      })
+    })
 }
 
-
 export const getTargetsByCode = text => {
-    return apolloClient.mutate({
-        mutation: gql`mutation SuggestPeakTargetByCode (
-            $text: String
-        ) {
-            suggestPeakEquivalanceTargets(input:{
-                code : $text
-            }){
-                
-                targets{
-                    code{
-                        id
-                        code
-                    }
-                    target{
-                        id
-                        status
-                        targetMain{
-                            targetName
-                        }
-                        targetArea{
-                            id
-                            Area
-                        }
-                        video
-                        targetInstr
-                    }
+  return apolloClient
+    .mutate({
+      mutation: gql`
+        mutation SuggestPeakTargetByCode($text: String) {
+          suggestPeakEquivalanceTargets(input: { code: $text }) {
+            targets {
+              code {
+                id
+                code
+              }
+              target {
+                id
+                status
+                targetMain {
+                  targetName
                 }
+                targetArea {
+                  id
+                  Area
+                }
+                video
+                targetInstr
+              }
             }
-        }`,
-        variables: {
-            text
-        },
+          }
+        }
+      `,
+      variables: {
+        text,
+      },
     })
-        .then(result => result)
-        .catch(error => {
-            error.graphQLErrors.map(item => {
-                return notification.error({
-                    message: 'Somthing went wrong',
-                    description: item.message,
-                })
-            })
+    .then(result => result)
+    .catch(error => {
+      error.graphQLErrors.map(item => {
+        return notification.error({
+          message: 'Somthing went wrong',
+          description: item.message,
         })
+      })
+    })
 }

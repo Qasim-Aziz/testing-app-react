@@ -18,51 +18,24 @@
 import React from 'react'
 import { Helmet } from 'react-helmet'
 import { connect } from 'react-redux'
-// THIS IS FOR STEP PROGRESS BAR COMPONENT
 import styled from 'styled-components'
-// END OF IMPORTS FOR STEP PROGRESS BAR COMPONENT
 import DataTable from 'react-data-table-component'
-import {
-  Button,
-  Card,
-  Avatar,
-  Select,
-  Input,
-  Icon,
-  Drawer,
-  Switch,
-  Dropdown,
-  Menu,
-  Radio,
-  Tag,
-} from 'antd'
+import { Button, Card, Select, Input, Drawer, Dropdown, Menu } from 'antd'
 import JsPDF from 'jspdf'
-// import 'jspdf-autotable'
 import * as FileSaver from 'file-saver'
 import * as XLSX from 'xlsx'
-import { Scrollbars } from 'react-custom-scrollbars'
 import {
-  FilterOutlined,
   PlusOutlined,
   CloseCircleOutlined,
-  FilePdfOutlined,
-  FileExcelOutlined,
-  DownOutlined,
   CommentOutlined,
   CloudDownloadOutlined,
 } from '@ant-design/icons'
 import moment from 'moment'
-// import { gql } from 'apollo-boost'
-// import leadClient from '../../../apollo/leads_config'
-import { FilterCard } from '../../../components/FilterCard/FilterTable'
 import EditBasicInformation from './EditBasicInformation'
 import CreateLeader from '../createLeader'
 import LeadCommentTimeline from '../LeadCommentTimeline'
-// import client from '../../../apollo/config'
 import './style.scss'
-import { COLORS } from '../../../assets/styles/globalStyles'
-
-/* *************************** THE STEP PROGRESS BAR COMPONENT *************************** */
+import { COLORS, DRAWER } from '../../../assets/styles/globalStyles'
 
 const Container = styled.div`
   display: block;
@@ -126,12 +99,6 @@ class StepProgressBar extends React.Component {
             console.log('THE INDEX FOR STEP_PROGRESS', i)
             return (
               <StepElementContainer key={i}>
-                {/* <Step
-                  className={i <= statusIndex ? "active" : null}
-                  completed={i <= statusIndex}
-                >
-                  {item}
-                </Step> */}
                 <UpperText>{item}</UpperText>
                 <StepElement
                   isLast={i === statusArr.length - 1}
@@ -149,8 +116,6 @@ class StepProgressBar extends React.Component {
 
 const statusArr = ['NEW', 'CONTACTED', 'INTRESTED', 'UNDER_REVIEW', 'DEMO', 'CONVERTED']
 
-/* *************************** END OF STEP PROGRESS BAR COMPONENT *************************** */
-
 const { Meta } = Card
 
 const customStyles = {
@@ -164,7 +129,7 @@ const customStyles = {
       borderTopStyle: 'solid',
       borderTopWidth: '1px',
       borderTopColor: '#ddd',
-      backgroundColor: '#f5f5f5',
+      backgroundColor: COLORS.palleteLightBlue,
     },
   },
   headCells: {
@@ -207,28 +172,8 @@ const customStyles = {
   },
 }
 
-const customSpanStyle = {
-  backgroundColor: '#52c41a',
-  color: 'white',
-  borderRadius: '3px',
-  padding: '1px 5px',
-}
-const inActiveSpanStyle = {
-  backgroundColor: 'red',
-  color: 'white',
-  borderRadius: '3px',
-  padding: '1px 5px',
-}
-const inputCustom = { width: '180px', marginBottom: '8px', display: 'block' }
 const tableFilterStyles = { margin: '0px 32px 0 8px' }
-const customLabel = {
-  fontSize: '17px',
-  color: '#000',
-  marginRight: '12px',
-  marginBottom: '12px',
-}
-
-@connect(({ user, leaders }) => ({ user, leaders }))
+@connect(({ user, leaders, staffs }) => ({ user, leaders, staffs }))
 class LeaderTable extends React.Component {
   state = {
     divShow: false,
@@ -243,7 +188,6 @@ class LeaderTable extends React.Component {
     searchedColumn: '',
     filteredInfo: null,
     filterCategory: '',
-    // for create learner drawer
     visible: false,
     visibleEdit: false,
     visibleFilter: false,
@@ -270,12 +214,19 @@ class LeaderTable extends React.Component {
   }
 
   componentDidMount() {
-    console.log(`LETS SEE ALL PROPS \n `, this.props)
-    console.log(`LETS SEE ALL state \n `, this.state)
     const { dispatch } = this.props
     dispatch({
       type: 'leaders/GET_DATA',
     })
+
+    if (this.props.staffs.StaffList.length === 0) {
+      dispatch({
+        type: 'staffs/GET_STAFFS',
+        payload: {
+          isActive: true,
+        },
+      })
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -303,7 +254,6 @@ class LeaderTable extends React.Component {
 
   info = e => {
     const { dispatch } = this.props
-    // setting leader id to local storage for further operations
     localStorage.setItem('LeadId', JSON.stringify(e.id))
 
     dispatch({
@@ -319,7 +269,6 @@ class LeaderTable extends React.Component {
     this.showEditDrawer()
   }
 
-  // DRAWER FOR EDITING
   showEditDrawer = () => {
     this.setState({
       visibleEdit: true,
@@ -444,8 +393,6 @@ class LeaderTable extends React.Component {
   }
 
   render() {
-    console.log('THE PROPS IN LEADERS initially (render) \n', this.props)
-    console.log('THE STATE IN LEADERS initially (render) \n', this.state)
     let { filteredInfo, visibleFilter, realLearnerList } = this.state
 
     filteredInfo = filteredInfo || {}
@@ -454,28 +401,21 @@ class LeaderTable extends React.Component {
     } = this.props
 
     let filteredList = this.state.tableData
-    console.log('FILTEREDLIST', filteredList)
 
-    // ************************ WORK ON THIS ************************ //
     if (this.state.filterStatus) {
-      console.log('FILTER+STATUS', this.state.filterStatus)
-      /** Instead of changing the state I will store the value of state in a local-variable */
       let local_status = this.state.filterStatus
       if (local_status === 'all') {
-        // this.state.filterStatus = ''
         local_status = ''
       }
 
       filteredList =
         filteredList &&
         filteredList.filter(item => {
-          // console.log('Filtering by lead-status', item)
           return (
             item.leadStatus && item.leadStatus.toLowerCase().includes(local_status.toLowerCase())
           )
         })
     }
-    /* These are css classes that will get triggered according to the state-changes */
 
     const { divShow, filterShow } = this.state
     const divClass = divShow ? 'col-sm-12' : 'col-sm-12'
@@ -486,25 +426,14 @@ class LeaderTable extends React.Component {
         name: 'Name',
         selector: 'name',
         sortable: true,
-        // maxWidth: '120px',
         cell: row => {
-          console.log('ROW', row)
-          // console.log('ROW', row.user)
-
           row.user === null ? <span> </span> : <></>
-
-          // if (row.user.firstName === null || row.user.lastName === null) {
-          //   return <span> </span>
-          // }
-
           return (
             <Button
               onClick={() => this.info(row)} // this.info(row)
               type="link"
               style={{ padding: '0px', fontWeight: 'bold', fontSize: '11px' }}
             >
-              {/* {console.log('THE NAMES', row.user.firstName)} */}
-              {/* {console.log('THE NAMES', row.user.lastname)} */}
               {row.name} {row.surname}
             </Button>
           )
@@ -515,20 +444,16 @@ class LeaderTable extends React.Component {
         selector: 'email',
         // maxWidth: '120px',
         cell: row => {
-          // console.log('ROW', row)
           if (row.user === null) {
             return <span> </span>
           }
-          // console.log('ROW', row.user.email)
           return <span>{row.email ? row.email : ''} </span>
         },
       },
       {
         name: 'Mobile',
         selector: 'mobile',
-        // maxWidth: '120px',
         cell: row => {
-          // console.log('ROW', row)
           if (row.phone === null) {
             return <span> </span>
           }
@@ -565,8 +490,6 @@ class LeaderTable extends React.Component {
               <CommentOutlined
                 style={{ color: COLORS.palleteDarkBlue, fontSize: 24, paddingRight: '.9em' }}
                 onClick={() => {
-                  // setComment(data.key)
-                  // setCommentDrawer(true)
                   this.setState({
                     commentDrawer: true,
                     updateLead: data.id,
@@ -658,7 +581,6 @@ class LeaderTable extends React.Component {
       </Menu>
     )
 
-    // THE PROPS FOR STEP PROGRESS BAR
     let drawdownStatus = 'NEW'
     let disbursementStatus = 'UNDER_REVIEW'
     let stepProgressProps = {
@@ -666,22 +588,13 @@ class LeaderTable extends React.Component {
       status: disbursementStatus || drawdownStatus,
     }
 
-    console.log(`LETS SEE ALL PROPS at the end render \n `, this.props)
-    console.log(`LETS SEE ALL state at the end render \n `, this.state)
-
+    console.log(this.props, 'props')
     return (
       <>
-        {console.log(`LETS SEE ALL PROPS \n `, this.props)}
-        {console.log(`LETS SEE ALL state \n `, this.state)}
         <Helmet title="Leaders" />
-        {/* DRAWER FOR FILTER */}
-        {/* ------------------------------------ */}
-        {/* END OF DRAWER FOR FILTER */}
-
-        {/* DRAWER FOR Create-lEADER  */}
         <Drawer
           title="CREATE LEAD"
-          width="75%"
+          width={DRAWER.widthL2}
           placement="right"
           closable={true}
           onClose={this.onClose}
@@ -689,37 +602,24 @@ class LeaderTable extends React.Component {
         >
           <CreateLeader CloseDrawer={this.onClose} />
         </Drawer>
-        {/* END OF DRAWER FOR CREATE-LEADER */}
-
-        {/* DRAWER FOR EDIT-LEADER */}
         <Drawer
           title="EDIT LEAD"
-          width="80%"
+          width={DRAWER.widthL2}
           placement="right"
           closable={true}
           onClose={this.onCloseEdit}
           visible={this.state.visibleEdit}
         >
-          {/* Once the drawer is visible the "UserProfile"(defined in the local-state)
-              will set with the details of that particular leader.
-              • And the form values will be set to that user's details
-          */}
           {UserProfile ? (
-            /* The entire drawer is a card */
-
             <div className="card" style={{ marginTop: '5px', border: 'none' }}>
               <div className="card-body">
-                {/* <h2>hello {UserProfile.leadStatus}</h2> */}
-                {/* THE Step progress bar */}
                 <div
                   className="step-progress"
                   style={{ padding: '2rems', marginBottom: '5px', fontWeight: 'bold' }}
                 >
                   {console.log('THE STATUS ARRAY', stepProgressProps)}
-                  {/* {(stepProgressProps.status = UserProfile.leadStatus)} */}
                   <StepProgressBar {...stepProgressProps} user_Status={UserProfile.leadStatus} />
                 </div>
-                {/* End of step progress bar */}
                 <div id="basic_form_div" style={{ marginTop: '100px' }}>
                   {isUserProfile ? (
                     <EditBasicInformation key={UserProfile.id} onCloseEdit={this.onCloseEdit} />
@@ -731,9 +631,6 @@ class LeaderTable extends React.Component {
             ''
           )}
         </Drawer>
-        {/* END OF DRAWER FOR EDIT-LEADER */}
-
-        {/* ***************** DIV FOR TOP_BAR ***************** */}
         <div
           style={{
             display: 'flex',
@@ -741,18 +638,11 @@ class LeaderTable extends React.Component {
             justifyContent: 'space-between',
             alignItems: 'center',
             padding: '0px 10px',
-            // marginTop: '20px',
             backgroundColor: '#FFF',
             boxShadow: '0 1px 6px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.12)',
           }}
         >
-          {/* Div is used to position the stuff inside it on the left-side  */}
           <div style={{ padding: '5px 0px' }}>
-            {/* The filter icon on the top-left side of top bar  */}
-            {/* <Button onClick={() => this.showDrawerFilter()} size="large">
-              <FilterOutlined />
-            </Button> */}
-            {/* The below section is when someone adds filters a clear-filter button gets displayed */}
             {this.state.isFilterActive ? (
               <Button
                 type="link"
@@ -774,28 +664,22 @@ class LeaderTable extends React.Component {
               </Button>
             ) : null}
           </div>
-          {/* On the top you can see the Title of page */}
           <div>
             <span style={{ fontSize: '25px', color: '#000' }}>Leads List</span>
           </div>
-          {/* This div comprise of downloading stuff & button on the top right */}
           <div style={{ padding: '5px 0px' }}>
-            {/* This is the blue button to the right-side of add Learners to download table in pdf or excel form */}
             <Dropdown overlay={menu} trigger={['click']}>
               <Button style={{ marginRight: '10px' }} type="link">
                 <CloudDownloadOutlined />{' '}
               </Button>
             </Dropdown>
-            {/* This is the blue button to add Learners */}
             <Button onClick={this.showDrawer} type="primary">
               <PlusOutlined /> ADD LEAD
             </Button>
           </div>
         </div>
-        {/* ********************** END of DIV FOR TOP_BAR***************** */}
         <div className={divClass}>
           <div style={{ marginTop: '24px', marginBottom: '50px' }}>
-            {/* ************* DIV FOR filtering ************ */}
             <div
               style={{
                 display: 'flex',
@@ -807,7 +691,6 @@ class LeaderTable extends React.Component {
                 paddingTop: '4px',
               }}
             >
-              {/* Search bar for name */}
               <span style={{ display: 'flex', alignItems: 'center' }}>
                 <span>Name :</span>
                 <Input
@@ -825,7 +708,6 @@ class LeaderTable extends React.Component {
                   style={{ ...tableFilterStyles, width: '112px' }}
                 />
               </span>
-              {/* Search bar for email */}
               <span style={{ display: 'flex', alignItems: 'center' }}>
                 <span>Email :</span>
                 <Input
@@ -843,7 +725,6 @@ class LeaderTable extends React.Component {
                   style={{ ...tableFilterStyles, width: '148px' }}
                 />
               </span>
-              {/* Search bar for project */}
               <span style={{ display: 'flex', alignItems: 'center' }}>
                 <span>Project :</span>
                 <Input
@@ -861,32 +742,15 @@ class LeaderTable extends React.Component {
                   style={{ ...tableFilterStyles, width: '148px' }}
                 />
               </span>
-              {/* Different kinds of status */}
               <span style={{ display: 'flex', alignItems: 'center' }}>
                 <span>Status :</span>
-                {/* DO NOT DELETE */}
-                {/* <Radio.Group
-                  size="small"
-                  buttonStyle="solid"
-                  value={this.state.filterStatus}
-                  onChange={e => {
-                    this.selectActiveStatus(e.target.value)
-                    this.setState({ filterStatus: e.target.value, isFilterActive: true })
-                  }}
-                  style={tableFilterStyles}
-                >
-                  <Radio.Button value="all">All</Radio.Button>
-                  <Radio.Button value="In_progress">In progress</Radio.Button>
-                  <Radio.Button value="Converted">Converted</Radio.Button>
-                  <Radio.Button value="Not_converted">Not Converted</Radio.Button>
-                  <Radio.Button value="Contact_Later">Contact Later</Radio.Button>
-                </Radio.Group> */}
+
                 <Select
                   placeholder="Status"
+                  size="small"
                   allowClear
                   value={this.state.filterStatus}
                   onChange={e => {
-                    console.log('-----------------------------------------------', e)
                     this.selectActiveStatus(e)
                     this.setState({ filterStatus: e, isFilterActive: true })
                     this.filterHandler({ status: e })
@@ -901,9 +765,6 @@ class LeaderTable extends React.Component {
                 </Select>
               </span>
             </div>
-            {/* ************* END OF DIV FOR filtering ************ */}
-            {/* ************* DIV FOR DATA-TABLE ************ */}
-            {console.log('list fiiiiii', filteredList)}
             <div className="modify-data-table">
               <DataTable
                 title="Leaders List"
@@ -918,23 +779,13 @@ class LeaderTable extends React.Component {
                 customStyles={customStyles}
                 noHeader={true}
                 progressPending={loadingLeaders}
-                // paginationServer={true}
-                // paginationTotalRows={TotalLeaders}
-                // onChangePage={(page, rows) => this.pageChanged(page, rows)}
                 paginationServerOptions={{
                   persistSelectedOnPageChange: false,
                   persistSelectedOnSort: false,
                 }}
-                // onChangeRowsPerPage={(currentRowsPerPage, currentPage) =>
-                //   this.rowsChanged(currentRowsPerPage, currentPage)
-                // }
-                // paginationRowsPerPageOptions={
-                //   TotalLeaders > 100 ? [10, 20, 50, 80, 100, TotalLeaders] : [10, 20, 50, 80, 100]
-                // }
                 currentPage={2}
               />
             </div>
-            {/* ************* END OF DIV FOR DATA-TABLE ************ */}
           </div>
         </div>
         <Drawer
@@ -957,7 +808,6 @@ class LeaderTable extends React.Component {
               leadStatus={this.state.leadStatus}
               name={this.state.name}
               projectName={this.state.projectName}
-              // setUpdateTicketId={setUpdateTimeline}
             />
           </div>
         </Drawer>
@@ -967,52 +817,3 @@ class LeaderTable extends React.Component {
 }
 
 export default LeaderTable
-
-/* ********************* DISCARDED STUFF ********************
-// fetch(`http://127.0.0.1:8000/graphql/`, {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({
-    //     query: `
-    // query{
-    //   leads{
-    //     id
-    //     name
-    //     projectName,
-    //     leadStatus,
-    //     phone
-    //     user{
-    //       email
-    //     }
-    //   }
-    //         }`,
-    //   }),
-    // })
-    //   .then(res => res.json())
-    //   .then(data => {
-    //     console.log('***********************', data)
-    //   })
-
-    *****************************************************
-    // console.log('ROCKEt SCience', this.props)
-    // leadClient
-    //   .query({
-    //     query: gql`
-    //       {
-    //         leads {
-    //           id
-    //           name
-    //           projectName
-    //           leadStatus
-    //           phone
-    //           user {
-    //             email
-    //           }
-    //         }
-    //       }
-    //     `,
-    //   })
-    //   .then(result => {
-    //     console.log('MY VALUE', result.data)
-    //   })
-*/

@@ -25,6 +25,14 @@ export async function getLeaders(payload) {
             leadType
             phone
             createdAt
+            therapist {
+              edges {
+                node {
+                  id
+                  name
+                }
+              }
+            }
             user {
               id
               email
@@ -118,71 +126,61 @@ export async function createLeader(payload) {
 }
 
 export async function updateLeader(payload) {
-  console.log('THE UPDATE LEADER', payload)
   let lead_id = parseInt(payload.id)
   let user_id = parseInt(payload.user_id)
-  console.log('PAYLOAD', lead_id, typeof lead_id, payload.values)
-  // let user_id = payload.values.
-  return (
-    apolloClient
-      // Update_The_Leader()
-      .mutate({
-        mutation: gql`
-          mutation Update_The_Leader(
-            $id: ID!
-            $projectName: String
-            $leadStatus: String
-            $leadType: String
-            $phone: String
-            $name: String
-            $surname: String
-            $email: String
+  return apolloClient
+    .mutate({
+      mutation: gql`
+        mutation(
+          $id: ID!
+          $leadStatus: String
+          $leadType: String
+          $phone: String
+          $name: String
+          $surname: String
+          $email: String
+          $therapist: [ID]
+        ) {
+          updateLead(
+            pk: $id
+            leadStatus: $leadStatus
+            leadType: $leadType
+            phone: $phone
+            name: $name
+            surname: $surname
+            email: $email
+            therapist: $therapist
           ) {
-            updateLead(
-              pk: $id
-              projectName: $projectName
-              leadStatus: $leadStatus
-              leadType: $leadType
-              phone: $phone
-              name: $name
-              surname: $surname
-              email: $email
-            ) {
-              details {
+            details {
+              id
+              name
+              projectName
+              leadStatus
+              phone
+              createdAt
+              user {
                 id
-                name
-                projectName
-                leadStatus
-                phone
-                createdAt
-                user {
-                  id
-                  email
-                  firstName
-                  lastName
-                }
+                email
+                firstName
+                lastName
               }
             }
           }
-        `,
-        variables: {
-          id: payload.id, // id of Lead
-          projectName: payload.values.projectName,
-          leadStatus: payload.values.leadStatus,
-          leadType: payload.values.leadType,
-          phone: payload.values.mobileNo,
-          name: payload.values.firstName,
-          surname: payload.values.lastName,
-          email: payload.values.email,
-        },
-      })
-      .then(result => {
-        console.log('THE RESULT OF UPDATE', result)
-        return result
-      })
-      .catch(error => {
-        console.log('THE ERORR', JSON.stringify(error))
-        return error
-      })
-  )
+        }
+      `,
+      variables: {
+        id: payload.id, // id of Lead
+        therapist: payload.values.therapist,
+        leadStatus: payload.values.leadStatus,
+        leadType: payload.values.leadType,
+        phone: payload.values.mobileNo,
+        name: payload.values.firstName,
+        surname: payload.values.lastName,
+        email: payload.values.email,
+      },
+    })
+    .then(result => result)
+    .catch(error => {
+      return error
+    })
 }
