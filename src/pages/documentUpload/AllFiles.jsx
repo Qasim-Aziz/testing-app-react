@@ -1,61 +1,40 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
-/* eslint-disable jsx-a11y/label-has-for */
-/* eslint-disable react/no-unused-state */
-import { gql } from 'apollo-boost'
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import apolloClient from '../../apollo/config'
+/* eslint-disable no-nested-ternary */
+/* eslint-disable no-unneeded-ternary */
+import React from 'react'
+import { useQuery } from 'react-apollo'
 import AllFilesData from './AllFilesData'
+import { GET_STAFF_DATA, GET_STUDENT_DATA } from './query'
 
-@connect(({ user, sessionrecording }) => ({ user, sessionrecording }))
-class AllFiles extends Component {
-  state = {
-    studentData: null,
-    isFilterActive: false,
-    mainFilteredData: [],
-  }
+const AllFiles = ({ learnerId, staffId, isLearnerById, isStaffById, handleUserName }) => {
+  const std = JSON.parse(localStorage.getItem('studentId'))
+  const therapistId = JSON.parse(localStorage.getItem('therapistId'))
+  const { data } = useQuery(GET_STUDENT_DATA, {
+    variables: {
+      id: learnerId ? learnerId : std,
+    },
+  })
 
-  componentDidMount() {
-    const std = JSON.parse(localStorage.getItem('studentId'))
-    apolloClient
-      .query({
-        query: gql`{
-      student(id: "${std}"){
-        id
-        firstname
-        files{
-            edges{
-                node{
-                    id
-                    file
-                    fileName
-                    fileDescription
-                }
-            }
-        }
-      }
-    }`,
-      })
-      .then(result => {
-        this.setState({
-          studentData: result.data.student,
-        })
-      })
-      .catch(error => {
-        console.log(error)
-      })
-  }
+  const { data: staffData } = useQuery(GET_STAFF_DATA, {
+    variables: {
+      id: staffId ? staffId : therapistId ? therapistId : '',
+    },
+  })
 
-  render() {
-    const studentData = this.state
-    return (
-      <>
-        <div className="all_file_container">
-          <AllFilesData studentData={studentData} />
-        </div>
-      </>
-    )
-  }
+  return (
+    <>
+      <div className="all_file_container">
+        <AllFilesData
+          learnerId={learnerId}
+          isLearnerById={isLearnerById}
+          staffData={staffData}
+          studentData={data}
+          isStaffById={isStaffById}
+          staffId={staffId}
+          handleUserName={handleUserName}
+        />
+      </div>
+    </>
+  )
 }
 
 export default AllFiles
