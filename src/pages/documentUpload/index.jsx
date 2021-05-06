@@ -1,10 +1,11 @@
+/* eslint-disable no-nested-ternary */
+/* eslint-disable no-unneeded-ternary */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
 import { Drawer, Tabs } from 'antd'
 import { DRAWER } from 'assets/styles/globalStyles'
-import gql from 'graphql-tag'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import client from '../../apollo/config'
@@ -13,65 +14,15 @@ import FileUploadFrom from './FileUploadFrom'
 import './index.scss'
 import LearnersList from './LearnersList'
 import NewAuthorization from './NewAuthorization'
+import { GET_ALL_LEARNERS, STAFF_LIST } from './query'
 import StaffsList from './StaffsList'
 
 const { TabPane } = Tabs
-
-function callback(key) {
-  console.log(key)
-}
-
-const STAFF_LIST = gql`
-  query {
-    staffs {
-      edges {
-        node {
-          id
-          name
-          email
-          gender
-          empType
-          user {
-            id
-          }
-        }
-      }
-    }
-  }
-`
-
-const GET_ALL_LEARNERS = gql`
-  query {
-    students(isActive: true) {
-      edges {
-        node {
-          id
-          firstname
-          internalNo
-          mobileno
-          email
-          lastname
-          caseManager {
-            id
-            name
-            email
-            contactNo
-          }
-          category {
-            id
-            category
-          }
-        }
-      }
-    }
-  }
-`
 
 const index = () => {
   const isAuthorization = false
   const [staffs, setStaffs] = useState([])
   const [learners, setLearners] = useState([])
-  const [selectedStaffs, setSelectedStaffs] = useState({ id: '', name: '' })
   const user = useSelector(state => state.user)
   const userRole = JSON.parse(localStorage.getItem('role'))
   const [staffsVisibleFilter, setStaffsVisibleFilter] = useState(false)
@@ -82,7 +33,10 @@ const index = () => {
   const [isLearnerById, setIsLearnerById] = useState(false)
   const [isStaffById, setIsStaffById] = useState(false)
 
-  console.log('staffId ====>', staffId, '<==== staffId')
+  const [learnerName, setLearnerName] = useState('')
+  const [staffName, setStaffName] = useState('')
+
+  const [isDrawerTitle, setIsDrawerTitle] = useState(false)
 
   useEffect(() => {
     client.query({ query: GET_ALL_LEARNERS }).then(res => setLearners(res.data.students.edges))
@@ -92,7 +46,6 @@ const index = () => {
     if (user.role === 'school_admin') {
       client.query({ query: STAFF_LIST }).then(res => {
         setStaffs(res.data.staffs.edges)
-        setSelectedStaffs(res.data.staffs.edges[0].node)
       })
     }
   }, [])
@@ -102,12 +55,9 @@ const index = () => {
 
   const handleLearner = () => {
     setLearnersVisibleFilter(true)
-    // if(isStaffById) {
     setIsStaffById(false)
     setStaffId('')
     setIsLearnerById(true)
-
-    // }
   }
   const handleIsLearnerById = () => {
     setIsLearnerById(false)
@@ -115,12 +65,28 @@ const index = () => {
 
   const handleStaff = () => {
     setStaffsVisibleFilter(true)
-    // if(isLearnerById){
     setIsLearnerById(false)
     setLearnerId('')
     setIsStaffById(true)
+  }
 
-    // }
+  const handleUserName = (text, name) => {
+    if (text === 'learner') {
+      setLearnerName(name)
+      setStaffName('')
+    }
+    if (text === 'staff') {
+      setStaffName(name)
+      setLearnerName('')
+    }
+  }
+  function callback(key) {
+    if (key === '1') {
+      setIsDrawerTitle(false)
+    }
+    if (key === '2') {
+      setIsDrawerTitle(true)
+    }
   }
 
   return (
@@ -137,6 +103,7 @@ const index = () => {
                       isLearnerById={isLearnerById}
                       staffId={staffId}
                       learnerId={learnerId}
+                      handleUserName={handleUserName}
                     />
                   </TabPane>
                   {isAuthorization ? (
@@ -145,14 +112,19 @@ const index = () => {
                     </TabPane>
                   ) : (
                     <TabPane tab="New File" key="2">
-                      <FileUploadFrom />
+                      <FileUploadFrom
+                        isStaffById={isStaffById}
+                        isLearnerById={isLearnerById}
+                        learnerId={learnerId}
+                        staffId={staffId}
+                      />
                     </TabPane>
                   )}
                 </Tabs>
               </div>
             </div>
           </div>
-          {userRole === 'school_admin' ? (
+          {userRole === 'school_admin' && isDrawerTitle === false ? (
             <div className="filter_as_clinic">
               <p onClick={handleStaff} className="staffs_title">
                 Staffs
@@ -162,7 +134,7 @@ const index = () => {
               </p>
             </div>
           ) : null}
-          {userRole === 'therapist' ? (
+          {userRole === 'therapist' && isDrawerTitle === false ? (
             <div className="filter_as_clinic">
               <p onClick={handleLearner} className="learners_title">
                 Learners
@@ -194,6 +166,13 @@ const index = () => {
             />
           </Drawer>
         </div>
+        <p className="student_name">
+          {!learnerName && !staffName
+            ? `Select Staff/Learner`
+            : learnerName
+            ? `${learnerName}-Learner`
+            : `${staffName}-Therapist`}
+        </p>
       </div>
     </>
   )

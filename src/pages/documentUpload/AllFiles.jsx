@@ -1,49 +1,11 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unneeded-ternary */
-import gql from 'graphql-tag'
 import React from 'react'
 import { useQuery } from 'react-apollo'
 import AllFilesData from './AllFilesData'
+import { GET_STAFF_DATA, GET_STUDENT_DATA } from './query'
 
-const GET_STUDENT_DATA = gql`
-  query($id: ID!) {
-    student(id: $id) {
-      id
-      firstname
-      files {
-        edges {
-          node {
-            id
-            file
-            fileName
-            fileDescription
-          }
-        }
-      }
-    }
-  }
-`
-
-const GET_STAFF_DATA = gql`
-  query($id: ID!) {
-    staff(id: $id) {
-      id
-      name
-      files {
-        edges {
-          node {
-            id
-            file
-            fileName
-            fileDescription
-          }
-        }
-      }
-    }
-  }
-`
-
-const AllFiles = ({ learnerId, staffId, isLearnerById, isStaffById }) => {
+const AllFiles = ({ learnerId, staffId, isLearnerById, isStaffById, handleUserName }) => {
   const std = JSON.parse(localStorage.getItem('studentId'))
   const therapistId = JSON.parse(localStorage.getItem('therapistId'))
   const { data } = useQuery(GET_STUDENT_DATA, {
@@ -68,6 +30,7 @@ const AllFiles = ({ learnerId, staffId, isLearnerById, isStaffById }) => {
           studentData={data}
           isStaffById={isStaffById}
           staffId={staffId}
+          handleUserName={handleUserName}
         />
       </div>
     </>

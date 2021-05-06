@@ -4,14 +4,13 @@ import { Card, Input } from 'antd'
 import React, { useState } from 'react'
 import DragFile from './DragFile'
 
-const FileUploadFrom = () => {
+const FileUploadFrom = ({ learnerId, staffId, isLearnerById, isStaffById }) => {
   const [value, setValue] = useState('')
 
   const handleChange = e => {
     setValue(e.target.value)
   }
 
-  console.log(value)
   return (
     <>
       <div className="file_upload_container">
@@ -26,7 +25,13 @@ const FileUploadFrom = () => {
               <Input id="fileDesc" onChange={handleChange} placeholder="Files description" />
             </div>
           </div>
-          <DragFile value={value} />
+          <DragFile
+            learnerId={learnerId}
+            staffId={staffId}
+            value={value}
+            isLearnerById={isLearnerById}
+            isStaffById={isStaffById}
+          />
         </Card>
       </div>
     </>

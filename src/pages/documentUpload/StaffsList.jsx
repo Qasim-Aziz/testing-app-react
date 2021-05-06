@@ -48,19 +48,6 @@ const StaffsList = ({ staffs, staffChanged }) => {
       <p style={pstyle}>
         <span style={{ fontWeight: 700 }}>Gender :</span> {nodeItem.node.gender}
       </p>
-      <hr />
-      {/* <p style={pstyle}>
-          <span style={{ fontWeight: 700 }}>Case Manager : </span>
-          {nodeItem.node.caseManager?.name}
-        </p> */}
-      {/* <p style={pstyle}>
-          <span style={{ fontWeight: 700 }}>CM Email : </span>
-          {nodeItem.node.caseManager?.email}
-        </p>
-        <p style={pstyle}>
-          <span style={{ fontWeight: 700 }}>CM Phone : </span>
-          {nodeItem.node.caseManager?.contactNo}
-        </p> */}
     </Panel>
   )
 

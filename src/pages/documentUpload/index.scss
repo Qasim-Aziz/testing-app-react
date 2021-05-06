@@ -1,8 +1,17 @@
 @import '../../assets/styles/mixins.scss';
 
 .file_upload_section {
-  // background-color: $backgroundBg;
   min-height: 90vh;
+  position: relative;
+
+  .student_name {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    font-size: 25px;
+    font-weight: 500;
+    color: black;
+  }
 
   .file_upload_header {
     width: 100%;
@@ -12,15 +21,6 @@
         .filter_container {
           display: flex;
           padding: 1%;
-
-          .student_name {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            font-size: 25px;
-            font-weight: 500;
-            color: black;
-          }
 
           .name_filter_section {
             display: flex;
@@ -249,6 +249,13 @@
       background-color: transparent;
       border-color: transparent;
       color: red;
+    }
+
+    .upload_file_title {
+      cursor: pointer;
+    }
+    .upload_file_title:hover {
+      color: #1890ff;
     }
   }
 }
