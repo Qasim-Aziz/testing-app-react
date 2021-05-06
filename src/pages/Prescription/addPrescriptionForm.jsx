@@ -1,18 +1,5 @@
 /* eslint-disable */
 
-/**[Explaination]
- * This component is a part of the "Prescription" component wherein
- *  - Only the authenticated & allowed users which are doctors/therapist can have access
- *  - The Parent of a particular learner can view their child's prescription and take a printout of it in a pdf formart
- * How is component structured
- *  - In antD we already have Editable-Row & Editable-Cell Table component
- *    • wherein we can edit every row
- *    • and delete each row
- *    • Once all values in the prescription table are set we will send save & dispatch that the entire array of objects
- *      to the API for CRUD application
- *  - NOTE:
- */
-
 import {
   Avatar,
   Button,
@@ -53,57 +40,21 @@ const { Meta } = Card
 const { TextArea } = Input
 const InputGroup = Input.Group
 
-/* Some static css */
-const itemStyle = {
-  display: 'flex',
-  marginRight: '25px',
-  justifyContent: 'flex-end',
-  marginTop: -15,
-}
-const itemStyle2 = {
-  display: 'flex',
-  marginRight: '25px',
-  // justifyContent: 'flex-end',
-  marginTop: -15,
-}
-const itemStyle3 = {
-  display: 'flex',
-  marginRight: '25px',
-  // justifyContent: 'flex-end',
-  marginTop: -15,
-}
-
-const inputStyle = {
-  width: '200px',
-  borderRadius: 0,
-  border: 'none',
-  borderBottom: '2px solid',
-}
-const inputStyle2 = {
-  width: '160px',
-  borderRadius: 0,
-  border: 'none',
-  borderBottom: '2px solid',
-}
-const inputStyle3 = {
-  borderRadius: 0,
-}
-
 const layout1 = {
   labelCol: {
-    span: 3,
+    span: 8,
   },
   wrapperCol: {
-    span: 18,
+    span: 16,
   },
 }
 
-const testLayout = {
+const lt = {
   labelCol: {
-    span: 3,
+    span: 4,
   },
   wrapperCol: {
-    span: 14,
+    span: 20,
   },
 }
 
@@ -133,25 +84,6 @@ const layout13 = {
     span: 12,
   },
 }
-
-const customSpanStyle = {
-  backgroundColor: '#52c41a',
-  color: 'white',
-  borderRadius: '3px',
-  padding: '1px 5px',
-}
-const inActiveSpanStyle = {
-  backgroundColor: 'red',
-  color: 'white',
-  borderRadius: '3px',
-  padding: '1px 5px',
-}
-
-/* The below function is a helper function */
-// const [testDataSource, setTestDataSource] = useState([]);
-// const handleTestChange = ()  => {
-//   setTestDataSource(e.target.value)
-// };
 
 function addNevObject(val) {
   let theMainArray = []
@@ -195,7 +127,7 @@ const GetComplaints = ({ form }) => {
   return (
     <>
       {(form.getFieldValue('complaints') || !form.getFieldValue('complaints')) && (
-        <Form.Item {...FORM.layout} label="MAIN Complaints">
+        <Form.Item {...lt} label="MAIN Complaints">
           {form.getFieldDecorator('complaints')(
             <Select
               mode="tags"
@@ -243,7 +175,7 @@ const GetDiagnosis = ({ form }) => {
   return (
     <>
       {(form.getFieldValue('diagnosis') || !form.getFieldValue('diagnosis')) && (
-        <Form.Item {...FORM.layout} label="MAIN diagnosis">
+        <Form.Item {...lt} label="MAIN diagnosis">
           {form.getFieldDecorator('diagnosis')(
             <Select
               mode="tags"
@@ -291,7 +223,7 @@ const GetTest = ({ form }) => {
   return (
     <>
       {(form.getFieldValue('tests') || !form.getFieldValue('tests')) && (
-        <Form.Item {...FORM.layout} label="MAIN tests">
+        <Form.Item {...lt} label="MAIN tests">
           {form.getFieldDecorator('tests')(
             <Select
               mode="tags"
@@ -330,11 +262,6 @@ const BankDetails = props => {
   const prescriptions = useSelector(state => state.prescriptions)
   const dispatchOfPrescription = useDispatch()
   console.log('THE LOCAL STATE for getting prescription', prescriptions)
-  /* productsState ==> holds the array of all the medicines in the list 
-      productsDispatch ==> The local "Reducer" for updating the reducer which will hold each row items 
-      ⭐ NOTE: Here we have defined the initialState of the reducer to an empty array but 
-               we need to pass the latest prescription details.
-   */
 
   const [productsState, productsDispatch] = useReducer(productReducer, [])
 
@@ -342,8 +269,6 @@ const BankDetails = props => {
   const role = useSelector(state => state.user.role)
 
   useEffect(() => {
-    console.log('******************* THE COMPONENT Did mount method ie it will run only once ')
-    // props.setLearner(details)
     dispatchOfPrescription({
       type: 'prescriptions/SET_SPECIFIC_LEARNER',
       payload: props.details,
@@ -362,13 +287,6 @@ const BankDetails = props => {
       },
     })
   }, [])
-
-  /*[Explaination]
-     This effect will only run if the prescription values are set.
-     When this run what it does you may think???
-     1. It sets the productState (aka list-of-meds-objects) with the latest prescriptions
-     2. It will then, fill the form page with the latest prescription details
-   */
 
   useEffect(() => {
     console.log('THE PRESCRIPTION VALUE', prescriptions)
@@ -407,21 +325,18 @@ const BankDetails = props => {
 
   const handleSubmitt = e => {
     e.preventDefault()
-    console.log('submit✌✌✌✌✌✌✌✌✌')
     form.validateFields((err, values) => {
       console.log('THE LIST OF PRESCRIPTION', productsState)
       console.log('THE SUBMIT 🎉✨', err, values)
-      dispatchOfPrescription({
-        type: actionPrescription.CREATE_PRESCRIPTION,
-        payload: {
-          // Student's ID
-          id: details.id,
-          // vitals' values & array of complaints/tests/diagnosis
-          values: values,
-          // medicines array
-          data: productsState,
-        },
-      })
+      console.log(details.id, vaules, productsState, 'prd')
+      // dispatchOfPrescription({
+      //   type: actionPrescription.CREATE_PRESCRIPTION,
+      //   payload: {
+      //     id: details.id,
+      //     values: values,
+      //     data: productsState,
+      //   },
+      // })
     })
   }
 
@@ -439,137 +354,55 @@ const BankDetails = props => {
           {/* onSubmit={e => handleFormSubmit(e)} */}
           <Form className="update-bank-details">
             <Divider orientation="left">General Details</Divider>
-            <div>
-              <Card
-                style={{
-                  textAlign: 'center',
-                  border: 'none',
-                  display: 'flex',
-                  justifyContent: 'center',
-                }}
-              >
-                <Meta
-                  avatar={
-                    <Avatar
-                      src="https://www.thewodge.com/wp-content/uploads/2019/11/avatar-icon.png"
-                      style={{
-                        width: '100px',
-                        height: '100px',
-                        border: '1px solid #f6f7fb',
-                      }}
-                    />
-                  }
-                  title={
-                    <h5 style={{ marginTop: '20px' }}>
-                      {details ? details.firstname : ''} {details ? details.lastname : ''}
-                      <span
-                        style={{
-                          float: 'right',
-                          fontSize: '12px',
-                          padding: '5px',
-                          color: '#0190fe',
-                        }}
-                      >
-                        {details.isActive === true ? (
-                          <Switch
-                            checkedChildren={<Icon type="check" />}
-                            unCheckedChildren={<Icon type="close" />}
-                            defaultChecked
-                            // onChange={this.learnerActiveInactive}
-                          />
-                        ) : (
-                          <Switch
-                            checkedChildren={<Icon type="check" />}
-                            unCheckedChildren={<Icon type="close" />}
-                            // onChange={this.learnerActiveInactive}
-                          />
-                        )}
-                      </span>
-                    </h5>
-                  }
-                  description={
-                    <div>
-                      <div>
-                        <p
-                          style={{
-                            fontSize: '13px',
-                            marginBottom: '4px',
-                          }}
-                        >
-                          Enrollment Status &nbsp;{' '}
-                          {details.isActive ? (
-                            <span style={customSpanStyle}>Active</span>
-                          ) : (
-                            <span style={inActiveSpanStyle}>In-Active</span>
-                          )}
-                        </p>
-                      </div>
-                      <div>
-                        <p
-                          style={{
-                            fontSize: '13px',
-                            marginBottom: '4px',
-                          }}
-                        >
-                          <span>{details ? details.email : ''}</span>
-                        </p>
-                      </div>
-                    </div>
-                  }
-                />
-              </Card>
-            </div>
-            <br />
-            <Divider orientation="left">Vitals</Divider>
-            <div className="vitals_container">
-              <div>
-                <div>
-                  <Form.Item {...FORM.layout1} label="Height">
-                    {form.getFieldDecorator('height')(
-                      <Input className="vital_input" placeholder="cm" />,
-                    )}
-                  </Form.Item>
-                </div>
-                <div>
-                  <Form.Item {...FORM.layout1} label="Weight">
-                    {form.getFieldDecorator('weight')(
-                      <Input className="vital_input" placeholder="Kg" />,
-                    )}
-                  </Form.Item>
-                </div>
-              </div>
-              <div>
-                <div>
-                  <Form.Item {...FORM.layout1} label="Temperature">
-                    {form.getFieldDecorator('temperature')(
-                      <Input className="vital_input" placeholder="Celcious" />,
-                    )}
-                  </Form.Item>
-                </div>
-                <div>
-                  <Form.Item style={{ display: 'flex' }} label="Head Circumference">
-                    {form.getFieldDecorator('headCircumference')(
-                      <Input className="vital_input" placeholder="cm" />,
-                    )}
-                  </Form.Item>
-                </div>
-              </div>
-            </div>
-            {/* The complaints list */}
+            <Form.Item {...lt} label="Name">
+              {form.getFieldDecorator('name')(<Input className="vital_input" placeholder="cm" />)}
+            </Form.Item>
+            <Row>
+              <Col span={12}>
+                <Form.Item {...layout1} label="Height">
+                  {form.getFieldDecorator('height')(
+                    <Input className="vital_input" suffix="cm" placeholder="Enter height" />,
+                  )}
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item {...layout1} label="Weight">
+                  {form.getFieldDecorator('weight')(
+                    <Input className="vital_input" suffix="Kg" placeholder="Enter weight" />,
+                  )}
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={12}>
+                <Form.Item {...layout1} label="Temperature">
+                  {form.getFieldDecorator('temperature')(
+                    <Input
+                      className="vital_input"
+                      suffix="C"
+                      placeholder="Enter body temperature"
+                    />,
+                  )}
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item {...layout1} label="Head Circumference">
+                  {form.getFieldDecorator('headCircumference')(
+                    <Input
+                      suffix="cm"
+                      className="vital_input"
+                      placeholder="Enter head circumference"
+                    />,
+                  )}
+                </Form.Item>
+              </Col>
+            </Row>
             <GetComplaints form={form} />
-            {/* The diagnosis list */}
             <GetDiagnosis form={form} />
-            {/* The test list */}
             <GetTest form={form} />
             {prescriptions.loadingPrescriptions !== true &&
             prescriptions.isSpecificPrescription !== false ? (
               <>
-                {/*[Explaination]
-                   *  The "Global-State" for "PrescriptionItemTable" component is the "productState"
-                   * @productDispatch ==> The setter function of product state
-                   * @totalAmount ==> The count of list item which is initially set to zero
-                       (Further understanding would be mentioned inside the "PrescriptionItemTable")
-                   */}
                 <PrescriptionItemContext.Provider value={productsDispatch}>
                   <PrescriptionItemTable
                     style={{ marginTop: 25 }}
@@ -666,7 +499,6 @@ const BankDetails = props => {
                 onConfirm={handleSubmitt}
               >
                 <Button loading={false} type="primary" style={{ margin: 5 }}>
-                  {/* htmlType="submit" */}
                   ADD
                 </Button>
               </Popconfirm>

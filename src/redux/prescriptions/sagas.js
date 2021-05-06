@@ -12,7 +12,6 @@ import {
 import actions from './actions'
 
 export function* SET_SELECTED_LEARNER({ learner }) {
-  console.log('THE LEARNER', learner)
   yield put({
     type: actions.SET_SPECIFIC_LEARNER,
     payload: {

@@ -8,39 +8,15 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import { PrescriptionFormContext } from './context'
 import './index.scss'
 
-/**[Explanation]
- * This component will decide each item inside each cell of the entire table
- * record ==> each row in the entire table is a record
- * children ==>❗❗❗❗❗
- * title ==> title of the columnList; which is defined in the "prescriptionItemTable"
- * dataIndex ==> dataIndex of the columnList; which is defined in the "prescriptionItemTable"
- * handleSave ==> is a reducer function which save all the edits made in the local reducer of the component
- */
 export default ({ record, children, title, editable, dataIndex, handleSave, ...restProps }) => {
-  // console.log('RECORD', record)
-  // console.log('CHILDREN', children)
-  // console.log('TITLE', title)
-  // console.log('EDITABLE', editable)
-  // console.log('THE DATA INDEX', dataIndex)
-  // console.log('THE HANDLESAVE', handleSave)
-  // console.log('THE REST OF PROPS', restProps)
   const [editing, setEditing] = useState(false)
   const inputRef = useRef()
   const form = useContext(PrescriptionFormContext)
-  // console.log('THE LOCAL STATE of prescriptionItemCell', editing)
-  // console.log('THE inputRef', inputRef)
 
-  // useEffect(() => {
-  //   console.log('THE USE EFFECT ☑☑☑☑☑☑☑☑☑☑☑☑☑🚀🚀🚀🚀🚀')
-  //   console.log('CHECK HOW THE COMPONENT MOUNTS', title)
-  // }, [])
   console.log('record', record)
   useEffect(() => {
     if (editing) {
-      // console.log('THE inputRef inside useEffect', inputRef)
-
       if (inputRef.current) {
-        // console.log('THE inputRef inside useEffect >>>>>>', inputRef.current.focus())
         inputRef.current.focus()
       }
     }
@@ -67,11 +43,7 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
   let childNode = children
   if (editable) {
     childNode = editing ? (
-      <div>
-        {/* We have 7 fields the table column
-            Here we are defining what kind of input field each column will take
-         */}
-        {/* the medicine-Name field will be called "service" in the array object */}
+      <div className="table-input-field">
         {title === 'Product/Service' && (
           <Form.Item
             style={{
@@ -81,7 +53,6 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
             name={record.dataIndex}
           >
             {form.getFieldDecorator('name', {
-              //::before service
               initialValue: record.name, //::before record.service,
               rules: [
                 {
@@ -92,7 +63,6 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
             })(
               <Input
                 ref={inputRef}
-                // loading={false}
                 placeholder="Please enter prescription name"
                 onPressEnter={save}
                 onBlur={save}
@@ -101,7 +71,6 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
             )}
           </Form.Item>
         )}
-        {/* In the column of MedicineType we need to display a selector field */}
         {title === 'Type' ? (
           <Form.Item
             style={{
@@ -135,11 +104,10 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
               })(
                 <Input
                   ref={inputRef}
-                  // loading={false}
                   placeholder="Please enter the values"
                   onPressEnter={save}
                   onBlur={save}
-                  style={{ border: 'none', width: '200px' }}
+                  style={{ width: '100%', textAlign: 'right', alignSelf: 'flex-end' }}
                 />,
               )}
             </Form.Item>
@@ -149,9 +117,7 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
     ) : (
       <div
         className="editable-cell-value-wrap"
-        style={{
-          paddingRight: 0,
-        }}
+        style={{ padding: '6px 4px 6px 0' }}
         onClick={toggleEdit}
       >
         {children}

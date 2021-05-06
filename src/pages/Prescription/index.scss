@@ -117,48 +117,48 @@
 
 // PRESCRIPTION TABLE CSS
 
-#prescription_table_container {
-  .ant-table-thead > tr > th {
-    background-color: $palete-light-blue !important;
-    padding: 10px;
-    font-weight: 800;
-    border: 1px solid $palete-light-blue;
-  }
-  .ant-table-tbody {
-    font-weight: 600;
-    color: #000;
-    background-color: rgb(245, 245, 245);
-  }
-  .ant-table-tbody > tr > td {
-    border: 0.5px solid rgb(218, 218, 218);
-    padding: 8px;
-  }
-  .ant-table-tbody > tr > td:first-child {
-    background-color: $palete-light-blue;
-    width: 1%;
-  }
-  .ant-table-tbody > tr > td:nth-child(2) {
-    font-weight: 700;
-  }
-  .ant-table-tbody > tr > td:last-child {
-    width: 95px;
-    border: 0;
-  }
-  .ant-table-footer {
-    background-color: rgb(255, 255, 255);
-  }
-}
+// #prescription_table_container {
+//   .ant-table-thead > tr > th {
+//     background-color: $palete-light-blue !important;
+//     padding: 10px;
+//     font-weight: 800;
+//     border: 1px solid $palete-light-blue;
+//   }
+//   .ant-table-tbody {
+//     font-weight: 600;
+//     color: #000;
+//     background-color: rgb(245, 245, 245);
+//   }
+//   .ant-table-tbody > tr > td {
+//     border: 0.5px solid rgb(218, 218, 218);
+//     padding: 8px;
+//   }
+//   .ant-table-tbody > tr > td:first-child {
+//     background-color: $palete-light-blue;
+//     width: 1%;
+//   }
+//   .ant-table-tbody > tr > td:nth-child(2) {
+//     font-weight: 700;
+//   }
+//   .ant-table-tbody > tr > td:last-child {
+//     width: 95px;
+//     border: 0;
+//   }
+//   .ant-table-footer {
+//     background-color: rgb(255, 255, 255);
+//   }
+// }
 
-#prescription_visit_table_container {
-  .ant-table-tbody {
-    font-weight: 600;
-    color: rgb(0, 0, 0);
-  }
-  .ant-table-thead > tr > th {
-    padding: 10px;
-    font-weight: 800;
-  }
-}
+// #prescription_visit_table_container {
+//   .ant-table-tbody {
+//     font-weight: 600;
+//     color: rgb(0, 0, 0);
+//   }
+//   .ant-table-thead > tr > th {
+//     padding: 10px;
+//     font-weight: 800;
+//   }
+// }
 
 .remove_btn {
   background-color: transparent;
@@ -346,17 +346,26 @@
 }
 // ---------------------------------------------------------------
 
+.table-input-field {
+  .ant-form-item {
+    margin-bottom: 0;
+  }
+}
+
 .editable-cell {
   position: relative;
 }
 
+// .editable-row:hover .editable-cell-value-wrap {
+//   border: 1px solid #d9d9d9;
+//   border-radius: 4px;
+//   padding: 0;
+// }
 .editable-cell-value-wrap {
-  padding: 5px 12px;
+  padding: 0;
   cursor: pointer;
 }
 
-.editable-row:hover .editable-cell-value-wrap {
-  border: 1px solid rgb(217, 217, 217);
-  border-radius: 4px;
-  padding: 4px 11px;
-}
+// [data-theme='dark'] .editable-row:hover .editable-cell-value-wrap {
+//   border: 1px solid #434343;
+// }
