@@ -17,8 +17,6 @@ const DragFile = ({ value, learnerId, staffId, isStaffById, isLearnerById }) => 
   const [url, setUrl] = useState('')
   const [userPk, setUserPk] = useState('')
 
-  console.log('====>', url)
-
   useEffect(() => {
     if (userRole === 'parents') {
       setUrl('https://application.cogniable.us/apis/student-docs/')

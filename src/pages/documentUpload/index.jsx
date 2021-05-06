@@ -127,7 +127,7 @@ const index = () => {
           {userRole === 'school_admin' && isDrawerTitle === false ? (
             <div className="filter_as_clinic">
               <p onClick={handleStaff} className="staffs_title">
-                Staffs
+                Staff
               </p>
               <p onClick={handleLearner} className="learners_title">
                 Learners
@@ -170,8 +170,8 @@ const index = () => {
           {!learnerName && !staffName
             ? `Select Staff/Learner`
             : learnerName
-            ? `${learnerName}-Learner`
-            : `${staffName}-Therapist`}
+            ? `${learnerName} - Learner`
+            : `${staffName} - Therapist`}
         </p>
       </div>
     </>

@@ -367,7 +367,7 @@ const AllFilesData = ({
             />
           </div>
         </div>
-        <div className="description_filter_section">
+        <div className="description_filter_section" style={{ marginLeft: '30px' }}>
           <div className="description_filter">
             <label className="description_filter_label" htmlFor="description">
               Description:
