@@ -44,29 +44,23 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
   if (editable) {
     childNode = editing ? (
       <div className="table-input-field">
-        {title === 'Product/Service' && (
-          <Form.Item
-            style={{
-              margin: 0,
-              border: 'none',
-            }}
-            name={record.dataIndex}
-          >
+        {title === 'Name' && (
+          <Form.Item style={{ margin: 0, border: 'none' }} name={record.dataIndex}>
             {form.getFieldDecorator('name', {
               initialValue: record.name, //::before record.service,
               rules: [
                 {
                   required: true,
-                  message: 'Please enter prescription name',
+                  message: 'Please enter prescription',
                 },
               ],
             })(
               <Input
                 ref={inputRef}
-                placeholder="Please enter prescription name"
+                placeholder="Please enter prescription"
                 onPressEnter={save}
                 onBlur={save}
-                style={{ border: 'none', width: '200px' }}
+                style={{ width: '100%', textAlign: 'left' }}
               />,
             )}
           </Form.Item>
@@ -82,7 +76,7 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
             {form.getFieldDecorator('medicineType', {
               initialValue: record.medicineType,
             })(
-              <Select placeholder="Medicine Type" allowClear onSelect={save}>
+              <Select placeholder="Medicine Type" allowClear onSelect={save} onBlur={save}>
                 <Select.Option value="SYP">SYP</Select.Option>
                 <Select.Option value="TAB">TAB</Select.Option>
                 <Select.Option value="DRP">DRP</Select.Option>
@@ -91,7 +85,7 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
             )}
           </Form.Item>
         ) : (
-          title !== 'Product/Service' && (
+          title !== 'Name' && (
             <Form.Item
               style={{
                 margin: 0,

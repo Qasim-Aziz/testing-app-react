@@ -8,9 +8,7 @@ import {
   DatePicker,
   Divider,
   Form,
-  Icon,
   Input,
-  InputNumber,
   Layout,
   notification,
   Popconfirm,
@@ -18,14 +16,13 @@ import {
   Row,
   Select,
   Spin,
-  Switch,
   Typography,
 } from 'antd'
 import moment from 'moment'
 import React, { useEffect, useReducer, useState } from 'react'
 import { useQuery } from 'react-apollo'
 import { useDispatch, useSelector } from 'react-redux'
-import { FORM } from '../../assets/styles/globalStyles'
+import { CANCEL_BUTTON, FORM, SUBMITT_BUTTON } from '../../assets/styles/globalStyles'
 import actionPrescription from '../../redux/prescriptions/actions'
 import { PrescriptionItemContext } from './context'
 import './index.scss'
@@ -292,10 +289,8 @@ const BankDetails = props => {
     console.log('THE PRESCRIPTION VALUE', prescriptions)
     if (prescriptions.isSpecificPrescription) {
       let listOfMedicineObject = prescriptions.SpecificPrescription.medicineItems.edges
-      /**Add key in the product_state */
       let x = addNevObject(listOfMedicineObject)
       productsDispatch({ type: 'SET_PRODUCTS', payload: x })
-      // Once the meds are imported we fill all those values
 
       form.setFieldsValue({
         height: prescriptions.SpecificPrescription.height,
@@ -347,12 +342,34 @@ const BankDetails = props => {
     setTestTime(e.target.value)
   }
 
+  const test = {
+    labelCol: {
+      span: 12,
+    },
+    wrapperCol: {
+      span: 10,
+    },
+  }
+  const test2 = {
+    labelCol: {
+      span: 8,
+    },
+    wrapperCol: {
+      span: 10,
+    },
+  }
+
+  const opt = [
+    { label: 'Apple', value: 'Apple' },
+    { label: 'Pear', value: 'Pear' },
+    { label: 'Orange', value: 'Orange' },
+  ]
+
   return (
     <div>
       <Layout>
         <Content>
-          {/* onSubmit={e => handleFormSubmit(e)} */}
-          <Form className="update-bank-details">
+          <Form>
             <Divider orientation="left">General Details</Divider>
             <Form.Item {...lt} label="Name">
               {form.getFieldDecorator('name')(<Input className="vital_input" placeholder="cm" />)}
@@ -432,82 +449,66 @@ const BankDetails = props => {
                 )}
               </>
             )}
-            <div className="prescription_footer_section">
-              <div className="advice_contianer">
-                <div style={{ width: '85%' }}>
-                  <Form.Item {...layout1} label="Advice">
-                    {form.getFieldDecorator('advice')(
-                      <TextArea
-                        placeholder="Advice"
-                        autoSize={{ minRows: 4, maxRows: 6 }}
-                        allowClear
-                      />,
-                    )}
-                  </Form.Item>
-                </div>
-              </div>
-            </div>
-            <div style={{ marginLeft: '4%' }}>
-              <Form.Item {...layout12} label="Test Date">
+            <Row>
+              <Form.Item {...lt} label="Advice">
+                {form.getFieldDecorator('advice')(
+                  <TextArea
+                    placeholder="Advice"
+                    autoSize={{ minRows: 4, maxRows: 6 }}
+                    allowClear
+                  />,
+                )}
+              </Form.Item>
+              <Form.Item {...lt} label="Test Date">
                 {form.getFieldDecorator('testDate')(<DatePicker test />)}
               </Form.Item>
-            </div>
-            <Row style={{ marginLeft: '6%' }} type="flex" justify="start">
-              <Col span={5}>
-                <Form.Item {...layout11} label="Next Visit">
-                  {form.getFieldDecorator('nextVisitNumber')(
-                    <InputNumber min={1} max={12} onChange={onChangeInputNumber} />,
-                  )}
-                </Form.Item>
-              </Col>
-              <Col span={7}>
-                <Form.Item style={{ marginTop: '-2%' }}>
-                  {form.getFieldDecorator('nextVisitVal')(
-                    <Radio.Group onChange={onChangeNextVisitVal}>
-                      <Radio.Button value="days">days</Radio.Button>
-                      <Radio.Button value="weeks">weeks</Radio.Button>
-                      <Radio.Button value="months">months</Radio.Button>
-                    </Radio.Group>,
-                  )}
-                </Form.Item>
-              </Col>
-              <span
-                style={{
-                  fontWeight: '900',
-                  fontSize: '16px',
-                  marginLeft: '-2%',
-                  marginTop: '0.5%',
-                }}
-              >
-                OR
-              </span>
               <Col span={8}>
-                <Form.Item {...layout13} label="Next Visit Date">
+                <Form.Item {...test} label="Next Visit">
+                  {form.getFieldDecorator('nextVisitNumber')(
+                    <Input type="number" min={1} max={12} onChange={onChangeInputNumber} />,
+                  )}
+                </Form.Item>
+              </Col>
+              <Col span={4}>
+                <Radio.Group optionType="button" buttonStyle="solid">
+                  <Radio.Button value="days">days</Radio.Button>
+                  <Radio.Button value="weeks">weeks</Radio.Button>
+                  <Radio.Button value="months">months</Radio.Button>
+                </Radio.Group>
+                ,
+              </Col>
+              <Col span={2}>
+                <span
+                  style={{
+                    fontWeight: '900',
+                    fontSize: '16px',
+                  }}
+                >
+                  OR
+                </span>
+              </Col>
+              <Col span={8}>
+                <Form.Item {...test2} label="Next Visit Date">
                   {form.getFieldDecorator('nextVisitDate')(<DatePicker />)}
                 </Form.Item>
               </Col>
             </Row>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                margin: '20px 0',
-              }}
-            >
+
+            <Form.Item {...FORM.tailLayout}>
               <Popconfirm
                 title="Are you sure all the details filled are correct ?"
                 onConfirm={handleSubmitt}
               >
-                <Button loading={false} type="primary" style={{ margin: 5 }}>
+                <Button loading={false} type="primary" style={SUBMITT_BUTTON}>
                   ADD
                 </Button>
               </Popconfirm>
-              <Button onClick={() => props.closeAddDrawer()} type="ghost" style={{ margin: 5 }}>
+              <Button onClick={() => props.closeAddDrawer()} type="ghost" style={CANCEL_BUTTON}>
                 Cancel
               </Button>
-            </div>
+            </Form.Item>
           </Form>
-          <div className="visit_history_section">
+          {/* <div className="visit_history_section">
             <div className="vist_title">
               <Title level={2}>14 Visits</Title>
               <Text>Since14-Mar-2020</Text>
@@ -539,7 +540,7 @@ const BankDetails = props => {
                 )}
               </div>
             </div>
-          </div>
+          </div> */}
         </Content>
       </Layout>
     </div>

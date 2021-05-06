@@ -37,36 +37,36 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount, ...props }) =>
       width: 20,
     },
     {
-      title: 'Type', // MedicineType
+      title: 'Med Type', // MedicineType
       editable: true,
       dataIndex: 'medicineType', // ::before 'type',
-      width: 100,
+      width: 160,
     },
     {
-      title: 'Product/Service', // Name
+      title: 'Name', // Name
       editable: true,
       dataIndex: 'name', // name // ::before service
-      width: 120,
+      align: 'left',
     },
     {
       title: 'Dosage',
       dataIndex: 'dosage',
       editable: true,
-      width: 70,
+      width: 130,
       align: 'right',
     },
     {
       title: 'Unit',
       dataIndex: 'unit',
       editable: true,
-      width: 70,
+      width: 130,
       align: 'right',
     },
     {
       title: 'When',
       dataIndex: 'when',
       editable: true,
-      width: 85,
+      width: 130,
       align: 'right',
     },
     {
@@ -74,27 +74,27 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount, ...props }) =>
       dataIndex: 'frequency',
       editable: true,
       align: 'right',
-      width: 70,
+      width: 130,
     },
     {
       title: 'Duration',
       dataIndex: 'duration',
       editable: true,
-      width: 70,
+      width: 130,
       align: 'right',
     },
 
     {
       title: 'Qty',
       dataIndex: 'qty',
-      width: 70,
+      width: 130,
       editable: true,
       align: 'right',
     },
     {
       title: 'Operation',
       dataIndex: 'operation',
-      width: 25,
+      width: 110,
       render: (
         text,
         { key, ...val }, // key, id, ...val
@@ -157,7 +157,8 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount, ...props }) =>
   const handleAdd = () => {
     const newProductData = {
       key: products.length + 1,
-      name: '',
+      medicineType: 'SYP',
+      name: 'Med',
       rate: 0,
       dosage: 0,
       unit: 0,
@@ -191,7 +192,7 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount, ...props }) =>
   })
 
   return (
-    <div>
+    <div style={{ margin: '5px auto 18px' }}>
       <Table
         components={components}
         columns={columns}
