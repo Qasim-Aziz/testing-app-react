@@ -1,18 +1,5 @@
 /* eslint-disable */
 
-/**[Explaination]
- * This component is a part of the "Prescription" component wherein
- *  - Only the authenticated & allowed users which are doctors/therapist can have access
- *  - The Parent of a particular learner can view their child's prescription and take a printout of it in a pdf formart
- * How is component structured
- *  - In antD we already have Editable-Row & Editable-Cell Table component
- *    • wherein we can edit every row
- *    • and delete each row
- *    • Once all values in the prescription table are set we will send save & dispatch that the entire array of objects
- *      to the API for CRUD application
- *  - NOTE:
- */
-
 import {
   Button,
   Card,
@@ -21,7 +8,6 @@ import {
   Divider,
   Form,
   Input,
-  InputNumber,
   Layout,
   notification,
   Popconfirm,
@@ -31,11 +17,12 @@ import {
   Spin,
   Typography,
 } from 'antd'
+import LoadingComponent from 'components/LoadingComponent'
 import moment from 'moment'
 import React, { useEffect, useReducer, useState } from 'react'
 import { useQuery } from 'react-apollo'
 import { useDispatch, useSelector } from 'react-redux'
-import { FORM } from '../../assets/styles/globalStyles'
+import { CANCEL_BUTTON, FORM, SUBMITT_BUTTON } from '../../assets/styles/globalStyles'
 import actionPrescription from '../../redux/prescriptions/actions'
 import { PrescriptionItemContext } from './context'
 import './index.scss'
@@ -43,6 +30,7 @@ import PrescriptionItemTable from './prescriptionItemTable'
 import PrescriptionVisitTable from './PrescriptionVisit/PrescriptionVisitTable'
 import { GET_COMPLAINT_QUERY, GET_DIAGNOSIS_QUERY, GET_TESTS_QUERY } from './query'
 import productReducer from './reducer'
+// import OtpInput from 'react-otp-input'
 
 const { Header, Content } = Layout
 const { Text, Title } = Typography
@@ -50,111 +38,35 @@ const { Meta } = Card
 const { TextArea } = Input
 const InputGroup = Input.Group
 
-/* Some static css */
-const itemStyle = {
-  display: 'flex',
-  marginRight: '25px',
-  justifyContent: 'flex-end',
-  marginTop: -15,
-}
-const itemStyle2 = {
-  display: 'flex',
-  marginRight: '25px',
-  // justifyContent: 'flex-end',
-  marginTop: -15,
-}
-const itemStyle3 = {
-  display: 'flex',
-  marginRight: '25px',
-  // justifyContent: 'flex-end',
-  marginTop: -15,
-}
-
-const inputStyle = {
-  width: '200px',
-  borderRadius: 0,
-  border: 'none',
-  borderBottom: '2px solid',
-}
-const inputStyle2 = {
-  width: '160px',
-  borderRadius: 0,
-  border: 'none',
-  borderBottom: '2px solid',
-}
-const inputStyle3 = {
-  borderRadius: 0,
-}
-
 const layout1 = {
   labelCol: {
-    span: 3,
+    span: 8,
   },
   wrapperCol: {
-    span: 18,
+    span: 16,
   },
 }
 
-const testLayout = {
+const lt = {
   labelCol: {
-    span: 3,
+    span: 4,
   },
   wrapperCol: {
-    span: 14,
+    span: 20,
   },
 }
 
-const layout11 = {
-  labelCol: {
-    span: 12,
-  },
+const tl = {
   wrapperCol: {
-    span: 12,
+    offset: 4,
+    span: 20,
   },
 }
-
-const layout12 = {
-  labelCol: {
-    span: 3,
-  },
-  wrapperCol: {
-    span: 21,
-  },
-}
-
-const layout13 = {
-  labelCol: {
-    span: 12,
-  },
-  wrapperCol: {
-    span: 12,
-  },
-}
-
-const customSpanStyle = {
-  backgroundColor: '#52c41a',
-  color: 'white',
-  borderRadius: '3px',
-  padding: '1px 5px',
-}
-const inActiveSpanStyle = {
-  backgroundColor: 'red',
-  color: 'white',
-  borderRadius: '3px',
-  padding: '1px 5px',
-}
-
-/* The below function is a helper function */
-// const [testDataSource, setTestDataSource] = useState([]);
-// const handleTestChange = ()  => {
-//   setTestDataSource(e.target.value)
-// };
 
 function addNevObject(val) {
   let theMainArray = []
   val.map((item, index) => {
     let some_random = {}
-    console.log('THE ITEM', item)
     some_random.key = index + 1 // item.node.id
     some_random.name = item.node.name
     some_random.medicineType = item.node.medicineType
@@ -167,13 +79,10 @@ function addNevObject(val) {
 
     theMainArray.push(some_random)
   })
-  console.log('THE VAL', val)
-  console.log('THE MAIN ARRAY', theMainArray)
   return theMainArray
 }
 
 const GetComplaints = ({ form }) => {
-  console.log('form', form)
   const [sdText, setSdText] = useState('')
   const { data: sdData, error: sdError, loading: sdLoading } = useQuery(GET_COMPLAINT_QUERY, {
     variables: {
@@ -192,7 +101,7 @@ const GetComplaints = ({ form }) => {
   return (
     <>
       {(form.getFieldValue('complaints') || !form.getFieldValue('complaints')) && (
-        <Form.Item {...FORM.layout} label="MAIN Complaints">
+        <Form.Item {...lt} label="MAIN Complaints">
           {form.getFieldDecorator('complaints')(
             <Select
               mode="tags"
@@ -240,7 +149,7 @@ const GetDiagnosis = ({ form }) => {
   return (
     <>
       {(form.getFieldValue('diagnosis') || !form.getFieldValue('diagnosis')) && (
-        <Form.Item {...FORM.layout} label="MAIN diagnosis">
+        <Form.Item {...lt} label="MAIN diagnosis">
           {form.getFieldDecorator('diagnosis')(
             <Select
               mode="tags"
@@ -288,7 +197,7 @@ const GetTest = ({ form }) => {
   return (
     <>
       {(form.getFieldValue('tests') || !form.getFieldValue('tests')) && (
-        <Form.Item {...FORM.layout} label="MAIN tests">
+        <Form.Item {...lt} label="MAIN tests">
           {form.getFieldDecorator('tests')(
             <Select
               mode="tags"
@@ -318,40 +227,35 @@ const GetTest = ({ form }) => {
 }
 
 const BankDetails = props => {
-  function onDateChange(date, dateString) {
-    console.log(date, dateString)
-  }
-  const { form, details } = props
-  console.log('The state', props)
-  console.log('The form', form)
+  const { form, details, addPrescription, prescriptionObj } = props
   const prescriptions = useSelector(state => state.prescriptions)
   const dispatchOfPrescription = useDispatch()
-  console.log('THE LOCAL STATE for getting prescription', prescriptions)
-  /* productsState ==> holds the array of all the medicines in the list 
-      productsDispatch ==> The local "Reducer" for updating the reducer which will hold each row items 
-      ⭐ NOTE: Here we have defined the initialState of the reducer to an empty array but 
-               we need to pass the latest prescription details.
-   */
-
   const [productsState, productsDispatch] = useReducer(productReducer, [])
 
   const [subTotal, setSubTotal] = useState(0)
-  const role = useSelector(state => state.user.role)
 
+  console.log(prescriptionObj, 'prescription obj')
   useEffect(() => {
-    console.log('******************* THE COMPONENT Did mount method ie it will run only once ')
-    // props.setLearner(details)
+    console.log(props.details, details, 'props detilas')
     dispatchOfPrescription({
       type: 'prescriptions/SET_SPECIFIC_LEARNER',
       payload: props.details,
     })
-    dispatchOfPrescription({
-      type: actionPrescription.GET_LASTEST_PRESCRIPTIONS,
-      payload: {
-        /**Sending student's ID */
-        value: details.id,
-      },
-    })
+    if (addPrescription) {
+      dispatchOfPrescription({
+        type: actionPrescription.GET_LASTEST_PRESCRIPTIONS,
+        payload: {
+          value: details.id,
+        },
+      })
+    } else {
+      dispatchOfPrescription({
+        type: actionPrescription.GET_DETAILS_PRESCRIPTIONS,
+        payload: {
+          value: prescriptionObj.id,
+        },
+      })
+    }
     dispatchOfPrescription({
       type: actionPrescription.GET_PRESCRIPTIONS,
       payload: {
@@ -360,21 +264,13 @@ const BankDetails = props => {
     })
   }, [])
 
-  /*[Explaination]
-     This effect will only run if the prescription values are set.
-     When this run what it does you may think???
-     1. It sets the productState (aka list-of-meds-objects) with the latest prescriptions
-     2. It will then, fill the form page with the latest prescription details
-   */
-
   useEffect(() => {
-    console.log('THE PRESCRIPTION VALUE', prescriptions)
-    if (prescriptions.isSpecificPrescription) {
+    console.log(prescriptions, 'hey prprrp')
+    if (prescriptions.SpecificPrescription) {
+      console.log('dhfdkfjdfkjdfkjdfkjdfkjjjjjjjjjjjjjjjjjjjjjjjjjjjjj')
       let listOfMedicineObject = prescriptions.SpecificPrescription.medicineItems.edges
-      /**Add key in the product_state */
       let x = addNevObject(listOfMedicineObject)
       productsDispatch({ type: 'SET_PRODUCTS', payload: x })
-      // Once the meds are imported we fill all those values
 
       form.setFieldsValue({
         height: prescriptions.SpecificPrescription.height,
@@ -394,288 +290,142 @@ const BankDetails = props => {
     }
   }, [prescriptions.SpecificPrescription])
 
-  function onChangeInputNumber(value) {
-    console.log('changed', value)
-  }
-
-  function onChangeNextVisitVal(e) {
-    console.log(`radio checked:${e.target.value}`)
-  }
-
   const handleSubmitt = e => {
     e.preventDefault()
-    console.log('submit✌✌✌✌✌✌✌✌✌')
     form.validateFields((err, values) => {
-      console.log('THE LIST OF PRESCRIPTION', productsState)
-      console.log('THE SUBMIT 🎉✨', err, values)
       dispatchOfPrescription({
         type: actionPrescription.CREATE_PRESCRIPTION,
         payload: {
-          // Student's ID
           id: details.id,
-          // vitals' values & array of complaints/tests/diagnosis
           values: values,
-          // medicines array
           data: productsState,
         },
       })
     })
   }
 
-  const [testTime, setTestTime] = useState('')
-  console.log(testTime)
-  const handelTestTime = e => {
-    console.log(e.target.value)
-    setTestTime(e.target.value)
+  const updatePrescription = e => {
+    e.preventDefault()
+    form.validateFields((err, values) => {
+      dispatchOfPrescription({
+        type: actionPrescription.CREATE_PRESCRIPTION,
+        payload: {
+          id: details.id,
+          values: values,
+          data: productsState,
+        },
+      })
+    })
   }
+  const [testTime, setTestTime] = useState('')
 
   return (
     <div>
       <Layout>
         <Content>
-          {/* onSubmit={e => handleFormSubmit(e)} */}
-          <Form className="update-bank-details">
-            <h2 style={{ marginTop: '20px' }}>
-              {details ? details.firstname : ''} {details ? details.lastname : ''}
-            </h2>
-            {/* <Divider orientation="left">General Details</Divider> */}
-            {/* <div>
-              <Card
+          <Form onSubmit={addPrescription ? handleSubmitt : updatePrescription}>
+            <Divider orientation="left">General Details</Divider>
+            <Row style={{ marginBottom: 9 }}>
+              <Col
                 style={{
-                  textAlign: 'center',
-                  border: 'none',
                   display: 'flex',
-                  justifyContent: 'center',
+                  justifyContent: 'flex-end',
+                  paddingRight: 6,
+                  fontWeight: 700,
+                  color: 'black',
                 }}
+                span={4}
               >
-                <Meta
-                  avatar={
-                    <Avatar
-                      src="https://www.thewodge.com/wp-content/uploads/2019/11/avatar-icon.png"
-                      style={{
-                        width: '100px',
-                        height: '100px',
-                        border: '1px solid #f6f7fb',
-                      }}
-                    />
-                  }
-                  title={
-                    <h5 style={{ marginTop: '20px' }}>
-                      {details ? details.firstname : ''} {details ? details.lastname : ''}
-                      <span
-                        style={{
-                          float: 'right',
-                          fontSize: '12px',
-                          padding: '5px',
-                          color: '#0190fe',
-                        }}
-                      >
-                        {details.isActive === true ? (
-                          <Switch
-                            checkedChildren={<Icon type="check" />}
-                            unCheckedChildren={<Icon type="close" />}
-                            defaultChecked
-                            // onChange={this.learnerActiveInactive}
-                          />
-                        ) : (
-                          <Switch
-                            checkedChildren={<Icon type="check" />}
-                            unCheckedChildren={<Icon type="close" />}
-                            // onChange={this.learnerActiveInactive}
-                          />
-                        )}
-                      </span>
-                    </h5>
-                  }
-                  description={
-                    <div>
-                      <div>
-                        <p
-                          style={{
-                            fontSize: '13px',
-                            marginBottom: '4px',
-                          }}
-                        >
-                          Enrollment Status &nbsp;{' '}
-                          {details.isActive ? (
-                            <span style={customSpanStyle}>Active</span>
-                          ) : (
-                            <span style={inActiveSpanStyle}>In-Active</span>
-                          )}
-                        </p>
-                      </div>
-                      <div>
-                        <p
-                          style={{
-                            fontSize: '13px',
-                            marginBottom: '4px',
-                          }}
-                        >
-                          <span>{details ? details.email : ''}</span>
-                        </p>
-                      </div>
-                    </div>
-                  }
-                />
-              </Card>
-            </div>
-            <br /> */}
-            <Divider orientation="left">Vitals</Divider>
-            <div className="vitals_container">
-              <div>
-                <div>
-                  <Form.Item {...FORM.layout1} label="Height">
-                    {form.getFieldDecorator('height')(
-                      <Input className="vital_input" placeholder="cm" />,
-                    )}
-                  </Form.Item>
-                </div>
-                <div>
-                  <Form.Item {...FORM.layout1} label="Weight">
-                    {form.getFieldDecorator('weight')(
-                      <Input className="vital_input" placeholder="Kg" />,
-                    )}
-                  </Form.Item>
-                </div>
-              </div>
-              <div>
-                <div>
-                  <Form.Item {...FORM.layout1} label="Temperature">
-                    {form.getFieldDecorator('temperature')(
-                      <Input className="vital_input" placeholder="Celcious" />,
-                    )}
-                  </Form.Item>
-                </div>
-                <div>
-                  <Form.Item style={{ display: 'flex' }} label="Head Circumference">
-                    {form.getFieldDecorator('headCircumference')(
-                      <Input className="vital_input" placeholder="cm" />,
-                    )}
-                  </Form.Item>
-                </div>
-              </div>
-            </div>
-            {/* The complaints list */}
-            <GetComplaints form={form} />
-            {/* The diagnosis list */}
-            <GetDiagnosis form={form} />
-            {/* The test list */}
-            <GetTest form={form} />
-            {prescriptions.loadingPrescriptions !== true &&
-            prescriptions.isSpecificPrescription !== false ? (
-              <>
-                {/*[Explaination]
-                   *  The "Global-State" for "PrescriptionItemTable" component is the "productState"
-                   * @productDispatch ==> The setter function of product state
-                   * @totalAmount ==> The count of list item which is initially set to zero
-                       (Further understanding would be mentioned inside the "PrescriptionItemTable")
-                   */}
-                <PrescriptionItemContext.Provider value={productsDispatch}>
-                  <PrescriptionItemTable
-                    style={{ marginTop: 25 }}
-                    totalAmount={subTotal}
-                    products={productsState}
-                    dispatch={productsDispatch}
-                  />
-                </PrescriptionItemContext.Provider>
-              </>
-            ) : (
-              <>
-                {prescriptions.PrescriptionsList.length === 0 ? (
-                  <>
-                    <PrescriptionItemContext.Provider value={productsDispatch}>
-                      <PrescriptionItemTable
-                        style={{ marginTop: 25 }}
-                        totalAmount={subTotal}
-                        products={productsState}
-                        dispatch={productsDispatch}
-                      />
-                    </PrescriptionItemContext.Provider>
-                  </>
-                ) : (
-                  <>
-                    <Spin size="large" />
-                  </>
-                )}
-              </>
-            )}
-            <div className="prescription_footer_section">
-              <div className="advice_contianer">
-                <div style={{ width: '85%' }}>
-                  <Form.Item {...layout1} label="Advice">
-                    {form.getFieldDecorator('advice')(
-                      <TextArea
-                        placeholder="Advice"
-                        autoSize={{ minRows: 4, maxRows: 6 }}
-                        allowClear
-                      />,
-                    )}
-                  </Form.Item>
-                </div>
-              </div>
-            </div>
-            <div style={{ marginLeft: '4%' }}>
-              <Form.Item {...layout12} label="Test Date">
-                {form.getFieldDecorator('testDate')(<DatePicker test />)}
-              </Form.Item>
-            </div>
-            <Row style={{ marginLeft: '6%' }} type="flex" justify="start">
-              <Col span={5}>
-                <Form.Item {...layout11} label="Next Visit">
-                  {form.getFieldDecorator('nextVisitNumber')(
-                    <InputNumber min={1} max={12} onChange={onChangeInputNumber} />,
+                Name:
+              </Col>
+              <Col style={{ paddingLeft: 4 }} span={18}>
+                {details.firstname} {details.lastname}
+              </Col>
+            </Row>
+            <Row>
+              <Col span={12}>
+                <Form.Item {...layout1} label="Height">
+                  {form.getFieldDecorator('height')(
+                    <Input className="vital_input" suffix="cm" placeholder="Enter height" />,
                   )}
                 </Form.Item>
               </Col>
-              <Col span={7}>
-                <Form.Item style={{ marginTop: '-2%' }}>
-                  {form.getFieldDecorator('nextVisitVal')(
-                    <Radio.Group onChange={onChangeNextVisitVal}>
-                      <Radio.Button value="days">days</Radio.Button>
-                      <Radio.Button value="weeks">weeks</Radio.Button>
-                      <Radio.Button value="months">months</Radio.Button>
-                    </Radio.Group>,
+              <Col span={12}>
+                <Form.Item {...layout1} label="Weight">
+                  {form.getFieldDecorator('weight')(
+                    <Input className="vital_input" suffix="Kg" placeholder="Enter weight" />,
                   )}
-                </Form.Item>
-              </Col>
-              <span
-                style={{
-                  fontWeight: '900',
-                  fontSize: '16px',
-                  marginLeft: '-2%',
-                  marginTop: '0.5%',
-                }}
-              >
-                OR
-              </span>
-              <Col span={8}>
-                <Form.Item {...layout13} label="Next Visit Date">
-                  {form.getFieldDecorator('nextVisitDate')(<DatePicker />)}
                 </Form.Item>
               </Col>
             </Row>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                margin: '20px 0',
-              }}
-            >
-              <Popconfirm
-                title="Are you sure all the details filled are correct ?"
-                onConfirm={handleSubmitt}
+            <Row>
+              <Col span={12}>
+                <Form.Item {...layout1} label="Temperature">
+                  {form.getFieldDecorator('temperature')(
+                    <Input
+                      className="vital_input"
+                      suffix="C"
+                      placeholder="Enter body temperature"
+                    />,
+                  )}
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item {...layout1} label="Head Circumference">
+                  {form.getFieldDecorator('headCircumference')(
+                    <Input
+                      suffix="cm"
+                      className="vital_input"
+                      placeholder="Enter head circumference"
+                    />,
+                  )}
+                </Form.Item>
+              </Col>
+            </Row>
+            <GetComplaints form={form} />
+            <GetDiagnosis form={form} />
+            <GetTest form={form} />
+            <>
+              <PrescriptionItemContext.Provider value={productsDispatch}>
+                <PrescriptionItemTable
+                  style={{ marginTop: 25 }}
+                  totalAmount={subTotal}
+                  products={productsState}
+                  dispatch={productsDispatch}
+                />
+              </PrescriptionItemContext.Provider>
+            </>
+            <Form.Item {...lt} label="Advice">
+              {form.getFieldDecorator('advice')(
+                <TextArea placeholder="Advice" autoSize={{ minRows: 4, maxRows: 6 }} allowClear />,
+              )}
+            </Form.Item>
+            <Form.Item {...lt} label="Test Date">
+              {form.getFieldDecorator('testDate')(<DatePicker test />)}
+            </Form.Item>
+            <Form.Item {...lt} label="Next Visit Date">
+              {form.getFieldDecorator('nextVisitDate')(<DatePicker />)}
+            </Form.Item>
+            <Form.Item {...tl}>
+              <Button
+                loading={prescriptions.loadingPrescriptions}
+                type="primary"
+                style={SUBMITT_BUTTON}
               >
-                <Button loading={false} type="primary" style={{ margin: 5 }}>
-                  {/* htmlType="submit" */}
-                  ADD
-                </Button>
-              </Popconfirm>
-              <Button onClick={() => props.closeAddDrawer()} type="ghost" style={{ margin: 5 }}>
+                ADD
+              </Button>
+              <Button onClick={() => props.closeAddDrawer()} type="ghost" style={CANCEL_BUTTON}>
                 Cancel
               </Button>
-            </div>
+            </Form.Item>
           </Form>
-          <div className="visit_history_section">
+          {/* <OtpInput
+            value={otp}
+            onChange={t => setOtp(t)}
+            numInputs={6}
+            separator={<span>-</span>}
+          /> */}
+          {/* <div className="visit_history_section">
             <div className="vist_title">
               <Title level={2}>14 Visits</Title>
               <Text>Since14-Mar-2020</Text>
@@ -707,7 +457,7 @@ const BankDetails = props => {
                 )}
               </div>
             </div>
-          </div>
+          </div> */}
         </Content>
       </Layout>
     </div>

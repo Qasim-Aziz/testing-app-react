@@ -13,10 +13,6 @@ import AddPrescription from './addPrescriptionForm'
 import PrescriptionList from './prescriptionList'
 
 const Index = props => {
-  /**the local state of the application is similar to learners but written in hooks
-   * @specificLearner will determine a single user and populate the components with its prescriptions
-   */
-
   const [learnerState, setLearnerState] = useState({
     filterName: '',
     filterEmail: '',
@@ -28,6 +24,7 @@ const Index = props => {
     addPrescriptionDrawer: false,
     viewPrescriptionDrawer: false,
   })
+
   const learners = useSelector(state => state.learners)
   const authenticatedUser = useSelector(state => state.user)
   const dispatch = useDispatch()
@@ -35,7 +32,6 @@ const Index = props => {
   function closeAddDrawer() {
     setLearnerState({ ...learnerState, addPrescriptionDrawer: false })
   }
-  /* At the initial render we get all the learners in a list */
 
   useEffect(() => {
     dispatch({
@@ -43,7 +39,6 @@ const Index = props => {
     })
   }, [])
 
-  /* Once the learners are fetched this effect will set the values */
   useEffect(() => {
     setLearnerState({
       ...learnerState,
@@ -55,12 +50,7 @@ const Index = props => {
 
   const setLearner = val => {
     console.log('THE ROW', val)
-    // dispatch({
-    //   type: 'prescriptions/SET_SPECIFIC_LEARNER',
-    //   payload: val,
-    // })
   }
-  /**This useEffect will filter data based on every input in name and email field on the top of the page */
 
   useEffect(() => {
     let filteredList = learnerState.mainData
@@ -142,8 +132,6 @@ const Index = props => {
       title: 'Add',
       dataIndex: 'addPrescription',
       render: (text, row) => (
-        // Only a therapist is allowed to added prescription
-        // <Authorize roles={['therapist', 'school_admin']} redirect to="/dashboard/beta">
         <Button
           type="primary"
           onClick={() => {
@@ -152,23 +140,17 @@ const Index = props => {
               specificLearner: row,
               addPrescriptionDrawer: true,
             })
-            // setLearner(row)
           }}
         >
           ADD
           <PlusOutlined />
         </Button>
-        // </Authorize>
       ),
     },
   ]
 
-  // Check to see if the authenticated user is a therapist based on which I will display the 'ADD' column
   if (authenticatedUser.authorized && authenticatedUser.role === 'parents') {
-    console.log('THE COLUMN initially', columns)
-    // since the last object in columns is for adding new prescriptions I am poping it since the user isn't a therapist
     columns.pop()
-    console.log('THE COLUMN finally', columns)
   }
 
   const tableHeader = (
@@ -192,7 +174,6 @@ const Index = props => {
           placeholder="Search Name"
           value={learnerState.filterName}
           onChange={e =>
-            // filterHandler({ name: e.target.value })
             setLearnerState({
               ...learnerState,
               filterName: e.target.value,
@@ -202,7 +183,7 @@ const Index = props => {
         />
       </span>
 
-      <span style={{ display: 'flex', alignItems: 'center' }}>
+      <span style={{ display: 'flex', marginLeft: 20, alignItems: 'center' }}>
         <span style={{ marginRight: '7px' }}>Email :</span>
         <Input
           size="small"
@@ -220,7 +201,6 @@ const Index = props => {
     <>
       <Helmet title="Prescription" />
       {console.log('SPECIFIC LEARNER', learnerState.specificLearner)}
-      {/* If someone clicks on add then this drawer will open and hydrate the latest values in a prescription of that specific learner */}
       <Drawer
         width="80%"
         title="Add Prescription"
@@ -233,12 +213,12 @@ const Index = props => {
           setLearner={setLearner}
           details={learnerState.specificLearner}
           closeAddDrawer={closeAddDrawer}
+          addPrescription={true}
         />
       </Drawer>
-      {/* If user clicks on "view" then a list of prescription will be shown of that specific learner */}
       <Drawer
         width="80%"
-        title="View History Of Prescriptions"
+        title={`${learnerState?.specificLearner.firstname}'s - History Of Prescriptions`}
         closable={true}
         visible={learnerState.viewPrescriptionDrawer}
         onClose={() => setLearnerState({ ...learnerState, viewPrescriptionDrawer: false })}
@@ -279,9 +259,8 @@ const Index = props => {
           ) : null}
         </div>
         <div>
-          <span style={{ fontSize: '25px', color: '#000' }}>LEARNERS PRESCRIPTIONS</span>
+          <span style={{ fontSize: '25px', color: '#000' }}>Learner's Prescription</span>
         </div>
-        {/* This empty div is for supporting the above div to have the title of the page centered  */}
         <div style={{ padding: '5px 0px' }}></div>
       </div>
       <div style={{ marginBottom: '50px' }}>
@@ -290,24 +269,10 @@ const Index = props => {
             title={() => {
               return tableHeader
             }}
+            loading={learnerState.loadingLearners}
             columns={columns}
             rowKey={record => record.id}
             dataSource={learnerState.tableData}
-            loading={learnerState.loading}
-            // ⭐ The below commented code is for pagination from server side
-            /* pagination={{
-                   defaultPageSize: 20,
-                   onChange: (page, rows) => this.pageChanged(page, rows),
-                   onShowSizeChange: (currentPage, currentRowsPerPage) =>
-                   this.rowsChanged(currentRowsPerPage, currentPage),
-                   showSizeChanger: true,
-                   pageSizeOptions:
-                     TotalLeaders > 100
-                       ? ['20', '50', '80', '100', `${TotalLeaders}`]
-                       : ['20', '50', '80', '100'],
-                   position: 'bottom',
-                  }}
-            */
           />
         </div>
       </div>

@@ -16,7 +16,6 @@ import PrescriptionItemCell from './prescriptionItemCell'
 
 const EditableRow = ({ form, index, ...props }) => (
   <PrescriptionFormContext.Provider value={form} key={index}>
-    {/* {console.log('THE FORM⏩⏩⏩⏩', form, index, props)} */}
     <tr {...props} />
   </PrescriptionFormContext.Provider>
 )
@@ -31,78 +30,71 @@ const components = {
 }
 
 const PrescriptionItemTable = ({ products, dispatch, totalAmount, ...props }) => {
-  // console.log('THE PRODUCTS', products)
-  // console.log('THE Dispatch', dispatch)
-  // console.log('THE TOTAL AMOUNT☑☑☑', props)
-  // console.log('HEWIEJ', props.tryingTodelete)
   const columnsList = [
     {
       title: '#',
       dataIndex: 'key',
-      // width: 5,
+      width: 20,
     },
     {
-      title: 'Type', // MedicineType
+      title: 'Med Type', // MedicineType
       editable: true,
       dataIndex: 'medicineType', // ::before 'type',
-      // width: 20,
+      width: 160,
     },
     {
-      title: 'Product/Service', // Name
+      title: 'Name', // Name
       editable: true,
       dataIndex: 'name', // name // ::before service
-      // width: 180,
+      align: 'left',
     },
     {
       title: 'Dosage',
       dataIndex: 'dosage',
       editable: true,
-      // width: 70,
+      width: 130,
+      align: 'right',
     },
     {
       title: 'Unit',
       dataIndex: 'unit',
       editable: true,
-      // width: 70,
+      width: 130,
+      align: 'right',
     },
     {
       title: 'When',
       dataIndex: 'when',
       editable: true,
-      // width: 70,
+      width: 130,
+      align: 'right',
     },
     {
       title: 'Frequency',
       dataIndex: 'frequency',
       editable: true,
-      // width: 70,
+      align: 'right',
+      width: 130,
     },
     {
       title: 'Duration',
       dataIndex: 'duration',
       editable: true,
-      // width: 100,
+      width: 130,
+      align: 'right',
     },
 
     {
       title: 'Qty',
       dataIndex: 'qty',
-      // width: 10,
+      width: 130,
       editable: true,
-      // render: (text, record) => {
-      //   return parseFloat(record.qty) * parseFloat(record.rate)
-      // },
+      align: 'right',
     },
-    // {
-    //   title: 'Note',
-    //   dataIndex: 'note',
-    //   editable: true,
-    //   width: 70,
-    // },
     {
       title: 'Operation',
       dataIndex: 'operation',
-      width: 50,
+      width: 110,
       render: (
         text,
         { key, ...val }, // key, id, ...val
@@ -110,7 +102,6 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount, ...props }) =>
         <>
           {props.tryingTodelete ? (
             <>
-              {/* {console.log('THE KEY AND PRODUCT⏩⏩⏩⏩⏩⏩', val.pk, val)} */}
               {val.pk ? (
                 <>
                   <Button
@@ -122,7 +113,6 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount, ...props }) =>
                         type: 'REMOVE_PRODUCT',
                         payload: { key },
                       })
-                      // add the val.pk of which, the user wants to delete
                       console.log('TRYING TO REMOVE🚀🚀🚀🚀🚀🚀', val.pk)
                       props.setDeleteProduct(arr => [...arr, val.pk])
                     }}
@@ -167,9 +157,15 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount, ...props }) =>
   const handleAdd = () => {
     const newProductData = {
       key: products.length + 1,
-      name: '', // ::before service: '',
-      // qty: 1,
+      medicineType: 'SYP',
+      name: 'Med',
       rate: 0,
+      dosage: 0,
+      unit: 0,
+      when: 'morning',
+      frequency: 0,
+      duration: 10,
+      qty: 1,
     }
     dispatch({ type: 'ADD_PRODUCT', payload: newProductData })
   }
@@ -196,14 +192,12 @@ const PrescriptionItemTable = ({ products, dispatch, totalAmount, ...props }) =>
   })
 
   return (
-    <div id="prescription_table_container">
+    <div style={{ margin: '5px auto 18px' }}>
       <Table
         components={components}
         columns={columns}
         dataSource={products}
         bordered
-        width="710px"
-        rowClassName={() => 'editable-row'}
         pagination={false}
         loading={false}
         footer={() => (

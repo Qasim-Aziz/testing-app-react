@@ -996,9 +996,9 @@ const TargetAllocation = () => {
                 <TabPane tab="Directly" key="defaultGoalTab">
                   {defaultGoalTab}
                 </TabPane>
-                <TabPane tab="Assessments" key="assessments">
+                {/* <TabPane tab="Assessments" key="assessments">
                   <AssessmentContent />
-                </TabPane>
+                </TabPane> */}
               </Tabs>
             )}
           </div>

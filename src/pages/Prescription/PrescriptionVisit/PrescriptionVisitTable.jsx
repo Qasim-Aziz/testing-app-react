@@ -1,14 +1,5 @@
 import { Table } from 'antd'
 import React from 'react'
-import { PrescriptionFormContext } from '../context'
-
-const EditableRow = ({ form, index, ...props }) => (
-  <PrescriptionFormContext.Provider value={form} key={index}>
-    <tr {...props} />
-  </PrescriptionFormContext.Provider>
-)
-
-console.log(EditableRow)
 
 const PrescriptionVisitTable = ({ products, ...props }) => {
   const columns = [
@@ -57,7 +48,7 @@ const PrescriptionVisitTable = ({ products, ...props }) => {
   return (
     <>
       <div id="prescription_visit_table_container">
-        <Table bordered columns={columns} dataSource={products} />
+        <Table bordered columns={columns} dataSource={products} pagination={false} />
       </div>
     </>
   )

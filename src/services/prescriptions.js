@@ -9,7 +9,6 @@ import moment from 'moment'
 import apolloClient from '../apollo/config'
 
 export async function getPrescriptionFunc(payload) {
-  console.log('THE PAYLOAD IS --------------------->', payload)
   const idVal = payload.value
   return apolloClient
     .query({
@@ -89,9 +88,7 @@ export async function getPrescriptionFunc(payload) {
     })
     .then(result => result)
     .catch(error => {
-      console.log('THE ERROR💣💣💣🔥🔥', JSON.stringify(error))
       error.graphQLErrors.map(item => {
-        console.log('THE ERROR💣💣💣🔥🔥', item)
         return notification.error({
           message: 'Something went wrong',
           description: item.message,
@@ -106,7 +103,7 @@ export async function getLatestPrescription(payload) {
   return apolloClient
     .query({
       query: gql`
-        query getLatestPrescriptionDef($student: ID) {
+        query($student: ID) {
           getPrescriptions(student: $student, last: 1) {
             edges {
               node {
@@ -181,9 +178,7 @@ export async function getLatestPrescription(payload) {
     })
     .then(result => result)
     .catch(error => {
-      console.log('THE ERROR💣💣💣🔥🔥', JSON.stringify(error))
       error.graphQLErrors.map(item => {
-        console.log('THE ERROR💣💣💣🔥🔥', item)
         return notification.error({
           message: 'Something went wrong',
           description: item.message,
@@ -193,34 +188,29 @@ export async function getLatestPrescription(payload) {
 }
 
 export async function createPrescriptionFunc(payload) {
-  console.log('THE VALUE IN THE PAYLOAD 👉👉', payload)
   let array_of_meds = []
   let i
   for (i = 0; i < payload.data.length; i++) {
     let x = payload.data[i]
-    console.log('THE ARRAY', payload.data[i])
-    console.log('THE XXX', x)
     delete x.key
     delete x.rate
     delete x.note
-    console.log('THE XXX', x)
     if (x.qty === null) {
       delete x.qty
     }
     array_of_meds.push(x)
   }
-  console.log('THE array-of-meds ========================>', array_of_meds)
+  console.log(payload, 'pyaload payload')
   return apolloClient
     .mutate({
       mutation: gql`
-        mutation createInvoiceMethod(
+        mutation(
           $student: ID! #"U3R1ZGVudFR5cGU6NjQ4"
           $height: String # "175 cm"
           $weight: String # "64 kg"
           $temperature: String # "98.6 F"
           $headCircumference: String # "50 cm"
           $advice: String # "Test Advice"
-          $nextVisit: String # "2 Days"
           $nextVisitDate: Date # "2021-04-01"
           $testDate: Date # "2021-04-01"
           $complaints: [ID]
@@ -236,7 +226,6 @@ export async function createPrescriptionFunc(payload) {
               temperature: $temperature
               headCircumference: $headCircumference
               advice: $advice
-              nextVisit: $nextVisit
               nextVisitDate: $nextVisitDate
               testDate: $testDate
               complaints: $complaints # array of ids
@@ -316,15 +305,9 @@ export async function createPrescriptionFunc(payload) {
         temperature: payload.values.temperature,
         headCircumference: payload.values.headCircumference,
         advice: payload.values.advice ? payload.values.advice : '',
-        nextVisit:
-          payload.values.nextVisitNumber && payload.values.nextVisitVal
-            ? `${payload.values.nextVisitNumber} ${payload.values.nextVisitVal}`
-            : '',
-        //this has to be date with correct format
         nextVisitDate: payload.values.nextVisitDate
           ? moment(payload.values.nextVisitDate).format('YYYY-MM-DD')
           : null,
-        //this has to be data with correct format
         testDate: payload.values.testDate
           ? moment(payload.values.testDate).format('YYYY-MM-DD')
           : null,
@@ -336,7 +319,6 @@ export async function createPrescriptionFunc(payload) {
     })
     .then(result => result)
     .catch(error => {
-      console.log('THE ERROR', JSON.stringify(error))
       if (error.graphQLError) {
         error.graphQLErrors.map(item => {
           return notification.error({
@@ -354,8 +336,8 @@ export async function createPrescriptionFunc(payload) {
 }
 
 export async function getDetailPrescription(payload) {
-  console.log('THE VALUE IN THE PAYLOAD ---------------------> ', payload)
   // ID OF A PARTICULAR PRESCRIPTION
+  console.log('>>>>>>>>payloaud =>>>>>', payload, payload.value)
   const idVal = payload.value
   return apolloClient
     .query({
@@ -430,9 +412,7 @@ export async function getDetailPrescription(payload) {
     })
     .then(result => result)
     .catch(error => {
-      console.log('THE ERROR💣💣💣🔥🔥', JSON.stringify(error))
       error.graphQLErrors.map(item => {
-        console.log('THE ERROR💣💣💣🔥🔥', item)
         return notification.error({
           message: 'Something went wrong',
           description: item.message,
@@ -442,7 +422,6 @@ export async function getDetailPrescription(payload) {
 }
 
 export async function editAndSavePrescription(payload) {
-  console.log('THE VALUE 🌟EDIT🌟 IN THE PAYLOAD', payload)
   let array_of_meds = []
   let i
   for (i = 0; i < payload.data.length; i++) {
@@ -460,14 +439,13 @@ export async function editAndSavePrescription(payload) {
   return apolloClient
     .mutate({
       mutation: gql`
-        mutation updatePrescriptionMethod(
+        mutation(
           $pk: ID! #"U3R1ZGVudFR5cGU6NjQ4"
           $height: String # "175 cm"
           $weight: String # "64 kg"
           $temperature: String # "98.6 F"
           $headCircumference: String # "50 cm"
           $advice: String # "Test Advice"
-          $nextVisit: String # "2 Days"
           $nextVisitDate: Date # "2021-04-01"
           $testDate: Date # "2021-04-01"
           $complaints: [ID]
@@ -595,7 +573,6 @@ export async function editAndSavePrescription(payload) {
     })
     .then(result => result)
     .catch(error => {
-      console.log('THE ERROR 🔴🔴🔴🔴🔴', JSON.stringify(error))
       if (error.graphQLError) {
         error.graphQLErrors.map(item => {
           return notification.error({

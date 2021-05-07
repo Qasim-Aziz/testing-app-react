@@ -6,75 +6,145 @@
 // import Authorize from '../LayoutComponents/Authorize'
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import { Button, Divider, Drawer, Table, Tag } from 'antd'
+import { DRAWER } from 'assets/styles/globalStyles'
+import gql from 'graphql-tag'
+import moment from 'moment'
+import { useQuery, useMutation, useLazyQuery } from 'react-apollo'
+import LoadingComponent from 'components/LoadingComponent'
 import JsPDF from 'jspdf'
 import React, { useEffect, useState } from 'react'
-// import { renderToString } from 'react-dom/server'
 import { useDispatch, useSelector } from 'react-redux'
 import actionPrescription from '../../redux/prescriptions/actions'
 import EditPrescription from './editPrescriptionComponent'
+import PrescriptionPdf from './prescriptionPdf'
+import AddPrescriptionForm from './addPrescriptionForm'
 import './index.scss'
 
-// Every individual prescription
+const PRES = gql`
+  query($student: ID, $last: Int) {
+    getPrescriptions(student: $student, last: $last) {
+      edges {
+        node {
+          id
+          createddate
+          height
+          weight
+          temperature
+          headCircumference
+          advice
+          nextVisit
+          nextVisitDate
+          testDate
+          createdby {
+            id
+            username
+          }
+          student {
+            id
+            firstname
+            lastname
+          }
+          complaints {
+            edges {
+              node {
+                id
+                name
+              }
+            }
+          }
+
+          diagnosis {
+            edges {
+              node {
+                id
+                name
+              }
+            }
+          }
+
+          tests {
+            edges {
+              node {
+                id
+                name
+              }
+            }
+          }
+          medicineItems {
+            edges {
+              node {
+                id
+                name
+                medicineType
+                dosage
+                unit
+                when
+                frequency
+                duration
+                qty
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 export const History = props => {
   const authUser = useSelector(state => state.user)
   const dispatchOfPrescription = useDispatch()
-  // console.log('EACH HISTORY PROP', props)
   const [editPrescription, setEditPrescription] = useState(false)
+  const [prescriptionPdf, setPrescriptionPdf] = useState(false)
+  const [currentPrescription, setCurrentPrescription] = useState(null)
 
+  console.log(props, 'ther se arepr')
   const labelHead = {
-    minWidth: 160,
+    minWidth: 180,
     fontWeight: 700,
     color: 'black',
   }
-  // const medicineTableData = props.data.node.medicineItems.edges
+
   if (props.data.node) {
     const medicineTableData = props.data.node.medicineItems.edges
     const columns = [
       {
         title: '#',
         render: row => {
-          // console.log('THE ROW', row)
           return medicineTableData.indexOf(row) + 1
         },
       },
       {
-        /* medicine name */
-
-        title: 'name',
-        render: row => {
-          // console.log('THE ROW ITEM', row)
-          return <span>{row.node.name ? row.node.name : ''}</span>
-        },
+        title: 'Name',
+        dataIndex: 'node.name',
       },
       {
-        /* Medicine Type */
         title: 'Type',
-        /* 🔴 NOTE: medicine type options are  - ['SYP', 'TAB', 'DRP', 'LIQ'] */
-        render: row => <span>{row.node.medicineType ? row.node.medicineType : ''}</span>,
+        dataIndex: 'medicineType',
       },
       {
-        title: 'qty',
-        render: row => <span>{row.node.qty ? row.node.qty : ''}</span>,
+        title: 'Qty',
+        dataIndex: 'node.qty',
       },
       {
-        title: 'unit',
-        render: row => <span>{row.node.unit ? row.node.unit : ''}</span>,
+        title: 'Unit',
+        dataIndex: 'node.unit',
       },
       {
-        title: 'dosage',
-        render: row => <span>{row.node.dosage ? row.node.dosage : ''}</span>,
+        title: 'Dosage',
+        dataIndex: 'node.dosage',
       },
       {
         title: 'when',
-        render: row => <span>{row.node.when ? row.node.when : ''}</span>,
+        dataIndex: 'node.when',
       },
       {
-        title: 'frequency',
-        render: row => <span>{row.node.frequency ? row.node.frequency : ''}</span>,
+        title: 'Frequency',
+        dataIndex: 'node,frequency',
       },
       {
-        title: 'duration',
-        render: row => <span>{row.node.duration ? row.node.duration : ''}</span>,
+        title: 'Duration',
+        dataIndex: 'node.duration',
       },
     ]
 
@@ -110,13 +180,10 @@ export const History = props => {
         head: headers,
         body: data,
       }
-      console.log('THE PROPS>NUMBER', props.number)
       doc.text(title, 10, 10)
       doc.autoTable(content)
-      console.log('CHECKED 🤞')
       doc.html(document.querySelector(`#content${props.number}`), {
         callback: function(doc) {
-          // doc.save()
           console.log('HEYA')
           doc.addPage()
           doc.save('prescription.pdf')
@@ -124,7 +191,6 @@ export const History = props => {
         x: 10,
         y: doc.autoTable.previous.finalY + 30, // 10,
       })
-      // doc.save('prescription.pdf')
     }
 
     return (
@@ -134,14 +200,11 @@ export const History = props => {
             <div className="mainCard-child right-border">
               <div style={{ fontSize: '22px', color: 'black', marginBottom: '12px' }}>
                 Personal Information
-                {/* ❗ THE AUTHORIZATION for specific roles will be allowed to edit/delete prescription */}
-                {/*  */}
                 {authUser.authorized && authUser.role === 'therapist' ? (
                   <>
                     <Button
                       type="link"
                       onClick={() => {
-                        console.log('PERSONAL INFO CLICKED EDIT BUTTON CLICK')
                         setEditPrescription(true)
                       }}
                       style={{
@@ -155,7 +218,6 @@ export const History = props => {
                     <Button
                       type="link"
                       onClick={() => {
-                        console.log('PERSONAL INFO CLICKED DELETE BUTTON CLICK')
                         dispatchOfPrescription({
                           type: actionPrescription.DELETE_PRESCRIPTION,
                           payload: {
@@ -172,20 +234,11 @@ export const History = props => {
                       <DeleteOutlined />
                     </Button>
                   </>
-                ) : (
-                  <></>
-                )}
+                ) : null}
                 <Button
                   type="link"
-                  onClick={() => {
-                    console.log(' ******************PDF****************** ')
-                    prescriptionPfd()
-                  }}
-                  style={{
-                    paddingRight: 0,
-                    fontSize: '16px',
-                    float: 'right',
-                  }}
+                  onClick={() => setPrescriptionPdf(true)}
+                  style={{ paddingRight: 0, fontSize: '16px', float: 'right' }}
                 >
                   PDF
                 </Button>
@@ -212,7 +265,7 @@ export const History = props => {
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                <p style={labelHead}>advice</p>
+                <p style={labelHead}>Advice</p>
                 <p> : {props.data.node.advice ? props.data.node.advice : ''}</p>
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
@@ -238,8 +291,6 @@ export const History = props => {
                       {item.node.name}
                     </Tag>
                   ))}
-                  {/* <TagComponent diagnosisList={props.data.node.diagnosis.edges} /> */}
-                  {/* 🔴 NOTE: create a list of tags for diagnosis */}
                 </p>
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
@@ -266,85 +317,110 @@ export const History = props => {
               </div>
             </div>
           </div>
-          {/* Table of medicines */}
-          <Table columns={columns} rowKey={props.data.node.id} dataSource={medicineTableData} />
+          <Table
+            columns={columns}
+            rowKey={props.data.node.id}
+            dataSource={medicineTableData}
+            pagination={false}
+          />
         </div>
         <Drawer
-          width="90%"
+          width={DRAWER.widthL1}
           title="Edit Prescription"
           closable={true}
           visible={editPrescription}
           onClose={() => setEditPrescription(false)}
           destroyOnClose
         >
-          <EditPrescription details={props.data.node} learners={props.learners} />
+          <AddPrescriptionForm
+            details={props.learners}
+            closeAddDrawer={() => setEditPrescription(false)}
+            prescriptionObj={props.data.node}
+            addPrescription={false}
+          />
+        </Drawer>
+        <Drawer
+          width={DRAWER.widthL2}
+          title="Prescription PDF"
+          closable={true}
+          onClose={() => setPrescriptionPdf(false)}
+          destroyOnClose
+          visible={prescriptionPdf}
+        >
+          <PrescriptionPdf data={props} closeDrawer={() => setPrescriptionPdf(false)} />
         </Drawer>
       </>
     )
   } else {
-    return <>loading</>
+    return <LoadingComponent />
   }
 }
 
-/**@props ==> here in this component I am receiving a particular students details
- * All the prescription regarding a particular student will be listed in a drawer component
- */
-
 export default props => {
-  const prescriptions = useSelector(state => state.prescriptions)
-  const dispatch = useDispatch()
+  const selectedLearner = props.details
+  const [first, setFirst] = useState(2)
+  const [data, setData] = useState(null)
+  const [fetchPrescriptions, { data: prescriptions, loading: prescriptionsLoading }] = useLazyQuery(
+    PRES,
+  )
 
-  /**When the component first mounts it should render all the details regarding a learner's prescriptions */
   useEffect(() => {
-    console.log('THE USE-EFFECT RAN 👍👍👍👍👍👍')
-    console.log('THE LEARNER FROM PARENT COMPONENT ✌✌✌✌✌✌', props.details)
-    console.log('THE LEARNER IN GLOBAL STATE 👉👉👉👉👉👉', prescriptions.GlobalSpecificLearner)
-    if (prescriptions.GlobalSpecificLearner) {
-      if (prescriptions.GlobalSpecificLearner.id !== props.details.id) {
-        console.log('THIS IS A NEW LEARNER')
-        // props.setLearner(props.details)
-        dispatch({
-          type: 'prescriptions/SET_SPECIFIC_LEARNER',
-          payload: props.details,
-        })
-        dispatch({
-          type: actionPrescription.GET_PRESCRIPTIONS,
-          payload: {
-            value: props.details.id,
-          },
-        })
-      } else {
-        console.log('THIS IS NOT A NEW LEARNER')
-      }
-    } else {
-      props.setLearner(props.details)
-      dispatch({
-        type: actionPrescription.GET_PRESCRIPTIONS,
-        payload: {
-          value: props.details.id,
+    if (selectedLearner) {
+      fetchPrescriptions({
+        variables: {
+          student: selectedLearner.id,
+          last: first,
         },
       })
     }
-  }, [props.details, prescriptions.GlobalSpecificLearner]) // prescriptions.PrescriptionsList, prescriptions.PrescriptionCreated
+  }, [selectedLearner, first])
 
-  console.log('🌟THE Prescription REDUCER STATE', prescriptions)
+  useEffect(() => {
+    if (prescriptions) {
+      prescriptions.getPrescriptions.edges.sort(
+        (a, b) => new Date(b.node.createddate) - new Date(a.node.createddate),
+      )
+      setData(prescriptions)
+    }
+  }, prescriptions)
+
+  if (prescriptionsLoading && data === null) {
+    return <LoadingComponent />
+  }
+
   return (
-    <>
-      {prescriptions.loadingPrescriptions ? (
-        <>Loading</>
-      ) : (
-        <div>
-          {prescriptions.PrescriptionsList.map((item, index) => {
-            // console.log('THE PRESCRIPTION 👉', item)
-            return (
-              <div key={index}>
-                <Divider orientation="left">Prescription No.{index + 1}</Divider>
-                <History number={index + 1} data={item} learners={props.details} />
-              </div>
-            )
-          })}
+    <div>
+      {data?.getPrescriptions.edges.length === 0 ? (
+        <div style={{ fontSize: 16, fontWeight: 700, width: '100%', textAlign: 'center' }}>
+          No history found
         </div>
+      ) : (
+        <>
+          <div>
+            {data?.getPrescriptions.edges.map((item, index) => {
+              console.log(moment(item.node.createddate).format('YYYY-MM-DD hh:mm:ss'), 'nd')
+              return (
+                <div key={index}>
+                  <Divider orientation="left">Prescription No.{index + 1}</Divider>
+                  <History number={index + 1} data={item} learners={props.details} />
+                </div>
+              )
+            })}
+          </div>
+          {first !== null && (
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 15 }}>
+              <Button
+                loading={prescriptionsLoading}
+                style={{ fontSize: 20 }}
+                onClick={() => setFirst(null)}
+                type="link"
+              >
+                ...More
+              </Button>
+            </div>
+          )}
+        </>
       )}
-    </>
+    </div>
   )
 }
