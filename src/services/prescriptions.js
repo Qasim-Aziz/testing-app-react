@@ -103,7 +103,7 @@ export async function getLatestPrescription(payload) {
   return apolloClient
     .query({
       query: gql`
-        query getLatestPrescriptionDef($student: ID) {
+        query($student: ID) {
           getPrescriptions(student: $student, last: 1) {
             edges {
               node {
@@ -200,6 +200,7 @@ export async function createPrescriptionFunc(payload) {
     }
     array_of_meds.push(x)
   }
+  console.log(payload, 'pyaload payload')
   return apolloClient
     .mutate({
       mutation: gql`
@@ -336,6 +337,7 @@ export async function createPrescriptionFunc(payload) {
 
 export async function getDetailPrescription(payload) {
   // ID OF A PARTICULAR PRESCRIPTION
+  console.log('>>>>>>>>payloaud =>>>>>', payload, payload.value)
   const idVal = payload.value
   return apolloClient
     .query({
@@ -410,9 +412,7 @@ export async function getDetailPrescription(payload) {
     })
     .then(result => result)
     .catch(error => {
-      console.log('THE ERROR💣💣💣🔥🔥', JSON.stringify(error))
       error.graphQLErrors.map(item => {
-        console.log('THE ERROR💣💣💣🔥🔥', item)
         return notification.error({
           message: 'Something went wrong',
           description: item.message,
@@ -422,7 +422,6 @@ export async function getDetailPrescription(payload) {
 }
 
 export async function editAndSavePrescription(payload) {
-  console.log('THE VALUE 🌟EDIT🌟 IN THE PAYLOAD', payload)
   let array_of_meds = []
   let i
   for (i = 0; i < payload.data.length; i++) {
@@ -440,14 +439,13 @@ export async function editAndSavePrescription(payload) {
   return apolloClient
     .mutate({
       mutation: gql`
-        mutation updatePrescriptionMethod(
+        mutation(
           $pk: ID! #"U3R1ZGVudFR5cGU6NjQ4"
           $height: String # "175 cm"
           $weight: String # "64 kg"
           $temperature: String # "98.6 F"
           $headCircumference: String # "50 cm"
           $advice: String # "Test Advice"
-          $nextVisit: String # "2 Days"
           $nextVisitDate: Date # "2021-04-01"
           $testDate: Date # "2021-04-01"
           $complaints: [ID]
@@ -575,7 +573,6 @@ export async function editAndSavePrescription(payload) {
     })
     .then(result => result)
     .catch(error => {
-      console.log('THE ERROR 🔴🔴🔴🔴🔴', JSON.stringify(error))
       if (error.graphQLError) {
         error.graphQLErrors.map(item => {
           return notification.error({

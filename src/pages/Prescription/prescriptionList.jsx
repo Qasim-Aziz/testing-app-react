@@ -8,6 +8,7 @@ import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import { Button, Divider, Drawer, Table, Tag } from 'antd'
 import { DRAWER } from 'assets/styles/globalStyles'
 import gql from 'graphql-tag'
+import moment from 'moment'
 import { useQuery, useMutation, useLazyQuery } from 'react-apollo'
 import LoadingComponent from 'components/LoadingComponent'
 import JsPDF from 'jspdf'
@@ -16,14 +17,16 @@ import { useDispatch, useSelector } from 'react-redux'
 import actionPrescription from '../../redux/prescriptions/actions'
 import EditPrescription from './editPrescriptionComponent'
 import PrescriptionPdf from './prescriptionPdf'
+import AddPrescriptionForm from './addPrescriptionForm'
 import './index.scss'
 
 const PRES = gql`
-  query($student: ID, $first: Int) {
-    getPrescriptions(student: $student, first: $first) {
+  query($student: ID, $last: Int) {
+    getPrescriptions(student: $student, last: $last) {
       edges {
         node {
           id
+          createddate
           height
           weight
           temperature
@@ -32,7 +35,6 @@ const PRES = gql`
           nextVisit
           nextVisitDate
           testDate
-          createddate
           createdby {
             id
             username
@@ -94,6 +96,7 @@ export const History = props => {
   const dispatchOfPrescription = useDispatch()
   const [editPrescription, setEditPrescription] = useState(false)
   const [prescriptionPdf, setPrescriptionPdf] = useState(false)
+  const [currentPrescription, setCurrentPrescription] = useState(null)
 
   console.log(props, 'ther se arepr')
   const labelHead = {
@@ -202,7 +205,6 @@ export const History = props => {
                     <Button
                       type="link"
                       onClick={() => {
-                        console.log('PERSONAL INFO CLICKED EDIT BUTTON CLICK')
                         setEditPrescription(true)
                       }}
                       style={{
@@ -330,7 +332,12 @@ export const History = props => {
           onClose={() => setEditPrescription(false)}
           destroyOnClose
         >
-          <EditPrescription details={props.data.node} learners={props.learners} />
+          <AddPrescriptionForm
+            details={props.learners}
+            closeAddDrawer={() => setEditPrescription(false)}
+            prescriptionObj={props.data.node}
+            addPrescription={false}
+          />
         </Drawer>
         <Drawer
           width={DRAWER.widthL2}
@@ -362,7 +369,7 @@ export default props => {
       fetchPrescriptions({
         variables: {
           student: selectedLearner.id,
-          first,
+          last: first,
         },
       })
     }
@@ -370,6 +377,9 @@ export default props => {
 
   useEffect(() => {
     if (prescriptions) {
+      prescriptions.getPrescriptions.edges.sort(
+        (a, b) => new Date(b.node.createddate) - new Date(a.node.createddate),
+      )
       setData(prescriptions)
     }
   }, prescriptions)
@@ -377,6 +387,7 @@ export default props => {
   if (prescriptionsLoading && data === null) {
     return <LoadingComponent />
   }
+
   return (
     <div>
       {data?.getPrescriptions.edges.length === 0 ? (
@@ -387,6 +398,7 @@ export default props => {
         <>
           <div>
             {data?.getPrescriptions.edges.map((item, index) => {
+              console.log(moment(item.node.createddate).format('YYYY-MM-DD hh:mm:ss'), 'nd')
               return (
                 <div key={index}>
                   <Divider orientation="left">Prescription No.{index + 1}</Divider>

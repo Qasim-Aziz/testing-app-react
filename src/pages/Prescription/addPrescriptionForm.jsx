@@ -83,7 +83,6 @@ function addNevObject(val) {
 }
 
 const GetComplaints = ({ form }) => {
-  console.log('form', form)
   const [sdText, setSdText] = useState('')
   const { data: sdData, error: sdError, loading: sdLoading } = useQuery(GET_COMPLAINT_QUERY, {
     variables: {
@@ -228,26 +227,35 @@ const GetTest = ({ form }) => {
 }
 
 const BankDetails = props => {
-  const { form, details } = props
+  const { form, details, addPrescription, prescriptionObj } = props
   const prescriptions = useSelector(state => state.prescriptions)
   const dispatchOfPrescription = useDispatch()
-  const [otp, setOtp] = useState()
   const [productsState, productsDispatch] = useReducer(productReducer, [])
 
   const [subTotal, setSubTotal] = useState(0)
-  const role = useSelector(state => state.user.role)
 
+  console.log(prescriptionObj, 'prescription obj')
   useEffect(() => {
+    console.log(props.details, details, 'props detilas')
     dispatchOfPrescription({
       type: 'prescriptions/SET_SPECIFIC_LEARNER',
       payload: props.details,
     })
-    dispatchOfPrescription({
-      type: actionPrescription.GET_LASTEST_PRESCRIPTIONS,
-      payload: {
-        value: details.id,
-      },
-    })
+    if (addPrescription) {
+      dispatchOfPrescription({
+        type: actionPrescription.GET_LASTEST_PRESCRIPTIONS,
+        payload: {
+          value: details.id,
+        },
+      })
+    } else {
+      dispatchOfPrescription({
+        type: actionPrescription.GET_DETAILS_PRESCRIPTIONS,
+        payload: {
+          value: prescriptionObj.id,
+        },
+      })
+    }
     dispatchOfPrescription({
       type: actionPrescription.GET_PRESCRIPTIONS,
       payload: {
@@ -257,7 +265,9 @@ const BankDetails = props => {
   }, [])
 
   useEffect(() => {
-    if (prescriptions.isSpecificPrescription) {
+    console.log(prescriptions, 'hey prprrp')
+    if (prescriptions.SpecificPrescription) {
+      console.log('dhfdkfjdfkjdfkjdfkjdfkjjjjjjjjjjjjjjjjjjjjjjjjjjjjj')
       let listOfMedicineObject = prescriptions.SpecificPrescription.medicineItems.edges
       let x = addNevObject(listOfMedicineObject)
       productsDispatch({ type: 'SET_PRODUCTS', payload: x })
@@ -294,17 +304,26 @@ const BankDetails = props => {
     })
   }
 
+  const updatePrescription = e => {
+    e.preventDefault()
+    form.validateFields((err, values) => {
+      dispatchOfPrescription({
+        type: actionPrescription.CREATE_PRESCRIPTION,
+        payload: {
+          id: details.id,
+          values: values,
+          data: productsState,
+        },
+      })
+    })
+  }
   const [testTime, setTestTime] = useState('')
-
-  // if (prescriptions.loadingPrescriptions) {
-  //   return <LoadingComponent />
-  // }
 
   return (
     <div>
       <Layout>
         <Content>
-          <Form>
+          <Form onSubmit={addPrescription ? handleSubmitt : updatePrescription}>
             <Divider orientation="left">General Details</Divider>
             <Row style={{ marginBottom: 9 }}>
               <Col
@@ -388,18 +407,13 @@ const BankDetails = props => {
               {form.getFieldDecorator('nextVisitDate')(<DatePicker />)}
             </Form.Item>
             <Form.Item {...tl}>
-              <Popconfirm
-                title="Are you sure all the details filled are correct ?"
-                onConfirm={handleSubmitt}
+              <Button
+                loading={prescriptions.loadingPrescriptions}
+                type="primary"
+                style={SUBMITT_BUTTON}
               >
-                <Button
-                  loading={prescriptions.loadingPrescriptions}
-                  type="primary"
-                  style={SUBMITT_BUTTON}
-                >
-                  ADD
-                </Button>
-              </Popconfirm>
+                ADD
+              </Button>
               <Button onClick={() => props.closeAddDrawer()} type="ghost" style={CANCEL_BUTTON}>
                 Cancel
               </Button>

@@ -29,7 +29,7 @@ export function* GET_PRESCRIPTIONS({ payload }) {
   })
   const response = yield call(getPrescriptionFunc, payload)
   const tempList = response.data.getPrescriptions.edges
-  tempList.reverse()
+  // tempList.reverse()
   if (response) {
     yield put({
       type: actions.SET_STATE,
@@ -95,6 +95,7 @@ export function* CREATE_PRESCRIPTIONS({ payload }) {
       message: 'PRESCRIPTION Created Successfully',
     })
     const prescriptions = response.data.createPrescription.details
+    console.log('repsccscscsccsc   ', prescriptions)
     yield put({
       type: actions.APPEND_PRESCRIPTIONS_LIST,
       payload: {
@@ -126,25 +127,18 @@ export function* GET_DETAILS_PRESCRIPTIONS({ payload }) {
   })
   const response = yield call(getDetailPrescription, payload)
   if (response && response.data) {
-    notification.success({
-      message: 'PRESCRIPTION FETCHED',
-    })
     const prescriptions = response.data.getPrescriptionDetail
     yield put({
       type: actions.SET_STATE,
       payload: {
         SpecificPrescription: prescriptions,
         isSpecificPrescription: true,
+        loadingPrescription: false,
       },
     })
   }
-  yield put({
-    type: actions.SET_STATE,
-    payload: {
-      loadingPrescription: false,
-    },
-  })
 }
+
 export function* EDIT_PRESCRIPTION({ payload }) {
   yield put({
     type: actions.SET_STATE,

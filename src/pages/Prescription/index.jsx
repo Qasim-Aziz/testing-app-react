@@ -84,7 +84,6 @@ const Index = props => {
     })
   }, [learnerState.filterName, learnerState.filterEmail])
 
-  console.log(learnerState, 'learner state')
   const columns = [
     {
       title: '#',
@@ -214,6 +213,7 @@ const Index = props => {
           setLearner={setLearner}
           details={learnerState.specificLearner}
           closeAddDrawer={closeAddDrawer}
+          addPrescription={true}
         />
       </Drawer>
       <Drawer
