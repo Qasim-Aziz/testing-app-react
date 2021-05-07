@@ -17,6 +17,7 @@ const DragFile = ({ value, learnerId, staffId, isStaffById, isLearnerById }) => 
   const [url, setUrl] = useState('')
   const [userPk, setUserPk] = useState('')
   const cancelFileUpload = useRef(null)
+  const [uploadPercentage, setUploadPercentage] = useState(0)
 
   useEffect(() => {
     if (userRole === 'parents') {
@@ -62,6 +63,15 @@ const DragFile = ({ value, learnerId, staffId, isStaffById, isLearnerById }) => 
         database: 'india',
         Authorization: token ? `JWT ${token}` : '',
       },
+      onUploadProgress: progressEvent => {
+        const { loaded, total } = progressEvent
+
+        let percent = Math.floor((loaded * 100) / total)
+
+        if (percent < 100) {
+          setUploadPercentage(percent)
+        }
+      },
       cancelToken: new axios.CancelToken(cancel => (cancelFileUpload.current = cancel)),
     }
 
@@ -76,6 +86,12 @@ const DragFile = ({ value, learnerId, staffId, isStaffById, isLearnerById }) => 
     axios
       .post(url, data, options)
       .then(res => {
+        setUploadPercentage(100)
+
+        setTimeout(() => {
+          setUploadPercentage(0)
+        }, 1000)
+
         message.success(res.data.msg)
         setIsLoading('done')
         setFile(null)
@@ -103,7 +119,9 @@ const DragFile = ({ value, learnerId, staffId, isStaffById, isLearnerById }) => 
       {isLoading === 'loading' ? (
         <div style={{ textAlign: 'center' }}>
           <Spin size="large" />
-          <p style={{ fontSize: '16px', color: '#2998FF', fontWeight: '600' }}>Uploading...</p>
+          <p style={{ fontSize: '16px', color: '#2998FF', fontWeight: '600' }}>
+            Uploading...{uploadPercentage}%
+          </p>
           <Button onClick={() => cancelUpload()}>Cancel</Button>
         </div>
       ) : (
