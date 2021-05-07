@@ -3,8 +3,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable */
 import { Button, Icon, message, Spin } from 'antd'
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import axios, { isCancel } from 'axios'
+import React, { useEffect, useRef, useState } from 'react'
 
 const DragFile = ({ value, learnerId, staffId, isStaffById, isLearnerById }) => {
   const studentId = learnerId ? learnerId : JSON.parse(localStorage.getItem('studentId'))
@@ -16,6 +16,7 @@ const DragFile = ({ value, learnerId, staffId, isStaffById, isLearnerById }) => 
   const [isLoading, setIsLoading] = useState('')
   const [url, setUrl] = useState('')
   const [userPk, setUserPk] = useState('')
+  const cancelFileUpload = useRef(null)
 
   useEffect(() => {
     if (userRole === 'parents') {
@@ -54,11 +55,14 @@ const DragFile = ({ value, learnerId, staffId, isStaffById, isLearnerById }) => 
       token = JSON.parse(localStorage.getItem('token'))
     }
 
-    const headers = {
-      Accept: 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      database: 'india',
-      Authorization: token ? `JWT ${token}` : '',
+    const options = {
+      headers: {
+        Accept: 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        database: 'india',
+        Authorization: token ? `JWT ${token}` : '',
+      },
+      cancelToken: new axios.CancelToken(cancel => (cancelFileUpload.current = cancel)),
     }
 
     data.append('pk', userPk)
@@ -70,7 +74,7 @@ const DragFile = ({ value, learnerId, staffId, isStaffById, isLearnerById }) => 
     }
 
     axios
-      .post(url, data, { headers: headers })
+      .post(url, data, options)
       .then(res => {
         message.success(res.data.msg)
         setIsLoading('done')
@@ -80,10 +84,18 @@ const DragFile = ({ value, learnerId, staffId, isStaffById, isLearnerById }) => 
       })
       .catch(err1 => {
         console.error({ err1 })
-        message.error('upload Failed.')
+        if (isCancel(err1)) {
+          message.error(err1.message)
+        } else {
+          message.error('upload Failed.')
+        }
         setIsLoading('error')
         return false
       })
+  }
+
+  const cancelUpload = () => {
+    if (cancelFileUpload.current) cancelFileUpload.current('Cancel uploading')
   }
 
   return (
@@ -92,6 +104,7 @@ const DragFile = ({ value, learnerId, staffId, isStaffById, isLearnerById }) => 
         <div style={{ textAlign: 'center' }}>
           <Spin size="large" />
           <p style={{ fontSize: '16px', color: '#2998FF', fontWeight: '600' }}>Uploading...</p>
+          <Button onClick={() => cancelUpload()}>Cancel</Button>
         </div>
       ) : (
         <form style={{ width: '100%' }}>
@@ -109,9 +122,12 @@ const DragFile = ({ value, learnerId, staffId, isStaffById, isLearnerById }) => 
           </label>
           <input style={{ display: 'none' }} id="file_upload" type="file" onChange={onChange} />
           <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <Button className="submit_btn" onClick={() => handleClick()}>
-              Upload
-            </Button>
+            <div>
+              <Button className="submit_btn" onClick={() => handleClick()}>
+                Upload
+              </Button>
+              <Button style={{ marginLeft: '12px' }}>Cancel</Button>
+            </div>
           </div>
         </form>
       )}
