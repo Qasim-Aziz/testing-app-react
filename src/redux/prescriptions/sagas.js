@@ -28,12 +28,13 @@ export function* GET_PRESCRIPTIONS({ payload }) {
     },
   })
   const response = yield call(getPrescriptionFunc, payload)
-  console.log('THE RESPONSE ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐', response.data.getPrescriptions)
+  const tempList = response.data.getPrescriptions.edges
+  tempList.reverse()
   if (response) {
     yield put({
       type: actions.SET_STATE,
       payload: {
-        PrescriptionsList: response.data.getPrescriptions.edges,
+        PrescriptionsList: tempList,
       },
     })
   }
@@ -55,7 +56,6 @@ export function* GET_LASTEST_PRESCRIPTIONS({ payload }) {
   const response = yield call(getLatestPrescription, payload)
   if (response) {
     const prescriptions = response.data
-    console.log('THE PRESCRIPTIONS ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐', prescriptions)
     if (response.data.getPrescriptions.edges.length > 0) {
       yield put({
         type: actions.SET_STATE,
@@ -90,26 +90,17 @@ export function* CREATE_PRESCRIPTIONS({ payload }) {
     },
   })
   const response = yield call(createPrescriptionFunc, payload)
-  console.log('THE RESPONSE ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐', response)
   if (response && response.data) {
     notification.success({
       message: 'PRESCRIPTION Created Successfully',
     })
     const prescriptions = response.data.createPrescription.details
-    console.log('THE PRESCRIPTIONS', prescriptions)
-    /* **************************** */
     yield put({
       type: actions.APPEND_PRESCRIPTIONS_LIST,
       payload: {
-        /* TO reduce total number of mapping on different arrays
-         *  I have used the hack below ie to wrap the details
-         *  in a "node"
-         */
-
         prescription: { node: prescriptions },
       },
     })
-    /* **************************** */
     yield put({
       type: actions.SET_STATE,
       payload: {
@@ -138,9 +129,7 @@ export function* GET_DETAILS_PRESCRIPTIONS({ payload }) {
     notification.success({
       message: 'PRESCRIPTION FETCHED',
     })
-    console.log('response data ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐', response.data)
     const prescriptions = response.data.getPrescriptionDetail
-    console.log('THE PRESCRIPTIONS', prescriptions)
     yield put({
       type: actions.SET_STATE,
       payload: {
@@ -164,14 +153,11 @@ export function* EDIT_PRESCRIPTION({ payload }) {
     },
   })
   const response = yield call(editAndSavePrescription, payload)
-  console.log('THE RESPONSE ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐', response)
   if (response && response.data) {
     notification.success({
       message: 'PRESCRIPTION UPDATED SUCCESSFULLY',
     })
-    console.log('response data inside sagas', response.data)
     const prescriptions = response.data.updatePrescription.details
-    console.log('THE PRESCRIPTIONS', prescriptions)
     yield put({
       type: actions.SET_STATE,
       payload: {

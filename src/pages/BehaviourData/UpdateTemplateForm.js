@@ -9,7 +9,7 @@ import moment from 'moment'
 import { CANCEL_BUTTON, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import { remove, times, update } from 'ramda'
 import React, { useEffect, useReducer, useState } from 'react'
-import { useMutation, useQuery } from 'react-apollo'
+import { useMutation, useQuery, useLazyQuery } from 'react-apollo'
 import './templateform.scss'
 import LoadingComponent from 'components/LoadingComponent'
 
@@ -238,16 +238,10 @@ const UpdateTemplateForm = ({ style, tempId, form, closeUpdateDrawer }) => {
   const [remainderCount, setRemainderCount] = useState(0)
   const [remainderState, remainderDispatch] = useReducer(remainderReducer, [])
 
-  const {
-    data: getTemDetailsData,
-    loading: getTemDetailsLoading,
-    error: getTemDetailsError,
-  } = useQuery(TEMPLATE_DETAILS, {
-    fetchPolicy: 'network-only',
-    variables: {
-      id: tempId,
-    },
-  })
+  const [
+    fetchTempDetails,
+    { data: getTemDetailsData, loading: getTemDetailsLoading, error: getTemDetailsError },
+  ] = useLazyQuery(TEMPLATE_DETAILS)
 
   const { data: behaviorData, loading: behaviorLoading } = useQuery(BEHAVIORS, {
     variables: {
@@ -280,6 +274,17 @@ const UpdateTemplateForm = ({ style, tempId, form, closeUpdateDrawer }) => {
     createNewEnv,
     { data: createNewEnvData, loading: createNewEnvLoading, error: createNewEnvError },
   ] = useMutation(CREATE_ENVIRONMENT)
+
+  useEffect(() => {
+    if (tempId) {
+      fetchTempDetails({
+        fetchPolicy: 'network-only',
+        variables: {
+          id: tempId,
+        },
+      })
+    }
+  }, [tempId])
 
   useEffect(() => {
     if (getTemDetailsData) {
@@ -327,23 +332,6 @@ const UpdateTemplateForm = ({ style, tempId, form, closeUpdateDrawer }) => {
       setInitialMeasu(measurement)
     }
   }, [getTemDetailsData])
-
-  useEffect(() => {
-    if (updateTempData) {
-      notification.success({
-        message: 'Update Template Sucessfully',
-      })
-      closeUpdateDrawer()
-    }
-  }, [updateTempData])
-
-  useEffect(() => {
-    if (updateTempError) {
-      notification.error({
-        message: 'Opps their something wrong',
-      })
-    }
-  }, [updateTempError])
 
   useEffect(() => {
     if (createBehData) {
@@ -456,6 +444,13 @@ const UpdateTemplateForm = ({ style, tempId, form, closeUpdateDrawer }) => {
             remainders: reminder ? modefiRemainderState : null,
           },
         })
+          .then(res => {
+            notification.success({
+              message: 'Update Template Sucessfully',
+            })
+            closeUpdateDrawer()
+          })
+          .catch(ert => console.error(ert))
       }
     })
   }

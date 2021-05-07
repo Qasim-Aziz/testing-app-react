@@ -149,6 +149,9 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
               peakCorrect: tempTable[objIdx].peakCorrect + node.peak.totalCorrect,
               peakError: tempTable[objIdx].peakError + node.peak.totalError,
               peakPrompt: tempTable[objIdx].peakPrompt + node.peak.totalPrompt,
+              peakEquCorrect: tempTable[objIdx].peakEquCorrect + node.peakEquivalance.totalCorrect,
+              peakEquError: tempTable[objIdx].peakEquError + node.peakEquivalance.totalError,
+              peakEquPrompt: tempTable[objIdx].peakEquPrompt + node.peakEquivalance.totalPrompt,
             }
           } else {
             tempTable.push({
@@ -163,9 +166,9 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
               peakCorrect: node.peak.totalCorrect,
               peakError: node.peak.totalError,
               peakPrompt: node.peak.totalPrompt,
-              peakEquCorrect: 0,
-              peakEquError: 0,
-              peakEquPrompt: 0,
+              peakEquCorrect: node.peakEquivalance.totalCorrect,
+              peakEquError: node.peakEquivalance.totalError,
+              peakEquPrompt: node.peakEquivalance.totalPrompt,
               behCount: 0,
               behaviour: {},
               mand: {},
@@ -284,6 +287,9 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
             peakCorrect: tempTable[objIdx].peakCorrect + node.peak.totalCorrect,
             peakError: tempTable[objIdx].peakError + node.peak.totalError,
             peakPrompt: tempTable[objIdx].peakPrompt + node.peak.totalPrompt,
+            peakEquCorrect: tempTable[objIdx].peakEquCorrect + node.peakEquivalance.totalCorrect,
+            peakEquError: tempTable[objIdx].peakEquError + node.peakEquivalance.totalError,
+            peakEquPrompt: tempTable[objIdx].peakEquPrompt + node.peakEquivalance.totalPrompt,
           }
         } else {
           tempTable.push({
@@ -298,9 +304,9 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
             peakCorrect: node.peak.totalCorrect,
             peakError: node.peak.totalError,
             peakPrompt: node.peak.totalPrompt,
-            peakEquCorrect: 0,
-            peakEquError: 0,
-            peakEquPrompt: 0,
+            peakEquCorrect: node.peakEquivalance.totalCorrect,
+            peakEquError: node.peakEquivalance.totalError,
+            peakEquPrompt: node.peakEquivalance.totalPrompt,
             behCount: 0,
             behaviour: {},
             mand: {},
@@ -387,104 +393,14 @@ export default Form.create()(({ studentName, showDrawerFilter }) => {
         }
       })
     }
-
     tempTable.sort(compare)
     setTableData(tempTable)
   }, [dt, session])
-
-  // const getBehaviourList = behaviour => {
-  //   if (behaviour === 'No behaviour performed!') {
-  //     return []
-  //   }
-  //   const behaviorItems = behaviour.split(',')
-  //   const res = []
-  //   behaviorItems.map(item => {
-  //     const b = item.split(':')
-  //     if (!isNaN(Number(b[1]) / 1000))
-  //       res.push({
-  //         behaviour: b[0].trim(),
-  //         duration: Number(Number(Number(b[1]) / 1000).toFixed(0)),
-  //       })
-  //   })
-
-  //   return res
-  // }
 
   const [
     getFreDisTarget,
     { data: freDisData, error: freDisError, loading: freDisLoading },
   ] = useLazyQuery(FREQUENCY_DIS_TARGET)
-
-  // useEffect(() => {
-  //   if (data && data.sessionSummary && session) {
-  //     let filterData = []
-  //     if (session === 'All') {
-  //       data.sessionSummary.map(item => {
-  //         let itemExist = false
-  //         let itemIdx = -1
-  //         for (let i = 0; i < filterData.length; i += 1) {
-  //           if (filterData[i].sessionDate === item.sessionDate) {
-  //             itemExist = true
-  //             itemIdx = i
-  //           }
-  //         }
-
-  //         if (itemExist) {
-  //           filterData[itemIdx] = {
-  //             ...filterData[itemIdx],
-  //             key: filterData[itemIdx].id,
-  //             behCount: filterData[itemIdx].behCount + item.behCount,
-  //             behaviour:
-  //               filterData[itemIdx].behaviour === 'No behaviour performed!'
-  //                 ? item.behaviour
-  //                 : filterData[itemIdx].behaviour +
-  //                   (item.behaviour === 'No behaviour performed!' ? '' : item.behaviour),
-  //             correctCount: filterData[itemIdx].correctCount + item.correctCount,
-  //             duration: filterData[itemIdx].duration + item.duration,
-  //             errorCount: filterData[itemIdx].errorCount + item.errorCount,
-  //             mand:
-  //               filterData[itemIdx].mand === 'No mand performed!'
-  //                 ? item.mand
-  //                 : filterData[itemIdx].mand +
-  //                   (item.mand === 'No mand performed!' ? '' : `, ${item.mand}`),
-  //             peakCorrect: filterData[itemIdx].peakCorrect + item.peakCorrect,
-  //             peakError: filterData[itemIdx].peakError + item.peakError,
-  //             peakPrompt: filterData[itemIdx].peakPrompt + item.peakPrompt,
-  //             peakEquCorrect: filterData[itemIdx].peakEquCorrect + item.peakEquCorrect,
-  //             peakEquError: filterData[itemIdx].peakEquError + item.peakEquError,
-  //             peakEquPrompt: filterData[itemIdx].peakEquPrompt + item.peakEquPrompt,
-  //             promptCount: filterData[itemIdx].promptCount + item.promptCount,
-  //             toilet: item.toilet === 'No' ? 'No' : 'Yes',
-  //             toiletCount: filterData[itemIdx].toiletCount + item.toiletCount,
-  //           }
-  //         } else {
-  //           filterData.push({
-  //             ...item,
-  //             sessions: {
-  //               id: item.sessions.id,
-  //               key: item.sessions.id,
-  //               sessionName: {
-  //                 id: item.sessions.sessionName.id,
-  //                 key: item.sessions.sessionName.id,
-  //                 name: 'All',
-  //               },
-  //             },
-  //           })
-  //         }
-  //       })
-  //     } else {
-  //       filterData = data.sessionSummary.filter(item => item.sessions.sessionName.name === session)
-  //       filterData = filterData.map(item => {
-  //         return {
-  //           ...item,
-  //           key: item.id,
-  //         }
-  //       })
-  //     }
-  //     filterData.sort(compare)
-  //     // setTableData(filterData)
-  //   }
-  // }, [])
 
   useEffect(() => {
     if (freDisData) {

@@ -231,6 +231,13 @@ export const SESSION_DATA = gql`
             totalTrial
           }
 
+          peakEquivalance {
+            totalCorrect
+            totalError
+            totalPrompt
+            totalTrial
+          }
+
           durationStart
           durationEnd
           isPeak

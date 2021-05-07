@@ -1,7 +1,6 @@
 /* eslint-disable */
 
 import {
-  Avatar,
   Button,
   Card,
   Col,
@@ -18,6 +17,7 @@ import {
   Spin,
   Typography,
 } from 'antd'
+import LoadingComponent from 'components/LoadingComponent'
 import moment from 'moment'
 import React, { useEffect, useReducer, useState } from 'react'
 import { useQuery } from 'react-apollo'
@@ -30,6 +30,7 @@ import PrescriptionItemTable from './prescriptionItemTable'
 import PrescriptionVisitTable from './PrescriptionVisit/PrescriptionVisitTable'
 import { GET_COMPLAINT_QUERY, GET_DIAGNOSIS_QUERY, GET_TESTS_QUERY } from './query'
 import productReducer from './reducer'
+// import OtpInput from 'react-otp-input'
 
 const { Header, Content } = Layout
 const { Text, Title } = Typography
@@ -55,30 +56,10 @@ const lt = {
   },
 }
 
-const layout11 = {
-  labelCol: {
-    span: 12,
-  },
+const tl = {
   wrapperCol: {
-    span: 12,
-  },
-}
-
-const layout12 = {
-  labelCol: {
-    span: 3,
-  },
-  wrapperCol: {
-    span: 21,
-  },
-}
-
-const layout13 = {
-  labelCol: {
-    span: 12,
-  },
-  wrapperCol: {
-    span: 12,
+    offset: 4,
+    span: 20,
   },
 }
 
@@ -86,7 +67,6 @@ function addNevObject(val) {
   let theMainArray = []
   val.map((item, index) => {
     let some_random = {}
-    console.log('THE ITEM', item)
     some_random.key = index + 1 // item.node.id
     some_random.name = item.node.name
     some_random.medicineType = item.node.medicineType
@@ -99,8 +79,6 @@ function addNevObject(val) {
 
     theMainArray.push(some_random)
   })
-  console.log('THE VAL', val)
-  console.log('THE MAIN ARRAY', theMainArray)
   return theMainArray
 }
 
@@ -250,16 +228,10 @@ const GetTest = ({ form }) => {
 }
 
 const BankDetails = props => {
-  function onDateChange(date, dateString) {
-    console.log(date, dateString)
-  }
   const { form, details } = props
-  console.log('The state', props)
-  console.log('The form', form)
   const prescriptions = useSelector(state => state.prescriptions)
   const dispatchOfPrescription = useDispatch()
-  console.log('THE LOCAL STATE for getting prescription', prescriptions)
-
+  const [otp, setOtp] = useState()
   const [productsState, productsDispatch] = useReducer(productReducer, [])
 
   const [subTotal, setSubTotal] = useState(0)
@@ -273,7 +245,6 @@ const BankDetails = props => {
     dispatchOfPrescription({
       type: actionPrescription.GET_LASTEST_PRESCRIPTIONS,
       payload: {
-        /**Sending student's ID */
         value: details.id,
       },
     })
@@ -286,7 +257,6 @@ const BankDetails = props => {
   }, [])
 
   useEffect(() => {
-    console.log('THE PRESCRIPTION VALUE', prescriptions)
     if (prescriptions.isSpecificPrescription) {
       let listOfMedicineObject = prescriptions.SpecificPrescription.medicineItems.edges
       let x = addNevObject(listOfMedicineObject)
@@ -310,60 +280,25 @@ const BankDetails = props => {
     }
   }, [prescriptions.SpecificPrescription])
 
-  function onChangeInputNumber(value) {
-    console.log('changed', value)
-  }
-
-  function onChangeNextVisitVal(e) {
-    console.log(`radio checked:${e.target.value}`)
-  }
-
   const handleSubmitt = e => {
     e.preventDefault()
     form.validateFields((err, values) => {
-      console.log('THE LIST OF PRESCRIPTION', productsState)
-      console.log('THE SUBMIT 🎉✨', err, values)
-      console.log(details.id, vaules, productsState, 'prd')
-      // dispatchOfPrescription({
-      //   type: actionPrescription.CREATE_PRESCRIPTION,
-      //   payload: {
-      //     id: details.id,
-      //     values: values,
-      //     data: productsState,
-      //   },
-      // })
+      dispatchOfPrescription({
+        type: actionPrescription.CREATE_PRESCRIPTION,
+        payload: {
+          id: details.id,
+          values: values,
+          data: productsState,
+        },
+      })
     })
   }
 
   const [testTime, setTestTime] = useState('')
-  console.log(testTime)
-  const handelTestTime = e => {
-    console.log(e.target.value)
-    setTestTime(e.target.value)
-  }
 
-  const test = {
-    labelCol: {
-      span: 12,
-    },
-    wrapperCol: {
-      span: 10,
-    },
-  }
-  const test2 = {
-    labelCol: {
-      span: 8,
-    },
-    wrapperCol: {
-      span: 10,
-    },
-  }
-
-  const opt = [
-    { label: 'Apple', value: 'Apple' },
-    { label: 'Pear', value: 'Pear' },
-    { label: 'Orange', value: 'Orange' },
-  ]
+  // if (prescriptions.loadingPrescriptions) {
+  //   return <LoadingComponent />
+  // }
 
   return (
     <div>
@@ -371,9 +306,23 @@ const BankDetails = props => {
         <Content>
           <Form>
             <Divider orientation="left">General Details</Divider>
-            <Form.Item {...lt} label="Name">
-              {form.getFieldDecorator('name')(<Input className="vital_input" placeholder="cm" />)}
-            </Form.Item>
+            <Row style={{ marginBottom: 9 }}>
+              <Col
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  paddingRight: 6,
+                  fontWeight: 700,
+                  color: 'black',
+                }}
+                span={4}
+              >
+                Name:
+              </Col>
+              <Col style={{ paddingLeft: 4 }} span={18}>
+                {details.firstname} {details.lastname}
+              </Col>
+            </Row>
             <Row>
               <Col span={12}>
                 <Form.Item {...layout1} label="Height">
@@ -417,89 +366,37 @@ const BankDetails = props => {
             <GetComplaints form={form} />
             <GetDiagnosis form={form} />
             <GetTest form={form} />
-            {prescriptions.loadingPrescriptions !== true &&
-            prescriptions.isSpecificPrescription !== false ? (
-              <>
-                <PrescriptionItemContext.Provider value={productsDispatch}>
-                  <PrescriptionItemTable
-                    style={{ marginTop: 25 }}
-                    totalAmount={subTotal}
-                    products={productsState}
-                    dispatch={productsDispatch}
-                  />
-                </PrescriptionItemContext.Provider>
-              </>
-            ) : (
-              <>
-                {prescriptions.PrescriptionsList.length === 0 ? (
-                  <>
-                    <PrescriptionItemContext.Provider value={productsDispatch}>
-                      <PrescriptionItemTable
-                        style={{ marginTop: 25 }}
-                        totalAmount={subTotal}
-                        products={productsState}
-                        dispatch={productsDispatch}
-                      />
-                    </PrescriptionItemContext.Provider>
-                  </>
-                ) : (
-                  <>
-                    <Spin size="large" />
-                  </>
-                )}
-              </>
-            )}
-            <Row>
-              <Form.Item {...lt} label="Advice">
-                {form.getFieldDecorator('advice')(
-                  <TextArea
-                    placeholder="Advice"
-                    autoSize={{ minRows: 4, maxRows: 6 }}
-                    allowClear
-                  />,
-                )}
-              </Form.Item>
-              <Form.Item {...lt} label="Test Date">
-                {form.getFieldDecorator('testDate')(<DatePicker test />)}
-              </Form.Item>
-              <Col span={8}>
-                <Form.Item {...test} label="Next Visit">
-                  {form.getFieldDecorator('nextVisitNumber')(
-                    <Input type="number" min={1} max={12} onChange={onChangeInputNumber} />,
-                  )}
-                </Form.Item>
-              </Col>
-              <Col span={4}>
-                <Radio.Group optionType="button" buttonStyle="solid">
-                  <Radio.Button value="days">days</Radio.Button>
-                  <Radio.Button value="weeks">weeks</Radio.Button>
-                  <Radio.Button value="months">months</Radio.Button>
-                </Radio.Group>
-                ,
-              </Col>
-              <Col span={2}>
-                <span
-                  style={{
-                    fontWeight: '900',
-                    fontSize: '16px',
-                  }}
-                >
-                  OR
-                </span>
-              </Col>
-              <Col span={8}>
-                <Form.Item {...test2} label="Next Visit Date">
-                  {form.getFieldDecorator('nextVisitDate')(<DatePicker />)}
-                </Form.Item>
-              </Col>
-            </Row>
-
-            <Form.Item {...FORM.tailLayout}>
+            <>
+              <PrescriptionItemContext.Provider value={productsDispatch}>
+                <PrescriptionItemTable
+                  style={{ marginTop: 25 }}
+                  totalAmount={subTotal}
+                  products={productsState}
+                  dispatch={productsDispatch}
+                />
+              </PrescriptionItemContext.Provider>
+            </>
+            <Form.Item {...lt} label="Advice">
+              {form.getFieldDecorator('advice')(
+                <TextArea placeholder="Advice" autoSize={{ minRows: 4, maxRows: 6 }} allowClear />,
+              )}
+            </Form.Item>
+            <Form.Item {...lt} label="Test Date">
+              {form.getFieldDecorator('testDate')(<DatePicker test />)}
+            </Form.Item>
+            <Form.Item {...lt} label="Next Visit Date">
+              {form.getFieldDecorator('nextVisitDate')(<DatePicker />)}
+            </Form.Item>
+            <Form.Item {...tl}>
               <Popconfirm
                 title="Are you sure all the details filled are correct ?"
                 onConfirm={handleSubmitt}
               >
-                <Button loading={false} type="primary" style={SUBMITT_BUTTON}>
+                <Button
+                  loading={prescriptions.loadingPrescriptions}
+                  type="primary"
+                  style={SUBMITT_BUTTON}
+                >
                   ADD
                 </Button>
               </Popconfirm>
@@ -508,6 +405,12 @@ const BankDetails = props => {
               </Button>
             </Form.Item>
           </Form>
+          {/* <OtpInput
+            value={otp}
+            onChange={t => setOtp(t)}
+            numInputs={6}
+            separator={<span>-</span>}
+          /> */}
           {/* <div className="visit_history_section">
             <div className="vist_title">
               <Title level={2}>14 Visits</Title>

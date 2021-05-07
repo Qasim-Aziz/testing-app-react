@@ -13,7 +13,6 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
   const inputRef = useRef()
   const form = useContext(PrescriptionFormContext)
 
-  console.log('record', record)
   useEffect(() => {
     if (editing) {
       if (inputRef.current) {
@@ -27,7 +26,6 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
     form.setFieldsValue({
       [dataIndex]: record[dataIndex],
     })
-    console.log(form.setFieldsValue)
   }
 
   const save = async () => {
@@ -44,7 +42,7 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
   if (editable) {
     childNode = editing ? (
       <div className="table-input-field">
-        {title === 'Name' && (
+        {title === 'Name' ? (
           <Form.Item style={{ margin: 0, border: 'none' }} name={record.dataIndex}>
             {form.getFieldDecorator('name', {
               initialValue: record.name, //::before record.service,
@@ -64,15 +62,8 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
               />,
             )}
           </Form.Item>
-        )}
-        {title === 'Type' ? (
-          <Form.Item
-            style={{
-              margin: 0,
-              padding: 0,
-            }}
-            name={record.dataIndex}
-          >
+        ) : title === 'Med Type' ? (
+          <Form.Item style={{ margin: 0, padding: 0 }} name={record.dataIndex}>
             {form.getFieldDecorator('medicineType', {
               initialValue: record.medicineType,
             })(
@@ -84,28 +75,32 @@ export default ({ record, children, title, editable, dataIndex, handleSave, ...r
               </Select>,
             )}
           </Form.Item>
+        ) : title === 'Dosage' ? (
+          <Form.Item style={{ margin: 0, padding: 0 }} name={record.dataIndex}>
+            {form.getFieldDecorator(title.toLowerCase())(
+              <Input
+                ref={inputRef}
+                placeholder="Please enter the values"
+                onPressEnter={save}
+                onBlur={save}
+                style={{ width: '100%', textAlign: 'right', alignSelf: 'flex-end' }}
+              />,
+            )}
+          </Form.Item>
         ) : (
-          title !== 'Name' && (
-            <Form.Item
-              style={{
-                margin: 0,
-                padding: 0,
-              }}
-              name={record.dataIndex}
-            >
-              {form.getFieldDecorator(title.toLowerCase(), {
-                initialValue: record[title.toLowerCase()],
-              })(
-                <Input
-                  ref={inputRef}
-                  placeholder="Please enter the values"
-                  onPressEnter={save}
-                  onBlur={save}
-                  style={{ width: '100%', textAlign: 'right', alignSelf: 'flex-end' }}
-                />,
-              )}
-            </Form.Item>
-          )
+          <Form.Item style={{ margin: 0, padding: 0 }} name={record.dataIndex}>
+            {form.getFieldDecorator(title.toLowerCase(), {
+              initialValue: record[title.toLowerCase()],
+            })(
+              <Input
+                ref={inputRef}
+                placeholder="Please enter the values"
+                onPressEnter={save}
+                onBlur={save}
+                style={{ width: '100%', textAlign: 'right', alignSelf: 'flex-end' }}
+              />,
+            )}
+          </Form.Item>
         )}
       </div>
     ) : (

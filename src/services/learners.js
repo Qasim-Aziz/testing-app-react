@@ -54,6 +54,12 @@ export async function getClinicLearners(payload) {
                   id
                   name
                 }
+                school {
+                  id
+                  schoolName
+                  address
+                  email
+                }
                 tags {
                   edges {
                     node {

@@ -146,15 +146,12 @@ const Index = props => {
           ADD
           <PlusOutlined />
         </Button>
-        // </Authorize>
       ),
     },
   ]
 
   if (authenticatedUser.authorized && authenticatedUser.role === 'parents') {
-    console.log('THE COLUMN initially', columns)
     columns.pop()
-    console.log('THE COLUMN finally', columns)
   }
 
   const tableHeader = (
@@ -221,7 +218,7 @@ const Index = props => {
       </Drawer>
       <Drawer
         width="80%"
-        title="View History Of Prescriptions"
+        title={`${learnerState?.specificLearner.firstname}'s - History Of Prescriptions`}
         closable={true}
         visible={learnerState.viewPrescriptionDrawer}
         onClose={() => setLearnerState({ ...learnerState, viewPrescriptionDrawer: false })}
@@ -262,7 +259,7 @@ const Index = props => {
           ) : null}
         </div>
         <div>
-          <span style={{ fontSize: '25px', color: '#000' }}>LEARNERS PRESCRIPTIONS</span>
+          <span style={{ fontSize: '25px', color: '#000' }}>Learner's Prescription</span>
         </div>
         <div style={{ padding: '5px 0px' }}></div>
       </div>

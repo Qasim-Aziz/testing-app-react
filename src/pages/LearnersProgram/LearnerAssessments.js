@@ -1,3 +1,4 @@
+/* eslint-disable react/destructuring-assignment */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable react/no-unused-state */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
@@ -109,37 +110,39 @@ class StudentDrawer extends Component {
   }
 
   activeInactiveVbMapp = isActive => {
-    notification.info({
-      message: 'Attention!',
-      description: 'Please check with your clinic administrator this will be chargeable',
-      duration: 5,
-    })
-    console.log('hj g fh', isActive)
+    if (this.props.user.role === 'parent') {
+      notification.info({
+        message: 'Attention!',
+        description: 'Please check with your clinic administrator this will be chargeable',
+        duration: 5,
+      })
+    }
+    console.log(isActive, 'ooooooo hellllllllllllll maan')
+
     const std = JSON.parse(localStorage.getItem('studentId'))
-    if (isActive) {
-      apolloClient
-        .mutate({
-          mutation: gql`
+
+    apolloClient
+      .mutate({
+        mutation: gql`
           mutation{
             vbmappActivateStudent(input:{
                 student: "${std}"
+                activate: ${!isActive}
             }){
                 status
                 msg
             }
           }
           `,
+      })
+      .then(result => {
+        this.setState({
+          isVBMAPPActive: !isActive,
         })
-        .then(result => {
-          this.setState({
-            isVBMAPPActive: true,
-          })
-          console.log('vb-mapp ====> ', result)
-        })
-        .catch(error => {
-          console.log(error)
-        })
-    }
+      })
+      .catch(error => {
+        console.log(error)
+      })
   }
 
   activeInactivePEAK = isActive => {
@@ -220,6 +223,7 @@ class StudentDrawer extends Component {
   render() {
     const { studentDetails, isVBMAPPActive } = this.state
 
+    console.log(this.props)
     const tdStyle = { border: '1px solid #dddddd', padding: 8, textAlign: 'center' }
 
     return (
@@ -268,9 +272,11 @@ class StudentDrawer extends Component {
                   onClick={
                     isVBMAPPActive
                       ? () => {
+                          console.log(isVBMAPPActive, 'yeah active')
                           this.redirectToAssessment('VB-MAPP')
                         }
                       : () => {
+                          console.log(isVBMAPPActive, 'o hell no')
                           this.generateNotification('VB-MAPP assessment is not activated')
                         }
                   }
