@@ -1,15 +1,158 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable no-shadow */
+/* eslint-disable react/jsx-indent */
+/* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/label-has-for */
 /* eslint-disable no-plusplus */
-import { Icon, Input, Table } from 'antd'
+import { faTrashAlt, faUserEdit } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Button, Drawer, Form, Icon, Input, message, Table } from 'antd'
+import { DRAWER } from 'assets/styles/globalStyles'
 import React, { useState } from 'react'
+import { useMutation } from 'react-apollo'
+import {
+  DELETE_LEARNER_FILE,
+  DELETE_STAFF_FILE,
+  UPDATE_LEARNER_FILE,
+  UPDATE_STAFF_FILE,
+} from './query'
 
-const AllFilesData = ({ studentData }) => {
-  const StudentName = studentData?.studentData?.firstname
-  const files = studentData.studentData?.files.edges
-  const filesLength = studentData.studentData?.files.edges.length
+const AllFilesData = ({
+  studentData,
+  staffData,
+  isLearnerById,
+  learnerId,
+  staffId,
+  form,
+  handleUserName,
+}) => {
+  const userRole = JSON.parse(localStorage.getItem('role'))
+
+  const StudentName = studentData?.student?.firstname
+  const staffName = staffData?.staff?.name
+
+  const studentId = studentData?.student?.id || learnerId
+  const therapistId = staffData?.staff?.id || staffId
+
+  const studentFiles = studentData?.student?.files.edges
+  const staffFiles = staffData?.staff?.files?.edges
+
+  const studentFilesLength = studentFiles?.length
+  const staffFilesLength = staffFiles?.length
+
   const [filteredData, setFilteredData] = useState([])
   const [isFiltered, setIsFiltered] = useState(false)
+
+  const [deleteLearnerFile] = useMutation(DELETE_LEARNER_FILE)
+  const [deleteStaffFile] = useMutation(DELETE_STAFF_FILE)
+  const [updateLearnerFile] = useMutation(UPDATE_LEARNER_FILE)
+  const [updateStaffFile] = useMutation(UPDATE_STAFF_FILE)
+
+  const [visibleUpdate, setVisibleUpdate] = useState(false)
+
+  const [forUpdateUserId, setForUpdateUserId] = useState('')
+  const handleOpenUpdateDrawer = (id, value) => {
+    setVisibleUpdate(value)
+    setForUpdateUserId(id)
+  }
+  const handleSubmit = e => {
+    e.preventDefault()
+
+    form.validateFields((err, values) => {
+      if (values) {
+        if (userRole === 'parents') {
+          updateLearnerFile({
+            variables: {
+              docsId: forUpdateUserId,
+              fileName: values.fileName,
+              fileDescription: values.description,
+            },
+          })
+            .then(res => {
+              message.success('File update successfully')
+              console.log(res)
+            })
+            .catch(err => {
+              message.error('Some problem happen!')
+              console.log(err)
+            })
+        } else if (userRole === 'therapist' || userRole === 'school_admin') {
+          if (isLearnerById && learnerId) {
+            updateLearnerFile({
+              variables: {
+                docsId: forUpdateUserId,
+                fileName: values.fileName,
+                fileDescription: values.description,
+              },
+            })
+              .then(res => {
+                message.success('File update successfully')
+                console.log(res)
+              })
+              .catch(err => {
+                message.error('Some problem happen!')
+                console.log(err)
+              })
+          } else {
+            updateStaffFile({
+              variables: {
+                docsId: forUpdateUserId,
+                fileName: values.fileName,
+                fileDescription: values.description,
+              },
+            })
+              .then(res => {
+                message.success('File update successfully')
+                console.log(res)
+              })
+              .catch(err => {
+                message.error('Some problem happen!')
+                console.log(err)
+              })
+          }
+        }
+      }
+      if (!err) {
+        console.log('Received values of form: ', values)
+      }
+    })
+  }
+
+  const deleteLearnerFileHandler = (student, docsId) => {
+    deleteLearnerFile({
+      variables: {
+        student,
+        docsId: [docsId],
+      },
+    })
+      .then(res => {
+        message.success('File delete successfully')
+        console.log(res)
+      })
+      .catch(err => {
+        message.error('Some problem happen!')
+        console.log(err)
+      })
+  }
+
+  const deleteStaffFileHandler = (staff, docsId) => {
+    deleteStaffFile({
+      variables: {
+        staff,
+        docsId: [docsId],
+      },
+    })
+      .then(res => {
+        message.success('File delete successfully')
+        console.log(res)
+      })
+      .catch(err => {
+        message.error('Some problem happen!')
+        console.log(err)
+      })
+  }
 
   const columns = [
     {
@@ -18,7 +161,15 @@ const AllFilesData = ({ studentData }) => {
     },
     {
       title: 'File Name',
-      dataIndex: 'fileName',
+      render: record => (
+        <span
+          onClick={() => handleOpenUpdateDrawer(record.fileName.id, true)}
+          className="upload_file_title"
+        >
+          <FontAwesomeIcon style={{ marginRight: '5px' }} icon={faUserEdit} />
+          {record.fileName.name}
+        </span>
+      ),
     },
     {
       title: 'Description',
@@ -42,21 +193,128 @@ const AllFilesData = ({ studentData }) => {
       title: 'Upload',
       dataIndex: 'upload',
     },
+    {
+      title: 'Delete',
+      render: id => (
+        <Button
+          className="remove_btn"
+          type="danger"
+          onClick={() =>
+            userRole === 'parents'
+              ? deleteLearnerFileHandler(studentId, id)
+              : userRole === 'therapist'
+              ? isLearnerById && learnerId
+                ? deleteLearnerFileHandler(studentId, id)
+                : deleteStaffFileHandler(therapistId, id)
+              : userRole === 'school_admin'
+              ? isLearnerById && learnerId
+                ? deleteLearnerFileHandler(studentId, id)
+                : deleteStaffFileHandler(therapistId, id)
+              : null
+          }
+        >
+          <FontAwesomeIcon icon={faTrashAlt} />
+        </Button>
+      ),
+      dataIndex: 'delete',
+    },
   ]
 
   const data = []
-  for (let i = 0; i < filesLength || 0; i++) {
-    const item = files[i]
-    data.push({
-      key: i,
-      id: i + 1,
-      fileName: item.node.fileName ? item.node.fileName : 'No File Name !',
-      fileDescription: item.node.fileDescription
-        ? item.node.fileDescription
-        : 'No File Description!',
-      file: item.node.file ? item.node.file : '',
-      upload: StudentName && StudentName,
-    })
+  if (userRole === 'parents') {
+    for (let i = 0; i < studentFilesLength || 0; i++) {
+      const item = studentFiles[i]
+      data.push({
+        key: i,
+        id: i + 1,
+        fileName: {
+          name: item.node.fileName ? item.node.fileName : 'No File Name !',
+          id: item.node.id,
+        },
+        fileDescription: item.node.fileDescription
+          ? item.node.fileDescription
+          : 'No File Description!',
+        file: item.node.file ? item.node.file : '',
+        upload: StudentName && StudentName,
+        delete: item.node.id,
+      })
+    }
+  } else if (userRole === 'therapist') {
+    if (isLearnerById && learnerId) {
+      for (let i = 0; i < studentFilesLength || 0; i++) {
+        const item = studentFiles[i]
+        data.push({
+          key: i,
+          id: i + 1,
+          fileName: {
+            name: item.node.fileName ? item.node.fileName : 'No File Name !',
+            id: item.node.id,
+          },
+          fileDescription: item.node.fileDescription
+            ? item.node.fileDescription
+            : 'No File Description!',
+          file: item.node.file ? item.node.file : '',
+          upload: StudentName && StudentName,
+          delete: item.node.id,
+        })
+      }
+    } else {
+      for (let i = 0; i < staffFilesLength || 0; i++) {
+        const item = staffFiles[i]
+        data.push({
+          key: i,
+          id: i + 1,
+          fileName: {
+            name: item.node.fileName ? item.node.fileName : 'No File Name !',
+            id: item.node.id,
+          },
+          fileDescription: item.node.fileDescription
+            ? item.node.fileDescription
+            : 'No File Description!',
+          file: item.node.file ? item.node.file : '',
+          upload: staffName && staffName,
+          delete: item.node.id,
+        })
+      }
+    }
+  } else if (userRole === 'school_admin') {
+    if (isLearnerById && learnerId) {
+      for (let i = 0; i < studentFilesLength || 0; i++) {
+        const item = studentFiles[i]
+        data.push({
+          key: i,
+          id: i + 1,
+          fileName: {
+            name: item.node.fileName ? item.node.fileName : 'No File Name !',
+            id: item.node.id,
+          },
+          fileDescription: item.node.fileDescription
+            ? item.node.fileDescription
+            : 'No File Description!',
+          file: item.node.file ? item.node.file : '',
+          upload: StudentName && StudentName,
+          delete: item.node.id,
+        })
+      }
+    } else {
+      for (let i = 0; i < staffFilesLength || 0; i++) {
+        const item = staffFiles[i]
+        data.push({
+          key: i,
+          id: i + 1,
+          fileName: {
+            name: item.node.fileName ? item.node.fileName : 'No File Name !',
+            id: item.node.id,
+          },
+          fileDescription: item.node.fileDescription
+            ? item.node.fileDescription
+            : 'No File Description!',
+          file: item.node.file ? item.node.file : '',
+          upload: staffName && staffName,
+          delete: item.node.id,
+        })
+      }
+    }
   }
 
   const filterHandler = ({ name, description }) => {
@@ -77,6 +335,21 @@ const AllFilesData = ({ studentData }) => {
     setFilteredData(filteredList)
   }
 
+  if (userRole === 'parents') {
+    handleUserName('learner', StudentName)
+  } else if (userRole === 'therapist') {
+    if (isLearnerById && learnerId) {
+      handleUserName('learner', StudentName)
+    } else {
+      handleUserName('staff', staffName)
+    }
+  } else if (userRole === 'school_admin') {
+    if (isLearnerById && learnerId) {
+      handleUserName('learner', StudentName)
+    } else {
+      handleUserName('staff', staffName)
+    }
+  }
   return (
     <>
       <div className="filter_container">
@@ -94,7 +367,7 @@ const AllFilesData = ({ studentData }) => {
             />
           </div>
         </div>
-        <div className="description_filter_section">
+        <div className="description_filter_section" style={{ marginLeft: '30px' }}>
           <div className="description_filter">
             <label className="description_filter_label" htmlFor="description">
               Description:
@@ -112,8 +385,44 @@ const AllFilesData = ({ studentData }) => {
       <div className="all_files_data_container">
         <Table columns={columns} dataSource={isFiltered ? filteredData : data} />
       </div>
+      <Drawer
+        visible={visibleUpdate}
+        onClose={() => setVisibleUpdate(false)}
+        width={DRAWER.widthL4}
+        title="Update File(s)"
+        placement="right"
+      >
+        <Form onSubmit={handleSubmit} className="login-form">
+          <Form.Item>
+            {form.getFieldDecorator('fileName', {
+              rules: [{ required: true, message: 'Please input your file name!' }],
+            })(
+              <Input
+                prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                placeholder="File name"
+              />,
+            )}
+          </Form.Item>
+          <Form.Item>
+            {form.getFieldDecorator('description', {
+              rules: [{ required: true, message: 'Please input your file description!' }],
+            })(
+              <Input
+                prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
+                type="text"
+                placeholder="File description"
+              />,
+            )}
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" className="login-form-button">
+              Update
+            </Button>
+          </Form.Item>
+        </Form>
+      </Drawer>
     </>
   )
 }
 
-export default AllFilesData
+export default Form.create()(AllFilesData)

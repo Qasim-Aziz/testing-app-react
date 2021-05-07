@@ -1,15 +1,15 @@
-import { all, takeEvery, put, call } from 'redux-saga/effects'
+import { all, call, put, takeEvery } from 'redux-saga/effects'
 // import { push } from 'react-router-redux';
 // import { notification } from 'antd'
 import {
-  login,
-  RefreshToken,
-  StudentIdFromUserId,
-  GetUserDetailsByUsername,
-  logout,
-  GetStudentNameById,
-  StaffIdFromUserId,
   clinicDetails,
+  GetStudentNameById,
+  GetUserDetailsByUsername,
+  login,
+  logout,
+  RefreshToken,
+  StaffIdFromUserId,
+  StudentIdFromUserId,
 } from 'services/user'
 // import { GraphQLClient } from 'graphql-request'
 import actions from './actions'
@@ -60,6 +60,10 @@ export function* LOGIN({ payload }) {
 
       if (response.tokenAuth.user.groups.edges[0].node.name === 'therapist') {
         localStorage.setItem('userId', JSON.stringify(response.tokenAuth.user.id))
+        localStorage.setItem(
+          'therapistId',
+          JSON.stringify(response.tokenAuth.user.staffSet.edges[0].node.id),
+        )
         yield put({
           type: 'user/SET_STATE',
           payload: {
@@ -67,20 +71,21 @@ export function* LOGIN({ payload }) {
             staffName: response.tokenAuth.user.staffSet.edges[0].node.name,
             staffCountry: response.tokenAuth.user.staffSet.edges[0].node.country,
             staffState: response.tokenAuth.user.staffSet.edges[0].node.state,
-            staffObject: response.tokenAuth.user.staffSet.node
+            staffObject: response.tokenAuth.user.staffSet.node,
           },
         })
       }
 
       if (response.tokenAuth.user.groups.edges[0].node.name === 'school_admin') {
         const result4 = yield call(clinicDetails)
+        console.log(result4)
         if (result4) {
           localStorage.setItem('userId', JSON.stringify(result4.data.schoolDetail.id))
           yield put({
             type: 'user/SET_STATE',
             payload: {
               clinicName: result4.data.schoolDetail.schoolName,
-              clinicCountry: result4.data.schoolDetail.country?.name
+              clinicCountry: result4.data.schoolDetail.country?.name,
             },
           })
         }
@@ -151,7 +156,7 @@ export function* LOAD_CURRENT_ACCOUNT() {
               staffName: result3.data.staffs.edges[0].node.name,
               staffCountry: result3.data.staffs.edges[0].node.country,
               staffState: result3.data.staffs.edges[0].node.state,
-              staffObject: result3.data.staffs.edges[0].node
+              staffObject: result3.data.staffs.edges[0].node,
             },
           })
         }
@@ -165,7 +170,7 @@ export function* LOAD_CURRENT_ACCOUNT() {
             type: 'user/SET_STATE',
             payload: {
               clinicName: result4.data.schoolDetail.schoolName,
-              clinicCountry: result4.data.schoolDetail.country?.name
+              clinicCountry: result4.data.schoolDetail.country?.name,
             },
           })
         }

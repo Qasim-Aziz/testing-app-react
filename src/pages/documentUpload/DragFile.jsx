@@ -6,21 +6,37 @@ import { Button, Icon, message, Spin } from 'antd'
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 
-const DragFile = ({ value }) => {
-  const studentId = JSON.parse(localStorage.getItem('studentId'))
+const DragFile = ({ value, learnerId, staffId, isStaffById, isLearnerById }) => {
+  const studentId = learnerId ? learnerId : JSON.parse(localStorage.getItem('studentId'))
+  const therapistId = staffId ? staffId : JSON.parse(localStorage.getItem('therapistId'))
   const userRole = JSON.parse(localStorage.getItem('role'))
   const [selectedFile, setFile] = useState(null)
   const fileName = selectedFile?.file?.name
   const fileDescription = value
   const [isLoading, setIsLoading] = useState('')
   const [url, setUrl] = useState('')
+  const [userPk, setUserPk] = useState('')
 
   useEffect(() => {
-    if (userRole === 'therapist') {
-      setUrl('https://application.cogniable.us/apis/staff-docs/')
-    }
     if (userRole === 'parents') {
       setUrl('https://application.cogniable.us/apis/student-docs/')
+      setUserPk(studentId)
+    } else if (userRole === 'therapist') {
+      if (isLearnerById && learnerId) {
+        setUrl('https://application.cogniable.us/apis/student-docs/')
+        setUserPk(studentId)
+      } else {
+        setUrl('https://application.cogniable.us/apis/staff-docs/')
+        setUserPk(therapistId)
+      }
+    } else if (userRole === 'school_admin') {
+      if (isLearnerById && learnerId) {
+        setUrl('https://application.cogniable.us/apis/student-docs/')
+        setUserPk(studentId)
+      } else if (isStaffById && staffId) {
+        setUrl('https://application.cogniable.us/apis/staff-docs/')
+        setUserPk(therapistId)
+      }
     }
   }, [])
 
@@ -28,11 +44,8 @@ const DragFile = ({ value }) => {
     setFile({ file: e.target.files[0] })
   }
 
-  console.log(fileName)
-
   const handleClick = () => {
     setIsLoading('loading')
-    // const url = url
     const data = new FormData()
     data.append('file', selectedFile.file)
 
@@ -48,10 +61,9 @@ const DragFile = ({ value }) => {
       Authorization: token ? `JWT ${token}` : '',
     }
 
-    data.append('pk', studentId)
+    data.append('pk', userPk)
     data.set('file_name', fileName)
     data.append('file_description', fileDescription)
-    // console.log(studentId, selectedFile, 'this is upload')
 
     for (var key of data.entries()) {
       console.log(key[0] + ', ' + key[1])
@@ -60,11 +72,11 @@ const DragFile = ({ value }) => {
     axios
       .post(url, data, { headers: headers })
       .then(res => {
-        console.log(res, 'this iis respionse')
-        // then print response status
-        message.success('Upload Successfully.')
+        message.success(res.data.msg)
         setIsLoading('done')
         setFile(null)
+        window.location.reload(false)
+        console.log(res)
       })
       .catch(err1 => {
         console.error({ err1 })
