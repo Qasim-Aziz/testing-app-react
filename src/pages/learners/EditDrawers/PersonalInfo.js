@@ -1,13 +1,13 @@
 /* eslint-disable */
-import React, { useState, useEffect } from 'react'
-import { Form, Input, Button, Select, notification } from 'antd'
+import { Button, Form, Input, notification, Select } from 'antd'
+import { CANCEL_BUTTON, FORM, SUBMITT_BUTTON } from 'assets/styles/globalStyles'
 import moment from 'moment'
+import React, { useEffect, useState } from 'react'
 import { useMutation } from 'react-apollo'
-import { Link, withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 import AntdTag from '../../staffs/antdTag'
 import { GEN_INFO } from './query'
-import { COLORS, FORM, SUBMITT_BUTTON, CANCEL_BUTTON } from 'assets/styles/globalStyles'
 
 const { TextArea } = Input
 const { Option } = Select
@@ -96,6 +96,8 @@ function PersonalInfo(props) {
           },
         })
           .then(result => {
+            console.log('userProfile.id', userProfile.id)
+            console.log('result', result)
             dispatch({
               type: 'learners/EDIT_GENERAL_INFO',
               payload: {

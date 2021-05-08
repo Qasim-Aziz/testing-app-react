@@ -1,20 +1,21 @@
 /* eslint-disable */
-import React, { useState, useEffect } from 'react'
-import { connect } from 'react-redux'
-import { Card, Switch, Icon, Avatar, Tag, Tooltip, Button, Drawer } from 'antd'
 import { EditOutlined } from '@ant-design/icons'
-import { Link, withRouter } from 'react-router-dom'
+import { Avatar, Button, Card, Drawer, Tag, Tooltip } from 'antd'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import LoadingComponent from 'components/VBMappReport/LoadingComponent'
 import moment from 'moment'
-import GenDetails from './EditDrawers/GenInfo'
-import PersonalInfo from './EditDrawers/PersonalInfo'
-import ClinicInfo from './EditDrawers/ClinicInfo'
-import './style.scss'
-import EmergencyInfo from './EditDrawers/EmergencyInfo'
-import MiscInfo from './EditDrawers/MiscInfo'
+import React, { useEffect, useState } from 'react'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 import AppointmentCard from './AppointmentCard/index'
 import Attendance from './Attendance'
-import { COLORS, DRAWER } from 'assets/styles/globalStyles'
+import ClinicInfo from './EditDrawers/ClinicInfo'
+import EmergencyInfo from './EditDrawers/EmergencyInfo'
+import GenDetails from './EditDrawers/GenInfo'
+import MiscInfo from './EditDrawers/MiscInfo'
+import PersonalInfo from './EditDrawers/PersonalInfo'
+import StaffFiles from './StaffFile/StaffFiles'
+import './style.scss'
 
 const { Meta } = Card
 
@@ -485,6 +486,7 @@ function Profile(props) {
         </div>
       </div>
       <AppointmentCard />
+      <StaffFiles staffProfile={staffProfile} />
       <Attendance staffProfile={staffProfile} />
     </div>
   )

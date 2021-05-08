@@ -1,19 +1,20 @@
 /* eslint-disable */
-import React, { useState, useEffect } from 'react'
-import { connect } from 'react-redux'
-import { Card, Switch, Icon, Avatar, Tag, Tooltip, Button, Drawer } from 'antd'
-import { CloseCircleOutlined, CheckCircleOutlined, EditOutlined } from '@ant-design/icons'
-import { Link, withRouter } from 'react-router-dom'
+import { CheckCircleOutlined, CloseCircleOutlined, EditOutlined } from '@ant-design/icons'
+import { Avatar, Button, Card, Drawer, Tag, Tooltip } from 'antd'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import LoadingComponent from 'components/VBMappReport/LoadingComponent'
 import moment from 'moment'
+import React, { useEffect, useState } from 'react'
 import { Scrollbars } from 'react-custom-scrollbars'
-import './style.scss'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
+import AppointmentCard from './AppointmentCard'
+import ClinicInfo from './EditDrawers/ClinicInfo'
 import GenDetails from './EditDrawers/GeneralInfo'
 import PersonalInfo from './EditDrawers/PersonalInfo'
-import ClinicInfo from './EditDrawers/ClinicInfo'
 import ProgramInfo from './EditDrawers/ProgramInfo'
-import AppointmentCard from './AppointmentCard'
-import { COLORS, DRAWER } from 'assets/styles/globalStyles'
+import LearnerFiles from './LearnerFiles/LearnerFiles'
+import './style.scss'
 
 const { Meta } = Card
 
@@ -45,6 +46,8 @@ function Profile(props) {
   const [clinicInfoDrawer, setClinicInfoDrawer] = useState(false)
   const [programInfoDrawer, setProgramInfoDrawer] = useState(false)
 
+  console.log('==========>', props)
+
   useEffect(() => {
     if (props.learners.UserProfile) {
       const tt = props.learners.UserProfile
@@ -57,7 +60,7 @@ function Profile(props) {
     return <LoadingComponent />
   }
 
-  console.log(userProfile, 'userProfile')
+  // console.log(userProfile, 'userProfile')
 
   return (
     <div style={{ backgroundColor: COLORS.palleteLight, padding: '28px' }} className="profile-css">
@@ -486,6 +489,7 @@ function Profile(props) {
         </div>
       </div>
       <AppointmentCard />
+      <LearnerFiles userProfile={userProfile} />
     </div>
   )
 }
