@@ -46,8 +46,6 @@ function Profile(props) {
   const [clinicInfoDrawer, setClinicInfoDrawer] = useState(false)
   const [programInfoDrawer, setProgramInfoDrawer] = useState(false)
 
-  console.log('==========>', props)
-
   useEffect(() => {
     if (props.learners.UserProfile) {
       const tt = props.learners.UserProfile
@@ -488,8 +486,8 @@ function Profile(props) {
           </div>
         </div>
       </div>
-      <AppointmentCard />
       <LearnerFiles userProfile={userProfile} />
+      <AppointmentCard />
     </div>
   )
 }

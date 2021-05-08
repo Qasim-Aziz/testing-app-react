@@ -49,7 +49,7 @@ const AllFiles = ({ learnerId, staffId, isLearnerById, isStaffById, handleUserNa
           ...item.node,
           firstname: data.student.firstname,
           lastname: data.student.lastname,
-          stdId: data.student.id,
+          ownerId: data.student.id,
           role: 'student',
         }
       })
@@ -62,7 +62,7 @@ const AllFiles = ({ learnerId, staffId, isLearnerById, isStaffById, handleUserNa
           ...item.node,
           firstname: staffData.staff.name,
           lastname: staffData.staff.surname,
-          stdId: staffData.staff.id,
+          ownerId: staffData.staff.id,
           role: 'therapist',
         }
       })
@@ -156,8 +156,8 @@ const AllFiles = ({ learnerId, staffId, isLearnerById, isStaffById, handleUserNa
             title="Are you sure to delete this file?"
             onConfirm={() =>
               row.role === 'therapist'
-                ? deleteStaffFileHandler(row.stdId, row.id)
-                : deleteLearnerFileHandler(row.stdId, row.id)
+                ? deleteStaffFileHandler(row.ownerId, row.id)
+                : deleteLearnerFileHandler(row.ownerId, row.id)
             }
           >
             <Button type="link">

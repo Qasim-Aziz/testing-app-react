@@ -84,7 +84,6 @@ function Profile(props) {
 
     var years = b.diff(a, 'year')
     a.add(years, 'years')
-    // console.log(b, a)
 
     var months = b.diff(a, 'months')
     a.add(months, 'months')
@@ -98,7 +97,6 @@ function Profile(props) {
     var min = b.diff(a, 'minutes')
     a.add(min, 'minutes')
 
-    // console.log(days, hrs, min)
     if (years > 0) {
       if (months > 0) {
         return `${years} ${years == 1 ? 'Y' : 'Y'} ${months} ${months == 1 ? 'M' : 'M'} ago`
@@ -485,8 +483,8 @@ function Profile(props) {
           </div>
         </div>
       </div>
-      <AppointmentCard />
       <StaffFiles staffProfile={staffProfile} />
+      <AppointmentCard />
       <Attendance staffProfile={staffProfile} />
     </div>
   )

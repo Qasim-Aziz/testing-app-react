@@ -420,7 +420,6 @@ export async function updateStaff(payload) {
 }
 
 export async function getStaffProfile(payload) {
-  console.log(payload, 'oajdfvvkj')
   return apolloClient
     .query({
       query: gql`

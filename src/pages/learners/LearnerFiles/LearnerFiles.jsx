@@ -1,34 +1,19 @@
 /* eslint-disable no-plusplus */
 import { DeleteOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons'
-import { faTrashAlt, faUserEdit } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { Button, Drawer, Form, Icon, Input, message, Table } from 'antd'
+import { Button, Drawer, Popconfirm, notification, Table } from 'antd'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
+import UpdateFile from 'pages/documentUpload/updateFile'
 import React, { useEffect, useState } from 'react'
 import { useMutation } from 'react-apollo'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
-import { DELETE_LEARNER_FILE, UPDATE_LEARNER_FILE } from './query'
+import { DELETE_LEARNER_FILE } from './query'
 
-const LearnerFiles = ({ userProfile, form, dispatch }) => {
-  console.log(userProfile, 'userProfile')
-  const [files, setFiles] = useState([])
-  const studentId = userProfile.id
-
-  useEffect(() => {
-    setFiles(userProfile.files.edges)
-  }, [userProfile.files.edges])
-
+const LearnerFiles = ({ userProfile, dispatch }) => {
   const [deleteLearnerFile] = useMutation(DELETE_LEARNER_FILE)
-  const [updateLearnerFile] = useMutation(UPDATE_LEARNER_FILE)
-
-  const [visibleUpdate, setVisibleUpdate] = useState(false)
-  const [forUpdateDocsId, setForUpdateDocsId] = useState('')
-
-  const handleUpdateDrawer = id => {
-    setVisibleUpdate(true)
-    setForUpdateDocsId(id)
-  }
+  const [currentRow, setCurrentRow] = useState(null)
+  const [updateDrawer, setUpdateDrawer] = useState(false)
+  const [tableData, setTableData] = useState(null)
 
   const deleteLearnerFileHandler = (student, docsId) => {
     deleteLearnerFile({
@@ -38,13 +23,12 @@ const LearnerFiles = ({ userProfile, form, dispatch }) => {
       },
     })
       .then(res => {
-        message.success('File delete successfully')
-        setFiles(res.data.deleteLearnerFile.details.files.edges)
+        refetchStudentData()
+        notification.success({
+          message: 'File deleted successfully',
+        })
       })
-      .catch(err => {
-        message.error('Some problem happen!')
-        console.log(err)
-      })
+      .catch(err => console.log(err))
   }
 
   useEffect(() => {
@@ -52,55 +36,30 @@ const LearnerFiles = ({ userProfile, form, dispatch }) => {
       const tempData = userProfile.files.edges.map(({ node }) => {
         return {
           ...node,
-          stdId: userProfile.id,
+          ownerId: userProfile.id,
           firstname: userProfile.firstname,
           lastname: userProfile.lastname,
           role: 'student',
         }
       })
 
-      console.log(tempData, 'tempdata')
+      setTableData(tempData)
     }
   }, [userProfile])
 
-  const handleSubmit = e => {
-    e.preventDefault()
-
-    form.validateFields((err, values) => {
-      if (values) {
-        updateLearnerFile({
-          variables: {
-            docsId: forUpdateDocsId,
-            fileName: values.fileName,
-            fileDescription: values.description,
-          },
-        })
-          .then(res => {
-            // console.log('userProfile ===>',userProfile.id)
-            dispatch({
-              type: 'learners/EDIT_GENERAL_INFO',
-              payload: {
-                id: userProfile.id,
-                response: res,
-              },
-            })
-            setVisibleUpdate(false)
-          })
-          .catch(err1 => {
-            message.error('Some problem happen!')
-            console.log(err1)
-          })
-      }
-      if (!err) {
-        console.log('Received values of form: ', values)
-      }
+  const refetchStudentData = () => {
+    dispatch({
+      type: 'learners/GET_SINGLE_LEARNER',
+      payload: {
+        UserProfile: userProfile,
+      },
     })
   }
 
   const columns = [
     {
       title: '#',
-      dataIndex: 'id',
+      render: row => tableData?.indexOf(row) + 1,
     },
     {
       title: 'File Name',
@@ -112,41 +71,33 @@ const LearnerFiles = ({ userProfile, form, dispatch }) => {
     },
     {
       title: 'Actions',
-      render: record => (
+      render: row => (
         <>
-          <a target="_blank" rel="noopener noreferrer" href={record.actions.file}>
+          <a target="_blank" rel="noopener noreferrer" href={row.file}>
             <EyeOutlined style={{ fontSize: 20, padding: '0 16px', color: COLORS.primary }} />
           </a>
-          <Button onClick={() => handleUpdateDrawer(record.actions.fileId)} type="link">
+          <Button
+            onClick={() => {
+              setCurrentRow(row)
+              setUpdateDrawer(true)
+            }}
+            type="link"
+          >
             <EditOutlined style={{ fontSize: 20, color: COLORS.primary }} />
           </Button>
-          <Button
-            type="link"
-            onClick={() => deleteLearnerFileHandler(studentId, record.actions.fileId)}
+          <Popconfirm
+            trigger="click"
+            title="Are you sure to delete this file?"
+            onConfirm={() => deleteLearnerFileHandler(row.ownerId, row.id)}
           >
-            <DeleteOutlined style={{ fontSize: 20, color: COLORS.danger }} />
-          </Button>
+            <Button type="link">
+              <DeleteOutlined style={{ color: COLORS.danger, fontSize: 20, fontWeight: 600 }} />
+            </Button>
+          </Popconfirm>
         </>
       ),
     },
   ]
-
-  const data = []
-  for (let i = 0; i < files.length; i++) {
-    const item = files[i]
-    data.push({
-      key: i,
-      id: i + 1,
-      fileName: item.node.fileName ? item.node.fileName : 'No File Name !',
-      fileDescription: item.node.fileDescription
-        ? item.node.fileDescription
-        : 'No File Description!',
-      actions: {
-        file: item.node.file ? item.node.file : '',
-        fileId: item.node.id,
-      },
-    })
-  }
 
   const tableHeader = (
     <div>
@@ -154,55 +105,35 @@ const LearnerFiles = ({ userProfile, form, dispatch }) => {
     </div>
   )
 
-  console.log(data, 'data')
   return (
     <>
-      <Table
-        title={() => {
-          return tableHeader
-        }}
-        className="files_data"
-        columns={columns}
-        dataSource={data}
-        bordered
-        pagination={false}
-      />
-      <Drawer
-        visible={visibleUpdate}
-        onClose={() => setVisibleUpdate(false)}
-        width={DRAWER.widthL4}
-        title="Update File(s)"
-        placement="right"
-      >
-        <Form onSubmit={handleSubmit} className="login-form">
-          <Form.Item>
-            {form.getFieldDecorator('fileName', {
-              rules: [{ required: true, message: 'Please input your file name!' }],
-            })(
-              <Input
-                prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                placeholder="File name"
-              />,
-            )}
-          </Form.Item>
-          <Form.Item>
-            {form.getFieldDecorator('description', {
-              rules: [{ required: true, message: 'Please input your file description!' }],
-            })(
-              <Input
-                prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                type="text"
-                placeholder="File description"
-              />,
-            )}
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" className="login-form-button">
-              Update
-            </Button>
-          </Form.Item>
-        </Form>
-      </Drawer>
+      <div style={{ marginBottom: 28 }}>
+        <Table
+          title={() => {
+            return tableHeader
+          }}
+          className="files_data"
+          columns={columns}
+          rowKey="id"
+          dataSource={tableData}
+          bordered
+          pagination={false}
+        />
+        <Drawer
+          visible={updateDrawer}
+          onClose={() => setUpdateDrawer(false)}
+          width={DRAWER.widthL2}
+          title="Update File"
+          placement="right"
+          destroyOnClose
+        >
+          <UpdateFile
+            closeDrawer={() => setUpdateDrawer(false)}
+            refetchStudentData={refetchStudentData}
+            currentRow={currentRow}
+          />
+        </Drawer>
+      </div>
     </>
   )
 }
@@ -213,4 +144,4 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
-export default withRouter(connect(mapDispatchToProps)(Form.create()(LearnerFiles)))
+export default withRouter(connect(mapDispatchToProps)(LearnerFiles))

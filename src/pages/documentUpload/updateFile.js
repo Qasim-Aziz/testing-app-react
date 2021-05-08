@@ -14,7 +14,7 @@ function UpdateFile({ form, currentRow, refetchStaffData, refetchStudentData, cl
     e.preventDefault()
 
     form.validateFields((err, values) => {
-      if (!err && currentRow?.stdId && currentRow?.id) {
+      if (!err && currentRow?.ownerId && currentRow?.id) {
         if (currentRow.role === 'therapist') {
           updateStaffFile({
             variables: {
@@ -24,7 +24,9 @@ function UpdateFile({ form, currentRow, refetchStaffData, refetchStudentData, cl
             },
           })
             .then(res => {
-              refetchStaffData()
+              if (refetchStaffData) {
+                refetchStaffData()
+              }
               notification.success({
                 message: 'File updated successfully',
               })
@@ -40,7 +42,9 @@ function UpdateFile({ form, currentRow, refetchStaffData, refetchStudentData, cl
             },
           })
             .then(res => {
-              refetchStudentData()
+              if (refetchStudentData) {
+                refetchStudentData()
+              }
               notification.success({
                 message: 'File updated successfully',
               })

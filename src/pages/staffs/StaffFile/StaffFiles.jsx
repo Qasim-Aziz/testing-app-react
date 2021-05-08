@@ -1,32 +1,19 @@
 /* eslint-disable no-plusplus */
-import { faTrashAlt, faUserEdit } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { Button, Drawer, Form, Icon, Input, message, Table } from 'antd'
-import { DRAWER } from 'assets/styles/globalStyles'
+import { DeleteOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons'
+import { Button, Drawer, Popconfirm, notification, Table } from 'antd'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
+import UpdateFile from 'pages/documentUpload/updateFile'
 import React, { useEffect, useState } from 'react'
 import { useMutation } from 'react-apollo'
-import { DELETE_STAFF_FILE, UPDATE_STAFF_FILE } from './query'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router'
+import { DELETE_STAFF_FILE } from './query'
 
-const StaffFiles = ({ staffProfile, form }) => {
-  const [files, setFiles] = useState([])
-  const staffId = staffProfile.id
-
-  useEffect(() => {
-    setFiles(staffProfile.files.edges)
-  }, [staffProfile.files.edges])
-
-  console.log(staffProfile.id, 'user profile')
-
+const StaffFiles = ({ staffProfile, dispatch }) => {
   const [deleteStaffFile] = useMutation(DELETE_STAFF_FILE)
-  const [updateStaffFile] = useMutation(UPDATE_STAFF_FILE)
-
-  const [visibleUpdate, setVisibleUpdate] = useState(false)
-  const [forUpdateDocsId, setForUpdateDocsId] = useState('')
-
-  const handleUpdateDrawer = id => {
-    setVisibleUpdate(true)
-    setForUpdateDocsId(id)
-  }
+  const [currentRow, setCurrentRow] = useState(null)
+  const [updateDrawer, setUpdateDrawer] = useState(false)
+  const [tableData, setTableData] = useState(null)
 
   const deleteStaffFileHandler = (staff, docsId) => {
     deleteStaffFile({
@@ -36,46 +23,43 @@ const StaffFiles = ({ staffProfile, form }) => {
       },
     })
       .then(res => {
-        message.success('File delete successfully')
-        setFiles(res.data.deleteStaffFile.details.files.edges)
+        refetchStaffData()
+        notification.success({
+          message: 'File deleted successfully',
+        })
       })
-      .catch(err => {
-        message.error('Some problem happen!')
-        console.log(err)
-      })
+      .catch(err => console.log(err))
   }
 
-  const handleSubmit = e => {
-    e.preventDefault()
+  useEffect(() => {
+    if (staffProfile && staffProfile.files) {
+      const tempData = staffProfile.files.edges.map(({ node }) => {
+        return {
+          ...node,
+          ownerId: staffProfile.id,
+          firstname: staffProfile.name,
+          lastname: staffProfile.surname,
+          role: 'therapist',
+        }
+      })
 
-    form.validateFields((err, values) => {
-      if (values) {
-        updateStaffFile({
-          variables: {
-            docsId: forUpdateDocsId,
-            fileName: values.fileName,
-            fileDescription: values.description,
-          },
-        })
-          .then(res => {
-            message.success('File update successfully')
-            console.log(res)
-          })
-          .catch(err1 => {
-            message.error('Some problem happen!')
-            console.log(err1)
-          })
-      }
-      if (!err) {
-        console.log('Received values of form: ', values)
-      }
+      setTableData(tempData)
+    }
+  }, [staffProfile])
+
+  const refetchStaffData = () => {
+    dispatch({
+      type: 'staffs/GET_STAFF_PROFILE',
+      payload: {
+        ...staffProfile,
+      },
     })
   }
 
   const columns = [
     {
       title: '#',
-      dataIndex: 'id',
+      render: row => tableData?.indexOf(row) + 1,
     },
     {
       title: 'File Name',
@@ -87,125 +71,77 @@ const StaffFiles = ({ staffProfile, form }) => {
     },
     {
       title: 'Actions',
-      render: record => (
+      render: row => (
         <>
-          <span>
-            <a
-              style={{
-                fontSize: '18px',
-              }}
-              target="_blank"
-              rel="noopener noreferrer"
-              href={record.actions.file}
-            >
-              <Icon type="eye" />
-            </a>
-          </span>
-          <span>
-            <Button
-              onClick={() => handleUpdateDrawer(record.actions.fileId)}
-              className="update_btn"
-            >
-              <FontAwesomeIcon style={{ marginRight: '5px' }} icon={faUserEdit} />
+          <a target="_blank" rel="noopener noreferrer" href={row.file}>
+            <EyeOutlined style={{ fontSize: 20, padding: '0 16px', color: COLORS.primary }} />
+          </a>
+          <Button
+            onClick={() => {
+              setCurrentRow(row)
+              setUpdateDrawer(true)
+            }}
+            type="link"
+          >
+            <EditOutlined style={{ fontSize: 20, color: COLORS.primary }} />
+          </Button>
+          <Popconfirm
+            trigger="click"
+            title="Are you sure to delete this file?"
+            onConfirm={() => deleteStaffFileHandler(row.ownerId, row.id)}
+          >
+            <Button type="link">
+              <DeleteOutlined style={{ color: COLORS.danger, fontSize: 20, fontWeight: 600 }} />
             </Button>
-          </span>
-          <span>
-            <Button
-              className="remove_btn"
-              onClick={() => deleteStaffFileHandler(staffId, record.actions.fileId)}
-            >
-              <FontAwesomeIcon icon={faTrashAlt} />
-            </Button>
-          </span>
+          </Popconfirm>
         </>
       ),
     },
   ]
 
-  const data = []
-  for (let i = 0; i < files.length; i++) {
-    const item = files[i]
-    data.push({
-      key: i,
-      id: i + 1,
-      fileName: item.node.fileName ? item.node.fileName : 'No File Name !',
-      fileDescription: item.node.fileDescription
-        ? item.node.fileDescription
-        : 'No File Description!',
-      actions: {
-        file: item.node.file ? item.node.file : '',
-        fileId: item.node.id,
-      },
-    })
-  }
+  const tableHeader = (
+    <div>
+      <span style={{ fontSize: '18px', color: 'black', fontWeight: 600 }}>Documents</span>
+    </div>
+  )
+
   return (
     <>
-      <div
-        style={{
-          fontSize: '18px',
-          color: 'black',
-          fontWeight: 600,
-          padding: 16,
-          width: '100%',
-          border: '1px solid #d9d9d9',
-          borderBottom: 'none',
-        }}
-      >
-        <span>Documents</span>
+      <div style={{ marginBottom: 28 }}>
+        <Table
+          title={() => {
+            return tableHeader
+          }}
+          className="files_data"
+          rowKey="id"
+          columns={columns}
+          dataSource={tableData}
+          bordered
+          pagination={false}
+        />
+        <Drawer
+          visible={updateDrawer}
+          onClose={() => setUpdateDrawer(false)}
+          width={DRAWER.widthL2}
+          title="Update File"
+          placement="right"
+          destroyOnClose
+        >
+          <UpdateFile
+            closeDrawer={() => setUpdateDrawer(false)}
+            refetchStaffData={refetchStaffData}
+            currentRow={currentRow}
+          />
+        </Drawer>
       </div>
-      <div
-        style={{
-          fontSize: '18px',
-          color: 'black',
-          fontWeight: 600,
-          padding: 16,
-          width: '100%',
-          border: '1px solid #d9d9d9',
-          backgroundColor: '#ffffff',
-          marginBottom: '30px',
-        }}
-        className="files_data"
-      >
-        <Table columns={columns} dataSource={data} pagination={false} />
-      </div>
-      <Drawer
-        visible={visibleUpdate}
-        onClose={() => setVisibleUpdate(false)}
-        width={DRAWER.widthL4}
-        title="Update File(s)"
-        placement="right"
-      >
-        <Form onSubmit={handleSubmit} className="login-form">
-          <Form.Item>
-            {form.getFieldDecorator('fileName', {
-              rules: [{ required: true, message: 'Please input your file name!' }],
-            })(
-              <Input
-                prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                placeholder="File name"
-              />,
-            )}
-          </Form.Item>
-          <Form.Item>
-            {form.getFieldDecorator('description', {
-              rules: [{ required: true, message: 'Please input your file description!' }],
-            })(
-              <Input
-                prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
-                type="text"
-                placeholder="File description"
-              />,
-            )}
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit" className="login-form-button">
-              Update
-            </Button>
-          </Form.Item>
-        </Form>
-      </Drawer>
     </>
   )
 }
 
-export default Form.create()(StaffFiles)
+const mapDispatchToProps = dispatch => {
+  return {
+    dispatch,
+  }
+}
+
+export default withRouter(connect(mapDispatchToProps)(StaffFiles))
