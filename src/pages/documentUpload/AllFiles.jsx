@@ -4,18 +4,10 @@
 /* eslint-disable no-unneeded-ternary */
 import React, { useEffect, useState } from 'react'
 import { useQuery, useMutation, useLazyQuery } from 'react-apollo'
-import { Button, Drawer, Form, Input, Table, Tooltip, Popconfirm, notification } from 'antd'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Button, Drawer, Input, Table, Tooltip, Popconfirm, notification } from 'antd'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import { DeleteOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons'
-import {
-  DELETE_LEARNER_FILE,
-  DELETE_STAFF_FILE,
-  UPDATE_LEARNER_FILE,
-  GET_STAFF_DATA,
-  GET_STUDENT_DATA,
-  UPDATE_STAFF_FILE,
-} from './query'
+import { DELETE_LEARNER_FILE, DELETE_STAFF_FILE, GET_STAFF_DATA, GET_STUDENT_DATA } from './query'
 import UpdateFile from './updateFile'
 
 const AllFiles = ({ learnerId, staffId, isLearnerById, isStaffById, handleUserName }) => {
@@ -27,8 +19,6 @@ const AllFiles = ({ learnerId, staffId, isLearnerById, isStaffById, handleUserNa
   const [tableData, setTableData] = useState(null)
   const [originalData, setOriginalData] = useState(null)
   const [isFilterActive, setIsFilterActive] = useState(false)
-  const [visibleUpdate, setVisibleUpdate] = useState(false)
-  const [forUpdateUserId, setForUpdateUserId] = useState('')
   const [currentRow, setCurrentRow] = useState(null)
   const [updateDrawer, setUpdateDrawer] = useState(false)
 
@@ -51,11 +41,8 @@ const AllFiles = ({ learnerId, staffId, isLearnerById, isStaffById, handleUserNa
 
   const [deleteLearnerFile] = useMutation(DELETE_LEARNER_FILE)
   const [deleteStaffFile] = useMutation(DELETE_STAFF_FILE)
-  const [updateLearnerFile] = useMutation(UPDATE_LEARNER_FILE)
-  const [updateStaffFile] = useMutation(UPDATE_STAFF_FILE)
 
   useEffect(() => {
-    console.log(data, staffData, isLearnerById, isStaffById, 'hello')
     if (data && data.student && isLearnerById) {
       const tempTable = data.student.files.edges.map(item => {
         return {
@@ -117,11 +104,6 @@ const AllFiles = ({ learnerId, staffId, isLearnerById, isStaffById, handleUserNa
       .catch(err => console.log(err))
   }
 
-  const handleOpenUpdateDrawer = (id, value) => {
-    setVisibleUpdate(value)
-    setForUpdateUserId(id)
-  }
-
   const columns = [
     {
       title: 'Id',
@@ -129,13 +111,7 @@ const AllFiles = ({ learnerId, staffId, isLearnerById, isStaffById, handleUserNa
     },
     {
       title: 'File Name',
-      render: record => {
-        return (
-          <Button type="link" onClick={() => handleOpenUpdateDrawer(record.fileName.id, true)}>
-            {record.fileName}
-          </Button>
-        )
-      },
+      dataIndex: 'fileName',
     },
     {
       title: 'Description',

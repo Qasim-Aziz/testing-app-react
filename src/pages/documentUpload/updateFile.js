@@ -7,7 +7,6 @@ import { UPDATE_LEARNER_FILE, UPDATE_STAFF_FILE } from './query'
 const { layout, tailLayout } = FORM
 
 function UpdateFile({ form, currentRow, refetchStaffData, refetchStudentData, closeDrawer }) {
-  const userRole = JSON.parse(localStorage.getItem('role'))
   const [updateLearnerFile, { loading: learnerFileLoading }] = useMutation(UPDATE_LEARNER_FILE)
   const [updateStaffFile, { loading: staffFileLoading }] = useMutation(UPDATE_STAFF_FILE)
 

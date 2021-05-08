@@ -15,9 +15,7 @@ import gql from 'graphql-tag'
 import AllFiles from './AllFiles'
 import FileUploadFrom from './FileUploadFrom'
 import './index.scss'
-import LearnersList from './LearnersList'
 import NewAuthorization from './NewAuthorization'
-import { GET_ALL_LEARNERS } from './query'
 import StaffsList from './StaffsList'
 
 const { TabPane } = Tabs
@@ -62,13 +60,10 @@ export class Index extends Component {
       learnerId: localStorage.getItem('studentId'),
       selectedStaff: { id: '', name: '' },
     }
-
-    // this.handleUserName = this.handleUserName.bind(this)
   }
 
   componentDidMount() {
     const { dispatch, user, learnersprogram } = this.props
-    console.log(learnersprogram, 'lplp')
 
     if (learnersprogram && learnersprogram.Learners?.length === 0) {
       dispatch({
@@ -126,7 +121,6 @@ export class Index extends Component {
   }
 
   handleUserName = (text, name) => {
-    console.log(text, name, 'txtname')
     if (text === 'student') {
       this.setState({
         learnerName: name,
@@ -194,7 +188,6 @@ export class Index extends Component {
       staffName,
     } = this.state
 
-    console.log(this.state, 'this state')
     const std = localStorage.getItem('studentId')
     let fetchFor = localStorage.getItem('fetchFor')
 
@@ -202,12 +195,10 @@ export class Index extends Component {
       fetchFor = fetchFor ? fetchFor : 'student'
     } else if (userRole === 'therapist') {
       fetchFor = fetchFor ? fetchFor : 'therapist'
-    } else if (userRole === 'parent') {
+    } else if (userRole === 'parents') {
       fetchFor = fetchFor ? fetchFor : 'student'
     }
 
-    console.log(fetchFor, 'fetch for for for for')
-    console.log(learnerName, staffName, 'lrtst')
     return (
       <>
         <div className="file_upload_section">
@@ -253,13 +244,22 @@ export class Index extends Component {
                 </p>
               </div>
             ) : null}
-            {/* {userRole === 'therapist' && isDrawerTitle === false ? (
+            {userRole === 'therapist' && isDrawerTitle === false ? (
               <div className="filter_as_clinic">
-                <p onClick={handleLearner} className="learners_title">
+                <p
+                  onClick={() => {
+                    this.setState({ isStaffById: true, isLearnerById: false })
+                    localStorage.setItem('fetchFor', 'therapist')
+                  }}
+                  className="staffs_title"
+                >
+                  Own Data
+                </p>
+                <p onClick={this.handleLearner} className="learners_title">
                   Learners
                 </p>
               </div>
-            ) : null} */}
+            ) : null}
 
             <Drawer
               visible={staffsVisibleFilter}
