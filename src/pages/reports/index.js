@@ -22,7 +22,7 @@
 /* eslint-disable */
 import React from 'react'
 import { Helmet } from 'react-helmet'
-import { Layout, Row, Col, Card, Button, Typography, Drawer, Form, Menu, Select, Icon } from 'antd'
+import { Layout, Row, Col, Button, Typography, Drawer, Form, Menu, Select, Icon } from 'antd'
 import html2canvas from 'html2canvas'
 import { FilterOutlined } from '@ant-design/icons'
 import JsPDF from 'jspdf'
@@ -54,7 +54,6 @@ import client from '../../apollo/config'
 
 import './padding.scss'
 import { COLORS, DRAWER } from 'assets/styles/globalStyles'
-import { BiReplyAll } from 'react-icons/bi'
 
 const { Title, Text } = Typography
 const { Content } = Layout

@@ -80,6 +80,7 @@ export const GET_STUDENT_DATA = gql`
     student(id: $id) {
       id
       firstname
+      lastname
       files {
         edges {
           node {
@@ -99,6 +100,7 @@ export const GET_STAFF_DATA = gql`
     staff(id: $id) {
       id
       name
+      surname
       files {
         edges {
           node {
