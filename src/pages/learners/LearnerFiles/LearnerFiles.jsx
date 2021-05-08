@@ -1,8 +1,9 @@
 /* eslint-disable no-plusplus */
+import { DeleteOutlined, EditOutlined, EyeOutlined } from '@ant-design/icons'
 import { faTrashAlt, faUserEdit } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Button, Drawer, Form, Icon, Input, message, Table } from 'antd'
-import { DRAWER } from 'assets/styles/globalStyles'
+import { COLORS, DRAWER } from 'assets/styles/globalStyles'
 import React, { useEffect, useState } from 'react'
 import { useMutation } from 'react-apollo'
 import { connect } from 'react-redux'
@@ -10,6 +11,7 @@ import { withRouter } from 'react-router'
 import { DELETE_LEARNER_FILE, UPDATE_LEARNER_FILE } from './query'
 
 const LearnerFiles = ({ userProfile, form, dispatch }) => {
+  console.log(userProfile, 'userProfile')
   const [files, setFiles] = useState([])
   const studentId = userProfile.id
 
@@ -44,6 +46,22 @@ const LearnerFiles = ({ userProfile, form, dispatch }) => {
         console.log(err)
       })
   }
+
+  useEffect(() => {
+    if (userProfile && userProfile.files) {
+      const tempData = userProfile.files.edges.map(({ node }) => {
+        return {
+          ...node,
+          stdId: userProfile.id,
+          firstname: userProfile.firstname,
+          lastname: userProfile.lastname,
+          role: 'student',
+        }
+      })
+
+      console.log(tempData, 'tempdata')
+    }
+  }, [userProfile])
 
   const handleSubmit = e => {
     e.preventDefault()
@@ -96,34 +114,18 @@ const LearnerFiles = ({ userProfile, form, dispatch }) => {
       title: 'Actions',
       render: record => (
         <>
-          <span>
-            <a
-              style={{
-                fontSize: '18px',
-              }}
-              target="_blank"
-              rel="noopener noreferrer"
-              href={record.actions.file}
-            >
-              <Icon type="eye" />
-            </a>
-          </span>
-          <span>
-            <Button
-              onClick={() => handleUpdateDrawer(record.actions.fileId)}
-              className="update_btn"
-            >
-              <FontAwesomeIcon style={{ marginRight: '5px' }} icon={faUserEdit} />
-            </Button>
-          </span>
-          <span>
-            <Button
-              className="remove_btn"
-              onClick={() => deleteLearnerFileHandler(studentId, record.actions.fileId)}
-            >
-              <FontAwesomeIcon icon={faTrashAlt} />
-            </Button>
-          </span>
+          <a target="_blank" rel="noopener noreferrer" href={record.actions.file}>
+            <EyeOutlined style={{ fontSize: 20, padding: '0 16px', color: COLORS.primary }} />
+          </a>
+          <Button onClick={() => handleUpdateDrawer(record.actions.fileId)} type="link">
+            <EditOutlined style={{ fontSize: 20, color: COLORS.primary }} />
+          </Button>
+          <Button
+            type="link"
+            onClick={() => deleteLearnerFileHandler(studentId, record.actions.fileId)}
+          >
+            <DeleteOutlined style={{ fontSize: 20, color: COLORS.danger }} />
+          </Button>
         </>
       ),
     },
@@ -145,35 +147,26 @@ const LearnerFiles = ({ userProfile, form, dispatch }) => {
       },
     })
   }
+
+  const tableHeader = (
+    <div>
+      <span style={{ fontSize: '18px', color: 'black', fontWeight: 600 }}>Documents</span>
+    </div>
+  )
+
+  console.log(data, 'data')
   return (
     <>
-      <div
-        style={{
-          fontSize: '18px',
-          color: 'black',
-          fontWeight: 600,
-          padding: 16,
-          width: '100%',
-          border: '1px solid #d9d9d9',
-          borderBottom: 'none',
-        }}
-      >
-        <span>Documents</span>
-      </div>
-      <div
-        style={{
-          fontSize: '18px',
-          color: 'black',
-          fontWeight: 600,
-          padding: 16,
-          width: '100%',
-          border: '1px solid #d9d9d9',
-          backgroundColor: '#ffffff',
+      <Table
+        title={() => {
+          return tableHeader
         }}
         className="files_data"
-      >
-        <Table columns={columns} dataSource={data} pagination={false} />
-      </div>
+        columns={columns}
+        dataSource={data}
+        bordered
+        pagination={false}
+      />
       <Drawer
         visible={visibleUpdate}
         onClose={() => setVisibleUpdate(false)}
