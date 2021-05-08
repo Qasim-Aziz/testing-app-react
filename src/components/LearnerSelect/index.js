@@ -54,6 +54,7 @@ class LearnerSelect extends React.Component {
 
   studentChanged = id => {
     if (id) {
+      localStorage.setItem('fetchFor', 'student')
       localStorage.setItem('studentId', JSON.stringify(id))
       const {
         dispatch,
