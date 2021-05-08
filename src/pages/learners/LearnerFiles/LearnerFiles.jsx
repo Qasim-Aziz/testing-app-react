@@ -3,15 +3,19 @@ import { faTrashAlt, faUserEdit } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Button, Drawer, Form, Icon, Input, message, Table } from 'antd'
 import { DRAWER } from 'assets/styles/globalStyles'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useMutation } from 'react-apollo'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router'
 import { DELETE_LEARNER_FILE, UPDATE_LEARNER_FILE } from './query'
 
-const LearnerFiles = ({ userProfile, form }) => {
-  const files = userProfile.files.edges
+const LearnerFiles = ({ userProfile, form, dispatch }) => {
+  const [files, setFiles] = useState([])
   const studentId = userProfile.id
 
-  console.log(userProfile.id, 'user profile')
+  useEffect(() => {
+    setFiles(userProfile.files.edges)
+  }, [userProfile.files.edges])
 
   const [deleteLearnerFile] = useMutation(DELETE_LEARNER_FILE)
   const [updateLearnerFile] = useMutation(UPDATE_LEARNER_FILE)
@@ -33,7 +37,7 @@ const LearnerFiles = ({ userProfile, form }) => {
     })
       .then(res => {
         message.success('File delete successfully')
-        console.log(res)
+        setFiles(res.data.deleteLearnerFile.details.files.edges)
       })
       .catch(err => {
         message.error('Some problem happen!')
@@ -54,8 +58,15 @@ const LearnerFiles = ({ userProfile, form }) => {
           },
         })
           .then(res => {
-            message.success('File update successfully')
-            console.log(res)
+            // console.log('userProfile ===>',userProfile.id)
+            dispatch({
+              type: 'learners/EDIT_GENERAL_INFO',
+              payload: {
+                id: userProfile.id,
+                response: res,
+              },
+            })
+            setVisibleUpdate(false)
           })
           .catch(err1 => {
             message.error('Some problem happen!')
@@ -203,4 +214,10 @@ const LearnerFiles = ({ userProfile, form }) => {
   )
 }
 
-export default Form.create()(LearnerFiles)
+const mapDispatchToProps = dispatch => {
+  return {
+    dispatch,
+  }
+}
+
+export default withRouter(connect(mapDispatchToProps)(Form.create()(LearnerFiles)))

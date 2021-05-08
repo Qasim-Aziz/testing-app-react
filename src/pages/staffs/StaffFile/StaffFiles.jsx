@@ -3,13 +3,17 @@ import { faTrashAlt, faUserEdit } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Button, Drawer, Form, Icon, Input, message, Table } from 'antd'
 import { DRAWER } from 'assets/styles/globalStyles'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useMutation } from 'react-apollo'
 import { DELETE_STAFF_FILE, UPDATE_STAFF_FILE } from './query'
 
 const StaffFiles = ({ staffProfile, form }) => {
-  const files = staffProfile.files.edges
+  const [files, setFiles] = useState([])
   const staffId = staffProfile.id
+
+  useEffect(() => {
+    setFiles(staffProfile.files.edges)
+  }, [staffProfile.files.edges])
 
   console.log(staffProfile.id, 'user profile')
 
@@ -33,7 +37,7 @@ const StaffFiles = ({ staffProfile, form }) => {
     })
       .then(res => {
         message.success('File delete successfully')
-        console.log(res)
+        setFiles(res.data.deleteStaffFile.details.files.edges)
       })
       .catch(err => {
         message.error('Some problem happen!')

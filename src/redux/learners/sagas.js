@@ -1,19 +1,20 @@
+/* eslint-disable require-yield */
 /* eslint-disable no-plusplus */
 /* eslint-disable object-shorthand */
 /* eslint-disable dot-notation */
 /* eslint-disable prefer-const */
-import { all, takeEvery, put, call, select } from 'redux-saga/effects'
-import { notification, message } from 'antd'
+import { message, notification } from 'antd'
+import axios from 'axios'
+import { all, call, put, select, takeEvery } from 'redux-saga/effects'
 import {
-  getClinicLearners,
-  updateLearner,
   createLearner,
+  createLearnersProgram,
+  getClinicLearners,
+  getLearner,
   getLearnersDropdown,
   learnerActiveInactive,
-  createLearnersProgram,
-  getLearner,
+  updateLearner,
 } from 'services/learners'
-import axios from 'axios'
 import actions from './actions'
 
 export function* GET_DATA() {
@@ -301,8 +302,6 @@ export function* EDIT_GENERAL_INFO({ payload }) {
       } else {
         updatedLearner = { ...updatedLearner, tags: [] }
       }
-
-      // console.log(response.data.updateStudent.student.allergicTo)
 
       if (
         response.data.updateStudent.student.allergicTo?.edges &&
