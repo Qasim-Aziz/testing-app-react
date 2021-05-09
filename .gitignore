@@ -24,4 +24,4 @@ yarn-error.log*
 yarn.lock*
 
 # Environment
-/src/env.js
+#/src/env.js
